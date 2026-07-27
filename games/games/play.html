@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đang tải… — Hans Games</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hans Games">
+<meta property="og:image" content="og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">🎮</span>
+      <span id="brandName">Hans Games</span>
+    </a>
+    <div class="header-spacer"></div>
+    <button class="icon-btn" id="themeBtn" title="Đổi giao diện sáng/tối" aria-label="Đổi giao diện">🌙</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="play-bar">
+    <a class="back-link" href="index.html">← Tất cả game</a>
+    <span class="play-title" id="title">Đang tải…</span>
+    <div class="header-spacer"></div>
+    <button class="btn" id="restartBtn" title="Chơi lại từ đầu">↻ Chơi lại</button>
+    <button class="btn" id="fullBtn">⛶ Toàn màn hình</button>
+    <button class="btn btn-primary" id="shareBtn">🔗 Chia sẻ</button>
+  </div>
+
+  <div class="stage" id="stage">
+    <iframe id="frame" title="Khung game" allow="fullscreen; autoplay; gamepad" allowfullscreen></iframe>
+  </div>
+
+  <section class="meta">
+    <div>
+      <h2>Giới thiệu</h2>
+      <p id="desc"></p>
+    </div>
+    <div id="controlsBlock" hidden>
+      <h2>Điều khiển</h2>
+      <p id="controls"></p>
+    </div>
+    <div class="tags" id="tags"></div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+/* ---------- Theme ---------- */
+const savedTheme = localStorage.getItem('theme') || 'dark';
+document.documentElement.dataset.theme = savedTheme;
+$('#themeBtn').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+$('#themeBtn').onclick = () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('theme', next);
+  $('#themeBtn').textContent = next === 'dark' ? '🌙' : '☀️';
+};
+
+/* ---------- Toast ---------- */
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ---------- Load game ---------- */
+const id = new URLSearchParams(location.search).get('id');
+let game = null;
+
+fetch('games.json?v=' + Date.now())
+  .then(r => r.json())
+  .then(data => {
+    const site = data.site || {};
+    if (site.title) $('#brandName').textContent = site.title;
+
+    game = (data.games || []).find(g => g.id === id);
+    if (!game) {
+      $('#title').textContent = 'Không tìm thấy game';
+      $('#desc').innerHTML = 'Game với id <code>' + esc(id || '(trống)') +
+        '</code> không có trong danh sách. <a href="index.html" style="color:var(--accent)">Quay lại trang chủ →</a>';
+      $('#stage').remove();
+      return;
+    }
+
+    document.title = game.title + ' — ' + (site.title || 'Games');
+    $('#title').textContent = game.title;
+    $('#desc').textContent = game.description || '';
+    $('#frame').src = game.path;
+
+    if (game.controls) {
+      $('#controlsBlock').hidden = false;
+      $('#controls').textContent = game.controls;
+    }
+    $('#tags').innerHTML = (game.tags || []).map(t => `<span class="tag">#${esc(t)}</span>`).join('');
+  })
+  .catch(err => {
+    $('#title').textContent = 'Lỗi tải dữ liệu';
+    $('#desc').textContent = err.message + ' — nếu đang mở bằng file://, hãy chạy qua local server (python -m http.server 8000).';
+  });
+
+/* ---------- Buttons ---------- */
+$('#restartBtn').onclick = () => {
+  const f = $('#frame');
+  if (f.src) { f.src = f.src; toast('Đã khởi động lại'); }
+};
+
+$('#fullBtn').onclick = () => {
+  const el = $('#stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+};
+
+$('#shareBtn').onclick = async () => {
+  const url = location.href;
+  const title = game ? game.title : document.title;
+  if (navigator.share) {
+    try { await navigator.share({ title, text: 'Chơi thử game này nhé!', url }); return; }
+    catch (e) { if (e.name === 'AbortError') return; }
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    toast('Đã copy link! 🔗');
+  } catch {
+    prompt('Copy link này để chia sẻ:', url);
+  }
+};
+
+/* Bấm vào khung để game nhận bàn phím ngay */
+$('#stage').addEventListener('click', () => $('#frame').focus());
+</script>
+</body>
+</html>

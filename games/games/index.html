@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hans Games — Game HTML tự làm</title>
+<meta name="description" content="Bộ sưu tập game HTML tự làm, chơi ngay trên trình duyệt.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hans Games">
+<meta property="og:description" content="Bộ sưu tập game HTML tự làm, chơi ngay trên trình duyệt.">
+<meta property="og:image" content="og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">🎮</span>
+      <span id="brandName">Hans Games</span>
+    </a>
+    <div class="header-spacer"></div>
+    <button class="icon-btn" id="themeBtn" title="Đổi giao diện sáng/tối" aria-label="Đổi giao diện">🌙</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1 id="heroTitle">Hans Games</h1>
+    <p id="heroTagline">Bộ sưu tập game HTML tự làm — chơi ngay trên trình duyệt.</p>
+  </section>
+
+  <div class="controls">
+    <div class="search-box">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path>
+      </svg>
+      <input id="search" type="search" placeholder="Tìm game theo tên, mô tả hoặc tag…" autocomplete="off">
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer class="site-footer wrap">
+  <span id="footerLeft">© 2026 Hans Rivera</span>
+  <span id="count"></span>
+</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+
+/* ---------- Theme ---------- */
+const savedTheme = localStorage.getItem('theme') || 'dark';
+document.documentElement.dataset.theme = savedTheme;
+$('#themeBtn').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+$('#themeBtn').onclick = () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('theme', next);
+  $('#themeBtn').textContent = next === 'dark' ? '🌙' : '☀️';
+};
+
+/* ---------- State ---------- */
+let GAMES = [], activeCat = 'Tất cả', query = '';
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+/* ---------- Load ---------- */
+fetch('games.json?v=' + Date.now())
+  .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+  .then(data => {
+    const site = data.site || {};
+    if (site.title) {
+      document.title = site.title + ' — Game HTML tự làm';
+      $('#brandName').textContent = site.title;
+      $('#heroTitle').textContent = site.title;
+    }
+    if (site.tagline) $('#heroTagline').textContent = site.tagline;
+    if (site.author) $('#footerLeft').textContent = '© ' + new Date().getFullYear() + ' ' + site.author;
+
+    GAMES = (data.games || []).filter(g => g.id && g.path);
+    buildChips();
+    render();
+  })
+  .catch(err => {
+    $('#grid').innerHTML =
+      `<div class="empty"><div>⚠️</div><strong>Không đọc được games.json</strong>
+       <p style="margin-top:6px">${esc(err.message)}<br>
+       Nếu đang mở bằng file:// hãy chạy qua local server:<br>
+       <code>python -m http.server 8000</code></p></div>`;
+  });
+
+/* ---------- Chips ---------- */
+function buildChips() {
+  const cats = ['Tất cả', ...new Set(GAMES.map(g => g.category).filter(Boolean))];
+  $('#chips').innerHTML = cats.map(c =>
+    `<button class="chip${c === activeCat ? ' active' : ''}" data-cat="${esc(c)}">${esc(c)}</button>`
+  ).join('');
+  $('#chips').querySelectorAll('.chip').forEach(btn => {
+    btn.onclick = () => {
+      activeCat = btn.dataset.cat;
+      $('#chips').querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b === btn));
+      render();
+    };
+  });
+}
+
+/* ---------- Search ---------- */
+$('#search').oninput = e => { query = e.target.value.toLowerCase().trim(); render(); };
+
+/* ---------- Render ---------- */
+function render() {
+  const list = GAMES.filter(g => {
+    if (activeCat !== 'Tất cả' && g.category !== activeCat) return false;
+    if (!query) return true;
+    return [g.title, g.description, g.category, ...(g.tags || [])]
+      .join(' ').toLowerCase().includes(query);
+  });
+
+  $('#count').textContent = list.length + ' / ' + GAMES.length + ' game';
+
+  if (!list.length) {
+    $('#grid').innerHTML =
+      `<div class="empty"><div>🕹️</div><strong>Không tìm thấy game nào</strong>
+       <p style="margin-top:6px">Thử từ khoá khác hoặc bỏ bộ lọc.</p></div>`;
+    return;
+  }
+
+  $('#grid').innerHTML = list.map(g => {
+    const color = g.color || '#7c5cff';
+    const thumbBg = `background:linear-gradient(140deg, ${esc(color)}, ${esc(color)}44)`;
+    const thumbInner = g.thumbnail
+      ? `<img src="${esc(g.thumbnail)}" alt="${esc(g.title)}" loading="lazy">`
+      : `<span>${esc(g.emoji || '🎮')}</span>`;
+    return `
+      <a class="card" href="play.html?id=${encodeURIComponent(g.id)}">
+        <div class="thumb" style="${thumbBg}">
+          ${thumbInner}
+          ${g.category ? `<span class="badge">${esc(g.category)}</span>` : ''}
+          <div class="play-overlay"><span class="play-pill">▶ Chơi ngay</span></div>
+        </div>
+        <div class="card-body">
+          <h3>${esc(g.title)}</h3>
+          <p>${esc(g.description || '')}</p>
+          <div class="tags">${(g.tags || []).slice(0, 3).map(t => `<span class="tag">#${esc(t)}</span>`).join('')}</div>
+        </div>
+      </a>`;
+  }).join('');
+}
+</script>
+</body>
+</html>

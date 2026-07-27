@@ -1,0 +1,49 @@
+{
+  "site": {
+    "title": "Hans Games",
+    "tagline": "Bộ sưu tập game HTML tự làm — chơi ngay trên trình duyệt",
+    "author": "Hans Rivera",
+    "url": ""
+  },
+  "games": [
+    {
+      "id": "catch-the-box",
+      "title": "Catch the Box",
+      "description": "Di chuyển giỏ để hứng những khối rơi xuống. Càng lâu càng nhanh — bạn trụ được bao lâu?",
+      "category": "Arcade",
+      "tags": ["arcade", "reflex", "casual"],
+      "path": "games/catch-the-box/index.html",
+      "thumbnail": "",
+      "emoji": "🎁",
+      "color": "#7c5cff",
+      "controls": "← → hoặc kéo chuột / chạm màn hình",
+      "date": "2026-07-27"
+    },
+    {
+      "id": "jack-pot",
+      "title": "Jack Pot",
+      "description": "Balatro-like but Black Jack core.",
+      "category": "Rogue-Lite",
+      "tags": ["Black Jack", "casual", "Deck Builder"],
+      "path": "games/Jack-Pot/index.html",
+      "thumbnail": "",
+      "emoji": "🎰",
+      "color": "#ffd45c",
+      "controls": "",
+      "date": "2026-07-27"
+    },
+    {
+      "id": "dino",
+      "title": "Dino",
+      "description": "Weird Endless Run with many stuff.",
+      "category": "Arcade",
+      "tags": ["endless-runner", "casual"],
+      "path": "games/Dino/index.html",
+      "thumbnail": "",
+      "emoji": "🦖",
+      "color": "#5cff9d",
+      "controls": "Space để nhảy",
+      "date": "2026-07-27"
+    }
+  ]
+}
