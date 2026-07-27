@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Xì Lác Boss Run - Endless</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a1f18;
+    --table: #0f3d2e;
+    --gold: #c9a227;
+    --gold-light: #e8c547;
+    --red: #e74c3c;
+    --green: #2ecc71;
+    --blue: #3498db;
+    --purple: #9b59b6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+    background: linear-gradient(160deg, #061510 0%, #0a2a1f 40%, #0d3d2c 100%);
+    min-height: 100vh;
+    color: #f0f0f0;
+    overflow-x: hidden;
+  }
+
+  /* ========== SCREENS ========== */
+  .screen { display: none; flex-direction: column; align-items: center; padding: 16px; min-height: 100vh; }
+  .screen.active { display: flex; }
+
+  /* MENU */
+  #menu h1 {
+    font-size: clamp(2rem, 8vw, 3.2rem);
+    margin: 40px 0 8px;
+    text-shadow: 0 0 30px rgba(201,162,39,0.5);
+    background: linear-gradient(90deg, #e8c547, #c9a227, #a67c00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  #menu .sub { opacity: 0.7; margin-bottom: 40px; font-size: 1rem; }
+  .big-btn {
+    font-family: inherit;
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 16px 48px;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #c9a227, #a67c00);
+    color: #1a1a1a;
+    box-shadow: 0 6px 20px rgba(201,162,39,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .big-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(201,162,39,0.55); }
+  .big-btn:active { transform: translateY(0); }
+
+  /* HUD */
+  .hud {
+    width: 100%;
+    max-width: 960px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .hud-item {
+    background: rgba(0,0,0,0.35);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(201,162,39,0.25);
+  }
+  .hud-item strong { color: var(--gold-light); }
+  .hud-item.coin { border-color: rgba(241,196,15,0.5); background: rgba(241,196,15,0.12); }
+
+  /* JOKER BAR (in game) */
+  .joker-bar {
+    width: 100%; max-width: 960px;
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 12px; align-items: stretch;
+  }
+  .joker-chip {
+    flex: 1 1 0; min-width: 140px;
+    background: linear-gradient(160deg, #2a1a3a, #1a1028);
+    border: 2px solid rgba(155,89,182,0.55);
+    border-radius: 10px;
+    padding: 7px 10px;
+    font-size: 0.74rem;
+    line-height: 1.35;
+  }
+  .joker-chip.empty {
+    background: rgba(0,0,0,0.2);
+    border: 2px dashed rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+  }
+  .joker-chip .jname { font-weight: 700; color: #d7aef7; font-size: 0.8rem; }
+  .joker-chip .jdesc { opacity: 0.75; }
+  .joker-chip.active {
+    border-color: var(--gold-light);
+    box-shadow: 0 0 14px rgba(232,197,71,0.45);
+    background: linear-gradient(160deg, #3a2a1a, #281c10);
+  }
+  .joker-chip.active .jname { color: var(--gold-light); }
+
+  /* BOSS AREA */
+  .boss-panel {
+    width: 100%;
+    max-width: 960px;
+    background: linear-gradient(180deg, #1a0a0a 0%, #2a1212 100%);
+    border: 3px solid #8b1a1a;
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .boss-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top, rgba(231,76,60,0.15), transparent 70%);
+    pointer-events: none;
+  }
+  .boss-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .boss-name { font-size: 1.15rem; font-weight: 700; color: #ff6b6b; }
+  .boss-hp-bar {
+    height: 22px;
+    background: #2a1515;
+    border-radius: 11px;
+    overflow: hidden;
+    border: 1px solid #5a2020;
+    position: relative;
+  }
+  .boss-hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #c0392b, #e74c3c);
+    transition: width 0.4s ease;
+    border-radius: 11px;
+  }
+  .boss-hp-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-shadow: 0 1px 3px #000;
+  }
+
+  /* PLAYER AREA */
+  .player-panel {
+    width: 100%;
+    max-width: 960px;
+    background: linear-gradient(180deg, #0a1f18 0%, #0f3d2e 100%);
+    border: 3px solid #1a6b4a;
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+  .player-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .player-name { font-size: 1.1rem; font-weight: 700; color: #2ecc71; }
+  .player-hp-bar {
+    height: 20px;
+    background: #0d2a1f;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #1a5c40;
+    position: relative;
+  }
+  .player-hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #1a9b5c, #2ecc71);
+    transition: width 0.4s ease;
+    border-radius: 10px;
+  }
+  .player-hp-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-shadow: 0 1px 3px #000;
+  }
+
+  /* CARDS */
+  .cards-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 100px;
+    align-items: center;
+    padding: 6px 0;
+  }
+  .card {
+    width: 64px;
+    height: 92px;
+    background: #fff;
+    border-radius: 7px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 5px 6px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+    color: #111;
+    user-select: none;
+    position: relative;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .card.red { color: #c41e3a; }
+  .card.black { color: #111; }
+  .card .suit { font-size: 1.25rem; align-self: center; }
+  .card.draggable { cursor: pointer; }
+  .card.draggable:hover { transform: translateY(-5px); box-shadow: 0 8px 18px rgba(0,0,0,0.45); }
+  .card.dragging { opacity: 0.35; }
+  .card.swap-target { outline: 3px solid var(--gold); outline-offset: 1px; }
+  .card.selected {
+    transform: translateY(-10px);
+    box-shadow: 0 0 0 3px var(--gold-light), 0 10px 22px rgba(0,0,0,0.5);
+  }
+  .card.hidden-card {
+    background: linear-gradient(145deg, #1a3a6e, #0d2447);
+    color: transparent;
+    border: 2px solid var(--gold);
+  }
+  .card.hidden-card::after {
+    content: "♠";
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 1.8rem;
+    color: var(--gold);
+    opacity: 0.6;
+  }
+  .card .colmark {
+    position: absolute; top: 2px; right: 4px;
+    font-size: 0.55rem; font-weight: 700; color: rgba(0,0,0,0.28);
+  }
+
+  /* ===== HAND ROWS ===== */
+  .hand-rows { display: flex; flex-direction: column; gap: 8px; width: 100%; padding: 6px 0; }
+  .hand-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 8px 10px;
+  }
+  .hand-row.full { border-color: rgba(201,162,39,0.4); background: rgba(201,162,39,0.06); }
+  .hand-row .row-tag {
+    flex: 0 0 auto; width: 40px; text-align: center;
+    font-size: 0.72rem; font-weight: 700; color: var(--gold-light); opacity: 0.85; line-height: 1.3;
+  }
+  .hand-row .row-tag small { display: block; font-size: 0.62rem; opacity: 0.65; font-weight: 500; color: #ddd; }
+  .hand-row .row-cards {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    flex: 1 1 auto; min-height: 92px; align-items: center;
+  }
+  .hand-row .row-info {
+    flex: 0 0 auto; min-width: 104px; text-align: right;
+    font-size: 0.74rem; line-height: 1.4;
+  }
+  .hand-row .row-info .mult { color: #d7aef7; font-weight: 700; }
+  .hand-row .row-info .add { color: #7dcea0; font-weight: 600; }
+  .hand-row .row-info .jk { color: var(--gold-light); font-weight: 700; }
+  .hand-row .row-info .none { opacity: 0.35; }
+
+  /* SORT BAR */
+  .sort-bar { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 2px; }
+  .mini-btn {
+    font-family: inherit; font-size: 0.74rem; font-weight: 600;
+    padding: 5px 12px; border-radius: 8px; cursor: pointer;
+    background: rgba(255,255,255,0.08); color: #ddd;
+    border: 1px solid rgba(255,255,255,0.18);
+  }
+  .mini-btn:hover:not(:disabled) { background: rgba(255,255,255,0.16); }
+  .mini-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* BADGES */
+  .badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .combo-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(155,89,182,0.25);
+    border: 1px solid rgba(155,89,182,0.5);
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 0.85rem; font-weight: 600; color: #d7aef7;
+  }
+  .combo-badge.none { opacity: 0.5; background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.15); color: #aaa; }
+  .set-badge {
+    display: inline-flex;
+    background: rgba(241,196,15,0.18);
+    border: 1px solid rgba(241,196,15,0.45);
+    color: #f7dc6f;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 0.85rem; font-weight: 600;
+  }
+  .glob-badge {
+    display: inline-flex;
+    background: rgba(46,204,113,0.18);
+    border: 1px solid rgba(46,204,113,0.5);
+    color: #7dcea0;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 0.85rem; font-weight: 700;
+  }
+
+  /* CONTROLS */
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 14px 0; }
+  .btn {
+    font-family: inherit; font-size: 1rem; font-weight: 600;
+    padding: 12px 24px; border: none; border-radius: 10px;
+    cursor: pointer; transition: all 0.15s; min-width: 110px;
+  }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+  .btn-hit { background: #e8b923; color: #1a1a1a; }
+  .btn-hit:hover:not(:disabled) { background: #f5c94a; transform: translateY(-2px); }
+  .btn-ready { background: #2d8f6f; color: #fff; }
+  .btn-ready:hover:not(:disabled) { background: #36a882; transform: translateY(-2px); }
+  .btn-secondary { background: rgba(255,255,255,0.1); color: #ddd; border: 1px solid rgba(255,255,255,0.2); }
+  .btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.18); }
+
+  /* MESSAGE */
+  .msg {
+    text-align: center; font-size: 1.05rem; font-weight: 600;
+    min-height: 32px; padding: 8px 16px; border-radius: 8px;
+    margin: 8px 0; max-width: 960px; width: 100%;
+  }
+  .msg.info { background: rgba(52,152,219,0.2); color: #5dade2; }
+  .msg.win { background: rgba(46,204,113,0.2); color: #2ecc71; }
+  .msg.lose { background: rgba(231,76,60,0.2); color: #e74c3c; }
+  .msg.dmg { background: rgba(241,196,15,0.2); color: #f1c40f; }
+  .msg.boss { background: rgba(192,57,43,0.25); color: #ff7675; }
+
+  /* LOG */
+  .log {
+    width: 100%; max-width: 960px; max-height: 100px; overflow-y: auto;
+    background: rgba(0,0,0,0.3); border-radius: 10px;
+    padding: 10px 14px; font-size: 0.82rem; line-height: 1.5; opacity: 0.85;
+  }
+  .log div { margin-bottom: 2px; }
+
+  /* BUFF SELECT */
+  #buff-screen h2 { font-size: 1.6rem; margin: 26px 0 8px; color: var(--gold-light); }
+  #buff-screen .sub { opacity: 0.7; margin-bottom: 20px; }
+  .buffs { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; max-width: 900px; }
+  .buff-card {
+    width: 220px;
+    background: linear-gradient(160deg, #1a2a22, #0f1f18);
+    border: 2px solid rgba(201,162,39,0.4);
+    border-radius: 14px; padding: 20px 16px;
+    cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .buff-card:hover:not(.disabled) { transform: translateY(-6px); border-color: var(--gold); box-shadow: 0 12px 30px rgba(201,162,39,0.25); }
+  .buff-card.disabled { opacity: 0.3; cursor: not-allowed; }
+  .buff-card.picked { opacity: 1; border-color: var(--green); box-shadow: 0 0 22px rgba(46,204,113,0.35); cursor: default; }
+  .buff-card .icon { font-size: 2.2rem; margin-bottom: 10px; }
+  .buff-card .title { font-weight: 700; font-size: 1.05rem; margin-bottom: 6px; color: var(--gold-light); }
+  .buff-card .desc { font-size: 0.85rem; opacity: 0.85; line-height: 1.4; }
+  .buff-card .rarity {
+    display: inline-block; margin-top: 10px; font-size: 0.75rem;
+    padding: 2px 10px; border-radius: 10px; font-weight: 600;
+  }
+  .rarity.common { background: #555; color: #ccc; }
+  .rarity.uncommon { background: #1a6b3a; color: #7dcea0; }
+  .rarity.rare { background: #1a3a6b; color: #7db3ea; }
+  .rarity.epic { background: #4a1a6b; color: #c39bd3; }
+  .rarity.legendary { background: #6b5a1a; color: #f7dc6f; }
+
+  /* BOSS BLIND */
+  .blind-bar {
+    display: flex; align-items: center; gap: 10px;
+    margin: 10px 0 2px; padding: 8px 12px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,107,107,0.45);
+    border-left: 4px solid #ff6b6b;
+    border-radius: 10px;
+    font-size: 0.8rem; line-height: 1.4;
+  }
+  .blind-bar.calm { border-color: rgba(255,255,255,0.15); border-left-color: rgba(255,255,255,0.3); opacity: 0.6; }
+  .blind-bar .bicon { font-size: 1.4rem; flex: 0 0 auto; }
+  .blind-bar .bname { font-weight: 800; color: #ff9a90; }
+  .blind-bar.calm .bname { color: #bbb; }
+  .blind-bar .bdesc { opacity: 0.85; }
+
+  .blind-preview {
+    display: flex; align-items: center; gap: 12px;
+    max-width: 560px; width: 100%;
+    background: linear-gradient(120deg, #2a1212, #1a0d0d);
+    border: 2px solid rgba(255,107,107,0.5);
+    border-radius: 14px; padding: 12px 16px; margin-bottom: 18px;
+  }
+  .blind-preview .bicon { font-size: 2rem; }
+  .blind-preview .blabel { font-size: 0.7rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.5px; }
+  .blind-preview .bname { font-weight: 800; font-size: 1.05rem; color: #ff9a90; }
+  .blind-preview .bdesc { font-size: 0.8rem; opacity: 0.85; line-height: 1.4; }
+
+  /* DIFFICULTY */
+  .diff-list { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 700px; margin-top: 16px; }
+  .diff-card {
+    display: flex; align-items: center; gap: 14px;
+    background: linear-gradient(120deg, #16241d, #0e1a15);
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 14px; padding: 14px 16px;
+    cursor: pointer; transition: all 0.18s;
+  }
+  .diff-card:hover { transform: translateX(6px); border-color: var(--gold); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .diff-card .dicon { font-size: 2rem; flex: 0 0 auto; width: 46px; text-align: center; }
+  .diff-card .dbody { flex: 1 1 auto; min-width: 0; }
+  .diff-card .dname { font-weight: 800; font-size: 1.1rem; }
+  .diff-card .dtag { font-size: 0.78rem; color: var(--gold-light); font-weight: 600; margin: 2px 0 4px; }
+  .diff-card .ddesc { font-size: 0.78rem; opacity: 0.7; line-height: 1.4; }
+  .diff-card .dstat {
+    flex: 0 0 auto; text-align: right; font-size: 0.72rem; line-height: 1.55;
+    opacity: 0.8; border-left: 1px solid rgba(255,255,255,0.12); padding-left: 12px;
+  }
+  .diff-card .dstat b { color: var(--gold-light); }
+  .diff-card[data-d="0"] { border-color: rgba(46,204,113,0.45); }
+  .diff-card[data-d="1"] { border-color: rgba(125,206,160,0.45); }
+  .diff-card[data-d="2"] { border-color: rgba(241,196,15,0.45); }
+  .diff-card[data-d="3"] { border-color: rgba(230,126,34,0.5); }
+  .diff-card[data-d="4"] { border-color: rgba(231,76,60,0.55); }
+  .diff-card[data-d="0"] .dname { color: #2ecc71; }
+  .diff-card[data-d="1"] .dname { color: #7dcea0; }
+  .diff-card[data-d="2"] .dname { color: #f1c40f; }
+  .diff-card[data-d="3"] .dname { color: #e67e22; }
+  .diff-card[data-d="4"] .dname { color: #e74c3c; }
+
+  /* SHOP MODAL */
+  .modal-back {
+    position: fixed; inset: 0; z-index: 50;
+    background: rgba(0,0,0,0.78);
+    display: none; align-items: flex-start; justify-content: center;
+    overflow-y: auto; padding: 20px 10px;
+  }
+  .modal-back.open { display: flex; }
+  .shop {
+    width: 100%; max-width: 940px;
+    background: linear-gradient(165deg, #2a1a0a, #14100a 60%, #0e0c08);
+    border: 2px solid #a67c00; border-radius: 18px;
+    padding: 20px 22px 24px;
+  }
+  .shop h3 { color: var(--gold-light); font-size: 1.35rem; margin-bottom: 2px; }
+  .shop .shop-sub { font-size: 0.82rem; opacity: 0.7; margin-bottom: 14px; }
+  .shop-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .coin-big {
+    background: rgba(241,196,15,0.15); border: 2px solid rgba(241,196,15,0.55);
+    color: #f7dc6f; font-weight: 800; font-size: 1.15rem;
+    padding: 8px 18px; border-radius: 12px; white-space: nowrap;
+  }
+  .shop-section { margin-top: 18px; }
+  .shop-section > .sec-title {
+    font-size: 0.9rem; font-weight: 700; color: var(--gold-light);
+    margin-bottom: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .shop-section > .sec-title small { font-weight: 400; opacity: 0.6; font-size: 0.75rem; color: #ddd; }
+  .shop-line { display: flex; gap: 10px; align-items: stretch; }
+  .shop-items { display: flex; gap: 10px; flex-wrap: wrap; flex: 1 1 auto; }
+  .reroll-btn {
+    flex: 0 0 auto; width: 82px;
+    font-family: inherit; font-size: 0.78rem; font-weight: 700;
+    border-radius: 12px; cursor: pointer;
+    background: linear-gradient(160deg, #1a3a6b, #0f2140);
+    border: 2px solid rgba(93,173,226,0.5); color: #9ecbf0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    padding: 8px 4px; line-height: 1.25;
+  }
+  .reroll-btn:hover:not(:disabled) { background: linear-gradient(160deg, #204a86, #142c52); }
+  .reroll-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .joker-item {
+    width: 158px;
+    background: linear-gradient(160deg, #2a1a3a, #150e22);
+    border: 2px solid rgba(155,89,182,0.5);
+    border-radius: 12px; padding: 10px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .joker-item .jt { font-weight: 700; font-size: 0.86rem; color: #d7aef7; line-height: 1.25; }
+  .joker-item .jd { font-size: 0.72rem; opacity: 0.8; line-height: 1.35; flex: 1 1 auto; }
+  .joker-item.sold { opacity: 0.3; }
+  .joker-item.add-type { border-color: rgba(46,204,113,0.5); }
+  .joker-item.add-type .jt { color: #7dcea0; }
+  .joker-item.special { border-color: rgba(241,196,15,0.55); }
+  .joker-item.special .jt { color: var(--gold-light); }
+
+  .buy-btn {
+    font-family: inherit; font-size: 0.78rem; font-weight: 700;
+    padding: 6px 10px; border-radius: 8px; border: none; cursor: pointer;
+    background: linear-gradient(135deg, #c9a227, #a67c00); color: #1a1a1a;
+  }
+  .buy-btn:hover:not(:disabled) { filter: brightness(1.12); }
+  .buy-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .sell-btn {
+    font-family: inherit; font-size: 0.7rem; font-weight: 700;
+    padding: 4px 8px; border-radius: 7px; cursor: pointer;
+    background: rgba(231,76,60,0.2); color: #ff9a90;
+    border: 1px solid rgba(231,76,60,0.5);
+  }
+  .sell-btn:hover { background: rgba(231,76,60,0.35); }
+
+  .shop-card-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .slot-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+  .slot-box {
+    width: 158px; min-height: 96px; border-radius: 12px; padding: 10px;
+    background: linear-gradient(160deg, #2a1a3a, #150e22);
+    border: 2px solid rgba(155,89,182,0.5);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .slot-box.empty {
+    background: rgba(0,0,0,0.25); border: 2px dashed rgba(255,255,255,0.14);
+    color: rgba(255,255,255,0.3); align-items: center; justify-content: center; font-size: 0.78rem;
+  }
+  .trade-box {
+    margin-top: 18px; background: rgba(0,0,0,0.28);
+    border: 1px solid rgba(166,124,0,0.5); border-radius: 12px;
+    padding: 14px 16px; text-align: center;
+  }
+  .shop-close {
+    margin-top: 20px; width: 100%;
+    font-family: inherit; font-size: 1rem; font-weight: 700;
+    padding: 12px; border-radius: 12px; border: none; cursor: pointer;
+    background: rgba(255,255,255,0.12); color: #eee;
+  }
+  .shop-close:hover { background: rgba(255,255,255,0.2); }
+
+  /* GAME OVER */
+  #gameover h2 { font-size: 2.2rem; color: #e74c3c; margin: 40px 0 12px; }
+  #gameover .stats-box {
+    background: rgba(0,0,0,0.35); border-radius: 14px;
+    padding: 24px 36px; margin: 20px 0 30px; text-align: center;
+  }
+  #gameover .stats-box div { margin: 8px 0; font-size: 1.1rem; }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+    margin-top: 8px; font-size: 0.82rem; opacity: 0.9;
+  }
+  .stats-bar span { background: rgba(0,0,0,0.3); padding: 4px 12px; border-radius: 12px; }
+
+  .help-text {
+    font-size: 0.78rem; opacity: 0.6; text-align: center;
+    max-width: 680px; margin-top: 8px; line-height: 1.5;
+  }
+
+  /* ANIMATION */
+  @keyframes deal { from { transform: translateY(-30px) scale(0.85); opacity: 0; } to { transform: none; opacity: 1; } }
+  .card { animation: deal 0.25s ease-out; }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .shake { animation: shake 0.35s ease; }
+
+  /* MOBILE */
+  @media (max-width: 640px) {
+    .card { width: 46px; height: 68px; font-size: 0.82rem; padding: 3px 4px; border-radius: 5px; }
+    .card .suit { font-size: 0.95rem; }
+    .card.hidden-card::after { font-size: 1.2rem; }
+    .cards-row { min-height: 74px; gap: 5px; }
+    .hand-row { gap: 6px; padding: 6px; }
+    .hand-row .row-cards { min-height: 68px; gap: 4px; }
+    .hand-row .row-tag { width: 26px; font-size: 0.64rem; }
+    .hand-row .row-tag small { font-size: 0.55rem; }
+    .hand-row .row-info { min-width: 78px; font-size: 0.66rem; }
+    .boss-panel, .player-panel { padding: 12px; }
+    .joker-chip { min-width: 46%; font-size: 0.68rem; }
+    .joker-item, .slot-box { width: 46%; }
+    .shop { padding: 14px 12px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== MENU ========== -->
+<div id="menu" class="screen active">
+  <h1>♠️ XÌ LÁC BOSS</h1>
+  <p class="sub">Endless Run • Đánh Boss • Combo theo hàng • Joker</p>
+  <button class="big-btn" id="btn-start">Bắt đầu</button>
+  <div class="help-text" style="margin-top:36px">
+    Rút bài → tự xếp thành <strong>hàng 5 lá</strong> → chạm 2 lá để đổi chỗ → Sẵn sàng<br>
+    Mỗi hàng: <strong>(điểm hàng + add) × mult</strong>, cộng dồn rồi × <strong>hệ số tầng (1.2^tầng)</strong><br>
+    Xì Dách + thưởng bộ cộng sau, cuối cùng nhân Mậu Binh và Joker toàn cục<br>
+    Máu Boss tăng theo <strong>độ khó bạn chọn</strong> — Boss dùng combo nhưng <strong>không scale</strong><br>
+    Mỗi Boss mang một <strong>luật riêng</strong> — xem trước ở màn buff để còn kịp mua Joker đối phó<br>
+    Hạ Boss → nhận vàng + lợi tức → chọn buff → mua <strong>Joker</strong> ở Thương nhân → bấm Màn tiếp
+  </div>
+</div>
+
+<!-- ========== CHỌN ĐỘ KHÓ ========== -->
+<div id="difficulty" class="screen">
+  <h2 style="font-size:1.7rem;margin:26px 0 6px;color:var(--gold-light)">Chọn độ khó</h2>
+  <p class="sub" style="opacity:.7;text-align:center;max-width:620px;margin-bottom:6px">
+    Độ khó chỉ đổi <strong>máu Boss</strong>. Sát thương của bạn luôn tăng ×1.2 mỗi tầng —
+    độ khó là nhịp máu Boss đuổi theo con số đó nhanh cỡ nào.
+  </p>
+  <div class="diff-list" id="diff-list"></div>
+  <button class="mini-btn" id="btn-back-menu" style="margin-top:22px;padding:8px 20px">← Quay lại</button>
+</div>
+
+<!-- ========== GAME ========== -->
+<div id="game" class="screen">
+  <div class="hud">
+    <div class="hud-item">Tầng <strong id="floor-num">1</strong></div>
+    <div class="hud-item">Độ khó: <strong id="diff-name">Thường</strong></div>
+    <div class="hud-item coin">💰 <strong id="gold-val">0</strong></div>
+    <div class="hud-item">Hệ số tầng: <strong id="scale-val">×1.00</strong></div>
+    <div class="hud-item">Dmg tối đa: <strong id="overflow-val">21</strong></div>
+    <div class="hud-item">Bộ bài: <strong id="extra-cards">52</strong></div>
+    <div class="hud-item">Highscore: <strong id="highscore-val">0</strong></div>
+  </div>
+
+  <div class="joker-bar" id="joker-bar"></div>
+
+  <!-- BOSS -->
+  <div class="boss-panel" id="boss-panel">
+    <div class="boss-header">
+      <span class="boss-name" id="boss-name">Chủ Sàn #1</span>
+      <span id="boss-buffs" style="font-size:0.78rem;opacity:0.8"></span>
+    </div>
+    <div class="blind-bar" id="blind-bar"></div>
+    <div class="boss-hp-bar">
+      <div class="boss-hp-fill" id="boss-hp-fill" style="width:100%"></div>
+      <div class="boss-hp-text" id="boss-hp-text">75 / 75</div>
+    </div>
+    <div class="cards-row" id="boss-cards"></div>
+    <div style="margin-top:6px;font-size:0.85rem;opacity:0.75">
+      Điểm: <strong id="boss-score">-</strong>
+      <span id="boss-bj" style="color:#f1c40f;margin-left:8px"></span>
+    </div>
+  </div>
+
+  <!-- MESSAGE -->
+  <div class="msg info" id="message">Lượt của bạn — Rút bài rồi nhấn Sẵn sàng</div>
+
+  <!-- PLAYER -->
+  <div class="player-panel">
+    <div class="player-header">
+      <span class="player-name">Bạn</span>
+      <span id="player-dmg-preview" style="font-size:0.9rem;font-weight:700;color:#f7dc6f"></span>
+    </div>
+    <div class="player-hp-bar">
+      <div class="player-hp-fill" id="player-hp-fill" style="width:100%"></div>
+      <div class="player-hp-text" id="player-hp-text">100 / 100</div>
+    </div>
+
+    <div class="sort-bar">
+      <button class="mini-btn" id="btn-sort-rank">↕ Xếp theo Rank</button>
+      <button class="mini-btn" id="btn-sort-suit">♠ Xếp theo Chất</button>
+      <button class="mini-btn" id="btn-sort-col">⇅ Gom cột dọc</button>
+      <span style="font-size:0.72rem;opacity:0.5;align-self:center">Chạm 1 lá rồi chạm lá khác để đổi chỗ</span>
+    </div>
+
+    <div class="hand-rows" id="player-cards"></div>
+    <div class="badge-row">
+      <div class="combo-badge none" id="combo-badge">Chưa có combo toàn bài</div>
+      <div class="set-badge" id="set-badge" style="display:none"></div>
+      <div class="glob-badge" id="glob-badge" style="display:none"></div>
+    </div>
+    <div style="margin-top:6px;font-size:0.85rem;opacity:0.75">
+      Điểm: <strong id="player-score">-</strong>
+      <span id="player-bj" style="color:#f1c40f;margin-left:8px"></span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-hit" id="btn-hit">Rút bài</button>
+    <button class="btn btn-ready" id="btn-ready">Sẵn sàng</button>
+  </div>
+
+  <div class="stats-bar">
+    <span>Máu tối đa: <strong id="stat-maxhp">100</strong></span>
+    <span>Thưởng AA: <strong id="stat-aa">10</strong></span>
+    <span>Xì Dách: <strong id="stat-xd">+10</strong></span>
+  </div>
+
+  <div class="log" id="log"></div>
+</div>
+
+<!-- ========== BUFF SELECT ========== -->
+<div id="buff-screen" class="screen">
+  <h2>🏆 Boss đã gục!</h2>
+  <p class="sub" id="buff-sub">Chọn 1 buff, ghé Thương nhân thoải mái, xong bấm Màn tiếp</p>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:18px">
+    <div class="hud-item coin">💰 <strong id="buff-gold">0</strong></div>
+    <div class="hud-item">Thu nhập: <strong id="buff-income">+5</strong></div>
+    <div class="hud-item">Joker: <strong id="buff-jokers">0/4</strong></div>
+  </div>
+
+  <div class="blind-preview" id="blind-preview"></div>
+
+  <div class="buffs" id="buff-list"></div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:30px">
+    <button class="btn" id="btn-open-shop" style="background:linear-gradient(135deg,#a67c00,#8b5e00);color:#fff;min-width:230px;font-size:1.05rem;padding:14px 26px">
+      🧙‍♂️ Thương nhân tham lam
+    </button>
+    <button class="big-btn" id="btn-next-floor" style="padding:14px 40px;font-size:1.05rem">Màn tiếp →</button>
+  </div>
+  <div class="help-text" id="buff-hint" style="margin-top:14px">Chọn 1 buff trước khi sang màn tiếp.</div>
+</div>
+
+<!-- ========== SHOP MODAL ========== -->
+<div class="modal-back" id="shop-modal">
+  <div class="shop">
+    <div class="shop-head">
+      <div>
+        <h3>🧙‍♂️ Thương nhân tham lam</h3>
+        <div class="shop-sub">Đổi máu lấy sức mạnh… và bán Joker cho kẻ liều lĩnh</div>
+      </div>
+      <div class="coin-big">💰 <span id="shop-gold">0</span></div>
+    </div>
+
+    <div class="shop-section">
+      <div class="sec-title">🎴 Joker đang sở hữu <small id="slot-count">0/4 slot · bán lại được nửa giá</small></div>
+      <div class="slot-grid" id="owned-slots"></div>
+    </div>
+
+    <div class="shop-section">
+      <div class="sec-title">✨ Joker bán ra <small>Mỗi Joker là duy nhất — không bao giờ trùng lá bạn đang có</small></div>
+      <div class="shop-line">
+        <div class="shop-items" id="shop-jokers"></div>
+        <button class="reroll-btn" id="reroll-jokers">🔄 Đổi lại<span id="rr-joker-cost">1💰</span></button>
+      </div>
+    </div>
+
+    <div class="shop-section">
+      <div class="sec-title">🃏 Lá bài thêm vào bộ <small>Chỉ vào bộ bài của bạn — Boss có bộ riêng</small></div>
+      <div class="shop-line">
+        <div class="shop-items" id="shop-cards"></div>
+        <button class="reroll-btn" id="reroll-cards">🔄 Đổi lại<span id="rr-card-cost">1💰</span></button>
+      </div>
+    </div>
+
+    <div class="trade-box">
+      <div style="font-size:0.9rem;margin-bottom:10px">
+        Máu tối đa: <strong id="merchant-hp">100</strong> &nbsp;|&nbsp; Dmg tối đa: <strong id="merchant-dmg">21</strong>
+      </div>
+      <button class="btn" id="btn-merchant-trade" style="background:linear-gradient(135deg,#a67c00,#8b5e00);color:#fff;min-width:240px;font-size:0.9rem">
+        Đổi 25 Máu tối đa → +1 Dmg tối đa
+      </button>
+      <div id="merchant-msg" style="margin-top:8px;font-size:0.8rem;min-height:18px;opacity:0.9"></div>
+    </div>
+
+    <button class="shop-close" id="btn-close-shop">Rời cửa hàng</button>
+  </div>
+</div>
+
+<!-- ========== GAME OVER ========== -->
+<div id="gameover" class="screen">
+  <h2>💀 Thất bại</h2>
+  <div class="stats-box">
+    <div style="color:var(--gold-light);font-weight:700" id="go-diff">Thường</div>
+    <div>Bạn đã hạ được <strong id="go-killed">0</strong> Boss</div>
+    <div>Tầng cao nhất: <strong id="go-floor">1</strong></div>
+    <div>Tổng sát thương gây ra: <strong id="go-dmg">0</strong></div>
+    <div>Sát thương cao nhất 1 hit: <strong id="go-high">0</strong></div>
+  </div>
+  <button class="big-btn" id="btn-restart">Chơi lại</button>
+</div>
+
+<script>
+/* ===================== CONFIG (chỉnh cân bằng ở đây) ===================== */
+const CONFIG = {
+  XD_BASE: 10,            // Xì Dách người chơi = XD_BASE · XD_RATE^tầng
+  XD_RATE: 1.2,
+  // Hệ số tầng = COMBO_RATE^tầng, nhân vào TOÀN BỘ phần điểm hàng
+  // (điểm lá + combo cộng + Joker cộng, sau khi đã nhân mult của hàng).
+  // Nếu chỉ scale riêng phần combo cộng thì tầng 15+ vẫn cần ~48 lượt/Boss.
+  COMBO_RATE: 1.2,
+
+  BOSS_XD_BASE: 10,       // Xì Dách Boss = 10 + 2·tầng (tuyến tính, không scale)
+  BOSS_XD_STEP: 2,
+  BOSS_OVERFLOW_PER_FLOOR: 1,   // Boss +1 dmg tối đa mỗi tầng
+  BOSS_FLAT_EVERY: 3,           // Boss +1 dmg phẳng mỗi 3 tầng
+
+  // Máu Boss lấy từ bảng DIFFICULTIES bên dưới (chọn ở màn bắt đầu).
+
+  GOLD_PER_FLOOR: 5,
+  INTEREST_PER: 10,
+  INTEREST_CAP: 5,
+
+  JOKER_SLOTS: 4,
+  SHOP_JOKERS: 5,
+  SHOP_CARDS: 5,
+  CARD_PRICE_MIN: 3,
+  CARD_PRICE_MAX: 5,
+  REROLL_BASE: 2,         // giá = REROLL_BASE^lần (lần 0 → 1 vàng)
+};
+
+const SUITS = ['♠','♥','♦','♣'];
+const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const RANK_VAL = {A:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:10,Q:10,K:10};
+const RANK_ORDER = {A:14, K:13, Q:12, J:11, 10:10, 9:9, 8:8, 7:7, 6:6, 5:5, 4:4, 3:3, 2:2};
+const ROW_SIZE = 5;
+
+/* ===================== ĐỘ KHÓ =====================
+ * Máu Boss KHÔNG dùng số mũ cố định. Số mũ cố định làm đoạn giữa quá dễ rồi
+ * đoạn cuối dựng tường — đúng cái bảng ante của Balatro tránh được:
+ *   Balatro ante 1→8: 300, 800, 2.000, 5.000, 11.000, 20.000, 35.000, 50.000
+ *   tức nhịp ×2.67 → 2.5 → 2.5 → 2.2 → 1.82 → 1.75 → 1.43 — GIẢM DẦN.
+ *
+ * Ở đây cũng vậy: nhịp máu Boss bắt đầu ×1.28 rồi thoải dần về ×1.16.
+ *   rate(i) = e^(K1 − 2·K2·i) · drift
+ * K1/K2 lấy từ hồi quy đường cong sát thương thật (6.000 lượt mô phỏng mỗi tầng),
+ * nên đường máu Boss bám sát đường sức mạnh người chơi ở MỌI tầng.
+ * `drift` là thứ duy nhất phân biệt độ khó: >1 nghĩa là Boss nhích nhanh hơn bạn.
+ */
+const HP_K1 = 0.2448, HP_K2 = 0.000848, HP_RATE_MIN = 1.10;
+
+const DIFFICULTIES = [
+  { key:'veasy',  name:'Cực dễ',   icon:'🌱', baseHP:75,  drift:0.984, turns:'3–5 lượt', wall:'không có',
+    tag:'Độ dài trận gần như không đổi',
+    desc:'Boss luôn tụt sau bạn một nhịp. Hợp để làm quen combo và thử build lạ.' },
+  { key:'easy',   name:'Dễ',       icon:'🙂', baseHP:90,  drift:0.986, turns:'4–6 lượt', wall:'không có',
+    tag:'Bám sát nhịp sức mạnh của bạn',
+    desc:'Đánh Boss tầng 1 hay tầng 50 đều tốn chừng đó lượt. Build lởm vẫn đi được tới cuối.' },
+  { key:'normal', name:'Thường',   icon:'⚔️', baseHP:100, drift:0.994, turns:'5–8 lượt', wall:'không có',
+    tag:'Nặng dần rồi chững lại quanh tầng 40',
+    desc:'Đủ chỗ để sai vài nước. Build tốt thì đi rất sâu, build lởm thì lê lết chứ không tắc hẳn.' },
+  { key:'hard',   name:'Khó',      icon:'🔥', baseHP:110, drift:1.009, turns:'6–14 lượt', wall:'gắt nhất ~T40',
+    tag:'Đỉnh điểm ở tầng 35-45 rồi nhẹ dần',
+    desc:'Phải săn Joker nhân chồng và giữ vàng ăn lợi tức. Qua được tầng 45 thì phần sau dễ thở hơn.' },
+  { key:'insane', name:'Siêu khó', icon:'💀', baseHP:125, drift:1.024, turns:'7–28 lượt', wall:'~tầng 25',
+    tag:'Boss vượt mặt bạn từ tầng 20',
+    desc:'Chỉ build gần hoàn hảo mới qua nổi tầng 25. Đi được tầng nào hay tầng đó.' },
+];
+
+/* ===================== LUẬT BOSS (Boss Blind) =====================
+ * Mỗi Boss mang một luật riêng, hiện ra TRƯỚC khi vào trận để người chơi
+ * còn kịp mua Joker đối phó. Luật chỉ trói người chơi — Boss không bị dính.
+ * Ba nhóm, nhắm đúng ba thứ người chơi phải quyết trong game này:
+ *   ① khâu dừng bài (đỏ đen)  ② khâu sắp hàng (giải đố)  ③ điểm & kinh tế
+ */
+const BLINDS = [
+  { key:'none', icon:'🎴', name:'Sòng phẳng', minFloor:0, group:'—',
+    desc:'Boss này không giở trò gì. Đánh bình thường.' },
+
+  // ① khâu dừng bài
+  { key:'lowcap', icon:'📉', name:'Trần Thấp', minFloor:1, group:'rút bài',
+    desc:'Dmg tối đa mua được bị cắt một nửa. Trần quắc tụt sát về 21.' },
+  { key:'minscore', icon:'🪝', name:'Ép Tới', minFloor:2, group:'rút bài',
+    desc:'Chưa chạm sát trần (trần − 4) thì chưa được dừng. Ép bạn rút tới mép vực.' },
+  { key:'maxcards', icon:'✋', name:'Bủn Xỉn', minFloor:3, group:'rút bài',
+    desc:'Tay bài không được quá 5 lá.' },
+  { key:'blindfold', icon:'🙈', name:'Bịt Mắt', minFloor:6, group:'rút bài',
+    desc:'Bài của bạn úp hết, chỉ lật khi bấm Sẵn sàng. Rút trong bóng tối.' },
+
+  // ② khâu sắp hàng
+  { key:'nosort', icon:'🔒', name:'Khoá Tay', minFloor:2, group:'sắp hàng',
+    desc:'Không được kéo thả hay sắp xếp. Bài nằm đúng thứ tự rút.' },
+  { key:'full5only', icon:'📏', name:'Đủ Hàng', minFloor:3, group:'sắp hàng',
+    desc:'Chỉ hàng đủ 5 lá mới tính combo. Hàng lẻ coi như mậu thầu.' },
+  { key:'firstrow', icon:'✂️', name:'Cắt Đầu', minFloor:7, group:'sắp hàng',
+    desc:'Hàng 1 mất hết hệ số nhân (vẫn giữ phần cộng). Đẩy bài đẹp xuống hàng dưới.' },
+
+  // ③ điểm & kinh tế
+  { key:'noxidach', icon:'🚫', name:'Chặt Thưởng', minFloor:2, group:'điểm',
+    desc:'Mất sạch phần CỘNG: combo cộng, Joker cộng, Xì Dách, thưởng bộ. Chỉ còn điểm lá × hệ số nhân.' },
+  { key:'multdown', icon:'🩸', name:'Bào Mòn', minFloor:5, group:'điểm',
+    desc:'Mọi hệ số nhân — combo lẫn Joker — đều bị trừ 1 (thấp nhất ×1).' },
+  { key:'jokerlock', icon:'⛓️', name:'Xiềng Joker', minFloor:4, group:'kinh tế',
+    desc:'1 Joker ngẫu nhiên của bạn bị vô hiệu trong trận này.' },
+  { key:'nogold', icon:'🕳️', name:'Keo Kiệt', minFloor:3, group:'kinh tế',
+    desc:'Hạ được Boss này cũng không nhận đồng vàng nào.' },
+];
+
+function pickBlind(floor) {
+  const pool = BLINDS.filter(b => b.key !== 'none' && b.minFloor <= floor && b.key !== state.lastBlindKey);
+  if (!pool.length) return BLINDS[0];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+function blindIs(key) { return state.blind && state.blind.key === key; }
+/** Joker còn hiệu lực (luật Xiềng Joker tắt 1 lá). */
+function activeJokers() {
+  if (!blindIs('jokerlock')) return state.jokers;
+  return state.jokers.filter((j, i) => i !== state.lockedJoker);
+}
+
+const BOSS_NAMES = [
+  "Chủ Sàn Tập Sự","Ông Chủ Quán Nhỏ","Đại Ca Khu Chợ","Bà Chủ Hẻm","Ông Trùm Phố Cổ",
+  "Chủ Sòng Bạc","Đại Gia Đất Bắc","Hắc Thủ Lĩnh","Ma Vương Bài","Thiên Vương Xì Dách"
+];
+
+/* Combo → giá Joker nhân (theo mult) và giá trị Joker cộng */
+const COMBO_INFO = {
+  'Đôi':            { mult: {2:6,  3:8,  4:10, 5:12}, add: 20,    addPrice: 8  },
+  '2 Đôi':          { mult: {2:7,  3:9,  4:11, 5:13}, add: 30,    addPrice: 9  },
+  'Sám':            { mult: {2:8,  3:10, 4:12, 5:14}, add: 50,    addPrice: 10 },
+  'Sảnh':           { mult: {2:9,  3:11, 4:13, 5:15}, add: 100,   addPrice: 12 },
+  'Thùng':          { mult: {2:10, 3:12, 4:14, 5:16}, add: 200,   addPrice: 13 },
+  'Cù lũ':          { mult: {2:11, 3:13, 4:15, 5:17}, add: 500,   addPrice: 15 },
+  'Tứ quý':         { mult: {2:12, 3:14, 4:16, 5:18}, add: 1000,  addPrice: 16 },
+  'Thùng phá sảnh': { mult: {2:13, 3:15, 4:17, 5:19}, add: 2000,  addPrice: 18 },
+  'Sảnh Chúa':      { mult: {2:14, 3:16, 4:18, 5:20}, add: 5000,  addPrice: 20 },
+  'Ngũ quý':        { mult: {2:15, 3:17, 4:19, 5:20}, add: 10000, addPrice: 20 },
+};
+const COMBO_KEYS = Object.keys(COMBO_INFO);
+
+/* ===================== STATE ===================== */
+function freshState(difficulty = 2) {
+  return {
+    difficulty,
+    floor: 0,
+    bossesKilled: 0,
+    playerMaxHP: 100,
+    playerHP: 100,
+    overflow: 0,
+    extraCards: [],
+    totalDamageDealt: 0,
+    highScore: 0,
+
+    gold: 0,
+    jokers: [],
+    shopJokers: [],
+    shopCards: [],
+    rerollJoker: 0,
+    rerollCard: 0,
+    buffPicked: false,
+
+    bossMaxHP: 75,
+    bossHP: 75,
+    playerHand: [],
+    bossHand: [],
+    playerDeck: [],
+    bossDeck: [],
+    blind: BLINDS[0],
+    nextBlind: null,
+    lastBlindKey: null,
+    lockedJoker: -1,
+    phase: 'player',
+    gameOver: false,
+  };
+}
+let state = freshState();
+let selectedIdx = null;   // lá đang được chọn để đổi chỗ
+
+/* ===================== UTILS ===================== */
+function $(id) { return document.getElementById(id); }
+function fmt(v) { return Number.isInteger(v) ? String(v) : (+v.toFixed(1)).toString(); }
+function fmtN(v) { return Math.round(v).toLocaleString('en-US'); }
+
+function log(msg) {
+  const el = $('log');
+  const d = document.createElement('div');
+  d.textContent = msg;
+  el.prepend(d);
+  while (el.children.length > 40) el.removeChild(el.lastChild);
+}
+
+function setMsg(text, type = 'info') {
+  const el = $('message');
+  el.textContent = text;
+  el.className = 'msg ' + type;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function randInt(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+
+function createBaseDeck() {
+  const d = [];
+  for (const s of SUITS) for (const r of RANKS) d.push({rank: r, suit: s});
+  return d;
+}
+/** Bộ bài CỦA NGƯỜI CHƠI: đúng 1 bộ 52 lá + những lá mua thêm ở shop. */
+function buildPlayerDeck() {
+  const d = createBaseDeck();
+  for (const c of state.extraCards) d.push({...c});
+  return shuffle(d);
+}
+/** Bộ bài RIÊNG của Boss: luôn là 1 bộ 52 lá sạch, không dính gì tới bộ của bạn. */
+function buildBossDeck() {
+  return shuffle(createBaseDeck());
+}
+function playerDeckSize() { return 52 + state.extraCards.length; }
+
+function bjValue(hand) {
+  let total = 0, aces = 0;
+  for (const c of hand) {
+    if (c.rank === 'A') { aces++; total += 11; }
+    else total += RANK_VAL[c.rank] || 10;
+  }
+  while (total > 21 && aces > 0) { total -= 10; aces--; }
+  return total;
+}
+
+function chunkRows(hand) {
+  const rows = [];
+  for (let i = 0; i < hand.length; i += ROW_SIZE) rows.push(hand.slice(i, i + ROW_SIZE));
+  return rows;
+}
+
+function longestStraight(ranks) {
+  if (!ranks.length) return 0;
+  let best = 1, cur = 1;
+  for (let i = 1; i < ranks.length; i++) {
+    if (ranks[i] === ranks[i-1] + 1) { cur++; best = Math.max(best, cur); }
+    else cur = 1;
+  }
+  if ([14,2,3,4,5].every(v => ranks.includes(v))) best = Math.max(best, 5);
+  return best;
+}
+
+/* ===================== SCALING ===================== */
+function floorScale()      { return Math.pow(CONFIG.COMBO_RATE, state.floor); }
+function getXiDachBonus()  { return CONFIG.XD_BASE * Math.pow(CONFIG.XD_RATE, state.floor); }
+function getBossXiDachBonus() { return CONFIG.BOSS_XD_BASE + CONFIG.BOSS_XD_STEP * state.floor; }
+function bossOverflow()    { return CONFIG.BOSS_OVERFLOW_PER_FLOOR * state.floor; }
+function bossFlatDmg()     { return Math.floor(state.floor / CONFIG.BOSS_FLAT_EVERY); }
+
+function diff() { return DIFFICULTIES[state.difficulty] || DIFFICULTIES[2]; }
+
+/** Nhịp máu Boss ở tầng thứ i (0-based) — giảm dần theo tầng. */
+function bossHPRate(i) {
+  return Math.max(HP_RATE_MIN, Math.exp(HP_K1 - 2 * HP_K2 * i) * diff().drift);
+}
+function calcBossHP(x) {
+  let hp = diff().baseHP;
+  for (let i = 0; i < x; i++) hp *= bossHPRate(i);
+  return Math.round(hp);
+}
+
+/* ===================== THƯỞNG BỘ TRÙNG RANK ===================== */
+function setBase(k) {
+  if (k < 2) return 0;
+  const seq = [1, 2, 5];
+  const i = k - 2;
+  return seq[i % 3] * Math.pow(10, 1 + Math.floor(i / 3));
+}
+function setGrowth(k) {
+  if (k < 2) return 0;
+  const b = setBase(k);
+  return k <= 3 ? b / 2 : b;
+}
+function aceSetBonus(k) {
+  if (k < 2) return 0;
+  return setBase(k) + setGrowth(k) * state.floor;
+}
+function calcSetBonus(hand) {
+  const cnt = {};
+  for (const c of hand) cnt[c.rank] = (cnt[c.rank] || 0) + 1;
+  let total = 0;
+  const parts = [];
+  for (const r in cnt) {
+    const k = cnt[r];
+    if (k < 2) continue;
+    let v = aceSetBonus(k);
+    if (r !== 'A') v /= 2;
+    if (v > 0) { total += v; parts.push({ rank: r, count: k, value: v }); }
+  }
+  parts.sort((a, b) => b.value - a.value);
+  return { total, parts };
+}
+
+/* ===================== COMBO THEO HÀNG ===================== */
+/** Combo của một hàng SAU khi áp luật Boss. Chỉ áp cho người chơi. */
+function rowCombosFor(row, ri, isPlayer) {
+  if (!isPlayer) return evaluateRow(row);
+  if (blindIs('full5only') && row.length < ROW_SIZE) return [];
+  let combos = evaluateRow(row);
+  // Cắt Đầu: hàng 1 mất hệ số nhân, giữ phần cộng
+  if (blindIs('firstrow') && ri === 0) combos = combos.map(c => ({ ...c, mult: 1 }));
+  // Chặt Thưởng: mất hết phần cộng
+  if (blindIs('noxidach')) combos = combos.map(c => ({ ...c, add: 0 }));
+  if (blindIs('multdown')) combos = combos.map(c => ({ ...c, mult: erode(c.mult) }));
+  return combos;
+}
+
+function evaluateRow(row) {
+  const combos = [];
+  const n = row.length;
+  if (n < 2) return combos;
+
+  const rankCount = {}, suitCount = {};
+  for (const c of row) {
+    rankCount[c.rank] = (rankCount[c.rank] || 0) + 1;
+    suitCount[c.suit] = (suitCount[c.suit] || 0) + 1;
+  }
+  const counts = Object.values(rankCount).sort((a, b) => b - a);
+  const uniq = [...new Set(row.map(c => RANK_ORDER[c.rank]))].sort((a, b) => a - b);
+
+  if (counts[0] >= 2) combos.push({ name: 'Đôi', add: 2, mult: 1, rank: 2 });
+  if (counts[0] >= 2 && counts[1] >= 2) combos.push({ name: '2 Đôi', add: 4, mult: 1, rank: 3 });
+  if (counts[0] >= 3) combos.push({ name: 'Sám', add: 6, mult: 1, rank: 4 });
+  if (counts[0] >= 4) combos.push({ name: 'Tứ quý', add: 0, mult: 6, rank: 8 });
+  if (counts[0] >= 5) combos.push({ name: 'Ngũ quý', add: 0, mult: 10, rank: 10 });
+
+  if (n >= ROW_SIZE) {
+    const isFlush = Object.values(suitCount).some(v => v >= 5);
+    const isStraight = longestStraight(uniq) >= 5;
+    const isRoyal = [10, 11, 12, 13, 14].every(v => uniq.includes(v));
+    if (isStraight && isFlush) {
+      if (isRoyal) combos.push({ name: 'Sảnh Chúa', add: 0, mult: 12, rank: 12 });
+      else combos.push({ name: 'Thùng phá sảnh', add: 0, mult: 9, rank: 11 });
+    } else {
+      if (isFlush) combos.push({ name: 'Thùng', add: 0, mult: 3, rank: 6 });
+      if (isStraight) combos.push({ name: 'Sảnh', add: 0, mult: 2, rank: 5 });
+    }
+    if (counts[0] >= 3 && counts[1] >= 2) combos.push({ name: 'Cù lũ', add: 0, mult: 4, rank: 7 });
+  }
+
+  combos.sort((a, b) => b.rank - a.rank);
+  return combos;
+}
+
+/* ===================== COMBO MẬU BINH ===================== */
+function evaluateMauBinh(hand, rows) {
+  const combos = [];
+  const n = hand.length;
+  if (n < 6) return combos;
+
+  const rankCount = {};
+  for (const c of hand) rankCount[c.rank] = (rankCount[c.rank] || 0) + 1;
+  const counts = Object.values(rankCount).sort((a, b) => b - a);
+  const uniq = [...new Set(hand.map(c => RANK_ORDER[c.rank]))].sort((a, b) => a - b);
+  const longStr = longestStraight(uniq);
+
+  const reds = hand.filter(c => c.suit === '♥' || c.suit === '♦').length;
+  if (reds === n || reds === 0) combos.push({ name: 'Đồng màu', mult: 15, rank: 15 });
+  if (longStr >= 8 || (uniq.length >= 10 && longStr >= 7)) combos.push({ name: 'Sảnh Rồng', mult: 20, rank: 16 });
+  if (longStr >= 10 || uniq.length >= 12) combos.push({ name: 'Rồng cuốn', mult: 25, rank: 17 });
+
+  const pairCount = counts.filter(c => c >= 2).length;
+  const tripleCount = counts.filter(c => c >= 3).length;
+  if (pairCount >= 6) combos.push({ name: 'Lục phé bôn', mult: 12, rank: 13 });
+  if (pairCount >= 5 && tripleCount >= 1) combos.push({ name: 'Năm đôi một sám', mult: 14, rank: 14 });
+
+  let flushRows = 0, straightRows = 0;
+  for (const r of rows) {
+    if (r.length < ROW_SIZE) continue;
+    const sc = {};
+    for (const c of r) sc[c.suit] = (sc[c.suit] || 0) + 1;
+    if (Object.values(sc).some(v => v >= 5)) flushRows++;
+    const u = [...new Set(r.map(c => RANK_ORDER[c.rank]))].sort((a, b) => a - b);
+    if (longestStraight(u) >= 5) straightRows++;
+  }
+  if (flushRows >= 3) combos.push({ name: '3 Thùng', mult: 12, rank: 12 });
+  if (straightRows >= 3) combos.push({ name: '3 Sảnh', mult: 10, rank: 11 });
+
+  combos.sort((a, b) => b.rank - a.rank);
+  return combos;
+}
+
+/* ===================== CỘT DỌC ===================== */
+/** Cột j = các lá ở vị trí j của mọi hàng. Trả về số lá trùng rank nhiều nhất trong 1 cột. */
+function bestColumnMatch(hand) {
+  const rows = chunkRows(hand);
+  let best = 0;
+  for (let col = 0; col < ROW_SIZE; col++) {
+    const cnt = {};
+    for (const r of rows) if (r[col]) cnt[r[col].rank] = (cnt[r[col].rank] || 0) + 1;
+    for (const k in cnt) best = Math.max(best, cnt[k]);
+  }
+  return best;
+}
+
+/* ===================== JOKER ===================== */
+let jokerSeq = 1;
+
+function jokerComboMult(combo, mult) {
+  return {
+    key: `cm:${combo}:${mult}`, type: 'comboMult', combo, mult,
+    name: `${combo} ×${mult}`,
+    desc: `Hàng nào có ${combo} thì nhân ${mult} lần điểm hàng đó.`,
+    price: COMBO_INFO[combo].mult[mult],
+    style: '', w: 0.95
+  };
+}
+function jokerComboAdd(combo) {
+  const v = COMBO_INFO[combo].add;
+  return {
+    key: `ca:${combo}`, type: 'comboAdd', combo, add: v,
+    name: `${combo} +${fmtN(v)}`,
+    desc: `Hàng nào có ${combo} thì cộng thêm ${fmtN(v)} điểm (nằm trong hệ số tầng).`,
+    price: COMBO_INFO[combo].addPrice,
+    style: 'add-type', w: 2.4
+  };
+}
+function jokerXiDach(mult) {
+  return {
+    key: `xd:${mult}`, type: 'xiDach', mult,
+    name: `Xì Dách ×${mult}`,
+    desc: `Nếu tay bài đúng 21 điểm thì nhân ${mult} lần tổng sát thương.`,
+    price: {3:5, 4:6, 5:7}[mult],
+    style: 'special', w: 5.3
+  };
+}
+function jokerFewCards(nCards) {
+  const mult = 7 - nCards;   // 2→×5, 3→×4, 4→×3, 5→×2
+  return {
+    key: `fc:${nCards}`, type: 'fewCards', nCards, mult,
+    name: `Đúng ${nCards} lá ×${mult}`,
+    desc: `Nếu tay bài có ĐÚNG ${nCards} lá (không hơn không kém) thì nhân ${mult} lần tổng sát thương.`,
+    price: 5,
+    style: 'special', w: 3.25
+  };
+}
+function jokerColumn(mult) {
+  return {
+    key: `col:${mult}`, type: 'column', need: 3, mult,
+    name: `Cột dọc ×${mult}`,
+    desc: `Nếu có 3 lá cùng rank nằm cùng một cột dọc thì nhân ${mult} lần tổng sát thương. (Cần ≥3 hàng)`,
+    price: {3:10, 4:14, 5:18}[mult],
+    style: 'special', w: 3.0
+  };
+}
+
+/* Pool tĩnh — mỗi Joker là UNIQUE, xác định bởi .key */
+function buildJokerPool() {
+  const out = [];
+  for (const combo of COMBO_KEYS) {
+    for (const m of [2, 3, 4, 5]) out.push(jokerComboMult(combo, m));
+    out.push(jokerComboAdd(combo));
+  }
+  for (const m of [3, 4, 5]) out.push(jokerXiDach(m));
+  for (const n of [2, 3, 4, 5]) out.push(jokerFewCards(n));
+  for (const m of [3, 4, 5]) out.push(jokerColumn(m));
+  return out;
+}
+const JOKER_POOL = buildJokerPool();
+
+/** Bốc n Joker KHÁC NHAU, loại bỏ những lá người chơi đã sở hữu. */
+function rollShopJokers(n) {
+  const owned = new Set(state.jokers.map(j => j.key));
+  const avail = JOKER_POOL.filter(j => !owned.has(j.key));
+  const out = [];
+  while (out.length < n && avail.length) {
+    let total = 0;
+    for (const j of avail) total += j.w;
+    let r = Math.random() * total, idx = avail.length - 1;
+    for (let i = 0; i < avail.length; i++) { r -= avail[i].w; if (r <= 0) { idx = i; break; } }
+    out.push({ ...avail[idx], id: jokerSeq++ });
+    avail.splice(idx, 1);
+  }
+  return out;
+}
+
+function randomShopCard() {
+  return {
+    id: jokerSeq++,
+    card: { rank: pick(RANKS), suit: pick(SUITS) },
+    price: randInt(CONFIG.CARD_PRICE_MIN, CONFIG.CARD_PRICE_MAX)
+  };
+}
+
+/* ===================== DAMAGE CALC ===================== */
+/**
+ * Người chơi:
+ *   scale  = 1.2^tầng
+ *   hàng   : (điểm hàng + Σadd·scale + Σ JokerCộng khớp) × Πmult × Π JokerNhân khớp
+ *   core   = Σ hàng + Xì Dách(10·1.2^tầng nếu 21) + thưởng bộ trùng rank
+ *   DMG    = core × Π MậuBinh × Π Joker toàn cục (Xì Dách / Tối giản / Cột dọc)
+ * Boss:
+ *   combo dùng SỐ GỐC (không scale), không Joker, không thưởng bộ.
+ *   DMG = Σ hàng + XìDách tuyến tính + dmg phẳng (+1 mỗi 3 tầng)
+ */
+function evalHandAt(hand, total, acesAs11, isPlayer) {
+  const res = {
+    val: total, busted: false, bjBonus: 0,
+    rows: [], mauBinh: [], setBonus: { total: 0, parts: [] },
+    globals: [], globalMult: 1, dmg: 0
+  };
+
+  const rows = chunkRows(hand);
+  const scale = isPlayer ? floorScale() : 1;
+  const jokers = isPlayer ? activeJokers() : [];
+
+  // ----- combo & hệ số từng hàng -----
+  const rowData = rows.map((r, ri) => {
+    const combos = rowCombosFor(r, ri, isPlayer);
+    const names = new Set(combos.map(c => c.name));
+    let add = 0, mult = 1;
+    for (const c of combos) { add += c.add; mult *= c.mult; }
+    const jk = [];
+    for (const j of jokers) {
+      if (j.type === 'comboMult' && names.has(j.combo)) {
+        mult *= (blindIs('firstrow') && ri === 0) ? 1 : erode(j.mult); jk.push(j);
+      } else if (j.type === 'comboAdd' && names.has(j.combo)) {
+        if (!blindIs('noxidach')) { add += j.add; jk.push(j); }
+      }
+    }
+    return { cards: r, combos, jokers: jk, add, mult, base: 0 };
+  });
+
+  // ----- gán A = 11 vào hàng có mult cao nhất -----
+  const vals = hand.map(c => c.rank === 'A' ? 1 : (RANK_VAL[c.rank] || 10));
+  const aceIdx = [];
+  hand.forEach((c, i) => { if (c.rank === 'A') aceIdx.push(i); });
+  aceIdx.sort((a, b) => rowData[Math.floor(b / ROW_SIZE)].mult - rowData[Math.floor(a / ROW_SIZE)].mult);
+  for (let k = 0; k < acesAs11 && k < aceIdx.length; k++) vals[aceIdx[k]] = 11;
+  hand.forEach((c, i) => { rowData[Math.floor(i / ROW_SIZE)].base += vals[i]; });
+
+  // Hệ số tầng nhân vào toàn bộ phần điểm hàng (Boss có scale = 1)
+  let core = 0;
+  for (const rd of rowData) core += (rd.base + rd.add) * rd.mult;
+  core *= scale;
+  res.rowTotal = core;
+
+  if (!isPlayer) {
+    if (total === 21) { res.bjBonus = getBossXiDachBonus(); core += res.bjBonus; }
+    core += bossFlatDmg();
+    res.rows = rowData;
+    res.dmg = Math.floor(core);
+    return res;
+  }
+
+  const cut = blindIs('noxidach');
+  if (total === 21 && !cut) { res.bjBonus = getXiDachBonus(); core += res.bjBonus; }
+
+  const sb = cut ? { total: 0, parts: [] } : calcSetBonus(hand);
+  core += sb.total;
+
+  // ----- nhân toàn cục -----
+  const mb = evaluateMauBinh(hand, rows);
+  let gMult = 1;
+  for (const c of mb) gMult *= erode(c.mult);
+
+  const globals = [];
+  const colBest = bestColumnMatch(hand);
+  for (const j of jokers) {
+    if (j.type === 'xiDach' && total === 21) { gMult *= erode(j.mult); globals.push(j); }
+    else if (j.type === 'fewCards' && hand.length === j.nCards) { gMult *= erode(j.mult); globals.push(j); }
+    else if (j.type === 'column' && colBest >= j.need) { gMult *= erode(j.mult); globals.push(j); }
+  }
+
+  core *= gMult;
+
+  res.rows = rowData;
+  res.setBonus = sb;
+  res.mauBinh = mb;
+  res.globals = globals;
+  res.globalMult = gMult;
+  res.dmg = Math.floor(core);
+  return res;
+}
+
+/** Trần quắc của người chơi. Luật Trần Thấp cắt một nửa Dmg tối đa mua được. */
+function playerCap() {
+  const ov = blindIs('lowcap') ? Math.floor(state.overflow / 2) : state.overflow;
+  return 21 + ov;
+}
+/** Hệ số nhân sau khi luật Bào Mòn gặm mất 1. */
+function erode(m) { return blindIs('multdown') ? Math.max(1, m - 1) : m; }
+/** Luật Ép Tới: điểm tối thiểu phải đạt mới được dừng. */
+function forcedMin() { return blindIs('minscore') ? playerCap() - 4 : 0; }
+function calcDamage(hand, isPlayer) {
+  const cap = isPlayer ? playerCap() : 21 + bossOverflow();
+  const aces = hand.filter(c => c.rank === 'A').length;
+  const nonAce = hand.reduce((s, c) => s + (c.rank === 'A' ? 0 : (RANK_VAL[c.rank] || 10)), 0);
+
+  let best = null;
+  for (let j = aces; j >= 0; j--) {
+    const total = nonAce + 11 * j + (aces - j);
+    if (total > cap) continue;
+    const r = evalHandAt(hand, total, j, isPlayer);
+    if (!best || r.dmg > best.dmg) best = r;
+  }
+  if (!best) {
+    return {
+      val: nonAce + aces, busted: true, bjBonus: 0,
+      rows: [], mauBinh: [], setBonus: { total: 0, parts: [] },
+      globals: [], globalMult: 1, dmg: 0
+    };
+  }
+  return best;
+}
+
+/* ===================== RENDER: CARDS ===================== */
+function renderCard(card, opts = {}) {
+  const div = document.createElement('div');
+  if (opts.hidden) { div.className = 'card hidden-card'; return div; }
+  const isRed = card.suit === '♥' || card.suit === '♦';
+  div.className = 'card ' + (isRed ? 'red' : 'black');
+  if (opts.draggable) {
+    div.classList.add('draggable');
+    div.draggable = true;
+    div.dataset.idx = opts.idx;
+    if (opts.idx === selectedIdx) div.classList.add('selected');
+  }
+  div.innerHTML =
+    `<div>${card.rank}</div>` +
+    `<div class="suit">${card.suit}</div>` +
+    `<div style="transform:rotate(180deg);font-size:0.9rem">${card.rank}</div>` +
+    (opts.col != null ? `<div class="colmark">C${opts.col + 1}</div>` : '');
+  return div;
+}
+
+function renderPlayerRows() {
+  const pEl = $('player-cards');
+  pEl.innerHTML = '';
+  const rows = chunkRows(state.playerHand);
+  const scale = floorScale();
+  const showCol = rows.length >= 3;
+
+  const hideOwn = blindIs('blindfold') && state.phase === 'player';
+  const canMove = state.phase === 'player' && !blindIs('nosort') && !hideOwn;
+
+  rows.forEach((row, ri) => {
+    const combos = rowCombosFor(row, ri, true);
+    const names = new Set(combos.map(c => c.name));
+    let add = 0, mult = 1;
+    for (const c of combos) { add += c.add; mult *= c.mult; }
+    const jkParts = [];
+    for (const j of activeJokers()) {
+      if (j.type === 'comboMult' && names.has(j.combo)) {
+        const m = (blindIs('firstrow') && ri === 0) ? 1 : erode(j.mult);
+        mult *= m;
+        jkParts.push(m > 1 ? `🃏 ×${m}` : `🃏 ×${j.mult} bị chặn`);
+      } else if (j.type === 'comboAdd' && names.has(j.combo)) {
+        if (blindIs('noxidach')) jkParts.push(`🃏 +${fmtN(j.add)} bị chặn`);
+        else { add += j.add; jkParts.push(`🃏 +${fmtN(j.add)}`); }
+      }
+    }
+    const rowPts = row.reduce((s, c) => s + (c.rank === 'A' ? 11 : (RANK_VAL[c.rank] || 10)), 0);
+
+    const rowEl = document.createElement('div');
+    rowEl.className = 'hand-row' + (row.length === ROW_SIZE ? ' full' : '');
+    rowEl.dataset.row = ri;
+
+    const tag = document.createElement('div');
+    tag.className = 'row-tag';
+    tag.innerHTML = `H${ri + 1}<small>${row.length}/${ROW_SIZE}</small>`;
+
+    const cardsEl = document.createElement('div');
+    cardsEl.className = 'row-cards';
+    row.forEach((c, ci) => {
+      cardsEl.appendChild(renderCard(c, {
+        hidden: hideOwn,
+        draggable: canMove,
+        idx: ri * ROW_SIZE + ci,
+        col: showCol ? ci : null
+      }));
+    });
+
+    const info = document.createElement('div');
+    info.className = 'row-info';
+    if (hideOwn) {
+      info.innerHTML = '<span class="none">— úp bài —</span>';
+      rowEl.append(tag, cardsEl, info);
+      pEl.appendChild(rowEl);
+      return;
+    }
+    const lines = combos.map(c =>
+      c.mult > 1 ? `<span class="mult">${c.name} ×${c.mult}</span>`
+      : c.add > 0 ? `<span class="add">${c.name} +${c.add}</span>`
+      : `<span class="none">${c.name} bị chặn</span>`
+    );
+    if (jkParts.length) lines.push(`<span class="jk">${jkParts.join(' ')}</span>`);
+    if (lines.length) {
+      info.innerHTML = lines.join('<br>') +
+        `<div style="opacity:.6;margin-top:2px">(${rowPts}+${fmtN(add)})×${fmt(mult)}×${scale.toFixed(2)}</div>` +
+        `<div class="jk">≈ ${fmtN((rowPts + add) * mult * scale)}</div>`;
+    } else {
+      info.innerHTML = `<span class="none">— mậu thầu —</span>` +
+        `<div style="opacity:.5;margin-top:2px">${rowPts}×${scale.toFixed(2)} ≈ ${fmtN(rowPts * scale)}</div>`;
+    }
+
+    rowEl.append(tag, cardsEl, info);
+    pEl.appendChild(rowEl);
+  });
+}
+
+function renderJokerBar(activeIds) {
+  const bar = $('joker-bar');
+  bar.innerHTML = '';
+  for (let i = 0; i < CONFIG.JOKER_SLOTS; i++) {
+    const j = state.jokers[i];
+    const d = document.createElement('div');
+    if (!j) {
+      d.className = 'joker-chip empty';
+      d.textContent = 'Slot trống';
+    } else {
+      d.className = 'joker-chip' + (activeIds && activeIds.has(j.id) ? ' active' : '');
+      d.innerHTML = `<div class="jname">🃏 ${j.name}</div><div class="jdesc">${j.desc}</div>`;
+    }
+    bar.appendChild(d);
+  }
+}
+
+function renderHands(hideBossFirst = false) {
+  const bEl = $('boss-cards');
+  bEl.innerHTML = '';
+  renderPlayerRows();
+
+  state.bossHand.forEach((c, i) => {
+    const hide = hideBossFirst && i === 0 && state.phase === 'player';
+    bEl.appendChild(renderCard(c, { hidden: hide }));
+  });
+
+  const pInfo = calcDamage(state.playerHand, true);
+  const hidden = blindIs('blindfold') && state.phase === 'player';
+  $('player-score').textContent = hidden ? '???' : (pInfo.busted ? pInfo.val + ' (Quắc!)' : pInfo.val);
+  $('player-bj').textContent = (!hidden && !pInfo.busted && pInfo.val === 21 && pInfo.bjBonus)
+    ? `+${fmtN(pInfo.bjBonus)} Xì Dách` : '';
+  $('player-dmg-preview').textContent = hidden
+    ? `${state.playerHand.length} lá úp — không xem được`
+    : `DMG dự kiến: ${fmtN(pInfo.dmg)}`;
+
+  if (hideBossFirst && state.phase === 'player') {
+    const vis = state.bossHand.slice(1);
+    $('boss-score').textContent = vis.length ? bjValue(vis) + ' + ?' : '?';
+    $('boss-bj').textContent = '';
+  } else {
+    const bInfo = calcDamage(state.bossHand, false);
+    $('boss-score').textContent = bInfo.busted ? bInfo.val + ' (Quắc!)' : bInfo.val;
+    $('boss-bj').textContent = (!bInfo.busted && bInfo.val === 21) ? `+${bInfo.bjBonus} Xì Dách` : '';
+  }
+
+  // Mậu Binh
+  const rows = chunkRows(state.playerHand);
+  const mb = hidden ? [] : evaluateMauBinh(state.playerHand, rows);
+  const badge = $('combo-badge');
+  if (hidden) {
+    badge.className = 'combo-badge none';
+    badge.textContent = '🙈 Bịt Mắt — lật bài khi bấm Sẵn sàng';
+    $('set-badge').style.display = 'none';
+    $('glob-badge').style.display = 'none';
+    renderJokerBar(new Set());
+    updateHPBars();
+    return;
+  }
+  if (mb.length) {
+    badge.className = 'combo-badge';
+    badge.textContent = '🐉 ' + mb.map(c => `${c.name} ×${c.mult}`).join(' · ');
+  } else {
+    badge.className = 'combo-badge none';
+    badge.textContent = state.playerHand.length < 6
+      ? 'Mậu Binh cần ≥6 lá (tính toàn bài)' : 'Chưa có combo Mậu Binh';
+  }
+
+  // Thưởng bộ
+  const sb = calcSetBonus(state.playerHand);
+  const setEl = $('set-badge');
+  if (sb.total > 0) {
+    setEl.style.display = '';
+    setEl.textContent = '🂡 ' + sb.parts.map(p => `${p.count}×${p.rank} +${fmt(p.value)}`).join(' · ') + ` = +${fmt(sb.total)}`;
+  } else setEl.style.display = 'none';
+
+  // Joker toàn cục đang kích hoạt
+  const globEl = $('glob-badge');
+  if (pInfo.globals && pInfo.globals.length) {
+    globEl.style.display = '';
+    globEl.textContent = '🃏 ' + pInfo.globals.map(j => `${j.name}`).join(' · ');
+  } else globEl.style.display = 'none';
+
+  // highlight joker đang hoạt động
+  const active = new Set();
+  (pInfo.globals || []).forEach(j => active.add(j.id));
+  (pInfo.rows || []).forEach(rd => (rd.jokers || []).forEach(j => active.add(j.id)));
+  renderJokerBar(active);
+
+  updateHPBars();
+}
+
+function updateHPBars() {
+  const pPct = Math.max(0, state.playerHP / state.playerMaxHP * 100);
+  $('player-hp-fill').style.width = pPct + '%';
+  $('player-hp-text').textContent = `${Math.max(0, Math.ceil(state.playerHP))} / ${state.playerMaxHP}`;
+
+  const bPct = Math.max(0, state.bossHP / state.bossMaxHP * 100);
+  $('boss-hp-fill').style.width = bPct + '%';
+  $('boss-hp-text').textContent = `${fmtN(Math.max(0, state.bossHP))} / ${fmtN(state.bossMaxHP)}`;
+}
+
+function updateHUD() {
+  $('floor-num').textContent = state.floor + 1;
+  $('diff-name').textContent = diff().icon + ' ' + diff().name;
+  $('gold-val').textContent = state.gold;
+  $('scale-val').textContent = '×' + floorScale().toFixed(2);
+  $('overflow-val').textContent = 21 + state.overflow;
+  $('extra-cards').textContent = playerDeckSize() + (state.extraCards.length ? ` (+${state.extraCards.length})` : '');
+  $('highscore-val').textContent = fmtN(state.highScore);
+  $('stat-maxhp').textContent = state.playerMaxHP;
+  $('stat-aa').textContent = fmt(aceSetBonus(2));
+  $('stat-xd').textContent = '+' + fmtN(getXiDachBonus());
+  $('boss-name').textContent = (BOSS_NAMES[state.floor % BOSS_NAMES.length] || 'Boss') + ` #${state.floor + 1}`;
+  $('boss-buffs').textContent =
+    `Dmg tối đa ${21 + bossOverflow()} · Dmg phẳng +${bossFlatDmg()} · Xì Dách +${getBossXiDachBonus()}`;
+
+  const b = state.blind || BLINDS[0];
+  const bar = $('blind-bar');
+  bar.className = 'blind-bar' + (b.key === 'none' ? ' calm' : '');
+  bar.innerHTML = `<div class="bicon">${b.icon}</div>` +
+    `<div><span class="bname">${b.name}</span> — <span class="bdesc">${b.desc}</span></div>`;
+}
+
+/* ===================== SẮP BÀI: CHẠM ĐỔI CHỖ + KÉO THẢ ===================== */
+function swapCards(i, j) {
+  if (i === j || i == null || j == null) return;
+  const h = state.playerHand;
+  if (i < 0 || j < 0 || i >= h.length || j >= h.length) return;
+  [h[i], h[j]] = [h[j], h[i]];
+}
+
+let dragIdx = null;
+let didDrag = false;
+
+document.addEventListener('dragstart', e => {
+  const t = e.target;
+  if (!t.classList || !t.classList.contains('draggable')) return;
+  dragIdx = +t.dataset.idx;
+  didDrag = true;
+  selectedIdx = null;
+  t.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  try { e.dataTransfer.setData('text/plain', String(dragIdx)); } catch (_) {}
+});
+
+document.addEventListener('dragend', e => {
+  if (e.target.classList) e.target.classList.remove('dragging');
+  document.querySelectorAll('.swap-target').forEach(el => el.classList.remove('swap-target'));
+  dragIdx = null;
+  setTimeout(() => { didDrag = false; }, 60);
+});
+
+document.addEventListener('dragover', e => {
+  if (dragIdx === null) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const t = e.target.closest && e.target.closest('.card.draggable');
+  document.querySelectorAll('.swap-target').forEach(el => el.classList.remove('swap-target'));
+  if (t && +t.dataset.idx !== dragIdx) t.classList.add('swap-target');
+});
+
+document.addEventListener('drop', e => {
+  if (dragIdx === null) return;
+  e.preventDefault();
+  const t = e.target.closest && e.target.closest('.card.draggable');
+  if (!t) return;
+  swapCards(dragIdx, +t.dataset.idx);
+  dragIdx = null;
+  renderHands(true);
+});
+
+// Chạm/click: chọn lá 1 → chọn lá 2 → đổi chỗ. Hoạt động tốt trên cả điện thoại.
+$('player-cards').addEventListener('click', e => {
+  if (didDrag) return;
+  if (state.phase !== 'player') return;
+  const t = e.target.closest('.card.draggable');
+  if (!t) { selectedIdx = null; renderHands(true); return; }
+  const idx = +t.dataset.idx;
+  if (selectedIdx === null) selectedIdx = idx;
+  else if (selectedIdx === idx) selectedIdx = null;
+  else { swapCards(selectedIdx, idx); selectedIdx = null; }
+  renderHands(true);
+});
+
+/** Bật/tắt nút theo luật Boss. */
+function refreshControls() {
+  const p = state.phase === 'player' && !state.gameOver;
+  const n = state.playerHand.length;
+  const val = bjValue(state.playerHand);
+  const maxed = blindIs('maxcards') && n >= 5;
+  // Ép Tới: chưa chạm ngưỡng thì chưa được dừng — trừ khi đã quắc thì thôi
+  const need = forcedMin();
+  const forced = need > 0 && val < need && !calcDamage(state.playerHand, true).busted;
+  const frozen = blindIs('nosort') || (blindIs('blindfold') && state.phase === 'player');
+  $('btn-hit').disabled = !p || maxed;
+  $('btn-ready').disabled = !p || forced;
+  $('btn-hit').textContent = maxed ? 'Hết lượt rút' : 'Rút bài';
+  $('btn-ready').textContent = forced ? `Chưa đủ ${need} (${val})` : 'Sẵn sàng';
+  ['btn-sort-rank', 'btn-sort-suit', 'btn-sort-col'].forEach(id => { $(id).disabled = !p || frozen; });
+}
+
+function sortHand(mode) {
+  if (state.phase !== 'player') return;
+  if (blindIs('nosort') || (blindIs('blindfold') && state.phase === 'player')) return;
+  const h = state.playerHand;
+  if (mode === 'rank') {
+    const cnt = {};
+    for (const c of h) cnt[c.rank] = (cnt[c.rank] || 0) + 1;
+    h.sort((a, b) => (cnt[b.rank] - cnt[a.rank]) || (RANK_ORDER[b.rank] - RANK_ORDER[a.rank]));
+  } else if (mode === 'suit') {
+    const cnt = {};
+    for (const c of h) cnt[c.suit] = (cnt[c.suit] || 0) + 1;
+    h.sort((a, b) => (cnt[b.suit] - cnt[a.suit]) || SUITS.indexOf(a.suit) - SUITS.indexOf(b.suit)
+      || (RANK_ORDER[a.rank] - RANK_ORDER[b.rank]));
+  } else if (mode === 'col') {
+    // gom lá cùng rank vào cùng cột: rải theo vòng rank
+    const groups = {};
+    for (const c of h) (groups[c.rank] = groups[c.rank] || []).push(c);
+    const ordered = Object.values(groups).sort((a, b) => b.length - a.length);
+    const rowsNeeded = Math.ceil(h.length / ROW_SIZE);
+    const grid = Array.from({ length: rowsNeeded }, () => new Array(ROW_SIZE).fill(null));
+    let col = 0;
+    const leftovers = [];
+    for (const g of ordered) {
+      if (g.length >= 2 && col < ROW_SIZE) {
+        let r = 0;
+        for (const c of g) {
+          if (r < rowsNeeded) grid[r++][col] = c;
+          else leftovers.push(c);
+        }
+        col++;
+      } else leftovers.push(...g);
+    }
+    let li = 0;
+    for (let r = 0; r < rowsNeeded; r++)
+      for (let cc = 0; cc < ROW_SIZE; cc++)
+        if (!grid[r][cc] && li < leftovers.length) grid[r][cc] = leftovers[li++];
+    const flat = grid.flat().filter(Boolean);
+    state.playerHand = flat;
+  }
+  selectedIdx = null;
+  renderHands(true);
+}
+
+/* ===================== GAME FLOW ===================== */
+function startFight() {
+  state.bossMaxHP = calcBossHP(state.floor);
+  state.bossHP = state.bossMaxHP;
+  state.playerHand = [];
+  state.bossHand = [];
+  state.playerDeck = buildPlayerDeck();
+  state.bossDeck = buildBossDeck();
+  state.phase = 'player';
+  state.gameOver = false;
+  selectedIdx = null;
+
+  // luật của Boss tầng này
+  state.blind = state.nextBlind || BLINDS[0];
+  state.lastBlindKey = state.blind.key;
+  state.lockedJoker = (blindIs('jokerlock') && state.jokers.length)
+    ? Math.floor(Math.random() * state.jokers.length) : -1;
+
+  state.playerHand.push(state.playerDeck.pop(), state.playerDeck.pop());
+  state.bossHand.push(state.bossDeck.pop(), state.bossDeck.pop());
+
+  updateHUD();
+  renderHands(true);
+  refreshControls();
+  setMsg(state.blind.key === 'none'
+    ? 'Lượt của bạn — Rút bài, sắp xếp hàng rồi nhấn Sẵn sàng'
+    : `${state.blind.icon} ${state.blind.name}: ${state.blind.desc}`,
+    state.blind.key === 'none' ? 'info' : 'boss');
+  log(`── Tầng ${state.floor + 1} | Boss ${fmtN(state.bossMaxHP)} máu | ${state.blind.icon} ${state.blind.name} ──`);
+  if (state.lockedJoker >= 0) log(`⛓️ Joker "${state.jokers[state.lockedJoker].name}" bị vô hiệu trận này`);
+}
+
+function playerHit() {
+  if (state.phase !== 'player' || state.gameOver) return;
+  if (blindIs('maxcards') && state.playerHand.length >= 5) return;
+  if (state.playerDeck.length < 1) state.playerDeck = buildPlayerDeck();
+  state.playerHand.push(state.playerDeck.pop());
+  selectedIdx = null;
+  renderHands(true);
+  refreshControls();
+
+  if (blindIs('blindfold')) {
+    setMsg(`🙈 Đã rút ${state.playerHand.length} lá — không xem được. Dừng hay liều tiếp?`, 'boss');
+    return;
+  }
+  const info = calcDamage(state.playerHand, true);
+  if (info.busted) setMsg(`Quắc ${info.val}! (Trần: ${playerCap()}) — Mất lượt sát thương`, 'lose');
+  else setMsg(`Điểm ${info.val} | DMG dự kiến: ${fmtN(info.dmg)}`, 'info');
+}
+
+function comboSummary(info) {
+  const bits = [];
+  info.rows.forEach((rd, i) => {
+    if (rd.combos.length) bits.push(`H${i + 1}: ${rd.combos.map(c => c.name).join('+')}`);
+  });
+  if (info.mauBinh.length) bits.push(`Mậu Binh: ${info.mauBinh.map(c => c.name).join('+')}`);
+  if (info.globals && info.globals.length) bits.push(`Joker: ${info.globals.map(j => j.name).join('+')}`);
+  if (info.setBonus.total > 0) bits.push(`Bộ +${fmt(info.setBonus.total)}`);
+  return bits;
+}
+
+function playerReady() {
+  if (state.phase !== 'player' || state.gameOver) return;
+  if (bjValue(state.playerHand) < forcedMin()
+      && !calcDamage(state.playerHand, true).busted) return;
+  $('btn-hit').disabled = true;
+  $('btn-ready').disabled = true;
+  selectedIdx = null;
+  state.phase = 'resolve-player';
+
+  const info = calcDamage(state.playerHand, true);
+  renderHands(false);
+
+  if (info.busted) {
+    setMsg('Bạn quắc! Không gây sát thương.', 'lose');
+    log(`Bạn quắc (${info.val}) → 0 DMG`);
+    setTimeout(bossTurn, 900);
+    return;
+  }
+
+  const dmg = info.dmg;
+  state.bossHP = Math.max(0, state.bossHP - dmg);
+  state.totalDamageDealt += dmg;
+  if (dmg > state.highScore) { state.highScore = dmg; }
+  updateHUD();
+  updateHPBars();
+  $('boss-panel').classList.add('shake');
+  setTimeout(() => $('boss-panel').classList.remove('shake'), 400);
+
+  const bits = comboSummary(info);
+  let msg = `Bạn gây ${fmtN(dmg)} sát thương!`;
+  if (info.bjBonus) msg += ` (+${fmtN(info.bjBonus)} Xì Dách)`;
+  if (bits.length) msg += ` [${bits.join(' | ')}]`;
+  setMsg(msg, 'dmg');
+  log(`Bạn: ${info.val} điểm → ${fmtN(dmg)} DMG${bits.length ? ' (' + bits.join(' | ') + ')' : ''}`);
+
+  if (state.bossHP <= 0) { setTimeout(onBossDefeated, 1100); return; }
+  setTimeout(bossTurn, 1100);
+}
+
+function bossTurn() {
+  if (state.gameOver) return;
+  state.phase = 'boss';
+  setMsg('Boss đang rút bài...', 'boss');
+  const target = 17 + bossOverflow();
+
+  const think = () => {
+    const val = bjValue(state.bossHand);
+    if (val < target) {
+      if (state.bossDeck.length < 1) state.bossDeck = buildBossDeck();
+      state.bossHand.push(state.bossDeck.pop());
+      renderHands(false);
+      setTimeout(think, 380);
+    } else finishBossTurn();
+  };
+  setTimeout(think, 450);
+}
+
+function finishBossTurn() {
+  const info = calcDamage(state.bossHand, false);
+  renderHands(false);
+
+  if (info.busted) {
+    setMsg(`Boss quắc ${info.val}! Bạn may mắn thoát.`, 'win');
+    log(`Boss quắc (${info.val}) → 0 DMG`);
+    setTimeout(nextPlayerTurn, 950);
+    return;
+  }
+
+  const dmg = info.dmg;
+  state.playerHP = Math.max(0, state.playerHP - dmg);
+  updateHPBars();
+  document.querySelector('.player-panel').classList.add('shake');
+  setTimeout(() => document.querySelector('.player-panel').classList.remove('shake'), 400);
+
+  const bc = [];
+  (info.rows || []).forEach((rd, i) => { if (rd.combos.length) bc.push(rd.combos.map(c => c.name).join('+')); });
+  let msg = `Boss gây ${fmtN(dmg)} sát thương!`;
+  if (info.bjBonus) msg += ` (+${info.bjBonus} Xì Dách)`;
+  if (bc.length) msg += ` [${bc.join(' | ')}]`;
+  setMsg(msg, 'boss');
+  log(`Boss: ${info.val} điểm → ${fmtN(dmg)} DMG${bc.length ? ' (' + bc.join(' | ') + ')' : ''}`);
+
+  if (state.playerHP <= 0) { setTimeout(onPlayerDead, 1000); return; }
+  setTimeout(nextPlayerTurn, 950);
+}
+
+function nextPlayerTurn() {
+  state.playerHand = [];
+  state.bossHand = [];
+  if (state.playerDeck.length < 2) state.playerDeck = buildPlayerDeck();
+  if (state.bossDeck.length < 2) state.bossDeck = buildBossDeck();
+  state.playerHand.push(state.playerDeck.pop(), state.playerDeck.pop());
+  state.bossHand.push(state.bossDeck.pop(), state.bossDeck.pop());
+  state.phase = 'player';
+  selectedIdx = null;
+  renderHands(true);
+  refreshControls();
+  setMsg('Lượt mới — Rút bài rồi Sẵn sàng', 'info');
+}
+
+function onBossDefeated() {
+  state.bossesKilled++;
+  state.floor++;
+  state.playerHP = state.playerMaxHP;
+
+  const stingy = blindIs('nogold');
+  const interest = stingy ? 0 : Math.min(CONFIG.INTEREST_CAP, Math.floor(state.gold / CONFIG.INTEREST_PER));
+  const reward = stingy ? 0 : CONFIG.GOLD_PER_FLOOR;
+  state.gold += reward + interest;
+
+  // bốc luật cho Boss tầng kế, hiện ngay ở màn buff để còn tính đường mua Joker
+  state.nextBlind = pickBlind(state.floor);
+
+  updateHPBars();
+  setMsg(stingy ? 'Boss gục! Nhưng lão keo kiệt không để lại đồng nào.' : 'Boss gục! Hồi full máu — Nhận vàng!', 'win');
+  log(stingy
+    ? `★ Hạ Boss tầng ${state.floor}! 🕳️ Keo Kiệt — không được vàng (${state.gold} 💰)`
+    : `★ Hạ Boss tầng ${state.floor}! +${reward} vàng, +${interest} lợi tức → ${state.gold} 💰`);
+  setTimeout(showBuffSelect, 900);
+}
+
+function onPlayerDead() {
+  state.gameOver = true;
+  $('go-diff').textContent = `${diff().icon} Độ khó: ${diff().name}`;
+  $('go-killed').textContent = state.bossesKilled;
+  $('go-floor').textContent = state.floor + 1;
+  $('go-dmg').textContent = fmtN(state.totalDamageDealt);
+  $('go-high').textContent = fmtN(state.highScore);
+  showScreen('gameover');
+}
+
+/* ===================== BUFFS ===================== */
+function weightedRandom(items) {
+  const total = items.reduce((s, i) => s + i.w, 0);
+  let r = Math.random() * total;
+  for (const it of items) { r -= it.w; if (r <= 0) return it; }
+  return items[items.length - 1];
+}
+
+function generateBuffs() {
+  const buffs = [];
+
+  const ov = weightedRandom([
+    { val: 3, w: 40, rarity: 'common' },
+    { val: 4, w: 28, rarity: 'uncommon' },
+    { val: 5, w: 18, rarity: 'rare' },
+    { val: 6, w: 10, rarity: 'epic' },
+    { val: 7, w: 4,  rarity: 'legendary' },
+  ]);
+  buffs.push({
+    type: 'overflow', value: ov.val,
+    title: `Dmg tối đa +${ov.val}`,
+    desc: `Cho phép vượt 21 thêm ${ov.val} điểm mà vẫn tính sát thương. Cộng dồn vĩnh viễn.`,
+    icon: '🔥', rarity: ov.rarity
+  });
+
+  const hpVal = 25 + Math.floor(Math.random() * 101);
+  let hpRarity = 'common';
+  if (hpVal >= 100) hpRarity = 'legendary';
+  else if (hpVal >= 75) hpRarity = 'epic';
+  else if (hpVal >= 50) hpRarity = 'rare';
+  else if (hpVal >= 35) hpRarity = 'uncommon';
+  buffs.push({
+    type: 'hp', value: hpVal,
+    title: `Máu tối đa +${hpVal}`,
+    desc: `Tăng máu tối đa thêm ${hpVal}. Hồi đầy máu khi nhận buff.`,
+    icon: '❤️', rarity: hpRarity
+  });
+
+  const goldVal = randInt(5, 15);
+  let gRarity = 'common';
+  if (goldVal >= 14) gRarity = 'epic';
+  else if (goldVal >= 11) gRarity = 'rare';
+  else if (goldVal >= 8) gRarity = 'uncommon';
+  buffs.push({
+    type: 'gold', value: goldVal,
+    title: `Nhận ${goldVal} vàng`,
+    desc: `Cộng thẳng ${goldVal} vàng. Vàng cũng sinh lợi tức (mỗi 10 vàng → +1/màn, trần ${CONFIG.INTEREST_CAP}).`,
+    icon: '💰', rarity: gRarity
+  });
+
+  return shuffle(buffs);
+}
+
+function showBuffSelect() {
+  state.buffPicked = false;
+  state.rerollJoker = 0;
+  state.rerollCard = 0;
+  state.shopJokers = rollShopJokers(CONFIG.SHOP_JOKERS);
+  state.shopCards = Array.from({ length: CONFIG.SHOP_CARDS }, randomShopCard);
+
+  const list = $('buff-list');
+  list.innerHTML = '';
+  generateBuffs().forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'buff-card';
+    div.innerHTML =
+      `<div class="icon">${b.icon}</div>` +
+      `<div class="title">${b.title}</div>` +
+      `<div class="desc">${b.desc}</div>` +
+      `<div class="rarity ${b.rarity}">${b.rarity.toUpperCase()}</div>`;
+    div.onclick = () => {
+      if (state.buffPicked) return;
+      applyBuff(b);
+      state.buffPicked = true;
+      [...list.children].forEach(el => el.classList.add(el === div ? 'picked' : 'disabled'));
+      updateBuffScreen();
+    };
+    list.appendChild(div);
+  });
+
+  updateBuffScreen();
+  showScreen('buff-screen');
+}
+
+function updateBuffScreen() {
+  const nb = state.nextBlind || BLINDS[0];
+  $('blind-preview').innerHTML =
+    `<div class="bicon">${nb.icon}</div>` +
+    `<div><div class="blabel">Boss tầng ${state.floor + 1} sẽ chơi luật</div>` +
+    `<div class="bname">${nb.name}</div><div class="bdesc">${nb.desc}</div></div>`;
+  $('buff-gold').textContent = state.gold;
+  const interest = Math.min(CONFIG.INTEREST_CAP, Math.floor(state.gold / CONFIG.INTEREST_PER));
+  $('buff-income').textContent = `+${CONFIG.GOLD_PER_FLOOR} & +${interest} lợi tức`;
+  $('buff-jokers').textContent = `${state.jokers.length}/${CONFIG.JOKER_SLOTS}`;
+  $('btn-next-floor').disabled = !state.buffPicked;
+  $('buff-hint').textContent = state.buffPicked
+    ? 'Đã chọn buff. Ghé Thương nhân bao nhiêu lần cũng được, xong bấm Màn tiếp.'
+    : 'Chọn 1 buff trước khi sang màn tiếp.';
+}
+
+function applyBuff(b) {
+  if (b.type === 'overflow') {
+    state.overflow += b.value;
+    log(`Buff: Dmg tối đa +${b.value} (tổng ${21 + state.overflow})`);
+  } else if (b.type === 'hp') {
+    state.playerMaxHP += b.value;
+    state.playerHP = state.playerMaxHP;
+    log(`Buff: Máu tối đa +${b.value} → ${state.playerMaxHP}`);
+  } else if (b.type === 'gold') {
+    state.gold += b.value;
+    log(`Buff: +${b.value} vàng → ${state.gold} 💰`);
+  }
+}
+
+/* ===================== SHOP ===================== */
+function rerollCost(n) { return Math.pow(CONFIG.REROLL_BASE, n); }
+
+function openShop() { renderShop(); $('shop-modal').classList.add('open'); }
+function closeShop() { $('shop-modal').classList.remove('open'); updateBuffScreen(); }
+
+function renderShop() {
+  $('shop-gold').textContent = state.gold;
+  $('slot-count').textContent = `${state.jokers.length}/${CONFIG.JOKER_SLOTS} slot · bán lại được nửa giá`;
+
+  // ----- Joker đang sở hữu -----
+  const owned = $('owned-slots');
+  owned.innerHTML = '';
+  for (let i = 0; i < CONFIG.JOKER_SLOTS; i++) {
+    const j = state.jokers[i];
+    const box = document.createElement('div');
+    if (!j) {
+      box.className = 'slot-box empty';
+      box.textContent = 'Slot trống';
+    } else {
+      box.className = 'slot-box';
+      const refund = Math.floor(j.price / 2);
+      box.innerHTML = `<div class="jt" style="font-size:0.82rem">🃏 ${j.name}</div>` +
+                      `<div class="jd" style="font-size:0.7rem;opacity:.75">${j.desc}</div>`;
+      const btn = document.createElement('button');
+      btn.className = 'sell-btn';
+      btn.textContent = `Bán +${refund}💰`;
+      btn.onclick = () => sellJoker(j.id);
+      box.appendChild(btn);
+    }
+    owned.appendChild(box);
+  }
+
+  // ----- Joker bán ra -----
+  const sj = $('shop-jokers');
+  sj.innerHTML = '';
+  state.shopJokers.forEach(j => {
+    const box = document.createElement('div');
+    box.className = 'joker-item ' + (j.style || '') + (j.sold ? ' sold' : '');
+    box.innerHTML = `<div class="jt">🃏 ${j.name}</div><div class="jd">${j.desc}</div>`;
+    const btn = document.createElement('button');
+    btn.className = 'buy-btn';
+    const full = state.jokers.length >= CONFIG.JOKER_SLOTS;
+    btn.textContent = j.sold ? 'Đã mua' : (full ? 'Hết slot' : `Mua ${j.price}💰`);
+    btn.disabled = j.sold || full || state.gold < j.price;
+    btn.onclick = () => buyJoker(j.id);
+    box.appendChild(btn);
+    sj.appendChild(box);
+  });
+
+  // ----- Lá bài bán ra -----
+  const sc = $('shop-cards');
+  sc.innerHTML = '';
+  state.shopCards.forEach(it => {
+    const wrap = document.createElement('div');
+    wrap.className = 'shop-card-item' + (it.sold ? ' sold' : '');
+    if (it.sold) wrap.style.opacity = '0.3';
+    wrap.appendChild(renderCard(it.card, {}));
+    const btn = document.createElement('button');
+    btn.className = 'buy-btn';
+    btn.textContent = it.sold ? 'Đã mua' : `Mua ${it.price}💰`;
+    btn.disabled = it.sold || state.gold < it.price;
+    btn.onclick = () => buyCard(it.id);
+    wrap.appendChild(btn);
+    sc.appendChild(wrap);
+  });
+
+  // ----- Reroll -----
+  const cj = rerollCost(state.rerollJoker), cc = rerollCost(state.rerollCard);
+  $('rr-joker-cost').textContent = cj + '💰';
+  $('rr-card-cost').textContent = cc + '💰';
+  $('reroll-jokers').disabled = state.gold < cj;
+  $('reroll-cards').disabled = state.gold < cc;
+
+  // ----- Trade -----
+  $('merchant-hp').textContent = state.playerMaxHP;
+  $('merchant-dmg').textContent = 21 + state.overflow;
+  const canTrade = state.playerMaxHP >= 50;
+  $('btn-merchant-trade').disabled = !canTrade;
+  if (!canTrade) $('merchant-msg').textContent = 'Máu tối đa quá thấp (cần ≥ 50 để đổi)';
+}
+
+function buyJoker(id) {
+  const j = state.shopJokers.find(x => x.id === id);
+  if (!j || j.sold) return;
+  if (state.jokers.length >= CONFIG.JOKER_SLOTS) return;
+  if (state.gold < j.price) return;
+  state.gold -= j.price;
+  j.sold = true;
+  state.jokers.push({ ...j, sold: undefined });
+  log(`Mua Joker "${j.name}" (-${j.price}💰)`);
+  renderShop();
+}
+
+function sellJoker(id) {
+  const i = state.jokers.findIndex(x => x.id === id);
+  if (i < 0) return;
+  const j = state.jokers[i];
+  const refund = Math.floor(j.price / 2);
+  state.gold += refund;
+  state.jokers.splice(i, 1);
+  log(`Bán Joker "${j.name}" (+${refund}💰)`);
+  renderShop();
+}
+
+function buyCard(id) {
+  const it = state.shopCards.find(x => x.id === id);
+  if (!it || it.sold || state.gold < it.price) return;
+  state.gold -= it.price;
+  it.sold = true;
+  state.extraCards.push({ ...it.card });
+  log(`Mua lá ${it.card.rank}${it.card.suit} (-${it.price}💰)`);
+  renderShop();
+}
+
+function doRerollJokers() {
+  const c = rerollCost(state.rerollJoker);
+  if (state.gold < c) return;
+  state.gold -= c;
+  state.rerollJoker++;
+  state.shopJokers = rollShopJokers(CONFIG.SHOP_JOKERS);
+  renderShop();
+}
+function doRerollCards() {
+  const c = rerollCost(state.rerollCard);
+  if (state.gold < c) return;
+  state.gold -= c;
+  state.rerollCard++;
+  state.shopCards = Array.from({ length: CONFIG.SHOP_CARDS }, randomShopCard);
+  renderShop();
+}
+
+function merchantTrade() {
+  if (state.playerMaxHP < 50) { $('merchant-msg').textContent = 'Không đủ máu tối đa!'; return; }
+  state.playerMaxHP -= 25;
+  if (state.playerHP > state.playerMaxHP) state.playerHP = state.playerMaxHP;
+  state.overflow += 1;
+  log(`Thương nhân: -25 Máu tối đa → +1 Dmg tối đa (HP max ${state.playerMaxHP}, Dmg max ${21 + state.overflow})`);
+  $('merchant-msg').textContent = `Đã đổi! Máu tối đa ${state.playerMaxHP} · Dmg tối đa ${21 + state.overflow}`;
+  renderShop();
+}
+
+function nextFloor() {
+  if (!state.buffPicked) return;
+  closeShop();
+  showScreen('game');
+  startFight();
+}
+
+/* ===================== CHỌN ĐỘ KHÓ ===================== */
+function showDifficulty() {
+  const list = $('diff-list');
+  list.innerHTML = '';
+  DIFFICULTIES.forEach((d, i) => {
+    const hpAt = x => {
+      let hp = d.baseHP;
+      for (let i = 0; i < x; i++) hp *= Math.max(HP_RATE_MIN, Math.exp(HP_K1 - 2 * HP_K2 * i) * d.drift);
+      return Math.round(hp).toLocaleString('en-US');
+    };
+    const el = document.createElement('div');
+    el.className = 'diff-card';
+    el.dataset.d = i;
+    el.innerHTML =
+      `<div class="dicon">${d.icon}</div>` +
+      `<div class="dbody">` +
+        `<div class="dname">${d.name}</div>` +
+        `<div class="dtag">${d.tag} · nhịp ×${(Math.exp(HP_K1) * d.drift).toFixed(2)} → ×${(Math.max(HP_RATE_MIN, Math.exp(HP_K1 - 2 * HP_K2 * 49) * d.drift)).toFixed(2)}</div>` +
+        `<div class="ddesc">${d.desc}</div>` +
+      `</div>` +
+      `<div class="dstat">` +
+        `Boss #1: <b>${hpAt(0)}</b><br>` +
+        `Tầng 10: <b>${hpAt(9)}</b><br>` +
+        `Tầng 25: <b>${hpAt(24)}</b><br>` +
+        `Nhịp đánh: <b>${d.turns}</b><br>` +
+        `Bí lối: <b>${d.wall}</b>` +
+      `</div>`;
+    el.onclick = () => newGame(i);
+    list.appendChild(el);
+  });
+  showScreen('difficulty');
+}
+
+/* ===================== INIT ===================== */
+function newGame(difficulty) {
+  state = freshState(difficulty != null ? difficulty : state.difficulty);
+  selectedIdx = null;
+  $('log').innerHTML = '';
+  showScreen('game');
+  startFight();
+}
+
+$('btn-start').onclick = showDifficulty;
+$('btn-back-menu').onclick = () => showScreen('menu');
+$('btn-restart').onclick = showDifficulty;
+$('btn-hit').onclick = playerHit;
+$('btn-ready').onclick = playerReady;
+$('btn-sort-rank').onclick = () => sortHand('rank');
+$('btn-sort-suit').onclick = () => sortHand('suit');
+$('btn-sort-col').onclick = () => sortHand('col');
+$('btn-open-shop').onclick = openShop;
+$('btn-close-shop').onclick = closeShop;
+$('btn-next-floor').onclick = nextFloor;
+$('reroll-jokers').onclick = doRerollJokers;
+$('reroll-cards').onclick = doRerollCards;
+$('btn-merchant-trade').onclick = merchantTrade;
+$('shop-modal').addEventListener('click', e => { if (e.target.id === 'shop-modal') closeShop(); });
+
+document.addEventListener('touchmove', () => {}, { passive: true });
+</script>
+</body>
+</html>

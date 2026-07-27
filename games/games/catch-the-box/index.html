@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Catch the Box</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; overflow:hidden; background:#12101c; }
+  body { display:flex; align-items:center; justify-content:center;
+         font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+         touch-action:none; user-select:none; }
+  canvas { display:block; max-width:100%; max-height:100%; background:#1a1730;
+           border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.5); cursor:none; }
+</style>
+</head>
+<body>
+<canvas id="c" width="480" height="640"></canvas>
+<script>
+const c = document.getElementById('c'), x = c.getContext('2d');
+const W = c.width, H = c.height;
+
+let state = 'menu';  // menu | play | over
+let score = 0, best = Number(localStorage.getItem('ctb_best') || 0);
+let boxes = [], spawnTimer = 0, speed = 2.2, lives = 3, t = 0;
+const basket = { x: W/2, w: 88, h: 18, y: H - 54 };
+let keys = {};
+
+const COLORS = ['#7c5cff','#ff5c8a','#5cd7ff','#ffd45c','#5cff9d'];
+
+function reset(){
+  boxes = []; score = 0; speed = 2.2; lives = 3; spawnTimer = 0;
+  basket.x = W/2; state = 'play';
+}
+
+function spawn(){
+  const s = 26 + Math.random()*14;
+  boxes.push({
+    x: s/2 + Math.random()*(W - s), y: -s, s,
+    vy: speed + Math.random()*1.4,
+    rot: 0, vr: (Math.random()-.5)*.08,
+    color: COLORS[(Math.random()*COLORS.length)|0],
+    bad: Math.random() < 0.16
+  });
+}
+
+function update(){
+  t++;
+  if (state !== 'play') return;
+
+  if (keys['ArrowLeft'])  basket.x -= 7;
+  if (keys['ArrowRight']) basket.x += 7;
+  basket.x = Math.max(basket.w/2, Math.min(W - basket.w/2, basket.x));
+
+  spawnTimer--;
+  if (spawnTimer <= 0){ spawn(); spawnTimer = Math.max(16, 46 - score*0.45); }
+  speed = 2.2 + score * 0.035;
+
+  for (let i = boxes.length - 1; i >= 0; i--){
+    const b = boxes[i];
+    b.y += b.vy; b.rot += b.vr;
+
+    const hit = b.y + b.s/2 >= basket.y && b.y - b.s/2 <= basket.y + basket.h
+             && Math.abs(b.x - basket.x) < basket.w/2 + b.s/2 - 6;
+
+    if (hit){
+      boxes.splice(i, 1);
+      if (b.bad){ lives--; flash = 12; if (lives <= 0) gameOver(); }
+      else { score++; pop.push({x:b.x, y:b.y, life:18, color:b.color}); }
+    } else if (b.y - b.s > H){
+      boxes.splice(i, 1);
+      if (!b.bad){ lives--; flash = 12; if (lives <= 0) gameOver(); }
+    }
+  }
+  for (let i = pop.length - 1; i >= 0; i--){ if (--pop[i].life <= 0) pop.splice(i,1); }
+  if (flash > 0) flash--;
+}
+
+let pop = [], flash = 0;
+
+function gameOver(){
+  state = 'over';
+  if (score > best){ best = score; localStorage.setItem('ctb_best', best); }
+}
+
+function roundRect(px, py, w, h, r){
+  x.beginPath();
+  x.moveTo(px+r, py);
+  x.arcTo(px+w, py, px+w, py+h, r);
+  x.arcTo(px+w, py+h, px, py+h, r);
+  x.arcTo(px, py+h, px, py, r);
+  x.arcTo(px, py, px+w, py, r);
+  x.closePath();
+}
+
+function draw(){
+  x.fillStyle = '#1a1730'; x.fillRect(0,0,W,H);
+
+  // lưới nền
+  x.strokeStyle = 'rgba(255,255,255,.03)'; x.lineWidth = 1;
+  for (let i = 0; i < W; i += 40){ x.beginPath(); x.moveTo(i,0); x.lineTo(i,H); x.stroke(); }
+  for (let i = 0; i < H; i += 40){ x.beginPath(); x.moveTo(0,i); x.lineTo(W,i); x.stroke(); }
+
+  if (flash > 0){ x.fillStyle = `rgba(255,80,110,${flash/40})`; x.fillRect(0,0,W,H); }
+
+  // khối rơi
+  boxes.forEach(b => {
+    x.save(); x.translate(b.x, b.y); x.rotate(b.rot);
+    x.fillStyle = b.bad ? '#ff3b5c' : b.color;
+    x.shadowColor = x.fillStyle; x.shadowBlur = 14;
+    roundRect(-b.s/2, -b.s/2, b.s, b.s, 6); x.fill();
+    x.shadowBlur = 0;
+    if (b.bad){
+      x.strokeStyle = '#fff'; x.lineWidth = 3; x.lineCap = 'round';
+      const k = b.s*0.22;
+      x.beginPath(); x.moveTo(-k,-k); x.lineTo(k,k); x.moveTo(k,-k); x.lineTo(-k,k); x.stroke();
+    }
+    x.restore();
+  });
+
+  // hiệu ứng ăn điểm
+  pop.forEach(p => {
+    x.globalAlpha = p.life/18;
+    x.strokeStyle = p.color; x.lineWidth = 3;
+    x.beginPath(); x.arc(p.x, p.y, (18-p.life)*2.2, 0, Math.PI*2); x.stroke();
+    x.globalAlpha = 1;
+  });
+
+  // giỏ
+  x.fillStyle = '#eaeaff';
+  x.shadowColor = '#7c5cff'; x.shadowBlur = 20;
+  roundRect(basket.x - basket.w/2, basket.y, basket.w, basket.h, 9); x.fill();
+  x.shadowBlur = 0;
+
+  // HUD
+  x.fillStyle = '#fff'; x.font = 'bold 30px system-ui, sans-serif'; x.textAlign = 'left';
+  x.fillText(score, 20, 46);
+  x.font = '14px system-ui, sans-serif'; x.fillStyle = 'rgba(255,255,255,.45)';
+  x.fillText('BEST ' + best, 20, 68);
+  x.textAlign = 'right'; x.font = '24px system-ui, sans-serif';
+  x.fillText('❤️'.repeat(Math.max(0, lives)), W - 18, 46);
+
+  if (state === 'menu' || state === 'over'){
+    x.fillStyle = 'rgba(18,16,28,.86)'; x.fillRect(0,0,W,H);
+    x.textAlign = 'center'; x.fillStyle = '#fff';
+    x.font = 'bold 42px system-ui, sans-serif';
+    x.fillText(state === 'menu' ? 'CATCH THE BOX' : 'GAME OVER', W/2, H/2 - 40);
+    x.font = '17px system-ui, sans-serif'; x.fillStyle = 'rgba(255,255,255,.62)';
+    if (state === 'menu'){
+      x.fillText('Hứng khối màu — né khối đỏ ✕', W/2, H/2 + 2);
+      x.fillText('← →  hoặc  kéo / chạm màn hình', W/2, H/2 + 30);
+    } else {
+      x.fillText('Điểm: ' + score + '   •   Kỷ lục: ' + best, W/2, H/2 + 6);
+    }
+    x.fillStyle = '#7c5cff'; x.font = 'bold 18px system-ui, sans-serif';
+    const pulse = 0.55 + 0.45*Math.sin(t/14);
+    x.globalAlpha = pulse;
+    x.fillText(state === 'menu' ? 'NHẤN ĐỂ BẮT ĐẦU' : 'NHẤN ĐỂ CHƠI LẠI', W/2, H/2 + 76);
+    x.globalAlpha = 1;
+  }
+}
+
+function loop(){ update(); draw(); requestAnimationFrame(loop); }
+loop();
+
+function start(){ if (state !== 'play') reset(); }
+function movePointer(clientX){
+  const r = c.getBoundingClientRect();
+  basket.x = Math.max(basket.w/2, Math.min(W - basket.w/2, (clientX - r.left) * (W / r.width)));
+}
+
+addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); start(); }
+});
+addEventListener('keyup', e => keys[e.key] = false);
+c.addEventListener('mousemove', e => movePointer(e.clientX));
+c.addEventListener('mousedown', e => { movePointer(e.clientX); start(); });
+c.addEventListener('touchstart', e => { e.preventDefault(); movePointer(e.touches[0].clientX); start(); }, {passive:false});
+c.addEventListener('touchmove',  e => { e.preventDefault(); movePointer(e.touches[0].clientX); }, {passive:false});
+</script>
+</body>
+</html>
