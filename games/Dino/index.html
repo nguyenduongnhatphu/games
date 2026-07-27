@@ -7898,7 +7898,7 @@ class GreatApeBoss {
                 this.drawDino();
                 ctx.save(); ctx.translate(0,-off);
                 ctx.fillStyle="black"; ctx.fillRect(CX-160,4,320,14); ctx.fillStyle="#AB47BC"; ctx.fillRect(CX-158,6,316*Math.max(0,this.hp/this.maxHp),10);
-                ctx.fillStyle="white"; ctx.font="bold 11px Courier New"; ctx.textAlign="center"; ctx.fillText(this.name+"  P"+this.phase+(this.invulnAll?"  \u2715 NGOAI KHUNG":"  \u25cf HA XUONG \u2014 DANH!"), CX, 32); ctx.textAlign="left"; ctx.restore();
+                ctx.fillStyle="white"; ctx.font="bold 11px Courier New"; ctx.textAlign="center"; ctx.fillText(this.name+"  P"+this.phase+(this.invulnAll?("  \u2715 "+LANG[currentLang].b_out):("  \u25cf "+LANG[currentLang].b_hit)), CX, 32); ctx.textAlign="left"; ctx.restore();
             }
         }
 
@@ -7910,7 +7910,7 @@ class GreatApeBoss {
                 this.hp=100; this.maxHp=100; this.w=46; this.h=52;
                 this.baseX=canvas.width-260; this.hoverY=110; this.baseY=320-this.h; this.x=canvas.width; this.y=this.baseY; this.dy=0;
                 this.name="VOLT REX"; this.state='entering'; this.subTimer=0; this.facingLeft=true;
-                this.dodging=true; this.invulnAll=true; this.jitter=0; this.burnTimer=0; this.enraged=false;
+                this.dodging=true; this.invulnAll=true; this.jitter=0; this.burnTimer=0; this.enraged=false; this.dodgeCharges=3; this.dodgeReCd=0;
                 this.beams=[]; this.strikes=[]; this.sweep=null; this.summon=null; this.burst=null; this.dash=null;
                 this.step=0; this.pillarElec=0; this.safeCol=-1; this.orbit=0; this.lastAttack=''; this.queued=null;
             }
@@ -7921,7 +7921,7 @@ class GreatApeBoss {
             moveTo(tx,ty,sp){ let dx=tx-this.x, dy=ty-this.y, d=Math.hypot(dx,dy)||1; if (d<=sp){this.x=tx;this.y=ty;return true;} this.x+=dx/d*sp; this.y+=dy/d*sp; return false; }
             pickAttack(){
                 if (this.queued){ let q=this.queued; this.queued=null; this.lastAttack=q; this.state=q; this.step=0; this.subTimer=0; return; }   // hoan thanh combo (luot sau quet)
-                if (this.hp<=this.maxHp*0.3 && this.lastAttack!=='storm' && Math.random()<0.5){ this.state='storm'; this.lastAttack='storm'; this.subTimer=0; this.step=0; this.safeCol=-1; return; }
+                if (this.hp<=this.maxHp*0.3 && this.lastAttack!=='storm'){ this.state='storm'; this.lastAttack='storm'; this.subTimer=0; this.step=0; this.safeCol=-1; return; }
                 if (!this.atkBag || this.atkBag.length===0){ this.atkBag=['beams','sweep','dashes'];   // xao tron TUI -> dung du 3 chieu moi lap
                     for (let i=this.atkBag.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); let tmp=this.atkBag[i]; this.atkBag[i]=this.atkBag[j]; this.atkBag[j]=tmp; }
                     if (this.atkBag[0]===this.lastAttack && this.atkBag.length>1){ let tmp=this.atkBag[0]; this.atkBag[0]=this.atkBag[1]; this.atkBag[1]=tmp; } }
@@ -7932,8 +7932,9 @@ class GreatApeBoss {
             toRest(sec){ this.state='rest'; this.restLen=sec*60; this.subTimer=0; }
             update(){
                 this.orbit+=0.1; if (this.jitter>0) this.jitter--; if (this.burnTimer>0){ this.burnTimer--; if(this.burnTimer%60===0) this.hp-=1; }
-                this.dodging = !(this.state==='rest');
-                this.invulnAll = this.dodging;
+                this.invulnAll = (this.state==='entering');   // chi bat tu luc moi VAO; con lai deu DINH duoc
+                if (this.dodgeReCd>0) this.dodgeReCd--; else if (this.dodgeCharges<3){ this.dodgeCharges++; this.dodgeReCd=90; }   // hoi 1 lan ne moi 1.5s
+                this.dodging = this.dodgeCharges > 0;
                 // pillar nhiem dien (5s sau sweep): dung tren cot -> dmg
                 if (this.pillarElec>0){ this.pillarElec--;
                     if (dino.grounded){ for (let p of this.pillars()){ if (Math.abs((dino.y+dino.h)-p.top)<8 && dino.x+dino.w>p.x && dino.x<p.x+p.w){ if (frames%14===0) this.hurtP(1); visualEffects.push(new Effect(dino.x+dino.w/2, p.top-6, 'lightning_shock')); } } } }
@@ -8044,12 +8045,119 @@ class GreatApeBoss {
                 ctx.fillStyle="rgba(64,196,255,"+aura.toFixed(2)+")"; ctx.beginPath(); ctx.arc(cx,cy,this.w*0.95,0,6.28); ctx.fill();
                 let legAnim = (((!this.grounded) || this.state==='dashes') && frames%12<6) ? 4 : 0;
                 try { dino.drawForm(false, x, y, legAnim, 1, this.facingLeft, VOLT_PAL); } catch(e){}
+                for (let d=0; d<3; d++){ ctx.fillStyle = d < this.dodgeCharges ? "#40C4FF" : "rgba(255,255,255,0.16)"; ctx.beginPath(); ctx.arc(cx-16+d*16, y-12, 4, 0, 6.28); ctx.fill(); ctx.strokeStyle="rgba(1,87,155,0.8)"; ctx.lineWidth=1; ctx.stroke(); }   // chỉ báo số lần NÉ
                 // tia dien phong quanh than
                 ctx.strokeStyle="#81D4FA"; ctx.lineWidth=1.5; for (let k=0;k<5;k++){ let a=this.orbit+k*1.26; ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*this.w*0.45, cy+Math.sin(a)*this.h*0.45); ctx.lineTo(cx+Math.cos(a)*this.w*0.8+(Math.random()-0.5)*8, cy+Math.sin(a)*this.h*0.8+(Math.random()-0.5)*8); ctx.stroke(); }
                 // HP bar
                 ctx.fillStyle="black"; ctx.fillRect(canvas.width/2-160,6,320,12); ctx.fillStyle="#40C4FF"; ctx.fillRect(canvas.width/2-158,8,316*Math.max(0,this.hp/this.maxHp),8);
-                ctx.fillStyle="white"; ctx.font="bold 11px Courier New"; ctx.textAlign="center"; ctx.fillText(this.name+(this.dodging?"  ✕ NÉ HẾT ĐẠN":"  ● SƠ HỞ — ĐÁNH!")+(this.hp<=this.maxHp*0.3?"  ⚡CUỒNG NỘ":""), canvas.width/2, 34); ctx.textAlign="left";
+                ctx.fillStyle="white"; ctx.font="bold 11px Courier New"; ctx.textAlign="center"; ctx.fillText(this.name+"  "+LT("NÉ","DODGE")+" "+this.dodgeCharges+"/3"+(this.hp<=this.maxHp*0.3?LT("  ⚡CUỒNG NỘ","  ⚡ENRAGED"):""), canvas.width/2, 34); ctx.textAlign="left";
             }
+        }
+
+        // ===================== BOSS 3 KHUNG LONG (TRIO) =====================
+        function setupTrioArena(){
+            mapTheme='trio';
+            platforms.length=0; enemies.length=0; obstacles.length=0; bossProjectiles.length=0; lavaGeysers.length=0; visualEffects.length=0;
+            platforms.push({ x:-60, w:canvas.width+160, top:320, h:80 });                 // dat bang
+            platforms.push({ x:120, w:150, top:252, h:16, pf:true });
+            platforms.push({ x:canvas.width-270, w:150, top:252, h:16, pf:true });
+            platforms.push({ x:canvas.width/2-95, w:190, top:206, h:16, pf:true });
+            platforms.push({ x:64,  w:130, top:158, h:16, pf:true });
+            platforms.push({ x:canvas.width-194, w:130, top:158, h:16, pf:true });
+            if (typeof dino!=='undefined' && dino){ dino.x=Math.round(canvas.width/2-dino.w/2); dino.y=320-dino.h; dino.dy=0; dino.grounded=true; dino.isFacingLeft=false; }
+        }
+        const TRIO_ROLES = [
+            { role:'shoot', name:'TRIO DO',   col:'#EF5350', dk:'#C62828' },
+            { role:'block', name:'TRIO VANG', col:'#FFCA28', dk:'#F9A825' },
+            { role:'ram',   name:'TRIO XANH', col:'#29B6F6', dk:'#0277BD' },
+        ];
+        class TriDino {
+            constructor(role, col, dk, name, x){
+                this.role=role; this.col=col; this.dk=dk; this.name=name;
+                this.w=32; this.h=34; this.x=x; this.y=320-this.h; this.dy=0; this.grounded=false;
+                this.hp=25; this.maxHp=25; this.invulnAll=false; this.burnTimer=0; this.dying=false; this.deathTimer=0;
+                this.facingLeft=false; this.tx=x; this.jumpCd=0; this.actCd=(role==='shoot'?50:(role==='ram'?120:30));
+                this.state='idle'; this.subT=0; this.shieldHits=2; this.shieldRegen=0; this.charge=null; this.pack=null; this.wanderCd=0; this.legAnim=0; this.slamPhase=null;
+            }
+            cx(){ return this.x+this.w/2; } cy(){ return this.y+this.h/2; }
+            physics(){
+                this.dy += 0.6; if (this.dy>13) this.dy=13; this.y += this.dy;
+                let feet=this.y+this.h, prevFeet=feet-this.dy; this.grounded=false;
+                for (let pf of platforms){ if (this.x+this.w>pf.x+4 && this.x<pf.x+pf.w-4 && prevFeet<=pf.top+2 && feet>=pf.top-2 && this.dy>=0){ this.y=pf.top-this.h; this.dy=0; this.grounded=true; break; } }
+                if (this.y > 320-this.h){ this.y=320-this.h; this.dy=0; this.grounded=true; }   // SAN DAT CUNG — khong lot xuong duoi map
+                if (this.x<0) this.x=0; if (this.x>canvas.width-this.w) this.x=canvas.width-this.w;
+            }
+            tryJump(v){ if (this.grounded && this.jumpCd<=0){ this.dy=v; this.grounded=false; this.jumpCd=22; } }
+            dodgeBullets(){ if (!this.grounded||this.jumpCd>0) return;
+                for (let p of projectiles){ if (Math.abs(p.x-this.cx())<66 && Math.abs(p.y-this.cy())<44){ this.tryJump(-11); break; } } }
+            moveToX(sp){ let d=this.tx-this.cx(); if (Math.abs(d)>6){ this.x += Math.sign(d)*sp; this.facingLeft=d<0; }
+                if (this.grounded){ for (let pf of platforms){ if (pf.top<this.y-4 && this.y-pf.top<118 && Math.abs((pf.x+pf.w/2)-this.cx())<130){ if (Math.random()<0.05) this.tryJump(-13); break; } } } }
+            update(){
+                if (this.jumpCd>0) this.jumpCd--; if (this.actCd>0) this.actCd--; if (this.wanderCd>0) this.wanderCd--;
+                if (this.shieldRegen>0){ this.shieldRegen--; if (this.shieldRegen===0) this.shieldHits=2; }
+                if (this.state!=='charge') this.physics();
+                this.dodgeBullets();
+                let px=dino.x+dino.w/2, py=dino.y+dino.h/2;
+                if (this.role==='shoot'){
+                    if (this.wanderCd<=0){ let dist=this.cx()-px; this.tx=Math.max(40,Math.min(canvas.width-40, px+(dist<0?-300:300))); this.wanderCd=48; }
+                    this.moveToX(2.4); this.facingLeft=px<this.cx();
+                    if (this.actCd<=0){ let dx=px-this.cx(), dy=py-this.cy(), d=Math.hypot(dx,dy)||1; bossProjectiles.push(new BossProjectile(this.cx()-8, this.cy()-8, dx/d*6, dy/d*6, false, 1)); this.actCd=30; }
+                }
+                else if (this.role==='block'){
+                    let allies=this.pack.filter(o=>o!==this && o.hp>0);
+                    let mx = allies.length? allies.reduce((a,o)=>a+o.cx(),0)/allies.length : this.cx();
+                    let pdist=Math.abs(this.cx()-px);
+                    if (this.state==='slam'){
+                        if (this.slamPhase==='approach'){ this.tx=px; this.moveToX(3.6); this.facingLeft=px<this.cx();
+                            if (Math.abs(this.cx()-px)<44 && this.grounded){ this.tryJump(-13); this.slamPhase='air'; } }
+                        else { if (this.grounded){ visualEffects.push(new Effect(this.cx(), this.y+this.h, 'explosion', true, 24)); shakeTimer=Math.max(shakeTimer,8);
+                            if (Math.hypot((dino.x+dino.w/2)-this.cx(), (dino.y+dino.h)-(this.y+this.h))<44){ if (!dino.isShielding()) dino.takeDamage(1); else visualEffects.push(new Effect(dino.x+dino.w/2,dino.y,'parry')); }
+                            this.state='idle'; this.actCd=110; } }
+                    } else {
+                        if (pdist<115 && this.actCd<=0 && this.grounded){ this.state='slam'; this.slamPhase='approach'; }
+                        else { let dir=Math.sign(mx-px)||1; this.tx=Math.max(30,Math.min(canvas.width-30, px+dir*130)); this.moveToX(3.0); this.facingLeft=px<this.cx(); }
+                    }
+                }
+                else if (this.role==='ram'){
+                    if (this.state==='idle'){
+                        if (this.wanderCd<=0){ let dist=this.cx()-px; this.tx=Math.max(40,Math.min(canvas.width-40, px+(dist<0?-150:150))); this.wanderCd=36; }
+                        this.moveToX(2.6);
+                        if (this.actCd<=0){ this.state='warn'; this.subT=26; this.facingLeft=px<this.cx(); }
+                    } else if (this.state==='warn'){ this.subT--; this.facingLeft=px<this.cx();
+                        if (this.subT<=0){ let dx=px-this.cx(), dy=py-this.cy(), d=Math.hypot(dx,dy)||1; this.charge={vx:dx/d, vy:dy/d, dist:0, max:Math.min(canvas.width, d+320)}; this.state='charge'; }   // LAO VUOT QUA nguoi choi (+320px) kieu Aegis
+                    } else if (this.state==='charge'){ let c=this.charge, sp=18; this.x+=c.vx*sp; this.y+=c.vy*sp; c.dist+=sp;
+                        if (checkAABB(this,dino)){ if (!dino.isShielding()) dino.takeDamage(1); else visualEffects.push(new Effect(dino.x+dino.w/2,dino.y,'parry')); }
+                        if (this.x<=0||this.x>=canvas.width-this.w||this.y<=40||c.dist>=c.max){ this.state='idle'; this.actCd=120; this.charge=null; } }
+                    if (this.x<0)this.x=0; if (this.x>canvas.width-this.w)this.x=canvas.width-this.w; if (this.y<40)this.y=40; if (this.y>320-this.h)this.y=320-this.h;
+                }
+                this.legAnim = (((!this.grounded)||this.state==='charge') && frames%12<6) ? 4 : 0;
+            }
+            drawBody(){ let x=this.x,y=this.y,w=this.w,h=this.h;
+                ctx.save(); if (this.facingLeft){ ctx.translate(x+w/2,0); ctx.scale(-1,1); ctx.translate(-(x+w/2),0); }
+                ctx.fillStyle=this.dk; ctx.beginPath(); ctx.moveTo(x+w*0.18,y+h*0.5); ctx.lineTo(x-6,y+h*0.42); ctx.lineTo(x+w*0.2,y+h*0.72); ctx.closePath(); ctx.fill();   // duoi
+                ctx.fillStyle=this.col; ctx.fillRect(x+w*0.14, y+h*0.34, w*0.6, h*0.46);   // than
+                ctx.fillStyle=this.dk; ctx.fillRect(x+w*0.14, y+h*0.34, w*0.6, 4);
+                ctx.fillStyle=this.col; ctx.fillRect(x+w*0.5, y+h*0.12, w*0.42, h*0.34);   // dau
+                ctx.fillStyle="#263238"; ctx.fillRect(x+w*0.52, y+h*0.34, w*0.4, h*0.08);  // mieng
+                ctx.fillStyle=this.dk; let lo=(this.legAnim?3:0); ctx.fillRect(x+w*0.24, y+h*0.78, w*0.14, h*0.22); ctx.fillRect(x+w*0.5, y+h*0.78+lo, w*0.14, h*0.22-lo);  // chan
+                ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(x+w*0.74, y+h*0.24, 3.2, 0, 6.28); ctx.fill();
+                ctx.fillStyle=this.dk; ctx.beginPath(); ctx.arc(x+w*0.76, y+h*0.24, 1.5, 0, 6.28); ctx.fill();
+                ctx.restore();
+            }
+            draw(){ let cx=this.cx(), cy=this.cy();
+                if (this.role==='block' && this.shieldHits>0){ ctx.strokeStyle="rgba(255,202,40,"+(0.45+0.15*Math.sin(frames*0.2)).toFixed(2)+")"; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(cx,cy,this.w*0.92,0,6.28); ctx.stroke();
+                    for (let i=0;i<this.shieldHits;i++){ ctx.fillStyle="#FFCA28"; ctx.beginPath(); ctx.arc(cx-8+i*16, this.y-9, 3,0,6.28); ctx.fill(); } }
+                if (this.role==='ram' && this.state==='warn'){ ctx.strokeStyle="rgba(239,83,80,0.85)"; ctx.lineWidth=2.5; ctx.beginPath(); ctx.arc(cx,cy,this.w*(0.8+0.4*Math.abs(Math.sin(frames*0.5))),0,6.28); ctx.stroke();
+                    let dx=(dino.x+dino.w/2)-cx, dy=(dino.y+dino.h/2)-cy, d=Math.hypot(dx,dy)||1; ctx.strokeStyle="rgba(239,83,80,0.5)"; ctx.setLineDash([6,6]); ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+dx/d*90, cy+dy/d*90); ctx.stroke(); ctx.setLineDash([]); }
+                this.drawBody();
+                ctx.fillStyle="rgba(0,0,0,0.6)"; ctx.fillRect(this.x-2,this.y-5,this.w+4,4); ctx.fillStyle=this.col; ctx.fillRect(this.x-1,this.y-4,(this.w+2)*Math.max(0,this.hp/this.maxHp),2);
+                let lbl = this.role==='shoot'?LT('BẮN','SHOOT'):(this.role==='ram'?LT('HÚC','RAM'):LT('KHIÊN','SHIELD'));
+                ctx.fillStyle=this.col; ctx.font="bold 8px Courier New"; ctx.textAlign="center"; ctx.fillText(lbl, cx, this.y-8); ctx.textAlign="left";
+            }
+        }
+        function spawnTrio(){ setupTrioArena(); let xs=[150, Math.round(canvas.width/2-16), canvas.width-190], pack=[];
+            for (let i=0;i<TRIO_ROLES.length;i++){ let r=TRIO_ROLES[i]; pack.push(new TriDino(r.role,r.col,r.dk,r.name,xs[i])); }
+            for (let d of pack) d.pack=pack; for (let d of pack) bosses.push(d);
         }
 
         function setupVolcanoArena() {
@@ -8862,6 +8970,15 @@ class GreatApeBoss {
             });
         }
 
+        function drawTrioEnv(){
+            let g=ctx.createLinearGradient(0,0,0,320); g.addColorStop(0,"#0e1630"); g.addColorStop(1,"#28344f"); ctx.fillStyle=g; ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle="rgba(255,255,255,0.5)"; for (let i=0;i<30;i++){ let sx=(i*173)%canvas.width, sy=(i*61)%180; if ((i+Math.floor(frames/30))%7!==0) ctx.fillRect(sx,sy,2,2); }
+            ctx.fillStyle="#1a2440"; ctx.beginPath(); ctx.moveTo(0,240); for (let x=0;x<=canvas.width;x+=60) ctx.lineTo(x, 205+Math.sin(x*0.011)*28); ctx.lineTo(canvas.width,320); ctx.lineTo(0,320); ctx.closePath(); ctx.fill();
+            platforms.forEach(pf=>{ if (pf.top>=320){ ctx.fillStyle="#2b3556"; ctx.fillRect(pf.x,pf.top,pf.w,pf.h); ctx.fillStyle="#3c4a74"; ctx.fillRect(pf.x,pf.top,pf.w,5); }
+                else { ctx.fillStyle="rgba(30,39,69,0.5)"; ctx.fillRect(pf.x+pf.w/2-6, pf.top+pf.h, 12, 34);
+                    ctx.fillStyle="#3a4670"; ctx.fillRect(pf.x,pf.top,pf.w,pf.h); ctx.fillStyle="#5566a0"; ctx.fillRect(pf.x,pf.top,pf.w,4); ctx.fillStyle="#1e2745"; ctx.fillRect(pf.x,pf.top+pf.h-3,pf.w,3); } });
+        }
+
         // ===================== SA MAC =====================
         // Kim tu thap ve theo TI LE chieu rong, tu cuon vong -> khong con don ve mot ben.
         function drawPyramid(cx, baseY, h, light, dark) {
@@ -8959,6 +9076,7 @@ class GreatApeBoss {
             if (mapTheme === 'volcano') { drawVolcanoEnv(); return; }
             if (mapTheme === 'aegis') { drawAegisEnv(); return; }
             if (mapTheme === 'shrine') { drawShrineEnv(); return; }
+            if (mapTheme === 'trio') { drawTrioEnv(); return; }
             drawDesertEnv();
         }
 
@@ -10167,7 +10285,7 @@ class GreatApeBoss {
                 }
 
                 let doDrop = false;
-                if ((mapTheme === 'forest' || mapTheme === 'volcano' || mapTheme === 'aegis' || mapTheme === 'tetris' || mapTheme === 'shrine') && (gameState === 'normal' || gameState === 'test_boss' || gameState === 'boss_rush') && this.grounded && crouchKey && this.dropTimer <= 0) {
+                if ((mapTheme === 'forest' || mapTheme === 'volcano' || mapTheme === 'aegis' || mapTheme === 'tetris' || mapTheme === 'shrine' || mapTheme === 'trio') && (gameState === 'normal' || gameState === 'test_boss' || gameState === 'boss_rush') && this.grounded && crouchKey && this.dropTimer <= 0) {
                     let curTop = this.y + this.h;
                     if (platforms.some(pf => this.x + this.w > pf.x + 5 && this.x < pf.x + pf.w - 5 && pf.top > curTop + 20 && pf.top < curTop + 150)) doDrop = true;
                 }
@@ -10184,7 +10302,7 @@ class GreatApeBoss {
                     if (this.y >= 320 - this.h) { this.y = 320 - this.h; this.dy = 0; this.grounded = true; this.canDoubleJump = false; }
                 } else {
                 this.dy += this.gravity; if (crouchKey && !this.grounded) this.dy += 1.0;
-                if ((mapTheme === 'forest' || mapTheme === 'volcano' || mapTheme === 'aegis' || mapTheme === 'tetris' || mapTheme === 'shrine') && (gameState === 'normal' || gameState === 'test_boss' || gameState === 'boss_rush')) {
+                if ((mapTheme === 'forest' || mapTheme === 'volcano' || mapTheme === 'aegis' || mapTheme === 'tetris' || mapTheme === 'shrine' || mapTheme === 'trio') && (gameState === 'normal' || gameState === 'test_boss' || gameState === 'boss_rush')) {
                     if (this.dropTimer > 0) this.dropTimer--;
                     this.y += this.dy;
                     let feet = this.y + this.h, prevFeet = feet - this.dy, landTop = Infinity, landPf = null;
@@ -10904,23 +11022,23 @@ let MENU_CUST_Y = 250;
                 let uE = dino.ultActive ? (dino.ultAmmo === 2 ? (dino.ammo / Math.max(1, dino.maxAmmo) * 100) : ultCharge) : ultCharge;
                 let timedUlt = dino.fireReactorTimer > 0 || dino.lightningFormTimer > 0;
                 let uFull = ultCharge >= 100 && !dino.ultActive && !timedUlt;
-                ctx.fillStyle = "black"; ctx.font = "bold 11px Courier New"; ctx.fillText(ultNames[currentAmmoType] || "CHIÊU CUỐI", 20, 104);
+                ctx.fillStyle = "black"; ctx.font = "bold 11px Courier New"; ctx.fillText(ultNames[currentAmmoType] || LANG[currentLang].ult_word, 20, 104);
                 ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(120, 95, 120, 11);
                 ctx.fillStyle = dino.ultActive ? (dino.ultAmmo === 0 ? "#00B0FF" : dino.ultAmmo === 1 ? "#FF1744" : dino.ultAmmo === 2 ? "#00E676" : "#FFEB3B") : (timedUlt ? (dino.fireReactorTimer > 0 ? "#FF5722" : "#00E5FF") : (uFull ? (frames % 20 < 10 ? "#FFEB3B" : "#FF9800") : "#9C27B0"));
                 ctx.fillRect(120, 95, 120 * Math.min(100, uE) / 100, 11);
                 ctx.strokeStyle = "black"; ctx.lineWidth = 1; ctx.strokeRect(120, 95, 120, 11);
-                { let SN = ["GUNSLINGER", "TRICKSTER", "ROYAL GUARD"], SC = ["#FF8F00", "#00ACC1", "#7E57C2"];
+                { let SN = LANG[currentLang].stances, SC = ["#FF8F00", "#00ACC1", "#7E57C2"];
                   ctx.fillStyle = SC[combatStance]; ctx.font = "bold 13px Courier New"; ctx.fillText("◆ " + SN[combatStance], 20, 124);
                   ctx.fillStyle = "rgba(0,0,0,0.55)"; ctx.font = "9px Courier New"; ctx.fillText("[I]→ [O]←", 168, 124); }
                 { let dMax = combatStance === 1 ? 26 : 42, dReady = dashCd <= 0;
-                  ctx.fillStyle = "black"; ctx.font = "bold 11px Courier New"; ctx.fillText("LƯỚT [Shift]", 20, 140);
+                  ctx.fillStyle = "black"; ctx.font = "bold 11px Courier New"; ctx.fillText(LANG[currentLang].dash, 20, 140);
                   ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(120, 131, 120, 9);
                   ctx.fillStyle = dReady ? "#00E5FF" : "#546E7A"; ctx.fillRect(120, 131, 120 * (1 - Math.max(0, dashCd) / dMax), 9);
                   ctx.strokeStyle = "black"; ctx.lineWidth = 1; ctx.strokeRect(120, 131, 120, 9);
-                  ctx.fillStyle = dReady ? "#00BCD4" : "#78909C"; ctx.font = "bold 9px Courier New"; ctx.fillText(dReady ? "SẴN" : "...", 246, 139); }
+                  ctx.fillStyle = dReady ? "#00BCD4" : "#78909C"; ctx.font = "bold 9px Courier New"; ctx.fillText(dReady ? LANG[currentLang].ready : "...", 246, 139); }
                 if (timedUlt) { ctx.fillStyle = "#000"; ctx.font = "bold 11px Courier New"; ctx.fillText(Math.ceil((dino.fireReactorTimer + dino.lightningFormTimer) / 60) + "s", 250, 105); }
-                else if (uFull && !dino.jcState) { ctx.fillStyle = frames % 20 < 10 ? "#D50000" : "#000"; ctx.font = "bold 12px Courier New"; ctx.fillText("BẤM U!", 246, 105); }
-                else if (dino.ultFillMult > 1 && !dino.ultActive) { ctx.fillStyle = "#FFD600"; ctx.font = "bold 12px Courier New"; ctx.fillText("SẠC x" + dino.ultFillMult, 250, 105); }
+                else if (uFull && !dino.jcState) { ctx.fillStyle = frames % 20 < 10 ? "#D50000" : "#000"; ctx.font = "bold 12px Courier New"; ctx.fillText(LANG[currentLang].press_u, 246, 105); }
+                else if (dino.ultFillMult > 1 && !dino.ultActive) { ctx.fillStyle = "#FFD600"; ctx.font = "bold 12px Courier New"; ctx.fillText(LANG[currentLang].charge_x + dino.ultFillMult, 250, 105); }
                 else if (dino.ultActive) { ctx.fillStyle = "#000"; ctx.font = "bold 10px Courier New"; ctx.fillText("ULT!", 246, 105); }
 
                 let _mb = mouseX >= canvas.width - 94 && mouseX <= canvas.width - 10 && mouseY >= 6 && mouseY <= 30;
@@ -11275,12 +11393,12 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
             ctx.fillStyle = "#00E5FF"; ctx.font = "bold 22px Courier New"; ctx.textAlign = "center"; ctx.fillText("CUSTOMIZE YOUR DINO", CX, 30);
 
             const forms = ["NORMAL", "RUSH", "ULTIMATE", "BEYOND"];
-            const formDesc = ["Cơ bản, cân bằng", "Nhanh nhẹn, gai xanh", "Mạnh, tối màu, hào quang", "Đỉnh cao, sừng + vảy"];
+            const formDesc = currentLang==="en" ? ["Balanced baseline","Agile, blue spikes","Strong, dark, aura","Peak: horns + scales"] : ["Cơ bản, cân bằng", "Nhanh nhẹn, gai xanh", "Mạnh, tối màu, hào quang", "Đỉnh cao, sừng + vảy"];
             const ammos = ["PULSE", "INFERNO", "RAPIDFIRE", "PRISM", "VOLT", "RIPPER", "PULSAR"];
-            const ammoDesc = ["Cân bằng, charge mạnh", "Cháy theo thời gian", "Xối xả, DPS đều", "Toả 3 tia, trúng gần", "Zigzag, nối mục tiêu", "Nặng, ít phát, xuyên", "Dồn tích một cú lớn"];
-            const SHIELDS = ["ĐỠ ĐÒN", "KHIÊN CHỦ ĐỘNG"];
-            const shieldDesc = ["Bấm đúng lúc: chặn 1 đòn + phản đòn (parry).", "Giữ tối đa 1,5s, sạc 4s. Đổi lại: mất phản đòn."];
-            const stances = [["GUNSLINGER", "#FF8F00", "Bắn xa, tích charge mạnh"], ["TRICKSTER", "#00ACC1", "Hồi lướt nhanh, tự ngắm rộng"], ["ROYAL GUARD", "#7E57C2", "Đỡ đòn lâu hơn, thủ vững"]];
+            const ammoDesc = currentLang==="en" ? ["Balanced, strong charge","Burns over time","Rapid, steady DPS","3-way spread, short range","Zigzag, chains targets","Heavy, few shots, pierces","Stores one big hit"] : ["Cân bằng, charge mạnh", "Cháy theo thời gian", "Xối xả, DPS đều", "Toả 3 tia, trúng gần", "Zigzag, nối mục tiêu", "Nặng, ít phát, xuyên", "Dồn tích một cú lớn"];
+            const SHIELDS = currentLang==="en" ? ["PARRY","ACTIVE SHIELD"] : ["ĐỠ ĐÒN", "KHIÊN CHỦ ĐỘNG"];
+            const shieldDesc = currentLang==="en" ? ["Time it right: block 1 hit + parry counter.","Hold up to 1.5s, 4s cooldown. Trade-off: no parry."] : ["Bấm đúng lúc: chặn 1 đòn + phản đòn (parry).", "Giữ tối đa 1,5s, sạc 4s. Đổi lại: mất phản đòn."];
+            const stances = [["GUNSLINGER", "#FF8F00", LT("Bắn xa, tích charge mạnh","Long range, strong charge")], ["TRICKSTER", "#00ACC1", LT("Hồi lướt nhanh, tự ngắm rộng","Fast dash cooldown, wide auto-aim")], ["ROYAL GUARD", "#7E57C2", LT("Đỡ đòn lâu hơn, thủ vững","Longer shield, solid defense")]];
 
             function panel(x, y, w, h, title, tc) {
                 ctx.fillStyle = "rgba(255,255,255,0.03)"; ctx.fillRect(x, y, w, h);
@@ -11302,25 +11420,25 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
             ctx.fillStyle = bBack ? "#757575" : "#424242"; ctx.fillRect(890, 8, 95, 24); ctx.fillStyle = "white"; ctx.font = "bold 12px Courier New"; ctx.textAlign = "center"; ctx.fillText("← BACK", 937, 25);
 
             // ===== TRAI: STANCE =====
-            panel(12, 44, 300, 200, "STANCE — LỐI ĐÁNH", "#FF8F00");
+            panel(12, 44, 300, 200, LT("STANCE — LỐI ĐÁNH","STANCE — PLAYSTYLE"), "#FF8F00");
             for (let i2 = 0; i2 < 3; i2++) {
                 let y = 72 + i2 * 56, sel = combatStance === i2, hov = mouseX >= 24 && mouseX <= 300 && mouseY >= y && mouseY <= y + 50;
                 ctx.fillStyle = sel ? "rgba(255,255,255,0.10)" : (hov ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)"); ctx.fillRect(24, y, 276, 50);
                 ctx.strokeStyle = sel ? stances[i2][1] : "rgba(255,255,255,0.12)"; ctx.lineWidth = sel ? 2 : 1; ctx.strokeRect(24, y, 276, 50);
                 ctx.fillStyle = stances[i2][1]; ctx.font = "bold 13px Courier New"; ctx.textAlign = "left"; ctx.fillText(stances[i2][0], 36, y + 22);
                 ctx.fillStyle = "#B0BEC5"; ctx.font = "10px Courier New"; ctx.fillText(stances[i2][2], 36, y + 40);
-                if (sel) { ctx.fillStyle = stances[i2][1]; ctx.font = "9px Courier New"; ctx.textAlign = "right"; ctx.fillText("● ĐANG CHỌN", 292, y + 22); }
+                if (sel) { ctx.fillStyle = stances[i2][1]; ctx.font = "9px Courier New"; ctx.textAlign = "right"; ctx.fillText(LT("● ĐANG CHỌN","● SELECTED"), 292, y + 22); }
             }
 
             // ===== GIUA: TRANG BI (Dang / Dan / Khien) =====
-            panel(324, 44, 352, 200, "TRANG BỊ", "#4FC3F7");
-            selRow(70, "DẠNG", forms[currentForm], "#ECEFF1", formDesc[currentForm]);
-            selRow(124, "ĐẠN", ammos[currentAmmoType], ammoColors[currentAmmoType], ammoDesc[currentAmmoType]);
-            selRow(182, "KHIÊN", SHIELDS[currentShieldType], currentShieldType === 1 ? "#69F0AE" : "#FFB74D", shieldDesc[currentShieldType]);
+            panel(324, 44, 352, 200, LT("TRANG BỊ","LOADOUT"), "#4FC3F7");
+            selRow(70, LT("DẠNG","FORM"), forms[currentForm], "#ECEFF1", formDesc[currentForm]);
+            selRow(124, LT("ĐẠN","AMMO"), ammos[currentAmmoType], ammoColors[currentAmmoType], ammoDesc[currentAmmoType]);
+            selRow(182, LT("KHIÊN","SHIELD"), SHIELDS[currentShieldType], currentShieldType === 1 ? "#69F0AE" : "#FFB74D", shieldDesc[currentShieldType]);
             if (currentShieldType === 1) { ctx.fillStyle = "#263238"; ctx.fillRect(340, 226, 320, 6); ctx.fillStyle = "#69F0AE"; ctx.fillRect(340, 226, 320 * (0.55 + 0.45 * Math.sin(frames * 0.06)), 6); }
 
             // ===== PHAI: RUNE =====
-            panel(688, 44, 300, 200, "RUNE — TỐI ĐA 2", "#B388FF");
+            panel(688, 44, 300, 200, LT("RUNE — TỐI ĐA 2","RUNES — MAX 2"), "#B388FF");
             for (let sl = 0; sl < 2; sl++) {
                 let y = 72 + sl * 84, has = runeSlots[sl], hov = mouseX >= 700 && mouseX <= 976 && mouseY >= y && mouseY <= y + 78;
                 ctx.fillStyle = has ? "rgba(102,187,106,0.12)" : (hov ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)"); ctx.fillRect(700, y, 276, 78);
@@ -11330,14 +11448,14 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                     let rr = RUNES.find(x => x.id === has);
                     let linkedC2 = runeCost(has) === 2 && runeSlots[0] === has && runeSlots[1] === has;
                     if (linkedC2 && sl === 1) {
-                        ctx.textAlign = "left"; ctx.fillStyle = "#B388FF"; ctx.font = "bold 11px Courier New"; ctx.fillText("↑ CẤP 2", 756, y + 30);
-                        ctx.fillStyle = "#90A4AE"; ctx.font = "9px Courier New"; ctx.fillText("dùng cả 2 ô rune", 756, y + 48);
+                        ctx.textAlign = "left"; ctx.fillStyle = "#B388FF"; ctx.font = "bold 11px Courier New"; ctx.fillText(LT("↑ CẤP 2","↑ LEVEL 2"), 756, y + 30);
+                        ctx.fillStyle = "#90A4AE"; ctx.font = "9px Courier New"; ctx.fillText(LT("dùng cả 2 ô rune","uses both slots"), 756, y + 48);
                     } else {
-                        ctx.textAlign = "left"; ctx.fillStyle = "#FFECB3"; ctx.font = "bold 11px Courier New"; ctx.fillText(rr.name.slice(0, 22), 756, y + 26);
+                        ctx.textAlign = "left"; ctx.fillStyle = "#FFECB3"; ctx.font = "bold 11px Courier New"; ctx.fillText(RNAME(rr).slice(0, 22), 756, y + 26);
                         ctx.fillStyle = "#90A4AE"; ctx.font = "9px Courier New";
-                        let dd = rr.desc; wrapText(dd, 756, y + 44, 210, 11);
+                        let dd = RDESC(rr); wrapText(dd, 756, y + 44, 210, 11);
                     }
-                } else { ctx.textAlign = "left"; ctx.fillStyle = "#78909C"; ctx.font = "11px Courier New"; ctx.fillText("Ô " + (sl + 1) + " — trống", 756, y + 30); ctx.fillStyle = "#546E7A"; ctx.font = "9px Courier New"; ctx.fillText("bấm để chọn rune", 756, y + 48); }
+                } else { ctx.textAlign = "left"; ctx.fillStyle = "#78909C"; ctx.font = "11px Courier New"; ctx.fillText(LT("Ô "+(sl+1)+" — trống","Slot "+(sl+1)+" — empty"), 756, y + 30); ctx.fillStyle = "#546E7A"; ctx.font = "9px Courier New"; ctx.fillText(LT("bấm để chọn rune","click to pick a rune"), 756, y + 48); }
             }
 
             if (runePicker !== null) drawRunePicker();
@@ -11430,7 +11548,7 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
         function drawRunePicker() {
             ctx.fillStyle = "rgba(0,0,0,0.9)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "#00E5FF"; ctx.font = "bold 20px Courier New"; ctx.textAlign = "center";
-            ctx.fillText("CHỌN RUNE CHO Ô " + (runePicker + 1), CX, 36);
+            ctx.fillText(LT("CHỌN RUNE CHO Ô "+(runePicker+1),"PICK A RUNE FOR SLOT "+(runePicker+1)), CX, 36);
             let G = runeGridGeom(), cols=G.cols, cw=G.cw, ch=G.ch, gx=G.gx, gy=G.gy;
             let items = pickerItems(), hovIdx = -1;
             for (let i = 0; i < items.length; i++) {
@@ -11446,7 +11564,7 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                 } else {
                     sel = runeSlots[runePicker] === it.id;
                     taken = it.id && (runeSlots[0]===it.id||runeSlots[1]===it.id) && runeSlots[runePicker]!==it.id;
-                    tag = taken ? '  (đã chọn)' : '';
+                    tag = taken ? LT('  (đã chọn)','  (in use)') : '';
                 }
                 ctx.fillStyle = sel ? "#1B5E20" : (taken ? "#3E2723" : (hov ? "#37474F" : "#212121"));
                 ctx.fillRect(cx0 + 4, cy0, cw - 8, ch - 6);
@@ -11462,7 +11580,7 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                 ctx.fillText(d, cx0 + 40, cy0 + 36);
             }
             ctx.textAlign = "center"; ctx.fillStyle = "#B0BEC5"; ctx.font = "11px Courier New";
-            ctx.fillText("Đệ: bấm để chọn Cấp 1 / Cấp 2 (C2 dùng 2 ô) — di chuột để xem to", CX, canvas.height - 12);
+            ctx.fillText(LT("Đệ: bấm để chọn Cấp 1 / Cấp 2 (C2 dùng 2 ô) — di chuột để xem to","Pet: click to pick Level 1 / Level 2 (C2 uses 2 slots) — hover to zoom"), CX, canvas.height - 12);
             ctx.textAlign = "left";
             if (runeLevelPick === null && hovIdx >= 0) drawRuneHoverZoom(items[hovIdx], gx, gy, cols, cw, ch, hovIdx);
             if (runeLevelPick !== null) drawRuneLevelChooser();
@@ -11472,7 +11590,7 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
             let W = 320, H = 116, bx = cardX + cw/2 - W/2;
             bx = Math.max(8, Math.min(canvas.width - W - 8, bx));
             let by = cardY - H - 6; if (by < 8) by = cardY + ch + 8;
-            let name = it.name, desc = (it.kind==='family') ? 'Đệ này có 2 cấp — bấm để mở bảng chọn Cấp 1 hoặc Cấp 2 (C2 mạnh hơn, dùng 2 ô rune).' : (it.desc||'');
+            let name = it.name, desc = (it.kind==='family') ? LT('Đệ này có 2 cấp — bấm để mở bảng chọn Cấp 1 hoặc Cấp 2 (C2 mạnh hơn, dùng 2 ô rune).','This pet has 2 levels — click to open the Level 1 / Level 2 chooser (C2 is stronger, uses 2 rune slots).') : (it.desc||'');
             ctx.save();
             ctx.fillStyle = "rgba(8,12,18,0.98)"; ctx.fillRect(bx, by, W, H);
             ctx.strokeStyle = "#00E5FF"; ctx.lineWidth = 2.5; ctx.strokeRect(bx, by, W, H);
@@ -11485,13 +11603,13 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
         function runeLevelCards(){
             let fam = PET_FAMILIES[runeLevelPick];
             let cardW=300, cardH=156, gap=44, totalW=cardW*2+gap, x0=CX-totalW/2, y0=112;
-            return { fam, cardW, cardH, y0, cards:[ {id:fam.c1, lvl:'CẤP 1', cost:'1 ô', x:x0}, {id:fam.c2, lvl:'CẤP 2', cost:'2 ô', x:x0+cardW+gap} ] };
+            return { fam, cardW, cardH, y0, cards:[ {id:fam.c1, lvl:LT('CẤP 1','LEVEL 1'), lv2:false, slots:1, x:x0}, {id:fam.c2, lvl:LT('CẤP 2','LEVEL 2'), lv2:true, slots:2, x:x0+cardW+gap} ] };
         }
         function drawRuneLevelChooser(){
             let L = runeLevelCards(), fam=L.fam;
             ctx.fillStyle = "rgba(0,0,0,0.78)"; ctx.fillRect(0,0,canvas.width,canvas.height);
             ctx.textAlign = "center"; ctx.fillStyle = "#00E5FF"; ctx.font = "bold 22px Courier New";
-            ctx.fillText(fam.icon + "  " + fam.name + " — CHỌN CẤP", CX, 74);
+            ctx.fillText(fam.icon + "  " + RNAME(fam) + LT(" — CHỌN CẤP"," — CHOOSE LEVEL"), CX, 74);
             for (let c of L.cards){
                 let r = RUNES.find(x=>x.id===c.id);
                 let hov = mouseX>=c.x && mouseX<=c.x+L.cardW && mouseY>=L.y0 && mouseY<=L.y0+L.cardH;
@@ -11501,13 +11619,13 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                 ctx.strokeStyle = equipped ? "#66BB6A" : (hov ? "#00E5FF" : "#546E7A"); ctx.lineWidth = 3; ctx.strokeRect(c.x, L.y0, L.cardW, L.cardH);
                 ctx.textAlign = "left";
                 ctx.font = "40px Courier New"; ctx.fillStyle = "#FFF"; ctx.fillText(fam.icon, c.x+18, L.y0+54);
-                ctx.font = "bold 22px Courier New"; ctx.fillStyle = c.lvl==='CẤP 2' ? "#FFD54F" : "#B3E5FC"; ctx.fillText(c.lvl, c.x+80, L.y0+34);
-                ctx.font = "12px Courier New"; ctx.fillStyle = "#90A4AE"; ctx.fillText("Tốn " + c.cost + " rune", c.x+80, L.y0+54);
-                ctx.font = "13px Courier New"; ctx.fillStyle = "#E8EAF6"; wrapText(r.desc, c.x+18, L.y0+84, L.cardW-36, 18);
-                if (equipped){ ctx.textAlign="center"; ctx.fillStyle="#69F0AE"; ctx.font="bold 13px Courier New"; ctx.fillText("✓ ĐANG DÙNG", c.x+L.cardW/2, L.y0+L.cardH-14); ctx.textAlign="left"; }
+                ctx.font = "bold 22px Courier New"; ctx.fillStyle = c.lv2 ? "#FFD54F" : "#B3E5FC"; ctx.fillText(c.lvl, c.x+80, L.y0+34);
+                ctx.font = "12px Courier New"; ctx.fillStyle = "#90A4AE"; ctx.fillText(LT("Tốn "+c.slots+" ô rune","Costs "+c.slots+" slot"+(c.slots>1?"s":"")), c.x+80, L.y0+54);
+                ctx.font = "13px Courier New"; ctx.fillStyle = "#E8EAF6"; wrapText(RDESC(r), c.x+18, L.y0+84, L.cardW-36, 18);
+                if (equipped){ ctx.textAlign="center"; ctx.fillStyle="#69F0AE"; ctx.font="bold 13px Courier New"; ctx.fillText(LT("✓ ĐANG DÙNG","✓ EQUIPPED"), c.x+L.cardW/2, L.y0+L.cardH-14); ctx.textAlign="left"; }
             }
             ctx.textAlign = "center"; ctx.fillStyle = "#B0BEC5"; ctx.font = "12px Courier New";
-            ctx.fillText("Bấm 1 cấp để trang bị  —  bấm ra ngoài để quay lại", CX, L.y0+L.cardH+34);
+            ctx.fillText(LT("Bấm 1 cấp để trang bị  —  bấm ra ngoài để quay lại","Click a level to equip  —  click outside to go back"), CX, L.y0+L.cardH+34);
             ctx.textAlign = "left";
         }
 
@@ -11624,7 +11742,7 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                     ["TREX+SPINO", 8, "#C2185B", "#AD1457"], ["PTERO+TRICE", 9, "#C2185B", "#AD1457"],
                     ["PTERO+SPINO", 10, "#C2185B", "#AD1457"], ["TRICE+SPINO", 11, "#C2185B", "#AD1457"] ] },
                 { title: "— ĐẶC BIỆT —", tc: "#42A5F5", items: [
-                    ["TETRIS", 36, "#42A5F5", "#1A237E", "#E3F2FD"] ] }
+                    ["TETRIS", 36, "#42A5F5", "#1A237E", "#E3F2FD"], ["3 KHỦNG LONG", 38, "#66BB6A", "#1B5E20", "#FFEB3B"] ] }
             ];
             if (testMenuPage < 0) testMenuPage = pages.length - 1;
             if (testMenuPage >= pages.length) testMenuPage = 0;
@@ -11825,7 +11943,10 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                 shield: "SHIELD: ",
                 ammo: "AMMO: ",
                 hp: "HP: ",
-                inst_1: "<b>P1:</b> W A S D | <b>P2:</b> Arrows",
+                inst_1: "Move: A/D &nbsp; Jump: W/Space &nbsp; Shoot: J &nbsp; Charge: K &nbsp; Shield: L &nbsp; Dash: Shift &nbsp; Ultimate: U &nbsp; Stance: I/O &nbsp;&nbsp;|&nbsp;&nbsp; P2: Arrows",
+                dash: "DASH [Shift]", ready: "READY", press_u: "PRESS U!", charge_x: "CHARGE x", ult_word: "ULTIMATE",
+                stances: ["GUNSLINGER", "TRICKSTER", "ROYAL GUARD"],
+                b_out: "OUT OF FRAME", b_hit: "DESCENDED — HIT!",
                 lang_btn: "🇻🇳 Tiếng Việt"
             },
             vi: {
@@ -11841,7 +11962,10 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                 shield: "KHIÊN: ",
                 ammo: "ĐẠN: ",
                 hp: "MÁU: ",
-                inst_1: "<b>P1:</b> W A S D | <b>P2:</b> Mũi tên",
+                inst_1: "Di chuyển: A/D &nbsp; Nhảy: W/Space &nbsp; Bắn: J &nbsp; Dồn: K &nbsp; Khiên: L &nbsp; Lướt: Shift &nbsp; Chiêu cuối: U &nbsp; Phái: I/O &nbsp;&nbsp;|&nbsp;&nbsp; P2: Mũi tên",
+                dash: "LƯỚT [Shift]", ready: "SẴN", press_u: "BẤM U!", charge_x: "SẠC x", ult_word: "CHIÊU CUỐI",
+                stances: ["GUNSLINGER", "TRICKSTER", "ROYAL GUARD"],
+                b_out: "NGOÀI KHUNG", b_hit: "HẠ XUỐNG — ĐÁNH!",
                 lang_btn: "🇬🇧 English"
             }
         };
@@ -11956,52 +12080,55 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
         let customMaxHp = 5;   // may goc moi (khong con chinh trong menu)
         // ===================== HE THONG RUNE =====================
         const RUNES = [
-            { id:'hp',       name:'+3 MÁU',           icon:'❤',  desc:'Máu gốc 5 → 8' },
-            { id:'maxgrow',  name:'DIỆT BOSS +1 MÁU', icon:'📈', desc:'Mỗi boss hạ được +1 máu tối đa (trần 10; thành 13 nếu có +3 Máu)' },
-            { id:'fullheal', name:'HỒI ĐẦY KHI HẠ BOSS', icon:'✚', desc:'Hạ boss thì hồi đầy máu (thường chỉ +1)' },
-            { id:'redbird',  name:'CHIM ĐỎ',          icon:'🐦', desc:'Bắn hạ chim đỏ để TÍCH máu (đầy máu thì cất kho); mất máu tự xả ra hồi lại' },
-            { id:'shield',   name:'LÁ CHẮN TÁI TẠO',  icon:'🛡', desc:'12 giây không trúng đòn → 1 lá chắn' },
-            { id:'revive',   name:'HỒI SINH • C1',    icon:'⟳',  desc:'Chết → sống lại 1 máu; màn đen CẮT ĐÔI mở ra' },
-            { id:'revivex',  name:'HỒI SINH • C2',    icon:'✝',  cost:2, desc:'Tốn 2 ô. Chết → hồi ĐẦY máu + nổ 20 dmg toàn màn, đập VỠ màn đen thành mảnh' },
-            { id:'afterimg', name:'TÀN ẢNH • C1',     icon:'👤', desc:'Lướt để lại 1 tàn ảnh mờ; nó bắn 1 viên (1 dmg) rồi biến mất' },
-            { id:'afterimgx',name:'TÀN ẢNH • C2',     icon:'👥', cost:2, desc:'Tốn 2 ô. Tàn ảnh bắn 3 viên (mỗi viên cách 1 giây) rồi biến mất' },
-            { id:'instult',  name:'CHIÊU CUỐI TỨC THÌ • C1', icon:'⚡', desc:'Vào màn là có sẵn chiêu cuối ngay' },
-            { id:'instultx', name:'CHIÊU CUỐI TỨC THÌ • C2', icon:'⚡', cost:2, desc:'Tốn 2 ô. Có sẵn chiêu cuối + tăng 50% tốc hồi chiêu cuối' },
-            { id:'chanshld', name:'KHIÊN KHI CHANNEL', icon:'⧗', cost:2, desc:'Tốn 2 ô. Cho giơ khiên (phím L) lúc channel để đỡ mà không bị đứt' },
-            { id:'pet',      name:'ĐỆ CHIM • C1',      icon:'🦖', desc:'Đệ chim bay theo, bắn 1 dmg mỗi giây vào địch gần nhất (xuyên chướng ngại)' },
-            { id:'petx',     name:'ĐỆ CHIM • C2',      icon:'✦', cost:2, desc:'Tốn 2 ô. Như C1, thêm: mỗi phát thứ 3 CHARGE bắn 3 tia Split DẪN ĐƯỜNG — lượn ~1s rồi lao vào địch, ưu tiên địch mới (1 dmg/tia)' },
-            { id:'pet2',     name:'ĐỆ NỔ • C1',        icon:'◉', desc:'Đệ máy bay theo, bắn 1 dmg mỗi giây vào địch gần nhất (xuyên chướng ngại)' },
-            { id:'pet2x',    name:'ĐỆ NỔ • C2',        icon:'✸', cost:2, desc:'Tốn 2 ô. Như C1, thêm: mỗi phát thứ 3 CHARGE bắn 1 viên nổ AOE (2 dmg)' },
-            { id:'pet3',     name:'ĐỆ KHIÊN • C1',     icon:'⬡', desc:'Đệ hộ vệ: mỗi 15s nhảy ra trước mặt tạo khiên 2s (chặn mọi đòn/parry, độc lập bạn)' },
-            { id:'pet3x',    name:'ĐỆ KHIÊN • C2',     icon:'⬢', cost:2, desc:'Tốn 2 ô. Như C1 nhưng tạo khiên mỗi 8 giây' },
-            { id:'pet4',     name:'ĐỆ HỒI MÁU • C1',   icon:'✚', desc:'Đệ chữa trị: hồi 1 HP mỗi 20 giây' },
-            { id:'pet4x',    name:'ĐỆ HỒI MÁU • C2',   icon:'❤', cost:2, desc:'Tốn 2 ô. Hồi 1 HP mỗi 10 giây' },
-            { id:'pet5',     name:'ĐỆ LƯỚT CHÉM • C1', icon:'↗', desc:'Đệ tốc kích: mỗi 12s lướt về phía cụm địch đông nhất, quét 3 dmg (hitbox lưỡi liềm)' },
-            { id:'pet5x',    name:'ĐỆ LƯỚT CHÉM • C2', icon:'⇗', cost:2, desc:'Tốn 2 ô. Như C1 nhưng lướt mỗi 6 giây' },
-            { id:'pet6',     name:'ĐỆ SAO XOAY • C1',  icon:'✳', desc:'Đệ pháp: mỗi 20s tạo 6 đạn xuyên xoay quanh (xoay nhanh, dãn xa dần), 1 dmg/trúng' },
-            { id:'pet6x',    name:'ĐỆ SAO XOAY • C2',  icon:'✺', cost:2, desc:'Tốn 2 ô. Như C1 nhưng mỗi 10 giây' },
+            { id:'hp',       name:'+3 MÁU',           nameEn:'+3 HP',                icon:'❤',  desc:'Máu gốc 5 → 8', descEn:'Base HP 5 → 8' },
+            { id:'maxgrow',  name:'DIỆT BOSS +1 MÁU', nameEn:'BOSS KILL +1 HP',      icon:'📈', desc:'Mỗi boss hạ được +1 máu tối đa (trần 10; thành 13 nếu có +3 Máu)', descEn:'Each boss killed: +1 max HP (cap 10; 13 with +3 HP)' },
+            { id:'fullheal', name:'HỒI ĐẦY KHI HẠ BOSS', nameEn:'FULL HEAL ON BOSS KILL', icon:'✚', desc:'Hạ boss thì hồi đầy máu (thường chỉ +1)', descEn:'Killing a boss fully heals you (normally only +1)' },
+            { id:'redbird',  name:'CHIM ĐỎ',          nameEn:'RED BIRD',             icon:'🐦', desc:'Bắn hạ chim đỏ để TÍCH máu (đầy máu thì cất kho); mất máu tự xả ra hồi lại', descEn:'Shoot red birds to BANK HP (stored when full); lose HP and it auto-restores' },
+            { id:'shield',   name:'LÁ CHẮN TÁI TẠO',  nameEn:'REGEN SHIELD',         icon:'🛡', desc:'12 giây không trúng đòn → 1 lá chắn', descEn:'12s without a hit → 1 shield' },
+            { id:'revive',   name:'HỒI SINH • C1',    nameEn:'REVIVE • C1',          icon:'⟳',  desc:'Chết → sống lại 1 máu; màn đen CẮT ĐÔI mở ra', descEn:'Die → revive with 1 HP; black screen SPLITS open' },
+            { id:'revivex',  name:'HỒI SINH • C2',    nameEn:'REVIVE • C2',          icon:'✝',  cost:2, desc:'Tốn 2 ô. Chết → hồi ĐẦY máu + nổ 20 dmg toàn màn, đập VỠ màn đen thành mảnh', descEn:'Costs 2 slots. Die → FULL heal + 20 dmg screen-wide blast, SHATTER the black screen' },
+            { id:'afterimg', name:'TÀN ẢNH • C1',     nameEn:'AFTERIMAGE • C1',      icon:'👤', desc:'Lướt để lại 1 tàn ảnh mờ; nó bắn 1 viên (1 dmg) rồi biến mất', descEn:'Dash leaves a faint clone; it fires 1 shot (1 dmg) then vanishes' },
+            { id:'afterimgx',name:'TÀN ẢNH • C2',     nameEn:'AFTERIMAGE • C2',      icon:'👥', cost:2, desc:'Tốn 2 ô. Tàn ảnh bắn 3 viên (mỗi viên cách 1 giây) rồi biến mất', descEn:'Costs 2 slots. Afterimage fires 3 shots (1s apart) then vanishes' },
+            { id:'instult',  name:'CHIÊU CUỐI TỨC THÌ • C1', nameEn:'INSTANT ULTIMATE • C1', icon:'⚡', desc:'Vào màn là có sẵn chiêu cuối ngay', descEn:'Start each stage with the ultimate ready' },
+            { id:'instultx', name:'CHIÊU CUỐI TỨC THÌ • C2', nameEn:'INSTANT ULTIMATE • C2', icon:'⚡', cost:2, desc:'Tốn 2 ô. Có sẵn chiêu cuối + tăng 50% tốc hồi chiêu cuối', descEn:'Costs 2 slots. Ultimate ready + 50% faster ultimate charge' },
+            { id:'chanshld', name:'KHIÊN KHI CHANNEL', nameEn:'SHIELD WHILE CHANNELING', icon:'⧗', cost:2, desc:'Tốn 2 ô. Cho giơ khiên (phím L) lúc channel để đỡ mà không bị đứt', descEn:'Costs 2 slots. Raise shield (L) during a channel to block without breaking it' },
+            { id:'pet',      name:'ĐỆ CHIM • C1',      nameEn:'BIRD PET • C1',        icon:'🦖', desc:'Đệ chim bay theo, bắn 1 dmg mỗi giây vào địch gần nhất (xuyên chướng ngại)', descEn:'Bird pet follows you, 1 dmg/sec to nearest enemy (pierces obstacles)' },
+            { id:'petx',     name:'ĐỆ CHIM • C2',      nameEn:'BIRD PET • C2',        icon:'✦', cost:2, desc:'Tốn 2 ô. Như C1, thêm: mỗi phát thứ 3 CHARGE bắn 3 tia Split DẪN ĐƯỜNG — lượn ~1s rồi lao vào địch, ưu tiên địch mới (1 dmg/tia)', descEn:'Costs 2 slots. Like C1, plus: every 3rd shot CHARGES 3 homing Split rays — loiter ~1s then dive, prioritizing new enemies (1 dmg/ray)' },
+            { id:'pet2',     name:'ĐỆ NỔ • C1',        nameEn:'BOMB PET • C1',        icon:'◉', desc:'Đệ máy bay theo, bắn 1 dmg mỗi giây vào địch gần nhất (xuyên chướng ngại)', descEn:'Drone pet follows you, 1 dmg/sec to nearest enemy (pierces obstacles)' },
+            { id:'pet2x',    name:'ĐỆ NỔ • C2',        nameEn:'BOMB PET • C2',        icon:'✸', cost:2, desc:'Tốn 2 ô. Như C1, thêm: mỗi phát thứ 3 CHARGE bắn 1 viên nổ AOE (2 dmg)', descEn:'Costs 2 slots. Like C1, plus: every 3rd shot CHARGES an AOE blast (2 dmg)' },
+            { id:'pet3',     name:'ĐỆ KHIÊN • C1',     nameEn:'SHIELD PET • C1',      icon:'⬡', desc:'Đệ hộ vệ: mỗi 15s nhảy ra trước mặt tạo khiên 2s (chặn mọi đòn/parry, độc lập bạn)', descEn:'Guardian pet: every 15s jumps ahead to make a 2s shield (blocks/parries any hit, independent of you)' },
+            { id:'pet3x',    name:'ĐỆ KHIÊN • C2',     nameEn:'SHIELD PET • C2',      icon:'⬢', cost:2, desc:'Tốn 2 ô. Như C1 nhưng tạo khiên mỗi 8 giây', descEn:'Costs 2 slots. Like C1 but makes a shield every 8s' },
+            { id:'pet4',     name:'ĐỆ HỒI MÁU • C1',   nameEn:'HEAL PET • C1',        icon:'✚', desc:'Đệ chữa trị: hồi 1 HP mỗi 20 giây', descEn:'Healer pet: restores 1 HP every 20s' },
+            { id:'pet4x',    name:'ĐỆ HỒI MÁU • C2',   nameEn:'HEAL PET • C2',        icon:'❤', cost:2, desc:'Tốn 2 ô. Hồi 1 HP mỗi 10 giây', descEn:'Costs 2 slots. Restores 1 HP every 10s' },
+            { id:'pet5',     name:'ĐỆ LƯỚT CHÉM • C1', nameEn:'DASH-SLASH PET • C1',  icon:'↗', desc:'Đệ tốc kích: mỗi 12s lướt về phía cụm địch đông nhất, quét 3 dmg (hitbox lưỡi liềm)', descEn:'Striker pet: every 12s dashes to the densest enemy cluster, sweeps 3 dmg (crescent hitbox)' },
+            { id:'pet5x',    name:'ĐỆ LƯỚT CHÉM • C2', nameEn:'DASH-SLASH PET • C2',  icon:'⇗', cost:2, desc:'Tốn 2 ô. Như C1 nhưng lướt mỗi 6 giây', descEn:'Costs 2 slots. Like C1 but dashes every 6s' },
+            { id:'pet6',     name:'ĐỆ SAO XOAY • C1',  nameEn:'ORBIT STAR PET • C1',  icon:'✳', desc:'Đệ pháp: mỗi 20s tạo 6 đạn xuyên xoay quanh (xoay nhanh, dãn xa dần), 1 dmg/trúng', descEn:'Mage pet: every 20s spawns 6 piercing stars orbiting (spin fast, widen out), 1 dmg/hit' },
+            { id:'pet6x',    name:'ĐỆ SAO XOAY • C2',  nameEn:'ORBIT STAR PET • C2',  icon:'✺', cost:2, desc:'Tốn 2 ô. Như C1 nhưng mỗi 10 giây', descEn:'Costs 2 slots. Like C1 but every 10s' },
         ];
         let runeSlots = [null, null];
         (function(){ try { let sv = JSON.parse(localStorage.getItem('dino_runes') || '[]'); runeSlots = [sv[0]||null, sv[1]||null]; } catch(e){} })();
         let runePicker = null;   // null = dong, 0/1 = dang chon cho o nao
         let runeLevelPick = null; // null = dong; = chi so PET_FAMILIES dang mo bang chon Cap
         const PET_FAMILIES = [
-            { name:'ĐỆ CHIM',      icon:'🦖', c1:'pet',  c2:'petx'  },
-            { name:'ĐỆ NỔ',        icon:'◉',  c1:'pet2', c2:'pet2x' },
-            { name:'ĐỆ KHIÊN',     icon:'⬡',  c1:'pet3', c2:'pet3x' },
-            { name:'ĐỆ HỒI MÁU',   icon:'✚',  c1:'pet4', c2:'pet4x' },
-            { name:'ĐỆ LƯỚT CHÉM', icon:'↗',  c1:'pet5', c2:'pet5x' },
-            { name:'ĐỆ SAO XOAY',  icon:'✳',  c1:'pet6', c2:'pet6x' },
-            { name:'HỒI SINH',     icon:'⟳',  c1:'revive', c2:'revivex' },
-            { name:'TÀN ẢNH',      icon:'👤', c1:'afterimg', c2:'afterimgx' },
-            { name:'CHIÊU CUỐI TỨC THÌ', icon:'⚡', c1:'instult', c2:'instultx' },
+            { name:'ĐỆ CHIM',      nameEn:'BIRD PET',        icon:'🦖', c1:'pet',  c2:'petx'  },
+            { name:'ĐỆ NỔ',        nameEn:'BOMB PET',        icon:'◉',  c1:'pet2', c2:'pet2x' },
+            { name:'ĐỆ KHIÊN',     nameEn:'SHIELD PET',      icon:'⬡',  c1:'pet3', c2:'pet3x' },
+            { name:'ĐỆ HỒI MÁU',   nameEn:'HEAL PET',        icon:'✚',  c1:'pet4', c2:'pet4x' },
+            { name:'ĐỆ LƯỚT CHÉM', nameEn:'DASH-SLASH PET',  icon:'↗',  c1:'pet5', c2:'pet5x' },
+            { name:'ĐỆ SAO XOAY',  nameEn:'ORBIT STAR PET',  icon:'✳',  c1:'pet6', c2:'pet6x' },
+            { name:'HỒI SINH',     nameEn:'REVIVE',          icon:'⟳',  c1:'revive', c2:'revivex' },
+            { name:'TÀN ẢNH',      nameEn:'AFTERIMAGE',      icon:'👤', c1:'afterimg', c2:'afterimgx' },
+            { name:'CHIÊU CUỐI TỨC THÌ', nameEn:'INSTANT ULTIMATE', icon:'⚡', c1:'instult', c2:'instultx' },
         ];
         const PET_RUNE_IDS = new Set(['pet','petx','pet2','pet2x','pet3','pet3x','pet4','pet4x','pet5','pet5x','pet6','pet6x','revive','revivex','afterimg','afterimgx','instult','instultx']);
+        function LT(vi, en){ return currentLang === 'en' ? en : vi; }
+        function RNAME(o){ return (currentLang==='en' && o && o.nameEn) ? o.nameEn : (o ? o.name : ''); }
+        function RDESC(o){ return (currentLang==='en' && o && o.descEn) ? o.descEn : (o ? (o.desc||'') : ''); }
         // Danh sach hien thi trong picker: [bo rune] + rune thuong + 6 "ho đệ" (moi ho 1 o, bam ra chon Cap)
         function pickerItems(){
-            let out = [{ id:null, name:'— BỎ RUNE —', icon:'∅', desc:'Không dùng rune ở ô này', kind:'rune' }];
-            for (let r of RUNES){ if (!PET_RUNE_IDS.has(r.id)) out.push({ id:r.id, name:r.name, icon:r.icon, desc:r.desc, kind:'rune' }); }
-            for (let fi=0; fi<PET_FAMILIES.length; fi++){ let fam=PET_FAMILIES[fi]; out.push({ kind:'family', fam:fam, famIdx:fi, name:fam.name, icon:fam.icon, desc:'Đệ có 2 cấp — bấm để chọn' }); }
+            let out = [{ id:null, name:LT('— BỎ RUNE —','— NO RUNE —'), icon:'∅', desc:LT('Không dùng rune ở ô này','Leave this slot empty'), kind:'rune' }];
+            for (let r of RUNES){ if (!PET_RUNE_IDS.has(r.id)) out.push({ id:r.id, name:RNAME(r), icon:r.icon, desc:RDESC(r), kind:'rune' }); }
+            for (let fi=0; fi<PET_FAMILIES.length; fi++){ let fam=PET_FAMILIES[fi]; out.push({ kind:'family', fam:fam, famIdx:fi, name:RNAME(fam), icon:fam.icon, desc:LT('Đệ có 2 cấp — bấm để chọn','2 levels — click to choose') }); }
             return out;
         }
         function setRuneSlot(id){
@@ -12014,7 +12141,7 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
         function hasRune(id){ return runeSlots[0] === id || runeSlots[1] === id; }
         function saveRunes(){ try { localStorage.setItem('dino_runes', JSON.stringify(runeSlots)); } catch(e){} }
         function runeCost(id){ let r = RUNES.find(x => x.id === id); return (r && r.cost) ? r.cost : 1; }
-        function runeName(id){ let r = RUNES.find(x => x.id === id); return r ? r.name : ''; }
+        function runeName(id){ let r = RUNES.find(x => x.id === id); return r ? RNAME(r) : ''; }
         function runeIcon(id){ let r = RUNES.find(x => x.id === id); return r ? r.icon : ''; }
 
         // ===================== THU CUNG BAY (rune 'pet') =====================
@@ -12934,6 +13061,7 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                 else if (testBossSelection === 35) { setupApeArena(); bosses.push(new GreatApeBoss(1)); }
                 else if (testBossSelection === 36) { setupTetrisArena(); bosses.push(new TetrisBoss(1)); }
                 else if (testBossSelection === 37) { setupShrineArena(); bosses.push(new VoltCloneBoss(1)); }
+                else if (testBossSelection === 38) { spawnTrio(); }
                 return;
             }
             
@@ -13312,9 +13440,22 @@ function checkPvPCollisions() {
                             }
                             
 // Clone Boss Nerf: Chặn tối đa 3 hit, xuyên và sét vượt qua thẳng khiên
-                            if (bosses[b].name === "VOLT REX" && bosses[b].dodging) {
-                                proj.hitIds.add(bosses[b]); bosses[b].jitter = 6;
-                                visualEffects.push(new Effect(bosses[b].x + bosses[b].w/2, proj.y, 'lightning_shock'));
+                            if (bosses[b].name === "VOLT REX") {
+                                if (bosses[b].invulnAll) { proj.hitIds.add(bosses[b]); }   // dang VAO -> mien nhiem
+                                else {
+                                    let special = (proj.type===2 || proj.type===4 || proj.type===10 || proj.type===11 || proj.pierceCount>0);   // xuyen/set/lua/ult -> KHONG ne duoc
+                                    if (!special && bosses[b].dodgeCharges > 0) {
+                                        proj.hitIds.add(bosses[b]); bosses[b].jitter = 6; bosses[b].dodgeCharges--; bosses[b].dodgeReCd = 90;   // NE (het 3 lan thi dinh)
+                                        visualEffects.push(new Effect(bosses[b].x + bosses[b].w/2, proj.y, 'lightning_shock'));
+                                    } else {
+                                        proj.hitIds.add(bosses[b]); bosses[b].hp -= proj.dmg; if (proj.type === 11) bosses[b].burnTimer = 120; projHit = true;
+                                    }
+                                }
+                            } else if (bosses[b].role === 'block' && bosses[b].shieldHits > 0) {
+                                // KHIEN cua con VANG: lua/xuyen xuyen thang, set bi chan nhung no mat mau, thuong thi tan khien
+                                if (proj.type===11 || proj.type===2 || proj.pierceCount>0){ proj.hitIds.add(bosses[b]); bosses[b].hp -= proj.dmg; if (proj.type===11) bosses[b].burnTimer=120; projHit=true; }
+                                else if (proj.type===4){ proj.hitIds.add(bosses[b]); bosses[b].hp -= 1; visualEffects.push(new Effect(bosses[b].x+bosses[b].w/2, proj.y, 'lightning_shock')); projHit=true; }
+                                else { proj.hitIds.add(bosses[b]); bosses[b].shieldHits--; if (bosses[b].shieldHits<=0){ bosses[b].shieldRegen=200; visualEffects.push(new Effect(bosses[b].x+bosses[b].w/2, bosses[b].y, 'explosion', true, 14)); } else visualEffects.push(new Effect(bosses[b].x+(bosses[b].facingLeft?0:bosses[b].w), proj.y, 'parry')); projHit=true; }
                             } else if (bosses[b].name === "AEGIS REX") {
                                 proj.hitIds.add(bosses[b]);
                                 if (bosses[b].invulnAll) { visualEffects.push(new Effect(bosses[b].x + bosses[b].w/2, proj.y, 'parry', false)); }
