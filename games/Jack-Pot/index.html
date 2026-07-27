@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PIT BOSS</title>
+<title>Xì Lác Boss Run - Endless</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 
@@ -380,6 +380,19 @@
   .buff-card:hover:not(.disabled) { transform: translateY(-6px); border-color: var(--gold); box-shadow: 0 12px 30px rgba(201,162,39,0.25); }
   .buff-card.disabled { opacity: 0.3; cursor: not-allowed; }
   .buff-card.picked { opacity: 1; border-color: var(--green); box-shadow: 0 0 22px rgba(46,204,113,0.35); cursor: default; }
+  .buff-card { position: relative; }
+  .buff-card.above-avg {
+    border-color: rgba(46,204,113,0.7);
+    box-shadow: 0 0 20px rgba(46,204,113,0.18);
+    background: linear-gradient(160deg, #16301f, #0d1f14);
+  }
+  .buff-card .hi-tag {
+    position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #2ecc71, #1a9b5c);
+    color: #06210f; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.4px;
+    padding: 3px 10px; border-radius: 10px; white-space: nowrap;
+  }
+  .buff-card .span-note { font-size: 0.7rem; opacity: 0.45; margin-top: 8px; }
   .buff-card .icon { font-size: 2.2rem; margin-bottom: 10px; }
   .buff-card .title { font-weight: 700; font-size: 1.05rem; margin-bottom: 6px; color: var(--gold-light); }
   .buff-card .desc { font-size: 0.85rem; opacity: 0.85; line-height: 1.4; }
@@ -591,60 +604,54 @@
     .joker-item, .slot-box { width: 46%; }
     .shop { padding: 14px 12px 18px; }
   }
-/* ===== language switch ===== */
-.lang-switch{position:fixed;top:10px;right:12px;z-index:9999;display:flex;
-  gap:0;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.22);
-  background:rgba(0,0,0,.45);backdrop-filter:blur(6px);font-size:.72rem;font-weight:700;
-  box-shadow:0 4px 14px rgba(0,0,0,.4)}
-.lang-switch button{background:transparent;border:0;color:rgba(255,255,255,.6);
-  padding:5px 12px;cursor:pointer;font:inherit;letter-spacing:.06em;transition:.15s}
-.lang-switch button:hover{color:#fff}
-.lang-switch button.on{background:linear-gradient(135deg,#d4af37,#a67c00);color:#1a1206}
-@media(max-width:600px){.lang-switch{top:6px;right:6px;font-size:.66rem}
-  .lang-switch button{padding:4px 9px}}
 </style>
 </head>
 <body>
 
-<div class="lang-switch" id="lang-switch">
-  <button data-lang="en">EN</button>
-  <button data-lang="vi">VI</button>
-</div>
-
 <!-- ========== MENU ========== -->
 <div id="menu" class="screen active">
-  <h1 id="game-title">♠️ PIT BOSS</h1>
-  <p class="sub" data-i18n="menu.sub"></p>
-  <button class="big-btn" id="btn-start" data-i18n="menu.start"></button>
-  <div class="help-text" style="margin-top:36px" data-i18n-html="menu.help"></div>
+  <h1>♠️ XÌ LÁC BOSS</h1>
+  <p class="sub">Endless Run • Đánh Boss • Combo theo hàng • Joker</p>
+  <button class="big-btn" id="btn-start">Bắt đầu</button>
+  <div class="help-text" style="margin-top:36px">
+    Rút bài → tự xếp thành <strong>hàng 5 lá</strong> → chạm 2 lá để đổi chỗ → Sẵn sàng<br>
+    Mỗi hàng: <strong>(điểm hàng + add) × mult</strong>, cộng dồn rồi × <strong>hệ số tầng (1.2^tầng)</strong><br>
+    Xì Dách + thưởng bộ cộng sau, cuối cùng nhân Mậu Binh và Joker toàn cục<br>
+    Máu Boss tăng theo <strong>độ khó bạn chọn</strong> — Boss dùng combo nhưng <strong>không scale</strong><br>
+    Mỗi Boss mang một <strong>luật riêng</strong> — xem trước ở màn buff để còn kịp mua Joker đối phó<br>
+    Hạ Boss → nhận vàng + lợi tức → chọn buff → mua <strong>Joker</strong> ở Thương nhân → bấm Màn tiếp
+  </div>
 </div>
 
-<!-- ========== DIFFICULTY ========== -->
+<!-- ========== CHỌN ĐỘ KHÓ ========== -->
 <div id="difficulty" class="screen">
-  <h2 style="font-size:1.7rem;margin:26px 0 6px;color:var(--gold-light)" data-i18n="diffscreen.title"></h2>
-  <p class="sub" style="opacity:.7;text-align:center;max-width:620px;margin-bottom:6px"
-     data-i18n-html="diffscreen.sub"></p>
+  <h2 style="font-size:1.7rem;margin:26px 0 6px;color:var(--gold-light)">Chọn độ khó</h2>
+  <p class="sub" style="opacity:.7;text-align:center;max-width:620px;margin-bottom:6px">
+    Độ khó chỉ đổi <strong>máu Boss</strong>. Sát thương của bạn luôn tăng ×1.2 mỗi tầng —
+    độ khó là nhịp máu Boss đuổi theo con số đó nhanh cỡ nào.
+  </p>
   <div class="diff-list" id="diff-list"></div>
-  <button class="mini-btn" id="btn-back-menu" style="margin-top:22px;padding:8px 20px" data-i18n="common.back"></button>
+  <button class="mini-btn" id="btn-back-menu" style="margin-top:22px;padding:8px 20px">← Quay lại</button>
 </div>
 
 <!-- ========== GAME ========== -->
 <div id="game" class="screen">
   <div class="hud">
-    <div class="hud-item"><span data-i18n="hud.floor"></span> <strong id="floor-num">1</strong></div>
-    <div class="hud-item"><span data-i18n="hud.diff"></span> <strong id="diff-name"></strong></div>
+    <div class="hud-item">Tầng <strong id="floor-num">1</strong></div>
+    <div class="hud-item">Độ khó: <strong id="diff-name">Thường</strong></div>
     <div class="hud-item coin">💰 <strong id="gold-val">0</strong></div>
-    <div class="hud-item"><span data-i18n="hud.scale"></span> <strong id="scale-val">×1.00</strong></div>
-    <div class="hud-item"><span data-i18n="hud.maxdmg"></span> <strong id="overflow-val">21</strong></div>
-    <div class="hud-item"><span data-i18n="hud.deck"></span> <strong id="extra-cards">52</strong></div>
-    <div class="hud-item"><span data-i18n="hud.high"></span> <strong id="highscore-val">0</strong></div>
+    <div class="hud-item">Hệ số tầng: <strong id="scale-val">×1.00</strong></div>
+    <div class="hud-item">Dmg tối đa: <strong id="overflow-val">21</strong></div>
+    <div class="hud-item">Bộ bài: <strong id="extra-cards">52</strong></div>
+    <div class="hud-item">Highscore: <strong id="highscore-val">0</strong></div>
   </div>
 
   <div class="joker-bar" id="joker-bar"></div>
 
+  <!-- BOSS -->
   <div class="boss-panel" id="boss-panel">
     <div class="boss-header">
-      <span class="boss-name" id="boss-name"></span>
+      <span class="boss-name" id="boss-name">Chủ Sàn #1</span>
       <span id="boss-buffs" style="font-size:0.78rem;opacity:0.8"></span>
     </div>
     <div class="blind-bar" id="blind-bar"></div>
@@ -654,16 +661,18 @@
     </div>
     <div class="cards-row" id="boss-cards"></div>
     <div style="margin-top:6px;font-size:0.85rem;opacity:0.75">
-      <span data-i18n="common.score"></span> <strong id="boss-score">-</strong>
+      Điểm: <strong id="boss-score">-</strong>
       <span id="boss-bj" style="color:#f1c40f;margin-left:8px"></span>
     </div>
   </div>
 
-  <div class="msg info" id="message"></div>
+  <!-- MESSAGE -->
+  <div class="msg info" id="message">Lượt của bạn — Rút bài rồi nhấn Sẵn sàng</div>
 
+  <!-- PLAYER -->
   <div class="player-panel">
     <div class="player-header">
-      <span class="player-name" data-i18n="common.you"></span>
+      <span class="player-name">Bạn</span>
       <span id="player-dmg-preview" style="font-size:0.9rem;font-weight:700;color:#f7dc6f"></span>
     </div>
     <div class="player-hp-bar">
@@ -672,33 +681,33 @@
     </div>
 
     <div class="sort-bar">
-      <button class="mini-btn" id="btn-sort-rank" data-i18n="sort.rank"></button>
-      <button class="mini-btn" id="btn-sort-suit" data-i18n="sort.suit"></button>
-      <button class="mini-btn" id="btn-sort-col" data-i18n="sort.col"></button>
-      <span style="font-size:0.72rem;opacity:0.5;align-self:center" data-i18n="sort.hint"></span>
+      <button class="mini-btn" id="btn-sort-rank">↕ Xếp theo Rank</button>
+      <button class="mini-btn" id="btn-sort-suit">♠ Xếp theo Chất</button>
+      <button class="mini-btn" id="btn-sort-col">⇅ Gom cột dọc</button>
+      <span style="font-size:0.72rem;opacity:0.5;align-self:center">Chạm 1 lá rồi chạm lá khác để đổi chỗ</span>
     </div>
 
     <div class="hand-rows" id="player-cards"></div>
     <div class="badge-row">
-      <div class="combo-badge none" id="combo-badge"></div>
+      <div class="combo-badge none" id="combo-badge">Chưa có combo toàn bài</div>
       <div class="set-badge" id="set-badge" style="display:none"></div>
       <div class="glob-badge" id="glob-badge" style="display:none"></div>
     </div>
     <div style="margin-top:6px;font-size:0.85rem;opacity:0.75">
-      <span data-i18n="common.score"></span> <strong id="player-score">-</strong>
+      Điểm: <strong id="player-score">-</strong>
       <span id="player-bj" style="color:#f1c40f;margin-left:8px"></span>
     </div>
   </div>
 
   <div class="controls">
-    <button class="btn btn-hit" id="btn-hit"></button>
-    <button class="btn btn-ready" id="btn-ready"></button>
+    <button class="btn btn-hit" id="btn-hit">Rút bài</button>
+    <button class="btn btn-ready" id="btn-ready">Sẵn sàng</button>
   </div>
 
   <div class="stats-bar">
-    <span><span data-i18n="stat.maxhp"></span> <strong id="stat-maxhp">100</strong></span>
-    <span><span data-i18n="stat.aa"></span> <strong id="stat-aa">10</strong></span>
-    <span><span data-i18n="stat.bj"></span> <strong id="stat-xd">+10</strong></span>
+    <span>Máu tối đa: <strong id="stat-maxhp">100</strong></span>
+    <span>Thưởng AA: <strong id="stat-aa">10</strong></span>
+    <span>Xì Dách: <strong id="stat-xd">+10</strong></span>
   </div>
 
   <div class="log" id="log"></div>
@@ -706,12 +715,12 @@
 
 <!-- ========== BUFF SELECT ========== -->
 <div id="buff-screen" class="screen">
-  <h2 data-i18n="buff.title"></h2>
-  <p class="sub" id="buff-sub" data-i18n="buff.sub"></p>
+  <h2>🏆 Boss đã gục!</h2>
+  <p class="sub" id="buff-sub">Chọn 1 buff, ghé Thương nhân thoải mái, xong bấm Màn tiếp</p>
 
   <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:18px">
     <div class="hud-item coin">💰 <strong id="buff-gold">0</strong></div>
-    <div class="hud-item"><span data-i18n="buff.income"></span> <strong id="buff-income">+5</strong></div>
+    <div class="hud-item">Thu nhập: <strong id="buff-income">+5</strong></div>
     <div class="hud-item">Joker: <strong id="buff-jokers">0/4</strong></div>
   </div>
 
@@ -720,12 +729,12 @@
   <div class="buffs" id="buff-list"></div>
 
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:30px">
-    <button class="btn" id="btn-open-shop" data-i18n="shop.open"
-      style="background:linear-gradient(135deg,#a67c00,#8b5e00);color:#fff;min-width:230px;font-size:1.05rem;padding:14px 26px"></button>
-    <button class="big-btn" id="btn-next-floor" data-i18n="buff.next"
-      style="padding:14px 40px;font-size:1.05rem"></button>
+    <button class="btn" id="btn-open-shop" style="background:linear-gradient(135deg,#a67c00,#8b5e00);color:#fff;min-width:230px;font-size:1.05rem;padding:14px 26px">
+      🧙‍♂️ Thương nhân tham lam
+    </button>
+    <button class="big-btn" id="btn-next-floor" style="padding:14px 40px;font-size:1.05rem">Màn tiếp →</button>
   </div>
-  <div class="help-text" id="buff-hint" style="margin-top:14px"></div>
+  <div class="help-text" id="buff-hint" style="margin-top:14px">Chọn 1 buff trước khi sang màn tiếp.</div>
 </div>
 
 <!-- ========== SHOP MODAL ========== -->
@@ -733,534 +742,61 @@
   <div class="shop">
     <div class="shop-head">
       <div>
-        <h3 data-i18n="shop.title"></h3>
-        <div class="shop-sub" data-i18n="shop.sub"></div>
+        <h3>🧙‍♂️ Thương nhân tham lam</h3>
+        <div class="shop-sub">Đổi máu lấy sức mạnh… và bán Joker cho kẻ liều lĩnh</div>
       </div>
       <div class="coin-big">💰 <span id="shop-gold">0</span></div>
     </div>
 
     <div class="shop-section">
-      <div class="sec-title"><span data-i18n="shop.owned"></span> <small id="slot-count"></small></div>
+      <div class="sec-title">🎴 Joker đang sở hữu <small id="slot-count">0/4 slot · bán lại được nửa giá</small></div>
       <div class="slot-grid" id="owned-slots"></div>
     </div>
 
     <div class="shop-section">
-      <div class="sec-title"><span data-i18n="shop.forsale"></span> <small data-i18n="shop.forsale.note"></small></div>
+      <div class="sec-title">✨ Joker bán ra <small>Mỗi Joker là duy nhất — không bao giờ trùng lá bạn đang có</small></div>
       <div class="shop-line">
         <div class="shop-items" id="shop-jokers"></div>
-        <button class="reroll-btn" id="reroll-jokers"><span data-i18n="shop.reroll"></span><span id="rr-joker-cost">1💰</span></button>
+        <button class="reroll-btn" id="reroll-jokers">🔄 Đổi lại<span id="rr-joker-cost">1💰</span></button>
       </div>
     </div>
 
     <div class="shop-section">
-      <div class="sec-title"><span data-i18n="shop.cards"></span> <small data-i18n="shop.cards.note"></small></div>
+      <div class="sec-title">🃏 Lá bài thêm vào bộ <small>Chỉ vào bộ bài của bạn — Boss có bộ riêng</small></div>
       <div class="shop-line">
         <div class="shop-items" id="shop-cards"></div>
-        <button class="reroll-btn" id="reroll-cards"><span data-i18n="shop.reroll"></span><span id="rr-card-cost">1💰</span></button>
+        <button class="reroll-btn" id="reroll-cards">🔄 Đổi lại<span id="rr-card-cost">1💰</span></button>
       </div>
     </div>
 
     <div class="trade-box">
       <div style="font-size:0.9rem;margin-bottom:10px">
-        <span data-i18n="stat.maxhp"></span> <strong id="merchant-hp">100</strong> &nbsp;|&nbsp;
-        <span data-i18n="hud.maxdmg"></span> <strong id="merchant-dmg">21</strong>
+        Máu tối đa: <strong id="merchant-hp">100</strong> &nbsp;|&nbsp; Dmg tối đa: <strong id="merchant-dmg">21</strong>
       </div>
-      <button class="btn" id="btn-merchant-trade" data-i18n="shop.trade"
-        style="background:linear-gradient(135deg,#a67c00,#8b5e00);color:#fff;min-width:240px;font-size:0.9rem"></button>
+      <button class="btn" id="btn-merchant-trade" style="background:linear-gradient(135deg,#a67c00,#8b5e00);color:#fff;min-width:240px;font-size:0.9rem">
+        Đổi 25 Máu tối đa → +1 Dmg tối đa
+      </button>
       <div id="merchant-msg" style="margin-top:8px;font-size:0.8rem;min-height:18px;opacity:0.9"></div>
     </div>
 
-    <button class="shop-close" id="btn-close-shop" data-i18n="shop.close"></button>
+    <button class="shop-close" id="btn-close-shop">Rời cửa hàng</button>
   </div>
 </div>
 
 <!-- ========== GAME OVER ========== -->
 <div id="gameover" class="screen">
-  <h2 data-i18n="go.title"></h2>
+  <h2>💀 Thất bại</h2>
   <div class="stats-box">
-    <div style="color:var(--gold-light);font-weight:700" id="go-diff"></div>
-    <div><span data-i18n="go.killed"></span> <strong id="go-killed">0</strong></div>
-    <div><span data-i18n="go.floor"></span> <strong id="go-floor">1</strong></div>
-    <div><span data-i18n="go.totaldmg"></span> <strong id="go-dmg">0</strong></div>
-    <div><span data-i18n="go.besthit"></span> <strong id="go-high">0</strong></div>
+    <div style="color:var(--gold-light);font-weight:700" id="go-diff">Thường</div>
+    <div>Bạn đã hạ được <strong id="go-killed">0</strong> Boss</div>
+    <div>Tầng cao nhất: <strong id="go-floor">1</strong></div>
+    <div>Tổng sát thương gây ra: <strong id="go-dmg">0</strong></div>
+    <div>Sát thương cao nhất 1 hit: <strong id="go-high">0</strong></div>
   </div>
-  <button class="big-btn" id="btn-restart" data-i18n="go.retry"></button>
+  <button class="big-btn" id="btn-restart">Chơi lại</button>
 </div>
 
 <script>
-/* =====================================================================
- * I18N — English / Tieng Viet.  Mac dinh: English.
- * Doi ngon ngu: nut EN/VI goc tren phai. Lua chon duoc ghi nho.
- * ===================================================================== */
-/* ====== DOI TEN GAME TAI DAY — sua 2 dong nay la xong ====== */
-const GAME_NAME  = 'PIT BOSS';        // ten hien o tab trinh duyet
-const GAME_TITLE = '♠️ PIT BOSS';     // ten hien to o man hinh chinh
-
-const I18N = {
-en: {
-  'menu.sub': 'Endless run • Boss fights • Row combos • Jokers',
-  'menu.start': 'Start',
-  'menu.help':
-    'Draw → cards auto-arrange into <strong>rows of 5</strong> → tap two cards to swap → Ready<br>' +
-    'Each row: <strong>(row points + add) × mult</strong>, summed, then × <strong>floor scale (1.2^floor)</strong><br>' +
-    'Blackjack + set bonus are added after, then global Jokers and Thirteen multipliers apply<br>' +
-    'Boss HP scales with <strong>your chosen difficulty</strong> — the boss uses combos but <strong>never scales</strong><br>' +
-    'Every boss brings <strong>its own rule</strong> — previewed on the reward screen so you can shop against it<br>' +
-    'Beat the boss → gold + interest → pick a buff → buy <strong>Jokers</strong> from the Merchant → Next floor',
-  'diffscreen.title': 'Choose difficulty',
-  'diffscreen.sub': 'Difficulty only changes <strong>boss HP</strong>. Your damage always grows ×1.2 per floor — difficulty is how fast boss HP chases that number.',
-  'common.back': '← Back',
-  'common.score': 'Score:',
-  'common.you': 'You',
-  'hud.floor': 'Floor',
-  'hud.diff': 'Difficulty:',
-  'hud.scale': 'Floor scale:',
-  'hud.maxdmg': 'Max dmg:',
-  'hud.deck': 'Deck:',
-  'hud.high': 'Highscore:',
-  'sort.rank': '↕ Sort by rank',
-  'sort.suit': '♠ Sort by suit',
-  'sort.col': '⇅ Stack columns',
-  'sort.hint': 'Tap one card then another to swap them',
-  'stat.maxhp': 'Max HP:',
-  'stat.aa': 'AA bonus:',
-  'stat.bj': 'Blackjack:',
-  'btn.hit': 'Hit',
-  'btn.hit.max': 'No draws left',
-  'btn.ready': 'Ready',
-  'btn.needmore': 'Need {need} ({val})',
-  'buff.title': '🏆 Boss down!',
-  'buff.sub': 'Pick one buff, visit the Merchant as often as you like, then hit Next floor',
-  'buff.income': 'Income:',
-  'buff.next': 'Next floor →',
-  'buff.hint.picked': 'Buff selected. Visit the Merchant as many times as you want, then hit Next floor.',
-  'buff.hint.pick': 'Pick one buff before moving on.',
-  'buff.incomeVal': '+{g} & +{i} interest',
-  'buff.ov.title': 'Max dmg +{v}',
-  'buff.ov.desc': 'Lets you go {v} points past 21 and still deal damage. Permanent, stacks.',
-  'buff.hp.title': 'Max HP +{v}',
-  'buff.hp.desc': 'Raises max HP by {v}. Fully heals you on pickup.',
-  'buff.gold.title': 'Gain {v} gold',
-  'buff.gold.desc': 'Adds {v} gold outright. Gold also earns interest (+1 per 10 gold each floor, capped at {cap}).',
-  'blind.preview': 'Floor {n} boss will play',
-  'shop.open': '🧙‍♂️ Greedy Merchant',
-  'shop.title': '🧙‍♂️ Greedy Merchant',
-  'shop.sub': 'Trade health for power… and sell Jokers to the reckless',
-  'shop.owned': '🎴 Your Jokers',
-  'shop.slots': '{n}/{max} slots · sells back for half price',
-  'shop.forsale': '✨ Jokers for sale',
-  'shop.forsale.note': 'Every Joker is unique — never a duplicate of one you own',
-  'shop.cards': '🃏 Cards to add to your deck',
-  'shop.cards.note': 'Only your deck — the boss has its own',
-  'shop.reroll': '🔄 Reroll',
-  'shop.trade': 'Trade 25 max HP → +1 max dmg',
-  'shop.close': 'Leave shop',
-  'shop.empty': 'Empty slot',
-  'shop.sell': 'Sell +{n}💰',
-  'shop.buy': 'Buy {n}💰',
-  'shop.bought': 'Bought',
-  'shop.full': 'No slots',
-  'shop.lowhp': 'Max HP too low (need ≥ 50 to trade)',
-  'shop.lowhp2': 'Not enough max HP!',
-  'shop.traded': 'Done! Max HP {hp} · Max dmg {dmg}',
-  'go.title': '💀 Defeated',
-  'go.diff': '{icon} Difficulty: {name}',
-  'go.killed': 'Bosses defeated:',
-  'go.floor': 'Highest floor:',
-  'go.totaldmg': 'Total damage dealt:',
-  'go.besthit': 'Biggest single hit:',
-  'go.retry': 'Play again',
-  'joker.xd.name': 'Blackjack ×{m}',
-  'joker.xd.desc': 'If your hand is exactly 21, multiply total damage by {m}.',
-  'joker.fc.name': 'Exactly {n} cards ×{m}',
-  'joker.fc.desc': 'If your hand has EXACTLY {n} cards (no more, no less), multiply total damage by {m}.',
-  'joker.col.name': 'Column ×{m}',
-  'joker.col.desc': 'If three cards of the same rank line up in one column, multiply total damage by {m}. (Needs ≥3 rows)',
-  'joker.cm.desc': 'Any row containing {combo} has its row score multiplied by {m}.',
-  'joker.ca.desc': 'Any row containing {combo} gains {v} extra points (inside the floor scale).',
-  'msg.yourturn': 'Your turn — hit, arrange your rows, then press Ready',
-  'msg.blind': '{icon} {name}: {desc}',
-  'msg.hidden': '🙈 Drew {n} cards — you cannot see them. Stand or push your luck?',
-  'msg.hiddenCount': '{n} cards face down — hidden',
-  'msg.dmgPreview': 'Projected DMG: {dmg}',
-  'msg.bust': 'Bust at {val}! (Ceiling: {cap}) — You lose your damage this turn',
-  'msg.score': 'Score {val} | Projected DMG: {dmg}',
-  'msg.youbust': 'You busted! No damage dealt.',
-  'msg.youdealt': 'You dealt {dmg} damage!',
-  'msg.bossdraw': 'Boss is drawing…',
-  'msg.bossbust': 'Boss busts at {val}! Lucky escape.',
-  'msg.bossdealt': 'Boss dealt {dmg} damage!',
-  'msg.newturn': 'New turn — Hit, then Ready',
-  'msg.bossdown.gold': 'Boss down! Fully healed — collect your gold!',
-  'msg.bossdown.nogold': 'Boss down! But the miser leaves nothing behind.',
-  'log.floor': '── Floor {n} | Boss {hp} HP | {icon} {name} ──',
-  'log.locked': '⛓️ Joker "{name}" is disabled this fight',
-  'log.youbust': 'You busted ({val}) → 0 DMG',
-  'log.you': 'You: {val} points → {dmg} DMG{bits}',
-  'log.bossbust': 'Boss busted ({val}) → 0 DMG',
-  'log.boss': 'Boss: {val} points → {dmg} DMG{bits}',
-  'log.win.gold': '★ Floor {n} boss down! +{r} gold, +{i} interest → {g} 💰',
-  'log.win.nogold': '★ Floor {n} boss down! 🕳️ Miser — no gold ({g} 💰)',
-  'log.buff.ov': 'Buff: Max dmg +{v} (total {t})',
-  'log.buff.hp': 'Buff: Max HP +{v} → {t}',
-  'log.buff.gold': 'Buff: +{v} gold → {t} 💰',
-  'log.buyjoker': 'Bought Joker "{name}" (-{p}💰)',
-  'log.selljoker': 'Sold Joker "{name}" (+{p}💰)',
-  'log.buycard': 'Bought card {c} (-{p}💰)',
-  'log.trade': 'Merchant: -25 max HP → +1 max dmg (max HP {hp}, max dmg {dmg})',
-  'bits.thirteen': 'Thirteen: {v}',
-  'bits.jokers': 'Jokers: {v}',
-  'bits.set': 'Set +{v}',
-  'bits.bj': 'Blackjack',
-  'row.hidden': '— face down —',
-  'row.nothing': '— no combo —',
-  'row.blocked': '{name} blocked',
-  'jk.blocked': '🃏 ×{m} blocked',
-  'jk.addblocked': '🃏 +{v} blocked',
-  'badge.blindfold': '🙈 Blindfold — cards flip when you press Ready',
-  'badge.need6': 'Thirteen needs ≥6 cards (whole hand)',
-  'badge.nomb': 'No Thirteen combo yet',
-  'boss.stats': 'Max dmg {ov} · Flat dmg +{flat} · Blackjack +{bj}',
-  'bust': 'Bust!',
-  'diffcard.rate': '{tag} · rate ×{a} → ×{b}',
-  'diffcard.f10': 'Floor 10:',
-  'diffcard.f25': 'Floor 25:',
-  'diffcard.turns': 'Turns/fight:',
-  'diffcard.wall': 'Wall:',
-  'diff.veasy.name': 'Very Easy',
-  'diff.veasy.tag': 'Fight length barely changes',
-  'diff.veasy.desc': 'The boss always trails one step behind you. Good for learning combos and testing odd builds.',
-  'diff.veasy.turns': '3–5 turns', 'diff.veasy.wall': 'none',
-  'diff.easy.name': 'Easy',
-  'diff.easy.tag': 'Tracks your power curve closely',
-  'diff.easy.desc': 'Floor 1 or floor 50 costs about the same number of turns. Even a sloppy build reaches the end.',
-  'diff.easy.turns': '4–6 turns', 'diff.easy.wall': 'none',
-  'diff.normal.name': 'Normal',
-  'diff.normal.tag': 'Ramps up, then levels off around floor 40',
-  'diff.normal.desc': 'Room to misplay a few hands. A strong build goes very deep; a weak one crawls but never fully stalls.',
-  'diff.normal.turns': '5–8 turns', 'diff.normal.wall': 'none',
-  'diff.hard.name': 'Hard',
-  'diff.hard.tag': 'Peaks at floors 35–45, then eases',
-  'diff.hard.desc': 'You must hunt stacking multiplier Jokers and hoard gold for interest. Past floor 45 it breathes easier.',
-  'diff.hard.turns': '6–14 turns', 'diff.hard.wall': 'harshest ~F40',
-  'diff.insane.name': 'Insane',
-  'diff.insane.tag': 'The boss outpaces you from floor 20',
-  'diff.insane.desc': 'Only a near-perfect build clears floor 25. Take whatever floor you can get.',
-  'diff.insane.turns': '7–28 turns', 'diff.insane.wall': '~floor 25',
-  'blind.none.name': 'Fair Play',
-  'blind.none.desc': 'This boss pulls no tricks. Play normally.',
-  'blind.lowcap.name': 'Low Ceiling',
-  'blind.lowcap.desc': 'Purchased max damage is halved. Your bust ceiling drops back near 21.',
-  'blind.minscore.name': 'Pushed',
-  'blind.minscore.desc': 'You cannot stand until you reach (ceiling − 4). Forces you to draw to the edge.',
-  'blind.maxcards.name': 'Stingy',
-  'blind.maxcards.desc': 'Your hand may not exceed 5 cards.',
-  'blind.blindfold.name': 'Blindfold',
-  'blind.blindfold.desc': 'Your cards stay face down until you press Ready. Draw in the dark.',
-  'blind.nosort.name': 'Handcuffed',
-  'blind.nosort.desc': 'No dragging or sorting. Cards stay in the order you drew them.',
-  'blind.full5only.name': 'Full Rows Only',
-  'blind.full5only.desc': 'Only rows of exactly 5 cards score combos. Short rows count as nothing.',
-  'blind.firstrow.name': 'Beheaded',
-  'blind.firstrow.desc': 'Row 1 loses all multipliers (additive bonuses remain). Push your best cards to lower rows.',
-  'blind.noxidach.name': 'Bonus Cut',
-  'blind.noxidach.desc': 'All ADDITIVE bonuses vanish: combo adds, Joker adds, Blackjack, set bonus. Only card points × multipliers remain.',
-  'blind.multdown.name': 'Erosion',
-  'blind.multdown.desc': 'Every multiplier — combo and Joker alike — is reduced by 1 (minimum ×1).',
-  'blind.jokerlock.name': 'Joker Chains',
-  'blind.jokerlock.desc': 'One random Joker of yours is disabled for this fight.',
-  'blind.nogold.name': 'Miser',
-  'blind.nogold.desc': 'Beating this boss earns you no gold at all.',
-  bossNames: ['Rookie Pit Boss','Corner Shop Owner','Market Kingpin','Alley Madam','Old Quarter Don',
-              'Casino Owner','Northern Tycoon','Black Hand Chief','Card Demon Lord','Blackjack Overlord'],
-  combo: {
-    'Đôi':'Pair', '2 Đôi':'Two Pair', 'Sám':'Three of a Kind',
-    'Sảnh':'Straight', 'Thùng':'Flush', 'Cù lũ':'Full House',
-    'Tứ quý':'Four of a Kind', 'Thùng phá sảnh':'Straight Flush',
-    'Sảnh Chúa':'Royal Flush', 'Ngũ quý':'Five of a Kind',
-    'Đồng màu':'One Color', 'Sảnh Rồng':'Dragon Straight',
-    'Rồng cuốn':'Full Dragon', 'Lục phé bôn':'Six Pairs',
-    'Năm đôi một sám':'Five Pairs + Trips',
-    '3 Thùng':'Three Flushes', '3 Sảnh':'Three Straights'
-  }
-},
-
-vi: {
-  'menu.sub': 'Endless Run • Đánh Boss • Combo theo hàng • Joker',
-  'menu.start': 'Bắt đầu',
-  'menu.help':
-    'Rút bài → tự xếp thành <strong>hàng 5 lá</strong> → chạm 2 lá để đổi chỗ → Sẵn sàng<br>' +
-    'Mỗi hàng: <strong>(điểm hàng + add) × mult</strong>, cộng dồn rồi × <strong>hệ số tầng (1.2^tầng)</strong><br>' +
-    'Xì Dách + thưởng bộ cộng sau, cuối cùng nhân Mậu Binh và Joker toàn cục<br>' +
-    'Máu Boss tăng theo <strong>độ khó bạn chọn</strong> — Boss dùng combo nhưng <strong>không scale</strong><br>' +
-    'Mỗi Boss mang một <strong>luật riêng</strong> — xem trước ở màn buff để còn kịp mua Joker đối phó<br>' +
-    'Hạ Boss → nhận vàng + lợi tức → chọn buff → mua <strong>Joker</strong> ở Thương nhân → bấm Màn tiếp',
-  'diffscreen.title': 'Chọn độ khó',
-  'diffscreen.sub': 'Độ khó chỉ đổi <strong>máu Boss</strong>. Sát thương của bạn luôn tăng ×1.2 mỗi tầng — độ khó là nhịp máu Boss đuổi theo con số đó nhanh cỡ nào.',
-  'common.back': '← Quay lại',
-  'common.score': 'Điểm:',
-  'common.you': 'Bạn',
-  'hud.floor': 'Tầng',
-  'hud.diff': 'Độ khó:',
-  'hud.scale': 'Hệ số tầng:',
-  'hud.maxdmg': 'Dmg tối đa:',
-  'hud.deck': 'Bộ bài:',
-  'hud.high': 'Highscore:',
-  'sort.rank': '↕ Xếp theo Rank',
-  'sort.suit': '♠ Xếp theo Chất',
-  'sort.col': '⇅ Gom cột dọc',
-  'sort.hint': 'Chạm 1 lá rồi chạm lá khác để đổi chỗ',
-  'stat.maxhp': 'Máu tối đa:',
-  'stat.aa': 'Thưởng AA:',
-  'stat.bj': 'Xì Dách:',
-  'btn.hit': 'Rút bài',
-  'btn.hit.max': 'Hết lượt rút',
-  'btn.ready': 'Sẵn sàng',
-  'btn.needmore': 'Chưa đủ {need} ({val})',
-  'buff.title': '🏆 Boss đã gục!',
-  'buff.sub': 'Chọn 1 buff, ghé Thương nhân thoải mái, xong bấm Màn tiếp',
-  'buff.income': 'Thu nhập:',
-  'buff.next': 'Màn tiếp →',
-  'buff.hint.picked': 'Đã chọn buff. Ghé Thương nhân bao nhiêu lần cũng được, xong bấm Màn tiếp.',
-  'buff.hint.pick': 'Chọn 1 buff trước khi sang màn tiếp.',
-  'buff.incomeVal': '+{g} & +{i} lợi tức',
-  'buff.ov.title': 'Dmg tối đa +{v}',
-  'buff.ov.desc': 'Cho phép vượt 21 thêm {v} điểm mà vẫn tính sát thương. Cộng dồn vĩnh viễn.',
-  'buff.hp.title': 'Máu tối đa +{v}',
-  'buff.hp.desc': 'Tăng máu tối đa thêm {v}. Hồi đầy máu khi nhận buff.',
-  'buff.gold.title': 'Nhận {v} vàng',
-  'buff.gold.desc': 'Cộng thẳng {v} vàng. Vàng cũng sinh lợi tức (mỗi 10 vàng → +1/màn, trần {cap}).',
-  'blind.preview': 'Boss tầng {n} sẽ chơi luật',
-  'shop.open': '🧙‍♂️ Thương nhân tham lam',
-  'shop.title': '🧙‍♂️ Thương nhân tham lam',
-  'shop.sub': 'Đổi máu lấy sức mạnh… và bán Joker cho kẻ liều lĩnh',
-  'shop.owned': '🎴 Joker đang sở hữu',
-  'shop.slots': '{n}/{max} slot · bán lại được nửa giá',
-  'shop.forsale': '✨ Joker bán ra',
-  'shop.forsale.note': 'Mỗi Joker là duy nhất — không bao giờ trùng lá bạn đang có',
-  'shop.cards': '🃏 Lá bài thêm vào bộ',
-  'shop.cards.note': 'Chỉ vào bộ bài của bạn — Boss có bộ riêng',
-  'shop.reroll': '🔄 Đổi lại',
-  'shop.trade': 'Đổi 25 Máu tối đa → +1 Dmg tối đa',
-  'shop.close': 'Rời cửa hàng',
-  'shop.empty': 'Slot trống',
-  'shop.sell': 'Bán +{n}💰',
-  'shop.buy': 'Mua {n}💰',
-  'shop.bought': 'Đã mua',
-  'shop.full': 'Hết slot',
-  'shop.lowhp': 'Máu tối đa quá thấp (cần ≥ 50 để đổi)',
-  'shop.lowhp2': 'Không đủ máu tối đa!',
-  'shop.traded': 'Đã đổi! Máu tối đa {hp} · Dmg tối đa {dmg}',
-  'go.title': '💀 Thất bại',
-  'go.diff': '{icon} Độ khó: {name}',
-  'go.killed': 'Số Boss đã hạ:',
-  'go.floor': 'Tầng cao nhất:',
-  'go.totaldmg': 'Tổng sát thương gây ra:',
-  'go.besthit': 'Sát thương cao nhất 1 hit:',
-  'go.retry': 'Chơi lại',
-  'joker.xd.name': 'Xì Dách ×{m}',
-  'joker.xd.desc': 'Nếu tay bài đúng 21 điểm thì nhân {m} lần tổng sát thương.',
-  'joker.fc.name': 'Đúng {n} lá ×{m}',
-  'joker.fc.desc': 'Nếu tay bài có ĐÚNG {n} lá (không hơn không kém) thì nhân {m} lần tổng sát thương.',
-  'joker.col.name': 'Cột dọc ×{m}',
-  'joker.col.desc': 'Nếu có 3 lá cùng rank nằm cùng một cột dọc thì nhân {m} lần tổng sát thương. (Cần ≥3 hàng)',
-  'joker.cm.desc': 'Hàng nào có {combo} thì nhân {m} lần điểm hàng đó.',
-  'joker.ca.desc': 'Hàng nào có {combo} thì cộng thêm {v} điểm (nằm trong hệ số tầng).',
-  'msg.yourturn': 'Lượt của bạn — Rút bài, sắp xếp hàng rồi nhấn Sẵn sàng',
-  'msg.blind': '{icon} {name}: {desc}',
-  'msg.hidden': '🙈 Đã rút {n} lá — không xem được. Dừng hay liều tiếp?',
-  'msg.hiddenCount': '{n} lá úp — không xem được',
-  'msg.dmgPreview': 'DMG dự kiến: {dmg}',
-  'msg.bust': 'Quắc {val}! (Trần: {cap}) — Mất lượt sát thương',
-  'msg.score': 'Điểm {val} | DMG dự kiến: {dmg}',
-  'msg.youbust': 'Bạn quắc! Không gây sát thương.',
-  'msg.youdealt': 'Bạn gây {dmg} sát thương!',
-  'msg.bossdraw': 'Boss đang rút bài...',
-  'msg.bossbust': 'Boss quắc {val}! Bạn may mắn thoát.',
-  'msg.bossdealt': 'Boss gây {dmg} sát thương!',
-  'msg.newturn': 'Lượt mới — Rút bài rồi Sẵn sàng',
-  'msg.bossdown.gold': 'Boss gục! Hồi full máu — Nhận vàng!',
-  'msg.bossdown.nogold': 'Boss gục! Nhưng lão keo kiệt không để lại đồng nào.',
-  'log.floor': '── Tầng {n} | Boss {hp} máu | {icon} {name} ──',
-  'log.locked': '⛓️ Joker "{name}" bị vô hiệu trận này',
-  'log.youbust': 'Bạn quắc ({val}) → 0 DMG',
-  'log.you': 'Bạn: {val} điểm → {dmg} DMG{bits}',
-  'log.bossbust': 'Boss quắc ({val}) → 0 DMG',
-  'log.boss': 'Boss: {val} điểm → {dmg} DMG{bits}',
-  'log.win.gold': '★ Hạ Boss tầng {n}! +{r} vàng, +{i} lợi tức → {g} 💰',
-  'log.win.nogold': '★ Hạ Boss tầng {n}! 🕳️ Keo Kiệt — không được vàng ({g} 💰)',
-  'log.buff.ov': 'Buff: Dmg tối đa +{v} (tổng {t})',
-  'log.buff.hp': 'Buff: Máu tối đa +{v} → {t}',
-  'log.buff.gold': 'Buff: +{v} vàng → {t} 💰',
-  'log.buyjoker': 'Mua Joker "{name}" (-{p}💰)',
-  'log.selljoker': 'Bán Joker "{name}" (+{p}💰)',
-  'log.buycard': 'Mua lá {c} (-{p}💰)',
-  'log.trade': 'Thương nhân: -25 Máu tối đa → +1 Dmg tối đa (HP max {hp}, Dmg max {dmg})',
-  'bits.thirteen': 'Mậu Binh: {v}',
-  'bits.jokers': 'Joker: {v}',
-  'bits.set': 'Bộ +{v}',
-  'bits.bj': 'Xì Dách',
-  'row.hidden': '— úp bài —',
-  'row.nothing': '— mậu thầu —',
-  'row.blocked': '{name} bị chặn',
-  'jk.blocked': '🃏 ×{m} bị chặn',
-  'jk.addblocked': '🃏 +{v} bị chặn',
-  'badge.blindfold': '🙈 Bịt Mắt — lật bài khi bấm Sẵn sàng',
-  'badge.need6': 'Mậu Binh cần ≥6 lá (tính toàn bài)',
-  'badge.nomb': 'Chưa có combo Mậu Binh',
-  'boss.stats': 'Dmg tối đa {ov} · Dmg phẳng +{flat} · Xì Dách +{bj}',
-  'bust': 'Quắc!',
-  'diffcard.rate': '{tag} · nhịp ×{a} → ×{b}',
-  'diffcard.f10': 'Tầng 10:',
-  'diffcard.f25': 'Tầng 25:',
-  'diffcard.turns': 'Nhịp đánh:',
-  'diffcard.wall': 'Bí lối:',
-  'diff.veasy.name': 'Cực dễ',
-  'diff.veasy.tag': 'Độ dài trận gần như không đổi',
-  'diff.veasy.desc': 'Boss luôn tụt sau bạn một nhịp. Hợp để làm quen combo và thử build lạ.',
-  'diff.veasy.turns': '3–5 lượt', 'diff.veasy.wall': 'không có',
-  'diff.easy.name': 'Dễ',
-  'diff.easy.tag': 'Bám sát nhịp sức mạnh của bạn',
-  'diff.easy.desc': 'Đánh Boss tầng 1 hay tầng 50 đều tốn chừng đó lượt. Build lởm vẫn đi được tới cuối.',
-  'diff.easy.turns': '4–6 lượt', 'diff.easy.wall': 'không có',
-  'diff.normal.name': 'Thường',
-  'diff.normal.tag': 'Nặng dần rồi chững lại quanh tầng 40',
-  'diff.normal.desc': 'Đủ chỗ để sai vài nước. Build tốt thì đi rất sâu, build lởm thì lê lết chứ không tắc hẳn.',
-  'diff.normal.turns': '5–8 lượt', 'diff.normal.wall': 'không có',
-  'diff.hard.name': 'Khó',
-  'diff.hard.tag': 'Đỉnh điểm ở tầng 35-45 rồi nhẹ dần',
-  'diff.hard.desc': 'Phải săn Joker nhân chồng và giữ vàng ăn lợi tức. Qua được tầng 45 thì phần sau dễ thở hơn.',
-  'diff.hard.turns': '6–14 lượt', 'diff.hard.wall': 'gắt nhất ~T40',
-  'diff.insane.name': 'Siêu khó',
-  'diff.insane.tag': 'Boss vượt mặt bạn từ tầng 20',
-  'diff.insane.desc': 'Chỉ build gần hoàn hảo mới qua nổi tầng 25. Đi được tầng nào hay tầng đó.',
-  'diff.insane.turns': '7–28 lượt', 'diff.insane.wall': '~tầng 25',
-  'blind.none.name': 'Sòng phẳng',
-  'blind.none.desc': 'Boss này không giở trò gì. Đánh bình thường.',
-  'blind.lowcap.name': 'Trần Thấp',
-  'blind.lowcap.desc': 'Dmg tối đa mua được bị cắt một nửa. Trần quắc tụt sát về 21.',
-  'blind.minscore.name': 'Ép Tới',
-  'blind.minscore.desc': 'Chưa chạm sát trần (trần − 4) thì chưa được dừng. Ép bạn rút tới mép vực.',
-  'blind.maxcards.name': 'Bủn Xỉn',
-  'blind.maxcards.desc': 'Tay bài không được quá 5 lá.',
-  'blind.blindfold.name': 'Bịt Mắt',
-  'blind.blindfold.desc': 'Bài của bạn úp hết, chỉ lật khi bấm Sẵn sàng. Rút trong bóng tối.',
-  'blind.nosort.name': 'Khoá Tay',
-  'blind.nosort.desc': 'Không được kéo thả hay sắp xếp. Bài nằm đúng thứ tự rút.',
-  'blind.full5only.name': 'Đủ Hàng',
-  'blind.full5only.desc': 'Chỉ hàng đủ 5 lá mới tính combo. Hàng lẻ coi như mậu thầu.',
-  'blind.firstrow.name': 'Cắt Đầu',
-  'blind.firstrow.desc': 'Hàng 1 mất hết hệ số nhân (vẫn giữ phần cộng). Đẩy bài đẹp xuống hàng dưới.',
-  'blind.noxidach.name': 'Chặt Thưởng',
-  'blind.noxidach.desc': 'Mất sạch phần CỘNG: combo cộng, Joker cộng, Xì Dách, thưởng bộ. Chỉ còn điểm lá × hệ số nhân.',
-  'blind.multdown.name': 'Bào Mòn',
-  'blind.multdown.desc': 'Mọi hệ số nhân — combo lẫn Joker — đều bị trừ 1 (thấp nhất ×1).',
-  'blind.jokerlock.name': 'Xiềng Joker',
-  'blind.jokerlock.desc': '1 Joker ngẫu nhiên của bạn bị vô hiệu trong trận này.',
-  'blind.nogold.name': 'Keo Kiệt',
-  'blind.nogold.desc': 'Hạ được Boss này cũng không nhận đồng vàng nào.',
-  bossNames: ['Chủ Sàn Tập Sự','Ông Chủ Quán Nhỏ','Đại Ca Khu Chợ','Bà Chủ Hẻm','Ông Trùm Phố Cổ',
-              'Chủ Sòng Bạc','Đại Gia Đất Bắc','Hắc Thủ Lĩnh','Ma Vương Bài','Thiên Vương Xì Dách'],
-  combo: null   // tieng Viet dung thang key goc
-}
-};
-
-let LANG = (function () {
-  try { const s = localStorage.getItem('pitboss_lang'); if (s === 'en' || s === 'vi') return s; } catch (e) {}
-  return 'en';                      // <<< MAC DINH TIENG ANH
-})();
-
-function t(k, v) {
-  let s = I18N[LANG][k];
-  if (s === undefined) s = I18N.en[k];
-  if (s === undefined) return k;
-  if (v) for (const key in v) s = s.split('{' + key + '}').join(v[key]);
-  return s;
-}
-/* ten combo: tieng Viet giu nguyen key goc, tieng Anh tra bang */
-function comboName(n) {
-  const map = I18N[LANG].combo;
-  return (map && map[n]) ? map[n] : n;
-}
-function bossNameAt(i) {
-  const arr = I18N[LANG].bossNames || I18N.en.bossNames;
-  return arr[i % arr.length] || 'Boss';
-}
-const diffName  = d => t('diff.' + d.key + '.name');
-const diffTag   = d => t('diff.' + d.key + '.tag');
-const diffDesc  = d => t('diff.' + d.key + '.desc');
-const diffTurns = d => t('diff.' + d.key + '.turns');
-const diffWall  = d => t('diff.' + d.key + '.wall');
-const blindName = b => t('blind.' + b.key + '.name');
-const blindDesc = b => t('blind.' + b.key + '.desc');
-
-/* ten & mo ta Joker tinh LUC HIEN THI -> doi ngon ngu la doi theo */
-function jokerName(j) {
-  switch (j.type) {
-    case 'comboMult': return comboName(j.combo) + ' ×' + j.mult;
-    case 'comboAdd':  return comboName(j.combo) + ' +' + fmtN(j.add);
-    case 'xiDach':    return t('joker.xd.name',  { m: j.mult });
-    case 'fewCards':  return t('joker.fc.name',  { n: j.nCards, m: j.mult });
-    case 'column':    return t('joker.col.name', { m: j.mult });
-  }
-  return '';
-}
-function jokerDesc(j) {
-  switch (j.type) {
-    case 'comboMult': return t('joker.cm.desc', { combo: comboName(j.combo), m: j.mult });
-    case 'comboAdd':  return t('joker.ca.desc', { combo: comboName(j.combo), v: fmtN(j.add) });
-    case 'xiDach':    return t('joker.xd.desc',  { m: j.mult });
-    case 'fewCards':  return t('joker.fc.desc',  { n: j.nCards, m: j.mult });
-    case 'column':    return t('joker.col.desc', { m: j.mult });
-  }
-  return '';
-}
-function buffTitle(b) {
-  if (b.type === 'overflow') return t('buff.ov.title',   { v: b.value });
-  if (b.type === 'hp')       return t('buff.hp.title',   { v: b.value });
-  return t('buff.gold.title', { v: b.value });
-}
-function buffDesc(b) {
-  if (b.type === 'overflow') return t('buff.ov.desc',   { v: b.value });
-  if (b.type === 'hp')       return t('buff.hp.desc',   { v: b.value });
-  return t('buff.gold.desc', { v: b.value, cap: CONFIG.INTEREST_CAP });
-}
-
-/* ap ngon ngu len cac phan tu tinh + ve lai man dang mo */
-function applyI18n() {
-  document.documentElement.lang = LANG;
-  document.title = GAME_NAME;
-  const gt = document.getElementById('game-title');
-  if (gt) gt.textContent = GAME_TITLE;
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    el.textContent = t(el.getAttribute('data-i18n'));
-  });
-  document.querySelectorAll('[data-i18n-html]').forEach(el => {
-    el.innerHTML = t(el.getAttribute('data-i18n-html'));
-  });
-  document.querySelectorAll('#lang-switch button').forEach(b => {
-    b.classList.toggle('on', b.dataset.lang === LANG);
-  });
-
-  if ($('difficulty').classList.contains('active')) showDifficulty();
-  if ($('game').classList.contains('active')) {
-    updateHUD(); renderHands(lastHideBoss); refreshControls();
-  }
-  if ($('buff-screen').classList.contains('active')) {
-    renderBuffList(); updateBuffScreen();
-  }
-  if ($('shop-modal').classList.contains('open')) renderShop();
-  if ($('gameover').classList.contains('active')) {
-    $('go-diff').textContent = t('go.diff', { icon: diff().icon, name: diffName(diff()) });
-  }
-}
-function setLang(l) {
-  if (l !== 'en' && l !== 'vi') return;
-  LANG = l;
-  try { localStorage.setItem('pitboss_lang', l); } catch (e) {}
-  applyI18n();
-}
-
 /* ===================== CONFIG (chỉnh cân bằng ở đây) ===================== */
 const CONFIG = {
   XD_BASE: 10,            // Xì Dách người chơi = XD_BASE · XD_RATE^tầng
@@ -1310,11 +846,21 @@ const ROW_SIZE = 5;
 const HP_K1 = 0.2448, HP_K2 = 0.000848, HP_RATE_MIN = 1.10;
 
 const DIFFICULTIES = [
-  { key:'veasy',  icon:'🌱', baseHP:75,  drift:0.984 },
-  { key:'easy',   icon:'🙂', baseHP:90,  drift:0.986 },
-  { key:'normal', icon:'⚔️', baseHP:100, drift:0.994 },
-  { key:'hard',   icon:'🔥', baseHP:110, drift:1.009 },
-  { key:'insane', icon:'💀', baseHP:125, drift:1.024 },
+  { key:'veasy',  name:'Cực dễ',   icon:'🌱', baseHP:75,  drift:0.984, turns:'3–5 lượt', wall:'không có',
+    tag:'Độ dài trận gần như không đổi',
+    desc:'Boss luôn tụt sau bạn một nhịp. Hợp để làm quen combo và thử build lạ.' },
+  { key:'easy',   name:'Dễ',       icon:'🙂', baseHP:90,  drift:0.986, turns:'4–6 lượt', wall:'không có',
+    tag:'Bám sát nhịp sức mạnh của bạn',
+    desc:'Đánh Boss tầng 1 hay tầng 50 đều tốn chừng đó lượt. Build lởm vẫn đi được tới cuối.' },
+  { key:'normal', name:'Thường',   icon:'⚔️', baseHP:100, drift:0.994, turns:'5–8 lượt', wall:'không có',
+    tag:'Nặng dần rồi chững lại quanh tầng 40',
+    desc:'Đủ chỗ để sai vài nước. Build tốt thì đi rất sâu, build lởm thì lê lết chứ không tắc hẳn.' },
+  { key:'hard',   name:'Khó',      icon:'🔥', baseHP:110, drift:1.009, turns:'6–14 lượt', wall:'gắt nhất ~T40',
+    tag:'Đỉnh điểm ở tầng 35-45 rồi nhẹ dần',
+    desc:'Phải săn Joker nhân chồng và giữ vàng ăn lợi tức. Qua được tầng 45 thì phần sau dễ thở hơn.' },
+  { key:'insane', name:'Siêu khó', icon:'💀', baseHP:125, drift:1.024, turns:'7–28 lượt', wall:'~tầng 25',
+    tag:'Boss vượt mặt bạn từ tầng 20',
+    desc:'Chỉ build gần hoàn hảo mới qua nổi tầng 25. Đi được tầng nào hay tầng đó.' },
 ];
 
 /* ===================== LUẬT BOSS (Boss Blind) =====================
@@ -1324,18 +870,36 @@ const DIFFICULTIES = [
  *   ① khâu dừng bài (đỏ đen)  ② khâu sắp hàng (giải đố)  ③ điểm & kinh tế
  */
 const BLINDS = [
-  { key:'none',      icon:'🎴', minFloor:0 },
-  { key:'lowcap',    icon:'📉', minFloor:1 },
-  { key:'minscore',  icon:'🪝', minFloor:2 },
-  { key:'maxcards',  icon:'✋', minFloor:3 },
-  { key:'blindfold', icon:'🙈', minFloor:6 },
-  { key:'nosort',    icon:'🔒', minFloor:2 },
-  { key:'full5only', icon:'📏', minFloor:3 },
-  { key:'firstrow',  icon:'✂️', minFloor:7 },
-  { key:'noxidach',  icon:'🚫', minFloor:2 },
-  { key:'multdown',  icon:'🩸', minFloor:5 },
-  { key:'jokerlock', icon:'⛓️', minFloor:4 },
-  { key:'nogold',    icon:'🕳️', minFloor:3 },
+  { key:'none', icon:'🎴', name:'Sòng phẳng', minFloor:0, group:'—',
+    desc:'Boss này không giở trò gì. Đánh bình thường.' },
+
+  // ① khâu dừng bài
+  { key:'lowcap', icon:'📉', name:'Trần Thấp', minFloor:1, group:'rút bài',
+    desc:'Dmg tối đa mua được bị cắt một nửa. Trần quắc tụt sát về 21.' },
+  { key:'minscore', icon:'🪝', name:'Ép Tới', minFloor:2, group:'rút bài',
+    desc:'Chưa chạm sát trần (trần − 4) thì chưa được dừng. Ép bạn rút tới mép vực.' },
+  { key:'maxcards', icon:'✋', name:'Bủn Xỉn', minFloor:3, group:'rút bài',
+    desc:'Tay bài không được quá 5 lá.' },
+  { key:'blindfold', icon:'🙈', name:'Bịt Mắt', minFloor:6, group:'rút bài',
+    desc:'Bài của bạn úp hết, chỉ lật khi bấm Sẵn sàng. Rút trong bóng tối.' },
+
+  // ② khâu sắp hàng
+  { key:'nosort', icon:'🔒', name:'Khoá Tay', minFloor:2, group:'sắp hàng',
+    desc:'Không được kéo thả hay sắp xếp. Bài nằm đúng thứ tự rút.' },
+  { key:'full5only', icon:'📏', name:'Đủ Hàng', minFloor:3, group:'sắp hàng',
+    desc:'Chỉ hàng đủ 5 lá mới tính combo. Hàng lẻ coi như mậu thầu.' },
+  { key:'firstrow', icon:'✂️', name:'Cắt Đầu', minFloor:7, group:'sắp hàng',
+    desc:'Hàng 1 mất hết hệ số nhân (vẫn giữ phần cộng). Đẩy bài đẹp xuống hàng dưới.' },
+
+  // ③ điểm & kinh tế
+  { key:'noxidach', icon:'🚫', name:'Chặt Thưởng', minFloor:2, group:'điểm',
+    desc:'Mất sạch phần CỘNG: combo cộng, Joker cộng, Xì Dách, thưởng bộ. Chỉ còn điểm lá × hệ số nhân.' },
+  { key:'multdown', icon:'🩸', name:'Bào Mòn', minFloor:5, group:'điểm',
+    desc:'Mọi hệ số nhân — combo lẫn Joker — đều bị trừ 1 (thấp nhất ×1).' },
+  { key:'jokerlock', icon:'⛓️', name:'Xiềng Joker', minFloor:4, group:'kinh tế',
+    desc:'1 Joker ngẫu nhiên của bạn bị vô hiệu trong trận này.' },
+  { key:'nogold', icon:'🕳️', name:'Keo Kiệt', minFloor:3, group:'kinh tế',
+    desc:'Hạ được Boss này cũng không nhận đồng vàng nào.' },
 ];
 
 function pickBlind(floor) {
@@ -1350,6 +914,10 @@ function activeJokers() {
   return state.jokers.filter((j, i) => i !== state.lockedJoker);
 }
 
+const BOSS_NAMES = [
+  "Chủ Sàn Tập Sự","Ông Chủ Quán Nhỏ","Đại Ca Khu Chợ","Bà Chủ Hẻm","Ông Trùm Phố Cổ",
+  "Chủ Sòng Bạc","Đại Gia Đất Bắc","Hắc Thủ Lĩnh","Ma Vương Bài","Thiên Vương Xì Dách"
+];
 
 /* Combo → giá Joker nhân (theo mult) và giá trị Joker cộng */
 const COMBO_INFO = {
@@ -1641,6 +1209,8 @@ let jokerSeq = 1;
 function jokerComboMult(combo, mult) {
   return {
     key: `cm:${combo}:${mult}`, type: 'comboMult', combo, mult,
+    name: `${combo} ×${mult}`,
+    desc: `Hàng nào có ${combo} thì nhân ${mult} lần điểm hàng đó.`,
     price: COMBO_INFO[combo].mult[mult],
     style: '', w: 0.95
   };
@@ -1649,6 +1219,8 @@ function jokerComboAdd(combo) {
   const v = COMBO_INFO[combo].add;
   return {
     key: `ca:${combo}`, type: 'comboAdd', combo, add: v,
+    name: `${combo} +${fmtN(v)}`,
+    desc: `Hàng nào có ${combo} thì cộng thêm ${fmtN(v)} điểm (nằm trong hệ số tầng).`,
     price: COMBO_INFO[combo].addPrice,
     style: 'add-type', w: 2.4
   };
@@ -1656,6 +1228,8 @@ function jokerComboAdd(combo) {
 function jokerXiDach(mult) {
   return {
     key: `xd:${mult}`, type: 'xiDach', mult,
+    name: `Xì Dách ×${mult}`,
+    desc: `Nếu tay bài đúng 21 điểm thì nhân ${mult} lần tổng sát thương.`,
     price: {3:5, 4:6, 5:7}[mult],
     style: 'special', w: 5.3
   };
@@ -1664,6 +1238,8 @@ function jokerFewCards(nCards) {
   const mult = 7 - nCards;   // 2→×5, 3→×4, 4→×3, 5→×2
   return {
     key: `fc:${nCards}`, type: 'fewCards', nCards, mult,
+    name: `Đúng ${nCards} lá ×${mult}`,
+    desc: `Nếu tay bài có ĐÚNG ${nCards} lá (không hơn không kém) thì nhân ${mult} lần tổng sát thương.`,
     price: 5,
     style: 'special', w: 3.25
   };
@@ -1671,6 +1247,8 @@ function jokerFewCards(nCards) {
 function jokerColumn(mult) {
   return {
     key: `col:${mult}`, type: 'column', need: 3, mult,
+    name: `Cột dọc ×${mult}`,
+    desc: `Nếu có 3 lá cùng rank nằm cùng một cột dọc thì nhân ${mult} lần tổng sát thương. (Cần ≥3 hàng)`,
     price: {3:10, 4:14, 5:18}[mult],
     style: 'special', w: 3.0
   };
@@ -1876,9 +1454,9 @@ function renderPlayerRows() {
       if (j.type === 'comboMult' && names.has(j.combo)) {
         const m = (blindIs('firstrow') && ri === 0) ? 1 : erode(j.mult);
         mult *= m;
-        jkParts.push(m > 1 ? `🃏 ×${m}` : t('jk.blocked', { m: j.mult }));
+        jkParts.push(m > 1 ? `🃏 ×${m}` : `🃏 ×${j.mult} bị chặn`);
       } else if (j.type === 'comboAdd' && names.has(j.combo)) {
-        if (blindIs('noxidach')) jkParts.push(t('jk.addblocked', { v: fmtN(j.add) }));
+        if (blindIs('noxidach')) jkParts.push(`🃏 +${fmtN(j.add)} bị chặn`);
         else { add += j.add; jkParts.push(`🃏 +${fmtN(j.add)}`); }
       }
     }
@@ -1906,15 +1484,15 @@ function renderPlayerRows() {
     const info = document.createElement('div');
     info.className = 'row-info';
     if (hideOwn) {
-      info.innerHTML = `<span class="none">${t('row.hidden')}</span>`;
+      info.innerHTML = '<span class="none">— úp bài —</span>';
       rowEl.append(tag, cardsEl, info);
       pEl.appendChild(rowEl);
       return;
     }
     const lines = combos.map(c =>
-      c.mult > 1 ? `<span class="mult">${comboName(c.name)} ×${c.mult}</span>`
-      : c.add > 0 ? `<span class="add">${comboName(c.name)} +${c.add}</span>`
-      : `<span class="none">${t('row.blocked', { name: comboName(c.name) })}</span>`
+      c.mult > 1 ? `<span class="mult">${c.name} ×${c.mult}</span>`
+      : c.add > 0 ? `<span class="add">${c.name} +${c.add}</span>`
+      : `<span class="none">${c.name} bị chặn</span>`
     );
     if (jkParts.length) lines.push(`<span class="jk">${jkParts.join(' ')}</span>`);
     if (lines.length) {
@@ -1922,7 +1500,7 @@ function renderPlayerRows() {
         `<div style="opacity:.6;margin-top:2px">(${rowPts}+${fmtN(add)})×${fmt(mult)}×${scale.toFixed(2)}</div>` +
         `<div class="jk">≈ ${fmtN((rowPts + add) * mult * scale)}</div>`;
     } else {
-      info.innerHTML = `<span class="none">${t('row.nothing')}</span>` +
+      info.innerHTML = `<span class="none">— mậu thầu —</span>` +
         `<div style="opacity:.5;margin-top:2px">${rowPts}×${scale.toFixed(2)} ≈ ${fmtN(rowPts * scale)}</div>`;
     }
 
@@ -1939,18 +1517,16 @@ function renderJokerBar(activeIds) {
     const d = document.createElement('div');
     if (!j) {
       d.className = 'joker-chip empty';
-      d.textContent = t('shop.empty');
+      d.textContent = 'Slot trống';
     } else {
       d.className = 'joker-chip' + (activeIds && activeIds.has(j.id) ? ' active' : '');
-      d.innerHTML = `<div class="jname">🃏 ${jokerName(j)}</div><div class="jdesc">${jokerDesc(j)}</div>`;
+      d.innerHTML = `<div class="jname">🃏 ${j.name}</div><div class="jdesc">${j.desc}</div>`;
     }
     bar.appendChild(d);
   }
 }
 
-let lastHideBoss = true;
 function renderHands(hideBossFirst = false) {
-  lastHideBoss = hideBossFirst;
   const bEl = $('boss-cards');
   bEl.innerHTML = '';
   renderPlayerRows();
@@ -1962,12 +1538,12 @@ function renderHands(hideBossFirst = false) {
 
   const pInfo = calcDamage(state.playerHand, true);
   const hidden = blindIs('blindfold') && state.phase === 'player';
-  $('player-score').textContent = hidden ? '???' : (pInfo.busted ? pInfo.val + ' (' + t('bust') + ')' : pInfo.val);
+  $('player-score').textContent = hidden ? '???' : (pInfo.busted ? pInfo.val + ' (Quắc!)' : pInfo.val);
   $('player-bj').textContent = (!hidden && !pInfo.busted && pInfo.val === 21 && pInfo.bjBonus)
-    ? `+${fmtN(pInfo.bjBonus)} ${t('bits.bj')}` : '';
+    ? `+${fmtN(pInfo.bjBonus)} Xì Dách` : '';
   $('player-dmg-preview').textContent = hidden
-    ? t('msg.hiddenCount', { n: state.playerHand.length })
-    : t('msg.dmgPreview', { dmg: fmtN(pInfo.dmg) });
+    ? `${state.playerHand.length} lá úp — không xem được`
+    : `DMG dự kiến: ${fmtN(pInfo.dmg)}`;
 
   if (hideBossFirst && state.phase === 'player') {
     const vis = state.bossHand.slice(1);
@@ -1975,8 +1551,8 @@ function renderHands(hideBossFirst = false) {
     $('boss-bj').textContent = '';
   } else {
     const bInfo = calcDamage(state.bossHand, false);
-    $('boss-score').textContent = bInfo.busted ? bInfo.val + ' (' + t('bust') + ')' : bInfo.val;
-    $('boss-bj').textContent = (!bInfo.busted && bInfo.val === 21) ? `+${bInfo.bjBonus} ${t('bits.bj')}` : '';
+    $('boss-score').textContent = bInfo.busted ? bInfo.val + ' (Quắc!)' : bInfo.val;
+    $('boss-bj').textContent = (!bInfo.busted && bInfo.val === 21) ? `+${bInfo.bjBonus} Xì Dách` : '';
   }
 
   // Mậu Binh
@@ -1985,7 +1561,7 @@ function renderHands(hideBossFirst = false) {
   const badge = $('combo-badge');
   if (hidden) {
     badge.className = 'combo-badge none';
-    badge.textContent = t('badge.blindfold');
+    badge.textContent = '🙈 Bịt Mắt — lật bài khi bấm Sẵn sàng';
     $('set-badge').style.display = 'none';
     $('glob-badge').style.display = 'none';
     renderJokerBar(new Set());
@@ -1994,11 +1570,11 @@ function renderHands(hideBossFirst = false) {
   }
   if (mb.length) {
     badge.className = 'combo-badge';
-    badge.textContent = '🐉 ' + mb.map(c => `${comboName(c.name)} ×${c.mult}`).join(' · ');
+    badge.textContent = '🐉 ' + mb.map(c => `${c.name} ×${c.mult}`).join(' · ');
   } else {
     badge.className = 'combo-badge none';
     badge.textContent = state.playerHand.length < 6
-      ? t('badge.need6') : t('badge.nomb');
+      ? 'Mậu Binh cần ≥6 lá (tính toàn bài)' : 'Chưa có combo Mậu Binh';
   }
 
   // Thưởng bộ
@@ -2013,7 +1589,7 @@ function renderHands(hideBossFirst = false) {
   const globEl = $('glob-badge');
   if (pInfo.globals && pInfo.globals.length) {
     globEl.style.display = '';
-    globEl.textContent = '🃏 ' + pInfo.globals.map(j => jokerName(j)).join(' · ');
+    globEl.textContent = '🃏 ' + pInfo.globals.map(j => `${j.name}`).join(' · ');
   } else globEl.style.display = 'none';
 
   // highlight joker đang hoạt động
@@ -2037,7 +1613,7 @@ function updateHPBars() {
 
 function updateHUD() {
   $('floor-num').textContent = state.floor + 1;
-  $('diff-name').textContent = diff().icon + ' ' + diffName(diff());
+  $('diff-name').textContent = diff().icon + ' ' + diff().name;
   $('gold-val').textContent = state.gold;
   $('scale-val').textContent = '×' + floorScale().toFixed(2);
   $('overflow-val').textContent = 21 + state.overflow;
@@ -2046,15 +1622,15 @@ function updateHUD() {
   $('stat-maxhp').textContent = state.playerMaxHP;
   $('stat-aa').textContent = fmt(aceSetBonus(2));
   $('stat-xd').textContent = '+' + fmtN(getXiDachBonus());
-  $('boss-name').textContent = bossNameAt(state.floor) + ` #${state.floor + 1}`;
+  $('boss-name').textContent = (BOSS_NAMES[state.floor % BOSS_NAMES.length] || 'Boss') + ` #${state.floor + 1}`;
   $('boss-buffs').textContent =
-    t('boss.stats', { ov: 21 + bossOverflow(), flat: bossFlatDmg(), bj: getBossXiDachBonus() });
+    `Dmg tối đa ${21 + bossOverflow()} · Dmg phẳng +${bossFlatDmg()} · Xì Dách +${getBossXiDachBonus()}`;
 
   const b = state.blind || BLINDS[0];
   const bar = $('blind-bar');
   bar.className = 'blind-bar' + (b.key === 'none' ? ' calm' : '');
   bar.innerHTML = `<div class="bicon">${b.icon}</div>` +
-    `<div><span class="bname">${blindName(b)}</span> — <span class="bdesc">${blindDesc(b)}</span></div>`;
+    `<div><span class="bname">${b.name}</span> — <span class="bdesc">${b.desc}</span></div>`;
 }
 
 /* ===================== SẮP BÀI: CHẠM ĐỔI CHỖ + KÉO THẢ ===================== */
@@ -2130,8 +1706,8 @@ function refreshControls() {
   const frozen = blindIs('nosort') || (blindIs('blindfold') && state.phase === 'player');
   $('btn-hit').disabled = !p || maxed;
   $('btn-ready').disabled = !p || forced;
-  $('btn-hit').textContent = maxed ? t('btn.hit.max') : t('btn.hit');
-  $('btn-ready').textContent = forced ? t('btn.needmore', { need, val }) : t('btn.ready');
+  $('btn-hit').textContent = maxed ? 'Hết lượt rút' : 'Rút bài';
+  $('btn-ready').textContent = forced ? `Chưa đủ ${need} (${val})` : 'Sẵn sàng';
   ['btn-sort-rank', 'btn-sort-suit', 'btn-sort-col'].forEach(id => { $(id).disabled = !p || frozen; });
 }
 
@@ -2203,11 +1779,11 @@ function startFight() {
   renderHands(true);
   refreshControls();
   setMsg(state.blind.key === 'none'
-    ? t('msg.yourturn')
-    : t('msg.blind', { icon: state.blind.icon, name: blindName(state.blind), desc: blindDesc(state.blind) }),
+    ? 'Lượt của bạn — Rút bài, sắp xếp hàng rồi nhấn Sẵn sàng'
+    : `${state.blind.icon} ${state.blind.name}: ${state.blind.desc}`,
     state.blind.key === 'none' ? 'info' : 'boss');
-  log(t('log.floor', { n: state.floor + 1, hp: fmtN(state.bossMaxHP), icon: state.blind.icon, name: blindName(state.blind) }));
-  if (state.lockedJoker >= 0) log(t('log.locked', { name: jokerName(state.jokers[state.lockedJoker]) }));
+  log(`── Tầng ${state.floor + 1} | Boss ${fmtN(state.bossMaxHP)} máu | ${state.blind.icon} ${state.blind.name} ──`);
+  if (state.lockedJoker >= 0) log(`⛓️ Joker "${state.jokers[state.lockedJoker].name}" bị vô hiệu trận này`);
 }
 
 function playerHit() {
@@ -2220,22 +1796,22 @@ function playerHit() {
   refreshControls();
 
   if (blindIs('blindfold')) {
-    setMsg(t('msg.hidden', { n: state.playerHand.length }), 'boss');
+    setMsg(`🙈 Đã rút ${state.playerHand.length} lá — không xem được. Dừng hay liều tiếp?`, 'boss');
     return;
   }
   const info = calcDamage(state.playerHand, true);
-  if (info.busted) setMsg(t('msg.bust', { val: info.val, cap: playerCap() }), 'lose');
-  else setMsg(t('msg.score', { val: info.val, dmg: fmtN(info.dmg) }), 'info');
+  if (info.busted) setMsg(`Quắc ${info.val}! (Trần: ${playerCap()}) — Mất lượt sát thương`, 'lose');
+  else setMsg(`Điểm ${info.val} | DMG dự kiến: ${fmtN(info.dmg)}`, 'info');
 }
 
 function comboSummary(info) {
   const bits = [];
   info.rows.forEach((rd, i) => {
-    if (rd.combos.length) bits.push(`R${i + 1}: ${rd.combos.map(c => comboName(c.name)).join('+')}`);
+    if (rd.combos.length) bits.push(`H${i + 1}: ${rd.combos.map(c => c.name).join('+')}`);
   });
-  if (info.mauBinh.length) bits.push(t('bits.thirteen', { v: info.mauBinh.map(c => comboName(c.name)).join('+') }));
-  if (info.globals && info.globals.length) bits.push(t('bits.jokers', { v: info.globals.map(j => jokerName(j)).join('+') }));
-  if (info.setBonus.total > 0) bits.push(t('bits.set', { v: fmt(info.setBonus.total) }));
+  if (info.mauBinh.length) bits.push(`Mậu Binh: ${info.mauBinh.map(c => c.name).join('+')}`);
+  if (info.globals && info.globals.length) bits.push(`Joker: ${info.globals.map(j => j.name).join('+')}`);
+  if (info.setBonus.total > 0) bits.push(`Bộ +${fmt(info.setBonus.total)}`);
   return bits;
 }
 
@@ -2252,8 +1828,8 @@ function playerReady() {
   renderHands(false);
 
   if (info.busted) {
-    setMsg(t('msg.youbust'), 'lose');
-    log(t('log.youbust', { val: info.val }));
+    setMsg('Bạn quắc! Không gây sát thương.', 'lose');
+    log(`Bạn quắc (${info.val}) → 0 DMG`);
     setTimeout(bossTurn, 900);
     return;
   }
@@ -2268,11 +1844,11 @@ function playerReady() {
   setTimeout(() => $('boss-panel').classList.remove('shake'), 400);
 
   const bits = comboSummary(info);
-  let msg = t('msg.youdealt', { dmg: fmtN(dmg) });
-  if (info.bjBonus) msg += ` (+${fmtN(info.bjBonus)} ${t('bits.bj')})`;
+  let msg = `Bạn gây ${fmtN(dmg)} sát thương!`;
+  if (info.bjBonus) msg += ` (+${fmtN(info.bjBonus)} Xì Dách)`;
   if (bits.length) msg += ` [${bits.join(' | ')}]`;
   setMsg(msg, 'dmg');
-  log(t('log.you', { val: info.val, dmg: fmtN(dmg), bits: bits.length ? ' (' + bits.join(' | ') + ')' : '' }));
+  log(`Bạn: ${info.val} điểm → ${fmtN(dmg)} DMG${bits.length ? ' (' + bits.join(' | ') + ')' : ''}`);
 
   if (state.bossHP <= 0) { setTimeout(onBossDefeated, 1100); return; }
   setTimeout(bossTurn, 1100);
@@ -2281,7 +1857,7 @@ function playerReady() {
 function bossTurn() {
   if (state.gameOver) return;
   state.phase = 'boss';
-  setMsg(t('msg.bossdraw'), 'boss');
+  setMsg('Boss đang rút bài...', 'boss');
   const target = 17 + bossOverflow();
 
   const think = () => {
@@ -2301,8 +1877,8 @@ function finishBossTurn() {
   renderHands(false);
 
   if (info.busted) {
-    setMsg(t('msg.bossbust', { val: info.val }), 'win');
-    log(t('log.bossbust', { val: info.val }));
+    setMsg(`Boss quắc ${info.val}! Bạn may mắn thoát.`, 'win');
+    log(`Boss quắc (${info.val}) → 0 DMG`);
     setTimeout(nextPlayerTurn, 950);
     return;
   }
@@ -2314,12 +1890,12 @@ function finishBossTurn() {
   setTimeout(() => document.querySelector('.player-panel').classList.remove('shake'), 400);
 
   const bc = [];
-  (info.rows || []).forEach((rd, i) => { if (rd.combos.length) bc.push(rd.combos.map(c => comboName(c.name)).join('+')); });
-  let msg = t('msg.bossdealt', { dmg: fmtN(dmg) });
-  if (info.bjBonus) msg += ` (+${info.bjBonus} ${t('bits.bj')})`;
+  (info.rows || []).forEach((rd, i) => { if (rd.combos.length) bc.push(rd.combos.map(c => c.name).join('+')); });
+  let msg = `Boss gây ${fmtN(dmg)} sát thương!`;
+  if (info.bjBonus) msg += ` (+${info.bjBonus} Xì Dách)`;
   if (bc.length) msg += ` [${bc.join(' | ')}]`;
   setMsg(msg, 'boss');
-  log(t('log.boss', { val: info.val, dmg: fmtN(dmg), bits: bc.length ? ' (' + bc.join(' | ') + ')' : '' }));
+  log(`Boss: ${info.val} điểm → ${fmtN(dmg)} DMG${bc.length ? ' (' + bc.join(' | ') + ')' : ''}`);
 
   if (state.playerHP <= 0) { setTimeout(onPlayerDead, 1000); return; }
   setTimeout(nextPlayerTurn, 950);
@@ -2336,7 +1912,7 @@ function nextPlayerTurn() {
   selectedIdx = null;
   renderHands(true);
   refreshControls();
-  setMsg(t('msg.newturn'), 'info');
+  setMsg('Lượt mới — Rút bài rồi Sẵn sàng', 'info');
 }
 
 function onBossDefeated() {
@@ -2352,17 +1928,20 @@ function onBossDefeated() {
   // bốc luật cho Boss tầng kế, hiện ngay ở màn buff để còn tính đường mua Joker
   state.nextBlind = pickBlind(state.floor);
 
+  if (state.floor % 10 === 0) log(`⬆⬆ Mốc tầng ${state.floor}: phần thưởng nâng cả mức sàn lẫn mức trần`);
+  else if (state.floor % 5 === 0) log(`⬆ Mốc tầng ${state.floor}: phần thưởng nâng mức trần`);
+
   updateHPBars();
-  setMsg(stingy ? t('msg.bossdown.nogold') : t('msg.bossdown.gold'), 'win');
+  setMsg(stingy ? 'Boss gục! Nhưng lão keo kiệt không để lại đồng nào.' : 'Boss gục! Hồi full máu — Nhận vàng!', 'win');
   log(stingy
-    ? t('log.win.nogold', { n: state.floor, g: state.gold })
-    : t('log.win.gold', { n: state.floor, r: reward, i: interest, g: state.gold }));
+    ? `★ Hạ Boss tầng ${state.floor}! 🕳️ Keo Kiệt — không được vàng (${state.gold} 💰)`
+    : `★ Hạ Boss tầng ${state.floor}! +${reward} vàng, +${interest} lợi tức → ${state.gold} 💰`);
   setTimeout(showBuffSelect, 900);
 }
 
 function onPlayerDead() {
   state.gameOver = true;
-  $('go-diff').textContent = t('go.diff', { icon: diff().icon, name: diffName(diff()) });
+  $('go-diff').textContent = `${diff().icon} Độ khó: ${diff().name}`;
   $('go-killed').textContent = state.bossesKilled;
   $('go-floor').textContent = state.floor + 1;
   $('go-dmg').textContent = fmtN(state.totalDamageDealt);
@@ -2371,41 +1950,58 @@ function onPlayerDead() {
 }
 
 /* ===================== BUFFS ===================== */
-function weightedRandom(items) {
-  const total = items.reduce((s, i) => s + i.w, 0);
-  let r = Math.random() * total;
-  for (const it of items) { r -= it.w; if (r <= 0) return it; }
-  return items[items.length - 1];
+/* Phần thưởng tịnh tiến theo tầng:
+ *   mỗi 5 tầng  → nâng mức TỐI ĐA một bậc (tối thiểu giữ nguyên)
+ *   mỗi 10 tầng → nâng CẢ tối thiểu lẫn tối đa một bậc
+ * Bậc: Dmg tối đa +1 · Máu tối đa +10 · Vàng +3
+ * (tầng 10, 20… ăn cả hai luật nên mức tối đa nhảy 2 bậc)
+ */
+const BUFF_RANGE = {
+  overflow: { min: 3,  max: 7,   step: 1  },
+  hp:       { min: 25, max: 125, step: 10 },
+  gold:     { min: 5,  max: 15,  step: 3  },
+};
+function buffTiers() {
+  return { n5: Math.floor(state.floor / 5), n10: Math.floor(state.floor / 10) };
+}
+function buffRange(type) {
+  const r = BUFF_RANGE[type];
+  const { n5, n10 } = buffTiers();
+  return { min: r.min + r.step * n10, max: r.max + r.step * (n5 + n10) };
+}
+
+function makeBuffCard(r) {
+  const pct = r.max > r.min ? (r.value - r.min) / (r.max - r.min) : 1;
+  const rarity = pct >= 0.8 ? 'legendary' : pct >= 0.6 ? 'epic'
+               : pct >= 0.4 ? 'rare' : pct >= 0.2 ? 'uncommon' : 'common';
+  const high = r.value > (r.min + r.max) / 2;
+  const span = `Tầng này: ${r.min}–${r.max}`;
+  if (r.type === 'overflow') return { ...r, rarity, high, icon: '🔥',
+    title: `Dmg tối đa +${r.value}`,
+    desc: `Cho phép vượt 21 thêm ${r.value} điểm mà vẫn tính sát thương. Cộng dồn vĩnh viễn.`, span };
+  if (r.type === 'hp') return { ...r, rarity, high, icon: '❤️',
+    title: `Máu tối đa +${r.value}`,
+    desc: `Tăng máu tối đa thêm ${r.value}. Hồi đầy máu khi nhận buff.`, span };
+  return { ...r, rarity, high, icon: '💰',
+    title: `Nhận ${r.value} vàng`,
+    desc: `Cộng thẳng ${r.value} vàng. Vàng cũng sinh lợi tức (mỗi 10 vàng → +1/màn, trần ${CONFIG.INTEREST_CAP}).`, span };
 }
 
 function generateBuffs() {
-  const buffs = [];
+  const rolls = ['overflow', 'hp', 'gold'].map(type => {
+    const { min, max } = buffRange(type);
+    return { type, min, max, value: randInt(min, max) };
+  });
 
-  const ov = weightedRandom([
-    { val: 3, w: 40, rarity: 'common' },
-    { val: 4, w: 28, rarity: 'uncommon' },
-    { val: 5, w: 18, rarity: 'rare' },
-    { val: 6, w: 10, rarity: 'epic' },
-    { val: 7, w: 4,  rarity: 'legendary' },
-  ]);
-  buffs.push({ type: 'overflow', value: ov.val, icon: '🔥', rarity: ov.rarity });
+  // Luôn phải có ít nhất MỘT phần thưởng trên trung bình.
+  // Có thể nhiều hơn, hoặc cả ba — nhưng không bao giờ được cả ba đều dưới mức.
+  const above = r => r.value > (r.min + r.max) / 2;
+  if (!rolls.some(above)) {
+    const r = pick(rolls);
+    r.value = randInt(Math.floor((r.min + r.max) / 2) + 1, r.max);
+  }
 
-  const hpVal = 25 + Math.floor(Math.random() * 101);
-  let hpRarity = 'common';
-  if (hpVal >= 100) hpRarity = 'legendary';
-  else if (hpVal >= 75) hpRarity = 'epic';
-  else if (hpVal >= 50) hpRarity = 'rare';
-  else if (hpVal >= 35) hpRarity = 'uncommon';
-  buffs.push({ type: 'hp', value: hpVal, icon: '❤️', rarity: hpRarity });
-
-  const goldVal = randInt(5, 15);
-  let gRarity = 'common';
-  if (goldVal >= 14) gRarity = 'epic';
-  else if (goldVal >= 11) gRarity = 'rare';
-  else if (goldVal >= 8) gRarity = 'uncommon';
-  buffs.push({ type: 'gold', value: goldVal, icon: '💰', rarity: gRarity });
-
-  return shuffle(buffs);
+  return shuffle(rolls.map(makeBuffCard));
 }
 
 function showBuffSelect() {
@@ -2415,65 +2011,60 @@ function showBuffSelect() {
   state.shopJokers = rollShopJokers(CONFIG.SHOP_JOKERS);
   state.shopCards = Array.from({ length: CONFIG.SHOP_CARDS }, randomShopCard);
 
-  state.buffs = generateBuffs();
-  pickedBuffIdx = -1;
-  renderBuffList();
-  updateBuffScreen();
-  showScreen('buff-screen');
-}
-
-let pickedBuffIdx = -1;
-function renderBuffList() {
   const list = $('buff-list');
   list.innerHTML = '';
-  (state.buffs || []).forEach((b, idx) => {
+  generateBuffs().forEach(b => {
     const div = document.createElement('div');
     div.className = 'buff-card';
+    if (b.high) div.classList.add('above-avg');
     div.innerHTML =
+      (b.high ? `<div class="hi-tag">⬆ TRÊN TRUNG BÌNH</div>` : '') +
       `<div class="icon">${b.icon}</div>` +
-      `<div class="title">${buffTitle(b)}</div>` +
-      `<div class="desc">${buffDesc(b)}</div>` +
+      `<div class="title">${b.title}</div>` +
+      `<div class="desc">${b.desc}</div>` +
+      `<div class="span-note">${b.span}</div>` +
       `<div class="rarity ${b.rarity}">${b.rarity.toUpperCase()}</div>`;
-    if (pickedBuffIdx >= 0) div.classList.add(idx === pickedBuffIdx ? 'picked' : 'disabled');
     div.onclick = () => {
       if (state.buffPicked) return;
       applyBuff(b);
       state.buffPicked = true;
-      pickedBuffIdx = idx;
-      [...list.children].forEach((el, k) => el.classList.add(k === idx ? 'picked' : 'disabled'));
+      [...list.children].forEach(el => el.classList.add(el === div ? 'picked' : 'disabled'));
       updateBuffScreen();
     };
     list.appendChild(div);
   });
+
+  updateBuffScreen();
+  showScreen('buff-screen');
 }
 
 function updateBuffScreen() {
   const nb = state.nextBlind || BLINDS[0];
   $('blind-preview').innerHTML =
     `<div class="bicon">${nb.icon}</div>` +
-    `<div><div class="blabel">${t('blind.preview', { n: state.floor + 1 })}</div>` +
-    `<div class="bname">${blindName(nb)}</div><div class="bdesc">${blindDesc(nb)}</div></div>`;
+    `<div><div class="blabel">Boss tầng ${state.floor + 1} sẽ chơi luật</div>` +
+    `<div class="bname">${nb.name}</div><div class="bdesc">${nb.desc}</div></div>`;
   $('buff-gold').textContent = state.gold;
   const interest = Math.min(CONFIG.INTEREST_CAP, Math.floor(state.gold / CONFIG.INTEREST_PER));
-  $('buff-income').textContent = t('buff.incomeVal', { g: CONFIG.GOLD_PER_FLOOR, i: interest });
+  $('buff-income').textContent = `+${CONFIG.GOLD_PER_FLOOR} & +${interest} lợi tức`;
   $('buff-jokers').textContent = `${state.jokers.length}/${CONFIG.JOKER_SLOTS}`;
   $('btn-next-floor').disabled = !state.buffPicked;
   $('buff-hint').textContent = state.buffPicked
-    ? t('buff.hint.picked')
-    : t('buff.hint.pick');
+    ? 'Đã chọn buff. Ghé Thương nhân bao nhiêu lần cũng được, xong bấm Màn tiếp.'
+    : 'Chọn 1 buff trước khi sang màn tiếp.';
 }
 
 function applyBuff(b) {
   if (b.type === 'overflow') {
     state.overflow += b.value;
-    log(t('log.buff.ov', { v: b.value, t: 21 + state.overflow }));
+    log(`Buff: Dmg tối đa +${b.value} (tổng ${21 + state.overflow})`);
   } else if (b.type === 'hp') {
     state.playerMaxHP += b.value;
     state.playerHP = state.playerMaxHP;
-    log(t('log.buff.hp', { v: b.value, t: state.playerMaxHP }));
+    log(`Buff: Máu tối đa +${b.value} → ${state.playerMaxHP}`);
   } else if (b.type === 'gold') {
     state.gold += b.value;
-    log(t('log.buff.gold', { v: b.value, t: state.gold }));
+    log(`Buff: +${b.value} vàng → ${state.gold} 💰`);
   }
 }
 
@@ -2485,7 +2076,7 @@ function closeShop() { $('shop-modal').classList.remove('open'); updateBuffScree
 
 function renderShop() {
   $('shop-gold').textContent = state.gold;
-  $('slot-count').textContent = t('shop.slots', { n: state.jokers.length, max: CONFIG.JOKER_SLOTS });
+  $('slot-count').textContent = `${state.jokers.length}/${CONFIG.JOKER_SLOTS} slot · bán lại được nửa giá`;
 
   // ----- Joker đang sở hữu -----
   const owned = $('owned-slots');
@@ -2495,15 +2086,15 @@ function renderShop() {
     const box = document.createElement('div');
     if (!j) {
       box.className = 'slot-box empty';
-      box.textContent = t('shop.empty');
+      box.textContent = 'Slot trống';
     } else {
       box.className = 'slot-box';
       const refund = Math.floor(j.price / 2);
-      box.innerHTML = `<div class="jt" style="font-size:0.82rem">🃏 ${jokerName(j)}</div>` +
-                      `<div class="jd" style="font-size:0.7rem;opacity:.75">${jokerDesc(j)}</div>`;
+      box.innerHTML = `<div class="jt" style="font-size:0.82rem">🃏 ${j.name}</div>` +
+                      `<div class="jd" style="font-size:0.7rem;opacity:.75">${j.desc}</div>`;
       const btn = document.createElement('button');
       btn.className = 'sell-btn';
-      btn.textContent = t('shop.sell', { n: refund });
+      btn.textContent = `Bán +${refund}💰`;
       btn.onclick = () => sellJoker(j.id);
       box.appendChild(btn);
     }
@@ -2516,11 +2107,11 @@ function renderShop() {
   state.shopJokers.forEach(j => {
     const box = document.createElement('div');
     box.className = 'joker-item ' + (j.style || '') + (j.sold ? ' sold' : '');
-    box.innerHTML = `<div class="jt">🃏 ${jokerName(j)}</div><div class="jd">${jokerDesc(j)}</div>`;
+    box.innerHTML = `<div class="jt">🃏 ${j.name}</div><div class="jd">${j.desc}</div>`;
     const btn = document.createElement('button');
     btn.className = 'buy-btn';
     const full = state.jokers.length >= CONFIG.JOKER_SLOTS;
-    btn.textContent = j.sold ? t('shop.bought') : (full ? t('shop.full') : t('shop.buy', { n: j.price }));
+    btn.textContent = j.sold ? 'Đã mua' : (full ? 'Hết slot' : `Mua ${j.price}💰`);
     btn.disabled = j.sold || full || state.gold < j.price;
     btn.onclick = () => buyJoker(j.id);
     box.appendChild(btn);
@@ -2537,7 +2128,7 @@ function renderShop() {
     wrap.appendChild(renderCard(it.card, {}));
     const btn = document.createElement('button');
     btn.className = 'buy-btn';
-    btn.textContent = it.sold ? t('shop.bought') : t('shop.buy', { n: it.price });
+    btn.textContent = it.sold ? 'Đã mua' : `Mua ${it.price}💰`;
     btn.disabled = it.sold || state.gold < it.price;
     btn.onclick = () => buyCard(it.id);
     wrap.appendChild(btn);
@@ -2556,7 +2147,7 @@ function renderShop() {
   $('merchant-dmg').textContent = 21 + state.overflow;
   const canTrade = state.playerMaxHP >= 50;
   $('btn-merchant-trade').disabled = !canTrade;
-  if (!canTrade) $('merchant-msg').textContent = t('shop.lowhp');
+  if (!canTrade) $('merchant-msg').textContent = 'Máu tối đa quá thấp (cần ≥ 50 để đổi)';
 }
 
 function buyJoker(id) {
@@ -2567,7 +2158,7 @@ function buyJoker(id) {
   state.gold -= j.price;
   j.sold = true;
   state.jokers.push({ ...j, sold: undefined });
-  log(t('log.buyjoker', { name: jokerName(j), p: j.price }));
+  log(`Mua Joker "${j.name}" (-${j.price}💰)`);
   renderShop();
 }
 
@@ -2578,7 +2169,7 @@ function sellJoker(id) {
   const refund = Math.floor(j.price / 2);
   state.gold += refund;
   state.jokers.splice(i, 1);
-  log(t('log.selljoker', { name: jokerName(j), p: refund }));
+  log(`Bán Joker "${j.name}" (+${refund}💰)`);
   renderShop();
 }
 
@@ -2588,7 +2179,7 @@ function buyCard(id) {
   state.gold -= it.price;
   it.sold = true;
   state.extraCards.push({ ...it.card });
-  log(t('log.buycard', { c: it.card.rank + it.card.suit, p: it.price }));
+  log(`Mua lá ${it.card.rank}${it.card.suit} (-${it.price}💰)`);
   renderShop();
 }
 
@@ -2610,12 +2201,12 @@ function doRerollCards() {
 }
 
 function merchantTrade() {
-  if (state.playerMaxHP < 50) { $('merchant-msg').textContent = t('shop.lowhp2'); return; }
+  if (state.playerMaxHP < 50) { $('merchant-msg').textContent = 'Không đủ máu tối đa!'; return; }
   state.playerMaxHP -= 25;
   if (state.playerHP > state.playerMaxHP) state.playerHP = state.playerMaxHP;
   state.overflow += 1;
-  log(t('log.trade', { hp: state.playerMaxHP, dmg: 21 + state.overflow }));
-  $('merchant-msg').textContent = t('shop.traded', { hp: state.playerMaxHP, dmg: 21 + state.overflow });
+  log(`Thương nhân: -25 Máu tối đa → +1 Dmg tối đa (HP max ${state.playerMaxHP}, Dmg max ${21 + state.overflow})`);
+  $('merchant-msg').textContent = `Đã đổi! Máu tối đa ${state.playerMaxHP} · Dmg tối đa ${21 + state.overflow}`;
   renderShop();
 }
 
@@ -2642,16 +2233,16 @@ function showDifficulty() {
     el.innerHTML =
       `<div class="dicon">${d.icon}</div>` +
       `<div class="dbody">` +
-        `<div class="dname">${diffName(d)}</div>` +
-        `<div class="dtag">${t('diffcard.rate', { tag: diffTag(d), a: (Math.exp(HP_K1) * d.drift).toFixed(2), b: (Math.max(HP_RATE_MIN, Math.exp(HP_K1 - 2 * HP_K2 * 49) * d.drift)).toFixed(2) })}</div>` +
-        `<div class="ddesc">${diffDesc(d)}</div>` +
+        `<div class="dname">${d.name}</div>` +
+        `<div class="dtag">${d.tag} · nhịp ×${(Math.exp(HP_K1) * d.drift).toFixed(2)} → ×${(Math.max(HP_RATE_MIN, Math.exp(HP_K1 - 2 * HP_K2 * 49) * d.drift)).toFixed(2)}</div>` +
+        `<div class="ddesc">${d.desc}</div>` +
       `</div>` +
       `<div class="dstat">` +
         `Boss #1: <b>${hpAt(0)}</b><br>` +
-        `${t('diffcard.f10')} <b>${hpAt(9)}</b><br>` +
-        `${t('diffcard.f25')} <b>${hpAt(24)}</b><br>` +
-        `${t('diffcard.turns')} <b>${diffTurns(d)}</b><br>` +
-        `${t('diffcard.wall')} <b>${diffWall(d)}</b>` +
+        `Tầng 10: <b>${hpAt(9)}</b><br>` +
+        `Tầng 25: <b>${hpAt(24)}</b><br>` +
+        `Nhịp đánh: <b>${d.turns}</b><br>` +
+        `Bí lối: <b>${d.wall}</b>` +
       `</div>`;
     el.onclick = () => newGame(i);
     list.appendChild(el);
@@ -2683,12 +2274,6 @@ $('reroll-jokers').onclick = doRerollJokers;
 $('reroll-cards').onclick = doRerollCards;
 $('btn-merchant-trade').onclick = merchantTrade;
 $('shop-modal').addEventListener('click', e => { if (e.target.id === 'shop-modal') closeShop(); });
-
-document.querySelectorAll('#lang-switch button').forEach(b => {
-  b.onclick = () => setLang(b.dataset.lang);
-});
-
-applyI18n();
 
 document.addEventListener('touchmove', () => {}, { passive: true });
 </script>
