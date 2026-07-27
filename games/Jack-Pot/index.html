@@ -810,6 +810,11 @@ const CONFIG = {
   BOSS_XD_STEP: 2,
   BOSS_OVERFLOW_PER_FLOOR: 1,   // Boss +1 dmg tối đa mỗi tầng
   BOSS_FLAT_EVERY: 3,           // Boss +1 dmg phẳng mỗi 3 tầng
+  // Hệ số tầng RIÊNG của Boss. Nhẹ hơn của người chơi (×1.2) rất nhiều,
+  // nhưng đủ để game còn trạng thái thua và buff Máu tối đa còn giá trị.
+  // 1.032 giữ cho Boss luôn cần ~12 lượt để giết bạn, trong khi trận chỉ kéo ~5 lượt
+  // → mỗi trận bạn mất khoảng 40% máu. Để 1.06 thì từ tầng 50 bạn chết trước khi kịp thắng.
+  BOSS_DMG_RATE: 1.032,
 
   // Máu Boss lấy từ bảng DIFFICULTIES bên dưới (chọn ở màn bắt đầu).
 
@@ -843,24 +848,41 @@ const ROW_SIZE = 5;
  * nên đường máu Boss bám sát đường sức mạnh người chơi ở MỌI tầng.
  * `drift` là thứ duy nhất phân biệt độ khó: >1 nghĩa là Boss nhích nhanh hơn bạn.
  */
-const HP_K1 = 0.2448, HP_K2 = 0.000848, HP_RATE_MIN = 1.10;
+/* BẢNG MÁU BOSS — đo bằng mô phỏng, không phải công thức.
+ * Sức mạnh người chơi KHÔNG phải hàm mũ đều: combo Mậu Binh nhân chồng nhau,
+ * mà cả bốn combo đó đều được kích bởi cùng một thứ — cầm nhiều lá.
+ * Nên khi Dmg tối đa đủ lớn để ôm 15-20 lá, damage nhảy ×3/tầng trong khoảng
+ * tầng 11-21 rồi mới ổn định lại về ~×1.25.
+ * Bảng dưới = DMG/lượt đo thật × 5 lượt, mức Thường, build bám nhịp
+ * Dmg tối đa +4.6/tầng và 4 Joker dồn vào Đôi.
+ */
+const BOSS_HP_TABLE = [
+  86, 122, 299, 465, 703, 1460, 1920, 2810,
+  3790, 5500, 35700, 51900, 87900, 153000, 389000, 1520000,
+  3460000, 13000000, 37800000, 152000000, 392000000, 975000000, 2350000000, 6160000000,
+  40100000000, 59000000000, 100000000000, 157000000000, 213000000000, 294000000000, 423000000000, 573000000000,
+  801000000000, 1040000000000, 1360000000000, 1910000000000, 2410000000000, 3140000000000, 3940000000000, 4960000000000,
+  6060000000000, 7740000000000, 10100000000000, 12100000000000, 15300000000000, 19200000000000, 23700000000000, 30100000000000,
+  37700000000000, 46400000000000, 57300000000000, 71700000000000, 90800000000000, 116000000000000, 138000000000000, 180000000000000,
+];
+const BOSS_HP_TAIL = 1.25;   // hết bảng thì nhân đều mỗi tầng
 
 const DIFFICULTIES = [
-  { key:'veasy',  name:'Cực dễ',   icon:'🌱', baseHP:75,  drift:0.984, turns:'3–5 lượt', wall:'không có',
-    tag:'Độ dài trận gần như không đổi',
-    desc:'Boss luôn tụt sau bạn một nhịp. Hợp để làm quen combo và thử build lạ.' },
-  { key:'easy',   name:'Dễ',       icon:'🙂', baseHP:90,  drift:0.986, turns:'4–6 lượt', wall:'không có',
-    tag:'Bám sát nhịp sức mạnh của bạn',
-    desc:'Đánh Boss tầng 1 hay tầng 50 đều tốn chừng đó lượt. Build lởm vẫn đi được tới cuối.' },
-  { key:'normal', name:'Thường',   icon:'⚔️', baseHP:100, drift:0.994, turns:'5–8 lượt', wall:'không có',
-    tag:'Nặng dần rồi chững lại quanh tầng 40',
-    desc:'Đủ chỗ để sai vài nước. Build tốt thì đi rất sâu, build lởm thì lê lết chứ không tắc hẳn.' },
-  { key:'hard',   name:'Khó',      icon:'🔥', baseHP:110, drift:1.009, turns:'6–14 lượt', wall:'gắt nhất ~T40',
-    tag:'Đỉnh điểm ở tầng 35-45 rồi nhẹ dần',
-    desc:'Phải săn Joker nhân chồng và giữ vàng ăn lợi tức. Qua được tầng 45 thì phần sau dễ thở hơn.' },
-  { key:'insane', name:'Siêu khó', icon:'💀', baseHP:125, drift:1.024, turns:'7–28 lượt', wall:'~tầng 25',
-    tag:'Boss vượt mặt bạn từ tầng 20',
-    desc:'Chỉ build gần hoàn hảo mới qua nổi tầng 25. Đi được tầng nào hay tầng đó.' },
+  { key:'veasy',  name:'Cực dễ',   icon:'🌱', mult:0.70, drift:0.970, turns:'1–4 lượt', wall:'không có',
+    tag:'Trận ngắn dần theo thời gian',
+    desc:'Boss tụt lại sau bạn mỗi tầng. Hợp để làm quen combo và thử build lạ.' },
+  { key:'easy',   name:'Dễ',       icon:'🙂', mult:0.85, drift:0.990, turns:'2–6 lượt', wall:'không có',
+    tag:'Nhẹ hơn nhịp sức mạnh của bạn',
+    desc:'Sai vài nước vẫn gỡ được. Build lởm vẫn đi rất sâu.' },
+  { key:'normal', name:'Thường',   icon:'⚔️', mult:1.00, drift:1.000, turns:'4–7 lượt', wall:'không có',
+    tag:'Bám đúng nhịp — 5 lượt mỗi Boss từ đầu tới cuối',
+    desc:'Máu Boss neo thẳng vào đường sát thương đo thật. Bám nhịp mua Dmg tối đa thì đi mãi.' },
+  { key:'hard',   name:'Khó',      icon:'🔥', mult:1.15, drift:1.020, turns:'5–10 lượt', wall:'không có',
+    tag:'Boss nhích nhanh hơn bạn 2% mỗi tầng',
+    desc:'Chậm nhịp mua Dmg tối đa là hụt ngay. Phải săn Joker nhân chồng và giữ vàng ăn lợi tức.' },
+  { key:'insane', name:'Siêu khó', icon:'💀', mult:1.35, drift:1.045, turns:'6–37 lượt', wall:'~tầng 25',
+    tag:'Boss vượt mặt bạn 4.5% mỗi tầng',
+    desc:'Chỉ build gần hoàn hảo mới qua nổi tầng 30. Đi được tầng nào hay tầng đó.' },
 ];
 
 /* ===================== LUẬT BOSS (Boss Blind) =====================
@@ -975,7 +997,16 @@ let selectedIdx = null;   // lá đang được chọn để đổi chỗ
 /* ===================== UTILS ===================== */
 function $(id) { return document.getElementById(id); }
 function fmt(v) { return Number.isInteger(v) ? String(v) : (+v.toFixed(1)).toString(); }
-function fmtN(v) { return Math.round(v).toLocaleString('en-US'); }
+/** Số lớn rút gọn: 1.234 · 5,4 tr · 8,7 tỷ · 3,2 ngh.tỷ · 4,5e18 */
+function fmtN(v) {
+  const n = Math.abs(v);
+  if (n < 1e6) return Math.round(v).toLocaleString('en-US');
+  if (n >= 1e18) return v.toExponential(2).replace('e+', 'e');
+  const U = [[1e15, 'triệu tỷ'], [1e12, 'ngh.tỷ'], [1e9, 'tỷ'], [1e6, 'tr']];
+  for (const [d, u] of U) {
+    if (n >= d) { const x = v / d; return (x < 10 ? x.toFixed(2) : x < 100 ? x.toFixed(1) : Math.round(x)) + ' ' + u; }
+  }
+}
 
 function log(msg) {
   const el = $('log');
@@ -1054,19 +1085,25 @@ function longestStraight(ranks) {
 function floorScale()      { return Math.pow(CONFIG.COMBO_RATE, state.floor); }
 function getXiDachBonus()  { return CONFIG.XD_BASE * Math.pow(CONFIG.XD_RATE, state.floor); }
 function getBossXiDachBonus() { return CONFIG.BOSS_XD_BASE + CONFIG.BOSS_XD_STEP * state.floor; }
+function bossScale()       { return Math.pow(CONFIG.BOSS_DMG_RATE, state.floor); }
 function bossOverflow()    { return CONFIG.BOSS_OVERFLOW_PER_FLOOR * state.floor; }
 function bossFlatDmg()     { return Math.floor(state.floor / CONFIG.BOSS_FLAT_EVERY); }
 
 function diff() { return DIFFICULTIES[state.difficulty] || DIFFICULTIES[2]; }
 
-/** Nhịp máu Boss ở tầng thứ i (0-based) — giảm dần theo tầng. */
+/** Máu Boss gốc ở tầng x (0-based), lấy từ bảng đo, hết bảng thì nối đuôi. */
+function baseBossHP(x) {
+  const t = BOSS_HP_TABLE;
+  if (x < t.length) return t[x];
+  return t[t.length - 1] * Math.pow(BOSS_HP_TAIL, x - t.length + 1);
+}
+/** Nhịp máu Boss ở tầng thứ i — chỉ để hiển thị. */
 function bossHPRate(i) {
-  return Math.max(HP_RATE_MIN, Math.exp(HP_K1 - 2 * HP_K2 * i) * diff().drift);
+  return (baseBossHP(i + 1) / baseBossHP(i)) * diff().drift;
 }
 function calcBossHP(x) {
-  let hp = diff().baseHP;
-  for (let i = 0; i < x; i++) hp *= bossHPRate(i);
-  return Math.round(hp);
+  const d = diff();
+  return Math.round(baseBossHP(x) * d.mult * Math.pow(d.drift, x));
 }
 
 /* ===================== THƯỞNG BỘ TRÙNG RANK ===================== */
@@ -1348,6 +1385,7 @@ function evalHandAt(hand, total, acesAs11, isPlayer) {
   if (!isPlayer) {
     if (total === 21) { res.bjBonus = getBossXiDachBonus(); core += res.bjBonus; }
     core += bossFlatDmg();
+    core *= bossScale();          // hệ số tầng riêng của Boss
     res.rows = rowData;
     res.dmg = Math.floor(core);
     return res;
@@ -2222,11 +2260,7 @@ function showDifficulty() {
   const list = $('diff-list');
   list.innerHTML = '';
   DIFFICULTIES.forEach((d, i) => {
-    const hpAt = x => {
-      let hp = d.baseHP;
-      for (let i = 0; i < x; i++) hp *= Math.max(HP_RATE_MIN, Math.exp(HP_K1 - 2 * HP_K2 * i) * d.drift);
-      return Math.round(hp).toLocaleString('en-US');
-    };
+    const hpAt = x => fmtN(baseBossHP(x) * d.mult * Math.pow(d.drift, x));
     const el = document.createElement('div');
     el.className = 'diff-card';
     el.dataset.d = i;
@@ -2234,7 +2268,7 @@ function showDifficulty() {
       `<div class="dicon">${d.icon}</div>` +
       `<div class="dbody">` +
         `<div class="dname">${d.name}</div>` +
-        `<div class="dtag">${d.tag} · nhịp ×${(Math.exp(HP_K1) * d.drift).toFixed(2)} → ×${(Math.max(HP_RATE_MIN, Math.exp(HP_K1 - 2 * HP_K2 * 49) * d.drift)).toFixed(2)}</div>` +
+        `<div class="dtag">${d.tag}</div>` +
         `<div class="ddesc">${d.desc}</div>` +
       `</div>` +
       `<div class="dstat">` +
