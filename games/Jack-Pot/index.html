@@ -244,6 +244,16 @@
     transform: translateY(-10px);
     box-shadow: 0 0 0 3px var(--gold-light), 0 10px 22px rgba(0,0,0,0.5);
   }
+  .card.dead {
+    filter: grayscale(1) brightness(0.5);
+    opacity: 0.55;
+  }
+  .card.dead::before {
+    content: '✕';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; color: rgba(231,76,60,0.85); font-weight: 800;
+  }
   .card.hidden-card {
     background: linear-gradient(145deg, #1a3a6e, #0d2447);
     color: transparent;
@@ -521,6 +531,8 @@
   .joker-item.add-type .jt { color: #7dcea0; }
   .joker-item.special { border-color: rgba(241,196,15,0.55); }
   .joker-item.special .jt { color: var(--gold-light); }
+  .joker-item.rank-type { border-color: rgba(93,173,226,0.6); }
+  .joker-item.rank-type .jt { color: #7db3ea; }
 
   .buy-btn {
     font-family: inherit; font-size: 0.78rem; font-weight: 700;
@@ -549,6 +561,68 @@
     background: rgba(0,0,0,0.25); border: 2px dashed rgba(255,255,255,0.14);
     color: rgba(255,255,255,0.3); align-items: center; justify-content: center; font-size: 0.78rem;
   }
+  .blind-shop-card {
+    flex: 1 1 auto;
+    display: flex; align-items: center; gap: 12px;
+    background: linear-gradient(120deg, #2a1212, #170c0c);
+    border: 2px solid rgba(255,107,107,0.45);
+    border-radius: 12px; padding: 10px 14px;
+  }
+  .blind-shop-card.calm { border-color: rgba(255,255,255,0.15); opacity: 0.7; }
+  .blind-shop-card .bicon { font-size: 1.8rem; flex: 0 0 auto; }
+  .blind-shop-card .bname { font-weight: 800; color: #ff9a90; font-size: 0.95rem; }
+  .blind-shop-card.calm .bname { color: #bbb; }
+  .blind-shop-card .bdesc { font-size: 0.76rem; opacity: 0.82; line-height: 1.4; }
+  .blind-shop-card .bpay {
+    font-size: 0.74rem; font-weight: 700; color: #f7dc6f; margin-top: 3px;
+  }
+
+  /* LƯỚI BỘ BÀI */
+  .deck-grid {
+    display: grid;
+    grid-template-columns: 22px repeat(13, 1fr);
+    gap: 3px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 10px;
+    padding: 8px;
+  }
+  .deck-grid .dg-head {
+    font-size: 0.66rem; font-weight: 700; text-align: center;
+    opacity: 0.55; padding: 2px 0;
+  }
+  .deck-cell {
+    position: relative;
+    aspect-ratio: 2/2.6;
+    min-height: 30px;
+    border-radius: 4px;
+    background: #f4f4f4;
+    color: #111;
+    font-size: 0.6rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.2);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .deck-cell.red { color: #c41e3a; }
+  .deck-cell:hover:not(.gone):not(.locked) { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(231,76,60,0.5); border-color: #e74c3c; }
+  .deck-cell.gone { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.15); cursor: default; border-color: rgba(255,255,255,0.06); }
+  .deck-cell.locked { cursor: not-allowed; opacity: 0.55; }
+  .deck-cell.dup { background: linear-gradient(160deg, #f7dc6f, #e8c547); }
+  .deck-cell .cnt {
+    position: absolute; top: -3px; right: -3px;
+    background: #1a6b3a; color: #fff;
+    font-size: 0.55rem; font-weight: 800;
+    min-width: 13px; height: 13px; line-height: 13px;
+    border-radius: 7px; text-align: center;
+    border: 1px solid rgba(0,0,0,0.35);
+  }
+  @media (max-width: 640px) {
+    .deck-grid { grid-template-columns: 16px repeat(13, 1fr); gap: 2px; padding: 5px; }
+    .deck-cell { min-height: 22px; font-size: 0.5rem; }
+    .deck-cell .cnt { font-size: 0.48rem; min-width: 11px; height: 11px; line-height: 11px; }
+    .deck-grid .dg-head { font-size: 0.55rem; }
+  }
+
   .trade-box {
     margin-top: 18px; background: rgba(0,0,0,0.28);
     border: 1px solid rgba(166,124,0,0.5); border-radius: 12px;
@@ -618,7 +692,7 @@
     Mỗi hàng: <strong>(điểm hàng + add) × mult</strong>, cộng dồn rồi × <strong>hệ số tầng (1.2^tầng)</strong><br>
     Xì Dách + thưởng bộ cộng sau, cuối cùng nhân Mậu Binh và Joker toàn cục<br>
     Máu Boss tăng theo <strong>độ khó bạn chọn</strong> — Boss dùng combo nhưng <strong>không scale</strong><br>
-    Mỗi Boss mang một <strong>luật riêng</strong> — xem trước ở màn buff để còn kịp mua Joker đối phó<br>
+    Cứ <strong>3 tầng một lần</strong> (từ tầng 4) Boss mang luật riêng — phá được thì <strong>thưởng thêm vàng</strong><br>
     Hạ Boss → nhận vàng + lợi tức → chọn buff → mua <strong>Joker</strong> ở Thương nhân → bấm Màn tiếp
   </div>
 </div>
@@ -632,6 +706,16 @@
   </p>
   <div class="diff-list" id="diff-list"></div>
   <button class="mini-btn" id="btn-back-menu" style="margin-top:22px;padding:8px 20px">← Quay lại</button>
+</div>
+
+<!-- ========== CHỌN BỘ BÀI ========== -->
+<div id="deckselect" class="screen">
+  <h2 style="font-size:1.7rem;margin:26px 0 6px;color:var(--gold-light)">Chọn bộ bài</h2>
+  <p class="sub" style="opacity:.7;text-align:center;max-width:620px;margin-bottom:6px">
+    Mỗi bộ bài đổi hẳn luật chơi: thành phần lá, cách quắc, hay cả cách sinh lợi tức.
+  </p>
+  <div class="diff-list" id="deck-list"></div>
+  <button class="mini-btn" id="btn-back-diff" style="margin-top:22px;padding:8px 20px">← Quay lại</button>
 </div>
 
 <!-- ========== GAME ========== -->
@@ -684,6 +768,7 @@
       <button class="mini-btn" id="btn-sort-rank">↕ Xếp theo Rank</button>
       <button class="mini-btn" id="btn-sort-suit">♠ Xếp theo Chất</button>
       <button class="mini-btn" id="btn-sort-col">⇅ Gom cột dọc</button>
+      <span id="swap-left" style="font-size:0.74rem;font-weight:700;color:#ff9a90;align-self:center;display:none"></span>
       <span style="font-size:0.72rem;opacity:0.5;align-self:center">Chạm 1 lá rồi chạm lá khác để đổi chỗ</span>
     </div>
 
@@ -701,6 +786,7 @@
 
   <div class="controls">
     <button class="btn btn-hit" id="btn-hit">Rút bài</button>
+    <button class="btn" id="btn-discard" style="background:linear-gradient(135deg,#8e44ad,#5b2c6f);color:#fff">🗑️ Bỏ lá (2)</button>
     <button class="btn btn-ready" id="btn-ready">Sẵn sàng</button>
   </div>
 
@@ -769,12 +855,29 @@
       </div>
     </div>
 
+    <div class="shop-section" id="blind-shop">
+      <div class="sec-title">⚖️ Luật Boss tầng tới <small>Không hợp build thì trả tiền bốc lại</small></div>
+      <div class="shop-line" style="align-items:stretch">
+        <div class="blind-shop-card" id="blind-shop-card"></div>
+        <button class="reroll-btn" id="reroll-blind">🔄 Đổi luật<span id="rr-blind-cost">5💰</span></button>
+      </div>
+    </div>
+
+    <div class="shop-section">
+      <div class="sec-title">
+        🗑️ Bộ bài của bạn — <span id="deck-total">52 lá</span>
+        <small>Bấm vào lá để xoá 1 bản, <strong id="cut-price">5</strong>💰 mỗi lá. Bộ càng mỏng thì lá còn lại càng dễ về.</small>
+      </div>
+      <div class="deck-grid" id="deck-grid"></div>
+      <div id="deck-hint" style="font-size:0.74rem;opacity:0.55;margin-top:8px"></div>
+    </div>
+
     <div class="trade-box">
       <div style="font-size:0.9rem;margin-bottom:10px">
         Máu tối đa: <strong id="merchant-hp">100</strong> &nbsp;|&nbsp; Dmg tối đa: <strong id="merchant-dmg">21</strong>
       </div>
       <button class="btn" id="btn-merchant-trade" style="background:linear-gradient(135deg,#a67c00,#8b5e00);color:#fff;min-width:240px;font-size:0.9rem">
-        Đổi 25 Máu tối đa → +1 Dmg tối đa
+        Đổi 25 Máu tối đa → +3 Dmg tối đa
       </button>
       <div id="merchant-msg" style="margin-top:8px;font-size:0.8rem;min-height:18px;opacity:0.9"></div>
     </div>
@@ -818,7 +921,8 @@ const CONFIG = {
 
   // Máu Boss lấy từ bảng DIFFICULTIES bên dưới (chọn ở màn bắt đầu).
 
-  GOLD_PER_FLOOR: 5,
+  GOLD_PER_FLOOR: 10000,      // thưởng gốc mỗi màn
+  GOLD_STEP_EVERY: 3,     // cứ mỗi 3 Boss thì thưởng gốc +1
   INTEREST_PER: 10,
   INTEREST_CAP: 5,
 
@@ -827,6 +931,8 @@ const CONFIG = {
   SHOP_CARDS: 5,
   CARD_PRICE_MIN: 3,
   CARD_PRICE_MAX: 5,
+  CUT_PRICE: 5,        // giá xoá 1 lá khỏi bộ bài
+  DECK_MIN: 2,        // không cho xoá bộ mỏng hơn mức này
   REROLL_BASE: 2,         // giá = REROLL_BASE^lần (lần 0 → 1 vàng)
 };
 
@@ -853,17 +959,27 @@ const ROW_SIZE = 5;
  * mà cả bốn combo đó đều được kích bởi cùng một thứ — cầm nhiều lá.
  * Nên khi Dmg tối đa đủ lớn để ôm 15-20 lá, damage nhảy ×3/tầng trong khoảng
  * tầng 11-21 rồi mới ổn định lại về ~×1.25.
- * Bảng dưới = DMG/lượt đo thật × 5 lượt, mức Thường, build bám nhịp
- * Dmg tối đa +4.6/tầng và 4 Joker dồn vào Đôi.
+ * Bảng dưới giải ngược từ mô phỏng: mỗi tầng dò nhị phân ra lượng máu khiến
+ * trận kéo đúng 5 lượt. Nhịp build lấy từ một run kỷ lục thật (tầng 30 có
+ * Dmg tối đa 177, bộ bài 88 lá, 4 Joker toàn loại nhân dồn vào Đôi/2 Đôi):
+ *   Dmg tối đa +5.2/tầng · mua thêm ~1.2 lá/tầng · Joker thứ 4 xong ở tầng 19
+ * Lưu ý: bộ bài phình mới là đòn bẩy mạnh nhất — 88 lá nghĩa là mỗi rank có
+ * ~6.8 bản thay vì 4, nên Đôi và Sám nổ dày hơn hẳn ở mọi hàng.
+ *
+ * Bảng đã được LÀM MƯỢT và HẠ MẶT BẰNG từ tầng 9. Bản đo thô có các bước nhảy
+ * ×6.1 / ×7.8 / ×5.7 ở tầng 9 / 14 / 16 — đó là lúc build mô phỏng chạm ngưỡng
+ * Mậu Binh đúng tầng đó. Build thật không nhảy như vậy, nên những bước đó biến
+ * thành tường chặn không qua nổi. Sau khi làm mượt: vách lớn nhất còn ×3.5,
+ * và tầng 20-55 nhẹ hơn bản thô 5 đến 18 lần.
  */
 const BOSS_HP_TABLE = [
-  86, 122, 299, 465, 703, 1460, 1920, 2810,
-  3790, 5500, 35700, 51900, 87900, 153000, 389000, 1520000,
-  3460000, 13000000, 37800000, 152000000, 392000000, 975000000, 2350000000, 6160000000,
-  40100000000, 59000000000, 100000000000, 157000000000, 213000000000, 294000000000, 423000000000, 573000000000,
-  801000000000, 1040000000000, 1360000000000, 1910000000000, 2410000000000, 3140000000000, 3940000000000, 4960000000000,
-  6060000000000, 7740000000000, 10100000000000, 12100000000000, 15300000000000, 19200000000000, 23700000000000, 30100000000000,
-  37700000000000, 46400000000000, 57300000000000, 71700000000000, 90800000000000, 116000000000000, 138000000000000, 180000000000000,
+  86, 123, 188, 393, 672, 1130, 1940, 3750,
+  8340, 19700, 46200, 110000, 283000, 779000, 2170000, 5850000,
+  15400000, 39500000, 99100000, 243000000, 577000000, 1330000000, 2970000000, 6430000000,
+  13400000000, 27100000000, 52800000000, 99400000000, 181000000000, 320000000000, 547000000000, 908000000000,
+  1460000000000, 2300000000000, 3520000000000, 5260000000000, 7680000000000, 11000000000000, 15400000000000, 21200000000000,
+  28500000000000, 37800000000000, 49300000000000, 63200000000000, 79800000000000, 99000000000000, 121000000000000, 145000000000000,
+  172000000000000, 199000000000000, 228000000000000, 257000000000000, 285000000000000, 314000000000000, 345000000000000, 380000000000000,
 ];
 const BOSS_HP_TAIL = 1.25;   // hết bảng thì nhân đều mỗi tầng
 
@@ -877,54 +993,124 @@ const DIFFICULTIES = [
   { key:'normal', name:'Thường',   icon:'⚔️', mult:1.00, drift:1.000, turns:'4–7 lượt', wall:'không có',
     tag:'Bám đúng nhịp — 5 lượt mỗi Boss từ đầu tới cuối',
     desc:'Máu Boss neo thẳng vào đường sát thương đo thật. Bám nhịp mua Dmg tối đa thì đi mãi.' },
-  { key:'hard',   name:'Khó',      icon:'🔥', mult:1.15, drift:1.020, turns:'5–10 lượt', wall:'không có',
-    tag:'Boss nhích nhanh hơn bạn 2% mỗi tầng',
+  { key:'hard',   name:'Khó',      icon:'🔥', mult:1.12, drift:1.015, turns:'5–9 lượt', wall:'không có',
+    tag:'Boss nhích nhanh hơn bạn 1.5% mỗi tầng',
     desc:'Chậm nhịp mua Dmg tối đa là hụt ngay. Phải săn Joker nhân chồng và giữ vàng ăn lợi tức.' },
-  { key:'insane', name:'Siêu khó', icon:'💀', mult:1.35, drift:1.045, turns:'6–37 lượt', wall:'~tầng 25',
-    tag:'Boss vượt mặt bạn 4.5% mỗi tầng',
-    desc:'Chỉ build gần hoàn hảo mới qua nổi tầng 30. Đi được tầng nào hay tầng đó.' },
+  { key:'insane', name:'Siêu khó', icon:'💀', mult:1.22, drift:1.028, turns:'6–18 lượt', wall:'~tầng 40',
+    tag:'Boss vượt mặt bạn 2.8% mỗi tầng',
+    desc:'Luật Boss cộng thêm máu cao khiến mọi sai lầm đều đắt. Cần build chặt từ tầng 5.' },
 ];
+
+/* ===================== BỘ BÀI (Deck) =====================
+ * Giống Balatro: mỗi bộ bài đổi hẳn một luật nền của run.
+ */
+function deckOf(pairs) {
+  const d = [];
+  for (const [suits, ranks, copies] of pairs)
+    for (const s of suits) for (const r of ranks) for (let i = 0; i < copies; i++) d.push({ rank: r, suit: s });
+  return d;
+}
+const DECKS = [
+  { key:'standard', icon:'🎴', name:'Bộ Tiêu Chuẩn', tag:'52 lá chuẩn',
+    desc:'Bốn chất, mười ba rank, không thêm không bớt.',
+    build: () => deckOf([[SUITS, RANKS, 1]]) },
+
+  { key:'redblack', icon:'♥️', name:'Bộ Cơ Bích', tag:'26 lá Cơ + 26 lá Bích',
+    desc:'Chỉ còn hai chất, mỗi rank có 2 bản mỗi chất. Thùng và Đôi nổ dày hơn hẳn.',
+    build: () => deckOf([[['♥','♠'], RANKS, 2]]) },
+
+  { key:'nobust', icon:'🛡️', name:'Bộ Bất Quắc', tag:'Không bao giờ quắc',
+    desc:'Bạn không thể quắc — cầm bao nhiêu lá cũng được. Đổi lại không còn thưởng Kịch Trần dễ ăn.',
+    noBust: true, build: () => deckOf([[SUITS, RANKS, 1]]) },
+
+  { key:'nofaces', icon:'🔢', name:'Bộ Chân Phương', tag:'36 lá, không J Q K A',
+    desc:'Bỏ hết J, Q, K, A. Bộ mỏng, điểm lá thấp nên ôm được rất nhiều lá.',
+    build: () => deckOf([[SUITS, ['2','3','4','5','6','7','8','9','10'], 1]]) },
+
+  { key:'royal', icon:'👑', name:'Bộ Hoàng Tộc', tag:'48 lá, chỉ J Q K A',
+    desc:'Chỉ có J, Q, K, A — mỗi rank 3 bản mỗi chất. Tứ quý và Ngũ quý về liên tục.',
+    build: () => deckOf([[SUITS, ['J','Q','K','A'], 3]]) },
+
+  { key:'merchant', icon:'💰', name:'Bộ Con Buôn', tag:'Lợi tức vô hạn',
+    desc:'Lợi tức không còn trần, và cứ mỗi 5 vàng đang có thì nhận thêm 1 vàng mỗi màn.',
+    interest: { per: 5, cap: Infinity }, build: () => deckOf([[SUITS, RANKS, 1]]) },
+
+  { key:'chaos', icon:'🎲', name:'Bộ Hỗn Mang', tag:'52 lá ngẫu nhiên',
+    desc:'52 lá bốc hoàn toàn ngẫu nhiên — có thể trùng, có thể thiếu cả một rank.',
+    build: () => Array.from({ length: 52 }, () => ({ rank: pick(RANKS), suit: pick(SUITS) })) },
+];
+function deckDef() { return DECKS.find(d => d.key === state.deckKey) || DECKS[0]; }
+function interestRule() { return deckDef().interest || { per: CONFIG.INTEREST_PER, cap: CONFIG.INTEREST_CAP }; }
+function calcInterest() {
+  const r = interestRule();
+  return Math.min(r.cap, Math.floor(state.gold / r.per));
+}
+function canBust() { return !deckDef().noBust; }
 
 /* ===================== LUẬT BOSS (Boss Blind) =====================
  * Mỗi Boss mang một luật riêng, hiện ra TRƯỚC khi vào trận để người chơi
  * còn kịp mua Joker đối phó. Luật chỉ trói người chơi — Boss không bị dính.
  * Ba nhóm, nhắm đúng ba thứ người chơi phải quyết trong game này:
  *   ① khâu dừng bài (đỏ đen)  ② khâu sắp hàng (giải đố)  ③ điểm & kinh tế
+ *
+ * NHỊP 1-TRONG-3, giống hệt Balatro: ở đó một Ante gồm Small (không luật, $3),
+ * Big (không luật, $4) rồi mới tới Boss (có luật, $5) — tức chỉ 1/3 số trận
+ * có luật, và trận đó TRẢ NHIỀU TIỀN NHẤT. Bản trước của game này bắt mọi tầng
+ * đều mang luật mà không bù đồng nào, nặng gấp ba bản gốc.
+ * Ba tầng đầu miễn hoàn toàn vì người chơi khởi đầu quá yếu.
+ *
+ * `bonus` = vàng thưởng thêm khi hạ Boss mang luật đó.
+ * `hpCut` = HỆ SỐ MÁU BOSS trong trận có luật đó. Luật càng nặng thì Boss càng
+ * ít máu — vì điều kiện đã là một hình phạt rồi, cộng thêm máu đầy nữa là bất công.
+ * Cả hai số đều tính từ độ nặng ĐO ĐƯỢC bằng mô phỏng ở đúng tầng luật xuất hiện
+ * (số lượt cần thêm so với trận Sòng phẳng), rồi bù quá 10% để trận có luật
+ * thật sự NHẸ hơn trận thường về mặt máu. Balatro cũng coi máu và luật là hai
+ * mặt cùng một cán cân: The Wall không có luật nhưng máu 4× thay vì 2×.
  */
+const BLIND_FROM_FLOOR = 3;   // chỉ số tầng (0-based) bắt đầu có luật → tầng 4
+const BLIND_EVERY = 3;        // sau đó cứ 3 tầng một lần
+
 const BLINDS = [
-  { key:'none', icon:'🎴', name:'Sòng phẳng', minFloor:0, group:'—',
+  { key:'none', icon:'🎴', name:'Sòng phẳng', minFloor:0, group:'—', bonus:0, hpCut:1,
     desc:'Boss này không giở trò gì. Đánh bình thường.' },
 
   // ① khâu dừng bài
-  { key:'lowcap', icon:'📉', name:'Trần Thấp', minFloor:1, group:'rút bài',
-    desc:'Dmg tối đa mua được bị cắt một nửa. Trần quắc tụt sát về 21.' },
-  { key:'minscore', icon:'🪝', name:'Ép Tới', minFloor:2, group:'rút bài',
-    desc:'Chưa chạm sát trần (trần − 4) thì chưa được dừng. Ép bạn rút tới mép vực.' },
-  { key:'maxcards', icon:'✋', name:'Bủn Xỉn', minFloor:3, group:'rút bài',
-    desc:'Tay bài không được quá 5 lá.' },
-  { key:'blindfold', icon:'🙈', name:'Bịt Mắt', minFloor:6, group:'rút bài',
-    desc:'Bài của bạn úp hết, chỉ lật khi bấm Sẵn sàng. Rút trong bóng tối.' },
+  { key:'lowcap', icon:'📉', name:'Trần Thấp', minFloor:3, group:'rút bài', bonus:8, hpCut:0.65,
+    desc:'Trần quắc của bạn bị trừ thẳng 8 điểm trong trận này.' },
+  { key:'minscore', icon:'🪝', name:'Ép Tới', minFloor:4, group:'rút bài', bonus:8, hpCut:0.67,
+    desc:'Chưa chạm sát trần (trần − 4) thì chưa được dừng. Tỉ lệ quắc tăng gần gấp đôi.' },
+  { key:'maxcards', icon:'✋', name:'Bủn Xỉn', minFloor:6, group:'rút bài', bonus:6, hpCut:0.84,
+    desc:'Tối đa 15 lá (tràn sang hàng 4).' },
+  { key:'blindfold', icon:'🙈', name:'Bịt Mắt', minFloor:9, group:'rút bài', bonus:5, hpCut:0.90,
+    desc:'Rút bài trong bóng tối — không thấy lá, không thấy điểm. Bấm Lật bài rồi mới được sắp xếp.' },
 
   // ② khâu sắp hàng
-  { key:'nosort', icon:'🔒', name:'Khoá Tay', minFloor:2, group:'sắp hàng',
-    desc:'Không được kéo thả hay sắp xếp. Bài nằm đúng thứ tự rút.' },
-  { key:'full5only', icon:'📏', name:'Đủ Hàng', minFloor:3, group:'sắp hàng',
+  { key:'nosort', icon:'🔒', name:'Khoá Tay', minFloor:6, group:'sắp hàng', bonus:6, hpCut:0.88,
+    desc:'Mỗi tay bài chỉ được đổi chỗ 3 lần. Nút xếp nhanh cũng tính là 1 lần.' },
+  { key:'full5only', icon:'📏', name:'Đủ Hàng', minFloor:9, group:'sắp hàng', bonus:4, hpCut:0.86,
     desc:'Chỉ hàng đủ 5 lá mới tính combo. Hàng lẻ coi như mậu thầu.' },
-  { key:'firstrow', icon:'✂️', name:'Cắt Đầu', minFloor:7, group:'sắp hàng',
-    desc:'Hàng 1 mất hết hệ số nhân (vẫn giữ phần cộng). Đẩy bài đẹp xuống hàng dưới.' },
+  { key:'norepeat', icon:'👁️', name:'Không Lặp', minFloor:9, group:'sắp hàng', bonus:12, hpCut:0.55,
+    desc:'Hai hàng không được trùng combo cao nhất. Hàng nào trùng với hàng trên sẽ mất sạch hệ số nhân.' },
+  { key:'firstrow', icon:'✂️', name:'Cắt Đầu', minFloor:15, group:'sắp hàng', bonus:14, hpCut:0.50,
+    desc:'Hàng mạnh nhất bị chia đôi hệ số nhân (vẫn giữ phần cộng). Đổi chỗ cũng không né được.' },
 
-  // ③ điểm & kinh tế
-  { key:'noxidach', icon:'🚫', name:'Chặt Thưởng', minFloor:2, group:'điểm',
+  // ③ điểm
+  { key:'noxidach', icon:'🚫', name:'Chặt Thưởng', minFloor:3, group:'điểm', bonus:6, hpCut:0.78,
     desc:'Mất sạch phần CỘNG: combo cộng, Joker cộng, Xì Dách, thưởng bộ. Chỉ còn điểm lá × hệ số nhân.' },
-  { key:'multdown', icon:'🩸', name:'Bào Mòn', minFloor:5, group:'điểm',
+  { key:'bansuit', icon:'🚷', name:'Cấm Chất', minFloor:9999, group:'điểm', bonus:10, hpCut:0.70,
+    desc:'Một chất bị vô hiệu hoàn toàn: lá thuộc chất đó tính 0 điểm và không được tính vào combo nào.' },
+  { key:'multdown', icon:'🩸', name:'Bào Mòn', minFloor:12, group:'điểm', bonus:14, hpCut:0.46,
     desc:'Mọi hệ số nhân — combo lẫn Joker — đều bị trừ 1 (thấp nhất ×1).' },
-  { key:'jokerlock', icon:'⛓️', name:'Xiềng Joker', minFloor:4, group:'kinh tế',
+  { key:'jokerlock', icon:'⛓️', name:'Xiềng Joker', minFloor:9, group:'kinh tế', bonus:13, hpCut:0.49,
     desc:'1 Joker ngẫu nhiên của bạn bị vô hiệu trong trận này.' },
-  { key:'nogold', icon:'🕳️', name:'Keo Kiệt', minFloor:3, group:'kinh tế',
-    desc:'Hạ được Boss này cũng không nhận đồng vàng nào.' },
 ];
 
+/** Tầng này có mang luật không? */
+function hasBlindAt(floor) {
+  return floor >= BLIND_FROM_FLOOR && (floor - BLIND_FROM_FLOOR) % BLIND_EVERY === 0;
+}
 function pickBlind(floor) {
+  if (!hasBlindAt(floor)) return BLINDS[0];
   const pool = BLINDS.filter(b => b.key !== 'none' && b.minFloor <= floor && b.key !== state.lastBlindKey);
   if (!pool.length) return BLINDS[0];
   return pool[Math.floor(Math.random() * pool.length)];
@@ -941,31 +1127,46 @@ const BOSS_NAMES = [
   "Chủ Sòng Bạc","Đại Gia Đất Bắc","Hắc Thủ Lĩnh","Ma Vương Bài","Thiên Vương Xì Dách"
 ];
 
-/* Combo → giá Joker nhân (theo mult) và giá trị Joker cộng */
+/* Combo → giá Joker nhân (theo mult) và giá trị Joker cộng.
+ *
+ * Giá KHÔNG theo độ "sang" của combo mà theo GIÁ TRỊ KỲ VỌNG = tần suất ghép
+ * được × độ lớn hiệu ứng. Đo bằng mô phỏng: với người chơi sắp xếp tối ưu,
+ * tỉ lệ một hàng ghép được combo (trung bình ba giai đoạn tầng 5 / 20 / 30):
+ *   Đôi 84% · 2 Đôi 49% · Sám 40% · Cù lũ 39% · Thùng 38%
+ *   Sảnh 14% · Tứ quý 10% · Thùng phá sảnh 3% · Ngũ quý 2% · Sảnh Chúa 0.3%
+ * Nên "Đôi ×5" đắt nhất (8 vàng) còn "Sảnh Chúa ×5" rẻ nhất (3 vàng) —
+ * một lá gần như không bao giờ nổ thì không đáng giá dù combo nghe kêu.
+ * Khớp thu nhập ~5-10 vàng mỗi tầng: mọi Joker nằm gọn trong 3-8 vàng.
+ *
+ * Khoá `mult` là BẬC (2-5) dùng cho giá và trọng số; hệ số nhân thật = bậc + 1,
+ * tức các lá chạy từ ×3 tới ×6. Thang `add` cũng đã nhân đôi theo mốc 1-2-5:
+ * phần cộng trước đây quá yếu so với phần nhân nên gần như không ai mua.
+ */
 const COMBO_INFO = {
-  'Đôi':            { mult: {2:6,  3:8,  4:10, 5:12}, add: 20,    addPrice: 8  },
-  '2 Đôi':          { mult: {2:7,  3:9,  4:11, 5:13}, add: 30,    addPrice: 9  },
-  'Sám':            { mult: {2:8,  3:10, 4:12, 5:14}, add: 50,    addPrice: 10 },
-  'Sảnh':           { mult: {2:9,  3:11, 4:13, 5:15}, add: 100,   addPrice: 12 },
-  'Thùng':          { mult: {2:10, 3:12, 4:14, 5:16}, add: 200,   addPrice: 13 },
-  'Cù lũ':          { mult: {2:11, 3:13, 4:15, 5:17}, add: 500,   addPrice: 15 },
-  'Tứ quý':         { mult: {2:12, 3:14, 4:16, 5:18}, add: 1000,  addPrice: 16 },
-  'Thùng phá sảnh': { mult: {2:13, 3:15, 4:17, 5:19}, add: 2000,  addPrice: 18 },
-  'Sảnh Chúa':      { mult: {2:14, 3:16, 4:18, 5:20}, add: 5000,  addPrice: 20 },
-  'Ngũ quý':        { mult: {2:15, 3:17, 4:19, 5:20}, add: 10000, addPrice: 20 },
+  'Đôi':            { jmult: 4, jprice: 8, add: 30,    addPrice: 6 },
+  '2 Đôi':          { jmult: 5, jprice: 7, add: 50,    addPrice: 6 },
+  'Sám':            { jmult: 6, jprice: 7, add: 100,   addPrice: 6 },
+  'Sảnh':           { jmult: 6, jprice: 6, add: 200,   addPrice: 6 },
+  'Thùng':          { jmult: 5, jprice: 6, add: 500,   addPrice: 8 },
+  'Cù lũ':          { jmult: 3, jprice: 5, add: 1000,  addPrice: 8 },
+  'Tứ quý':         { jmult: 4, jprice: 5, add: 2000,  addPrice: 8 },
+  'Thùng phá sảnh': { jmult: 4, jprice: 4, add: 5000,  addPrice: 7 },
+  'Sảnh Chúa':      { jmult: 5, jprice: 4, add: 10000, addPrice: 6 },
+  'Ngũ quý':        { jmult: 5, jprice: 4, add: 10000, addPrice: 8 },
 };
 const COMBO_KEYS = Object.keys(COMBO_INFO);
 
 /* ===================== STATE ===================== */
-function freshState(difficulty = 2) {
+function freshState(difficulty = 2, deckKey = 'standard') {
   return {
     difficulty,
+    deckKey,
     floor: 0,
     bossesKilled: 0,
     playerMaxHP: 100,
     playerHP: 100,
     overflow: 0,
-    extraCards: [],
+    deckList: (DECKS.find(d => d.key === deckKey) || DECKS[0]).build(),
     totalDamageDealt: 0,
     highScore: 0,
 
@@ -983,10 +1184,18 @@ function freshState(difficulty = 2) {
     bossHand: [],
     playerDeck: [],
     bossDeck: [],
+    bannedSuit: null,
+    revealed: true,
     blind: BLINDS[0],
     nextBlind: null,
     lastBlindKey: null,
     lockedJoker: -1,
+    swapsUsed: 0,
+    blindRerolls: 0,
+    discardsLeft: 2,
+    bannedDraw: [],
+    turnCount: 0,
+    freeRerollUsed: {},
     phase: 'player',
     gameOver: false,
   };
@@ -1042,17 +1251,21 @@ function createBaseDeck() {
   for (const s of SUITS) for (const r of RANKS) d.push({rank: r, suit: s});
   return d;
 }
-/** Bộ bài CỦA NGƯỜI CHƠI: đúng 1 bộ 52 lá + những lá mua thêm ở shop. */
+/** Bộ bài CỦA NGƯỜI CHƠI: bắt đầu 52 lá, mua thì thêm, xoá ở Thương nhân thì bớt. */
 function buildPlayerDeck() {
-  const d = createBaseDeck();
-  for (const c of state.extraCards) d.push({...c});
-  return shuffle(d);
+  return shuffle(state.deckList.map(c => ({...c})));
 }
 /** Bộ bài RIÊNG của Boss: luôn là 1 bộ 52 lá sạch, không dính gì tới bộ của bạn. */
 function buildBossDeck() {
   return shuffle(createBaseDeck());
 }
-function playerDeckSize() { return 52 + state.extraCards.length; }
+function playerDeckSize() { return state.deckList.length; }
+/** Đếm số bản của từng lá trong bộ: { '♠A': 2, ... } */
+function deckCounts() {
+  const m = {};
+  for (const c of state.deckList) { const k = c.suit + c.rank; m[k] = (m[k] || 0) + 1; }
+  return m;
+}
 
 function bjValue(hand) {
   let total = 0, aces = 0;
@@ -1064,9 +1277,24 @@ function bjValue(hand) {
   return total;
 }
 
+function getRowSize(ri) { return (ri % 3 === 2) ? 3 : 5; } // Hàng thứ 3 (index 2) sẽ có 3 lá
+function getRowIndex(cardIdx) { // Tìm xem lá bài thứ i nằm ở hàng nào
+  let cycle = Math.floor(cardIdx / 13);
+  let rem = cardIdx % 13;
+  if (rem < 5) return cycle * 3;
+  if (rem < 10) return cycle * 3 + 1;
+  return cycle * 3 + 2;
+}
+
 function chunkRows(hand) {
   const rows = [];
-  for (let i = 0; i < hand.length; i += ROW_SIZE) rows.push(hand.slice(i, i + ROW_SIZE));
+  let i = 0, ri = 0;
+  while (i < hand.length) {
+    let size = getRowSize(ri);
+    rows.push(hand.slice(i, i + size));
+    i += size;
+    ri++;
+  }
   return rows;
 }
 
@@ -1080,11 +1308,39 @@ function longestStraight(ranks) {
   if ([14,2,3,4,5].every(v => ranks.includes(v))) best = Math.max(best, 5);
   return best;
 }
+/** Sảnh cách quãng 1 rank (1 3 5 7 9) — chỉ bật khi có Joker Sảnh Nhảy Cóc. */
+function longestStraightGap(ranks) {
+  if (!ranks.length) return 0;
+  let best = 1, cur = 1;
+  for (let i = 1; i < ranks.length; i++) {
+    if (ranks[i] === ranks[i-1] + 2) { cur++; best = Math.max(best, cur); }
+    else cur = 1;
+  }
+  return best;
+}
+/** Sảnh dài nhất, có tính luật Joker. */
+function bestRun(ranks, gap) {
+  const a = longestStraight(ranks);
+  return gap ? Math.max(a, longestStraightGap(ranks)) : a;
+}
+/** Cờ luật do Joker cấp (chỉ áp cho người chơi). */
+function jokerFlags(isPlayer) {
+  if (!isPlayer) return { gap: false, short: false };
+  const js = activeJokers();
+  return {
+    gap: js.some(j => j.type === 'gapRun'),
+    short: js.some(j => j.type === 'shortRun'),
+  };
+}
 
 /* ===================== SCALING ===================== */
 function floorScale()      { return Math.pow(CONFIG.COMBO_RATE, state.floor); }
 function getXiDachBonus()  { return CONFIG.XD_BASE * Math.pow(CONFIG.XD_RATE, state.floor); }
 function getBossXiDachBonus() { return CONFIG.BOSS_XD_BASE + CONFIG.BOSS_XD_STEP * state.floor; }
+/** Thưởng vàng gốc mỗi màn — tăng 1 sau mỗi GOLD_STEP_EVERY Boss. */
+function goldPerFloor(bosses = state.bossesKilled) {
+  return CONFIG.GOLD_PER_FLOOR + Math.floor(bosses / CONFIG.GOLD_STEP_EVERY);
+}
 function bossScale()       { return Math.pow(CONFIG.BOSS_DMG_RATE, state.floor); }
 function bossOverflow()    { return CONFIG.BOSS_OVERFLOW_PER_FLOOR * state.floor; }
 function bossFlatDmg()     { return Math.floor(state.floor / CONFIG.BOSS_FLAT_EVERY); }
@@ -1101,9 +1357,10 @@ function baseBossHP(x) {
 function bossHPRate(i) {
   return (baseBossHP(i + 1) / baseBossHP(i)) * diff().drift;
 }
-function calcBossHP(x) {
+function calcBossHP(x, blind) {
   const d = diff();
-  return Math.round(baseBossHP(x) * d.mult * Math.pow(d.drift, x));
+  const b = blind || state.blind || BLINDS[0];
+  return Math.round(baseBossHP(x) * d.mult * Math.pow(d.drift, x) * (b.hpCut != null ? b.hpCut : 1));
 }
 
 /* ===================== THƯỞNG BỘ TRÙNG RANK ===================== */
@@ -1139,20 +1396,27 @@ function calcSetBonus(hand) {
 }
 
 /* ===================== COMBO THEO HÀNG ===================== */
+/** Luật Cấm Chất: lá thuộc chất bị cấm coi như không tồn tại. */
+function isDead(c) { return blindIs('bansuit') && c.suit === state.bannedSuit; }
+function liveCards(row) { return blindIs('bansuit') ? row.filter(c => !isDead(c)) : row; }
+/** Điểm xì dách của tay bài người chơi, đã bỏ lá bị Cấm Chất. */
+function liveValue(hand) { return bjValue(liveCards(hand)); }
+
 /** Combo của một hàng SAU khi áp luật Boss. Chỉ áp cho người chơi. */
 function rowCombosFor(row, ri, isPlayer) {
-  if (!isPlayer) return evaluateRow(row);
-  if (blindIs('full5only') && row.length < ROW_SIZE) return [];
-  let combos = evaluateRow(row);
-  // Cắt Đầu: hàng 1 mất hệ số nhân, giữ phần cộng
-  if (blindIs('firstrow') && ri === 0) combos = combos.map(c => ({ ...c, mult: 1 }));
+  if (!isPlayer) return evaluateRow(row, { gap: false, short: false });
+  const live = liveCards(row);
+  if (blindIs('full5only') && live.length < ROW_SIZE) return [];
+  let combos = evaluateRow(live, jokerFlags(true));
+  // Cắt Đầu: hàng mạnh nhất bị chia đôi hệ số nhân, giữ phần cộng
+  if (blindIs('firstrow') && ri === cutTargetRow) combos = combos.map(c => ({ ...c, mult: cutFirst(c.mult, ri) }));
   // Chặt Thưởng: mất hết phần cộng
   if (blindIs('noxidach')) combos = combos.map(c => ({ ...c, add: 0 }));
   if (blindIs('multdown')) combos = combos.map(c => ({ ...c, mult: erode(c.mult) }));
   return combos;
 }
 
-function evaluateRow(row) {
+function evaluateRow(row, opts = {}) {
   const combos = [];
   const n = row.length;
   if (n < 2) return combos;
@@ -1171,10 +1435,27 @@ function evaluateRow(row) {
   if (counts[0] >= 4) combos.push({ name: 'Tứ quý', add: 0, mult: 6, rank: 8 });
   if (counts[0] >= 5) combos.push({ name: 'Ngũ quý', add: 0, mult: 10, rank: 10 });
 
-  if (n >= ROW_SIZE) {
-    const isFlush = Object.values(suitCount).some(v => v >= 5);
-    const isStraight = longestStraight(uniq) >= 5;
+  // Joker "Tay Ngắn": Thùng và Sảnh chỉ cần 3 lá
+  const need = opts.short ? 3 : 5;
+  if (n >= need) {
+    const isFlush = Object.values(suitCount).some(v => v >= need);
+    const isStraight = bestRun(uniq, opts.gap) >= need;
     const isRoyal = [10, 11, 12, 13, 14].every(v => uniq.includes(v));
+
+    // ----- Combo chỉ có ở game này (nhờ mua thêm lá trùng) -----
+    let fiveFlush = false, fullFlush = false;
+    for (const s in suitCount) {
+      if (suitCount[s] < 5) continue;
+      const sub = row.filter(c => c.suit === s);
+      const rc = {};
+      for (const c of sub) rc[c.rank] = (rc[c.rank] || 0) + 1;
+      const cs = Object.values(rc).sort((a, b) => b - a);
+      if (cs[0] >= 5) fiveFlush = true;
+      if (cs[0] >= 3 && cs[1] >= 2) fullFlush = true;
+    }
+    if (fiveFlush) combos.push({ name: 'Ngũ quý thùng', add: 0, mult: 16, rank: 14 });
+    else if (fullFlush) combos.push({ name: 'Thùng cù lũ', add: 0, mult: 15, rank: 13 });
+
     if (isStraight && isFlush) {
       if (isRoyal) combos.push({ name: 'Sảnh Chúa', add: 0, mult: 12, rank: 12 });
       else combos.push({ name: 'Thùng phá sảnh', add: 0, mult: 9, rank: 11 });
@@ -1182,7 +1463,7 @@ function evaluateRow(row) {
       if (isFlush) combos.push({ name: 'Thùng', add: 0, mult: 3, rank: 6 });
       if (isStraight) combos.push({ name: 'Sảnh', add: 0, mult: 2, rank: 5 });
     }
-    if (counts[0] >= 3 && counts[1] >= 2) combos.push({ name: 'Cù lũ', add: 0, mult: 4, rank: 7 });
+    if (n >= 5 && counts[0] >= 3 && counts[1] >= 2) combos.push({ name: 'Cù lũ', add: 0, mult: 4, rank: 7 });
   }
 
   combos.sort((a, b) => b.rank - a.rank);
@@ -1199,29 +1480,35 @@ function evaluateMauBinh(hand, rows) {
   for (const c of hand) rankCount[c.rank] = (rankCount[c.rank] || 0) + 1;
   const counts = Object.values(rankCount).sort((a, b) => b - a);
   const uniq = [...new Set(hand.map(c => RANK_ORDER[c.rank]))].sort((a, b) => a - b);
-  const longStr = longestStraight(uniq);
+  const flags = jokerFlags(true);
+  const longStr = bestRun(uniq, flags.gap);
 
   const reds = hand.filter(c => c.suit === '♥' || c.suit === '♦').length;
-  if (reds === n || reds === 0) combos.push({ name: 'Đồng màu', mult: 15, rank: 15 });
-  if (longStr >= 8 || (uniq.length >= 10 && longStr >= 7)) combos.push({ name: 'Sảnh Rồng', mult: 20, rank: 16 });
-  if (longStr >= 10 || uniq.length >= 12) combos.push({ name: 'Rồng cuốn', mult: 25, rank: 17 });
+  // Mậu Binh giờ ăn theo SỐ LƯỢNG THẬT đang có trên tay, không còn mốc cứng.
+  if (reds === n || reds === 0) combos.push({ name: `Đồng màu ${n} lá`, mult: 15 + 2 * (n - 6), rank: 15 });
+  if (longStr >= 8) combos.push({ name: `Sảnh Rồng ${longStr}`, mult: 20 + 3 * (longStr - 8), rank: 16 });
+  if (longStr >= 10) combos.push({ name: `Rồng cuốn ${longStr}`, mult: 25 + 4 * (longStr - 10), rank: 17 });
 
   const pairCount = counts.filter(c => c >= 2).length;
   const tripleCount = counts.filter(c => c >= 3).length;
-  if (pairCount >= 6) combos.push({ name: 'Lục phé bôn', mult: 12, rank: 13 });
-  if (pairCount >= 5 && tripleCount >= 1) combos.push({ name: 'Năm đôi một sám', mult: 14, rank: 14 });
+  if (pairCount >= 6 && tripleCount === 0)
+    combos.push({ name: `${pairCount} đôi`, mult: 12 + 3 * (pairCount - 6), rank: 13 });
+  if (pairCount >= 5 && tripleCount >= 1)
+    combos.push({ name: `${pairCount - tripleCount} đôi ${tripleCount} sám`,
+      mult: 14 + 3 * (pairCount - 5) + 3 * (tripleCount - 1), rank: 14 });
 
   let flushRows = 0, straightRows = 0;
   for (const r of rows) {
-    if (r.length < ROW_SIZE) continue;
+    const need = flags.short ? 3 : 5;
+    if (r.length < need) continue;
     const sc = {};
     for (const c of r) sc[c.suit] = (sc[c.suit] || 0) + 1;
-    if (Object.values(sc).some(v => v >= 5)) flushRows++;
+    if (Object.values(sc).some(v => v >= need)) flushRows++;
     const u = [...new Set(r.map(c => RANK_ORDER[c.rank]))].sort((a, b) => a - b);
-    if (longestStraight(u) >= 5) straightRows++;
+    if (bestRun(u, flags.gap) >= need) straightRows++;
   }
-  if (flushRows >= 3) combos.push({ name: '3 Thùng', mult: 12, rank: 12 });
-  if (straightRows >= 3) combos.push({ name: '3 Sảnh', mult: 10, rank: 11 });
+  if (flushRows >= 3) combos.push({ name: `${flushRows} Thùng`, mult: 12 + 4 * (flushRows - 3), rank: 12 });
+  if (straightRows >= 3) combos.push({ name: `${straightRows} Sảnh`, mult: 10 + 3 * (straightRows - 3), rank: 11 });
 
   combos.sort((a, b) => b.rank - a.rank);
   return combos;
@@ -1243,12 +1530,14 @@ function bestColumnMatch(hand) {
 /* ===================== JOKER ===================== */
 let jokerSeq = 1;
 
-function jokerComboMult(combo, mult) {
+/** Mỗi combo chỉ còn ĐÚNG MỘT mốc bội số. */
+function jokerComboMult(combo) {
+  const mult = COMBO_INFO[combo].jmult;
   return {
-    key: `cm:${combo}:${mult}`, type: 'comboMult', combo, mult,
+    key: `cm:${combo}`, type: 'comboMult', combo, mult,
     name: `${combo} ×${mult}`,
     desc: `Hàng nào có ${combo} thì nhân ${mult} lần điểm hàng đó.`,
-    price: COMBO_INFO[combo].mult[mult],
+    price: COMBO_INFO[combo].jprice,
     style: '', w: 0.95
   };
 }
@@ -1262,31 +1551,133 @@ function jokerComboAdd(combo) {
     style: 'add-type', w: 2.4
   };
 }
+/* Kịch trần: đo được 0% khi điều kiện là "đúng 21" — có Dmg tối đa rồi thì
+ * không ai dừng ở 21 nữa. Đổi thành "chạm đúng trần của bạn" mới có đất sống. */
 function jokerXiDach(mult) {
   return {
     key: `xd:${mult}`, type: 'xiDach', mult,
-    name: `Xì Dách ×${mult}`,
-    desc: `Nếu tay bài đúng 21 điểm thì nhân ${mult} lần tổng sát thương.`,
-    price: {3:5, 4:6, 5:7}[mult],
-    style: 'special', w: 5.3
+    name: `Kịch Trần ×${mult}`,
+    desc: `Nếu tay bài chạm ĐÚNG trần quắc của bạn thì nhân ${mult} lần tổng sát thương.`,
+    price: {3:4, 4:5, 5:6}[mult],
+    style: 'special', w: 3.2
   };
 }
-function jokerFewCards(nCards) {
-  const mult = 7 - nCards;   // 2→×5, 3→×4, 4→×3, 5→×2
+const FEW_CARDS = [
+  { n: 3, mult: 10, atMost: true,  label: '3 lá hoặc ít hơn', price: 6 },
+  { n: 4, mult: 6,  atMost: false, label: 'đúng 4 lá',        price: 5 },
+  { n: 5, mult: 4,  atMost: false, label: 'đúng 5 lá',        price: 4 },
+];
+function jokerFewCards(f) {
   return {
-    key: `fc:${nCards}`, type: 'fewCards', nCards, mult,
-    name: `Đúng ${nCards} lá ×${mult}`,
-    desc: `Nếu tay bài có ĐÚNG ${nCards} lá (không hơn không kém) thì nhân ${mult} lần tổng sát thương.`,
-    price: 5,
-    style: 'special', w: 3.25
+    key: `fc:${f.n}`, type: 'fewCards', nCards: f.n, atMost: f.atMost, mult: f.mult,
+    name: `${f.label} ×${f.mult}`,
+    desc: `Nếu tay bài có ${f.label} thì nhân ${f.mult} lần tổng sát thương.`,
+    price: f.price,
+    style: 'special', w: 1.6
   };
 }
+/* Mậu thầu: gánh đầu game, lúc gần nửa số hàng chưa ghép nổi combo nào.
+ * Tự yếu dần khi bộ bài dày lên và hàng nào cũng có Đôi. */
+function jokerNoCombo(mult) {
+  return {
+    key: `nc:${mult}`, type: 'noCombo', mult,
+    name: `Mậu thầu ×${mult}`,
+    desc: `Hàng nào KHÔNG có combo nào thì nhân ${mult} lần điểm hàng đó.`,
+    price: {8:6, 9:7, 10:8}[mult],
+    style: 'special', w: 4.5
+  };
+}
+
+/* Buff theo nhóm rank. Nhân vào phần điểm lá đóng góp cho SÁT THƯƠNG,
+ * KHÔNG nhân vào điểm quắc — nên rank thấp vẫn giữ lợi thế cầm được nhiều lá.
+ * Rank càng thấp hệ số càng cao để bù đúng phần điểm gốc chúng thiếu. */
+/* Mỗi rank một Joker riêng, tất cả đều ×3 và CỘNG DỒN MŨ:
+ * đánh k lá thuộc rank đó → nhân 3^k lần tổng sát thương.
+ * Rank 2-9 ra shop dày hơn hẳn so với 10/J/Q/K/A. */
+const RANK_MULT = 3;
+function jokerRank(rank) {
+  const rare = ['10','J','Q','K','A'].includes(rank);
+  return {
+    key: `rk:${rank}`, type: 'rank', ranks: [rank], mult: RANK_MULT,
+    name: `${rare ? '👑' : '🔢'} Mỗi lá ${rank} ×${RANK_MULT}`,
+    desc: `Mỗi lá ${rank} bạn đánh ra nhân thêm ${RANK_MULT} lần tổng sát thương (k lá → ×${RANK_MULT}^k).`,
+    price: rare ? 8 : 6,
+    style: 'rank-type', w: rare ? 1.1 : 3.4
+  };
+}
+/* Joker theo CHẤT — cũng cộng dồn mũ. */
+function jokerSuitMult(suit) {
+  return {
+    key: `sm:${suit}`, type: 'suitMult', suit, mult: 3,
+    name: `${suit} Mỗi lá ${suit} ×3`,
+    desc: `Mỗi lá chất ${suit} bạn đánh ra nhân thêm 3 lần tổng sát thương (k lá → ×3^k).`,
+    price: 7, style: 'rank-type', w: 2.2
+  };
+}
+function jokerSuitAdd(suit) {
+  return {
+    key: `sa:${suit}`, type: 'suitAdd', suit, add: 20,
+    name: `${suit} Mỗi lá ${suit} +20`,
+    desc: `Mỗi lá chất ${suit} cộng thêm 20 điểm vào hàng chứa nó (nằm trong hệ số tầng).`,
+    price: 5, style: 'add-type', w: 2.6
+  };
+}
+/* ----- Joker cơ chế mới ----- */
+function jokerEmptySlot() {
+  return {
+    key: 'empty', type: 'emptySlot',
+    name: '🕳️ Chỗ Trống ×(số slot trống)',
+    desc: 'Mỗi slot Joker còn trống nhân tổng sát thương thêm 1 lần (2 slot trống → ×2).',
+    price: 5, style: 'special', w: 2.6
+  };
+}
+function jokerShortRun() {
+  return {
+    key: 'shortrun', type: 'shortRun',
+    name: '📐 Tay Ngắn',
+    desc: 'Thùng và Sảnh chỉ cần 3 lá là đã tính (áp cho cả combo Mậu Binh 3 Thùng / 3 Sảnh).',
+    price: 8, style: 'special', w: 2.8
+  };
+}
+function jokerGapRun() {
+  return {
+    key: 'gaprun', type: 'gapRun',
+    name: '🦘 Sảnh Nhảy Cóc',
+    desc: 'Sảnh và mọi combo liên quan tới Sảnh ghép được từ các lá cách nhau 1 rank (1 3 5 7 9).',
+    price: 8, style: 'special', w: 2.6
+  };
+}
+function jokerTurn4() {
+  return {
+    key: 'turn4', type: 'turn4', mult: 4,
+    name: '⏱️ Nhịp Bốn ×4',
+    desc: 'Cứ mỗi lượt thứ 4 trong trận, lượt đó nhân 4 lần tổng sát thương.',
+    price: 6, style: 'special', w: 2.8
+  };
+}
+function jokerFreeReroll() {
+  return {
+    key: 'freeroll', type: 'freeReroll',
+    name: '🎟️ Vé Mời',
+    desc: 'Lần đổi lại ĐẦU TIÊN của mỗi loại (Joker / lá bài / luật Boss) ở mỗi cửa hàng là miễn phí.',
+    price: 5, style: 'special', w: 2.4
+  };
+}
+function jokerGoldFace() {
+  return {
+    key: 'goldface', type: 'goldFace',
+    name: '🏦 Thuế Quý Tộc',
+    desc: 'Mỗi lá Face (J, Q, K) bạn đánh ra sinh 1 vàng.',
+    price: 6, style: 'special', w: 2.4
+  };
+}
+
 function jokerColumn(mult) {
   return {
     key: `col:${mult}`, type: 'column', need: 3, mult,
     name: `Cột dọc ×${mult}`,
     desc: `Nếu có 3 lá cùng rank nằm cùng một cột dọc thì nhân ${mult} lần tổng sát thương. (Cần ≥3 hàng)`,
-    price: {3:10, 4:14, 5:18}[mult],
+    price: {3:5, 4:6, 5:7}[mult],
     style: 'special', w: 3.0
   };
 }
@@ -1295,28 +1686,89 @@ function jokerColumn(mult) {
 function buildJokerPool() {
   const out = [];
   for (const combo of COMBO_KEYS) {
-    for (const m of [2, 3, 4, 5]) out.push(jokerComboMult(combo, m));
+    out.push(jokerComboMult(combo));
     out.push(jokerComboAdd(combo));
   }
   for (const m of [3, 4, 5]) out.push(jokerXiDach(m));
-  for (const n of [2, 3, 4, 5]) out.push(jokerFewCards(n));
+  for (const f of FEW_CARDS) out.push(jokerFewCards(f));
   for (const m of [3, 4, 5]) out.push(jokerColumn(m));
+  for (const m of [8, 9, 10]) out.push(jokerNoCombo(m));
+  for (const r of RANKS) out.push(jokerRank(r));
+  for (const s of SUITS) { out.push(jokerSuitMult(s)); out.push(jokerSuitAdd(s)); }
+  out.push(jokerEmptySlot(), jokerShortRun(), jokerGapRun(), jokerTurn4(), jokerFreeReroll(), jokerGoldFace());
   return out;
 }
 const JOKER_POOL = buildJokerPool();
+
+/* ===== TRỌNG SỐ THEO TẦNG =====
+ * Bán một lá "Sảnh Chúa ×5" ở tầng 2 là bán rác: tỉ lệ ghép được Sảnh Chúa lúc
+ * đó là 0%. Nên shop phải đổi khẩu vị theo tầng.
+ *   Đầu game  → combo dễ dính (Đôi, 2 Đôi) và hệ số nhỏ ×2/×3, rẻ và chắc ăn.
+ *   Cuối game → combo hiếm (Tứ quý, Ngũ quý) và hệ số lớn ×4/×5, lúc đó bộ bài
+ *               đã dày nên chúng mới thật sự ghép được.
+ * Bảng dưới là tỉ lệ hàng ghép được ĐO BẰNG MÔ PHỎNG ở tầng 5 / 20 / 30. */
+const ACHIEVE = {
+  'Đôi':            [0.51, 1.00, 1.00],
+  '2 Đôi':          [0.13, 0.66, 0.69],
+  'Sám':            [0.04, 0.41, 0.75],
+  'Cù lũ':          [0.02, 0.41, 0.75],
+  'Thùng':          [0.02, 0.52, 0.61],
+  'Sảnh':           [0.02, 0.22, 0.17],
+  'Tứ quý':         [0.00, 0.04, 0.27],
+  'Ngũ quý':        [0.00, 0.00, 0.06],
+  'Thùng phá sảnh': [0.00, 0.03, 0.05],
+  'Sảnh Chúa':      [0.00, 0.00, 0.01],
+};
+/** Tỉ lệ ghép được combo ở tầng f, nội suy giữa các mốc 5/20/30. */
+function achieveAt(combo, f) {
+  const a = ACHIEVE[combo];
+  if (!a) return 0.5;
+  const fl = f + 1;
+  if (fl <= 5) return a[0] * (fl / 5);
+  if (fl <= 20) return a[0] + (a[1] - a[0]) * (fl - 5) / 15;
+  if (fl <= 30) return a[1] + (a[2] - a[1]) * (fl - 20) / 10;
+  return a[2];
+}
+/** Sớm chuộng hệ số nhỏ, muộn chuộng hệ số lớn. */
+function tierWeight(mult, f) {
+  const t = Math.min(1, f / 18);
+  const early = { 2: 1.00, 3: 0.85, 4: 0.30, 5: 0.15 }[mult];
+  const late  = { 2: 0.25, 3: 0.50, 4: 1.00, 5: 1.20 }[mult];
+  return early + (late - early) * t;
+}
+/* Hai hàm chuẩn hoá: giữ TỈ LỆ GIỮA CÁC LOẠI Joker không đổi, để phần ưu tiên
+ * theo tầng chỉ xáo trộn thứ tự BÊN TRONG nhóm chứ không nhấn chìm cả nhóm. */
+function comboBias(combo, f) { return 0.06 + 1.5 * achieveAt(combo, f); }
+function comboNorm(f) {
+  let s = 0; for (const c of COMBO_KEYS) s += comboBias(c, f);
+  return s / COMBO_KEYS.length;
+}
+function tierNorm(f) {
+  return [2, 3, 4, 5].reduce((a, m) => a + tierWeight(m, f), 0) / 4;
+}
+function jokerWeight(j, f) {
+  const t = Math.min(1, f / 18);
+  let w = j.w;
+  if (j.combo) w *= comboBias(j.combo, f) / comboNorm(f);
+  if (j.type === 'fewCards')  w *= 1.6 - 1.4 * t;      // tay bài dài dần → ngày càng vô dụng
+  if (j.type === 'column')    w *= 0.15 + 1.4 * t;     // cần ≥3 hàng, chỉ có ở tầng cao
+  if (j.type === 'noCombo')   w *= 1.9 - 1.7 * t;      // đầu game nửa số hàng còn mậu thầu
+  return Math.max(0.01, w);
+}
 
 /** Bốc n Joker KHÁC NHAU, loại bỏ những lá người chơi đã sở hữu. */
 function rollShopJokers(n) {
   const owned = new Set(state.jokers.map(j => j.key));
   const avail = JOKER_POOL.filter(j => !owned.has(j.key));
+  const wts = avail.map(j => jokerWeight(j, state.floor));
   const out = [];
   while (out.length < n && avail.length) {
     let total = 0;
-    for (const j of avail) total += j.w;
+    for (const w of wts) total += w;
     let r = Math.random() * total, idx = avail.length - 1;
-    for (let i = 0; i < avail.length; i++) { r -= avail[i].w; if (r <= 0) { idx = i; break; } }
+    for (let i = 0; i < avail.length; i++) { r -= wts[i]; if (r <= 0) { idx = i; break; } }
     out.push({ ...avail[idx], id: jokerSeq++ });
-    avail.splice(idx, 1);
+    avail.splice(idx, 1); wts.splice(idx, 1);
   }
   return out;
 }
@@ -1350,31 +1802,48 @@ function evalHandAt(hand, total, acesAs11, isPlayer) {
   const rows = chunkRows(hand);
   const scale = isPlayer ? floorScale() : 1;
   const jokers = isPlayer ? activeJokers() : [];
+  if (isPlayer) computeCutTargetRow(rows); else cutTargetRow = -1;
 
   // ----- combo & hệ số từng hàng -----
+  const seenTop = new Set();   // luật Không Lặp: combo cao nhất đã dùng ở hàng trên
   const rowData = rows.map((r, ri) => {
-    const combos = rowCombosFor(r, ri, isPlayer);
+    let combos = rowCombosFor(r, ri, isPlayer);
+    // Không Lặp: hàng nào trùng combo cao nhất với hàng trên thì mất sạch hệ số nhân
+    let muted = false;
+    if (isPlayer && blindIs('norepeat') && combos.length) {
+      const top = combos[0].name;
+      if (seenTop.has(top)) { combos = combos.map(c => ({ ...c, mult: 1 })); muted = true; }
+      else seenTop.add(top);
+    }
     const names = new Set(combos.map(c => c.name));
     let add = 0, mult = 1;
     for (const c of combos) { add += c.add; mult *= c.mult; }
     const jk = [];
     for (const j of jokers) {
       if (j.type === 'comboMult' && names.has(j.combo)) {
-        mult *= (blindIs('firstrow') && ri === 0) ? 1 : erode(j.mult); jk.push(j);
+        mult *= muted ? 1 : cutFirst(erode(j.mult), ri); jk.push(j);
       } else if (j.type === 'comboAdd' && names.has(j.combo)) {
         if (!blindIs('noxidach')) { add += j.add; jk.push(j); }
+      } else if (j.type === 'suitAdd') {
+        const k = r.filter(c => c.suit === j.suit && !isDead(c)).length;
+        if (k && !blindIs('noxidach')) { add += j.add * k; jk.push(j); }
+      } else if (j.type === 'noCombo' && combos.length === 0) {
+        mult *= cutFirst(erode(j.mult), ri); jk.push(j);
       }
     }
-    return { cards: r, combos, jokers: jk, add, mult, base: 0 };
+    return { cards: r, combos, jokers: jk, add, mult, base: 0, muted };
   });
 
   // ----- gán A = 11 vào hàng có mult cao nhất -----
-  const vals = hand.map(c => c.rank === 'A' ? 1 : (RANK_VAL[c.rank] || 10));
+  // Lá thuộc chất bị Cấm Chất coi như 0 điểm.
+  const vals = hand.map(c => (isPlayer && isDead(c)) ? 0
+                        : c.rank === 'A' ? 1 : (RANK_VAL[c.rank] || 10));
   const aceIdx = [];
-  hand.forEach((c, i) => { if (c.rank === 'A') aceIdx.push(i); });
-  aceIdx.sort((a, b) => rowData[Math.floor(b / ROW_SIZE)].mult - rowData[Math.floor(a / ROW_SIZE)].mult);
+  hand.forEach((c, i) => { if (c.rank === 'A' && !(isPlayer && isDead(c))) aceIdx.push(i); });
+  aceIdx.sort((a, b) => rowData[getRowIndex(b)].mult - rowData[getRowIndex(a)].mult);
   for (let k = 0; k < acesAs11 && k < aceIdx.length; k++) vals[aceIdx[k]] = 11;
-  hand.forEach((c, i) => { rowData[Math.floor(i / ROW_SIZE)].base += vals[i]; });
+
+  hand.forEach((c, i) => { rowData[getRowIndex(i)].base += vals[i]; });
 
   // Hệ số tầng nhân vào toàn bộ phần điểm hàng (Boss có scale = 1)
   let core = 0;
@@ -1404,10 +1873,28 @@ function evalHandAt(hand, total, acesAs11, isPlayer) {
 
   const globals = [];
   const colBest = bestColumnMatch(hand);
+  const liveHand = isPlayer ? liveCards(hand) : hand;
+  // Joker theo Rank / Chất: MỖI LÁ đánh ra cộng thêm một mũ.
   for (const j of jokers) {
-    if (j.type === 'xiDach' && total === 21) { gMult *= erode(j.mult); globals.push(j); }
-    else if (j.type === 'fewCards' && hand.length === j.nCards) { gMult *= erode(j.mult); globals.push(j); }
+    if (j.type === 'rank') {
+      const k = liveHand.filter(c => j.ranks.includes(c.rank)).length;
+      if (k) { gMult *= Math.pow(erode(j.mult), k); globals.push(j); res.rankJokers = (res.rankJokers || []).concat(j); }
+    } else if (j.type === 'suitMult') {
+      const k = liveHand.filter(c => c.suit === j.suit).length;
+      if (k) { gMult *= Math.pow(erode(j.mult), k); globals.push(j); res.rankJokers = (res.rankJokers || []).concat(j); }
+    }
+  }
+  for (const j of jokers) {
+    if (j.type === 'xiDach' && total === playerCap()) { gMult *= erode(j.mult); globals.push(j); }
+    else if (j.type === 'fewCards' && (j.atMost ? hand.length <= j.nCards : hand.length === j.nCards)) { gMult *= erode(j.mult); globals.push(j); }
     else if (j.type === 'column' && colBest >= j.need) { gMult *= erode(j.mult); globals.push(j); }
+    else if (j.type === 'emptySlot') {
+      const empty = Math.max(0, CONFIG.JOKER_SLOTS - state.jokers.length);
+      if (empty > 0) { gMult *= erode(empty); globals.push(j); }
+    }
+    else if (j.type === 'turn4' && state.turnCount > 0 && state.turnCount % 4 === 0) {
+      gMult *= erode(j.mult); globals.push(j);
+    }
   }
 
   core *= gMult;
@@ -1423,17 +1910,44 @@ function evalHandAt(hand, total, acesAs11, isPlayer) {
 
 /** Trần quắc của người chơi. Luật Trần Thấp cắt một nửa Dmg tối đa mua được. */
 function playerCap() {
-  const ov = blindIs('lowcap') ? Math.floor(state.overflow / 2) : state.overflow;
-  return 21 + ov;
+  if (!canBust()) return Infinity;
+  return Math.max(21, 21 + state.overflow - (blindIs('lowcap') ? 8 : 0));
 }
 /** Hệ số nhân sau khi luật Bào Mòn gặm mất 1. */
 function erode(m) { return blindIs('multdown') ? Math.max(1, m - 1) : m; }
+/** Luật Cắt Đầu: hàng mạnh nhất chỉ còn một nửa hệ số nhân. */
+let cutTargetRow = -1;
+function computeCutTargetRow(rows) {
+  if (!blindIs('firstrow')) { cutTargetRow = -1; return; }
+  let best = -1, bestMult = -1;
+  rows.forEach((r, ri) => {
+    const combos = evaluateRow(liveCards(r), jokerFlags(true));
+    let m = 1;
+    for (const c of combos) m *= c.mult;
+    if (m > bestMult) { bestMult = m; best = ri; }
+  });
+  cutTargetRow = best;
+}
+function cutFirst(m, ri) { return (blindIs('firstrow') && ri === cutTargetRow) ? Math.max(1, m / 2) : m; }
 /** Luật Ép Tới: điểm tối thiểu phải đạt mới được dừng. */
-function forcedMin() { return blindIs('minscore') ? playerCap() - 4 : 0; }
+function forcedMin() { return (blindIs('minscore') && canBust()) ? playerCap() - 4 : 0; }
+/** Luật Bủn Xỉn: số lá tối đa được cầm. */
+function handLimit() { return blindIs('maxcards') ? ROW_SIZE * 3 : Infinity; }
+/** Luật Khoá Tay: số lần đổi chỗ còn lại trong tay bài này. */
+const SWAP_LIMIT = 3;
+function swapsLeft() {
+  if (isHidden()) return 0;
+  return blindIs('nosort') ? Math.max(0, SWAP_LIMIT - state.swapsUsed) : Infinity;
+}
+function useSwap() { if (blindIs('nosort')) state.swapsUsed++; }
+/** Luật Bịt Mắt: bài còn úp, chưa bấm Lật bài. */
+function isHidden() { return blindIs('blindfold') && !state.revealed && state.phase === 'player'; }
 function calcDamage(hand, isPlayer) {
   const cap = isPlayer ? playerCap() : 21 + bossOverflow();
-  const aces = hand.filter(c => c.rank === 'A').length;
-  const nonAce = hand.reduce((s, c) => s + (c.rank === 'A' ? 0 : (RANK_VAL[c.rank] || 10)), 0);
+  // Lá bị Cấm Chất là lá chết: không tính điểm, cũng không làm bạn quắc.
+  const live = isPlayer ? liveCards(hand) : hand;
+  const aces = live.filter(c => c.rank === 'A').length;
+  const nonAce = live.reduce((s, c) => s + (c.rank === 'A' ? 0 : (RANK_VAL[c.rank] || 10)), 0);
 
   let best = null;
   for (let j = aces; j >= 0; j--) {
@@ -1457,7 +1971,7 @@ function renderCard(card, opts = {}) {
   const div = document.createElement('div');
   if (opts.hidden) { div.className = 'card hidden-card'; return div; }
   const isRed = card.suit === '♥' || card.suit === '♦';
-  div.className = 'card ' + (isRed ? 'red' : 'black');
+  div.className = 'card ' + (isRed ? 'red' : 'black') + (opts.dead ? ' dead' : '');
   if (opts.draggable) {
     div.classList.add('draggable');
     div.draggable = true;
@@ -1479,42 +1993,54 @@ function renderPlayerRows() {
   const scale = floorScale();
   const showCol = rows.length >= 3;
 
-  const hideOwn = blindIs('blindfold') && state.phase === 'player';
-  const canMove = state.phase === 'player' && !blindIs('nosort') && !hideOwn;
+  const hideOwn = isHidden();
+  const canMove = state.phase === 'player' && swapsLeft() > 0 && !hideOwn;
 
+  const pInfo0 = calcDamage(state.playerHand, true);
+  let absIdx = 0;
   rows.forEach((row, ri) => {
-    const combos = rowCombosFor(row, ri, true);
+    const rd0 = pInfo0.rows && pInfo0.rows[ri];
+    const muted = !!(rd0 && rd0.muted);
+    const combos = rd0 ? rd0.combos : rowCombosFor(row, ri, true);
     const names = new Set(combos.map(c => c.name));
     let add = 0, mult = 1;
     for (const c of combos) { add += c.add; mult *= c.mult; }
     const jkParts = [];
     for (const j of activeJokers()) {
       if (j.type === 'comboMult' && names.has(j.combo)) {
-        const m = (blindIs('firstrow') && ri === 0) ? 1 : erode(j.mult);
+        const m = muted ? 1 : cutFirst(erode(j.mult), ri);
         mult *= m;
-        jkParts.push(m > 1 ? `🃏 ×${m}` : `🃏 ×${j.mult} bị chặn`);
+        jkParts.push(m > 1 ? `🃏 ×${fmt(m)}` : `🃏 ×${j.mult} bị chặn`);
       } else if (j.type === 'comboAdd' && names.has(j.combo)) {
         if (blindIs('noxidach')) jkParts.push(`🃏 +${fmtN(j.add)} bị chặn`);
         else { add += j.add; jkParts.push(`🃏 +${fmtN(j.add)}`); }
+      } else if (j.type === 'suitAdd') {
+        const k = row.filter(c => c.suit === j.suit && !isDead(c)).length;
+        if (k && !blindIs('noxidach')) { add += j.add * k; jkParts.push(`🃏 ${j.suit}×${k} +${j.add * k}`); }
+      } else if (j.type === 'noCombo' && combos.length === 0) {
+        const m = muted ? 1 : cutFirst(erode(j.mult), ri);
+        mult *= m; jkParts.push(`🃏 mậu thầu ×${fmt(m)}`);
       }
     }
-    const rowPts = row.reduce((s, c) => s + (c.rank === 'A' ? 11 : (RANK_VAL[c.rank] || 10)), 0);
+    const rowPts = row.reduce((s, c) =>
+      s + (isDead(c) ? 0 : (c.rank === 'A' ? 11 : (RANK_VAL[c.rank] || 10))), 0);
 
     const rowEl = document.createElement('div');
-    rowEl.className = 'hand-row' + (row.length === ROW_SIZE ? ' full' : '');
+    rowEl.className = 'hand-row' + (row.length === getRowSize(ri) ? ' full' : '');
     rowEl.dataset.row = ri;
 
     const tag = document.createElement('div');
     tag.className = 'row-tag';
-    tag.innerHTML = `H${ri + 1}<small>${row.length}/${ROW_SIZE}</small>`;
+    tag.innerHTML = `H${ri + 1}<small>${row.length}/${getRowSize(ri)}</small>`;
 
     const cardsEl = document.createElement('div');
     cardsEl.className = 'row-cards';
     row.forEach((c, ci) => {
       cardsEl.appendChild(renderCard(c, {
         hidden: hideOwn,
+        dead: isDead(c),
         draggable: canMove,
-        idx: ri * ROW_SIZE + ci,
+        idx: absIdx++,
         col: showCol ? ci : null
       }));
     });
@@ -1528,11 +2054,12 @@ function renderPlayerRows() {
       return;
     }
     const lines = combos.map(c =>
-      c.mult > 1 ? `<span class="mult">${c.name} ×${c.mult}</span>`
+      c.mult > 1 ? `<span class="mult">${c.name} ×${fmt(c.mult)}</span>`
       : c.add > 0 ? `<span class="add">${c.name} +${c.add}</span>`
       : `<span class="none">${c.name} bị chặn</span>`
     );
     if (jkParts.length) lines.push(`<span class="jk">${jkParts.join(' ')}</span>`);
+    if (muted) lines.unshift(`<span class="none">👁️ trùng combo hàng trên — mất mult</span>`);
     if (lines.length) {
       info.innerHTML = lines.join('<br>') +
         `<div style="opacity:.6;margin-top:2px">(${rowPts}+${fmtN(add)})×${fmt(mult)}×${scale.toFixed(2)}</div>` +
@@ -1575,7 +2102,7 @@ function renderHands(hideBossFirst = false) {
   });
 
   const pInfo = calcDamage(state.playerHand, true);
-  const hidden = blindIs('blindfold') && state.phase === 'player';
+  const hidden = isHidden();
   $('player-score').textContent = hidden ? '???' : (pInfo.busted ? pInfo.val + ' (Quắc!)' : pInfo.val);
   $('player-bj').textContent = (!hidden && !pInfo.busted && pInfo.val === 21 && pInfo.bjBonus)
     ? `+${fmtN(pInfo.bjBonus)} Xì Dách` : '';
@@ -1633,6 +2160,7 @@ function renderHands(hideBossFirst = false) {
   // highlight joker đang hoạt động
   const active = new Set();
   (pInfo.globals || []).forEach(j => active.add(j.id));
+  (pInfo.rankJokers || []).forEach(j => active.add(j.id));
   (pInfo.rows || []).forEach(rd => (rd.jokers || []).forEach(j => active.add(j.id)));
   renderJokerBar(active);
 
@@ -1655,7 +2183,8 @@ function updateHUD() {
   $('gold-val').textContent = state.gold;
   $('scale-val').textContent = '×' + floorScale().toFixed(2);
   $('overflow-val').textContent = 21 + state.overflow;
-  $('extra-cards').textContent = playerDeckSize() + (state.extraCards.length ? ` (+${state.extraCards.length})` : '');
+  const dd = playerDeckSize() - 52;
+  $('extra-cards').textContent = playerDeckSize() + (dd ? ` (${dd > 0 ? '+' : ''}${dd})` : '');
   $('highscore-val').textContent = fmtN(state.highScore);
   $('stat-maxhp').textContent = state.playerMaxHP;
   $('stat-aa').textContent = fmt(aceSetBonus(2));
@@ -1667,16 +2196,21 @@ function updateHUD() {
   const b = state.blind || BLINDS[0];
   const bar = $('blind-bar');
   bar.className = 'blind-bar' + (b.key === 'none' ? ' calm' : '');
+  const extra = b.key === 'bansuit' ? ` <strong style="color:#ff6b6b">Chất bị cấm: ${state.bannedSuit}</strong>` : '';
+  const cut = b.hpCut && b.hpCut < 1
+    ? ` <span style="color:#7dcea0">· Bù lại Boss chỉ còn ${Math.round(b.hpCut * 100)}% máu, thưởng +${b.bonus}💰</span>` : '';
   bar.innerHTML = `<div class="bicon">${b.icon}</div>` +
-    `<div><span class="bname">${b.name}</span> — <span class="bdesc">${b.desc}</span></div>`;
+    `<div><span class="bname">${b.name}</span> — <span class="bdesc">${b.desc}${extra}</span>${cut}</div>`;
 }
 
 /* ===================== SẮP BÀI: CHẠM ĐỔI CHỖ + KÉO THẢ ===================== */
 function swapCards(i, j) {
   if (i === j || i == null || j == null) return;
+  if (swapsLeft() <= 0) return;
   const h = state.playerHand;
   if (i < 0 || j < 0 || i >= h.length || j >= h.length) return;
   [h[i], h[j]] = [h[j], h[i]];
+  useSwap();
 }
 
 let dragIdx = null;
@@ -1717,6 +2251,7 @@ document.addEventListener('drop', e => {
   swapCards(dragIdx, +t.dataset.idx);
   dragIdx = null;
   renderHands(true);
+  refreshMsg();
 });
 
 // Chạm/click: chọn lá 1 → chọn lá 2 → đổi chỗ. Hoạt động tốt trên cả điện thoại.
@@ -1728,30 +2263,72 @@ $('player-cards').addEventListener('click', e => {
   const idx = +t.dataset.idx;
   if (selectedIdx === null) selectedIdx = idx;
   else if (selectedIdx === idx) selectedIdx = null;
-  else { swapCards(selectedIdx, idx); selectedIdx = null; }
+  else { swapCards(selectedIdx, idx); selectedIdx = null; refreshMsg(); }
   renderHands(true);
+  refreshControls();
 });
+
+/** Cập nhật dòng thông báo theo tay bài hiện tại (gọi sau mỗi lần sắp xếp). */
+function refreshMsg() {
+  if (state.phase !== 'player' || state.gameOver) return;
+  if (isHidden()) return;
+  const info = calcDamage(state.playerHand, true);
+  if (info.busted) setMsg(`Quắc ${info.val}! (Trần: ${playerCap()}) — Mất lượt sát thương`, 'lose');
+  else setMsg(`Điểm ${info.val} | DMG dự kiến: ${fmtN(info.dmg)}`, 'info');
+}
 
 /** Bật/tắt nút theo luật Boss. */
 function refreshControls() {
   const p = state.phase === 'player' && !state.gameOver;
   const n = state.playerHand.length;
-  const val = bjValue(state.playerHand);
-  const maxed = blindIs('maxcards') && n >= 5;
+  const val = liveValue(state.playerHand);
+  const maxed = n >= handLimit();
+  const hid = isHidden();
   // Ép Tới: chưa chạm ngưỡng thì chưa được dừng — trừ khi đã quắc thì thôi
   const need = forcedMin();
-  const forced = need > 0 && val < need && !calcDamage(state.playerHand, true).busted;
-  const frozen = blindIs('nosort') || (blindIs('blindfold') && state.phase === 'player');
-  $('btn-hit').disabled = !p || maxed;
+  const busted = calcDamage(state.playerHand, true).busted;
+  const forced = !hid && need > 0 && val < need && !busted && state.playerDeck.length > 0;
+  const frozen = swapsLeft() <= 0;
+  $('btn-hit').disabled = !p || maxed || busted;
   $('btn-ready').disabled = !p || forced;
-  $('btn-hit').textContent = maxed ? 'Hết lượt rút' : 'Rút bài';
-  $('btn-ready').textContent = forced ? `Chưa đủ ${need} (${val})` : 'Sẵn sàng';
+  $('btn-hit').textContent = busted ? '💥 Quắc — hết rút' : maxed ? `Đủ ${handLimit()} lá` : 'Rút bài';
+  $('btn-ready').textContent = hid ? '👁️ Lật bài'
+    : forced ? `Chưa đủ ${need} (${val})` : 'Sẵn sàng';
+  const dbtn = $('btn-discard');
+  dbtn.textContent = `🗑️ Bỏ lá (${state.discardsLeft})`;
+  dbtn.disabled = !p || hid || state.discardsLeft <= 0 || selectedIdx === null;
+  dbtn.title = selectedIdx === null
+    ? 'Chạm chọn 1 lá trên tay rồi bấm để bỏ lá đó'
+    : 'Bỏ lá đang chọn — lá đó không thể bốc trúng trong lượt này';
   ['btn-sort-rank', 'btn-sort-suit', 'btn-sort-col'].forEach(id => { $(id).disabled = !p || frozen; });
+  const sl = $('swap-left');
+  if (blindIs('nosort')) { sl.style.display = ''; sl.textContent = `🔒 Còn ${swapsLeft()} lần đổi chỗ`; }
+  else sl.style.display = 'none';
+}
+
+/** Bỏ 1 lá trên tay. Lá đó không thể bốc trúng trong lượt này. Mỗi màn tối đa 2 lần. */
+function playerDiscard() {
+  if (state.phase !== 'player' || state.gameOver) return;
+  if (state.discardsLeft <= 0 || selectedIdx === null) return;
+  const card = state.playerHand[selectedIdx];
+  if (!card) return;
+  state.playerHand.splice(selectedIdx, 1);
+  selectedIdx = null;
+  state.discardsLeft--;
+  // Chỉ cấm đúng 1 bản sao trong xấp (nếu có), không quét sạch mọi lá trùng
+  const dupIdx = state.playerDeck.findIndex(c => c.rank === card.rank && c.suit === card.suit);
+  if (dupIdx >= 0) state.bannedDraw.push(...state.playerDeck.splice(dupIdx, 1));
+  state.bannedDraw.push(card);
+  log(`🗑️ Bỏ lá ${card.rank}${card.suit} — không bốc trúng trong lượt này (còn ${state.discardsLeft} lần)`);
+  renderHands(true);
+  refreshControls();
+  refreshMsg();
 }
 
 function sortHand(mode) {
   if (state.phase !== 'player') return;
-  if (blindIs('nosort') || (blindIs('blindfold') && state.phase === 'player')) return;
+  if (swapsLeft() <= 0) return;
+  useSwap();
   const h = state.playerHand;
   if (mode === 'rank') {
     const cnt = {};
@@ -1790,10 +2367,13 @@ function sortHand(mode) {
   }
   selectedIdx = null;
   renderHands(true);
+  refreshMsg();
 }
 
 /* ===================== GAME FLOW ===================== */
 function startFight() {
+  // Luật phải chốt TRƯỚC khi tính máu, vì luật nặng thì Boss ít máu lại.
+  state.blind = state.nextBlind || BLINDS[0];
   state.bossMaxHP = calcBossHP(state.floor);
   state.bossHP = state.bossMaxHP;
   state.playerHand = [];
@@ -1804,12 +2384,16 @@ function startFight() {
   state.gameOver = false;
   selectedIdx = null;
 
-  // luật của Boss tầng này
-  state.blind = state.nextBlind || BLINDS[0];
   state.lastBlindKey = state.blind.key;
+  state.bannedSuit = blindIs('bansuit') ? pick(SUITS) : null;
+  state.revealed = !blindIs('blindfold');
   state.lockedJoker = (blindIs('jokerlock') && state.jokers.length)
     ? Math.floor(Math.random() * state.jokers.length) : -1;
 
+  state.swapsUsed = 0;
+  state.discardsLeft = 2;
+  state.bannedDraw = [];
+  state.turnCount = 1;
   state.playerHand.push(state.playerDeck.pop(), state.playerDeck.pop());
   state.bossHand.push(state.bossDeck.pop(), state.bossDeck.pop());
 
@@ -1826,15 +2410,25 @@ function startFight() {
 
 function playerHit() {
   if (state.phase !== 'player' || state.gameOver) return;
-  if (blindIs('maxcards') && state.playerHand.length >= 5) return;
-  if (state.playerDeck.length < 1) state.playerDeck = buildPlayerDeck();
+  if (state.playerHand.length >= handLimit()) return;
+  // Quắc rồi thì không được rút thêm
+  if (calcDamage(state.playerHand, true).busted) {
+    setMsg('Bạn đã quắc — không được rút thêm.', 'lose');
+    return;
+  }
+  // Khắc phục: Nếu hết bài trong xấp thì khóa rút và báo lỗi
+  if (state.playerDeck.length < 1) {
+    setMsg("Hết bài trong bộ! Không thể rút thêm.", "lose");
+    return; 
+  } 
   state.playerHand.push(state.playerDeck.pop());
+  
   selectedIdx = null;
   renderHands(true);
   refreshControls();
 
-  if (blindIs('blindfold')) {
-    setMsg(`🙈 Đã rút ${state.playerHand.length} lá — không xem được. Dừng hay liều tiếp?`, 'boss');
+  if (isHidden()) {
+    setMsg(`🙈 Đã rút ${state.playerHand.length} lá — không xem được. Lật bài hay liều tiếp?`, 'boss');
     return;
   }
   const info = calcDamage(state.playerHand, true);
@@ -1855,7 +2449,15 @@ function comboSummary(info) {
 
 function playerReady() {
   if (state.phase !== 'player' || state.gameOver) return;
-  if (bjValue(state.playerHand) < forcedMin()
+  // Bịt Mắt: lần bấm đầu chỉ LẬT BÀI, lật xong mới được sắp xếp rồi bấm lần nữa
+  if (isHidden()) {
+    state.revealed = true;
+    renderHands(true);
+    refreshControls();
+    refreshMsg();
+    return;
+  }
+  if (liveValue(state.playerHand) < forcedMin()
       && !calcDamage(state.playerHand, true).busted) return;
   $('btn-hit').disabled = true;
   $('btn-ready').disabled = true;
@@ -1876,6 +2478,11 @@ function playerReady() {
   state.bossHP = Math.max(0, state.bossHP - dmg);
   state.totalDamageDealt += dmg;
   if (dmg > state.highScore) { state.highScore = dmg; }
+  // Joker Thuế Quý Tộc: mỗi lá Face đánh ra sinh 1 vàng
+  if (activeJokers().some(j => j.type === 'goldFace')) {
+    const faces = state.playerHand.filter(c => ['J','Q','K'].includes(c.rank)).length;
+    if (faces) { state.gold += faces; log(`🏦 Thuế Quý Tộc: +${faces} vàng (${faces} lá Face)`); }
+  }
   updateHUD();
   updateHPBars();
   $('boss-panel').classList.add('shake');
@@ -1942,12 +2549,16 @@ function finishBossTurn() {
 function nextPlayerTurn() {
   state.playerHand = [];
   state.bossHand = [];
+  state.turnCount++;
+  if (state.bannedDraw.length) { state.playerDeck.push(...state.bannedDraw); shuffle(state.playerDeck); state.bannedDraw = []; }
   if (state.playerDeck.length < 2) state.playerDeck = buildPlayerDeck();
   if (state.bossDeck.length < 2) state.bossDeck = buildBossDeck();
   state.playerHand.push(state.playerDeck.pop(), state.playerDeck.pop());
   state.bossHand.push(state.bossDeck.pop(), state.bossDeck.pop());
   state.phase = 'player';
   selectedIdx = null;
+  state.swapsUsed = 0;
+  state.revealed = !blindIs('blindfold');
   renderHands(true);
   refreshControls();
   setMsg('Lượt mới — Rút bài rồi Sẵn sàng', 'info');
@@ -1958,10 +2569,13 @@ function onBossDefeated() {
   state.floor++;
   state.playerHP = state.playerMaxHP;
 
-  const stingy = blindIs('nogold');
-  const interest = stingy ? 0 : Math.min(CONFIG.INTEREST_CAP, Math.floor(state.gold / CONFIG.INTEREST_PER));
-  const reward = stingy ? 0 : CONFIG.GOLD_PER_FLOOR;
-  state.gold += reward + interest;
+  const beaten = state.blind || BLINDS[0];   // luật vừa hạ được
+  const interest = calcInterest();
+  const reward = goldPerFloor();
+  const bonus = beaten.bonus || 0;           // tiền công cho việc chịu luật
+  state.gold += reward + interest + bonus;
+  if (state.bossesKilled % CONFIG.GOLD_STEP_EVERY === 0)
+    log(`💰 Mốc ${state.bossesKilled} Boss: thu nhập gốc lên ${goldPerFloor()} vàng/màn`);
 
   // bốc luật cho Boss tầng kế, hiện ngay ở màn buff để còn tính đường mua Joker
   state.nextBlind = pickBlind(state.floor);
@@ -1970,10 +2584,12 @@ function onBossDefeated() {
   else if (state.floor % 5 === 0) log(`⬆ Mốc tầng ${state.floor}: phần thưởng nâng mức trần`);
 
   updateHPBars();
-  setMsg(stingy ? 'Boss gục! Nhưng lão keo kiệt không để lại đồng nào.' : 'Boss gục! Hồi full máu — Nhận vàng!', 'win');
-  log(stingy
-    ? `★ Hạ Boss tầng ${state.floor}! 🕳️ Keo Kiệt — không được vàng (${state.gold} 💰)`
-    : `★ Hạ Boss tầng ${state.floor}! +${reward} vàng, +${interest} lợi tức → ${state.gold} 💰`);
+  setMsg(bonus
+    ? `Boss gục! Phá được luật ${beaten.name} — thưởng thêm ${bonus} vàng!`
+    : 'Boss gục! Hồi full máu — Nhận vàng!', 'win');
+  log(`★ Hạ Boss tầng ${state.floor}! +${reward} vàng, +${interest} lợi tức`
+    + (bonus ? `, +${bonus} tiền công phá luật ${beaten.icon}${beaten.name}` : '')
+    + ` → ${state.gold} 💰`);
   setTimeout(showBuffSelect, 900);
 }
 
@@ -1995,9 +2611,9 @@ function onPlayerDead() {
  * (tầng 10, 20… ăn cả hai luật nên mức tối đa nhảy 2 bậc)
  */
 const BUFF_RANGE = {
-  overflow: { min: 3,  max: 7,   step: 1  },
-  hp:       { min: 25, max: 125, step: 10 },
-  gold:     { min: 5,  max: 15,  step: 3  },
+  overflow: { min: 99,  max: 999,   step: 1  },
+  hp:       { min: 30, max: 150, step: 10 },
+  gold:     { min: 6,  max: 15,  step: 3  },
 };
 function buffTiers() {
   return { n5: Math.floor(state.floor / 5), n10: Math.floor(state.floor / 10) };
@@ -2022,7 +2638,8 @@ function makeBuffCard(r) {
     desc: `Tăng máu tối đa thêm ${r.value}. Hồi đầy máu khi nhận buff.`, span };
   return { ...r, rarity, high, icon: '💰',
     title: `Nhận ${r.value} vàng`,
-    desc: `Cộng thẳng ${r.value} vàng. Vàng cũng sinh lợi tức (mỗi 10 vàng → +1/màn, trần ${CONFIG.INTEREST_CAP}).`, span };
+    desc: `Cộng thẳng ${r.value} vàng. Vàng cũng sinh lợi tức (mỗi ${interestRule().per} vàng → +1/màn, `
+      + `trần ${interestRule().cap === Infinity ? 'không giới hạn' : interestRule().cap}).`, span };
 }
 
 function generateBuffs() {
@@ -2031,12 +2648,14 @@ function generateBuffs() {
     return { type, min, max, value: randInt(min, max) };
   });
 
-  // Luôn phải có ít nhất MỘT phần thưởng trên trung bình.
-  // Có thể nhiều hơn, hoặc cả ba — nhưng không bao giờ được cả ba đều dưới mức.
+  // Luôn phải có ít nhất MỘT phần thưởng trên trung bình — HAI nếu vừa phá được
+  // một luật Boss. Chịu luật thì phải được trả công, không thì luật chỉ là hình phạt.
   const above = r => r.value > (r.min + r.max) / 2;
-  if (!rolls.some(above)) {
-    const r = pick(rolls);
-    r.value = randInt(Math.floor((r.min + r.max) / 2) + 1, r.max);
+  const need = (state.blind && state.blind.key !== 'none') ? 2 : 1;
+  const boost = r => { r.value = randInt(Math.floor((r.min + r.max) / 2) + 1, r.max); };
+  for (const r of shuffle(rolls.slice())) {
+    if (rolls.filter(above).length >= need) break;
+    if (!above(r)) boost(r);
   }
 
   return shuffle(rolls.map(makeBuffCard));
@@ -2046,6 +2665,7 @@ function showBuffSelect() {
   state.buffPicked = false;
   state.rerollJoker = 0;
   state.rerollCard = 0;
+  state.freeRerollUsed = {};
   state.shopJokers = rollShopJokers(CONFIG.SHOP_JOKERS);
   state.shopCards = Array.from({ length: CONFIG.SHOP_CARDS }, randomShopCard);
 
@@ -2080,11 +2700,17 @@ function updateBuffScreen() {
   const nb = state.nextBlind || BLINDS[0];
   $('blind-preview').innerHTML =
     `<div class="bicon">${nb.icon}</div>` +
-    `<div><div class="blabel">Boss tầng ${state.floor + 1} sẽ chơi luật</div>` +
+    `<div><div class="blabel">${nb.key === 'none'
+        ? `Boss tầng ${state.floor + 1} — không luật` +
+          (state.floor < BLIND_FROM_FLOOR ? ` (luật bắt đầu từ tầng ${BLIND_FROM_FLOOR + 1})`
+                                          : ` (luật cứ ${BLIND_EVERY} tầng một lần)`)
+        : `Boss tầng ${state.floor + 1} chơi luật — Boss còn ${Math.round(nb.hpCut * 100)}% máu, thưởng +${nb.bonus}💰`}</div>` +
     `<div class="bname">${nb.name}</div><div class="bdesc">${nb.desc}</div></div>`;
   $('buff-gold').textContent = state.gold;
-  const interest = Math.min(CONFIG.INTEREST_CAP, Math.floor(state.gold / CONFIG.INTEREST_PER));
-  $('buff-income').textContent = `+${CONFIG.GOLD_PER_FLOOR} & +${interest} lợi tức`;
+  const interest = calcInterest();
+  const toNext = CONFIG.GOLD_STEP_EVERY - (state.bossesKilled % CONFIG.GOLD_STEP_EVERY);
+  $('buff-income').textContent =
+    `+${goldPerFloor()} & +${interest} lợi tức (${toNext} Boss nữa lên ${goldPerFloor() + 1})`;
   $('buff-jokers').textContent = `${state.jokers.length}/${CONFIG.JOKER_SLOTS}`;
   $('btn-next-floor').disabled = !state.buffPicked;
   $('buff-hint').textContent = state.buffPicked
@@ -2108,6 +2734,30 @@ function applyBuff(b) {
 
 /* ===================== SHOP ===================== */
 function rerollCost(n) { return Math.pow(CONFIG.REROLL_BASE, n); }
+function hasFreeReroll() { return state.jokers.some(j => j.type === 'freeReroll'); }
+/** Giá đổi lại theo loại — Joker "Vé Mời" cho lần đầu mỗi loại miễn phí. */
+function rerollCostFor(kind) {
+  if (hasFreeReroll() && !state.freeRerollUsed[kind]) return 0;
+  if (kind === 'joker') return rerollCost(state.rerollJoker);
+  if (kind === 'card')  return rerollCost(state.rerollCard);
+  return 5 * Math.pow(2, state.blindRerolls);
+}
+/** Đổi luật đắt dần suốt cả run: 5 → 10 → 20 → 40… */
+function blindRerollCost() { return rerollCostFor('blind'); }
+function doRerollBlind() {
+  const c = blindRerollCost();
+  if (state.gold < c || !hasBlindAt(state.floor)) return;
+  const old = state.nextBlind;
+  if (!old || old.key === 'none') return;
+  state.gold -= c;
+  state.freeRerollUsed.blind = true;
+  state.blindRerolls++;
+  state.lastBlindKey = old.key;          // không bốc lại đúng lá vừa bỏ
+  state.nextBlind = pickBlind(state.floor);
+  log(`⚖️ Đổi luật: ${old.icon}${old.name} → ${state.nextBlind.icon}${state.nextBlind.name} (-${c}💰)`);
+  renderShop();
+  updateBuffScreen();
+}
 
 function openShop() { renderShop(); $('shop-modal').classList.add('open'); }
 function closeShop() { $('shop-modal').classList.remove('open'); updateBuffScreen(); }
@@ -2174,11 +2824,27 @@ function renderShop() {
   });
 
   // ----- Reroll -----
-  const cj = rerollCost(state.rerollJoker), cc = rerollCost(state.rerollCard);
-  $('rr-joker-cost').textContent = cj + '💰';
-  $('rr-card-cost').textContent = cc + '💰';
+  const cj = rerollCostFor('joker'), cc = rerollCostFor('card');
+  $('rr-joker-cost').textContent = cj === 0 ? 'Miễn phí' : cj + '💰';
+  $('rr-card-cost').textContent = cc === 0 ? 'Miễn phí' : cc + '💰';
   $('reroll-jokers').disabled = state.gold < cj;
   $('reroll-cards').disabled = state.gold < cc;
+
+  // ----- Luật Boss tầng tới -----
+  const nb = state.nextBlind || BLINDS[0];
+  const isReal = nb.key !== 'none';
+  $('blind-shop').style.display = hasBlindAt(state.floor) ? '' : 'none';
+  $('blind-shop-card').className = 'blind-shop-card' + (isReal ? '' : ' calm');
+  $('blind-shop-card').innerHTML =
+    `<div class="bicon">${nb.icon}</div>` +
+    `<div><div class="bname">${nb.name}</div><div class="bdesc">${nb.desc}</div>` +
+    (isReal ? `<div class="bpay">Boss chỉ còn ${Math.round(nb.hpCut * 100)}% máu · phá được thưởng +${nb.bonus}💰 và 2 phần thưởng trên trung bình</div>` : '') +
+    `</div>`;
+  const bc = blindRerollCost();
+  $('rr-blind-cost').textContent = bc === 0 ? 'Miễn phí' : bc + '💰';
+  $('reroll-blind').disabled = state.gold < bc || !isReal;
+
+  renderDeckGrid();
 
   // ----- Trade -----
   $('merchant-hp').textContent = state.playerMaxHP;
@@ -2211,28 +2877,94 @@ function sellJoker(id) {
   renderShop();
 }
 
+/** Xoá 1 bản của lá rank+suit khỏi bộ bài, giá CUT_PRICE. */
+function cutCard(rank, suit) {
+  if (state.gold < CONFIG.CUT_PRICE) return;
+  if (state.deckList.length <= CONFIG.DECK_MIN) return;
+  const i = state.deckList.findIndex(c => c.rank === rank && c.suit === suit);
+  if (i < 0) return;
+  state.gold -= CONFIG.CUT_PRICE;
+  state.deckList.splice(i, 1);
+  log(`Xoá lá ${rank}${suit} khỏi bộ (-${CONFIG.CUT_PRICE}💰) · bộ còn ${state.deckList.length} lá`);
+  renderShop();
+}
+
+function renderDeckGrid() {
+  const g = $('deck-grid');
+  g.innerHTML = '';
+  const counts = deckCounts();
+  const total = state.deckList.length;
+  $('deck-total').textContent = total + ' lá' + (total !== 52 ? ` (${total > 52 ? '+' : ''}${total - 52})` : '');
+  $('cut-price').textContent = CONFIG.CUT_PRICE;
+
+  const locked = total <= CONFIG.DECK_MIN;
+  const poor = state.gold < CONFIG.CUT_PRICE;
+
+  g.appendChild(Object.assign(document.createElement('div'), { className: 'dg-head' }));
+  for (const r of RANKS) {
+    const h = document.createElement('div');
+    h.className = 'dg-head'; h.textContent = r;
+    g.appendChild(h);
+  }
+  for (const s of SUITS) {
+    const h = document.createElement('div');
+    h.className = 'dg-head';
+    h.textContent = s;
+    h.style.alignSelf = 'center';
+    if (s === '♥' || s === '♦') h.style.color = '#e74c3c';
+    g.appendChild(h);
+    for (const r of RANKS) {
+      const n = counts[s + r] || 0;
+      const cell = document.createElement('div');
+      const isRed = s === '♥' || s === '♦';
+      cell.className = 'deck-cell' + (isRed ? ' red' : '') + (n === 0 ? ' gone' : '')
+        + (n > 1 ? ' dup' : '') + ((locked || poor) && n > 0 ? ' locked' : '');
+      cell.textContent = r;
+      cell.title = n === 0 ? `${r}${s} — đã xoá hết`
+        : locked ? `Bộ bài đã ở mức tối thiểu ${CONFIG.DECK_MIN} lá`
+        : poor ? `Cần ${CONFIG.CUT_PRICE} vàng để xoá`
+        : `${r}${s} — còn ${n} bản. Bấm để xoá 1 bản (${CONFIG.CUT_PRICE}💰)`;
+      if (n > 1) cell.appendChild(Object.assign(document.createElement('div'), { className: 'cnt', textContent: n }));
+      if (n > 0 && !locked && !poor) cell.onclick = () => cutCard(r, s);
+      g.appendChild(cell);
+    }
+  }
+
+  // gợi ý theo build
+  const byRank = {};
+  for (const c of state.deckList) byRank[c.rank] = (byRank[c.rank] || 0) + 1;
+  const top = Object.entries(byRank).sort((a, b) => b[1] - a[1])[0];
+  const odds = top ? (top[1] / total * 100).toFixed(1) : '0';
+  $('deck-hint').textContent = locked
+    ? `Bộ bài đã chạm mức tối thiểu ${CONFIG.DECK_MIN} lá, không xoá thêm được.`
+    : `Rank dày nhất: ${top[0]} với ${top[1]} bản — chiếm ${odds}% bộ bài. `
+      + `Ngũ quý cần 5 bản cùng rank nằm chung một hàng, nên xoá bớt rank khác là cách nhanh nhất để ép nó về.`;
+}
+
 function buyCard(id) {
   const it = state.shopCards.find(x => x.id === id);
   if (!it || it.sold || state.gold < it.price) return;
   state.gold -= it.price;
   it.sold = true;
-  state.extraCards.push({ ...it.card });
+  state.deckList.push({ ...it.card });
   log(`Mua lá ${it.card.rank}${it.card.suit} (-${it.price}💰)`);
   renderShop();
 }
 
 function doRerollJokers() {
-  const c = rerollCost(state.rerollJoker);
+  const c = rerollCostFor('joker');
   if (state.gold < c) return;
   state.gold -= c;
+  state.freeRerollUsed.joker = true;
   state.rerollJoker++;
   state.shopJokers = rollShopJokers(CONFIG.SHOP_JOKERS);
   renderShop();
 }
 function doRerollCards() {
-  const c = rerollCost(state.rerollCard);
+  const c = rerollCostFor('card');
   if (state.gold < c) return;
   state.gold -= c;
+  state.freeRerollUsed.card = true;
   state.rerollCard++;
   state.shopCards = Array.from({ length: CONFIG.SHOP_CARDS }, randomShopCard);
   renderShop();
@@ -2242,8 +2974,8 @@ function merchantTrade() {
   if (state.playerMaxHP < 50) { $('merchant-msg').textContent = 'Không đủ máu tối đa!'; return; }
   state.playerMaxHP -= 25;
   if (state.playerHP > state.playerMaxHP) state.playerHP = state.playerMaxHP;
-  state.overflow += 1;
-  log(`Thương nhân: -25 Máu tối đa → +1 Dmg tối đa (HP max ${state.playerMaxHP}, Dmg max ${21 + state.overflow})`);
+  state.overflow += 3;
+  log(`Thương nhân: -25 Máu tối đa → +3 Dmg tối đa (HP max ${state.playerMaxHP}, Dmg max ${21 + state.overflow})`);
   $('merchant-msg').textContent = `Đã đổi! Máu tối đa ${state.playerMaxHP} · Dmg tối đa ${21 + state.overflow}`;
   renderShop();
 }
@@ -2278,15 +3010,40 @@ function showDifficulty() {
         `Nhịp đánh: <b>${d.turns}</b><br>` +
         `Bí lối: <b>${d.wall}</b>` +
       `</div>`;
-    el.onclick = () => newGame(i);
+    el.onclick = () => showDeckSelect(i);
     list.appendChild(el);
   });
   showScreen('difficulty');
 }
 
+/* ===================== CHỌN BỘ BÀI ===================== */
+let pendingDifficulty = 2;
+function showDeckSelect(difficulty) {
+  pendingDifficulty = difficulty;
+  const list = $('deck-list');
+  list.innerHTML = '';
+  DECKS.forEach(d => {
+    const size = d.build().length;
+    const el = document.createElement('div');
+    el.className = 'diff-card';
+    el.innerHTML =
+      `<div class="dicon">${d.icon}</div>` +
+      `<div class="dbody">` +
+        `<div class="dname">${d.name}</div>` +
+        `<div class="dtag">${d.tag}</div>` +
+        `<div class="ddesc">${d.desc}</div>` +
+      `</div>` +
+      `<div class="dstat">Số lá: <b>${size}</b><br>Quắc: <b>${d.noBust ? 'không bao giờ' : 'có'}</b><br>` +
+        `Lợi tức: <b>${d.interest ? `mỗi ${d.interest.per}💰, vô hạn` : `mỗi ${CONFIG.INTEREST_PER}💰, trần ${CONFIG.INTEREST_CAP}`}</b></div>`;
+    el.onclick = () => newGame(difficulty, d.key);
+    list.appendChild(el);
+  });
+  showScreen('deckselect');
+}
+
 /* ===================== INIT ===================== */
-function newGame(difficulty) {
-  state = freshState(difficulty != null ? difficulty : state.difficulty);
+function newGame(difficulty, deckKey) {
+  state = freshState(difficulty != null ? difficulty : state.difficulty, deckKey || 'standard');
   selectedIdx = null;
   $('log').innerHTML = '';
   showScreen('game');
@@ -2295,8 +3052,10 @@ function newGame(difficulty) {
 
 $('btn-start').onclick = showDifficulty;
 $('btn-back-menu').onclick = () => showScreen('menu');
+$('btn-back-diff').onclick = showDifficulty;
 $('btn-restart').onclick = showDifficulty;
 $('btn-hit').onclick = playerHit;
+$('btn-discard').onclick = playerDiscard;
 $('btn-ready').onclick = playerReady;
 $('btn-sort-rank').onclick = () => sortHand('rank');
 $('btn-sort-suit').onclick = () => sortHand('suit');
@@ -2305,6 +3064,7 @@ $('btn-open-shop').onclick = openShop;
 $('btn-close-shop').onclick = closeShop;
 $('btn-next-floor').onclick = nextFloor;
 $('reroll-jokers').onclick = doRerollJokers;
+$('reroll-blind').onclick = doRerollBlind;
 $('reroll-cards').onclick = doRerollCards;
 $('btn-merchant-trade').onclick = merchantTrade;
 $('shop-modal').addEventListener('click', e => { if (e.target.id === 'shop-modal') closeShop(); });
