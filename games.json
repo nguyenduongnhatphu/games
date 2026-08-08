@@ -7,19 +7,6 @@
   },
   "games": [
     {
-      "id": "catch-the-box",
-      "title": "Catch the Box",
-      "description": "Di chuyển giỏ để hứng những khối rơi xuống. Càng lâu càng nhanh — bạn trụ được bao lâu?",
-      "category": "Arcade",
-      "tags": ["arcade", "reflex", "casual"],
-      "path": "games/catch-the-box/index.html",
-      "thumbnail": "",
-      "emoji": "🎁",
-      "color": "#7c5cff",
-      "controls": "← → hoặc kéo chuột / chạm màn hình",
-      "date": "2026-07-27"
-    },
-    {
       "id": "pit-boss",
       "title": "Pit Boss",
       "description": "Balatro-like but Black Jack core.",
