@@ -15,7 +15,38 @@
     <canvas id="gameCanvas" width="1000" height="400"></canvas>
     <div class="instructions" id="instruction-box"></div>
 
+<!--
+================================================================================
+  DINO RUNNER — BAN DO FILE
+  Tim nhanh: bam Ctrl+F roi go dung chuoi trong cot "TIM BANG"
+================================================================================
+  KHOI   NOI DUNG                                            TIM BANG
+  ------------------------------------------------------------------------------
+  [1]    Boss phan 1 + ham ve canh/sung dung chung            @@KHOI-1
+  [2]    Boss phan 2 + nen (environment) cua tung map         @@KHOI-2
+  [3]    Class nen tang: Effect, Projectile, quai thuong      @@KHOI-3
+  [4]    Class Player — toan bo dieu khien va 8 loai dan      @@KHOI-4
+  [5]    Giao dien: HUD, Menu, San tap (Dojo), Rune picker    @@KHOI-5
+  [6]    Loi game: canvas, SFX, Rune, Pet, spawn, vong lap    @@KHOI-6
+================================================================================
+  CAC HE THONG RIENG (deu nam trong KHOI 6, tim bang tag)
+  ------------------------------------------------------------------------------
+  BOOMERANG   nem/bat/Channel/Ult cuoi luoi                   @@HE-BOOMERANG
+  PRISM       Khuc xa tich tu (moi 3 lan trung no 1 don)      @@HE-PRISM
+  INFERNO     Hoa an (cam vao dich roi phat no)               @@HE-INFERNO
+  CHARGE      Bang moc doi mau vong nap tung loai dan         @@HE-CHARGE
+  BOSS AI     Giu vi tri, tui xao tron chieu chua dung        @@HE-BOSSAI
+  NOVA        Vu no lan cua rune Awakened: Nova               @@HE-NOVA
+================================================================================
+  LUU Y KHI SUA
+  - KHONG dat comment // giua dong tren cac dong 1-dong (se nuot mat dau })
+  - Kiem tra sau moi lan sua bang: node --check tren phan script ghep lai
+================================================================================
+-->
     <script>
+        /* ============================================================================
+           @@KHOI-1  —  BOSS PHAN 1 + HAM VE CANH / SUNG / VAY DUNG CHUNG
+           ============================================================================ */
 /* ===== js/bosses.js ===== */
 // ===== BOSSES =====
 // Tach tu Dino_v16.html / index.html. Nap TRUOC script chinh.
@@ -1909,7 +1940,7 @@
             }
             update() {
                 this.bub += 0.12;
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 for (let i = this.pillarRespawn.length - 1; i >= 0; i--) {
                     let r = this.pillarRespawn[i]; r.t--;
                     if (r.t <= 0) { platforms.push({ x: r.x, w: r.w, top: r.top, h: 400 - r.top, volcano: true, pillar: true, crack: 0 }); visualEffects.push(new Effect(r.x + r.w/2, r.top, 'explosion', true, 26)); this.pillarRespawn.splice(i, 1); }
@@ -2458,7 +2489,7 @@ class DilophosBoss {
                 if (c === 'dil_pounce') this.pounceCount = 0;
             }
             update() {
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 if (this.state === 'entering') {
                     this.x -= 5; if (this.x <= this.baseX) { this.x = this.baseX; this.state = 'idle'; this.actionTimer = 55; }
                 } else if (this.state === 'idle') {
@@ -3764,7 +3795,7 @@ class DilophosBoss {
                     return;
                 }
                 let gDmg = this.getDmg();
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 if (this.state === 'entering') { this.x -= 2; if (this.x <= this.baseX) this.state = 'idle'; }
                 // ===== GIAI DOAN 2: duoi 50% mau =====
                 else if (true) {
@@ -4164,7 +4195,7 @@ class DilophosBoss {
                 this.dy += 0.65; this.y += this.dy;
                 if (this.y >= this.baseY) { this.y = this.baseY; this.dy = 0; this.grounded = true; }
                 if (this.jumpCd > 0) this.jumpCd--;
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
 
                 if (this.state === 'dying') {
                     this.subTimer++; if (this.subTimer === 20) { visualEffects.push(new Effect(this.x + this.w/2, this.y + this.h/2, 'explosion')); }
@@ -4458,7 +4489,7 @@ class DilophosBoss {
                 this.dy += 0.65; this.y += this.dy;
                 if (this.y >= this.baseY) { this.y = this.baseY; this.dy = 0; this.grounded = true; }
                 if (this.jumpCd > 0) this.jumpCd--;
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 let spd = this.ignited ? 1.35 : 1;
 
                 // ground fires burn (tam thap -> tren la an toan)
@@ -4790,7 +4821,7 @@ class DilophosBoss {
             }
             updateUlt() {
                 shakeTimer = Math.max(shakeTimer, 5); this.y = this.baseY; this.dy = 0; this.grounded = true;
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 if (this.state === 'ult_start') {
                     this.subTimer++;
                     if (this.subTimer === 1) { floatingTexts.push(new FloatingText(this.x + this.w/2 - 40, this.y - 20, "PHÁN QUYẾT!")); this.x = Math.max(60, Math.min(canvas.width - this.w - 60, this.x)); }
@@ -4954,7 +4985,7 @@ class DilophosBoss {
                 if (this.shieldUp > 0) this.shieldUp--;
                 if (this.parryFlash > 0) this.parryFlash--;
                 if (this.shieldBrokenTimer > 0) { this.shieldBrokenTimer--; if (this.shieldBrokenTimer === 0) { this.shieldHp = this.shieldMax; floatingTexts.push(new FloatingText(this.x, this.y - 16, "KHIÊN HỒI!")); } }
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 if (this.state === 'entering') { this.x -= 4; this.faceP(); if (this.x <= this.baseX) { this.x = this.baseX; this.state = 'intro'; this.subTimer = 0; } return; }
                 if (this.state === 'intro') {
                     this.subTimer++; shakeTimer = 4;
@@ -5154,7 +5185,7 @@ class DilophosBoss {
             }
             update() {
                 this.bob += 0.08; this.wing += 0.3;
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 if (this.state === 'entering') { this.x -= 6; this.faceP(); if (this.x <= this.baseX) { this.x = this.baseX; this.state = 'intro'; this.subTimer = 0; } return; }
                 if (this.state === 'intro') { this.subTimer++; if (this.subTimer === 1) { floatingTexts.push(new FloatingText(this.x, this.y - 16, "PHONG LONG!")); if (SFX.bossEntry) SFX.bossEntry(); } if (this.subTimer > 46) { this.state = 'roam'; this.actionTimer = 70; } return; }
                 this.faceP();
@@ -5463,7 +5494,7 @@ class MagmorBoss {
             }
             update() {
                 this.glow += 0.06;
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 if (this.state === 'entering') { this.x -= 5; if (this.x <= canvas.width - 320) { this.state = 'intro'; this.subTimer = 0; } return; }
                 if (this.state === 'intro') { this.subTimer++; if (this.subTimer === 1) { floatingTexts.push(new FloatingText(this.x, this.y - 40, "MAGMOR!")); if (SFX.bossEntry) SFX.bossEntry(); } if (this.subTimer > 44) { this.state = 'idle'; this.actionTimer = 60; } return; }
                 if (this.state !== 'jump_up' && this.state !== 'jump_fall') this.facingLeft = (dino.x + dino.w/2) < (this.x + this.w/2);
@@ -5712,7 +5743,7 @@ class PillarLordBoss {
             setTop(pf, nt) { let d = nt - pf.top; if (this.onPillar(pf)) dino.y += d; pf.top = nt; pf.h = 400 - nt; }
             update() {
                 const BANDS = [300, 235, 165];
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 let P = this.pillars();
                 if (this.state === 'entering') { this.x -= 6; if (this.x <= canvas.width - 260) { this.state = 'intro'; this.subTimer = 0; } return; }
                 if (this.state === 'intro') { this.subTimer++; if (this.subTimer === 1) { floatingTexts.push(new FloatingText(this.x, this.y - 40, "THACH TRU REX!")); if (SFX.bossEntry) SFX.bossEntry(); } if (this.subTimer > 44) { this.state = 'idle'; this.actionTimer = 55; } return; }
@@ -6016,7 +6047,7 @@ class IceFangBoss {
             update() {
                 const BANDS = [160, 240, 305];
                 this.wing += 0.32; this.bob += 0.07;
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 let R = this.rocks();
                 if (this.state === 'entering') { this.x -= 6; if (this.x <= canvas.width - 240) { this.state = 'intro'; this.subTimer = 0; } return; }
                 if (this.state === 'intro') { this.subTimer++; if (this.subTimer === 1) { floatingTexts.push(new FloatingText(this.x, this.y - 40, "BANG NHA!")); if (SFX.bossEntry) SFX.bossEntry(); } if (this.subTimer > 44) { this.state = 'roam'; this.actionTimer = 60; } return; }
@@ -6283,7 +6314,7 @@ class VajraRexBoss {
             hitBox() { let sd = this.facingLeft ? -1 : 1; return { x: this.x + (sd < 0 ? -78 : this.w - 6), y: this.y - 14, w: 84, h: this.h + 30 }; }
             update() {
                 this.aura += 0.08;
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 if (this.state === 'entering') { this.x -= 6; if (this.x <= canvas.width - 280) { this.state = 'intro'; this.subTimer = 0; } return; }
                 if (this.state === 'intro') { this.subTimer++; if (this.subTimer === 1) { floatingTexts.push(new FloatingText(this.x, this.y - 40, "KIM CANG REX!")); if (SFX.bossEntry) SFX.bossEntry(); } if (this.subTimer > 44) { this.state = 'idle'; this.actionTimer = 50; } return; }
                 if (this.state !== 'dive_go') this.facingLeft = (dino.x + dino.w/2) < (this.x + this.w/2);
@@ -6489,7 +6520,7 @@ class FireDragonBoss {
             rest(n) { this.state = 'rest'; this.subTimer = n; }
             update() {
                 this.wing += 0.3; this.bob += 0.06; if (this.tailFx > 0) this.tailFx--;
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 if (this.state === 'entering') { this.x -= 6; if (this.x <= canvas.width - 250) { this.state = 'intro'; this.subTimer = 0; } return; }
                 if (this.state === 'intro') { this.subTimer++; if (this.subTimer === 1) { floatingTexts.push(new FloatingText(this.x, this.y - 40, "HOA LONG!")); if (SFX.bossEntry) SFX.bossEntry(); } if (this.subTimer > 44) { this.state = 'roam'; this.actionTimer = 70; } return; }
                 if (this.state !== 'dash_go' && this.state !== 'sky_fall') this.facingLeft = (dino.x + dino.w/2) < (this.x + this.w/2);
@@ -6728,7 +6759,7 @@ class DragonLordBoss {
             }
             update() {
                 this.eyeGlow += 0.07; if (this.armSwing > 0) this.armSwing--;
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 if (this.state === 'entering') { this.x -= 5; if (this.x <= this.baseX) { this.x = this.baseX; this.state = 'intro'; this.subTimer = 0; } return; }
                 if (this.state === 'intro') { this.subTimer++; if (this.subTimer === 1) { floatingTexts.push(new FloatingText(this.x - 60, 120, "HAC LONG VUONG!")); if (SFX.bossEntry) SFX.bossEntry(); shakeTimer = 50; } if (this.subTimer > 60) { this.state = 'idle'; this.actionTimer = 80; } return; }
 
@@ -7022,7 +7053,7 @@ class StoneRocBoss {
             rocks() { return platforms.filter(p => p.summit); }
             update() {
                 this.wing += 0.3; this.bob += 0.06;
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 if (this.state === 'entering') { this.x -= 6; if (this.x <= canvas.width - 250) { this.state = 'intro'; this.subTimer = 0; } return; }
                 if (this.state === 'intro') { this.subTimer++; if (this.subTimer === 1) { floatingTexts.push(new FloatingText(this.x, this.y - 40, "THACH UNG!")); if (SFX.bossEntry) SFX.bossEntry(); } if (this.subTimer > 44) { this.state = 'roam'; this.actionTimer = 60; } return; }
                 if (!this.grabbed) this.facingLeft = (dino.x + dino.w/2) < (this.x + this.w/2);
@@ -7310,7 +7341,7 @@ class CliffGolemBoss {
             rocks() { return platforms.filter(p => p.summit); }
             armAnchor() { return { x: this.side > 0 ? canvas.width - 30 : 30, y: this.y + 40 }; }
             update() {
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 if (this.rumble > 0) this.rumble--;
                 if (this.state === 'entering') { this.subTimer++; if (this.subTimer > 30) { this.state = 'intro'; this.subTimer = 0; } return; }
                 if (this.state === 'intro') { this.subTimer++; if (this.subTimer === 1) { floatingTexts.push(new FloatingText(canvas.width/2 - 60, 90, "CU THACH!")); if (SFX.bossEntry) SFX.bossEntry(); shakeTimer = 34; } if (this.subTimer > 50) { this.state = 'idle'; this.actionTimer = 70; } return; }
@@ -7541,7 +7572,7 @@ class MountainGodBoss {
             rocks() { return platforms.filter(p => p.summit); }
             update() {
                 this.eye += 0.06;
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 if (this.state === 'entering') { this.subTimer++; if (this.subTimer > 30) { this.state = 'intro'; this.subTimer = 0; } return; }
                 if (this.state === 'intro') { this.subTimer++;
                     if (this.subTimer === 1) { floatingTexts.push(new FloatingText(canvas.width/2 - 110, 120, "THIEN TRU SON THAN!")); if (SFX.bossEntry) SFX.bossEntry(); shakeTimer = 60; }
@@ -7813,7 +7844,7 @@ class GreatApeBoss {
                 return { vx: vx, vy: vy };
             }
             update() {
-                let parry = () => visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry'));
+                let parry = () => { visualEffects.push(new Effect(dino.x + dino.w, dino.y, 'parry')); shinGuardReset(false); };
                 this.sway += 0.04;
                 if (this.state === 'entering') { this.x -= 6; if (this.x <= this.treeX - 40) { this.state = 'climb_up'; this.subTimer = 40; } return; }
                 if (this.state === 'climb_up') {
@@ -8208,6 +8239,9 @@ class GreatApeBoss {
 
 </script>
     <script>
+        /* ============================================================================
+           @@KHOI-2  —  BOSS PHAN 2 + NEN (ENVIRONMENT) CUA TUNG MAP
+           ============================================================================ */
 /* ===== js/maps.js ===== */
 // ===== MAPS =====
 // Dia hinh, chunk, spawner, arena, ve nen 4 map. Nap TRUOC script chinh.
@@ -8375,8 +8409,6 @@ class GreatApeBoss {
             { k:'L', col:'#FFA726', cells:[[0,0],[0,1],[0,2],[1,0]] },
             { k:'J', col:'#5C6BC0', cells:[[0,0],[0,1],[0,2],[1,2]] },
         ];
-        const TSHAPE_I_VERT = { k:'Iv', col:'#00E5FF', cells:[[0,0],[1,0],[2,0],[3,0]] };
-        function shapeWidth(sh){ let m=0; for (let c of sh.cells) if (c[1]>m) m=c[1]; return m+1; }
         function tetroRots(cells){ let out=[], cur=cells.map(c=>[c[0],c[1]]);
             for (let k=0;k<4;k++){ let mnR=Math.min.apply(null,cur.map(c=>c[0])), mnC=Math.min.apply(null,cur.map(c=>c[1]));
                 let norm=cur.map(c=>[c[0]-mnR,c[1]-mnC]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]); let key=JSON.stringify(norm);
@@ -11340,14 +11372,6 @@ class GreatApeBoss {
             snapDinoToPlatform();
         }
 
-        function setupSummitBossArena() {
-            mapTheme = 'aegis';
-            platforms.length = 0;
-            platforms.push({ x: 20, w: 960, top: 305, h: 95, summit: true });   // doi hinh bang phang trong: buoc toi danh boss bay
-            platforms.push({ x: 250, w: 150, top: 150, h: 18, summit: true });   // buc cao de ban rong bay
-            platforms.push({ x: 600, w: 150, top: 150, h: 18, summit: true });
-            snapDinoToPlatform();
-        }
 
         function setupAegisArena() {
             mapTheme = 'aegis';
@@ -12099,6 +12123,9 @@ class GreatApeBoss {
 
 </script>
     <script>
+        /* ============================================================================
+           @@KHOI-3  —  CLASS NEN TANG: Effect, FloatingText, Projectile, Obstacle, quai thuong
+           ============================================================================ */
 /* ===== js/entities.js ===== */
 // ===== ENTITIES (dan, hieu ung, quai thuong, vat pham) =====
 // Nap TRUOC script chinh.
@@ -12145,6 +12172,7 @@ class GreatApeBoss {
                         if (this.tint === 'nova')       { cE = "255,167,38";  cC = "255,243,205"; cG = "#FFB300"; }
                         else if (this.tint === 'clash') { cE = "41,182,246";  cC = "225,247,255"; cG = "#40C4FF"; }
                         else if (this.tint === 'dark')  { cE = "18,14,26";    cC = "150,110,215"; cG = "#7E57C2"; aMul = 0.74; }
+                        else if (this.tint === 'mika')  { cE = "129,212,250"; cC = "255,255,255"; cG = "#4FC3F7"; aMul = 0.88; }
                         fade *= aMul;
                         ctx.shadowBlur = (this.tint === 'dark') ? 16 : 10; ctx.shadowColor = cG;
                         // 3 VET MONG: lech ban kinh + tre goc -> ra hinh vuot cao
@@ -12685,6 +12713,9 @@ class GreatApeBoss {
 
 </script>
     <script>
+        /* ============================================================================
+           @@KHOI-4  —  CLASS PLAYER — dieu khien, 8 loai dan, Charge / Channel / Ult
+           ============================================================================ */
 /* ===== js/player.js ===== */
 // ===== PLAYER (co che chien dau: dan, stance, jump, dash, charge, channel, ultimate) =====
 // Nap TRUOC script chinh.
@@ -12697,13 +12728,13 @@ class GreatApeBoss {
                 this.runeShield = 0; this.usedRevive = false; this.channelGuardUsed = false;
                 this.shieldEnergy = 100; this.parryWindow = 0; this.petShieldTimer = 0;
                 this.ammoType = ammoType; this.form = form;
-                this.maxAmmo = (ammoType === 2) ? 10 : 6; this.ammo = this.maxAmmo;   // RAPIDFIRE: bang 10 vien
+                this.maxAmmo = (ammoType === 2) ? 10 : (ammoType === 7 ? 3 : 6); this.ammo = this.maxAmmo;   // RAPIDFIRE 10 vien | BOOMERANG 3 luoi
                 this.isOverheated = false; this.overheatTimer = 0; this.aKeyHeldTime = 0; 
                 this.jcState = null; this.kHoldTime = 0; this.jcTimer = 0; this.jcRadius = 0; this.jcReturnX = 80; this.jcReturnY = 0; this.jcSlashes = []; this.clawChannel = false; this.clawChannelHits = 0; this.clawChannelCd = 0; this.clawJCircles = [];
-                this.clawSwords = []; this.clawFlying = []; this.clawSwordCd = 0; this.clawGuard = 0; this.clawGuardHits = new Map();
-                this.ultActive = false; this.ultAmmo = -1; this.ultTimer = 0; this.ultPrevMaxAmmo = 0; this.ultBeam = null; this.ultBeamRect = null; this.ultBolts = []; this.ultLightTargets = null; this.ultBeamTick = 0; this.ultFillMult = 1; this.webTimer = 0; this.rapidBurst = 0; this.rapidChannel = false; this.fireChannel = false; this.fireRings = []; this.fireChannelCd = 0; this.fireReactorTimer = 0; this.lightChannel = false; this.lightLinkTargets = null; this.lightZaps = []; this.lightningFormTimer = 0; this.lightningDashActive = 0; this.lightningDashHit = null; this.splitChannel = false; this.splitChannelCd = 0; this.pulsarStar = null; this.pulsarChannel = false; this.pulsarUltStar = null;
+                this.clawSwords = []; this.clawFlying = []; this.clawSwordCd = 0; this.crescent2 = null; this.clawGuard = 0; this.clawGuardHits = new Map();
+                this.ultActive = false; this.ultAmmo = -1; this.ultTimer = 0; this.ultPrevMaxAmmo = 0; this.ultBeam = null; this.ultBeamRect = null; this.ultBolts = []; this.ultLightTargets = null; this.ultBeamTick = 0; this.ultFillMult = 1; this.webTimer = 0; this.rapidBurst = 0; this.rapidChannel = false; this.fireChannel = false; this.fireRings = []; this.fireChannelCd = 0; this.fireReactorTimer = 0; this.lightChannel = false; this.lightLinkTargets = null; this.lightZaps = []; this.lightningFormTimer = 0; this.lightningDashActive = 0; this.lightningDashHit = null; this.splitChannel = false; this.splitChannelCd = 0; this.pulsarStar = null; this.pulsarChannel = false; this.pulsarUltStar = null; this.boomChannel = false; this.boomChanLeft = 0; this.boomChanCd = 0; this.boomOut = 0; this.boomSpin = 0; this.boomUltRide = null; this.boomUltLeft = 0; this.boomUltSmall = 0; this.boomLostPend = 0; this.boomRefillT = 0; this.boomThrowCount = 0;
                 this.chargeProgress = 0; this.laserActiveTimer = 0; this.spreadCount = 1; this.normalLaserChannel = false;
-                this.meleeTimer = 0; this.meleeID = 0; this.shieldCd = 0; this.clawStrikeTimer = 0; this.clawStrikeRect = null; this.dashShieldTimer = 0; this.dashDir = 1; 
+                this.meleeTimer = 0; this.meleeID = 0; this.shieldCd = 0; this.clawStrikeTimer = 0; this.clawStrikeRect = null; this.dashShieldTimer = 0; this.dashDir = 1; this.shinGuardCd = 0; this.shinFlash = 0; 
                 this.invincible = false; this.invTimer = 0; this.grounded = true; 
                 this.isCrouching = false; this.attackCooldown = 0;
                 this.fireBreathTimer = 0; this.fireBreathLength = 240; this.laserType = 0;
@@ -12713,7 +12744,66 @@ class GreatApeBoss {
                 this.clawUltState = null; this.clawUltTimer = 0; this.clawUltDestX = 0; this.clawUltStartX = 0; this.clawUltReturnX = 80; this.clawUltWorldShifted = 0; this.clawUltHitSet = new Set();
             }
 
-            isShielding() { return this.meleeTimer > 0 || (this.dashShieldTimer||0) > 0; }
+            // HISUISHO cua SWORDMASTER cung tinh la dang gio khien (chan don tu phia truoc)
+            // ===== KHIEN LUC GIAC: vong giap tron ghep tu nhieu o luc giac =====
+            // 3 vanh o, moi o sang/toi lech pha nen nhin nhu vo dang chay nang luong.
+            _drawHexShield(sc) {
+                let cx = this.x + this.w / 2, cy = this.y + this.h / 2;
+                let R = Math.max(this.w, this.h) * 0.86 * sc;
+                let sg = hasRune('shinguard');
+                let flash = (this.shinFlash || 0) / 16;
+                // mau: thuong lam ngoc / SHIN ROYAL GUARD tim vang
+                let base = sg ? "126,87,194" : "0,229,255";
+                let hot  = sg ? "255,214,10" : "178,235,242";
+                ctx.save();
+                // quang nen
+                let g = ctx.createRadialGradient(cx, cy, R * 0.45, cx, cy, R);
+                g.addColorStop(0, "rgba(" + base + ",0.02)");
+                g.addColorStop(0.78, "rgba(" + base + ",0.16)");
+                g.addColorStop(1, "rgba(" + base + ",0.02)");
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+                // cac o luc giac xep thanh 3 vanh
+                const RINGS = [{ n: 14, r: 1.00, s: 0.155, sp: 0.011 },
+                               { n: 10, r: 0.80, s: 0.135, sp: -0.016 },
+                               { n: 6,  r: 0.58, s: 0.120, sp: 0.022 }];
+                for (let ri = 0; ri < RINGS.length; ri++) {
+                    let ring = RINGS[ri], rr = R * ring.r, hs = R * ring.s;
+                    for (let i = 0; i < ring.n; i++) {
+                        let a = (i / ring.n) * Math.PI * 2 + frames * ring.sp + ri * 0.4;
+                        let px = cx + Math.cos(a) * rr, py = cy + Math.sin(a) * rr * 0.92;
+                        // nhip sang chay vong quanh
+                        let pulse = 0.42 + 0.58 * Math.pow(Math.max(0, Math.sin(a * 2 - frames * 0.10)), 3);
+                        let al = (0.20 + 0.42 * pulse) * (0.62 + 0.38 * flash);
+                        ctx.save();
+                        ctx.translate(px, py); ctx.rotate(a + Math.PI / 2);
+                        ctx.beginPath();
+                        for (let k = 0; k < 6; k++) {
+                            let ha = k * Math.PI / 3;
+                            let hx = Math.cos(ha) * hs, hy = Math.sin(ha) * hs;
+                            if (k === 0) ctx.moveTo(hx, hy); else ctx.lineTo(hx, hy);
+                        }
+                        ctx.closePath();
+                        ctx.fillStyle = "rgba(" + base + "," + (al * 0.55).toFixed(3) + ")";
+                        ctx.fill();
+                        ctx.strokeStyle = "rgba(" + hot + "," + Math.min(1, al + 0.28 * flash).toFixed(3) + ")";
+                        ctx.lineWidth = 1.6 + 1.6 * pulse + 1.4 * flash;
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+                // vien ngoai
+                ctx.strokeStyle = "rgba(" + hot + "," + (0.45 + 0.5 * flash) + ")";
+                ctx.lineWidth = 2 + 3 * flash;
+                ctx.shadowBlur = 14 + 20 * flash; ctx.shadowColor = "rgb(" + hot + ")";
+                ctx.beginPath(); ctx.ellipse(cx, cy, R * 1.06, R * 0.98, 0, 0, Math.PI * 2); ctx.stroke();
+                ctx.restore();
+                if (this.shinFlash > 0) this.shinFlash--;
+            }
+            isShielding() {
+                if (this.meleeTimer > 0 || (this.dashShieldTimer||0) > 0) return true;
+                if (typeof smBlades !== 'undefined') { for (let bl of smBlades) if (bl.owner === this && bl.t > 0) return true; }
+                return false;
+            }
             
             getFormScale(overrideForm = -1) {
                 let f = overrideForm !== -1 ? overrideForm : (this.id === 1 ? currentForm : this.form);
@@ -12880,12 +12970,8 @@ class GreatApeBoss {
                 let sScale = this.getFormScale();
                 let pos = this.getShootPos();
 
-                if (this.isShielding()) {
-                    let sX = this.isFacingLeft ? this.x - 15*sScale : this.x + (this.isCrouching ? 48*sScale : 42*sScale); 
-                    let sY = this.y - 15;
-                    ctx.fillStyle = "rgba(0, 255, 255, 0.4)"; ctx.fillRect(sX, sY, 15, 75 * sScale);
-                    ctx.strokeStyle = "rgba(0, 255, 255, 0.9)"; ctx.lineWidth = 3; ctx.strokeRect(sX, sY, 15, 75 * sScale);
-                }
+                // ===== KHIEN: lop giap LUC GIAC bao tron quanh nguoi choi =====
+                if (this.isShielding()) this._drawHexShield(sScale);
 
                 let legAnim = (frames % 12 < 6 && !this.grounded === false) ? 4 : 0;
                 // Nghieng dau nhe ve phia dich gan nhat (gioi han +-20 do)
@@ -12949,9 +13035,29 @@ class GreatApeBoss {
                 // ===== VONG NAP: chay lien tuc tu luc giu den nguong Channel (180f) =====
                 {
                     let _anyCh = !!(this.clawChannel || this.rapidChannel || this.normalLaserChannel || this.fireChannel
-                                 || this.lightChannel || this.splitChannel || this.pulsarChannel);
+                                 || this.lightChannel || this.splitChannel || this.pulsarChannel || this.boomChannel);
                     if (_anyCh && !this._ringChPrev) this.chgBurst = 22;
                     this._ringChPrev = _anyCh;
+                }
+                // BOOMERANG: xoay luoi quanh nguoi sau khi bat duoc
+                if (this.boomSpin > 0) {
+                    this.boomSpin--;
+                    let bs = this.boomSpin / 22, R = 86 * (this.getFormScale ? this.getFormScale() : 1);
+                    let cxb = this.x + this.w / 2, cyb = this.y + this.h / 2;
+                    ctx.save();
+                    ctx.globalAlpha = bs;
+                    ctx.strokeStyle = "#80DEEA"; ctx.lineWidth = 4; ctx.shadowBlur = 16; ctx.shadowColor = "#80DEEA";
+                    ctx.beginPath(); ctx.arc(cxb, cyb, R * (0.55 + 0.45 * (1 - bs)), 0, Math.PI * 2); ctx.stroke();
+                    ctx.shadowBlur = 0;
+                    for (let k = 0; k < 3; k++) {
+                        let a = frames * 0.55 + k * (Math.PI * 2 / 3), rr = R * 0.8;
+                        ctx.save();
+                        ctx.translate(cxb + Math.cos(a) * rr, cyb + Math.sin(a) * rr); ctx.rotate(a * 3);
+                        ctx.strokeStyle = "#FFFFFF"; ctx.lineWidth = 4; ctx.lineCap = "round";
+                        ctx.beginPath(); ctx.moveTo(-11, 6); ctx.lineTo(0, -8); ctx.lineTo(11, 6); ctx.stroke();
+                        ctx.restore();
+                    }
+                    ctx.restore();
                 }
                 if (this.chgBurst > 0) {
                     // vong no bung ra roi tan bien -> Channel xuat hien
@@ -13143,6 +13249,14 @@ class GreatApeBoss {
                     floatingTexts.push(new FloatingText(this.x, this.y - 30, "SUPERNOVA!"));
                     shakeTimer = Math.max(shakeTimer, 24);
                     if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(500, 0.3, 'triangle', 0.25, 900);
+                } else if (ammo === 7) {
+                    ultCharge = 0;
+                    this.ultActive = true; this.ultAmmo = 7; this.ultTimer = 0;
+                    this.aKeyHeldTime = 0; this.chargeProgress = 0; this.isOverheated = false;
+                    this.boomUltLeft = 3; this.boomUltRide = null; this.boomUltSmall = 0;
+                    floatingTexts.push(new FloatingText(this.x - 30, this.y - 30, "OVERDRIVE: 3 LUOI!"));
+                    shakeTimer = Math.max(shakeTimer, 24);
+                    if (typeof SFX !== 'undefined' && SFX.tone) { SFX.tone(320, 0.3, 'sawtooth', 0.28, 880); SFX.tone(880, 0.25, 'square', 0.16, 1200); }
                 } else {
                     this.ultActive = true; this.ultAmmo = ammo; this.ultTimer = 0;
                     this.aKeyHeldTime = 0; this.chargeProgress = 0; this.isOverheated = false;
@@ -13153,9 +13267,30 @@ class GreatApeBoss {
             endUlt() {
                 if (this.ultAmmo === 2 && this.ultPrevMaxAmmo) { this.maxAmmo = this.ultPrevMaxAmmo; this.ammo = this.maxAmmo; }
                 this.ultActive = false; this.ultAmmo = -1; this.ultBeam = null; this.ultBeamRect = null; this.ultLightTargets = null; this.ultBolts = []; ultCharge = 0;
+                if (this.boomUltRide) { this.boomUltRide.mounted = false; this.boomUltRide.state = 'slam'; this.boomUltRide.slamT = 0; }
+                this.boomUltRide = null; this.boomUltLeft = 0; this.boomUltSmall = 0;
             }
             doUltFire(ammo, fireKey, chargeKey) {
                 this.ultTimer++;
+                // ===== BOOMERANG ULT — OVERDRIVE: nem luoi lon roi TREO LEN no =====
+                if (ammo === 7) {
+                    let ride = this.boomUltRide;
+                    if (ride && boomerangs.indexOf(ride) < 0) { this.boomUltRide = null; ride = null; }
+                    // J = nem luoi LON (chi khi chua co chiec nao dang bay)
+                    if (fireKey && !ride && this.boomUltLeft > 0 && this.attackCooldown <= 0) {
+                        this.boomUltRide = throwBoomerang(this, { big: true });
+                        this.attackCooldown = 24;
+                        floatingTexts.push(new FloatingText(this.x - 20, this.y - 30, "NHAY DE TREO LEN!"));
+                    }
+                    // K = dang dung tren luoi thi nem luoi NHO tu tim muc tieu
+                    if (chargeKey && ride && ride.mounted && this.attackCooldown <= 0 && (this.boomUltSmall || 0) < 4) {
+                        let sb = throwBoomerang(this, { dmg: 4, charge: 1, twice: true, ultSmall: true });
+                        this.boomUltSmall = (this.boomUltSmall || 0) + 1;
+                        this.attackCooldown = 16;
+                    }
+                    if (this.boomUltLeft <= 0 && !ride) this.endUlt();
+                    return;
+                }
                 if (ammo === 2) {
                     if (chargeKey && this.attackCooldown <= 0 && this.ammo > 0) this.fireRapid();
                     else if (fireKey && this.attackCooldown <= 0 && this.ammo > 0) this.fireRapidSingle();
@@ -13358,26 +13493,17 @@ class GreatApeBoss {
                 }
             }
 
-            spawnMiniJC() {
-                let dir = this.isFacingLeft ? -1 : 1, cx = this.x + this.w/2, cy = this.y + this.h/2;
-                let tgt = null, minD = 99999;
-                [...bosses, ...enemies].forEach(t => { if (t.invulnAll) return; let d = (t.x + t.w/2 - cx) * dir; if (d > -60 && d < minD) { minD = d; tgt = t; } });
-                let px = tgt ? tgt.x + tgt.w/2 : cx + dir * 200, py = tgt ? tgt.y + tgt.h/2 : cy;
-                let slashes = []; for (let i = 0; i < 5; i++) slashes.push({ ang: Math.random() * Math.PI, off: (Math.random() - 0.5) * 90 });
-                this.clawJCircles.push({ x: px, y: py, r: 0, maxR: 74, timer: 0, life: 30, dmg: 4, applied: false, big: false, slashes: slashes });
-                if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(520, 0.08, 'square', 0.14, 760);
-            }
             // ===== KIEM TRAN (thay Channel cu): moi 0.25s trieu 1 thanh kiem lo lung, toi da 20 =====
             // Nha ra / trung don -> ban het vao dich truoc mat, dich chet thi kiem tu doi muc tieu.
             // Nha CHU DONG luc DAY 20 kiem -> giu lai 5 cay xoay quanh nguoi 1 giay lam khien.
             addClawSword() {
-                if (this.clawSwords.length >= 20) return;
+                if (this.clawSwords.length >= clawSwordCap()) return;
                 this.clawSwords.push({ a: Math.random() * 6.28, r: 50 + Math.random() * 30, guard: false });
                 if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(880 + this.clawSwords.length * 22, 0.05, 'triangle', 0.10, 1400);
             }
             launchClawSwords(voluntary) {
                 let n = this.clawSwords.length; if (n <= 0) return;
-                let keep = (voluntary && n >= 20) ? 5 : 0;
+                let keep = (voluntary && n >= clawSwordCap()) ? 5 : 0;
                 let cxp = this.x + this.w/2, cyp = this.y + this.h/2;
                 for (let i = 0; i < n - keep; i++) {
                     let s = this.clawSwords[i];
@@ -13462,31 +13588,10 @@ class GreatApeBoss {
                 }
                 // dem so kiem dang giu
                 if (this.clawChannel && this.clawSwords.length > 0) {
-                    ctx.fillStyle = this.clawSwords.length >= 20 ? "#FFD54F" : "#E1F5FE";
+                    ctx.fillStyle = this.clawSwords.length >= clawSwordCap() ? "#FFD54F" : "#E1F5FE";
                     ctx.font = "bold 13px Courier New"; ctx.textAlign = "center";
-                    ctx.fillText(this.clawSwords.length + "/20", cxp, this.y - 26); ctx.textAlign = "left";
+                    ctx.fillText(this.clawSwords.length + "/" + clawSwordCap(), cxp, this.y - 26); ctx.textAlign = "left";
                 }
-            }
-            fireClawChannelFinish(nHits) {
-                if (nHits < 3) return;
-                let tier = Math.min(nHits, 6);
-                let sizeFrac = tier === 3 ? 0.25 : tier === 4 ? (1/3) : tier === 5 ? 0.5 : 1;
-                let R = (canvas.width * sizeFrac) / 2;
-                let dmg = tier === 3 ? 25 : tier === 4 ? 40 : tier === 5 ? 60 : 100;
-                let dir = this.isFacingLeft ? -1 : 1, cx0 = this.x + this.w/2, cy0 = this.y + this.h/2, px, py;
-                if (tier >= 6) { px = canvas.width/2; py = 190; }
-                else {
-                    let tgt = null, minD = 99999;
-                    [...bosses, ...enemies].forEach(t => { if (t.invulnAll) return; let d = (t.x + t.w/2 - cx0) * dir; if (d > -60 && d < minD) { minD = d; tgt = t; } });
-                    px = tgt ? tgt.x + tgt.w/2 : cx0 + dir * 220; py = tgt ? tgt.y + tgt.h/2 : cy0;
-                }
-                let ns = tier >= 6 ? 18 : 12, slashes = [];
-                for (let i = 0; i < ns; i++) slashes.push({ ang: Math.random() * Math.PI, off: (Math.random() - 0.5) * R * 1.4 });
-                this.clawJCircles.push({ x: px, y: py, r: 0, maxR: R, timer: 0, life: 46, dmg: dmg, applied: false, big: true, slashes: slashes });
-                this.invincible = true; if (this.invTimer < 24) this.invTimer = 24;
-                shakeTimer = Math.max(shakeTimer, tier >= 6 ? 55 : 28);
-                if (tier >= 6) { ultCharge = 0; floatingTexts.push(new FloatingText(this.x, this.y - 30, "JUDGEMENT CUT END!")); }
-                else { floatingTexts.push(new FloatingText(this.x, this.y - 26, "CAT!")); }
             }
             tickClawJCircles() {
                 if (!this.clawJCircles || !this.clawJCircles.length) return;
@@ -13578,47 +13683,6 @@ class GreatApeBoss {
                             if (big) shakeTimer = Math.max(shakeTimer, 14);
                         }
                         if (this.clawUltTimer >= 60) { this.clawUltState = 'freefall'; this.clawUltTimer = 30; }
-                    } else if (this.clawUltState === '__legacy_dash') {
-                        // LUON luot toi dich co dinh, khong bao gio dung vi vat can (kieu dash MegaMan X)
-                        let dxC = this.clawUltDestX - this.x;
-                        let step = 26;
-                        // Vung chem quet doc than trong luc luot.
-                        // Cao het chieu man hinh phia tren de cham duoc ca boss bay (Ptero/Quetzal),
-                        // nhung van gioi han duoi de khong danh trung vat qua xa duoi dat.
-                        let reach = 150 * this.getFormScale();
-                        let sweepRect = dirC === 1 ? { x: this.x - 10, y: 0, w: this.w + reach, h: this.y + this.h + 30 } : { x: this.x - reach + 10, y: 0, w: this.w + reach, h: this.y + this.h + 30 };
-                        // Chem moi vat chi 1 lan (dung clawUltHitSet)
-                        if (gameState === 'pvp') {
-                            let target = this.id === 1 ? dino2 : dino;
-                            if (checkAABB(sweepRect, target) && !this.clawUltHitSet.has(target)) {
-                                this.clawUltHitSet.add(target);
-                                if (target.isShielding()) visualEffects.push(new Effect(target.x + (target.isFacingLeft ? target.w : 0), target.y, 'parry'));
-                                else target.takeDamage(1);
-                            }
-                        } else {
-                            [...obstacles, ...enemies, ...bosses].forEach(o => {
-                                if (checkAABB(sweepRect, o) && !this.clawUltHitSet.has(o)) {
-                                    this.clawUltHitSet.add(o);
-                                    if (o.invulnAll) { visualEffects.push(new Effect(o.x + o.w/2, o.y, 'parry', false)); }
-                                    else if (o.name === "AEGIS REX") { if (o.shieldBrokenTimer > 0) { o.hp -= 5; if (gameState !== 'pvp') score += 1; } else { o.hitShield(3, o.x + o.w/2, o.y + o.h/2); } }
-                                    else if (o.name === "HELIOS REX" && (o.shieldTimer > 0 || o.spamShieldTimer > 0 || o.state.includes('clone_dash') || o.state === 'clone_bounce_back' || o.state === 'clone_wait') && o.shieldHp > 0) {
-                                        visualEffects.push(new Effect(o.x - 10, o.y + 20, 'parry', false)); o.shieldHp--;
-                                    } else { o.hp -= 5; if (gameState !== 'pvp') score += 1; }
-                                }
-                            });
-                            cutBossProjectiles(sweepRect);
-                        }
-                        if (Math.abs(dxC) <= step) {
-                            this.x = this.clawUltDestX;
-                            this.clawUltState = 'slash'; this.clawUltTimer = 14;
-                            // Vet chem lon o diem ket thuc, keo dai theo quang duong vua luot
-                            let travelled = Math.abs(this.clawUltDestX - (this.clawUltStartX !== undefined ? this.clawUltStartX : this.clawUltDestX));
-                            let fx = this.x + (dirC === 1 ? this.w + reach/2 : -reach/2);
-                            let eff = new Effect(fx, this.y + this.h/2, 'claw_big', dirC === -1, Math.min(travelled, 220));
-                            visualEffects.push(eff);
-                        } else {
-                            this.x += Math.sign(dxC) * step;
-                        }
                     } else if (this.clawUltState === 'slash') {
                         this.clawUltTimer--;
                         if (this.clawUltTimer <= 0) {
@@ -13695,11 +13759,11 @@ class GreatApeBoss {
                     }
                     else { this.grounded = false; if (feet > 344 && mapTheme !== 'tetris' && mapTheme !== 'ocean') {
                         // KHIEN KHI CHANNEL C2: roi ho thi MAT trang thai channel nhung KHONG mat mau
-                        let _inChan = (this.clawChannel || this.rapidChannel || this.normalLaserChannel || this.fireChannel || this.lightChannel || this.splitChannel || this.pulsarChannel);
+                        let _inChan = (this.clawChannel || this.rapidChannel || this.normalLaserChannel || this.fireChannel || this.lightChannel || this.splitChannel || this.pulsarChannel || this.boomChannel);
                         if (hasRune('chanshldx') && _inChan && this.chanInvul > 0) {   // CHI trong cua so 2 giay dau
                             if (this.pulsarStar && this.pulsarStar.onBody) this.pulsarStar = null;
                             this.clawChannel = false; this.rapidChannel = false; this.normalLaserChannel = false; this.fireChannel = false;
-                            this.lightChannel = false; this.splitChannel = false; this.pulsarChannel = false;
+                            this.lightChannel = false; this.splitChannel = false; this.pulsarChannel = false; this.boomChannel = false; this.boomChanLeft = 0;
                             projectiles.forEach(p => { if (p.bounce) p.bounce = false; });
                             this.lightLinkTargets = null; this.laserActiveTimer = 0; this.clawChannelHits = 0; this.aKeyHeldTime = 0; this.chargeProgress = 0;
                             this.chanInvul = 0;
@@ -13733,17 +13797,45 @@ class GreatApeBoss {
                 let checkAmmo = this.id === 1 ? currentAmmoType : p2AmmoType;
                 let regenRate = checkAmmo === 2 ? 11 : 22; if (combatStance === 1) regenRate = Math.max(5, Math.floor(regenRate / 2)); 
                 
-                if (this.isOverheated) { 
-                    this.overheatTimer--; 
-                    if (this.overheatTimer <= 0) { this.isOverheated = false; this.ammo = this.maxAmmo; } 
-                } 
-                else if (!shootKey && !this.ultActive && this.laserActiveTimer <= 0 && this.fireBreathTimer <= 0) { 
-                    if (this.ammo < this.maxAmmo && frames % regenRate === 0) this.ammo += 1; 
+                // SHIN TRICKSTER: bat thuong VO HAN — luon day dan, khong bao gio qua nhiet
+                if (hasRune('shintrick')) { this.isOverheated = false; this.overheatTimer = 0; this.ammo = this.maxAmmo; }
+                if (this.isOverheated) {
+                    this.overheatTimer--;
+                    if (this.overheatTimer <= 0) { this.isOverheated = false; this.ammo = this.maxAmmo; if (checkAmmo === 7) this.boomLostPend = 0; }
+                }
+                // BOOMERANG: thanh dan = so LUOI DANG CAM TAY. Nem ra la mat luon,
+                // chi khi luoi BI MAT (khong bat kip) moi hoi lai, va phai cho 1 giay.
+                else if (checkAmmo === 7) {
+                    if (this.boomLostPend > 0) {
+                        this.boomRefillT = (this.boomRefillT || 0) + 1;
+                        if (this.boomRefillT >= 60) {
+                            this.boomRefillT = 0; this.boomLostPend--;
+                            if (this.ammo < this.maxAmmo) this.ammo++;
+                        }
+                    } else this.boomRefillT = 0;
+                }
+                else if (!shootKey && !this.ultActive && this.laserActiveTimer <= 0 && this.fireBreathTimer <= 0) {
+                    if (this.ammo < this.maxAmmo && frames % regenRate === 0) this.ammo += 1;
                 }
 
-                if (this.meleeTimer > 0) this.meleeTimer--; if (this.clawStrikeTimer > 0) this.clawStrikeTimer--; if (this.shieldCd > 0) this.shieldCd--;
+                if (this.meleeTimer > 0) this.meleeTimer--; if (this.clawStrikeTimer > 0) this.clawStrikeTimer--; if (this.shieldCd > 0) this.shieldCd--; if (this.shinGuardCd > 0) this.shinGuardCd--;
                 if (this.clawComboWindow > 0) this.clawComboWindow--;   // het cua so -> combo Zero reset ve nhat 1
                 if (this.clawRiseWindow > 0) this.clawRiseWindow--;     // cua so bam NHAY de ra Ryuenjin
+                // SWORDMASTER: luoi dao THU HAI, ban ra khi luoi truoc da di du CRESCENT_GAP px
+                if (this.crescent2) {
+                    this.crescent2.t--;
+                    if (this.crescent2.t <= 0) {
+                        let c2 = this.crescent2; this.crescent2 = null;
+                        let pos2 = this.getShootPos();
+                        let p2 = new Projectile(pos2.x, pos2.y, c2.dmg, c2.big ? 8 : 7, 0, c2.pierce, pos2.dir, this.id);
+                        p2.y -= p2.h / 2;
+                        projectiles.push(p2);
+                        // KHONG goi _slashFx o day: no ve hoat anh chem TREN NGUOI CHOI,
+                        // trong nhu nhan vat tu dong vung them mot nhat nua. Chi loe sang tai cho luoi ra.
+                        visualEffects.push(new Effect(pos2.x, pos2.y - p2.h / 2, 'parry', pos2.dir === -1));
+                        if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(700, 0.08, 'square', 0.14, 1100);
+                    }
+                }
                 // VUNG CHEM dang song: tinh lai theo vi tri HIEN TAI moi frame -> hitbox trung khop hoat anh
                 if (this.slashAtk) {
                     let _a = this.slashAtk, _r = this._slashRect();
@@ -13778,7 +13870,10 @@ class GreatApeBoss {
 
                 // K = CHARGE: tich luy khi giu (dan Rapid khong charge)
                 this.ultFillMult = 1;
-                if (chargeKey && combatStance === 0 && !this.isOverheated && this.laserActiveTimer <= 0 && this.fireBreathTimer <= 0) {
+                // SHIN TRICKSTER cho phep charge o the Trickster (binh thuong chi Gunslinger).
+                // CHANNEL van chi co o Gunslinger vi cac cong Channel deu bat buoc combatStance === 0.
+                let _canCharge = (combatStance === 0) || (combatStance === 1 && hasRune('shintrick'));
+                if (chargeKey && _canCharge && !this.isOverheated && this.laserActiveTimer <= 0 && this.fireBreathTimer <= 0) {
                     this.aKeyHeldTime++; this.chargeProgress = Math.min(100, (this.aKeyHeldTime / maxChargeFrames) * 100);
                     if (this.chargeProgress >= 100) { let oc = this.aKeyHeldTime - maxChargeFrames; this.ultFillMult = oc >= 300 ? 3 : 2; }
                 }
@@ -13787,10 +13882,12 @@ class GreatApeBoss {
                 if (checkAmmo === 5 && chargeKey && combatStance === 0 && !this.isOverheated && this.aKeyHeldTime >= 180) {
                     if (!this.clawChannel) { this.clawChannel = true; this.clawSwordCd = 0;
                         if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(180, 0.2, 'sawtooth', 0.16, 90); }
-                    // KIEM TRAN: moi 15 frame (0.25s) trieu them 1 thanh, tran 20
+                    // KIEM TRAN: trieu them 1 thanh moi nhip. SWORDMASTER: 30 thanh / 10 frame,
+                    // thuong: 20 thanh / 15 frame — ca hai deu day sau 300 frame.
+                    let _cap = clawSwordCap(), _tick = clawSwordTick();
                     if (this.clawSwordCd > 0) this.clawSwordCd--;
-                    if (this.clawSwordCd <= 0 && this.clawSwords.length < 20) { this.addClawSword(); this.clawSwordCd = 15; }
-                    if (this.clawSwords.length >= 20 && frames % 8 < 4) shakeTimer = Math.max(shakeTimer, 3);
+                    if (this.clawSwordCd <= 0 && this.clawSwords.length < _cap) { this.addClawSword(); this.clawSwordCd = _tick; }
+                    if (this.clawSwords.length >= _cap && frames % 8 < 4) shakeTimer = Math.max(shakeTimer, 3);
                 }
 
                 // Rapid: giu charge qua 3s -> channel ban gacha lien tuc 6 vien/s
@@ -13835,6 +13932,35 @@ class GreatApeBoss {
                 if (checkAmmo === 6 && chargeKey && combatStance === 0 && !this.isOverheated && this.aKeyHeldTime >= 180) {
                     if (!this.pulsarChannel) { this.pulsarChannel = true; this.createPulsarStar(0, true); }
                 }
+                // BOOMERANG CHANNEL — TAM LUOI: 3 chiec nem lien tuc, phai bat lien tuc
+                // BOOMERANG CHANNEL — KHIEN LUOI: bat duoc thi nem lai NGAY, khong can giu phim nua
+                if (checkAmmo === 7 && chargeKey && combatStance === 0 && !this.isOverheated && this.aKeyHeldTime >= 180) {
+                    if (!this.boomChannel) {
+                        this.boomChannel = true; this.boomChanLeft = 3; this.boomChanCd = 0; this.boomThrowCount = 0;
+                        floatingTexts.push(new FloatingText(this.x - 20, this.y - 30, "KHIEN LUOI!"));
+                        if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(420, 0.2, 'triangle', 0.22, 760);
+                    }
+                }
+                if (this.boomChannel) {
+                    this.boomChanCd = (this.boomChanCd || 0) - 1;
+                    // 3 luoi dau nem lien tuc luc moi vao
+                    if (this.boomChanLeft > 0 && this.boomChanCd <= 0) { this.boomChannelThrow(); this.boomChanLeft--; this.boomChanCd = 22; }
+                    // VAN GIU K: cu 1 giay tao bu 1 luoi neu luoi cu da mat
+                    else if (this.boomChanLeft <= 0 && chargeKey && combatStance === 0) {
+                        this.boomChanRefill = (this.boomChanRefill || 0) + 1;
+                        if (this.boomChanRefill >= 60) {
+                            this.boomChanRefill = 0;
+                            if ((this.boomOut || 0) < 3) { this.boomChannelThrow(); floatingTexts.push(new FloatingText(this.x - 20, this.y - 40, "BU LUOI")); }
+                        }
+                    } else this.boomChanRefill = 0;
+                    // Chi ket thuc khi KHONG con luoi nao tren khong VA da nha phim
+                    if (this.boomChanLeft <= 0 && (this.boomOut || 0) <= 0 && !chargeKey) {
+                        this.boomChannel = false; this.boomThrowCount = 0;
+                        this.isOverheated = true; this.overheatTimer = 120;
+                        this.aKeyHeldTime = 0; this.chargeProgress = 0;
+                        floatingTexts.push(new FloatingText(this.x - 24, this.y - 30, "MAT HET LUOI!"));
+                    }
+                }
 
                 // K nha ra = ban don CHARGE theo muc
                 if (!chargeKey && this.aKeyHeldTime > 0) {
@@ -13872,6 +13998,10 @@ class GreatApeBoss {
                     } else if (checkAmmo === 6) {
                         if (this.pulsarChannel) { this.pulsarChannel = false; this.pulsarStar = null; }
                         else if (!this.pulsarStar) this.createPulsarStar(this.aKeyHeldTime, false);
+                    } else if (checkAmmo === 7) {
+                        // NHA K khi dang KHIEN LUOI: KHONG tat che do. Luoi con bay thi van con dieu khien duoc.
+                        if (this.boomChannel) { this.boomChanRefill = 0; }
+                        else if (this.ammo > 0 && !this.isOverheated && this.attackCooldown <= 0) this.boomThrow(this.aKeyHeldTime);
                     }
                     this.chargeProgress = 0; this.aKeyHeldTime = 0;
                 }
@@ -13885,6 +14015,7 @@ class GreatApeBoss {
                     else if (checkAmmo === 4) { if (this.ammo > 0) this.fireLightning(1, 3); }
                     else if (checkAmmo === 5) { if (this.ammo > 0) this.clawSlash(); }
                     else if (checkAmmo === 6) { if (this.ammo > 0) this.firePulsarBullet(); }
+                    else if (checkAmmo === 7) { if (this.ammo > 0) this.boomThrow(0); }
                 }
 
                 // Rapid charge: xa tung vien gacha toc do cao (giong ban goc), xong overheat 1s
@@ -13986,12 +14117,21 @@ class GreatApeBoss {
             // Chem lien tiep thi noi combo; chem cach quang qua 0.6s thi combo reset ve nhat 1.
             // Tao hieu ung nhat chem va GAN vao nguoi choi -> chem xong nhay/chay thi vet chem di theo
             _slashFx(kind, isLeft, R) {
+                this._fxLast = { kind: kind, isLeft: isLeft, R: R };   // de SOGENMU dung lai dung hoat anh
                 let e = new Effect(this.x + this.w/2, this.y + this.h/2, kind, isLeft, R);
                 e.follow = this;
                 // MAU nhat chem doi theo nang cap dang mang
                 let _n = hasRune('explshot'), _c = hasRune('bulletclash');
                 e.tint = (_n && _c) ? 'dark' : (_n ? 'nova' : (_c ? 'clash' : null));
-                visualEffects.push(e); return e;
+                visualEffects.push(e);
+                // SWORDMASTER — MIKAZUKIZAN: mot vet chem THU HAI y het hinh dang nhung ban kinh lon hon,
+                // nen no luon khop voi don danh goc thay vi la mot hinh ve rieng.
+                if (hasRune('swordmaster')) {
+                    let e2 = new Effect(this.x + this.w/2, this.y + this.h/2, kind, isLeft, R + (R * 0.35 + 22));
+                    e2.follow = this; e2.tint = 'mika';
+                    visualEffects.push(e2);
+                }
+                return e;
             }
             // ===== VUNG CHEM SONG THEO FRAME: hitbox bam theo nguoi choi dung nhu hoat anh =====
             // Moi muc tieu chi an dmg 1 lan cho mot nhat chem (hitSet), nhung dich di vao vung
@@ -14001,8 +14141,13 @@ class GreatApeBoss {
                 // AWAKENED: NOVA voi Claws = nhat chem duoc cuong hoa: +1 dmg va chem duoc dan.
                 // CHEM DAN chi co khi mang NOVA hoac VA CHAM DAN — Claws tran KHONG chem dan duoc nua.
                 let _n = hasRune('explshot');
-                this.slashAtk = { dmg: dmg + (_n ? 1 : 0), t: life, dir, reach, hTop, hBot, spin: spinR || 0,
-                                  hit: new Set(), cut: (_n || hasRune('bulletclash')) };
+                // SWORDMASTER — MIKAZUKIZAN: noi them mot doan luoi trang khuyet vao moi nhat chem.
+                let _sm = hasRune('swordmaster');
+                let _ext = _sm ? Math.round(reach * 0.35 + 22) : 0;
+                this.slashSeq = (this.slashSeq || 0) + 1;
+                this.slashAtk = { dmg: dmg + (_n ? 1 : 0), t: life, dir, reach: reach + _ext, hTop, hBot, spin: spinR ? spinR + (_sm ? 22 : 0) : 0,
+                                  hit: new Set(), cut: (_n || hasRune('bulletclash') || _sm), mika: _ext,
+                                  seq: this.slashSeq, base: dmg, fx: this._fxLast || null };
             }
             _slashRect() {
                 let a = this.slashAtk; if (!a) return null;
@@ -14137,6 +14282,12 @@ class GreatApeBoss {
                 let p = new Projectile(pos.x, pos.y, dmg, big ? 8 : 7, 0, pierce, pos.dir, this.id);
                 p.y -= p.h / 2;
                 projectiles.push(p);
+                // SWORDMASTER: luoi dao thu HAI theo sau, cach luoi truoc CRESCENT_GAP px.
+                // Hen gio theo toc do that cua vien dan nen khoang cach luon dung.
+                if (hasRune('swordmaster')) {
+                    let sp = Math.abs(p.speed) || 14;
+                    this.crescent2 = { t: Math.max(1, Math.round(CRESCENT_GAP / sp)), big: big, pierce: pierce, dmg: dmg };
+                }
                 if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; }
             }
             startClawUltimate() {
@@ -14189,20 +14340,6 @@ class GreatApeBoss {
                 let yC = pos.y - (4*pos.scale)/2;
                 projectiles.push(new Projectile(pos.x, yC, this.bulletDmg, 5, 0, 0, pos.dir, this.id));
                 if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; }
-            }
-            fireRapidVolley(count) {
-                let n = Math.min(count, this.ammo);
-                if (n <= 0) return;
-                let pos = this.getShootPos(), yC = pos.y - (4*pos.scale)/2;
-                for (let i = 0; i < n; i++) {
-                    this.ammo--;
-                    let roll = Math.random(), yo = (i - (n - 1) / 2) * 6;
-                    if (roll < 0.12) projectiles.push(new Projectile(pos.x, yC + yo, this.bulletDmg * 2, 9, 0, 0, pos.dir, this.id));
-                    else if (roll < 0.24) projectiles.push(new Projectile(pos.x, yC + yo, this.bulletDmg, 6, 0, 1, pos.dir, this.id));
-                    else projectiles.push(new Projectile(pos.x, yC + yo, this.bulletDmg, 5, 0, 0, pos.dir, this.id));
-                }
-                this.attackCooldown = 12; this.isOverheated = true; this.overheatTimer = 60;
-                if (typeof SFX !== 'undefined' && SFX.shoot) SFX.shoot(2);
             }
             fireRapidChannel() {
                 let pos = this.getShootPos(), yC = pos.y - (4*pos.scale)/2;
@@ -14401,18 +14538,40 @@ class GreatApeBoss {
                 let currentAngle = Math.max(0.5, 3.5 - (chargeIntervals * 0.5));
                 
                 let pCount = 0;
-                if (chargeTime >= 60) pCount = 999; 
-                else if (chargeTime >= 30) pCount = 1; 
+                if (chargeTime >= 60) pCount = 999;
+                else if (chargeTime >= 30) pCount = 1;
 
-                projectiles.push(new Projectile(pos.x, yCenter, this.bulletDmg + 1, 6, 0, pCount, pos.dir, this.id));
-                projectiles.push(new Projectile(pos.x, yCenter, this.bulletDmg + 1, 6, -currentAngle, pCount, pos.dir, this.id)); 
-                projectiles.push(new Projectile(pos.x, yCenter, this.bulletDmg + 1, 6, currentAngle, pCount, pos.dir, this.id));  
-                if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; } 
+                // Manh dan LUON 2 dmg du charge hay khong. Suc manh nam o KHUC XA tich tu.
+                let pd = this.bulletDmg + 1;
+                [0, -currentAngle, currentAngle].forEach(a => {
+                    let p = new Projectile(pos.x, yCenter, pd, 6, a, pCount, pos.dir, this.id);
+                    p.prism = true; projectiles.push(p);
+                });
+                if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; }
+            }
+            // ===== BOOMERANG =====
+            // held = so frame da giu K. 0 = nem thuong.
+            boomThrow(held) {
+                let maxF = 90;
+                let t = Math.max(0, Math.min(1, held / maxF));
+                let full = held >= maxF;
+                this.ammo--; this.attackCooldown = 60;   // 1 giay giua 2 lan nem
+                this.boomOut = (this.boomOut || 0) + 1;
+                let nb = throwBoomerang(this, { dmg: held > 0 ? 4 : 3, charge: t, twice: full });
+                nb.paid = true;                          // luoi nay da tru dan -> mat thi moi hoan lai
+                if (full) floatingTexts.push(new FloatingText(this.x - 20, this.y - 28, "LUOI KEP!"));
+            }
+            // CHANNEL: 3 chiec nem lien tuc, moi chiec 5 dmg, bat duoc 5 dmg
+            boomChannelThrow() {
+                this.boomOut = (this.boomOut || 0) + 1;
+                // KHIEN LUOI: luoi tu ngam vao dich gan nhat ngay tu cu nem dau
+                let b = throwBoomerang(this, { dmg: 5, charge: 0.65, twice: true, aim: true, fitRange: true });
+                this.attackCooldown = 8;
             }
             fireSplitBounce() {
                 if (projectiles.filter(p => p.bounce).length >= 12) return;
                 let pos = this.getShootPos(), yCenter = pos.y - (6*pos.scale)/2, ang = 3.0;
-                [0, -ang, ang].forEach(a => { let p = new Projectile(pos.x, yCenter, 2, 6, a, 999, pos.dir, this.id); p.bounce = true; projectiles.push(p); });
+                [0, -ang, ang].forEach(a => { let p = new Projectile(pos.x, yCenter, 2, 6, a, 999, pos.dir, this.id); p.bounce = true; p.prism = true; projectiles.push(p); });
                 if (typeof SFX !== 'undefined' && SFX.shoot) SFX.shoot(3);
             }
             fireBigBullet() { 
@@ -14476,24 +14635,6 @@ class GreatApeBoss {
                 if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(300, 0.20, 'sawtooth', 0.22, 1200);
                 if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; }
             }
-            // ===== PULSE CHANNEL: dung 4 nut thanh HANG, nha ra thi ca 4 noi nhau ban chum tia =====
-            firePulseGrid() {
-                let hit = new Set();
-                for (let i = 0; i < pulseNodes.length; i++) {
-                    let a = pulseNodes[i], b = pulseNodes[i + 1];
-                    let x0 = 0, x1 = canvas.width;
-                    let yy = a.y;
-                    let rect = { x: x0, y: yy - 20, w: x1 - x0, h: 40 };
-                    for (let o of bosses.concat(enemies, obstacles)) {
-                        if (o.invulnAll || hit.has(o)) continue;
-                        if (checkAABB(rect, o)) { hit.add(o); o.hp -= 6; visualEffects.push(new Effect(o.x + o.w/2, o.y + o.h/2, 'explosion', true, 20)); }
-                    }
-                    pulseBeams.push({ y: yy, t: 22 });   // dai tia nhin thay duoc
-                    if (b) { let mx = (a.x + b.x)/2, my = (a.y + b.y)/2; visualEffects.push(new Effect(mx, my, 'explosion', true, 18)); }
-                }
-                if (pulseNodes.length) { shakeTimer = Math.max(shakeTimer, 24); if (typeof SFX !== 'undefined' && SFX.glassBreak) SFX.glassBreak(); }
-                pulseNodes = [];
-            }
             fireRedLaser() { this.laserActiveTimer = 90; this.laserType = 1; this.ammo = 0; this.isOverheated = true; this.overheatTimer = 150; }
             // ===== INFERNO MAX — HOA AN: cau lua nang cam vao dich, chay am i roi NO LON sau 2.5 giay =====
             fireBrand() {
@@ -14544,7 +14685,7 @@ class GreatApeBoss {
                     this.clawChannel = false; this.clawChannelHits = 0;
                     this.aKeyHeldTime = 0; this.chargeProgress = 0; this.attackCooldown = 20;
                 }
-                if (this.clawChannel || this.rapidChannel || this.normalLaserChannel || this.fireChannel || this.lightChannel || this.splitChannel || this.pulsarChannel) { if (this.pulsarChannel && this.pulsarStar && this.pulsarStar.onBody) this.pulsarStar = null; this.clawChannel = false; this.rapidChannel = false; this.normalLaserChannel = false; this.fireChannel = false; this.lightChannel = false; this.splitChannel = false; this.pulsarChannel = false; projectiles.forEach(p => { if (p.bounce) p.bounce = false; }); this.lightLinkTargets = null; this.laserActiveTimer = 0; this.clawChannelHits = 0; this.aKeyHeldTime = 0; this.chargeProgress = 0; floatingTexts.push(new FloatingText(this.x, this.y - 20, "NGAT CHANNEL!")); }
+                if (this.clawChannel || this.rapidChannel || this.normalLaserChannel || this.fireChannel || this.lightChannel || this.splitChannel || this.pulsarChannel || this.boomChannel) { if (this.pulsarChannel && this.pulsarStar && this.pulsarStar.onBody) this.pulsarStar = null; this.clawChannel = false; this.rapidChannel = false; this.normalLaserChannel = false; this.fireChannel = false; this.lightChannel = false; this.splitChannel = false; this.pulsarChannel = false; this.boomChannel = false; this.boomChanLeft = 0; projectiles.forEach(p => { if (p.bounce) p.bounce = false; }); this.lightLinkTargets = null; this.laserActiveTimer = 0; this.clawChannelHits = 0; this.aKeyHeldTime = 0; this.chargeProgress = 0; floatingTexts.push(new FloatingText(this.x, this.y - 20, "NGAT CHANNEL!")); }
                 this.hp -= amount; this.invincible = true; this.invTimer = 80; speedBonus = 0; shakeTimer = 15;
                 noDamageTaken = false; noDmgStreak = 0; stylePoints *= 0.45; styleLastTag = '';
                 shieldCharge = Math.max(0, shieldCharge - 300);   // trung don LUI 5 giay tien do la chan, khong xoa sach
@@ -14561,9 +14702,11 @@ class GreatApeBoss {
 
 </script>
     <script>
+        /* ============================================================================
+           @@KHOI-5  —  GIAO DIEN: HUD, Menu, San tap (Dojo), Rune picker, man hinh chet
+           ============================================================================ */
 /* ===== js/ui.js ===== */
 // ==== UI: menu, HUD, man hinh chon, hieu ung man hinh ====
-let MENU_CUST_Y = 250;
 
         function updateHTMLInstructions() {
             document.getElementById("instruction-box").innerHTML = `<p class="controls">${LANG[currentLang].inst_1}</p>`;
@@ -14800,312 +14943,6 @@ let MENU_CUST_Y = 250;
         }
 
 
-        function drawPreviewScene() {
-            let pY = 250; 
-            let pH = 150; 
-
-            ctx.fillStyle = "#FFCC80"; ctx.fillRect(0, pY, canvas.width, pH);
-            previewBgOffset = (previewBgOffset + 3) % 40; 
-            ctx.fillStyle = "#E6C287"; ctx.fillRect(0, pY + 110, canvas.width, 40); 
-            ctx.fillStyle = "#A88349";
-            for (let i = -1; i < canvas.width / 40 + 1; i++) {
-                ctx.fillRect(i * 40 - previewBgOffset + 10, pY + 115, 12, 4);
-                ctx.fillRect(i * 40 - previewBgOffset + 30, pY + 125, 8, 4);
-            }
-
-            previewDino.dy += dino.gravity; // Using normal dino gravity for preview
-            previewDino.y += previewDino.dy;
-            let sScale = dino.getFormScale();
-            let floorY = pY + 110 - 44 * sScale; 
-            if (previewDino.y >= floorY) { previewDino.y = floorY; previewDino.dy = 0; previewDino.grounded = true; }
-            if (previewDino.shieldTimer > 0) previewDino.shieldTimer--;
-
-            let dx = 80; let dy = previewDino.y; 
-            let pos = { x: dx + 42*sScale + 15, y: dy + 12*sScale, scale: sScale, dir: 1 };
-
-            previewTimer++;
-            let t = previewTimer;
-
-            let lineY = pos.y - 12; // dat quai sao cho tam no nam ngay tam ban
-            let rowR = (n, gap, hp, yy) => { for (let i = 0; i < n; i++) { let e = new PreviewEnemy(hp, pY); e.x = canvas.width - 30 - i * gap; e.y = (yy !== undefined ? yy : lineY); previewEnemies.push(e); } };
-            let clusterR = (n, cx, hp, spread) => { let sp = spread || 70; for (let i = 0; i < n; i++) { let e = new PreviewEnemy(hp, pY); e.x = cx + (Math.random() - 0.5) * sp; e.y = pY + 34 + Math.random() * 52; previewEnemies.push(e); } };
-            let scatterR = (n, hp) => { for (let i = 0; i < n; i++) { let e = new PreviewEnemy(hp, pY); e.x = canvas.width - 30 - i * 52 + (Math.random() - 0.5) * 24; e.y = pY + 22 + Math.random() * 72; previewEnemies.push(e); } };
-            // Split: tinh vy sao cho 3 vien tach trung dung 3 con o 3 lane; laneGap nho => quai chum
-            let splitDemo = (E, laneGap, hp, pierce, depth) => {
-                let f = (E - pos.x) / 16;
-                for (let k = -1; k <= 1; k++) {
-                    let vy = (k * laneGap) / f;
-                    previewProjectiles.push(new PreviewProjectile(pos.x, pos.y - 3, 1, 6, vy, pierce));
-                    for (let d = 0; d < (depth || 1); d++) { let e = new PreviewEnemy(hp, pY); e.x = E + d * 42; e.y = pos.y + k * laneGap - 12; previewEnemies.push(e); }
-                }
-            };
-
-            if (currentAmmoType === 0) {
-                // Tier 1: ban thuong (1 dmg) - 3 phat trung 3 con le
-                if (t === 12) rowR(3, 70, 1);
-                if (t === 20 || t === 38 || t === 56) previewProjectiles.push(new PreviewProjectile(pos.x, pos.y - 3, 1, 0));
-                // Tier 2: dan to (2 dmg, sac 25%) - 3 phat, 3 con hp2
-                if (t > 95 && t < 118) previewDino.chargeProgress = 25;
-                if (t === 108) rowR(3, 70, 2);
-                if (t === 118) previewDino.chargeProgress = 0;
-                if (t === 120 || t === 138 || t === 156) previewProjectiles.push(new PreviewProjectile(pos.x, pos.y - 3, 2, 1));
-                // Tier 3: dan XUYEN (2 dmg, sac 62.5%) - 1 vien xuyen ca hang dai tu goc phai
-                if (t > 195 && t < 235) previewDino.chargeProgress = (t - 195) / 40 * 62.5;
-                if (t === 214) rowR(8, 46, 2);
-                if (t === 235) { previewDino.chargeProgress = 0; previewProjectiles.push(new PreviewProjectile(pos.x, pos.y - 3, 2, 2)); }
-                // Tier 4: LAZER (sac 100%) - ca hang dai thieu rui
-                if (t > 300 && t < 360) previewDino.chargeProgress = (t - 300) / 60 * 100;
-                if (t === 342) rowR(10, 44, 7);
-                if (t === 360) { previewDino.chargeProgress = 0; previewDino.laserActiveTimer = 90; previewDino.laserType = 0; }
-                if (t === 520) resetPreview();
-            }
-            else if (currentAmmoType === 1) {
-                // Tier 1: phun lua - hang quai trai dai nhieu tam (cone lon dan nuot dan)
-                if (t === 10) rowR(5, 62, 3);
-                if (t === 18) { previewDino.fireBreathTimer = 90; previewDino.fireBreathLength = 130; }
-                if (t > 18 && t < 95 && t % 10 === 0) previewDino.fireBreathLength += 90;
-                // Tier 2: cau lua No (type3, AoE) - cum quai nhieu do cao
-                if (t > 120 && t < 145) previewDino.chargeProgress = 30;
-                if (t === 136) clusterR(5, 610, 2, 80);
-                if (t === 145) previewDino.chargeProgress = 0;
-                if (t === 148 || t === 160) previewProjectiles.push(new PreviewProjectile(pos.x, pos.y - 8, 2, 3));
-                // Tier 3: cau lua doi (type4) - 2 qua CUNG do cao, ban lien tiep (qua sau cach 120px)
-                if (t > 225 && t < 255) previewDino.chargeProgress = 62.5;
-                if (t === 244) { for (let i = 0; i < 6; i++) { let e = new PreviewEnemy(2, pY); e.x = 560 + i * 30; e.y = lineY + (Math.random() - 0.5) * 34; previewEnemies.push(e); } }
-                if (t === 255) previewDino.chargeProgress = 0;
-                if (t === 258) { previewProjectiles.push(new PreviewProjectile(pos.x, pos.y - 8, 1, 4)); previewProjectiles.push(new PreviewProjectile(pos.x - 120, pos.y - 8, 1, 4)); }
-                // Tier 4: LAZER DO - hang dai
-                if (t > 330 && t < 390) previewDino.chargeProgress = (t - 330) / 60 * 100;
-                if (t === 372) rowR(9, 48, 7);
-                if (t === 390) { previewDino.chargeProgress = 0; previewDino.laserActiveTimer = 90; previewDino.laserType = 1; }
-                if (t === 540) resetPreview();
-            }
-            else if (currentAmmoType === 2) {
-                // Lien thanh: 1 tam ban duy nhat -> quai NGANG TAM (khong random cao thap), bay tu goc phai
-                if (t === 10) rowR(6, 50, 3);
-                if (t === 130) rowR(7, 46, 3);
-                if (t >= 20 && t <= 250 && t % 7 === 0) {
-                    let roll = Math.floor(t / 7) % 5;
-                    if (roll === 0) previewProjectiles.push(new PreviewProjectile(pos.x, pos.y - 2, 2, 9));
-                    else if (roll === 1) previewProjectiles.push(new PreviewProjectile(pos.x, pos.y - 2, 1, 6, 0, 1));
-                    else if (roll === 2) { previewProjectiles.push(new PreviewProjectile(pos.x, pos.y - 6, 1, 5)); previewProjectiles.push(new PreviewProjectile(pos.x, pos.y + 4, 1, 5)); }
-                    else previewProjectiles.push(new PreviewProjectile(pos.x, pos.y - 2, 1, 5));
-                }
-                if (t === 300) resetPreview();
-            }
-            else if (currentAmmoType === 3) {
-                // Split: dan cang chum thi quai cang chum; cang nhieu quai cang vao trong
-                // Tier 1 (khong sac): toe rong, 3 con cach xa -> moi vien trung 1 con
-                if (t === 20) splitDemo(760, 46, 1, 0, 1);
-                // Tier 2 (sac 1/3, xuyen 1): hep hon, moi lane 2 con
-                if (t > 80 && t < 108) previewDino.chargeProgress = (t - 80) / 28 * 100;
-                if (t === 108) { previewDino.chargeProgress = 0; splitDemo(700, 30, 1, 1, 2); }
-                // Tier 3 (sac 2/3, xuyen han): chum hon, moi lane 3 con, vao trong hon
-                if (t > 160 && t < 210) previewDino.chargeProgress = (t - 160) / 50 * 100;
-                if (t === 210) { previewDino.chargeProgress = 0; splitDemo(650, 18, 1, 999, 3); }
-                // Tier 4 (sac max): 3 vien gan nhu chum 1, quai co cum sat, vao sau nhat
-                if (t > 265 && t < 350) previewDino.chargeProgress = (t - 265) / 85 * 100;
-                if (t === 350) { previewDino.chargeProgress = 0; splitDemo(600, 8, 1, 999, 4); }
-                if (t === 470) resetPreview();
-            }
-            else if (currentAmmoType === 4) {
-                // Set day chuyen: quai RAI RAC bay tu goc phai de thay tia nhay qua tung con
-                if (t === 18) scatterR(4, 2);
-                if (t === 40) activeLightnings.push({ timer: 15, chains: calculateLightningChains(pos.x, pos.y, 1, 3, 1) });
-                if (t > 130 && t < 172) previewDino.chargeProgress = (t - 130) / 42 * 50;
-                if (t === 148) scatterR(6, 2);
-                if (t === 172) { previewDino.chargeProgress = 0; activeLightnings.push({ timer: 15, chains: calculateLightningChains(pos.x, pos.y, 2, 6, 1) }); }
-                if (t > 260 && t < 350) previewDino.chargeProgress = (t - 260) / 90 * 100;
-                if (t === 328) scatterR(9, 2);
-                if (t === 350) { previewDino.chargeProgress = 0; activeLightnings.push({ timer: 15, chains: calculateLightningChains(pos.x, pos.y, 3, 9, 1) }); }
-                if (t === 500) resetPreview();
-            }
-            else if (currentAmmoType === 5) {
-                // Tier 1: chem mong vuot (3 dmg, tam gan) - 3 nhat, quai ap sat
-                if (t === 12 || t === 47 || t === 82) { let e = new PreviewEnemy(3, pY); e.x = pos.x + 70; e.y = pY + 55; previewEnemies.push(e); }
-                if (t === 20 || t === 55 || t === 90) {
-                    previewDino.clawSlashTimer = 12; previewDino.clawSlashBig = false;
-                    previewEnemies.forEach(e => { if (e.x > pos.x - 10 && e.x < pos.x + 120 && Math.abs((e.y + e.h / 2) - pos.y) < 55) e.hp -= 3; });
-                }
-                // Tier 2: luoi khi (type7, 2 dmg, 0.5s) - 3 luoi, quai bay tu phai
-                if (t > 120 && t < 152) previewDino.chargeProgress = (t - 120) / 32 * 40;
-                if (t === 136) rowR(3, 70, 2);
-                if (t === 152) previewDino.chargeProgress = 0;
-                if (t === 154 || t === 175 || t === 196) { let cp = new PreviewProjectile(pos.x, pos.y, 2, 7); cp.y -= cp.h / 2; previewProjectiles.push(cp); }
-                // Tier 3: luoi khi LON XUYEN (type8, 3 dmg) - xuyen ca hang dai
-                if (t > 235 && t < 268) previewDino.chargeProgress = (t - 235) / 33 * 80;
-                if (t === 248) rowR(8, 46, 3);
-                if (t === 268) { previewDino.chargeProgress = 0; let cp = new PreviewProjectile(pos.x, pos.y, 3, 8, 0, 999); cp.y -= cp.h / 2; previewProjectiles.push(cp); }
-                // Tier 4: TUYET KY luot xuyen - chem - lui ve (bat tu) - CUM quai dong
-                if (t > 320 && t < 380) previewDino.chargeProgress = (t - 320) / 60 * 100;
-                if (t === 385) { previewDino.chargeProgress = 0; previewDino.clawUlt = true; clusterR(8, 470, 5, 130); }
-                if (t >= 388 && t <= 412) {
-                    let travel = (t - 388) / 24;
-                    previewDino._ultDashX = 80 + travel * 350;
-                    previewEnemies.forEach(e => { if (e.x < previewDino._ultDashX + 180 && e.x > previewDino._ultDashX - 40 && e.hp > 0) e.hp -= 1; });
-                }
-                if (t === 412) { previewDino.clawSlashTimer = 18; previewDino.clawSlashBig = true; previewDino._ultDashX = 430; }
-                if (t >= 430 && t <= 450) { let backP = (t - 430) / 20; previewDino._ultDashX = 430 - backP * 350; }
-                if (t === 450) { previewDino.clawUlt = false; previewDino._ultDashX = undefined; }
-                if (t === 540) resetPreview();
-            }
-            else if (currentAmmoType === 6) {
-                let sX = canvas.width * 0.56, sY = pY + pH * 0.5;
-                // Phase 1: don ban thuong (dan vang xuyen) truoc
-                if (t === 10) rowR(6, 44, 2);
-                if (t === 20 || t === 48 || t === 76) previewProjectiles.push(new PreviewProjectile(pos.x, pos.y - 3, 1, 6, 0, 999));
-                // Phase 2: sao xuat hien, ban dan vang vao -> no 5 CANH cung luc (72 do) x 3 vong -> xoan oc
-                let starOn = t >= 110;
-                if (starOn && (t - 110) % 46 === 0) previewProjectiles.push(new PreviewProjectile(pos.x, pos.y - 3, 1, 6, 0, 999));
-                if (starOn) { let ph = (t - 110) % 46; if (ph === 12 || ph === 15 || ph === 18) { let base = frames * 0.16; for (let i = 0; i < 5; i++) { let a = base + i * (Math.PI*2/5); let sp = 6.5; let pp = new PreviewProjectile(sX, sY, 1, 6, 0, 0); pp.speed = Math.cos(a) * sp; pp.vy = Math.sin(a) * sp; previewProjectiles.push(pp); } } }
-                if (starOn) {
-                    ctx.save(); ctx.translate(sX, sY); ctx.rotate(frames * 0.16);
-                    ctx.fillStyle = '#FFEB3B'; ctx.shadowBlur = 14; ctx.shadowColor = '#FFEB3B'; ctx.beginPath();
-                    for (let i = 0; i < 10; i++) { let rr = (i % 2 === 0) ? 18 : 8, aa = (i * Math.PI / 5) - Math.PI/2, xx = Math.cos(aa) * rr, yy = Math.sin(aa) * rr; if (i === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy); }
-                    ctx.closePath(); ctx.fill(); ctx.fillStyle = '#FFFDE7'; ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI*2); ctx.fill(); ctx.restore();
-                }
-                if (t === 300) resetPreview();
-            }
-
-            if (previewDino.shieldTimer > 0) {
-                let sX = dx + 42*sScale; let sY = dy - 15;
-                ctx.fillStyle = "rgba(0, 255, 255, 0.4)"; ctx.fillRect(sX, sY, 15, 75 * sScale);
-                ctx.strokeStyle = "rgba(0, 255, 255, 0.9)"; ctx.lineWidth = 3; ctx.strokeRect(sX, sY, 15, 75 * sScale);
-            }
-
-            let legAnim = (!previewDino.grounded) ? 4 : ((frames % 12 < 6) ? 4 : 0);
-            if (previewDino._ultDashX !== undefined) dx = previewDino._ultDashX;
-dino.drawForm(false, dx, dy, legAnim, currentForm, false);
-
-            ctx.save();
-            if (previewDino.chargeProgress > 0 && previewDino.laserActiveTimer <= 0) {
-                let _pH = previewDino.aKeyHeldTime || 0, _pT = Math.max(0, Math.min(1, _pH / 180));
-                let _pC = chargeRingColor(currentAmmoType, _pH);
-                ctx.strokeStyle = _pC;
-                ctx.lineWidth = 3 + _pT * 5; ctx.beginPath(); ctx.arc(pos.x, pos.y, 10 + _pT * 34, 0, Math.PI*2); ctx.stroke();
-                ctx.shadowBlur = 12; ctx.shadowColor = _pC; ctx.lineWidth = 4;
-                ctx.beginPath(); ctx.arc(pos.x, pos.y, 46, -Math.PI/2, -Math.PI/2 + Math.PI*2*_pT); ctx.stroke();
-                ctx.shadowBlur = 0;
-                let _pTi = CHARGE_TIERS[currentAmmoType] || CHARGE_TIERS[0];
-                ctx.lineWidth = 2;
-                for (let ti = 0; ti < _pTi.length; ti++) {
-                    let a = -Math.PI/2 + Math.PI*2*(_pTi[ti][0]/180);
-                    ctx.strokeStyle = _pH >= _pTi[ti][0] ? _pTi[ti][1] : "rgba(255,255,255,0.28)";
-                    ctx.beginPath();
-                    ctx.moveTo(pos.x + Math.cos(a)*41, pos.y + Math.sin(a)*41);
-                    ctx.lineTo(pos.x + Math.cos(a)*51, pos.y + Math.sin(a)*51);
-                    ctx.stroke();
-                }
-            }
-            if (currentAmmoType === 4 && previewDino.chargeProgress > 0 && previewDino.laserActiveTimer <= 0) {
-                ctx.strokeStyle = "#00E5FF"; ctx.lineWidth = 2;
-                let boltCount = Math.floor(previewDino.chargeProgress / 15) + 1;
-                for(let i = 0; i < boltCount; i++) {
-                    ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
-                    let angle = (Math.random() - 0.5) * Math.PI; let length = 15 + Math.random() * 25;
-                    ctx.lineTo(pos.x + Math.cos(angle)*length, pos.y + Math.sin(angle)*length); ctx.stroke();
-                }
-            }
-            // CLAW: charge = vu no tia trang giua than
-            if (currentAmmoType === 5 && previewDino.chargeProgress > 0) {
-                let ccx = dx + 16 * sScale, ccy = dy + 22 * sScale;
-                let boltCount = Math.floor(previewDino.chargeProgress / 12) + 2;
-                ctx.strokeStyle = "rgba(255,255,255,0.95)"; ctx.lineWidth = 2;
-                for (let bi = 0; bi < boltCount; bi++) {
-                    ctx.beginPath(); ctx.moveTo(ccx, ccy);
-                    let bAng = Math.random() * Math.PI * 2; let bLen = 8 + (previewDino.chargeProgress/6) + Math.random() * 8;
-                    ctx.lineTo(ccx + Math.cos(bAng)*bLen, ccy + Math.sin(bAng)*bLen); ctx.stroke();
-                }
-                let _pT2 = Math.max(0, Math.min(1, (previewDino.aKeyHeldTime || 0) / 180));
-                ctx.strokeStyle = chargeRingColor(5, previewDino.aKeyHeldTime || 0); ctx.lineWidth = 2 + _pT2 * 4;
-                ctx.beginPath(); ctx.arc(ccx, ccy, 8 + _pT2 * 26, 0, Math.PI*2); ctx.stroke();
-            }
-            // CLAW: ve vet chem 3 mong vuot cong (giong het gameplay that)
-            if (previewDino.clawSlashTimer > 0) {
-                let bigC = previewDino.clawSlashBig;
-                let dur = bigC ? 18 : 12;
-                let tt = dur - previewDino.clawSlashTimer;
-                ctx.save();
-                let sx = bigC && previewDino._ultDashX !== undefined ? previewDino._ultDashX + 90 : pos.x + (bigC ? 70 : 50);
-                ctx.translate(sx, pos.y);
-                let R = bigC ? 105 : 58;
-                let gap = bigC ? 24 : 16, spreadAng = 0.62;
-                ctx.lineCap = "round";
-                for (let k = -1; k <= 1; k++) {
-                    let lp = Math.min(1, Math.max(0, (tt - (k + 1) * 1.3) / dur));
-                    if (lp <= 0) continue;
-                    let a = 1 - lp, cx = -R * 0.55, cy = k * gap;
-                    ctx.strokeStyle = "rgba(" + (bigC ? "255,235,59" : "0,229,255") + "," + (a * 0.85) + ")"; ctx.lineWidth = bigC ? 9 : 6;
-                    ctx.beginPath(); ctx.arc(cx, cy, R, -spreadAng, spreadAng); ctx.stroke();
-                    ctx.strokeStyle = "rgba(255,255,255," + a + ")"; ctx.lineWidth = bigC ? 4.5 : 3;
-                    ctx.beginPath(); ctx.arc(cx, cy, R, -spreadAng, spreadAng); ctx.stroke();
-                }
-                ctx.restore();
-                previewDino.clawSlashTimer--;
-            }
-            if (previewDino.fireBreathTimer > 0) {
-                previewDino.fireBreathTimer--;
-                ctx.fillStyle = (frames % 4 < 2) ? "rgba(255, 87, 34, 0.8)" : "rgba(255, 193, 7, 0.8)";
-                ctx.beginPath(); ctx.moveTo(pos.x, pos.y); ctx.lineTo(pos.x + previewDino.fireBreathLength, pos.y - 20); ctx.lineTo(pos.x + previewDino.fireBreathLength, pos.y + 20); ctx.closePath(); ctx.fill();
-            }
-            if (previewDino.laserActiveTimer > 0) {
-                previewDino.laserActiveTimer--;
-                let clrMain = previewDino.laserType === 1 ? "rgba(255, 23, 68, 0.5)" : "rgba(224, 64, 251, 0.5)";
-                let clrCore = previewDino.laserType === 1 ? "rgba(255, 23, 68, 0.7)" : "rgba(224, 64, 251, 0.7)";
-                ctx.fillStyle = clrMain; ctx.fillRect(pos.x, pos.y - 24, canvas.width - pos.x, 48);
-                ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; ctx.fillRect(pos.x, pos.y - 8, canvas.width - pos.x, 16);
-                ctx.fillStyle = "rgba(255, 255, 255, 0.9)"; ctx.beginPath(); ctx.arc(pos.x, pos.y, 22, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = clrCore; ctx.beginPath(); ctx.arc(pos.x, pos.y, 16, 0, Math.PI*2); ctx.fill();
-            }
-            ctx.restore();
-
-            if (previewDino.laserActiveTimer > 0) {
-                previewEnemies.forEach(e => { if (frames % 10 === 0) e.hp -= 1; });
-            }
-            if (previewDino.fireBreathTimer > 0) {
-                let rect = { x: pos.x, y: pos.y - 20, w: previewDino.fireBreathLength, h: 40 };
-                previewEnemies.forEach(e => { if (checkAABB(rect, e) && frames % 10 === 0) e.hp -= 1; });
-            }
-
-            for (let p = previewProjectiles.length - 1; p >= 0; p--) {
-                let proj = previewProjectiles[p];
-                proj.update(); proj.draw();
-                let hit = false;
-                for (let e = previewEnemies.length - 1; e >= 0; e--) {
-                    let en = previewEnemies[e];
-                    if (checkAABB(proj, en)) { en.hp -= proj.dmg; hit = true; if (proj.type !== 2 && proj.pierceCount <= 0) break; }
-                }
-                if (hit && proj.type !== 2) {
-                    proj.pierceCount--;
-                    if (proj.pierceCount < 0) {
-                        if (proj.type === 3 || proj.type === 4 || proj.type === 10) {
-                            visualEffects.push(new Effect(proj.x + proj.w/2, proj.y + proj.h/2, 'explosion', true, 40));
-                            let aoeRect = { x: proj.x + proj.w/2 - 40, y: proj.y + proj.h/2 - 40, w: 80, h: 80 };
-                            previewEnemies.forEach(en => { if(checkAABB(aoeRect, en)) en.hp -= 2; });
-                        }
-                        previewProjectiles.splice(p, 1);
-                    }
-                }
-                else if (proj.x > canvas.width || proj.x < -30 || proj.y < pY - 30 || proj.y > pY + pH + 30) previewProjectiles.splice(p, 1);
-            }
-
-            for (let e = previewEnemies.length - 1; e >= 0; e--) {
-                let en = previewEnemies[e];
-                en.update(); en.draw();
-                if (en.hp <= 0 || en.x < -50) previewEnemies.splice(e, 1);
-            }
-
-            for (let i = visualEffects.length - 1; i >= 0; i--) { visualEffects[i].update(); visualEffects[i].draw(); if (visualEffects[i].timer >= 30) visualEffects.splice(i, 1); }
-
-            ctx.strokeStyle = "#FFD700"; ctx.lineWidth = 4; ctx.strokeRect(0, pY, canvas.width, pH);
-            ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fillRect(10, pY + 10, 200, 25);
-            ctx.fillStyle = "#FFF"; ctx.font = "bold 14px Courier New"; ctx.fillText("AUTO PREVIEW", 20, pY + 28);
-            { let chanDesc = ["Giu K 3s: giu tia laser vo han (8 dmg/giay)", "Giu K 3s: song nhiet hach 5 dmg toan map/giay", "Giu K 3s: ban gacha lien tuc ~6 vien/giay", "Giu K 3s: 3 vien xuyen nay DVD (toi da 12)", "Giu K 3s: xich set bam 4 muc tieu", "Giu K 3s: vong Judgement Cut nho + finisher", "Giu K 3s: sao tren than xoay ban 5 canh"];
-              let ultDesc = ["OVERCHARGE: trang thai SS-Blue tang luc", "ATOMIC CORE: lo nguyen tu 4 dmg/giay toan map 20s", "OVERDRIVE: 100 vien ban khong nap", "PRISM NOVA: 12 vien nay toa 360 do, 10s", "THUNDER GOD: form Dash + giat set thu dong 20s", "JUDGEMENT CUT: chem 100 dmg dien vung", "SUPERNOVA: sao khong lo roi giua map no 180 vien"];
-              ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(10, pY + pH - 44, canvas.width - 20, 38);
-              ctx.font = "bold 11px Courier New"; ctx.fillStyle = "#80D8FF"; ctx.fillText("CHANNEL  " + (chanDesc[currentAmmoType] || ""), 18, pY + pH - 26);
-              ctx.fillStyle = "#FFD54F"; ctx.fillText("ULT (U)  " + (ultDesc[currentAmmoType] || ""), 18, pY + pH - 11); }
-        }
 
 
         function drawPvPSetup() {
@@ -15113,7 +14950,7 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
             ctx.fillStyle = "#00E5FF"; ctx.font = "bold 26px Courier New"; ctx.textAlign = "center"; ctx.fillText("PVP SETUP (P1 VS P2)", canvas.width/2, 40);
 
             let forms = ["NORMAL", "RUSH", "ULT", "BEYOND"];
-            let ammos = ["PULSE", "INFERNO", "RAPIDFIRE", "PRISM", "VOLT", "RIPPER", "PULSAR"];
+            let ammos = AMMO_NAMES;
 
             ctx.font = "bold 18px Courier New";
 
@@ -15158,8 +14995,8 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
 
             const forms = ["NORMAL", "RUSH", "ULTIMATE", "BEYOND"];
             const formDesc = currentLang==="en" ? ["Balanced baseline","Agile, blue spikes","Strong, dark, aura","Peak: horns + scales"] : ["Cơ bản, cân bằng", "Nhanh nhẹn, gai xanh", "Mạnh, tối màu, hào quang", "Đỉnh cao, sừng + vảy"];
-            const ammos = ["PULSE", "INFERNO", "RAPIDFIRE", "PRISM", "VOLT", "RIPPER", "PULSAR"];
-            const ammoDesc = currentLang==="en" ? ["Balanced, strong charge","Burns over time","Rapid, steady DPS","3-way spread, short range","Zigzag, chains targets","Heavy, few shots, pierces","Stores one big hit"] : ["Cân bằng, charge mạnh", "Cháy theo thời gian", "Xối xả, DPS đều", "Toả 3 tia, trúng gần", "Zigzag, nối mục tiêu", "Nặng, ít phát, xuyên", "Dồn tích một cú lớn"];
+            const ammos = AMMO_NAMES;
+            const ammoDesc = currentLang==="en" ? ["Balanced, strong charge","Burns over time","Rapid, steady DPS","3-way spread, short range","Zigzag, chains targets","Heavy, few shots, pierces","Stores one big hit","Throw and catch mid-air"] : ["Cân bằng, charge mạnh", "Cháy theo thời gian", "Xối xả, DPS đều", "Toả 3 tia, trúng gần", "Zigzag, nối mục tiêu", "Nặng, ít phát, xuyên", "Dồn tích một cú lớn", "Ném đi rồi bắt trên không"];
             const SHIELDS = currentLang==="en" ? ["PARRY","ACTIVE SHIELD"] : ["ĐỠ ĐÒN", "KHIÊN CHỦ ĐỘNG"];
             const shieldDesc = currentLang==="en" ? ["Time it right: block 1 hit + parry counter.","Hold up to 1.5s, 4s cooldown. Trade-off: no parry."] : ["Bấm đúng lúc: chặn 1 đòn + phản đòn (parry).", "Giữ tối đa 1,5s, sạc 4s. Đổi lại: mất phản đòn."];
             const stances = [["GUNSLINGER", "#FF8F00", LT("Bắn xa, tích charge mạnh","Long range, strong charge")], ["TRICKSTER", "#00ACC1", LT("Hồi lướt nhanh, tự ngắm rộng","Fast dash cooldown, wide auto-aim")], ["ROYAL GUARD", "#7E57C2", LT("Đỡ đòn lâu hơn, thủ vững","Longer shield, solid defense")]];
@@ -15236,90 +15073,36 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
             ctx.fillText(line, x, yy);
         }
 
-        // ======= HOVER TEN DAN -> bang gioi thieu CHANNEL + CHIEU CUOI (co animation) =======
-        const AMMO_INFO = [
-            { name:"PULSE", color:"#00BCD4", ch:"TIA LASER VÔ HẠN", chDesc:"Giữ một tia laser liên tục, KHÔNG quá nhiệt, quét cả hàng ngang cho tới khi nhả phím hoặc dính đòn.", ult:"OVERCHARGE", ultDesc:"Giữ K để phóng tia mega xuyên màn (2 dmg mỗi nhịp, tiêu thanh chiêu); hoặc bấm J bắn đạn nặng." },
-            { name:"INFERNO", color:"#FF5722", ch:"XUNG NHIỆT HẠCH", chDesc:"Mỗi 1 giây phát 1 xung nổ 5 dmg toàn màn hình — bào mòn diện rộng theo thời gian.", ult:"ATOMIC CORE", ultDesc:"Vào dạng Lò Phản Ứng 20 giây: mỗi giây nổ AOE lửa toàn màn, thanh chiêu thành đồng hồ đếm ngược." },
-            { name:"RAPIDFIRE", color:"#76FF03", ch:"LIÊN THANH GACHA", chDesc:"Xối xả ~6 viên/giây liên tục, ngẫu nhiên có viên to hoặc xuyên — DPS đều tay.", ult:"OVERDRIVE", ultDesc:"Nạp 100 viên rồi xả cực nhanh: giữ K = liên thanh tối đa, bấm J = phát đơn, tới khi hết đạn." },
-            { name:"PRISM", color:"#FFEB3B", ch:"TAM TIA DVD", chDesc:"Bắn 3 viên xuyên nảy quanh màn kiểu DVD, tự lặp lại mỗi 1 giây.", ult:"PRISM NOVA", ultDesc:"Bùng nổ 12 viên xuyên toả tròn, nảy khắp màn ~10 giây, phủ kín khu vực." },
-            { name:"VOLT", color:"#00E5FF", ch:"XÍCH SÉT", chDesc:"Tự giật sét nối vào 4 mục tiêu gần nhất liên tục — sát thương theo chuỗi.", ult:"THUNDER GOD", ultDesc:"Vào dạng Lôi Thần 20 giây: lướt sét né đòn, tự giật 3 địch gần nhất mỗi giây." },
-            { name:"RIPPER", color:"#ECEFF1", ch:"TRẢM LIÊN HOÀN", chDesc:"Tung các nhát Trảm Kích (Judgement Cut) nhỏ liên tục quanh người.", ult:"JUDGEMENT CUT", ultDesc:"Bất tử + đóng băng thời gian, chém một nhát khổng lồ 100 dmg diện rộng rồi trở về." },
-            { name:"PULSAR", color:"#FFD700", ch:"SAO XOAY", chDesc:"Mọc một ngôi sao trên thân, tự xoay và bắn đạn liên tục quanh người.", ult:"SUPERNOVA", ultDesc:"Phóng một ngôi sao khổng lồ rơi xuống giữa màn, nổ lớn và bắn đạn toả 360°." },
-        ];
-        const CH_HOW = "Giữ phím K ~3 giây (chỉ khi ở Gunslinger)";
-        const ULT_HOW = "Đầy thanh Chiêu Cuối rồi bấm phím U";
-        function wrapInfo(text, x, y, maxW, lh){
-            let words = String(text).split(' '), line='', yy=y;
-            for (let w of words){ let test=line+w+' '; if (ctx.measureText(test).width>maxW && line){ ctx.fillText(line, x, yy); line=w+' '; yy+=lh; } else line=test; }
-            ctx.fillText(line, x, yy); return yy+lh;
-        }
-        function infoStar(cx, cy, rot, R, col){
-            ctx.save(); ctx.translate(cx,cy); ctx.rotate(rot); ctx.fillStyle=col; ctx.beginPath();
-            for (let i=0;i<10;i++){ let r=(i%2)?R*0.45:R, a=i*Math.PI/5; if(i===0) ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r); else ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r); }
-            ctx.closePath(); ctx.fill(); ctx.restore();
-        }
-        function drawChannelAnim(idx, ax, ay, aw, ah){
-            let t=frames, cx=ax+aw/2, cy=ay+ah/2, C=AMMO_INFO[idx].color;
-            if (idx===0){ let pw=0.5+0.5*Math.sin(t*0.2); ctx.fillStyle="rgba(0,188,212,"+(0.3+0.3*pw).toFixed(2)+")"; ctx.fillRect(ax+18, cy-6, aw-18, 12); ctx.fillStyle="#E0FFFF"; ctx.fillRect(ax+18, cy-2, aw-18, 4); ctx.fillStyle=C; ctx.beginPath(); ctx.arc(ax+16, cy, 7+3*pw, 0, 6.28); ctx.fill(); }
-            else if (idx===1){ for (let k=0;k<3;k++){ let ph=((t*0.03 + k/3)%1); ctx.strokeStyle="rgba(255,87,34,"+(1-ph).toFixed(2)+")"; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(cx,cy,ph*aw*0.48,0,6.28); ctx.stroke(); } ctx.fillStyle="#FFC107"; ctx.beginPath(); ctx.arc(cx,cy,6,0,6.28); ctx.fill(); }
-            else if (idx===2){ for (let k=0;k<9;k++){ let x=ax+8+((t*4 + k*24)%(aw-16)); ctx.fillStyle=C; ctx.beginPath(); ctx.arc(x, cy+((k%2)?-5:5), 3.2, 0,6.28); ctx.fill(); } ctx.fillStyle="#33691E"; ctx.beginPath(); ctx.arc(ax+12,cy,7,0,6.28); ctx.fill(); }
-            else if (idx===3){ for (let k=0;k<3;k++){ let bx=ax+8+(0.5+0.5*Math.sin(t*0.05+k*2.1))*(aw-16), by=ay+8+(0.5+0.5*Math.cos(t*0.07+k*2.1))*(ah-16); ctx.fillStyle=C; ctx.beginPath(); ctx.arc(bx,by,4.5,0,6.28); ctx.fill(); ctx.fillStyle="rgba(255,235,59,0.3)"; ctx.beginPath(); ctx.arc(bx,by,8,0,6.28); ctx.fill(); } }
-            else if (idx===4){ ctx.strokeStyle=C; ctx.lineWidth=1.6; for (let k=0;k<4;k++){ let a2=t*0.03+k*1.57, ex=cx+Math.cos(a2)*aw*0.3, ey=cy+Math.sin(a2)*ah*0.32; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo((cx+ex)/2+(Math.random()-0.5)*12,(cy+ey)/2+(Math.random()-0.5)*12); ctx.lineTo(ex,ey); ctx.stroke(); ctx.fillStyle="#B3E5FC"; ctx.beginPath(); ctx.arc(ex,ey,3.5,0,6.28); ctx.fill(); } ctx.fillStyle=C; ctx.beginPath(); ctx.arc(cx,cy,4,0,6.28); ctx.fill(); }
-            else if (idx===5){ for (let k=0;k<3;k++){ let ph=((t*0.04+k/3)%1), x=ax+ph*aw; ctx.strokeStyle="rgba(236,239,241,"+(1-ph).toFixed(2)+")"; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x-14, cy+18); ctx.lineTo(x+14, cy-18); ctx.stroke(); } }
-            else { infoStar(cx,cy,t*0.1,15,C); for (let k=0;k<4;k++){ let a2=-t*0.06+k*1.57; ctx.fillStyle="#FFF59D"; ctx.beginPath(); ctx.arc(cx+Math.cos(a2)*32, cy+Math.sin(a2)*22, 3.2,0,6.28); ctx.fill(); } }
-        }
-        function drawUltAnim(idx, ax, ay, aw, ah){
-            let t=frames, cx=ax+aw/2, cy=ay+ah/2, C=AMMO_INFO[idx].color;
-            if (idx===0){ let pw=0.5+0.5*Math.sin(t*0.3); ctx.fillStyle="rgba(0,188,212,0.3)"; ctx.fillRect(ax, cy-20, aw, 40); ctx.fillStyle="rgba(224,255,255,"+(0.6+0.35*pw).toFixed(2)+")"; ctx.fillRect(ax, cy-8, aw, 16); }
-            else if (idx===1){ let fl=(t*0.05)%1; ctx.fillStyle="rgba(255,87,34,"+(0.3*(1-fl)).toFixed(2)+")"; ctx.fillRect(ax,ay,aw,ah); let cr=8+7*Math.abs(Math.sin(t*0.15)); ctx.fillStyle="#FF7043"; ctx.beginPath(); ctx.arc(cx,cy,cr+9,0,6.28); ctx.fill(); ctx.fillStyle="#FFEB3B"; ctx.beginPath(); ctx.arc(cx,cy,cr,0,6.28); ctx.fill(); }
-            else if (idx===2){ for (let k=0;k<18;k++){ let x=ax+((t*8 + k*13)%aw); ctx.fillStyle="#B2FF59"; ctx.fillRect(x, cy-10+(k%3)*7, 7, 3); } }
-            else if (idx===3){ for (let k=0;k<12;k++){ let a2=k*0.5236, ph=((t*0.035)%1), r=ph*aw*0.48; ctx.fillStyle="rgba(255,235,59,"+(1-ph).toFixed(2)+")"; ctx.beginPath(); ctx.arc(cx+Math.cos(a2)*r, cy+Math.sin(a2)*r, 3.2,0,6.28); ctx.fill(); } }
-            else if (idx===4){ ctx.fillStyle="rgba(0,229,255,0.12)"; ctx.beginPath(); ctx.arc(cx,cy,ah*0.42,0,6.28); ctx.fill(); ctx.strokeStyle=C; ctx.lineWidth=2; for (let k=0;k<6;k++){ let a2=t*0.05+k*1.05, r=ah*0.42; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a2)*r+(Math.random()-0.5)*8, cy+Math.sin(a2)*r); ctx.stroke(); } }
-            else if (idx===5){ let ph=((t*0.02)%1), al=(ph<0.5?ph*2:2-ph*2); ctx.strokeStyle="rgba(255,255,255,"+al.toFixed(2)+")"; ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(ax+10, ay+ah-10); ctx.lineTo(ax+aw-10, ay+10); ctx.stroke(); ctx.beginPath(); ctx.moveTo(ax+10, ay+10); ctx.lineTo(ax+aw-10, ay+ah-10); ctx.stroke(); }
-            else { let ph=((t*0.02)%1), sy=ay+ph*(ah-24); infoStar(cx, sy, t*0.2, 14, C); if (ph>0.82){ let e=(ph-0.82)/0.18; ctx.fillStyle="rgba(255,215,0,"+(1-e).toFixed(2)+")"; ctx.beginPath(); ctx.arc(cx, ay+ah-14, e*42, 0,6.28); ctx.fill(); } }
-        }
-        function drawAmmoInfoPopup(idx){
-            let a=AMMO_INFO[idx];
-            ctx.save();
-            ctx.fillStyle="rgba(0,0,0,0.86)"; ctx.fillRect(0,0,canvas.width,canvas.height);
-            ctx.textAlign="center"; ctx.font="bold 20px Courier New"; ctx.fillStyle=a.color;
-            ctx.fillText(a.name + " — KỸ NĂNG", CX, 32);
-            let cols=[ {x:40, title:"CHANNEL", tc:"#4FC3F7", sub:a.ch, desc:a.chDesc, how:CH_HOW, kind:'ch'},
-                       {x:520, title:"CHIÊU CUỐI", tc:"#FFD54F", sub:a.ult, desc:a.ultDesc, how:ULT_HOW, kind:'ult'} ];
-            for (let p of cols){
-                let px=p.x, py=48, pw=440, ph=336;
-                ctx.fillStyle="rgba(12,16,22,0.97)"; ctx.fillRect(px,py,pw,ph);
-                ctx.strokeStyle=p.tc; ctx.lineWidth=3; ctx.strokeRect(px,py,pw,ph);
-                ctx.textAlign="center"; ctx.font="bold 16px Courier New"; ctx.fillStyle=p.tc; ctx.fillText(p.title, px+pw/2, py+24);
-                let axx=px+20, ayy=py+38, aw=pw-40, ah=118;
-                ctx.fillStyle="rgba(0,0,0,0.5)"; ctx.fillRect(axx,ayy,aw,ah);
-                ctx.strokeStyle="rgba(255,255,255,0.12)"; ctx.lineWidth=1; ctx.strokeRect(axx,ayy,aw,ah);
-                ctx.save(); ctx.beginPath(); ctx.rect(axx,ayy,aw,ah); ctx.clip();
-                if (p.kind==='ch') drawChannelAnim(idx,axx,ayy,aw,ah); else drawUltAnim(idx,axx,ayy,aw,ah);
-                ctx.restore();
-                ctx.textAlign="center"; ctx.font="bold 15px Courier New"; ctx.fillStyle=a.color; ctx.fillText(p.sub, px+pw/2, ayy+ah+24);
-                ctx.textAlign="left"; ctx.font="12px Courier New"; ctx.fillStyle="#CFD8DC";
-                let ny=wrapInfo(p.desc, px+20, ayy+ah+46, pw-40, 17);
-                ctx.font="bold 11px Courier New"; ctx.fillStyle="#80CBC4";
-                wrapInfo("★ Kích hoạt: " + p.how, px+20, ny+10, pw-40, 15);
-            }
-            ctx.textAlign="center"; ctx.fillStyle="#90A4AE"; ctx.font="11px Courier New";
-            ctx.fillText("Di chuột ra khỏi tên đạn để đóng bảng", CX, canvas.height-8);
-            ctx.restore(); ctx.textAlign="left";
-        }
+        const AMMO_NAMES = ["PULSE", "INFERNO", "RAPIDFIRE", "PRISM", "VOLT", "RIPPER", "PULSAR", "BOOMERANG"];
         const RUNE_GRID = { cols:3, cw:316, ch:48, gy:54 };
         function runeGridGeom(){ let g=RUNE_GRID; return { cols:g.cols, cw:g.cw, ch:g.ch, gy:g.gy, gx: CX - g.cols*g.cw/2 }; }
         function drawRunePicker() {
             ctx.fillStyle = "rgba(0,0,0,0.9)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "#00E5FF"; ctx.font = "bold 20px Courier New"; ctx.textAlign = "center";
             ctx.fillText(LT("CHỌN RUNE CHO Ô "+(runePicker+1),"PICK A RUNE FOR SLOT "+(runePicker+1)), CX, 36);
-            let G = runeGridGeom(), cols=G.cols, cw=G.cw, ch=G.ch, gx=G.gx, gy=G.gy;
-            let items = pickerItems(), hovIdx = -1;
-            for (let i = 0; i < items.length; i++) {
-                let it = items[i], cx0 = gx + (i % cols) * cw, cy0 = gy + Math.floor(i / cols) * ch;
+            let L = runePickerLayout(), cols = L.cols, cw = L.cw, ch = L.ch, gx = L.gx;
+            let hovCell = null;
+            ctx.save();
+            ctx.beginPath(); ctx.rect(0, L.top, canvas.width, L.viewH); ctx.clip();
+            // --- tieu de tung nhom ---
+            for (let hd of L.heads) {
+                let hy = hd.y - runeScroll + L.top;
+                if (hy < L.top - RUNE_HEAD_H || hy > L.top + L.viewH) continue;
+                ctx.textAlign = "left";
+                ctx.fillStyle = hd.cat.col; ctx.font = "bold 13px Courier New";
+                ctx.fillText(LT(hd.cat.name, hd.cat.nameEn), gx + 6, hy + 16);
+                ctx.strokeStyle = hd.cat.col; ctx.globalAlpha = 0.45; ctx.lineWidth = 2;
+                let tw = ctx.measureText(LT(hd.cat.name, hd.cat.nameEn)).width;
+                ctx.beginPath(); ctx.moveTo(gx + 14 + tw, hy + 12); ctx.lineTo(gx + cols * cw - 6, hy + 12); ctx.stroke();
+                ctx.globalAlpha = 1;
+            }
+            // --- cac o rune ---
+            for (let c of L.cells) {
+                let it = c.it, cx0 = c.x, cy0 = c.y - runeScroll + L.top;
+                if (cy0 < L.top - ch || cy0 > L.top + L.viewH) continue;
                 let hov = mouseX >= cx0 + 4 && mouseX <= cx0 + cw - 4 && mouseY >= cy0 && mouseY <= cy0 + ch - 6;
-                if (hov) hovIdx = i;
-                let sel=false, taken=false, tag='';
+                if (hov) hovCell = { it: it, x: cx0, y: cy0 };
+                let sel=false, taken=false, lock=false, tag='';
                 if (it.kind === 'family'){
                     let f=it.fam, s0=runeSlots[0], s1=runeSlots[1];
                     let inCur = runeSlots[runePicker]===f.c1 || runeSlots[runePicker]===f.c2;
@@ -15328,32 +15111,52 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                 } else {
                     sel = runeSlots[runePicker] === it.id;
                     taken = it.id && (runeSlots[0]===it.id||runeSlots[1]===it.id) && runeSlots[runePicker]!==it.id;
-                    tag = taken ? LT('  (đã chọn)','  (in use)') : (it.ammo ? LT('  ⚡ĐẠN','  ⚡AMMO') : '');
+                    lock = it.id && runeLocked(it.id);
+                    let stReq = it.id ? runeOnlyStance(it.id) : -1;
+                    tag = lock ? LT('  🔒 CẦN ' + AMMO_NAMES[runeOnlyAmmo(it.id)], '  🔒 NEEDS ' + AMMO_NAMES[runeOnlyAmmo(it.id)])
+                        : (taken ? LT('  (đã chọn)','  (in use)')
+                        : (stReq >= 0 ? LT('  ⚑ ' + STANCE_NAMES[stReq], '  ⚑ ' + STANCE_NAMES[stReq])
+                        : (it.ammo ? LT('  ⚡ĐẠN','  ⚡AMMO') : '')));
                 }
-                ctx.fillStyle = sel ? "#1B5E20" : (taken ? "#3E2723" : (hov ? "#37474F" : (it.ammo ? "#2A1D08" : "#212121")));
+                ctx.fillStyle = lock ? "#1A1A1A" : (sel ? "#1B5E20" : (taken ? "#3E2723" : (hov ? "#37474F" : (it.ammo ? "#2A1D08" : "#212121"))));
                 ctx.fillRect(cx0 + 4, cy0, cw - 8, ch - 6);
-                ctx.strokeStyle = sel ? "#66BB6A" : (hov ? "#00E5FF" : (it.ammo ? "#FF8F00" : "#455A64")); ctx.lineWidth = 2;
+                ctx.strokeStyle = lock ? "#5D4037" : (sel ? "#66BB6A" : (hov ? "#00E5FF" : (it.ammo ? "#FF8F00" : "#455A64"))); ctx.lineWidth = 2;
                 ctx.strokeRect(cx0 + 4, cy0, cw - 8, ch - 6);
                 ctx.textAlign = "left";
-                ctx.fillStyle = taken ? "#8D6E63" : "#FFF"; ctx.font = "18px Courier New";
+                ctx.fillStyle = lock ? "#616161" : (taken ? "#8D6E63" : "#FFF"); ctx.font = "18px Courier New";
                 ctx.fillText(it.icon, cx0 + 14, cy0 + 26);
-                ctx.font = "bold 11px Courier New"; ctx.fillStyle = (it.kind==='family'&&(sel||taken)) ? "#A5D6A7" : (taken ? "#8D6E63" : (it.ammo ? "#FFB74D" : "#FFECB3"));
+                ctx.font = "bold 11px Courier New"; ctx.fillStyle = lock ? "#795548" : ((it.kind==='family'&&(sel||taken)) ? "#A5D6A7" : (taken ? "#8D6E63" : (it.ammo ? "#FFB74D" : "#FFECB3")));
                 ctx.fillText(it.name + tag, cx0 + 40, cy0 + 20);
                 ctx.font = "9px Courier New"; ctx.fillStyle = "#90A4AE";
-                let d = it.desc || ""; if (d.length > 44) d = d.slice(0, 43) + "…";
+                let d = (it.desc || "").replace(/\n/g, ' '); if (d.length > 44) d = d.slice(0, 43) + "…";
                 ctx.fillText(d, cx0 + 40, cy0 + 36);
             }
+            ctx.restore();
+            // --- THANH CUON ---
+            if (L.maxScroll > 0) {
+                let bx = gx + cols * cw + 6, bh = L.viewH;
+                ctx.fillStyle = "rgba(255,255,255,0.10)"; ctx.fillRect(bx, L.top, 8, bh);
+                let th = Math.max(28, bh * (L.viewH / L.contentH));
+                let ty = L.top + (bh - th) * (runeScroll / L.maxScroll);
+                ctx.fillStyle = "#00E5FF"; ctx.fillRect(bx, ty, 8, th);
+                // mui ten bao con noi dung o tren / duoi
+                ctx.fillStyle = "#00E5FF"; ctx.textAlign = "center"; ctx.font = "bold 12px Courier New";
+                if (runeScroll > 2) ctx.fillText("▲", bx + 4, L.top - 2);
+                if (runeScroll < L.maxScroll - 2) ctx.fillText("▼", bx + 4, L.top + bh + 12);
+            }
             ctx.textAlign = "center"; ctx.fillStyle = "#B0BEC5"; ctx.font = "11px Courier New";
-            ctx.fillText(LT("Đệ: bấm để chọn Cấp 1 / Cấp 2 (C2 dùng 2 ô) — di chuột để xem to","Pet: click to pick Level 1 / Level 2 (C2 uses 2 slots) — hover to zoom"), CX, canvas.height - 12);
+            ctx.fillText(LT("Lăn chuột để cuộn · Đệ bấm để chọn Cấp 1 / Cấp 2 (C2 dùng 2 ô) · di chuột để xem to",
+                            "Scroll to see more · Pets: click to pick Level 1 / 2 (C2 uses 2 slots) · hover to zoom"), CX, canvas.height - 10);
             ctx.textAlign = "left";
-            if (runeLevelPick === null && hovIdx >= 0) drawRuneHoverZoom(items[hovIdx], gx, gy, cols, cw, ch, hovIdx);
+            if (runeLevelPick === null && hovCell) drawRuneHoverZoom(hovCell.it, hovCell.x, hovCell.y, cw, ch);
             if (runeLevelPick !== null) drawRuneLevelChooser();
         }
-        function drawRuneHoverZoom(it, gx, gy, cols, cw, ch, idx){
-            let col = idx % cols, row = Math.floor(idx/cols), cardX = gx + col*cw, cardY = gy + row*ch;
-            let W = 320, H = 116, bx = cardX + cw/2 - W/2;
+        // cardX / cardY = toa do MAN HINH cua o dang di chuot (da tru scroll)
+        function drawRuneHoverZoom(it, cardX, cardY, cw, ch){
+            let W = 340, H = 132, bx = cardX + cw/2 - W/2;
             bx = Math.max(8, Math.min(canvas.width - W - 8, bx));
             let by = cardY - H - 6; if (by < 8) by = cardY + ch + 8;
+            if (by + H > canvas.height - 8) by = Math.max(8, canvas.height - 8 - H);
             let name = it.name, desc = (it.kind==='family') ? LT('Đệ này có 2 cấp — bấm để mở bảng chọn Cấp 1 hoặc Cấp 2 (C2 mạnh hơn, dùng 2 ô rune).','This pet has 2 levels — click to open the Level 1 / Level 2 chooser (C2 is stronger, uses 2 rune slots).') : (it.desc||'');
             ctx.save();
             ctx.fillStyle = "rgba(8,12,18,0.98)"; ctx.fillRect(bx, by, W, H);
@@ -15654,11 +15457,6 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
             }
             return false;
         }
-        function drawDojoMenu(){ drawMenuPanel(); }
-        function drawMenu() {
-            drawEnvironment(); ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.fillRect(0,0, canvas.width, canvas.height);
-            drawMenuPanel();
-        }
 
 
         function getTestMenuLayout() {
@@ -15881,6 +15679,9 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
 
 </script>
     <script>
+        /* ============================================================================
+           @@KHOI-6  —  LOI GAME: canvas, SFX, Rune, Pet, he dan phu tro, spawn, vong lap chinh
+           ============================================================================ */
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         const CX = canvas.width / 2;
@@ -16034,7 +15835,6 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
         const keys = {}; let mouseX = 0, mouseY = 0;
 
         let currentForm = parseInt(localStorage.getItem("dino_current_form")) || 0;
-        let customMaxHp = 5;   // may goc moi (khong con chinh trong menu)
         // ===================== HE THONG RUNE =====================
         const RUNES = [
             { id:'hp',       name:'+3 MÁU',           nameEn:'+3 HP',                icon:'❤',  desc:'Máu gốc 5 → 8', descEn:'Base HP 5 → 8' },
@@ -16052,7 +15852,7 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
             { id:'chanshldx',name:'KHIÊN KHI CHANNEL • C2', nameEn:'CHANNEL GUARD • C2', icon:'⧖', cost:2, desc:'Tốn 2 ô. Như C1, thêm: vừa vào channel là được 2 giây MIỄN SÁT THƯƠNG hoàn toàn — không đòn nào ngắt được channel trong lúc đó', descEn:'Costs 2 slots. Like C1, plus: entering a channel grants 2 seconds of full damage immunity — nothing can break the channel during it' },
             { id:'bulletclash', name:'VA CHẠM ĐẠN', nameEn:'PROJECTILE CLASH', icon:'✸', desc:'Bắn vỡ được MỌI loại đạn địch. Đạn nhỏ 1 máu, đạn to vừa (kể cả đạn đổi hướng) 3 máu, đạn cực to 5 máu — bắn đủ số phát là vỡ; sát thương thừa của viên đạn vẫn bay tiếp. Đạn xuyên quét sạch cả đường bay, chỉ bị đạn xuyên của địch chặn', descEn:'Breaks EVERY enemy projectile. Small bullets 1 HP, medium (incl. redirecting orbs) 3 HP, huge 5 HP — chip them down; leftover damage keeps flying. Pierce clears the whole lane, stopped only by an enemy pierce shot' },
             { id:'hover',       name:'LƠ LỬNG', nameEn:'HOVER', icon:'☁', desc:'Nhảy tới đỉnh cao thì đứng yên trên không 2 giây (vẫn di chuyển/bắn/nhảy tiếp; bấm xuống để hạ nhanh). Hợp để né đòn quét sàn', descEn:'At a jump apex, hover in mid-air for 2s (still move/shoot/double-jump; press down to drop fast). Great vs floor-sweep attacks' },
-            { id:'explshot',    name:'AWAKENED: NOVA', nameEn:'AWAKENED: NOVA', icon:'💥', cost:2, ammoRune:true, desc:'Tốn 2 ô. NÂNG CẤP ĐẠN. Đòn đánh tạo vụ nổ lan 1 dmg ra mục tiêu XUNG QUANH (mục tiêu trúng trực tiếp không ăn thêm). Đạn XUYÊN nổ ở MỖI lần va chạm. Cầu lửa charge Inferno: nổ to gấp đôi VÀ gấp đôi dmg. Sét Volt: mỗi tia đều tạo nổ sét, cộng thêm dmg nhân theo số lần đã giật. Ripper: vuốt chém nổ ra xung quanh (mục tiêu gốc +1 dmg), nhát chém xa nổ lớn hơn', descEn:'Costs 2 slots. AMMO UPGRADE. Your attacks burst for 1 splash dmg to NEARBY targets (the one you hit directly takes no extra). PIERCING shots detonate on EVERY hit. Inferno charged fireballs: double blast size AND double damage. Volt: every bolt makes a lightning nova, bonus damage scaling with how many times it struck. Ripper: claw slashes burst outward (+1 dmg to the original target), ranged slashes blast wider' },
+            { id:'explshot',    name:'AWAKENED: NOVA', nameEn:'AWAKENED: NOVA', icon:'💥', cost:2, ammoRune:true, desc:'Tốn 2 ô. NÂNG CẤP ĐẠN. Đòn đánh tạo vụ nổ lan 1 dmg ra mục tiêu XUNG QUANH (mục tiêu trúng trực tiếp không ăn thêm). Đạn XUYÊN nổ ở MỖI lần va chạm. Cầu lửa charge Inferno: nổ to gấp đôi VÀ gấp đôi dmg. Sét Volt: mỗi tia đều tạo nổ sét, cộng thêm dmg nhân theo số lần đã giật. Ripper: vuốt chém nổ ra xung quanh (mục tiêu gốc +1 dmg), nhát chém xa nổ lớn hơn. Boomerang: lưỡi để lại vệt nổ dọc đường bay, vùng bắt lưỡi rộng hơn và mạnh hơn 2 dmg', descEn:'Costs 2 slots. AMMO UPGRADE. Your attacks burst for 1 splash dmg to NEARBY targets (the one you hit directly takes no extra). PIERCING shots detonate on EVERY hit. Inferno charged fireballs: double blast size AND double damage. Volt: every bolt makes a lightning nova, bonus damage scaling with how many times it struck. Ripper: claw slashes burst outward (+1 dmg to the original target), ranged slashes blast wider. Boomerang: blades trail explosions in flight, and the catch burst is wider and hits 2 harder' },
             { id:'headbutt',    name:'HÚC ĐẦU', nameEn:'HEADBUTT', icon:'🐏', desc:'Lướt tạo lớp khiên bán nguyệt trước mặt suốt cú lướt, PARRY như khiên (mạnh hơn 50%, đẩy boss lại). Ở phái Royal Guard khiên lướt này tồn tại lâu gấp đôi', descEn:'Dashing makes a half-moon shield in front for the whole dash that PARRIES like your shield (50% stronger, knocks bosses back). In Royal Guard this dash-shield lasts twice as long' },
             { id:'pet',      name:'ĐỆ CHIM • C1',      nameEn:'BIRD PET • C1',        icon:'🦖', desc:'Đệ chim bay theo, mỗi 2 giây bắn 3 tia Split DẪN ĐƯỜNG — lượn ~1s rồi lao vào địch, ưu tiên địch mới (1 dmg/tia)', descEn:'Bird pet follows you; every 2s fires 3 homing Split rays — loiter ~1s then dive, prioritizing new enemies (1 dmg/ray)' },
             { id:'petx',     name:'ĐỆ CHIM • C2',      nameEn:'BIRD PET • C2',        icon:'✦', cost:2, desc:'Tốn 2 ô. Cùng loạt Split DẪN ĐƯỜNG như C1 nhưng bắn mỗi 1 giây (gấp đôi nhịp)', descEn:'Costs 2 slots. Same homing Split volley as C1 but every 1s (double rate)' },
@@ -16083,18 +15883,101 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
             { name:'CHIÊU CUỐI TỨC THÌ', nameEn:'INSTANT ULTIMATE', icon:'⚡', c1:'instult', c2:'instultx' },
             { name:'KHIÊN KHI CHANNEL', nameEn:'CHANNEL GUARD', icon:'⧗', c1:'chanshld', c2:'chanshldx' },
         ];
+        // ===== RUNE DOC QUYEN THEO LOAI DAN: chi hien va chi dung duoc khi dang cam dung loai dan do =====
+        RUNES.push({ id:'swordmaster', name:'SWORDMASTER', nameEn:'SWORDMASTER', icon:'⚔', cost:2, ammoRune:true, onlyAmmo:5,
+            desc:'Tốn 2 ô. ĐỘC QUYỀN RIPPER. Ba kỹ thuật kiếm sĩ:\n• MIKAZUKIZAN — mọi nhát chém nối thêm một đoạn lưỡi trăng khuyết, tầm xa hơn hẳn và chém rụng đạn.\n• HISUISHO — lướt trên không dựng một lưỡi kiếm trước mặt: vừa chặn sát thương bay tới như khiên, vừa gây 4 dmg.\n• SOGENMU — lướt dưới đất triệu phân thân đứng trước mặt trong 2 giây, lặp lại y hệt mọi hành động của bạn và tự gây sát thương khi lao tới. Chỉ hồi lướt khi phân thân biến mất.',
+            descEn:'Costs 2 slots. RIPPER ONLY. Three swordsman arts:\n• MIKAZUKIZAN — every slash gains an extra crescent segment: far longer reach, and it cuts bullets down.\n• HISUISHO — air-dash raises a blade in front of you: it blocks incoming damage like a shield AND deals 4 dmg.\n• SOGENMU — ground dash summons an afterimage in front of you for 2s that mirrors your every action and damages what it charges through. Dash only recharges once the afterimage is gone.' });
+        // id rune -> chi so loai dan bat buoc
+        // KIEM TRAN: so kiem toi da va nhip trieu hoi. Mang SWORDMASTER thi len 30 thanh,
+        // nhung nhip trieu nhanh len de TONG THOI GIAN van la 300 frame (5 giay) nhu cu.
+        const CRESCENT_GAP = 190;   // khoang cach giua 2 luoi dao cua SWORDMASTER
+        function clawSwordCap(){ return hasRune('swordmaster') ? 30 : 20; }
+        function clawSwordTick(){ return hasRune('swordmaster') ? 10 : 15; }
+        RUNES.push({ id:'shintrick', name:'SHIN TRICKSTER', nameEn:'SHIN TRICKSTER', icon:'🎯', cost:2, ammoRune:true, onlyStance:1,
+            desc:'Tốn 2 ô. ĐỘC QUYỀN TRICKSTER. Bắn thường KHÔNG giới hạn: không tốn đạn, không bao giờ quá nhiệt. Mở khoá luôn đòn Charge khi đứng Trickster (vốn chỉ Gunslinger mới charge được). Đổi lại: KHÔNG dùng được Channel ở thế này.',
+            descEn:'Costs 2 slots. TRICKSTER ONLY. Basic fire is unlimited: no ammo cost, never overheats. Also unlocks Charge attacks while in Trickster (normally Gunslinger-only). Trade-off: Channel is disabled in this stance.' });
+        RUNES.push({ id:'shinguard', name:'SHIN ROYAL GUARD', nameEn:'SHIN ROYAL GUARD', icon:'🛡', cost:2, ammoRune:true, onlyStance:2,
+            desc:'Tốn 2 ô. ĐỘC QUYỀN ROYAL GUARD. Phản đòn hoàn hảo hoặc đỡ trúng một đòn đâm thì khiên NGẮT NGAY và HỒI NGAY lập tức — đỡ liên tiếp không cần chờ sạc.',
+            descEn:'Costs 2 slots. ROYAL GUARD ONLY. On a Perfect Parry or a successful block of a thrust, the shield drops AND recharges instantly — block again with no cooldown.' });
+        // ---- Dieu kien bat buoc cua rune doc quyen ----
+        function runeOnlyAmmo(id){ let r = RUNES.find(x => x.id === id); return (r && r.onlyAmmo !== undefined) ? r.onlyAmmo : -1; }
+        function runeOnlyStance(id){ let r = RUNES.find(x => x.id === id); return (r && r.onlyStance !== undefined) ? r.onlyStance : -1; }
+        const STANCE_NAMES = ["GUNSLINGER", "TRICKSTER", "ROYAL GUARD"];
+        // Khoa trong PICKER: chi khoa theo LOAI DAN (dan chon o menu, khong doi giua tran).
+        // The dung doi duoc bang I/O ngay giua tran nen KHONG khoa picker — chi tat hieu luc.
+        function runeLocked(id){ let a = runeOnlyAmmo(id); return a >= 0 && currentAmmoType !== a; }
+        function runeStanceOff(id){ let st = runeOnlyStance(id); return st >= 0 && combatStance !== st; }
+        // SHIN ROYAL GUARD: do thanh cong -> khien KHONG TAT, ma duoc NAP LAI tu dau.
+        // (Ban truoc dat meleeTimer = 0 nen khien bien mat ngay khi cham don dau tien,
+        //  keo theo mat luon cua so Perfect Parry — dung nghia la vo dung.)
+        function shinGuardReset(perfect) {
+            if (!hasRune('shinguard') || !dino) return;
+            if (dino.shinGuardCd > 0) return;                 // chong kich hoat lien tuc trong cung mot don
+            dino.shinGuardCd = 8;
+            let full = (combatStance === 2) ? 45 : 30;
+            dino.meleeTimer = full;       // TAI KICH HOAT: khien dung nguyen, dem lai tu dau
+            dino.shieldCd = 0;            // khong phai cho sac
+            dino.parryWindow = 8;         // mo lai cua so Perfect Parry ngay
+            perfectParryCd = 0;
+            dino.shinFlash = 16;
+            visualEffects.push(new Effect(dino.x + dino.w / 2, dino.y + dino.h / 2, 'parry', dino.isFacingLeft));
+            floatingTexts.push(new FloatingText(dino.x - 30, dino.y - 40, perfect ? "SHIN GUARD! NẠP LẠI" : "ĐỠ TRÚNG! NẠP LẠI"));
+            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(1180, 0.09, 'triangle', 0.20, 1700);
+        }
         const PET_RUNE_IDS = new Set(['pet','petx','pet2','pet2x','pet3','pet3x','pet4','pet4x','pet5','pet5x','pet6','pet6x','revive','revivex','afterimg','afterimgx','instult','instultx','chanshld','chanshldx']);
         function LT(vi, en){ return currentLang === 'en' ? en : vi; }
         function RNAME(o){ return (currentLang==='en' && o && o.nameEn) ? o.nameEn : (o ? o.name : ''); }
         function RDESC(o){ return (currentLang==='en' && o && o.descEn) ? o.descEn : (o ? (o.desc||'') : ''); }
         // Danh sach hien thi trong picker: [bo rune] + rune thuong + 6 "ho đệ" (moi ho 1 o, bam ra chon Cap)
+        // ===== PHAN NHOM RUNE =====
+        // Rune nao thuoc nhom nao. Khong liet ke o day = tu roi vao nhom CHIEN DAU.
+        const RUNE_CAT_OF = {
+            hp:'base', maxgrow:'base', fullheal:'base', redbird:'base', shield:'base',
+            bulletclash:'fight', hover:'fight', headbutt:'fight'
+        };
+        const RUNE_CATS = [
+            { key:'base',  name:'CƠ BẢN',   nameEn:'CORE',      col:'#66BB6A' },
+            { key:'fight', name:'CHIẾN ĐẤU', nameEn:'COMBAT',    col:'#29B6F6' },
+            { key:'pet',   name:'ĐỆ & TRỢ THỦ', nameEn:'PETS & SUPPORT', col:'#AB47BC' },
+            { key:'awak',  name:'AWAKENED — 2 Ô', nameEn:'AWAKENED — 2 SLOTS', col:'#FF8F00' }
+        ];
         function pickerItems(){
-            let out = [{ id:null, name:LT('— BỎ RUNE —','— NO RUNE —'), icon:'∅', desc:LT('Không dùng rune ở ô này','Leave this slot empty'), kind:'rune' }];
-            for (let r of RUNES){ if (!PET_RUNE_IDS.has(r.id) && !r.ammoRune) out.push({ id:r.id, name:RNAME(r), icon:r.icon, desc:RDESC(r), kind:'rune' }); }
-            for (let fi=0; fi<PET_FAMILIES.length; fi++){ let fam=PET_FAMILIES[fi]; out.push({ kind:'family', fam:fam, famIdx:fi, name:RNAME(fam), icon:fam.icon, desc:LT('Đệ có 2 cấp — bấm để chọn','2 levels — click to choose') }); }
-            // NHOM RUNE NANG CAP DAN (AWAKENED) — xep cuoi, vien cam rieng biet
-            for (let r of RUNES){ if (r.ammoRune) out.push({ id:r.id, name:RNAME(r), icon:r.icon, desc:RDESC(r), kind:'rune', ammo:true }); }
+            let out = [{ id:null, name:LT('— BỎ RUNE —','— NO RUNE —'), icon:'∅', desc:LT('Không dùng rune ở ô này','Leave this slot empty'), kind:'rune', cat:'base' }];
+            for (let r of RUNES){ if (!PET_RUNE_IDS.has(r.id) && !r.ammoRune) out.push({ id:r.id, name:RNAME(r), icon:r.icon, desc:RDESC(r), kind:'rune', cat:(RUNE_CAT_OF[r.id] || 'fight') }); }
+            for (let fi=0; fi<PET_FAMILIES.length; fi++){ let fam=PET_FAMILIES[fi]; out.push({ kind:'family', fam:fam, famIdx:fi, name:RNAME(fam), icon:fam.icon, desc:LT('Đệ có 2 cấp — bấm để chọn','2 levels — click to choose'), cat:'pet' }); }
+            for (let r of RUNES){ if (r.ammoRune) out.push({ id:r.id, name:RNAME(r), icon:r.icon, desc:RDESC(r), kind:'rune', ammo:true, cat:'awak' }); }
             return out;
+        }
+        // ===== BO CUC BANG RUNE: MOT nguon toa do duy nhat cho ca VE lan BAM =====
+        // (truoc day tach lam hai bo toa do song song nen bam mot dang, hien mot neo)
+        let runeScroll = 0;
+        const RUNE_VIEW_TOP = 52, RUNE_VIEW_BOT = 26, RUNE_HEAD_H = 26;
+        function runePickerLayout(){
+            let g = runeGridGeom(), cols = g.cols, cw = g.cw, ch = g.ch, gx = g.gx;
+            let items = pickerItems(), cells = [], y = 0, heads = [];
+            for (let c of RUNE_CATS){
+                let group = items.filter(it => it.cat === c.key);
+                if (!group.length) continue;
+                heads.push({ cat: c, y: y });
+                y += RUNE_HEAD_H;
+                for (let i = 0; i < group.length; i++){
+                    cells.push({ it: group[i], x: gx + (i % cols) * cw, y: y + Math.floor(i / cols) * ch, w: cw, h: ch });
+                }
+                y += Math.ceil(group.length / cols) * ch + 8;
+            }
+            let viewH = canvas.height - RUNE_VIEW_TOP - RUNE_VIEW_BOT;
+            let maxScroll = Math.max(0, y - viewH);
+            runeScroll = Math.max(0, Math.min(maxScroll, runeScroll));
+            return { cells, heads, gx, cols, cw, ch, contentH: y, viewH, maxScroll, top: RUNE_VIEW_TOP };
+        }
+        function runeCellAt(mx, my){
+            let L = runePickerLayout();
+            if (my < L.top || my > L.top + L.viewH) return null;
+            for (let c of L.cells){
+                let sy = c.y - runeScroll + L.top;
+                if (mx >= c.x + 4 && mx <= c.x + c.w - 4 && my >= sy && my <= sy + c.h - 6) return { cell: c, sy: sy, L: L };
+            }
+            return null;
         }
         function setRuneSlot(id){
             let oi = runePicker === 0 ? 1 : 0, other = runeSlots[oi];
@@ -16103,10 +15986,14 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
             else { if (other && runeCost(other) === 2) runeSlots[oi] = null; runeSlots[runePicker] = id; }
             saveRunes();
         }
-        function hasRune(id){ return runeSlots[0] === id || runeSlots[1] === id; }
+        // Rune doc quyen dang deo nhung sai loai dan -> coi nhu KHONG co
+        function hasRune(id){
+            if (runeSlots[0] !== id && runeSlots[1] !== id) return false;
+            if (runeLocked(id)) return false;
+            return !runeStanceOff(id);
+        }
         function saveRunes(){ try { localStorage.setItem('dino_runes', JSON.stringify(runeSlots)); } catch(e){} }
         function runeCost(id){ let r = RUNES.find(x => x.id === id); return (r && r.cost) ? r.cost : 1; }
-        function runeName(id){ let r = RUNES.find(x => x.id === id); return r ? RNAME(r) : ''; }
         function runeIcon(id){ let r = RUNES.find(x => x.id === id); return r ? r.icon : ''; }
 
         // ===================== THU CUNG BAY (rune 'pet') =====================
@@ -16125,9 +16012,6 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
         const PET6_R0 = 46, PET6_RMAX = 330, PET6_GROW = 0.95;
         function pet6Gap(){ return hasRune('pet6x') ? 40 : 72; }
         let pet6Rings = [];
-        const PET6_RINGS = [120, 200, 280];   // (giu lai cho code cu tham chieu)
-        const PET6_LIFE = 360;                 // vong sao ton tai 6 giay
-        let pet6Life = 0;
         function petAcquire(px, py){
             let pool = enemies.concat(bosses), best = null, bd = 1e9;
             for (let t of pool){ if (t.invulnAll) continue; let dx=(t.x+t.w/2)-px, dy=(t.y+t.h/2)-py, d=dx*dx+dy*dy; if(d<bd){bd=d;best=t;} }
@@ -16574,32 +16458,6 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
             ctx.restore();
         }
         // Kiem tra MOI nguon sat thuong LIEN TUC cua nguoi choi (khong nam trong projectiles[])
-        // co dang trum len 1 hop hay khong -> dung cho rune Arcana Rex an moi loai dmg.
-        function playerBeamHitsBox(box) {
-            if (typeof dino === 'undefined' || !dino || !dino.getShootPos) return false;
-            let pos = dino.getShootPos();
-            // Laser (ca do lan tim/xanh)
-            if (dino.laserActiveTimer > 0 || dino.normalLaserChannel) {
-                let w = pos.dir === 1 ? canvas.width - pos.x : pos.x, sx = pos.dir === 1 ? pos.x : 0;
-                if (checkAABB({ x: sx, y: pos.y - 44, w: w, h: 88 }, box)) return true;
-            }
-            // Hoi lua
-            if (dino.fireBreathTimer > 0) {
-                let fw = dino.fireBreathLength || 240;
-                let fr = pos.dir === 1 ? { x: pos.x, y: pos.y - 30, w: fw, h: 60 } : { x: pos.x - fw, y: pos.y - 30, w: fw, h: 60 };
-                if (checkAABB(fr, box)) return true;
-            }
-            // Can chien / khien / vuot
-            if (dino.meleeTimer > 0) {
-                let mx = dino.isFacingLeft ? dino.x - 36 : dino.x + dino.w;
-                if (checkAABB({ x: mx, y: dino.y - 14, w: 46, h: dino.h + 28 }, box)) return true;
-            }
-            // Lao set (lightning dash)
-            if (dino.lightningDashActive > 0 && checkAABB({ x: dino.x, y: dino.y, w: dino.w, h: dino.h }, box)) return true;
-            // Tia chieu cuoi
-            if (dino.ultBeamRect && checkAABB(dino.ultBeamRect, box)) return true;
-            return false;
-        }
 
 
         let currentAmmoType = parseInt(localStorage.getItem("dino_ammo_type")) || 0; 
@@ -16611,7 +16469,7 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
         // P2 Setup variables
         let p2Form = 0; let p2AmmoType = 0;
 
-        let ammoColors = ["#00BCD4", "#FF5722", "#76FF03", "#FFEB3B", "#E0F7FA", "#FFFFFF", "#FFD700"]; 
+        let ammoColors = ["#00BCD4", "#FF5722", "#76FF03", "#FFEB3B", "#E0F7FA", "#FFFFFF", "#FFD700", "#80DEEA"]; 
 
         // --- PREVIEW VARIABLES (he thong xem truoc trong menu Customize) ---
         let previewTimer = 0, previewBgOffset = 0;
@@ -16627,6 +16485,13 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
             mouseY = e.clientY - rect.top; 
         });
 
+        // LAN CHUOT trong bang Rune -> cuon danh sach
+        canvas.addEventListener('wheel', e => {
+            if (runePicker === null || runeLevelPick !== null) return;
+            e.preventDefault();
+            let L = runePickerLayout();
+            runeScroll = Math.max(0, Math.min(L.maxScroll, runeScroll + Math.sign(e.deltaY) * 46));
+        }, { passive: false });
         canvas.addEventListener('click', e => {
             SFX.init(); SFX.resume();
             if (gameOver || gameVictory) { gameState = 'menu'; gameOver = false; gameVictory = false; paused = false; SFX.stopMusic(); setControlsVisible(true); return; }
@@ -16654,8 +16519,8 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                     else if (mouseX >= 380 && mouseX <= 410) currentForm = (currentForm + 1) % 4;
                 }
                 else if (mouseY >= 190 && mouseY <= 220) {
-                    if (mouseX >= 150 && mouseX <= 180) currentAmmoType = (currentAmmoType - 1 + 7) % 7;
-                    else if (mouseX >= 380 && mouseX <= 410) currentAmmoType = (currentAmmoType + 1) % 7;
+                    if (mouseX >= 150 && mouseX <= 180) currentAmmoType = (currentAmmoType - 1 + 8) % 8;
+                    else if (mouseX >= 380 && mouseX <= 410) currentAmmoType = (currentAmmoType + 1) % 8;
                 }
                 // P2 Controls
                 if (mouseY >= 110 && mouseY <= 140) {
@@ -16663,8 +16528,8 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                     else if (mouseX >= 780 && mouseX <= 810) p2Form = (p2Form + 1) % 4;
                 }
                 else if (mouseY >= 190 && mouseY <= 220) {
-                    if (mouseX >= 550 && mouseX <= 580) p2AmmoType = (p2AmmoType - 1 + 7) % 7;
-                    else if (mouseX >= 780 && mouseX <= 810) p2AmmoType = (p2AmmoType + 1) % 7;
+                    if (mouseX >= 550 && mouseX <= 580) p2AmmoType = (p2AmmoType - 1 + 8) % 8;
+                    else if (mouseX >= 780 && mouseX <= 810) p2AmmoType = (p2AmmoType + 1) % 8;
                 }
                 
                 if (mouseX >= 300 && mouseX <= 500 && mouseY >= 280 && mouseY <= 320) startGame('pvp');
@@ -16680,16 +16545,17 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                         if (!done) runeLevelPick = null;   // bam ngoai -> quay lai luoi
                         return;
                     }
-                    let G = runeGridGeom(), cols=G.cols, cw=G.cw, ch=G.ch, gx=G.gx, gy=G.gy;
-                    let items = pickerItems(), picked = false;
-                    for (let i = 0; i < items.length; i++) {
-                        let cx0 = gx + (i % cols) * cw, cy0 = gy + Math.floor(i / cols) * ch;
-                        if (mouseX >= cx0 + 4 && mouseX <= cx0 + cw - 4 && mouseY >= cy0 && mouseY <= cy0 + ch - 6) {
-                            let it = items[i];
-                            if (it.kind === 'family'){ runeLevelPick = it.famIdx; }   // mo bang chon Cap
-                            else { setRuneSlot(it.id); runePicker = null; }
-                            picked = true; break;
+                    // DUNG CHUNG runeCellAt() voi ham ve -> khong the lech toa do
+                    let picked = false;
+                    let hit = runeCellAt(mouseX, mouseY);
+                    if (hit) {
+                        let it = hit.cell.it;
+                        if (it.kind === 'family'){ runeLevelPick = it.famIdx; }   // mo bang chon Cap
+                        else if (it.id && runeLocked(it.id)) {                     // rune doc quyen sai loai dan -> khong chon duoc
+                            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(150, 0.12, 'square', 0.18, 90);
                         }
+                        else { setRuneSlot(it.id); runePicker = null; }
+                        picked = true;
                     }
                     if (!picked) { runePicker = null; runeLevelPick = null; }   // bam ra ngoai -> dong
                     return;
@@ -16706,15 +16572,15 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                     else if (mouseX >= 636 && mouseX <= 662) { currentForm = (currentForm + 1) % 4; localStorage.setItem("dino_current_form", currentForm); resetPreview(); }
                 }
                 else if (mouseX < 690 && mouseY >= 180 && mouseY <= 208) {
-                    if (mouseX >= 430 && mouseX <= 456) { currentAmmoType = (currentAmmoType - 1 + 7) % 7; localStorage.setItem("dino_ammo_type", currentAmmoType); resetPreview(); }
-                    else if (mouseX >= 636 && mouseX <= 662) { currentAmmoType = (currentAmmoType + 1) % 7; localStorage.setItem("dino_ammo_type", currentAmmoType); resetPreview(); }
+                    if (mouseX >= 430 && mouseX <= 456) { currentAmmoType = (currentAmmoType - 1 + 8) % 8; localStorage.setItem("dino_ammo_type", currentAmmoType); resetPreview(); }
+                    else if (mouseX >= 636 && mouseX <= 662) { currentAmmoType = (currentAmmoType + 1) % 8; localStorage.setItem("dino_ammo_type", currentAmmoType); resetPreview(); }
                 }
                 else if (mouseX < 690 && mouseY >= 282 && mouseY <= 310) {
                     if ((mouseX >= 430 && mouseX <= 456) || (mouseX >= 636 && mouseX <= 662)) { currentShieldType = (currentShieldType + 1) % 2; localStorage.setItem("dino_shield", currentShieldType); }
                 }
                 // PHAI: 2 o rune (the doc)
                 else if (mouseX >= 700 && mouseX <= 976 && mouseY >= 78 && mouseY <= 372) {
-                    for (let sl = 0; sl < 2; sl++) { let y = 78 + sl * 152; if (mouseY >= y && mouseY <= y + 142) { runePicker = sl; runeLevelPick = null; break; } }
+                    for (let sl = 0; sl < 2; sl++) { let y = 78 + sl * 152; if (mouseY >= y && mouseY <= y + 142) { runePicker = sl; runeLevelPick = null; runeScroll = 0; break; } }
                 }
             } else if (gameState === 'test_menu') {
                 const L = getTestMenuLayout();
@@ -16741,8 +16607,8 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
             pet1Shots.length = 0; pet1Cd = 0; pet1N = 0; pet2Shots.length = 0; pet2Cd = 0; pet2N = 0; afterimages.length = 0; birdBank = 0; birdSpendCd = 0; birdDmgAcc = 0; voltBossTicks = 0; voltTrashTicks = 0;
             pet3Cd = 300; pet4Cd = 600; pet4Flash = 0; pet4Charges = 0; pet4SpendCd = 0; pet3X = 0; pet3Y = 0; pet4X = 0; pet4Y = 0;
             pet5Cd = 300; pet5Dash = null; pet5Charges = 0; pet5X = 0; pet5Y = 0; pet6Cd = 600; pet6Active = false; pet6Radius = 28; pet6Angle = 0; pet6X = 0; pet6Y = 0; pet6Rings = [];
-            obstacles.length = 0; enemies.length = 0; hearts.length = 0; projectiles.length = 0; bossProjectiles.length = 0; bosses.length = 0; floatingTexts.length = 0; visualEffects.length = 0; platforms.length = 0; lavaGeysers.length = 0; forestBossQueue.length = 0; forestQueueInit = false; cloneGauntlet = false; gauntletGate = null; summitLastBand = 2; summitForkCd = 0; summitApproach = null; volcanoApproach = null; noDmgStreak = 0; pvpDeathTimer = -1; shieldCharge = 0;
-            pulseNodes = []; pulseBeams = []; fireBrands = [];
+            obstacles.length = 0; enemies.length = 0; hearts.length = 0; projectiles.length = 0; bossProjectiles.length = 0; bosses.length = 0; boomerangs.length = 0; smBlades.length = 0; smClone = null; floatingTexts.length = 0; visualEffects.length = 0; platforms.length = 0; lavaGeysers.length = 0; forestBossQueue.length = 0; forestQueueInit = false; cloneGauntlet = false; gauntletGate = null; summitLastBand = 2; summitForkCd = 0; summitApproach = null; volcanoApproach = null; noDmgStreak = 0; pvpDeathTimer = -1; shieldCharge = 0;
+            fireBrands = [];
             activeLightnings.length = 0; spawnTimerCactus = 60; spawnTimerEnemy = 100; noDamageTaken = true; ultCharge = (ultTestFill || hasRune("instult") || hasRune("instultx")) ? 100 : 0; paused = false; hitstopTimer = 0; dodgeCd = 0; grazeFlashTimer = 0; perfectParryCd = 0; flashKind = 0; stylePoints = 0; styleRankIdx = 0; styleLastTag = ''; styleFlash = 0; styleGrace = 0; sssArmed = true; laserFireTimer = 0; laserEngaged = false; laserBlockFlag = false; lavaFlood = 0;
             
             dino = new Player(1, 80, currentForm, currentAmmoType, false);
@@ -16770,7 +16636,7 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
         // HUT MAU: nguong doi lay 1 lieu mau, RIENG cho tung loai dan (theo DPS thuc te).
         // 0 PULSE / 1 INFERNO / 2 RAPIDFIRE / 3 PRISM / 4 VOLT / 5 RIPPER / 6 PULSAR
         // Rieng VOLT (index 4) dem theo TICK chu khong theo dmg (xem voltBossTicks ben duoi).
-        const LIFESTEAL_NEED = [30, 25, 20, 30, 20, 20, 25];
+        const LIFESTEAL_NEED = [30, 25, 20, 30, 20, 20, 25, 25];
         // Bo dem tick cua VOLT, cong truc tiep tu calculateLightningChains.
         // Tick tu BOSS khong bi tran (charge 3 tia x 3 = 9 tick, tuc ~2 lan charge la du 20);
         // tick tu quai thuong bi tran 4 moi frame de charge quet ca dan khong thanh may hut mau.
@@ -16784,7 +16650,7 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
         function tickLifesteal(){
             if (!hasRune('redbird')) return;
             // CHIEU CUOI va CHANNEL KHONG hut mau duoc — ap dung cho MOI loai dan.
-            let _noSteal = !dino || dino.ultActive || dino.fireChannel || dino.lightChannel || dino.splitChannel
+            let _noSteal = !dino || dino.ultActive || dino.fireChannel || dino.lightChannel || dino.splitChannel || dino.boomChannel
                         || dino.rapidChannel || dino.pulsarChannel || dino.clawChannel || dino.normalLaserChannel
                         || dino.laserActiveTimer > 0 || dino.fireReactorTimer > 0;
             let isVolt = (currentAmmoType === 4);
@@ -16940,6 +16806,22 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                 dashVx = dir * 22; if (mapTheme === 'ocean' && (dino.y + dino.h) > OCEAN_SURF + 4) dashVx *= 0.6;   // luot duoi nuoc cham hon
                 dashCd = (combatStance === 1 ? 26 : 42); // Trickster hoi luot nhanh hon
                 dino.invincible = true; if (dino.invTimer < 16) dino.invTimer = 16;
+                // ===== SWORDMASTER =====
+                if (hasRune('swordmaster')) {
+                    if (!dino.grounded) {
+                        // HISUISHO: luot tren khong -> dung luoi kiem chan truoc mat
+                        smSpawnBlade(dino, dir);
+                        floatingTexts.push(new FloatingText(dino.x - 16, dino.y - 22, "HISUISHO"));
+                    } else if (!smClone) {
+                        // SOGENMU: luot duoi dat -> trieu phan than 2 giay, luot KHOA cho toi khi no tan
+                        smClone = { x: dino.x, y: dino.y, w: dino.w, h: dino.h, left: dino.isFacingLeft,
+                                    t: SM_CLONE_LIFE, tape: [], atk: null, lastSeq: 0,
+                                    sx0: dino.x, slideT: 12, slideMax: 12, bodyHit: new Set() };
+                        dashCd = 99999;
+                        floatingTexts.push(new FloatingText(dino.x - 16, dino.y - 22, "SOGENMU"));
+                        if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(300, 0.18, 'sawtooth', 0.20, 620);
+                    }
+                }
             }
             spawnAfterimage();
         }
@@ -16968,6 +16850,27 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
                     }
                     // RYUENJIN: dang o duoi dat, vua chem xong trong 0.5s -> bam NHAY thanh cu chem hat len
                     else if (currentAmmoType === 5 && dino.grounded && (dino.clawRiseWindow || 0) > 0 && !dino.isOverheated && dino.ammo > 0 && !dino.ultActive) { dino.ryuenjin(); }
+                    // ===== BOOMERANG ULT: NHAY de treo len luoi lon / NHAY tiep de cam luoi xuong =====
+                    else if (dino.ultActive && dino.ultAmmo === 7 && dino.boomUltRide) {
+                        let rb = dino.boomUltRide;
+                        if (!rb.mounted) {
+                            // treo len: bam ra luoi va dung len tren
+                            rb.mounted = true; rb.sp = 0;
+                            dino.x = rb.x - dino.w / 2; dino.y = rb.y - rb.r - dino.h + 6;
+                            dino.dy = 0; dino.grounded = true; dino.canDoubleJump = true; dino.invincible = true; dino.invTimer = Math.max(dino.invTimer, 40);
+                            floatingTexts.push(new FloatingText(dino.x - 20, dino.y - 26, "LEN LUOI!"));
+                            visualEffects.push(new Effect(rb.x, rb.y, 'parry', false));
+                            SFX.jump();
+                        } else {
+                            // nhay ra: luoi CAM THANG XUONG DAT co homing nhe, nguoi choi duoc 2 bac nhay
+                            rb.mounted = false; rb.state = 'slam'; rb.slamT = 0; rb.hit = new Set();
+                            dino.grounded = false; dino.dy = dino.jumpPower * 1.05; dino.canDoubleJump = true; dino.hoverArmed = false;
+                            dino.boomUltRide = null; dino.boomUltLeft = Math.max(0, (dino.boomUltLeft || 0) - 1);
+                            floatingTexts.push(new FloatingText(dino.x - 20, dino.y - 26, "CAM XUONG! (" + dino.boomUltLeft + " luoi con lai)"));
+                            shakeTimer = Math.max(shakeTimer, 14);
+                            SFX.jump();
+                        }
+                    }
                     else if (dino.grounded) { dino.dy = dino.jumpPower; dino.grounded = false; dino.canDoubleJump = true; dino.hoverArmed = true; SFX.jump(); }
                     else if (dino.hoverTimer > 0) { dino.hoverTimer = 0; dino.hoverArmed = false; dino.dy = dino.jumpPower * 0.85; dino.canDoubleJump = false; SFX.jump(); }
                     else if (dino.canDoubleJump) { dino.dy = dino.jumpPower * 0.85; dino.canDoubleJump = false; dino.hoverArmed = false; SFX.jump(); }
@@ -17004,6 +16907,8 @@ dino.drawForm(false, dx, dy, legAnim, currentForm, false);
 
         // ===== AWAKENED: NOVA — vu no dung chung cho moi loai dan =====
         // exclude: Set cac muc tieu DA an dmg goc -> khong an dmg no (tru khi selfDmg > 0)
+        // ============================ @@HE-NOVA ============================
+        // Vu no lan cua rune AWAKENED: NOVA
         function novaBlast(x, y, r, dmg, exclude, selfDmg, kind) {
             visualEffects.push(new Effect(x, y, kind || 'explosion', true, r));
             if (gameState === 'pvp') return;
@@ -17193,7 +17098,533 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         }
         // ===================== PULSE — NUT CONG HUONG =====================
         // Dan co ban bay XUYEN QUA nut -> duoc khuech dai (x2 dmg + xuyen). Toi da 2 nut.
-        // ===================== INFERNO — HOA AN (max charge) =====================
+        // ============================ @@HE-SWORDMASTER ============================
+        // Rune doc quyen RIPPER. 3 ky thuat:
+        //   HISUISHO — luot TREN KHONG: dung mot luoi kiem truoc mat, vua chan dan bay toi
+        //              nhu khien vua gay 4 dmg.
+        //   SOGENMU  — luot DUOI DAT: trieu phan than dung truoc mat 2 giay, lap lai y het
+        //              moi hanh dong cua nguoi choi. Luot chi hoi khi phan than bien mat.
+        //   MIKAZUKIZAN nam trong class Player: _beginSlash noi dai hitbox, _slashFx phat
+        //              them mot vet chem thu hai y het hinh dang nhung ban kinh lon hon (tint 'mika').
+        let smBlades = [];        // luoi Hisuisho dang song
+        let smClone = null;       // phan than Sogenmu (toi da 1)
+        const SM_BLADE_LIFE = 26, SM_CLONE_LIFE = 120;
+        const SM_CLONE_LAG = 12;    // phan than tre bao nhieu frame so voi nguoi choi
+        const SM_CLONE_GAP = 150;   // phan than luon dung TRUOC MAT nguoi choi bao nhieu px
+        // Bang mau bong den cua phan than: giu nguyen hinh dang nguoi choi, chi doi mau
+        const SM_SHADOW_PAL = { bd:"#0B0A14", hd:"#141322", dk:"#050409", lt:"#2A2740", foot:"#000000",
+                                spk:"#4A3F7A", out:"#000000", rim:"#6E5FA8", eye:"#B39DDB", pup:"#4527A0", aura:null, crest:0 };
+
+        // ---- HISUISHO ----
+        function smSpawnBlade(p, dir) {
+            smBlades.push({ owner: p, dir: dir, t: SM_BLADE_LIFE, hit: new Set(), parry: 0 });
+            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(880, 0.10, 'square', 0.16, 1500);
+        }
+        function smBladeRect(bl) {
+            let p = bl.owner, sc = p.getFormScale ? p.getFormScale() : 1;
+            let W = 30 * sc, H = p.h + 34;
+            return { x: bl.dir === 1 ? p.x + p.w - 6 : p.x - W + 6, y: p.y - 17, w: W, h: H };
+        }
+        function tickSwordmaster() {
+            let p = dino;
+            // ===== LUOI HISUISHO =====
+            for (let i = smBlades.length - 1; i >= 0; i--) {
+                let bl = smBlades[i];
+                bl.t--; if (bl.parry > 0) bl.parry--;
+                if (bl.t <= 0 || !bl.owner || bl.owner.hp <= 0) { smBlades.splice(i, 1); continue; }
+                let r = smBladeRect(bl);
+                // 4 dmg cho moi muc tieu, moi muc tieu 1 lan
+                let one = (o, isBoss) => {
+                    if (!o || bl.hit.has(o) || !checkAABB(r, o)) return;
+                    if (isBoss && o.invulnAll) return;
+                    bl.hit.add(o); o.hp -= 4;
+                    visualEffects.push(new Effect(o.x + o.w / 2, o.y + o.h / 2, 'explosion', true, 16));
+                    if (gameState !== 'pvp') score += 1;
+                };
+                obstacles.forEach(o => one(o, false)); enemies.forEach(o => one(o, false)); bosses.forEach(o => one(o, true));
+                // CHAN DAN: dan boss cham luoi thi vo
+                for (let k = bossProjectiles.length - 1; k >= 0; k--) {
+                    let bp = bossProjectiles[k];
+                    if (checkAABB(r, bp)) {
+                        bossProjectiles.splice(k, 1); bl.parry = 6;
+                        visualEffects.push(new Effect(bp.x, bp.y, 'parry', bl.dir === -1));
+                    }
+                }
+                if (typeof cutBossProjectiles === 'function') cutBossProjectiles(r);
+            }
+            // ===== PHAN THAN SOGENMU =====
+            if (smClone) {
+                let c = smClone;
+                c.t--;
+                if (c.t <= 0 || !p || p.hp <= 0) {
+                    visualEffects.push(new Effect(c.x + c.w / 2, c.y + c.h / 2, 'explosion', true, 26));
+                    smClone = null;
+                    if (typeof dashCd !== 'undefined') dashCd = 0;      // phan than tan -> MOI hoi luot
+                } else {
+                    // --- LUOT RA: chi lan XUAT HIEN dau tien moi gay dmg bang than ---
+                    if (c.slideT > 0) {
+                        c.slideT--;
+                        // Nguoi choi dang DASH ve truoc, nen phai bam theo vi tri SONG cua ho,
+                        // neu khong phan than se bi bo lai phia sau.
+                        let u = 1 - (c.slideT / c.slideMax), e = 1 - (1 - u) * (1 - u);
+                        let tgt = p.x + (c.left ? -SM_CLONE_GAP : SM_CLONE_GAP);
+                        c.x = c.sx0 + (tgt - c.sx0) * e;
+                        c.y = p.y;
+                        let body = { x: c.x + 4, y: c.y + 6, w: c.w - 8, h: c.h - 10 };
+                        let one = (o, isBoss) => {
+                            if (!o || (isBoss && o.invulnAll) || c.bodyHit.has(o) || !checkAABB(body, o)) return;
+                            c.bodyHit.add(o); o.hp -= 3;
+                            visualEffects.push(new Effect(o.x + o.w / 2, o.y + o.h / 2, 'explosion', true, 18));
+                            if (gameState !== 'pvp') score += 1;
+                        };
+                        obstacles.forEach(o => one(o, false)); enemies.forEach(o => one(o, false)); bosses.forEach(o => one(o, true));
+                    } else {
+                        // --- BAM THEO: phat lai bang ghi hanh dong, tre SM_CLONE_LAG frame ---
+                        c.tape.push({ x: p.x, y: p.y, left: p.isFacingLeft,
+                                      seq: p.slashAtk ? p.slashAtk.seq : 0,
+                                      atk: p.slashAtk ? { dir: p.slashAtk.dir, reach: p.slashAtk.reach, hTop: p.slashAtk.hTop, hBot: p.slashAtk.hBot,
+                                                          spin: p.slashAtk.spin, t: p.slashAtk.t, base: p.slashAtk.base, fx: p.slashAtk.fx } : null });
+                        if (c.tape.length > SM_CLONE_LAG) {
+                            let f = c.tape.shift();
+                            c.left = f.left;
+                            c.x = f.x + (f.left ? -SM_CLONE_GAP : SM_CLONE_GAP);   // LUON o truoc mat
+                            c.y = f.y;
+                            // Nhat chem MOI -> phat dung hoat anh cua nguoi choi, gan vao phan than
+                            if (f.seq && f.seq !== c.lastSeq) {
+                                c.lastSeq = f.seq;
+                                let a = f.atk;
+                                if (a && a.fx) {
+                                    let e = new Effect(c.x + c.w / 2, c.y + c.h / 2, a.fx.kind, a.fx.isLeft, a.fx.R);
+                                    e.follow = c; e.tint = 'dark';
+                                    visualEffects.push(e);
+                                }
+                                if (a) {
+                                    // dmg: don thuong 1, don dac biet 2 (don goc tu 3 dmg tro len = dac biet)
+                                    c.atk = { dir: a.dir, reach: a.reach, hTop: a.hTop, hBot: a.hBot, spin: a.spin,
+                                              t: a.t, dmg: (a.base >= 3 ? 2 : 1), hit: new Set() };
+                                }
+                            }
+                        }
+                    }
+                    // --- VUNG CHEM CUA PHAN THAN ---
+                    if (c.atk) {
+                        let a = c.atk;
+                        let sr = a.spin ? { x: c.x + c.w / 2 - a.spin, y: c.y + c.h / 2 - a.spin, w: a.spin * 2, h: a.spin * 2 }
+                               : (a.dir === 1 ? { x: c.x + c.w - 5, y: c.y - a.hTop, w: a.reach, h: c.h + a.hTop + a.hBot }
+                                              : { x: c.x - a.reach + 5, y: c.y - a.hTop, w: a.reach, h: c.h + a.hTop + a.hBot });
+                        let one2 = (o, isBoss) => { if (!o || (isBoss && o.invulnAll) || a.hit.has(o) || !checkAABB(sr, o)) return; a.hit.add(o); o.hp -= a.dmg; if (gameState !== 'pvp') score += 1; };
+                        obstacles.forEach(o => one2(o, false)); enemies.forEach(o => one2(o, false)); bosses.forEach(o => one2(o, true));
+                        if (typeof cutBossProjectiles === 'function') cutBossProjectiles(sr);
+                        a.t--; if (a.t <= 0) c.atk = null;
+                    }
+                }
+            }
+        }
+        function drawSwordmaster() {
+            // ---- luoi Hisuisho ----
+            for (let bl of smBlades) {
+                let r = smBladeRect(bl), a = Math.max(0, bl.t / SM_BLADE_LIFE);
+                ctx.save();
+                ctx.globalAlpha = 0.35 + 0.6 * a;
+                let g = ctx.createLinearGradient(r.x, 0, r.x + r.w, 0);
+                g.addColorStop(0, "rgba(179,229,252,0.15)"); g.addColorStop(0.5, "rgba(255,255,255,0.95)"); g.addColorStop(1, "rgba(129,212,250,0.2)");
+                ctx.fillStyle = g; ctx.fillRect(r.x, r.y, r.w, r.h);
+                ctx.strokeStyle = bl.parry > 0 ? "#FFEB3B" : "#E1F5FE"; ctx.lineWidth = bl.parry > 0 ? 5 : 3;
+                ctx.shadowBlur = 18; ctx.shadowColor = bl.parry > 0 ? "#FFEB3B" : "#81D4FA";
+                ctx.beginPath();
+                ctx.moveTo(r.x + r.w / 2, r.y - 8);
+                ctx.lineTo(r.x + r.w - 2, r.y + r.h * 0.5);
+                ctx.lineTo(r.x + r.w / 2, r.y + r.h + 8);
+                ctx.lineTo(r.x + 2, r.y + r.h * 0.5);
+                ctx.closePath(); ctx.stroke();
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = "rgba(255,255,255,0.9)"; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(r.x + r.w / 2, r.y - 4); ctx.lineTo(r.x + r.w / 2, r.y + r.h + 4); ctx.stroke();
+                ctx.restore();
+            }
+            // ---- phan than Sogenmu: DUNG CHINH HINH NGUOI CHOI, to den trong suot ----
+            if (smClone && dino) {
+                let c = smClone;
+                let fade = Math.min(1, c.t / 18);
+                let legAnim = (!dino.grounded) ? 4 : ((frames % 12 < 6) ? 4 : 0);
+                ctx.save();
+                ctx.globalAlpha = 0.5 * fade;
+                // Dung DUNG hinh nguoi choi nhung thay bang bang mau DEN TRONG -> khong can filter
+                dino.drawForm(false, c.x, c.y, legAnim, currentForm, c.left, SM_SHADOW_PAL);
+                ctx.restore();
+                // dem nguoc thoi gian ton tai
+                ctx.save();
+                ctx.globalAlpha = 0.85;
+                ctx.strokeStyle = "#4FC3F7"; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(c.x + c.w / 2, c.y - 14, 9, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (c.t / SM_CLONE_LIFE)); ctx.stroke();
+                ctx.restore();
+            }
+        }
+        // ============================ @@HE-BOOMERANG ============================
+        // BOOMERANG — LUOI QUAY
+        // QUY DAO: nua hinh elip CO DINH tinh ngay luc nem, KHONG bam theo nguoi choi.
+        //   x = x0 + dir * A * sin(phi)          phi chay 0 -> PI
+        //   y = y0 - (lift/2) * (1 - cos(phi))
+        // phi=0 roi tay | phi=PI/2 xa nhat (A px) | phi=PI quay ve dung cho cu, cao hon 'lift'.
+        // Vi quy dao chot cung tu dau nen nguoi choi nhay len nhay xuong khong lam luoi meo theo.
+        // Charge cang lau -> A cang xa (gan het chieu ngang ban do) va diem bat cang thap.
+        let boomerangs = [];
+        const BOOM_CATCH_R = 46;
+        const BOOM_A_MIN = 330;      // tam nem thuong
+        const BOOM_A_MAX = 900;      // tam khi charge day (gan het chieu ngang man 1000px)
+        const BOOM_HOVER = 52;       // luoi lo lung cho bat bao lau truoc khi mat
+        const BOOM_DRIFT = 2.5;      // luc lo lung moi frame troi toi da bao nhieu px ve phia nguoi choi
+        // Ap dmg giong meleeStrike: ton trong khien AEGIS / HELIOS / mien nhiem
+        function boomApply(rect, dmg, hitSet) {
+            let any = false;
+            let one = (o, isBoss) => {
+                if (!o || (hitSet && hitSet.has(o)) || !checkAABB(rect, o)) return;
+                if (hitSet) hitSet.add(o);
+                if (isBoss) {
+                    if (o.invulnAll) { visualEffects.push(new Effect(o.x + o.w / 2, o.y, 'parry', false)); return; }
+                    if (o.name === "AEGIS REX") { if (o.shieldBrokenTimer > 0) { o.hp -= dmg; any = true; } else o.hitShield(3, o.x + o.w / 2, o.y + o.h / 2); return; }
+                    if (o.name === "HELIOS REX" && (o.shieldTimer > 0 || o.spamShieldTimer > 0 || o.state.includes('clone_dash') || o.state === 'clone_bounce_back' || o.state === 'clone_wait') && o.shieldHp > 0) {
+                        visualEffects.push(new Effect(o.x - 10, o.y + 20, 'parry', false)); o.shieldHp--; return;
+                    }
+                }
+                o.hp -= dmg; any = true;
+            };
+            obstacles.forEach(o => one(o, false));
+            enemies.forEach(o => one(o, false));
+            bosses.forEach(o => one(o, true));
+            if (any && gameState !== 'pvp') score += 1;
+            return any;
+        }
+        function boomNearestX(bx, by) {
+            let best = null, bd = 1e9;
+            for (let o of bosses.concat(enemies)) { if (o.invulnAll || o.hp <= 0) continue;
+                let d = Math.hypot((o.x + o.w / 2) - bx, (o.y + o.h / 2) - by); if (d < bd) { bd = d; best = o; } }
+            return best;
+        }
+        // Goc ngam tu (x,y) toi muc tieu gan nhat, GIOI HAN +-38 do so voi phuong ngang.
+        // Tra ve null neu khong co muc tieu -> ban theo huong dang quay mat.
+        const BOOM_AIM_CAP = 38 * Math.PI / 180;
+        function boomAim(x, y, faceDir) {
+            let t = boomNearestX(x, y);
+            if (!t) return null;
+            let tx = t.x + t.w / 2, ty = t.y + t.h / 2;
+            let dir = (tx >= x) ? 1 : -1;
+            let base = dir > 0 ? 0 : Math.PI;
+            let raw = Math.atan2(ty - y, tx - x);
+            let rel = Math.atan2(Math.sin(raw - base), Math.cos(raw - base));
+            rel = Math.max(-BOOM_AIM_CAP, Math.min(BOOM_AIM_CAP, rel));
+            return { ang: base + rel, dir: dir, dist: Math.hypot(tx - x, ty - y), tgt: t };
+        }
+        // charge 0..1 -> quay ve cang THAP (de bat), twice = an dmg ca luot di lan ve
+        function throwBoomerang(p, opts) {
+            opts = opts || {};
+            let sc = p.getFormScale ? p.getFormScale() : 1;
+            let dir = p.isFacingLeft ? -1 : 1;
+            let big = !!opts.big;
+            let ch = Math.max(0, Math.min(1, opts.charge || 0));
+            let A = opts.ultSmall ? 300 : (BOOM_A_MIN + (BOOM_A_MAX - BOOM_A_MIN) * ch);
+            // NGAM: xoay ca duong elip cho truc chinh huong ve muc tieu (chi khi duoc yeu cau)
+            let ang = 0;
+            if (opts.aim) {
+                let am = boomAim(p.x + p.w / 2, p.y + p.h * 0.42, dir);
+                if (am) {
+                    ang = am.ang; dir = am.dir;
+                    if (opts.fitRange) A = Math.max(240, Math.min(BOOM_A_MAX, am.dist * 1.18));
+                }
+            }
+            let b = {
+                dir: dir, ang: ang, dmg: opts.dmg || 3, big: big,
+                r: (big ? 30 : 14) * sc,
+                sp: big ? 15 : 17,
+                state: 'arc', spin: 0,
+                hit: new Set(), twice: !!opts.twice,
+                // ==== THONG SO QUY DAO (chot cung luc nem) ====
+                x0: p.x + p.w / 2 + dir * 18,          // goc toa do cua duong bay
+                y0: p.y + p.h * 0.42,
+                A: A,                                   // ban truc ngang = tam nem
+                lift: big ? 0 : (104 - 64 * ch),        // ve cao hon diem nem bao nhieu
+                phi: 0,                                  // 0 -> PI
+                dphi: Math.PI / (opts.ultSmall ? 62 : (58 + A * 0.09)),   // xa hon thi bay lau hon
+                turned: false,
+                caught: false, life: 0,
+                small: !!opts.small, ultSmall: !!opts.ultSmall, owner: p
+            };
+            b.x = b.x0; b.y = b.y0;
+            if (big) { b.state = 'ride'; b.rideT = 0; b.mounted = false; b.slamT = 0; }
+            boomerangs.push(b);
+            if (typeof SFX !== 'undefined' && SFX.shoot) SFX.shoot(1);
+            return b;
+        }
+        // Vi tri tren duong elip tai goc phi, da xoay theo goc ngam b.ang
+        function boomPos(b, ph) {
+            let u = b.A * Math.sin(ph);                    // doc truc chinh
+            let v = -(b.lift / 2) * (1 - Math.cos(ph));    // vuong goc truc chinh
+            if (!b.ang) return { x: b.x0 + b.dir * u, y: b.y0 + v };
+            let ca = Math.cos(b.ang), sa = Math.sin(b.ang);
+            return { x: b.x0 + ca * u - sa * v, y: b.y0 + sa * u + ca * v };
+        }
+        function tickBoomerangs() {
+            let p = dino;
+            for (let i = boomerangs.length - 1; i >= 0; i--) {
+                let b = boomerangs[i];
+                b.life++; b.spin += b.big ? 0.30 : 0.55;
+                let rect = { x: b.x - b.r, y: b.y - b.r, w: b.r * 2, h: b.r * 2 };
+
+                // ---------- BOOMERANG LON CUA ULT ----------
+                if (b.big) {
+                    if (b.state === 'ride') {
+                        b.rideT++;
+                        if (!b.mounted) {
+                            b.x += b.dir * b.sp;
+                            b.y += (130 - b.y) * 0.11;                      // VOT LEN CAO nhanh
+                            if (b.rideT > 34) b.sp *= 0.90;                 // cham dan roi lo lung cho nguoi choi treo len
+                            // Cua so treo len NGAN: khong dung lam ban hover ne dan duoc
+                            if (b.rideT > 132) {
+                                b.state = 'slam'; b.slamT = 0; b.hit = new Set();
+                                if (b.owner) { b.owner.boomUltRide = null; b.owner.boomUltLeft = Math.max(0, (b.owner.boomUltLeft || 0) - 1); }
+                            }
+                        } else {
+                            // DANG CHO NGUOI CHOI: bay NHANH ve phia truoc. Khong phai ban hover, phai xu ly gap.
+                            b.x += b.dir * 7.5;
+                            b.y += Math.sin(b.rideT * 0.09) * 0.7;
+                            if (b.x < 46 || b.x > canvas.width - 46) b.dir *= -1;   // cham mep thi doi huong, van khong dung yen
+                            b.x = Math.max(46, Math.min(canvas.width - 46, b.x));
+                            if (p) { p.x = b.x - p.w / 2; p.y = b.y - b.r - p.h + 6; p.dy = 0; p.grounded = true; p.canDoubleJump = true; }
+                            // dung tren luoi qua lau cung tu roi
+                            if (b.rideT > 330) {
+                                b.mounted = false; b.state = 'slam'; b.slamT = 0; b.hit = new Set();
+                                if (p) { p.grounded = false; p.dy = p.jumpPower; p.canDoubleJump = true; }
+                                if (b.owner) { b.owner.boomUltRide = null; b.owner.boomUltLeft = Math.max(0, (b.owner.boomUltLeft || 0) - 1); }
+                            }
+                        }
+                        boomApply(rect, 3, b.hit);
+                    } else if (b.state === 'slam') {
+                        b.slamT++;
+                        let tg = boomNearestX(b.x, b.y);
+                        if (tg) b.x += Math.max(-4.5, Math.min(4.5, ((tg.x + tg.w / 2) - b.x) * 0.10));   // homing NHE
+                        b.y += Math.min(26, 7 + b.slamT * 1.3);
+                        if (boomApply(rect, 25, b.hit)) {
+                            visualEffects.push(new Effect(b.x, b.y, 'explosion', true, 66));
+                            shakeTimer = Math.max(shakeTimer, 22);
+                            floatingTexts.push(new FloatingText(b.x - 40, b.y - 30, "CAM LUOI! -25"));
+                            boomerangs.splice(i, 1); continue;
+                        }
+                        if (b.y > 330) {
+                            visualEffects.push(new Effect(b.x, 322, 'explosion', true, 58));
+                            boomApply({ x: b.x - 62, y: 292, w: 124, h: 46 }, 25, b.hit);
+                            shakeTimer = Math.max(shakeTimer, 20);
+                            boomerangs.splice(i, 1); continue;
+                        }
+                    }
+                    continue;
+                }
+
+                // ---------- QUY DAO BOOMERANG: nua elip co dinh, KHONG bam theo nguoi choi ----------
+                if (b.state === 'arc') {
+                    b.phi += b.dphi;
+                    let ph = Math.min(Math.PI, b.phi);
+                    let pt = boomPos(b, ph);
+                    b.x = pt.x; b.y = pt.y;
+                    // qua diem xa nhat = da quay dau: MAX CHARGE cho an dmg lan hai
+                    if (!b.turned && ph >= Math.PI / 2) {
+                        b.turned = true;
+                        if (b.twice) b.hit = new Set();
+                    }
+                    boomApply({ x: b.x - b.r, y: b.y - b.r, w: b.r * 2, h: b.r * 2 }, b.dmg, b.hit);
+                    // AWAKENED: NOVA — luoi de lai vet no doc duong bay
+                    if (typeof hasRune === 'function' && hasRune('explshot') && b.life % 9 === 0 && typeof novaBlast === 'function') {
+                        novaBlast(b.x, b.y, 30, 1, b.hit, 0);
+                    }
+                    // bat duoc bat cu luc nao cham vao nguoi choi (ke ca luc dang bay ra)
+                    if (b.turned && p && p.hp > 0 && Math.hypot((p.x + p.w / 2) - b.x, (p.y + p.h * 0.42) - b.y) < BOOM_CATCH_R) {
+                        catchBoomerang(p, b); boomerangs.splice(i, 1); continue;
+                    }
+                    if (b.phi >= Math.PI) { b.state = 'hover'; b.hoverT = 0; }
+                }
+                // ---------- LO LUNG CHO BAT ----------
+                else if (b.state === 'hover') {
+                    b.hoverT++;
+                    b.y += 0.55 + b.hoverT * 0.045;                      // tu tu roi xuong
+                    // luc nay moi troi NHE ve phia nguoi choi, toi da 2.5px/frame -> khong be cong quy dao
+                    if (p) { let d = (p.x + p.w / 2) - b.x; b.x += Math.max(-BOOM_DRIFT, Math.min(BOOM_DRIFT, d * 0.12)); }
+                    boomApply({ x: b.x - b.r, y: b.y - b.r, w: b.r * 2, h: b.r * 2 }, b.dmg, b.hit);
+                    if (p && p.hp > 0 && Math.hypot((p.x + p.w / 2) - b.x, (p.y + p.h * 0.42) - b.y) < BOOM_CATCH_R) {
+                        catchBoomerang(p, b); boomerangs.splice(i, 1); continue;
+                    }
+                    if (b.hoverT > BOOM_HOVER || b.y > 330) {
+                        visualEffects.push(new Effect(b.x, b.y, 'explosion', true, 10));
+                        floatingTexts.push(new FloatingText(b.x - 30, b.y - 16, "HUT LUOI!"));
+                        boomLost(b); boomerangs.splice(i, 1); continue;
+                    }
+                }
+                if (b.life > 620) { boomLost(b); boomerangs.splice(i, 1); }
+            }
+        }
+        // Khong bat duoc -> tru so luoi dang bay (de con nem chiec moi)
+        function boomLost(b) {
+            if (!b || b.big || !b.owner) return;
+            b.owner.boomOut = Math.max(0, (b.owner.boomOut || 1) - 1);
+            // Chi luoi DA TRU DAN moi hoan lai. Hoan sau 1 giay ke tu luc mat.
+            if (b.paid) b.owner.boomLostPend = (b.owner.boomLostPend || 0) + 1;
+        }
+        // BAT DUOC = mot don PHAN CONG, khong phai chi la vu no quanh nguoi.
+        // Vu no quanh nguoi chi de don quai bu quanh chan; suc manh that nam o cu NEM NGUOC CO NGAM.
+        function catchBoomerang(p, b) {
+            let _nv = (typeof hasRune === 'function' && hasRune('explshot'));
+            let cxp = p.x + p.w / 2, cyp = p.y + p.h / 2;
+            // 1) No nho quanh nguoi (chi an khi co dich dung sat) — khong con la nguon dmg chinh
+            let aoeD = 3 + (_nv ? 2 : 0);
+            let R = (78 + (_nv ? 30 : 0)) * (p.getFormScale ? p.getFormScale() : 1);
+            boomApply({ x: cxp - R, y: cyp - R, w: R * 2, h: R * 2 }, aoeD, new Set());
+            visualEffects.push(new Effect(cxp, cyp, 'explosion', true, R));
+            shakeTimer = Math.max(shakeTimer, 12);
+            p.boomSpin = 22;
+            p.attackCooldown = 0;
+            p.boomOut = Math.max(0, (p.boomOut || 1) - 1);
+            if (typeof SFX !== 'undefined' && SFX.parry) SFX.parry();
+            if (typeof addStyle === 'function') addStyle(12, 'hit');
+
+            // 2) NEM NGUOC CO NGAM: bat duoc la nem thang vao dich gan nhat, mien phi dan
+            let chain = (b.chain || 0) + 1;
+            let inCh = !!p.boomChannel;
+            let cd = inCh ? 5 : 4;                            // Khien Luoi manh hon
+            let nb = throwBoomerang(p, { dmg: cd, charge: 0.55, twice: true, aim: true, fitRange: true });
+            nb.chain = chain; nb.counter = true; nb.paid = b.paid;
+            p.boomOut = (p.boomOut || 0) + 1;
+            p.boomThrowCount = chain;
+            let tag = boomNearestX(cxp, cyp) ? ("PHAN DON x" + chain + "  -" + cd) : ("BAT LUOI x" + chain);
+            floatingTexts.push(new FloatingText(cxp - 52, p.y - 30, tag));
+        }
+        function drawBoomerangs() {
+            for (let b of boomerangs) {
+                ctx.save();
+                ctx.translate(b.x, b.y); ctx.rotate(b.spin);
+                let R = b.r, col = b.big ? "#FFD54F" : (b.twice ? "#FF80AB" : "#80DEEA");
+                ctx.shadowBlur = b.big ? 20 : 12; ctx.shadowColor = col;
+                // luoi hinh chu V (boomerang) 2 canh
+                ctx.strokeStyle = col; ctx.lineWidth = b.big ? 9 : 5; ctx.lineCap = "round";
+                ctx.beginPath(); ctx.moveTo(-R, R * 0.55); ctx.lineTo(0, -R * 0.75); ctx.lineTo(R, R * 0.55); ctx.stroke();
+                ctx.strokeStyle = "rgba(255,255,255,0.9)"; ctx.lineWidth = b.big ? 3.5 : 2;
+                ctx.beginPath(); ctx.moveTo(-R, R * 0.55); ctx.lineTo(0, -R * 0.75); ctx.lineTo(R, R * 0.55); ctx.stroke();
+                ctx.restore();
+                // vet duoi mo phia sau
+                // vet duoi keo NGUOC voi huong bay thuc te (luot ve thi vet nam phia ben kia)
+                let vdir = b.big ? b.dir : (b.dir * (Math.cos(Math.min(Math.PI, b.phi || 0)) >= 0 ? 1 : -1));
+                ctx.save(); ctx.globalAlpha = 0.28; ctx.strokeStyle = b.big ? "#FFE082" : "#B2EBF2"; ctx.lineWidth = 3;
+                for (let k = 1; k <= 3; k++) { ctx.beginPath(); ctx.arc(b.x - vdir * k * 7, b.y, b.r * (1 - k * 0.18), 0, Math.PI * 2); ctx.stroke(); }
+                ctx.restore();
+                // dang quay ve: chi ro DIEM VE CO DINH (khong doi khi nguoi choi nhay)
+                if (b.state === 'arc' && b.turned) {
+                    let end = boomPos(b, Math.PI);
+                    ctx.save();
+                    ctx.globalAlpha = 0.35 + 0.35 * Math.abs(Math.sin(frames * 0.2));
+                    ctx.strokeStyle = "#80DEEA"; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+                    ctx.beginPath(); ctx.arc(end.x, end.y, BOOM_CATCH_R, 0, Math.PI * 2); ctx.stroke();
+                    // ve luon phan duong bay con lai de doc quy dao
+                    ctx.globalAlpha = 0.22; ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    for (let k = 0; k <= 16; k++) {
+                        let ph = b.phi + (Math.PI - b.phi) * (k / 16);
+                        let pp = boomPos(b, ph);
+                        if (k === 0) ctx.moveTo(pp.x, pp.y); else ctx.lineTo(pp.x, pp.y);
+                    }
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.restore();
+                }
+                // dang lo lung: vong bat sang ro, dem nguoc thoi gian con lai
+                if (b.state === 'hover') {
+                    let left = 1 - (b.hoverT / BOOM_HOVER);
+                    ctx.save();
+                    ctx.globalAlpha = 0.55 + 0.35 * Math.abs(Math.sin(frames * 0.35));
+                    ctx.strokeStyle = "#FFFFFF"; ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.arc(b.x, b.y, BOOM_CATCH_R, 0, Math.PI * 2); ctx.stroke();
+                    ctx.globalAlpha = 1;
+                    ctx.strokeStyle = "#80DEEA"; ctx.lineWidth = 4;
+                    ctx.beginPath(); ctx.arc(b.x, b.y, BOOM_CATCH_R + 6, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * left); ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        }
+        // ============================ @@HE-PRISM ============================
+        // PRISM — KHUC XA TICH TU
+        // Manh dan Prism LUON 2 dmg, charge hay khong deu vay.
+        // Nhung cu 3 lan trung CUNG MOT muc tieu thi no chiu them 1 don KHUC XA:
+        //   lan trung thu 3 -> +1 | thu 6 -> +2 | thu 9 -> +3 | thu 12 -> +4 ... khong gioi han.
+        // Chi la don CONG THEM tai dung nhip do, khong phai buff vinh vien.
+        // Ngung ban thi tich tu ro ri het -> phai duy tri ap luc len 1 muc tieu.
+        const PRISM_STEP = 3;        // bao nhieu lan trung thi no 1 don
+        const PRISM_HOLD = 180;      // giu nguyen 3 giay sau lan trung cuoi
+        const PRISM_BLEED = 12;      // sau do cu 12 frame ro ri 1 lan tich
+        const PRISM_COL = ["#80DEEA", "#4DD0E1", "#FFF176", "#FFB74D", "#FF80AB", "#E040FB", "#FFFFFF"];
+        function prismTier(o) { return o && o._pxN ? Math.floor(o._pxN / PRISM_STEP) : 0; }
+        function prismCol(t) { return PRISM_COL[Math.min(PRISM_COL.length - 1, t)]; }
+        // Goi DUNG MOT LAN moi cap (dan, muc tieu), ngay tai cho tru mau.
+        function prismDmg(proj, o) {
+            if (!proj || !proj.prism || !o) return proj ? proj.dmg : 0;
+            o._pxN = (o._pxN || 0) + 1; o._pxT = PRISM_HOLD; o._pxB = 0;
+            if (o._pxN % PRISM_STEP !== 0) return proj.dmg;
+            let burst = o._pxN / PRISM_STEP;
+            o._pxFlash = 20;
+            floatingTexts.push(new FloatingText(o.x + o.w / 2 - 52, o.y - 30, "KHUC XA x" + burst + "  -" + burst));
+            visualEffects.push(new Effect(o.x + o.w / 2, o.y + o.h / 2, 'parry', false));
+            shakeTimer = Math.max(shakeTimer, 5 + Math.min(9, burst));
+            return proj.dmg + burst;
+        }
+        function tickPrismStacks() {
+            let all = bosses.concat(enemies, obstacles);
+            for (let o of all) {
+                if (o._pxFlash > 0) o._pxFlash--;
+                if (!o._pxN) continue;
+                if (o._pxT > 0) { o._pxT--; continue; }
+                o._pxB = (o._pxB || 0) + 1;
+                if (o._pxB >= PRISM_BLEED) { o._pxB = 0; o._pxN--; }
+            }
+        }
+        function drawPrismStacks() {
+            let all = bosses.concat(enemies, obstacles);
+            for (let o of all) {
+                if (!o._pxN || o.hp <= 0) continue;
+                let tier = prismTier(o);                      // da no bao nhieu lan
+                let next = tier + 1;                          // don KHUC XA ke tiep manh bao nhieu
+                let col = prismCol(next);
+                let inStep = o._pxN - tier * PRISM_STEP;       // 0..2 tien do toi don ke tiep
+                let cxp = o.x + o.w / 2, yy = o.y - 16;
+                let fading = o._pxT <= 0;
+                ctx.save();
+                ctx.globalAlpha = fading ? 0.45 + 0.35 * Math.abs(Math.sin(frames * 0.25)) : 1;
+                // lang kinh: doi mau theo do lon cua don ke tiep
+                ctx.fillStyle = col; ctx.strokeStyle = "rgba(0,0,0,0.6)"; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(cxp - 34, yy + 6); ctx.lineTo(cxp - 26, yy - 7); ctx.lineTo(cxp - 18, yy + 6); ctx.closePath();
+                ctx.stroke(); ctx.fill();
+                // 3 o vuong = con may phat nua thi no
+                for (let s = 0; s < PRISM_STEP; s++) {
+                    ctx.fillStyle = (s < inStep) ? col : "rgba(255,255,255,0.18)";
+                    ctx.strokeStyle = "rgba(0,0,0,0.55)"; ctx.lineWidth = 1.5;
+                    ctx.fillRect(cxp - 12 + s * 12, yy - 5, 9, 11);
+                    ctx.strokeRect(cxp - 12 + s * 12, yy - 5, 9, 11);
+                }
+                // do lon cua don KHUC XA ke tiep
+                ctx.font = "bold 13px Courier New"; ctx.textAlign = "left";
+                ctx.lineWidth = 3; ctx.strokeStyle = "rgba(0,0,0,0.8)";
+                ctx.strokeText("-" + next, cxp + 27, yy + 6);
+                ctx.fillStyle = col; ctx.fillText("-" + next, cxp + 27, yy + 6);
+                ctx.restore();
+                // chop sang khi vua an don KHUC XA
+                if (o._pxFlash > 0) {
+                    let ft = o._pxFlash / 20;
+                    ctx.save();
+                    ctx.globalAlpha = ft;
+                    ctx.strokeStyle = prismCol(tier); ctx.lineWidth = 3;
+                    ctx.shadowBlur = 16; ctx.shadowColor = ctx.strokeStyle;
+                    let rr = (o.w / 2 + 10) + (1 - ft) * 34;
+                    ctx.beginPath(); ctx.arc(cxp, o.y + o.h / 2, rr, 0, Math.PI * 2); ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        }
+        // ============================ @@HE-INFERNO ============================
+        // INFERNO — HOA AN (max charge)
         // Cau lua nang cam vao muc tieu: chay am i roi PHAT NO lon sau 2.5 giay. Toi da 2 dau.
         let fireBrands = [];
         function tickFireBrands() {
@@ -17235,58 +17666,8 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                 ctx.restore();
             }
         }
-        let pulseNodes = [], pulseBeams = [];
-        const PULSE_NODE_LIFE = 360, PULSE_NODE_R = 30;
-        function addPulseNode(x, y, big) {
-            pulseNodes.push({ x: Math.max(40, Math.min(canvas.width - 40, x)), y: Math.max(60, Math.min(300, y)), t: 0, big: !!big });
-            while (pulseNodes.length > (big ? 4 : 2)) pulseNodes.shift();
-            visualEffects.push(new Effect(x, y, 'parry'));
-        }
-        function tickPulseNodes() {
-            for (let i = pulseNodes.length - 1; i >= 0; i--) { pulseNodes[i].t++; if (pulseNodes[i].t > PULSE_NODE_LIFE) pulseNodes.splice(i, 1); }
-            for (let i = pulseBeams.length - 1; i >= 0; i--) { pulseBeams[i].t--; if (pulseBeams[i].t <= 0) pulseBeams.splice(i, 1); }
-        }
-        function resonateProjectile(p) {
-            if (!pulseNodes.length || p.owner === 2) return;
-            for (let nd of pulseNodes) {
-                if (p._reso) return;
-                if (Math.hypot((p.x + p.w/2) - nd.x, (p.y + p.h/2) - nd.y) < PULSE_NODE_R) {
-                    p._reso = true; p.dmg *= 2; p.pierceCount = Math.max(p.pierceCount || 0, 2);
-                    p.w = Math.round(p.w * 1.5); p.h = Math.round(p.h * 1.5);
-                    visualEffects.push(new Effect(nd.x, nd.y, 'explosion', true, 14));
-                    if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(1250, 0.05, 'sine', 0.10, 1700);
-                }
-            }
-        }
-        function drawPulseNodes() {
-            for (let bm of pulseBeams) {
-                let a = bm.t / 22;
-                let g = ctx.createLinearGradient(0, bm.y - 22, 0, bm.y + 22);
-                g.addColorStop(0, "rgba(0,188,212,0.05)"); g.addColorStop(0.5, "rgba(200,255,255," + (0.9*a) + ")"); g.addColorStop(1, "rgba(0,188,212,0.05)");
-                ctx.fillStyle = g; ctx.fillRect(0, bm.y - 22, canvas.width, 44);
-                ctx.fillStyle = "rgba(255,255,255," + a + ")"; ctx.fillRect(0, bm.y - 5, canvas.width, 10);
-                for (let k = 0; k < 8; k++) { let sx = ((frames*22 + k*140) % (canvas.width + 90)) - 45;
-                    ctx.fillStyle = "rgba(178,235,242," + (0.7*a) + ")"; ctx.fillRect(sx, bm.y - 14, 40, 28); }
-            }
-            for (let nd of pulseNodes) {
-                let fade = nd.t > PULSE_NODE_LIFE - 60 ? (PULSE_NODE_LIFE - nd.t) / 60 : 1;
-                let pu = 0.7 + 0.3 * Math.sin(frames * 0.16 + nd.x);
-                ctx.save();
-                ctx.strokeStyle = "rgba(0,229,255," + (0.85 * fade) + ")"; ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.arc(nd.x, nd.y, PULSE_NODE_R * pu, 0, 6.28); ctx.stroke();
-                ctx.strokeStyle = "rgba(178,235,242," + (0.45 * fade) + ")"; ctx.lineWidth = 2;
-                ctx.beginPath(); ctx.arc(nd.x, nd.y, PULSE_NODE_R * 1.5 - PULSE_NODE_R * pu * 0.5, 0, 6.28); ctx.stroke();
-                ctx.fillStyle = "rgba(0,229,255," + (0.22 * fade) + ")";
-                ctx.beginPath(); ctx.arc(nd.x, nd.y, PULSE_NODE_R * 0.7, 0, 6.28); ctx.fill();
-                ctx.fillStyle = "rgba(255,255,255," + fade + ")";
-                ctx.beginPath(); ctx.arc(nd.x, nd.y, 4, 0, 6.28); ctx.fill();
-                for (let k = 0; k < 4; k++) { let a = frames * 0.05 + k * 1.57;
-                    ctx.fillStyle = "rgba(224,247,250," + (0.7 * fade) + ")";
-                    ctx.fillRect(nd.x + Math.cos(a) * PULSE_NODE_R - 2, nd.y + Math.sin(a) * PULSE_NODE_R - 2, 4, 4); }
-                ctx.restore();
-            }
-        }
-        // ===== VUOT MUC (overcharge) =====
+        // ============================ @@HE-CHARGE ============================
+        // VUOT MUC (overcharge) + bang moc doi mau vong nap
         // 0 = vua cham max charge, 1 = giu toi sat nguong Channel (180 frame).
         // Dung cho Phan Hach (Pulse) va Hoa An (Inferno): cham moc chi gay dmg vua,
         // giu them moi len toi da.
@@ -17309,7 +17690,9 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             // 5 RIPPER  : chem nang -> luoi dao to -> tu luc
             [[30,"#CFD8DC"],[60,"#B0BEC5"],[120,"#FFFFFF"]],
             // 6 PULSAR  : 4 -> 5 -> 6 -> 7 tia moi canh
-            [[30,"#FFE082"],[75,"#FFD54F"],[90,"#FFC107"],[120,"#FFFFFF"]]
+            [[30,"#FFE082"],[75,"#FFD54F"],[90,"#FFC107"],[120,"#FFFFFF"]],
+            // 7 BOOMERANG: goc quay ve thap dan, 90f = LUOI KEP (an dmg ca di lan ve)
+            [[30,"#B2EBF2"],[60,"#80DEEA"],[90,"#FF80AB"]]
         ];
         function chargeRingColor(ammo, held) {
             let T = CHARGE_TIERS[ammo] || CHARGE_TIERS[0], col = "#00E5FF";
@@ -17317,8 +17700,6 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             return col;
         }
         function overchargeT(held, maxF) { return Math.max(0, Math.min(1, (held - maxF) / Math.max(1, OC_FULL - maxF))); }
-        // TU LUC cua Claws: doi so frame da giu -> moc 1..5 (0 = chua du)
-        function clawFocusTier(f) { return f >= 390 ? 5 : f >= 360 ? 4 : f >= 300 ? 3 : f >= 240 ? 2 : f >= 180 ? 1 : 0; }
         // Cham than boss chi mat mau khi boss DANG TAN CONG cham (lao/hup/bo nhao/dam), khong phai luc dung yen/nap/ban xa/lui
         function bossContactAttack(b) {
             let st = b.state || '';
@@ -17327,6 +17708,8 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         }
         // NEO VI TRI: boss dung yen o cho no vao san, KHONG lui khi nguoi choi buoc toi.
         // Co dung 2 moc co dinh (cho goc + cho doi xung); doi ben thi dung im o moc ben kia.
+        // ============================ @@HE-BOSSAI ============================
+        // Boss giu vi tri + tui xao tron chieu (uu tien chieu chua dung)
         function bossHoldAnchor(b) {
             if (b.anchorL === undefined) {
                 let a = (b.baseX !== undefined) ? b.baseX : b.x, m = canvas.width - a - b.w;
@@ -17338,7 +17721,6 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             else b.x = want;
             b.x = Math.max(20, Math.min(canvas.width - b.w - 20, b.x));
         }
-        function bossKeepDistRef(b, ref) { bossHoldAnchor(b); }   // giu ten cu cho cac cho da goi
         function bossCornered(b, dist) {
             return (b.x <= 26 || b.x >= canvas.width - b.w - 26) && Math.abs((dino.x + dino.w/2) - (b.x + b.w/2)) < dist;
         }
@@ -17710,8 +18092,12 @@ function checkPvPCollisions() {
                 sX = dd<0 ? (dino.x - 30) : (dino.x + dino.w + 6); sY = dino.y - 12;
                 shieldHitbox = { x: (dd<0 ? dino.x-40 : dino.x + dino.w - 8), y: dino.y - 14, w: 48, h: dino.h + 28 };   // khien ban nguyet truoc mat khi luot
             } else {
-                sX = dino.x + (dino.isCrouching ? 48*sScale : 42*sScale); sY = dino.y - 15;
-                shieldHitbox = {x: sX, y: sY, w: 15, h: 75 * sScale};
+                // Khien gio la lop giap LUC GIAC bao TRON quanh nguoi -> hitbox cung phai tron theo,
+                // khong con la dai thang dung truoc mat nua (hitbox phai khop hoat anh).
+                let R = Math.max(dino.w, dino.h) * 0.86 * sScale;
+                let cxs = dino.x + dino.w / 2, cys = dino.y + dino.h / 2;
+                sX = dino.x + (dino.isCrouching ? 48*sScale : 42*sScale); sY = dino.y - 15;   // diem hien hieu ung parry
+                shieldHitbox = { x: cxs - R, y: cys - R * 0.98, w: R * 2, h: R * 1.96 };
             }
             let parryBoost = dashShield ? 1.5 : 1;   // HUC DAU: parry manh hon 50%
             let shieldDmg = Math.round((2 + dino.bulletDmg) * parryBoost); 
@@ -17815,8 +18201,9 @@ function checkPvPCollisions() {
                         if (!dino.ultActive && ultCharge < 100) ultCharge = Math.min(100, ultCharge + 6);
                         floatingTexts.push(new FloatingText(dino.x, dino.y - 22, "PHẢN!")); addStyle(28, 'parry');
                         SFX.parry(); SFX.tone(320, 0.14, 'square', 0.22, 90);
+                        shinGuardReset(true);
                     } else { visualEffects.push(new Effect(sX, bossProjectiles[i].y, 'parry')); addStyle(6, 'block'); }
-                    bossProjectiles.splice(i, 1); 
+                    bossProjectiles.splice(i, 1);
                 } else if (checkAABB(bossProjectiles[i], dino)) {
                     if (bossProjectiles[i].web) { dino.takeDamage(1); dino.webTimer = 45; } else dino.takeDamage(bossProjectiles[i].dmg); bossProjectiles.splice(i, 1);
                 }
@@ -17862,14 +18249,14 @@ function checkPvPCollisions() {
                 
                 for (let o = obstacles.length - 1; o >= 0; o--) { 
                     if (checkAABB(proj, obstacles[o]) && !proj.hitIds.has(obstacles[o])) { 
-                        proj.hitIds.add(obstacles[o]); obstacles[o].hp -= proj.dmg; if (proj.type === 11) obstacles[o].burnTimer = 120; projHit = true; 
+                        proj.hitIds.add(obstacles[o]); obstacles[o].hp -= prismDmg(proj, obstacles[o]); if (proj.type === 11) obstacles[o].burnTimer = 120; projHit = true;
                         if (proj.type !== 2 && proj.pierceCount <= 0) break; 
                     } 
                 }
                 if (!projHit || proj.type === 2 || proj.pierceCount > 0) {
                     for (let e = enemies.length - 1; e >= 0; e--) { 
                         if (checkAABB(proj, enemies[e]) && !proj.hitIds.has(enemies[e])) { 
-                            proj.hitIds.add(enemies[e]); enemies[e].hp -= proj.dmg; if (proj.type === 11) enemies[e].burnTimer = 120; projHit = true; 
+                            proj.hitIds.add(enemies[e]); enemies[e].hp -= prismDmg(proj, enemies[e]); if (proj.type === 11) enemies[e].burnTimer = 120; projHit = true;
                             if (proj.type !== 2 && proj.pierceCount <= 0) break; 
                         } 
                     }
@@ -17894,18 +18281,18 @@ function checkPvPCollisions() {
                                         proj.hitIds.add(bosses[b]); bosses[b].jitter = 6; bosses[b].dodgeCharges--; bosses[b].dodgeReCd = 90;   // NE (het 3 lan thi dinh)
                                         visualEffects.push(new Effect(bosses[b].x + bosses[b].w/2, proj.y, 'lightning_shock'));
                                     } else {
-                                        proj.hitIds.add(bosses[b]); bosses[b].hp -= proj.dmg; if (proj.type === 11) bosses[b].burnTimer = 120; projHit = true;
+                                        proj.hitIds.add(bosses[b]); bosses[b].hp -= prismDmg(proj, bosses[b]); if (proj.type === 11) bosses[b].burnTimer = 120; projHit = true;
                                     }
                                 }
                             } else if (bosses[b].role === 'block' && bosses[b].shieldHits > 0) {
                                 // KHIEN cua con VANG: lua/xuyen xuyen thang, set bi chan nhung no mat mau, thuong thi tan khien
-                                if (proj.type===11 || proj.type===2 || proj.pierceCount>0){ proj.hitIds.add(bosses[b]); bosses[b].hp -= proj.dmg; if (proj.type===11) bosses[b].burnTimer=120; projHit=true; }
+                                if (proj.type===11 || proj.type===2 || proj.pierceCount>0){ proj.hitIds.add(bosses[b]); bosses[b].hp -= prismDmg(proj, bosses[b]); if (proj.type===11) bosses[b].burnTimer=120; projHit=true; }
                                 else if (proj.type===4){ proj.hitIds.add(bosses[b]); bosses[b].hp -= 1; visualEffects.push(new Effect(bosses[b].x+bosses[b].w/2, proj.y, 'lightning_shock')); projHit=true; }
                                 else { proj.hitIds.add(bosses[b]); bosses[b].shieldHits--; if (bosses[b].shieldHits<=0){ bosses[b].shieldRegen=200; visualEffects.push(new Effect(bosses[b].x+bosses[b].w/2, bosses[b].y, 'explosion', true, 14)); } else visualEffects.push(new Effect(bosses[b].x+(bosses[b].facingLeft?0:bosses[b].w), proj.y, 'parry')); projHit=true; }
                             } else if (bosses[b].name === "AEGIS REX") {
                                 proj.hitIds.add(bosses[b]);
                                 if (bosses[b].invulnAll) { visualEffects.push(new Effect(bosses[b].x + bosses[b].w/2, proj.y, 'parry', false)); }
-                                else if (bosses[b].shieldBrokenTimer > 0) { bosses[b].hp -= proj.dmg; if (proj.type === 11) bosses[b].burnTimer = 120; }
+                                else if (bosses[b].shieldBrokenTimer > 0) { bosses[b].hp -= prismDmg(proj, bosses[b]); if (proj.type === 11) bosses[b].burnTimer = 120; }
                                 else { bosses[b].hitShield(aegisShieldDmg(proj), bosses[b].x + (bosses[b].facingLeft ? 0 : bosses[b].w), proj.y); }
                                 projHit = true;
                             } else if (bosses[b].name === "HELIOS REX" && (bosses[b].shieldTimer > 0 || bosses[b].spamShieldTimer > 0 || bosses[b].state.includes('clone_dash') || bosses[b].state === 'clone_bounce_back' || bosses[b].state === 'clone_wait') && proj.type !== 2 && proj.pierceCount <= 0) {
@@ -17914,12 +18301,12 @@ function checkPvPCollisions() {
                                     bosses[b].shieldHp--;
                                     projHit = true; 
                                 } else {
-                                    proj.hitIds.add(bosses[b]); bosses[b].hp -= proj.dmg; if (proj.type === 11) bosses[b].burnTimer = 120; projHit = true; 
+                                    proj.hitIds.add(bosses[b]); bosses[b].hp -= prismDmg(proj, bosses[b]); if (proj.type === 11) bosses[b].burnTimer = 120; projHit = true;
                                 }
                             } else {
                                 proj.hitIds.add(bosses[b]);
                                 let _dmgMul = (bosses[b].name === "SIEGE GOLIATH" && bosses[b].state === 'overheat') ? 2 : 1;   // CUA SO QUA NHIET: dmg gap doi
-                                bosses[b].hp -= proj.dmg * _dmgMul; if (proj.type === 11) bosses[b].burnTimer = 120; projHit = true;
+                                bosses[b].hp -= prismDmg(proj, bosses[b]) * _dmgMul; if (proj.type === 11) bosses[b].burnTimer = 120; projHit = true;
                             }
                             if (proj.type !== 2 && proj.pierceCount <= 0) break;
                         } 
@@ -18038,7 +18425,7 @@ function checkPvPCollisions() {
                     // giu lai sau khi boss chet, neu khong ca doan chay tiep theo mang dia hinh sai.
                     {
                         forestScene = null; grassField = []; echoTrees = []; sporePools = [];
-                        pulseNodes = []; pulseBeams = []; fireBrands = [];
+                        fireBrands = [];
                         platforms.length = 0; lavaGeysers.length = 0;
                         if (mapTheme === 'plateau' || mapTheme === 'dune' || mapTheme === 'dragoon' ||
                             mapTheme === 'forge' || mapTheme === 'chrono' || mapTheme === 'shrine' ||
@@ -18077,7 +18464,7 @@ function checkPvPCollisions() {
 
 
         const STYLE_RANKS = ['D', 'C', 'B', 'A', 'S', 'SS', 'SSS'];
-        const HIT_STYLE_MULT = [0.8, 0.65, 0.4, 0.65, 2.0, 1.2]; // Normal,Fire,Rapid,Split,Lightning,Claw - can bang toc do len diem theo hoi chieu
+        const HIT_STYLE_MULT = [0.8, 0.65, 0.4, 0.65, 2.0, 1.2, 0.9, 1.3]; // Normal,Fire,Rapid,Split,Lightning,Claw - can bang toc do len diem theo hoi chieu
         const STYLE_THRESH = [0, 22, 50, 90, 145, 215, 310];
         const STYLE_COLORS = ['#9E9E9E', '#66BB6A', '#42A5F5', '#AB47BC', '#FF9800', '#EF5350', '#FFD700'];
         const STYLE_WORDS = ['', 'CRAZY!', 'BLAST!', 'ALRIGHT!', 'STYLISH!', 'SAVAGE!!', 'SENSATIONAL!!!'];
@@ -18292,7 +18679,9 @@ function checkPvPCollisions() {
             if (hasRune('pet')||hasRune('petx')||hasRune('pet2')||hasRune('pet2x')||hasRune('pet3')||hasRune('pet3x')||hasRune('pet4')||hasRune('pet4x')||hasRune('pet5')||hasRune('pet5x')||hasRune('pet6')||hasRune('pet6x')) { updatePets(); drawPets(); }
             updateAfterimages(); drawAfterimages();
             tickFireBrands(); drawFireBrands();
-            drawPulseNodes();
+            tickPrismStacks(); drawPrismStacks();
+            tickBoomerangs(); drawBoomerangs();
+            tickSwordmaster(); drawSwordmaster();
             drawRuneShieldBubble();
             // he rieng cua 2 boss Rung moi
             if (bosses.some(b => b.name === "ECHO STALKER")) tickNoise();
@@ -18386,7 +18775,7 @@ function checkPvPCollisions() {
                 // KHIEN KHI CHANNEL C2: vua vao channel -> 2 giay mien sat thuong hoan toan
                 if (hasRune('chanshldx') && dino) {
                     let _ch = !!(dino.clawChannel || dino.rapidChannel || dino.normalLaserChannel || dino.fireChannel
-                              || dino.lightChannel || dino.splitChannel || dino.pulsarChannel);
+                              || dino.lightChannel || dino.splitChannel || dino.pulsarChannel || dino.boomChannel);
                     if (_ch && !dino._chanPrev) {
                         dino.chanInvul = 120;
                         floatingTexts.push(new FloatingText(dino.x, dino.y - 34, "BẤT KHẢ XÂM PHẠM"));
