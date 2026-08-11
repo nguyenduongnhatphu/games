@@ -2,18 +2,84 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Pixel Dinosaur</title>
     <style>
+        /* Giu lau tren dien thoai hay bi boi den chu + hien bang Copy/Paste.
+           Tat han o MOI phan tu, ke ca canvas.                             */
+        *, *::before, *::after {
+            -webkit-touch-callout: none; -webkit-user-select: none;
+            -moz-user-select: none; -ms-user-select: none; user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html, body { overscroll-behavior: none; }
         body { margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background-color: #111; font-family: 'Courier New', Courier, monospace; color: white; user-select: none; }
         canvas { border: 4px solid #444; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); background-color: #FFCC80; cursor: pointer; image-rendering: pixelated; }
         .instructions { margin-top: 10px; text-align: center; line-height: 1.5; font-size: 13px; color: #ccc; }
         b { color: #FFD700; } .controls { color: #00E5FF; }
+
+        /* ================= BAN MOBILE ================= */
+        /* Man game la 1000x400. Tren dien thoai ta co gian canvas cho vua man bang CSS
+           (thuoc tinh width/height cua canvas van giu nguyen 1000x400, nen moi toa do
+           ve trong game khong phai doi mot dong nao).                              */
+        #stage { position: relative; line-height: 0; }
+        /* Khung #stage om KHIT lay canvas (ti le 1000:400 = 2.5) nen lop nut ao
+           dat theo % se rot dung vi tri du man hinh to nho the nao.          */
+        body.mob { height: 100dvh; justify-content: center; padding: 0; overflow: hidden; touch-action: none; background: #000; }
+        body.mob #stage { position: fixed; left: 50%; top: 50%;
+                          width: min(100vw, calc(100dvh * 2.5));
+                          transform: translate(-50%, -50%); }
+        /* CAM DOC: khong bat nguoi choi xoay may — xoay thang cai khung 90 do,
+           lay chieu DAI cua man hinh lam chieu ngang cua game. Nho vay game
+           luon nam ngang, cam may kieu gi cung khong lat.                    */
+        body.mob.rot90 #stage { width: min(100dvh, calc(100vw * 2.5));
+                                transform: translate(-50%, -50%) rotate(90deg); }
+        body.mob canvas { width: 100%; height: auto; display: block;
+                          border: none; border-radius: 0; box-shadow: none; }
+        body.mob .instructions { display: none; }
+
+        /* Lop nut ao de len tren canvas */
+        #tpad { position: absolute; inset: 0; display: none; z-index: 20; pointer-events: none; touch-action: none; }
+        #tpad.on { display: block; }
+        .tb { position: absolute; pointer-events: auto; touch-action: none;
+              display: flex; flex-direction: column; align-items: center; justify-content: center;
+              font-family: 'Courier New', Courier, monospace; font-weight: bold;
+              color: #E8EEF7; background: rgba(18,22,30,0.42);
+              border: 2px solid rgba(190,205,225,0.45); border-radius: 50%;
+              -webkit-tap-highlight-color: transparent; user-select: none;
+              text-shadow: 0 1px 2px #000; line-height: 1; }
+        .tb.hit { background: rgba(255,255,255,0.34); border-color: #fff; }
+        .tb small { font-size: 8px; opacity: 0.72; font-weight: normal; margin-top: 2px; }
+        .tb.sq { border-radius: 10px; }
+
+        /* ---- CAN ANALOG (lai giua nut bam va can keo, kieu Minecraft PE cu) ---- */
+        .stk { position: absolute; pointer-events: auto; touch-action: none; border-radius: 50%;
+               background: rgba(16,20,28,0.30); border: 2px solid rgba(180,196,220,0.34); }
+        .stk .kn { position: absolute; left: 50%; top: 50%; width: 42%; height: 42%;
+                   margin: -21% 0 0 -21%; border-radius: 50%;
+                   background: rgba(226,236,250,0.30); border: 2px solid rgba(232,240,252,0.72);
+                   transition: background .08s linear; }
+        .stk.act .kn { background: rgba(255,255,255,0.52); }
+        .stk .lb { position: absolute; font-size: clamp(8px, 1.25vw, 13px); font-weight: bold;
+                   color: #DCE5F2; opacity: 0.62; text-shadow: 0 1px 2px #000; white-space: nowrap;
+                   transform: translate(-50%, -50%); pointer-events: none; }
+        .cap { position: absolute; pointer-events: none;
+               font-size: clamp(7px, 1.05vw, 11px); color: #B9C6D8; opacity: 0.55;
+               text-shadow: 0 1px 2px #000; white-space: nowrap; }
+        .stk .rimhint { position: absolute; inset: -2px; border-radius: 50%;
+                        border: 2px dashed rgba(255,214,120,0.0); pointer-events: none; }
+        .stk.rim .rimhint { border-color: rgba(255,214,120,0.85); }
+
+
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="1000" height="400"></canvas>
+    <div id="stage">
+        <canvas id="gameCanvas" width="1000" height="400"></canvas>
+        <div id="tpad"></div>
+    </div>
     <div class="instructions" id="instruction-box"></div>
+
 
 <!--
 ================================================================================
@@ -28,6 +94,8 @@
   [4]    Class Player — toan bo dieu khien va 8 loai dan      @@KHOI-4
   [5]    Giao dien: HUD, Menu, San tap (Dojo), Rune picker    @@KHOI-5
   [6]    Loi game: canvas, SFX, Rune, Pet, spawn, vong lap    @@KHOI-6
+         Dieu khien cam ung (ban mobile)                      @@HE-MOBILE
+         Nhip khung hinh 60 buoc/giay (moi man hinh)          @@HE-NHIPKHUNG
 ================================================================================
   CAC HE THONG RIENG (deu nam trong KHOI 6, tim bang tag)
   ------------------------------------------------------------------------------
@@ -24926,7 +24994,7 @@ class GreatApeBoss {
                     if (typeof SFX!=='undefined'){ if (lvl===2 && SFX.glassBreak) SFX.glassBreak(); else if (SFX.tone) SFX.tone(320,0.2,'square',0.2,900); }
                 } else { deathCineActive = false; gameOver = true; }
             }
-            requestAnimationFrame(loop);
+            requestAnimationFrame(rafDriver);
         }
 
 
@@ -25785,11 +25853,47 @@ class GreatApeBoss {
 
         let spawnTimerCactus = 60, spawnTimerEnemy = 40; 
 
+        // Canvas co the bi CSS co gian tren dien thoai -> phai quy doi toa do ve he 1000x400,
+        // neu khong thi bam nut trong menu se lech chuong.
+        // Doi mot diem tren MAN HINH ve he toa do goc cua khung game.
+        // Khi khung bi xoay 90 do (cam may doc), goc cua no khong con trung voi
+        // goc man hinh nua, nen phai quay nguoc lai truoc khi tinh.
+        function stageMap(clientX, clientY) {
+            const el = document.getElementById('stage') || canvas;
+            const r = el.getBoundingClientRect();
+            let dx = clientX - (r.left + r.width / 2);
+            let dy = clientY - (r.top + r.height / 2);
+            let rot = document.body.classList.contains('rot90');
+            if (rot) { let t = dx; dx = dy; dy = -t; }      // quay nguoc 90 do
+            let W = rot ? r.height : r.width;              // be ngang that cua khung
+            let H = rot ? r.width  : r.height;
+            return { x: W / 2 + dx, y: H / 2 + dy, W: W, H: H };
+        }
+        function canvasPos(cx, cy) {
+            let q = stageMap(cx, cy);
+            return { x: q.x * (canvas.width / q.W), y: q.y * (canvas.height / q.H) };
+        }
         canvas.addEventListener('mousemove', e => { 
-            const rect = canvas.getBoundingClientRect(); 
-            mouseX = e.clientX - rect.left; 
-            mouseY = e.clientY - rect.top; 
+            let q = canvasPos(e.clientX, e.clientY); mouseX = q.x; mouseY = q.y;
         });
+        let _tScrollY = null;
+        // Cham vao canvas: cap nhat toa do TRUOC khi su kien click chay, de menu bam dung o.
+        canvas.addEventListener('touchstart', e => {
+            if (!e.touches.length) return;
+            let q = canvasPos(e.touches[0].clientX, e.touches[0].clientY); mouseX = q.x; mouseY = q.y;
+            _tScrollY = e.touches[0].clientY;
+        }, { passive: true });
+        // Vuot ngon tay de cuon danh sach Rune (thay cho lan chuot)
+        canvas.addEventListener('touchmove', e => {
+            if (!e.touches.length) return;
+            let q = canvasPos(e.touches[0].clientX, e.touches[0].clientY); mouseX = q.x; mouseY = q.y;
+            if (runePicker !== null && runeLevelPick === null && _tScrollY !== null) {
+                let L = runePickerLayout();
+                runeScroll = Math.max(0, Math.min(L.maxScroll, runeScroll + (_tScrollY - e.touches[0].clientY) * 1.4));
+            }
+            _tScrollY = e.touches[0].clientY;
+        }, { passive: true });
+        canvas.addEventListener('touchend', () => { _tScrollY = null; }, { passive: true });
 
         // LAN CHUOT trong bang Rune -> cuon danh sach
         canvas.addEventListener('wheel', e => {
@@ -26270,10 +26374,10 @@ class GreatApeBoss {
                 }
             }
             if (['KeyA', 'ArrowLeft'].includes(e.code)) {
-                if ((gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss') && !e.repeat) handleMoveTap(-1);
+                if ((gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss') && !e.repeat && !e.fromStick) handleMoveTap(-1);
             }
             if (['KeyD', 'ArrowRight'].includes(e.code)) {
-                if ((gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss') && !e.repeat) handleMoveTap(1);
+                if ((gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss') && !e.repeat && !e.fromStick) handleMoveTap(1);
             }
             if ((e.code === 'ShiftLeft' || e.code === 'ShiftRight') && !e.repeat) doDash();
             if (e.code === 'KeyL') {
@@ -26285,6 +26389,354 @@ class GreatApeBoss {
             }
         });
         window.addEventListener('keyup', e => keys[e.code] = false);
+
+        /* ==================================================================
+           @@HE-MOBILE — DIEU KHIEN CAM UNG
+           ------------------------------------------------------------------
+           Nguyen tac: KHONG viet lai logic dieu khien. Moi nut ao chi phat ra
+           dung mot su kien keydown / keyup that su tren window, nen toan bo
+           duong di cu (nhay 2 nac, Ryuenjin, Unity, doi the, Ult, luot...)
+           chay y het ban phim ma khong phai sua o dau.
+           Tang 1 = nut luon hien. Tang 2 = mo bang nut ☰.
+           ================================================================== */
+        const TPAD = document.getElementById('tpad');
+        let touchMode = false;
+        const _tHeld = new Set();
+
+        function tKeyDown(code, fromStick) {
+            if (_tHeld.has(code)) return;
+            _tHeld.add(code);
+            let ev = new KeyboardEvent('keydown', { code: code, bubbles: false });
+            // Can analog hay bi gat qua gat lai. Neu de cu "bam trai/phai 2 lan nhanh = luot"
+            // an vao day thi se luot lung tung, nen danh dau de bo qua — da co "keo manh = luot".
+            if (fromStick) ev.fromStick = true;
+            window.dispatchEvent(ev);
+        }
+        function tKeyUp(code) {
+            if (!_tHeld.has(code)) return;
+            _tHeld.delete(code);
+            window.dispatchEvent(new KeyboardEvent('keyup', { code: code, bubbles: false }));
+        }
+        function tTap(code) { tKeyDown(code); setTimeout(() => tKeyUp(code), 40); }
+        function tReleaseAll() {
+            for (let c of [..._tHeld]) tKeyUp(c);
+            if (typeof tSticks !== 'undefined') for (let s of tSticks) if (s._release) s._release();
+        }
+
+        // hold = giu duoc (di chuyen, ban, khien) | tap = bam phat mot (nhay, luot, ult...)
+        // x/y/w tinh theo % chieu RONG cua khung -> ti le nut khong doi tren moi man hinh.
+        /* ------------------------------------------------------------------
+           BO CUC: 2 CAN ANALOG + 1 NUT NHAY + QUET DOI DAN / DOI THE
+           Can trai   : keo ngang = di, keo xuong = ngoi, keo cheo = vua ngoi vua di,
+                        keo HET CO sang ngang = LUOT, keo LEN = NHAY.
+                        Hat len roi tha ngay = nhay thuong.
+                        Giu tiep o tren  = nhay 2 bac (bac 2 ra sau STK_JUMP2 ms).
+                        Tha ve roi keo len lan nua = cung ra nhay 2 bac.
+           Can phai   : trai = CHEM/BAN, phai = CHARGE, xuong = KHIEN, len = CHIEU CUOI.
+                        Cham nhe roi tha = ban mot phat.
+           Quet ngang : nua trai = doi dan (Q/E), nua phai = doi the (I/O).
+           ------------------------------------------------------------------ */
+        // x/y/w tinh theo % chieu RONG khung. Khung ti le 2.5:1 nen % chieu cao = w*2.5.
+        const STK_L = { x: 1.5, y: 6, w: 23.5 };    // can di chuyen
+        const STK_R = { x: 75.0, y: 6, w: 23.5 };   // can hanh dong (doi xung voi can trai)
+        const BTN_MUTE = { k:'KeyM',  lbl:'♪', sub:'', x: 1.5, y: 84, w: 5.4 };
+        const BTN_OFF  = { k:null,    lbl:'✕', sub:'', x: 7.6, y: 84, w: 5.4 };
+
+        // Nguong tren can, tinh theo ban kinh vung cham
+        const STK_DEAD  = 0.26;   // trong vung nay = khong lam gi
+        const STK_MOVE  = 0.30;   // qua nguong nay theo chieu ngang = di
+        const STK_DOWN  = 0.36;   // keo xuong qua nguong nay = ngoi
+        const STK_DASH  = 0.80;   // keo gan het co sang ngang = LUOT
+        const STK_REARM = 0.55;   // keo ve duoi muc nay thi moi luot duoc lan nua
+        const STK_UP    = 0.36;   // keo len qua nguong nay = NHAY
+        const STK_UPOFF  = 0.22;  // keo ve duoi muc nay = coi nhu da tha, nhay lai duoc
+        const STK_JUMP2 = 190;    // giu o tren lau hon nay (ms) = ra them bac nhay thu 2
+        const SWIPE_MIN = 0.11;   // quet ngang phai dai it nhat 11% chieu rong khung
+        const SWIPE_MS  = 600;
+
+        function tMakeBtn(d, extraCls) {
+            let b = document.createElement('div');
+            b.className = 'tb' + (extraCls ? ' ' + extraCls : '');
+            b.innerHTML = '<span>' + d.lbl + '</span>' + (d.sub ? '<small>' + d.sub + '</small>' : '');
+            b.style.left = d.x + '%';
+            b.style.bottom = d.y + '%';
+            b.style.width = d.w + '%';
+            // nut tron: chieu cao = chieu rong. Khung rong gap 2.5 lan chieu cao
+            // nen % chieu cao phai nhan 2.5 thi moi ra hinh tron.
+            b.style.height = (d.w * 2.5) + '%';
+            b.style.fontSize = 'clamp(13px, ' + (d.w * 0.42) + 'vw, 26px)';
+            if (d.k) b.dataset.k = d.k;
+            return b;
+        }
+        function tBind(b, code, hold) {
+            const press = (ev) => {
+                ev.preventDefault();
+                if (ev.pointerId != null && b.setPointerCapture) { try { b.setPointerCapture(ev.pointerId); } catch (_) {} }
+                b.classList.add('hit');
+                if (hold) tKeyDown(code); else tTap(code);
+            };
+            const release = (ev) => {
+                if (ev) ev.preventDefault();
+                b.classList.remove('hit');
+                if (hold) tKeyUp(code);
+            };
+            b.addEventListener('pointerdown', press);
+            b.addEventListener('pointerup', release);
+            b.addEventListener('pointercancel', release);
+            b.addEventListener('contextmenu', e => e.preventDefault());
+        }
+
+        function tMakeStick(cfg, id, labels) {
+            let d = document.createElement('div');
+            d.className = 'stk'; d.id = id;
+            d.style.left = cfg.x + '%'; d.style.bottom = cfg.y + '%';
+            d.style.width = cfg.w + '%'; d.style.height = (cfg.w * 2.5) + '%';
+            d._cfg = cfg;
+            let hint = document.createElement('div'); hint.className = 'rimhint'; d.appendChild(hint);
+            let kn = document.createElement('div'); kn.className = 'kn'; d.appendChild(kn);
+            for (let L of labels) {
+                let e = document.createElement('div'); e.className = 'lb';
+                e.textContent = L.t; e.style.left = L.x + '%'; e.style.top = L.y + '%';
+                d.appendChild(e);
+            }
+            d._kn = kn;
+            return d;
+        }
+
+        // Tra ve cac phim dang phai giu, dua tren vi tri ngon tay so voi tam can.
+        function stickKeys(side, nx, ny) {     // nx, ny da chuan hoa ve -1..1
+            let out = [];
+            let d = Math.hypot(nx, ny);
+            if (d < STK_DEAD) return out;
+            if (side === 'L') {
+                if (Math.abs(nx) > STK_MOVE) out.push(nx < 0 ? 'KeyA' : 'KeyD');
+                if (ny > STK_DOWN) out.push('KeyS');
+            } else {
+                // chon huong tro' nhat
+                if (Math.abs(nx) >= Math.abs(ny)) out.push(nx > 0 ? 'KeyK' : 'KeyJ');
+                else if (ny > 0) out.push('KeyL');
+                // keo len = chieu cuoi -> khong phai phim giu, xu ly rieng
+            }
+            return out;
+        }
+
+        function tBindStick(el, side) {
+            let cur = new Set(), pid = null, dashArmed = true, ultArmed = true;
+            let st = 0, moved = 0;
+            let jumpPhase = 0, jumpT = 0;     // 0 = chua keo len | 1 = da nhay bac 1 | 2 = da nhay bac 2
+            el._nx = 0; el._ny = 0; el._on = false;
+            // Tam va ban kinh can duoc suy ra TU % trong cau hinh chu khong lay tu
+            // getBoundingClientRect — vi khi khung xoay 90 do thi rect la hinh bao
+            // ngoai, khong con la he toa do cua chinh phan tu.
+            const centre = () => {
+                let q = stageMap(0, 0), c = el._cfg;
+                return { cx: (c.x + c.w / 2) / 100 * q.W,
+                         cy: q.H * (1 - (c.y + c.w * 1.25) / 100),
+                         R:  c.w / 200 * q.W };
+            };
+            const setKeys = (want) => {
+                for (let k of [...cur]) if (!want.includes(k)) { tKeyUp(k); cur.delete(k); }
+                for (let k of want) if (!cur.has(k)) { tKeyDown(k, true); cur.add(k); }
+            };
+            const clear = () => { for (let k of [...cur]) tKeyUp(k); cur.clear();
+                                  el._on = false; el._nx = el._ny = 0;
+                                  dashArmed = true; ultArmed = true; jumpPhase = 0;
+                                  el.classList.remove('act', 'rim');
+                                  el._kn.style.transform = ''; };
+            // Tinh lai moi thu tu vi tri ngon tay hien tai. Goi ca luc ngon tay di chuyen
+            // LAN luc ngon tay dung yen (vong tick) — vi giu yen thi pointermove khong ban.
+            const apply = () => {
+                if (!el._on) return;
+                let nx = el._nx, ny = el._ny, d = Math.hypot(nx, ny);
+                let kx = nx, ky = ny; if (d > 1) { kx /= d; ky /= d; }
+                el._kn.style.transform = 'translate(' + (kx * 62) + '%,' + (ky * 62) + '%)';
+                el.classList.toggle('act', d >= STK_DEAD);
+                setKeys(stickKeys(side, nx, ny));
+                if (side === 'L') {
+                    // ---- KEO HET CO SANG NGANG = LUOT (moi lan day ra chi luot mot cai) ----
+                    let hard = Math.abs(nx) > STK_DASH && Math.abs(nx) > Math.abs(ny);
+                    if (hard && dashArmed) { dashArmed = false; tTap('ShiftLeft'); }
+                    if (Math.abs(nx) < STK_REARM) dashArmed = true;
+                    // ---- KEO LEN = NHAY. Giu tiep o tren = ra bac nhay thu 2 ----
+                    let up = (-ny) > STK_UP && Math.abs(ny) > Math.abs(nx) * 0.75;
+                    if (up) {
+                        if (jumpPhase === 0) { jumpPhase = 1; jumpT = Date.now(); tTap('Space'); }
+                        else if (jumpPhase === 1 && Date.now() - jumpT >= STK_JUMP2) { jumpPhase = 2; tTap('Space'); }
+                    } else if ((-ny) < STK_UPOFF) {
+                        jumpPhase = 0;   // da tha ve giua/xuong -> keo len lan nua lai nhay duoc
+                    }
+                    el.classList.toggle('rim', hard || up);
+                } else {
+                    // ---- KEO LEN = CHIEU CUOI ----
+                    let up = (-ny) > STK_UP && Math.abs(ny) > Math.abs(nx);
+                    if (up && ultArmed) { ultArmed = false; tTap('KeyU'); }
+                    if (-ny < STK_UPOFF) ultArmed = true;
+                    el.classList.toggle('rim', up);
+                }
+            };
+            const read = (ev) => {
+                let c = centre(), p = stageMap(ev.clientX, ev.clientY);
+                el._nx = (p.x - c.cx) / c.R;
+                el._ny = (p.y - c.cy) / c.R;
+                moved = Math.max(moved, Math.hypot(el._nx, el._ny));
+                apply();
+            };
+            el.addEventListener('pointerdown', (ev) => {
+                ev.preventDefault();
+                if (pid !== null) return;
+                pid = ev.pointerId;
+                try { el.setPointerCapture(ev.pointerId); } catch (_) {}
+                st = Date.now(); moved = 0;
+                dashArmed = true; ultArmed = true; jumpPhase = 0;
+                el._on = true; read(ev);
+            });
+            el.addEventListener('pointermove', (ev) => { if (ev.pointerId !== pid) return; ev.preventDefault(); read(ev); });
+            const up = (ev) => {
+                if (pid !== null && ev.pointerId !== pid) return;
+                ev.preventDefault(); pid = null;
+                // CHAM NHE ROI THA tren can phai = ban mot phat
+                let quickTap = (side === 'R' && moved < STK_DEAD && Date.now() - st < 260);
+                clear();
+                if (quickTap) tTap('KeyJ');
+            };
+            el.addEventListener('pointerup', up);
+            el.addEventListener('pointercancel', up);
+            el._release = clear;
+            el._tick = apply;
+        }
+
+        // ---- QUET NGANG tren nen: nua trai doi dan, nua phai doi the ----
+        // Cham nhe (khong phai quet) thi chuyen tiep thanh cu bam chuot vao canvas,
+        // nho vay nut TAM DUNG goc tren ben phai van bam duoc.
+        function tBindSwipe(el) {
+            let pid = null, sx = 0, sy = 0, st = 0;
+            el.addEventListener('pointerdown', (ev) => {
+                if (pid !== null) return;
+                let p = stageMap(ev.clientX, ev.clientY);
+                pid = ev.pointerId; sx = p.x; sy = p.y; st = Date.now();
+                try { el.setPointerCapture(ev.pointerId); } catch (_) {}
+            });
+            const fin = (ev) => {
+                if (ev.pointerId !== pid) return;
+                pid = null;
+                let p = stageMap(ev.clientX, ev.clientY);
+                let dx = p.x - sx, dy = p.y - sy, dt = Date.now() - st;
+                if (Math.abs(dx) > p.W * SWIPE_MIN && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < SWIPE_MS) {
+                    let leftHalf = sx < p.W * 0.5;
+                    if (leftHalf) tTap(dx > 0 ? 'KeyE' : 'KeyQ');    // doi dan
+                    else          tTap(dx > 0 ? 'KeyI' : 'KeyO');    // doi the
+                    return;
+                }
+                if (Math.abs(dx) < 14 && Math.abs(dy) < 14 && dt < 500) {
+                    let q = canvasPos(ev.clientX, ev.clientY); mouseX = q.x; mouseY = q.y;
+                    canvas.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: ev.clientX, clientY: ev.clientY }));
+                }
+            };
+            el.addEventListener('pointerup', fin);
+            el.addEventListener('pointercancel', (ev) => { if (ev.pointerId === pid) pid = null; });
+        }
+
+        function tMakeCap(cfg, text, side) {
+            let c = document.createElement('div');
+            c.className = 'cap'; c.textContent = text;
+            if (side === 'r') c.style.right = (100 - cfg.x - cfg.w) + '%';
+            else              c.style.left  = cfg.x + '%';
+            c.style.bottom = (cfg.y + cfg.w * 2.5 + 1.5) + '%';
+            return c;
+        }
+        let tSticks = [];
+        function tBuild() {
+            TPAD.innerHTML = ''; tSticks = [];
+            // nen bat quet — nam DUOI cung, 2 can va nut nhay de len tren
+            let bg = document.createElement('div');
+            bg.style.cssText = 'position:absolute;inset:0;pointer-events:auto;touch-action:none;';
+            tBindSwipe(bg); TPAD.appendChild(bg);
+
+            let sl = tMakeStick(STK_L, 'stkL', [
+                { t:'▲ NHẢY', x:50, y:11 }, { t:'◀', x:12, y:50 }, { t:'▶', x:88, y:50 },
+                { t:'▼ NGỒI', x:50, y:88 }]);
+            tBindStick(sl, 'L'); TPAD.appendChild(sl); tSticks.push(sl);
+
+            let sr = tMakeStick(STK_R, 'stkR', [
+                { t:'ULT', x:50, y:11 }, { t:'CHÉM', x:19, y:50 },
+                { t:'CHARGE', x:80, y:50 }, { t:'KHIÊN', x:50, y:88 }]);
+            tBindStick(sr, 'R'); TPAD.appendChild(sr); tSticks.push(sr);
+
+            TPAD.appendChild(tMakeCap(STK_L, 'giữ ▲ = nhảy 2 bậc · hết cỡ ngang = LƯỚT', 'l'));
+            TPAD.appendChild(tMakeCap(STK_R, 'chạm nhẹ = bắn · quẹt ngang = đổi đạn / đổi thế', 'r'));
+
+            let m = tMakeBtn(BTN_MUTE, 'sq'); tBind(m, BTN_MUTE.k, 0); TPAD.appendChild(m);
+            let o = tMakeBtn(BTN_OFF, 'sq');
+            o.addEventListener('pointerdown', e => { e.preventDefault(); setTouchMode(false); });
+            TPAD.appendChild(o);
+            // Chan han cu cham mac dinh cua trinh duyet tren ca lop nut
+            TPAD.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+            TPAD.addEventListener('touchmove',  e => e.preventDefault(), { passive: false });
+        }
+
+        function setTouchMode(on) {
+            touchMode = !!on;
+            document.body.classList.toggle('mob', touchMode);
+            TPAD.classList.toggle('on', touchMode);
+            if (!touchMode) tReleaseAll();
+            try { localStorage.setItem('dino_touch', touchMode ? '1' : '0'); } catch (_) {}
+            tSyncPad();
+        }
+        // Chi hien nut ao khi DANG CHOI. O menu / bang Rune / man chet thi an di
+        // cho khoi che cho bam.
+        function tPlaying() {
+            if (paused || gameOver || gameVictory) return false;
+            if (typeof runePicker !== 'undefined' && runePicker !== null) return false;
+            if (typeof dojoPick !== 'undefined' && dojoPick) return false;
+            return ['normal', 'boss_rush', 'test_boss', 'pvp'].includes(gameState);
+        }
+        function tSyncPad() {
+          try {
+            if (!touchMode) { TPAD.classList.remove('on'); return; }
+            let show = tPlaying();
+            TPAD.classList.toggle('on', show);
+            if (!show) tReleaseAll();
+            // Cam doc -> tu xoay khung 90 do. Khong bao gio bat nguoi choi phai xoay may,
+            // va game cung khong bao gio lat theo cam bien huong.
+            document.body.classList.toggle('rot90', window.innerHeight > window.innerWidth);
+          } catch (_) {}
+        }
+
+        // Android/Chrome cho khoa huong man hinh, nhung phai o che do toan man va
+        // phai xuat phat tu mot cu cham cua nguoi dung. iOS thi khong ho tro —
+        // luc do da co ban xoay khung bang CSS (class rot90) ganh thay.
+        let orientTried = false;
+        function tLockLandscape() {
+            if (orientTried || !touchMode) return;
+            orientTried = true;
+            try {
+                let el = document.documentElement;
+                let go = el.requestFullscreen || el.webkitRequestFullscreen;
+                let p = go ? go.call(el) : null;
+                let lock = () => { try { screen.orientation.lock('landscape').catch(() => {}); } catch (_) {} };
+                if (p && p.then) p.then(lock).catch(() => {}); else lock();
+            } catch (_) {}
+        }
+
+        (function tInit() {
+            tBuild();
+            let saved = null;
+            try { saved = localStorage.getItem('dino_touch'); } catch (_) {}
+            let auto = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || ('ontouchstart' in window);
+            setTouchMode(saved === null ? auto : saved === '1');
+            setInterval(tSyncPad, 180);
+            // Giu yen ngon tay thi trinh duyet khong ban pointermove nua, nen phai tu
+            // danh nhip lai — nho vay "giu ▲" moi ra duoc bac nhay thu 2.
+            setInterval(() => { for (let s of tSticks) if (s._tick) s._tick(); }, 30);
+            window.addEventListener('resize', tSyncPad);
+            window.addEventListener('orientationchange', tSyncPad);
+            window.addEventListener('blur', tReleaseAll);
+            // cu cham dau tien = co hoi duy nhat de xin toan man + khoa huong ngang
+            window.addEventListener('pointerdown', tLockLandscape, { once: true });
+            document.addEventListener('visibilitychange', () => { if (document.hidden) tReleaseAll(); });
+            // bam N tren ban phim de bat/tat nut ao (tien khi thu tren may tinh)
+            window.addEventListener('keydown', e => { if (e.code === 'KeyN' && !e.repeat) setTouchMode(!touchMode); });
+        })();
 
         // --- HIỆU ỨNG (VFX) ---
         const visualEffects = [];
@@ -27939,13 +28391,38 @@ function checkPvPCollisions() {
 
 
 
+                /* ==================================================================
+                   @@HE-NHIPKHUNG — GIU GAME LUON CHAY 60 BUOC/GIAY
+                   ------------------------------------------------------------------
+                   Truoc day loop() duoc goi thang tu requestAnimationFrame, tuc la
+                   MOI LAN MAN HINH QUET = MOT BUOC LOGIC. May 60Hz thi dung, nhung
+                   man 120Hz game chay nhanh gap doi, 144Hz thi gap 2.4 lan.
+                   Gio rafDriver cong don thoi gian THAT roi moi goi loop() dung so
+                   lan can thiet, nen toc do game giong nhau tren moi man hinh.
+                   ================================================================== */
+                const STEP_MS = 1000 / 60;
+                let _acc = 0, _prevT = 0;
+                function rafDriver(ts) {
+                    requestAnimationFrame(rafDriver);
+                    let now = (typeof ts === 'number') ? ts : performance.now();
+                    if (!_prevT) { _prevT = now; loop(); return; }
+                    let dt = now - _prevT; _prevT = now;
+                    // roi tab / may khuc mot cai: bo qua doan tre, khong dồn bu hang tram buoc
+                    if (dt > 250 || dt < 0) dt = STEP_MS;
+                    _acc += dt;
+                    let n = 0;
+                    // man cham hon 60Hz thi chay bu toi da 3 buoc mot khung hinh
+                    while (_acc >= STEP_MS && n < 3) { _acc -= STEP_MS; loop(); n++; }
+                    if (_acc > STEP_MS * 3) _acc = 0;
+                }
+
                 function loop() {
-            if (gameState === 'menu') { startDojo(); requestAnimationFrame(loop); return; }   // menu = SAN TAP chay that
-            if (gameState === 'map_select') { drawMapSelect(); requestAnimationFrame(loop); return; }
-            if (gameState === 'br_select') { drawBrSelect(); requestAnimationFrame(loop); return; }
-            if (gameState === 'custom_menu') { drawCustomMenu(); frames++; requestAnimationFrame(loop); drawLightningEffects(); return; } 
-            if (gameState === 'test_menu') { drawTestMenu(); requestAnimationFrame(loop); return; }
-            if (gameState === 'pvp_setup') { drawPvPSetup(); requestAnimationFrame(loop); return; }
+            if (gameState === 'menu') { startDojo(); return; }   // menu = SAN TAP chay that
+            if (gameState === 'map_select') { drawMapSelect(); return; }
+            if (gameState === 'br_select') { drawBrSelect(); return; }
+            if (gameState === 'custom_menu') { drawCustomMenu(); frames++; drawLightningEffects(); return; } 
+            if (gameState === 'test_menu') { drawTestMenu(); return; }
+            if (gameState === 'pvp_setup') { drawPvPSetup(); return; }
             
             if (deathCineActive) { runDeathCinematic(); return; }
             if (gameOver) { 
@@ -27954,7 +28431,7 @@ function checkPvPCollisions() {
                 ctx.fillStyle = "white"; ctx.textAlign = "center"; 
                 ctx.font = "bold 38px Courier New"; ctx.fillText(LANG[currentLang].game_over, canvas.width / 2, canvas.height / 2 - 20); 
                 ctx.font = "18px Courier New"; ctx.fillText("Chạm màn hình hoặc SPACE để về Menu", canvas.width / 2, canvas.height / 2 + 30);
-                requestAnimationFrame(loop); return; 
+                return; 
             }
             if (gameVictory) { 
                 SFX.stopMusic();
@@ -27964,7 +28441,7 @@ function checkPvPCollisions() {
                 let vText = noDamageTaken ? "PERFECT VICTORY!" : LANG[currentLang].victory;
                 ctx.fillText(vText, canvas.width / 2, canvas.height / 2 - 20); 
                 ctx.font = "18px Courier New"; ctx.fillText("Chạm màn hình hoặc SPACE để về Menu", canvas.width / 2, canvas.height / 2 + 30);
-                requestAnimationFrame(loop); return; 
+                return; 
             }
             if (gameState === 'pvp_end') {
                 ctx.fillStyle = "rgba(0,0,0,0.85)"; ctx.fillRect(0, 0, canvas.width, canvas.height); 
@@ -27974,11 +28451,11 @@ function checkPvPCollisions() {
                 ctx.fillStyle = dino.hp > 0 ? "#4CAF50" : (dino2.hp > 0 ? "#E53935" : "#FFEB3B");
                 ctx.fillText(winnerTxt, canvas.width / 2, canvas.height / 2 - 20); 
                 ctx.fillStyle = "white"; ctx.font = "18px Courier New"; ctx.fillText("Chạm màn hình hoặc SPACE để về Menu", canvas.width / 2, canvas.height / 2 + 30);
-                requestAnimationFrame(loop); return; 
+                return; 
             }
 
-            if (paused) { drawPauseMenu(); requestAnimationFrame(loop); return; }
-            if (hitstopTimer > 0) { hitstopTimer--; if (grazeFlashTimer > 0) grazeFlashTimer--; drawGrazeFlash(); requestAnimationFrame(loop); return; }
+            if (paused) { drawPauseMenu(); return; }
+            if (hitstopTimer > 0) { hitstopTimer--; if (grazeFlashTimer > 0) grazeFlashTimer--; drawGrazeFlash(); return; }
             ctx.save();
             if (shakeTimer > 0) { ctx.translate((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8); shakeTimer--; }
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -28285,7 +28762,7 @@ function checkPvPCollisions() {
             
             // SAN TAP: bang menu ve SAU CUNG nen luon nam tren cung; nguoi choi bat tu
             if (dojoMode) { if (dino && dino.hp < dino.maxHp) dino.hp = dino.maxHp; tickDojoQueue(); drawMenuPanel(); drawDojoPicker(); }
-            frames++; requestAnimationFrame(loop);
+            frames++;
         }
 
 
