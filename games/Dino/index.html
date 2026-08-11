@@ -24994,7 +24994,7 @@ class GreatApeBoss {
                     if (typeof SFX!=='undefined'){ if (lvl===2 && SFX.glassBreak) SFX.glassBreak(); else if (SFX.tone) SFX.tone(320,0.2,'square',0.2,900); }
                 } else { deathCineActive = false; gameOver = true; }
             }
-            requestAnimationFrame(rafDriver);
+            // KHONG tu hen gio o day: rafDriver da tu hen gio o dau moi lan chay roi.
         }
 
 
@@ -28766,7 +28766,9 @@ function checkPvPCollisions() {
         }
 
 
-        loop();
+        // Khoi dong: goi rafDriver chu KHONG goi loop() — loop() gio chi la mot buoc
+        // logic, khong tu hen gio nua, goi thang no thi game chay dung 1 khung roi dung.
+        rafDriver();
     </script>
 </body>
 </html>
