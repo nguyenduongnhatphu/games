@@ -72,6 +72,38 @@
 
 
     </style>
+
+<script>
+/* Pulsar range-tier visual feedback: visible meteor-style tier flash. */
+(function(){
+ if(window.__pulsarRangeVisualsInstalled)return; window.__pulsarRangeVisualsInstalled=true;
+ window.pulsarRangeTierVisual=function(x,y,tier){
+   const e=document.createElement('div');
+   e.className='pulsar-range-flash '+(tier>=3?'pulsar-range-tier3':'pulsar-range-tier2');
+   e.style.left=x+'px'; e.style.top=y+'px';
+   document.body.appendChild(e);
+   setTimeout(()=>e.remove(),260);
+ };
+})();
+</script>
+<style>
+.pulsar-range-flash{
+ position:fixed;width:28px;height:28px;border:3px solid rgba(255,90,45,.98);
+ border-radius:50%;transform:translate(-50%,-50%) scale(.25);pointer-events:none;
+ z-index:99999;animation:pulsarRangePulse .26s ease-out forwards;
+ box-shadow:0 0 14px rgba(255,60,30,.95),0 0 30px rgba(255,180,60,.55)
+}
+.pulsar-range-tier3{
+ width:44px;height:44px;border-width:4px;
+ box-shadow:0 0 20px rgba(255,30,20,1),0 0 42px rgba(255,150,40,.75)
+}
+@keyframes pulsarRangePulse{
+ 0%{opacity:0;transform:translate(-50%,-50%) scale(.25)}
+ 16%{opacity:1}
+ 100%{opacity:0;transform:translate(-50%,-50%) scale(1.8)}
+}
+</style>
+
 </head>
 <body>
     <div id="stage">
@@ -4799,7 +4831,7 @@ class DilophosBoss {
                 // ===== RIPPER: khoanh nua ban do (trai / giua / phai) roi CHEM, 3 dmg =====
                 if (st === 'u_ripper'){
                     if (this.subTimer === 16){
-                        let W = canvas.width * 0.52, px = dino.x + dino.w/2;
+                        let W = canvas.width * (12/23), px = dino.x + dino.w/2;
                         // chon o CHUA nguoi choi -> ep phai chay sang mien khac
                         let opts = [0, (canvas.width - W)/2, canvas.width - W];
                         let pick = opts[0], bestD = 1e9;
@@ -7648,6 +7680,263 @@ class DilophosBoss {
         const WR_W = 64, WR_H = 92;
         const WR_CHAIN_SPD = 21, WR_CHAIN_MAX = 420;
         const WR_GEY_W = 320, WR_GEY_UP = 190;   // vung Blade Geyser: rong 320, cao them 190 de cham muc tieu bay
+        // ============================================================================
+        // NERO — Devil May Cry 5 boss fight
+        // Red Queen / Blue Rose / Devil Breakers in phase 1; Devil Trigger in phase 2.
+        // ============================================================================
+        const NR_W = 44, NR_H = 64;
+        function setupNeroArena(){
+            mapTheme = 'nero';
+            platforms.length = 0; enemies.length = 0; obstacles.length = 0; bossProjectiles.length = 0;
+            lavaGeysers.length = 0; visualEffects.length = 0; lavaFlood = 0;
+            platforms.push({ x: -60, w: canvas.width + 160, top: 320, h: 80 });
+            if (typeof dino !== 'undefined' && dino) {
+                dino.x = 110; dino.y = 320 - dino.h; dino.dy = 0; dino.grounded = true; dino.isFacingLeft = false;
+            }
+        }
+        function drawNeroEnv(){
+            let sky = ctx.createLinearGradient(0, 0, 0, 320);
+            sky.addColorStop(0, '#08131A'); sky.addColorStop(0.52, '#12333B'); sky.addColorStop(1, '#205246');
+            ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, 320);
+            // Ruined Red Grave silhouette and Qliphoth roots.
+            ctx.fillStyle = '#071012';
+            for (let i = 0; i < 15; i++) {
+                let x = i * 72 - 18, h = 48 + ((i * 47) % 118);
+                ctx.fillRect(x, 266 - h, 56, h + 56);
+                ctx.fillStyle = 'rgba(110,255,178,0.10)';
+                for (let r = 0; r < 3; r++) ctx.fillRect(x + 9 + (i % 3) * 8, 246 - h + r * 22, 7, 9);
+                ctx.fillStyle = '#071012';
+            }
+            ctx.save(); ctx.globalAlpha = 0.52; ctx.strokeStyle = '#26361D'; ctx.lineCap = 'round';
+            for (let i = 0; i < 6; i++) {
+                let rx = 55 + i * 176;
+                ctx.lineWidth = 12 + (i % 3) * 3; ctx.beginPath(); ctx.moveTo(rx, 322);
+                ctx.bezierCurveTo(rx - 34, 238, rx + 42, 156, rx - 14, -20); ctx.stroke();
+                ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(131,184,69,0.62)'; ctx.beginPath();
+                ctx.moveTo(rx + 3, 260); ctx.quadraticCurveTo(rx + 50, 215, rx + 74, 175); ctx.stroke(); ctx.strokeStyle = '#26361D';
+            }
+            ctx.restore();
+            // Toxic green rain and a wet street.
+            ctx.strokeStyle = 'rgba(180,255,196,0.22)'; ctx.lineWidth = 1;
+            for (let i = 0; i < 66; i++) { let x = (i * 137 + frames * 2.4) % (canvas.width + 40) - 20, y = (i * 61 + frames * 5.3) % 280; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 5, y + 15); ctx.stroke(); }
+            let road = ctx.createLinearGradient(0, 320, 0, 400); road.addColorStop(0, '#263232'); road.addColorStop(1, '#071010');
+            ctx.fillStyle = road; ctx.fillRect(0, 320, canvas.width, 80); ctx.fillStyle = 'rgba(130,255,190,0.32)'; ctx.fillRect(0, 320, canvas.width, 3);
+            ctx.strokeStyle = 'rgba(165,255,207,0.12)';
+            for (let x = -40; x < canvas.width + 50; x += 90) { ctx.beginPath(); ctx.moveTo(x, 324); ctx.lineTo(x - 28, 400); ctx.stroke(); }
+        }
+        function drawNeroBody(b, x, y){
+            let dir = b.facingLeft ? -1 : 1, cx = x + b.w / 2, dt = b.phase === 2;
+            ctx.save(); ctx.translate(cx, y); ctx.scale(dir, 1); ctx.translate(-cx, -y);
+            let coat = dt ? '#263A57' : '#2C3E56', coatDark = dt ? '#101827' : '#142031';
+            // Devil Trigger wings.
+            if (dt) {
+                ctx.save(); ctx.globalAlpha = 0.68; ctx.strokeStyle = '#71E7FF'; ctx.shadowBlur = 12; ctx.shadowColor = '#39D6FF'; ctx.lineWidth = 4;
+                for (let s of [-1, 1]) for (let k = 0; k < 3; k++) { ctx.beginPath(); ctx.moveTo(cx - s * 8, y + 30); ctx.quadraticCurveTo(cx - s * (47 + k * 12), y + 1 + k * 16, cx - s * (32 + k * 14), y + 60 + k * 4); ctx.stroke(); }
+                ctx.restore();
+            }
+            // Boots and long coat tails.
+            ctx.fillStyle = '#101318'; ctx.fillRect(cx - 13, y + 47, 9, 17); ctx.fillRect(cx + 4, y + 47, 9, 17);
+            ctx.fillStyle = '#07090D'; ctx.fillRect(cx - 16, y + 59, 14, 5); ctx.fillRect(cx + 3, y + 59, 14, 5);
+            ctx.fillStyle = coatDark; ctx.beginPath(); ctx.moveTo(cx - 15, y + 31); ctx.lineTo(cx - 4, y + 61); ctx.lineTo(cx + 1, y + 47); ctx.lineTo(cx + 10, y + 63); ctx.lineTo(cx + 17, y + 31); ctx.closePath(); ctx.fill();
+            // Jacket, red lining, and belt.
+            ctx.fillStyle = coat; ctx.fillRect(cx - 15, y + 19, 30, 31); ctx.fillStyle = '#C62828'; ctx.fillRect(cx - 3, y + 21, 5, 29);
+            ctx.fillStyle = '#AAB7C6'; ctx.fillRect(cx + 3, y + 23, 8, 19); ctx.fillStyle = '#0A1018'; ctx.fillRect(cx - 15, y + 42, 30, 4);
+            // Back arm / Blue Rose.
+            let gunA = b.gunAngle || 0.45;
+            ctx.save(); ctx.translate(cx - 14, y + 25); ctx.rotate(gunA); ctx.fillStyle = coatDark; ctx.fillRect(-4, 0, 8, 20); ctx.fillStyle = '#D7BFA6'; ctx.fillRect(-4, 18, 8, 5);
+            if (b.gunDrawn) { ctx.fillStyle = '#1D2838'; ctx.fillRect(-3, 20, 27, 6); ctx.fillStyle = '#5DADE2'; ctx.fillRect(18, 21, 10, 3); ctx.fillStyle = '#CFD8DC'; ctx.fillRect(4, 21, 12, 2); }
+            ctx.restore();
+            // Devil Breaker arm.
+            let armA = b.armR || 0;
+            ctx.save(); ctx.translate(cx + 14, y + 25); ctx.rotate(armA); ctx.fillStyle = dt ? '#256E9A' : '#C62828'; ctx.fillRect(-5, 0, 10, 23);
+            ctx.fillStyle = dt ? '#7BE7FF' : '#FF7043'; ctx.fillRect(-4, 4, 8, 8); ctx.fillStyle = '#E8F6F3'; ctx.fillRect(-3, 20, 6, 7);
+            if (b.breakerGlow > 0) { ctx.globalAlpha = Math.min(1, b.breakerGlow / 24); ctx.shadowBlur = 15; ctx.shadowColor = dt ? '#4DD0E1' : '#FF7043'; ctx.fillStyle = dt ? '#80DEEA' : '#FFCC80'; ctx.beginPath(); ctx.arc(0, 24, 11, 0, Math.PI * 2); ctx.fill(); }
+            ctx.restore();
+            // Neck, face, and white hair.
+            ctx.fillStyle = '#E6C5A5'; ctx.fillRect(cx - 7, y + 8, 14, 14); ctx.fillStyle = '#E9EDF3';
+            ctx.beginPath(); ctx.moveTo(cx - 10, y + 10); ctx.lineTo(cx + 10, y + 10); ctx.lineTo(cx + 7, y - 5); ctx.lineTo(cx + 2, y + 1); ctx.lineTo(cx - 2, y - 7); ctx.lineTo(cx - 6, y + 2); ctx.lineTo(cx - 12, y - 1); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = dt ? '#9AF7FF' : '#9DE8FF'; ctx.fillRect(cx + 1, y + 14, 4, 2); ctx.fillStyle = '#11151D'; ctx.fillRect(cx - 5, y + 14, 3, 2);
+            // Red Queen sword.
+            if (b.swordDrawn) { let sa = b.swordAngle === undefined ? -0.42 : b.swordAngle; ctx.save(); ctx.translate(cx + 13 + Math.sin(armA) * 19, y + 27 + Math.cos(armA) * 19); ctx.rotate(sa); ctx.shadowBlur = b.exceed > 0 ? 14 : 0; ctx.shadowColor = '#FF3D00'; ctx.fillStyle = '#20242B'; ctx.fillRect(-4, -55, 8, 53); ctx.fillStyle = b.exceed > 0 ? '#FF7043' : '#DCE5EE'; ctx.fillRect(-2, -52, 4, 46); ctx.fillStyle = '#C62828'; ctx.fillRect(-7, -4, 14, 4); ctx.restore(); }
+            ctx.restore();
+        }
+        class NeroBoss {
+            constructor(level){
+                this.name='NERO'; this.hp=126; this.maxHp=126; this.phase=1;
+                this.w=NR_W; this.h=NR_H; this.baseY=320-this.h;
+                this.x=canvas.width+30; this.y=this.baseY; this.dy=0; this.grounded=true;
+                this.state='entering'; this.subTimer=0; this.actionTimer=60; this.facingLeft=true; this.invulnAll=true;
+                this.burnTimer=0; this.lastMeleeHit=-1; this.lastSkill=''; this._bag=null;
+                this.armR=0; this.gunAngle=0.45; this.gunDrawn=false;
+                this.swordDrawn=false; this.swordAngle=-0.42; this.exceed=0; this.breakerGlow=0;
+                this.combo=0; this.slashT=0; this.swingHit=false; this.dashDir=-1; this.dashHit=false;
+                this.shots=0; this.waveCount=0; this.snatch=null; this.busterX=0; this.busterHit=false;
+                this.guardHits=0; this.guardCounter=false; this.launchHit=false; this.airTargetX=0; this.breakerDiveHit=false;
+            }
+            cx(){ return this.x+this.w/2; }
+            cy(){ return this.y+this.h/2; }
+            faceP(){ this.facingLeft=(dino.x+dino.w/2)<this.cx(); }
+            dir(){ return this.facingLeft?-1:1; }
+            gap(){ return (dino.x+dino.w/2)-this.cx(); }
+            spd(){ return this.phase===2?1.28:1; }
+            hurtP(n){ if(!dino.isShielding()) dino.takeDamage(n); else visualEffects.push(new Effect(dino.x+(dino.isFacingLeft?0:dino.w),dino.y,'parry')); }
+            physics(){
+                this.dy+=0.64; this.y+=this.dy;
+                if(this.y>=this.baseY){this.y=this.baseY;this.dy=0;this.grounded=true;} else this.grounded=false;
+                this.x=Math.max(8,Math.min(canvas.width-this.w-8,this.x));
+            }
+            toIdle(t){
+                this.state='idle'; this.subTimer=0; this.actionTimer=Math.round(t/this.spd());
+                this.combo=0; this.slashT=0; this.swingHit=false;
+                this.gunDrawn=false; this.swordDrawn=false; this.breakerGlow=0; this.armR=0;
+                this.snatch=null;
+            }
+            fireBlueRose(charged,spread){
+                let sx=this.cx()+this.dir()*20, sy=this.y+24, tx=dino.x+dino.w/2, ty=dino.y+dino.h/2;
+                let dx=tx-sx,dy=ty-sy,len=Math.hypot(dx,dy)||1,speed=charged?11.5:13;
+                let a=Math.atan2(dy,dx)+(spread||0),p=new BossProjectile(sx,sy,Math.cos(a)*speed,Math.sin(a)*speed,false,1);
+                p.w=charged?25:14;p.h=charged?18:8;p.x-=p.w/2;p.y-=p.h/2;p.color=charged?'#FF7043':'#42A5F5';p.frail=true;
+                bossProjectiles.push(p);
+            }
+            fireBreakerWave(){
+                let p=new BossProjectile(this.cx()+this.dir()*17,288,this.dir()*(this.phase===2?12:10),0,true,1);
+                p.w=52;p.h=32;p.y=288;p.color=this.phase===2?'#80DEEA':'#26C6DA';p.frail=true;bossProjectiles.push(p);
+            }
+            fireGerberaFan(){
+                let sx=this.cx(),sy=this.y+28,tx=dino.x+dino.w/2,ty=dino.y+dino.h/2,base=Math.atan2(ty-sy,tx-sx);
+                for(let k=-1;k<=1;k++){let a=base+k*0.20,p=new BossProjectile(sx,sy,Math.cos(a)*8.2,Math.sin(a)*8.2,false,1);p.w=28;p.h=22;p.sonic=true;p.color='#B2EBF2';p.frail=true;bossProjectiles.push(p);}
+            }
+            bladeBox(reach){let d=this.dir();return {x:d>0?this.x+this.w-6:this.x-reach,y:this.y+9,w:reach+6,h:50};}
+            swing(reach){if(!this.swingHit&&checkAABB(dino,this.bladeBox(reach))){this.swingHit=true;this.hurtP(1);}}
+            pickSkill(){
+                let close=Math.abs(this.gap())<175,list;
+                if(this.phase===1) list=close?['rq_prep','streak_prep','snatch_prep','launcher_prep','breaker_spin_prep','guard_prep','breaker_prep','blue_prep']:['blue_prep','gerbera_prep','streak_prep','snatch_prep','launcher_prep','breaker_spin_prep','guard_prep','breaker_prep'];
+                else list=close?['rq_prep','streak_prep','dt_blades_prep','dt_buster_prep','breaker_prep']:['blue_prep','dt_blades_prep','gerbera_prep','dt_buster_prep','breaker_prep'];
+                this.state=pickFromBag(this,list);this.subTimer=0;this.faceP();
+                if(this.state==='dt_buster_prep')this.busterX=dino.x+dino.w/2;
+            }
+            startPhase2(){
+                this.phase=2;this.hp=108;this.maxHp=108;this.name='NERO — DEVIL TRIGGER';this.invulnAll=true;
+                this.state='dt_wake';this.subTimer=0;this._bag=null;this.y=this.baseY;this.dy=0;this.exceed=1;this.gunDrawn=false;this.swordDrawn=false;this.breakerGlow=0;bossProjectiles.length=0;
+                floatingTexts.push(new FloatingText(this.x-46,this.y-38,'DEVIL TRIGGER!'));visualEffects.push(new Effect(this.cx(),this.cy(),'lightning_burst',true,1.5));shakeTimer=Math.max(shakeTimer,24);
+                if(SFX.tone)SFX.tone(140,0.46,'sawtooth',0.24,62);
+            }
+            tickSnatch(){
+                let c=this.snatch;if(!c)return;
+                if(c.st==='out'){
+                    c.len+=24;
+                    let hx=this.cx()+c.dir*c.len,hy=this.cy()+c.vy*c.len;
+                    if(!c.hit&&checkAABB(dino,{x:hx-34,y:hy-34,w:68,h:68})){
+                        c.hit=true;c.st='pull';c.len=Math.abs((dino.x+dino.w/2)-this.cx());
+                        floatingTexts.push(new FloatingText(dino.x-24,dino.y-30,'BỊ KÉO!'));if(SFX.bossSkill)SFX.bossSkill();
+                    }
+                    if(c.len>460)c.st='back';
+                }else if(c.st==='pull'){
+                    c.len-=22;
+                    let tx=this.cx()+c.dir*Math.max(52,c.len)-dino.w/2;
+                    let ty=this.cy()+c.vy*Math.max(52,c.len)-dino.h/2;
+                    dino.x+=(tx-dino.x)*0.40;
+                    if(c.air){dino.y+=(ty-dino.y)*0.40;dino.dy=0;dino.grounded=false;} else if(dino.dy>0)dino.dy*=0.5;
+                    if(c.len<=56)c.st='back';
+                }else{c.len-=30;if(c.len<=0)this.snatch=null;}
+            }
+            update(){
+                if(this.breakerGlow>0)this.breakerGlow--;
+                this.tickSnatch();
+                if(this.state==='entering'){this.x-=5;if(this.x<=canvas.width-210){this.x=canvas.width-210;this.invulnAll=false;this.toIdle(42);}return;}
+                if(this.state==='idle'){
+                    this.physics();this.faceP();let g=this.gap(),ad=Math.abs(g);
+                    if(ad>250)this.x+=Math.sign(g)*2.4*this.spd();else if(ad<108)this.x-=Math.sign(g)*1.35*this.spd();
+                    this.actionTimer--;if(this.actionTimer<=0)this.pickSkill();return;
+                }
+                // RED QUEEN — viết lại hoàn toàn: 2 chém -> đứng charge -> 1 chém tầm xa.
+                if(this.state==='rq_prep'){
+                    this.physics();this.faceP();this.swordDrawn=true;this.exceed=0;this.subTimer++;
+                    if(this.subTimer>=18){this.state='rq_slash';this.subTimer=0;this.combo=0;this.swingHit=false;}
+                    return;
+                }
+                if(this.state==='rq_slash'){
+                    this.physics();this.faceP();this.swordDrawn=true;this.subTimer++;
+                    if(this.subTimer===5||this.subTimer===23){this.combo++;this.swingHit=false;this.slashT=8;this.swordAngle=this.combo===1?-1.75:0.72;this.x+=this.dir()*6;this.swing(60);}
+                    if(this.slashT>0){this.slashT--;this.swing(60);}
+                    if(this.subTimer>=34){this.state='rq_charge';this.subTimer=0;this.exceed=1;this.slashT=0;this.swingHit=false;this.swordAngle=-0.42;floatingTexts.push(new FloatingText(this.x-20,this.y-30,'EXCEED!'));}
+                    return;
+                }
+                if(this.state==='rq_charge'){
+                    this.physics();this.faceP();this.swordDrawn=true;this.swordAngle=-0.42;this.subTimer++;
+                    if(this.subTimer>=20){this.state='rq_release';this.subTimer=0;}
+                    return;
+                }
+                if(this.state==='rq_release'){
+                    this.physics();this.faceP();this.swordDrawn=true;this.swordAngle=-0.15;this.subTimer++;
+                    if(this.subTimer===1){let sx=this.cx()+this.dir()*22,sy=this.y+26,p=new BossProjectile(sx,sy,this.dir()*13,0,true,1);p.w=72;p.h=24;p.color='#FF7043';p.frail=true;p.crescent=true;bossProjectiles.push(p);visualEffects.push(new Effect(sx+this.dir()*30,sy,'lightning_shock',true,26));shakeTimer=10;}
+                    if(this.subTimer>=12)this.toIdle(34);return;
+                }
+                // SNATCH — dây thật sự bay ra, móc trúng rồi kéo người chơi như War/Death.
+                if(this.state==='snatch_prep'){
+                    this.physics();this.faceP();this.armR=-0.82;this.breakerGlow=24;this.subTimer++;
+                    if(this.subTimer>=18){this.snatch={st:'out',len:30,dir:this.dir(),vy:0,hit:false,air:false};this.state='snatch_pull';this.subTimer=0;if(SFX.bossSkill)SFX.bossSkill();}
+                    return;
+                }
+                if(this.state==='snatch_pull'){
+                    this.physics();this.faceP();this.armR=-0.92;this.breakerGlow=24;this.subTimer++;
+                    if(this.snatch&&this.snatch.st==='back'&&this.subTimer>8){this.toIdle(28);return;}
+                    if(this.snatch&&this.snatch.st==='pull'&&this.snatch.len<=90){this.state='snatch_slash';this.subTimer=0;this.swordDrawn=true;this.combo=0;this.swingHit=false;this.snatch.st='hold';}
+                    if(this.subTimer>70)this.toIdle(28);return;
+                }
+                if(this.state==='snatch_slash'){
+                    this.physics();this.faceP();this.swordDrawn=true;this.subTimer++;
+                    if(this.subTimer===4||this.subTimer===24){this.combo++;this.slashT=9;this.swingHit=false;this.swordAngle=this.combo===1?-1.8:0.65;this.x+=this.dir()*5;}
+                    if(this.slashT>0){this.slashT--;this.swing(58);}
+                    if(this.subTimer>42)this.toIdle(34);return;
+                }
+                // Launcher -> aerial combo -> downward finisher.
+                if(this.state==='launcher_prep'){this.physics();this.faceP();this.swordDrawn=true;this.subTimer++;if(this.subTimer>=20){this.state='launcher_hit';this.subTimer=0;this.launchHit=false;}return;}
+                if(this.state==='launcher_hit'){
+                    this.physics();this.faceP();this.swordDrawn=true;this.subTimer++;this.x+=this.dir()*3;this.swordAngle=-2.15;
+                    if(!this.launchHit&&checkAABB(dino,this.bladeBox(68))){this.launchHit=true;this.hurtP(1);dino.dy=-13;dino.grounded=false;this.state='launcher_air';this.subTimer=0;this.dy=-12;this.grounded=false;this.airTargetX=dino.x+dino.w/2;}
+                    if(this.subTimer>34)this.toIdle(30);return;
+                }
+                if(this.state==='launcher_air'){
+                    this.subTimer++;this.swordDrawn=true;this.faceP();this.dy+=0.42;this.y+=this.dy;this.x+=(this.airTargetX-this.cx())*0.045;
+                    if(this.subTimer===10||this.subTimer===22){this.slashT=8;this.swingHit=false;this.swordAngle=this.subTimer===10?-1.7:0.7;this.swing(60);}
+                    if(this.subTimer===34){this.swordAngle=-0.15;this.slashT=12;this.swingHit=false;this.dy=15;}
+                    if(this.slashT>0){this.slashT--;this.swing(82);}
+                    if(this.y>=this.baseY){this.y=this.baseY;this.dy=0;this.grounded=true;shakeTimer=16;this.toIdle(38);}return;
+                }
+                // Devil Breaker aerial dive -> Nero follows with downward slash.
+                if(this.state==='breaker_spin_prep'){this.physics();this.faceP();this.armR=-0.5;this.breakerGlow=24;this.subTimer++;if(this.subTimer>=18){this.state='breaker_spin';this.subTimer=0;this.dy=-11;this.grounded=false;this.breakerDiveHit=false;this.airTargetX=dino.x+dino.w/2;}return;}
+                if(this.state==='breaker_spin'){this.subTimer++;this.breakerGlow=24;this.armR=Math.sin(this.subTimer*0.55)*2.1;this.dy+=0.28;this.y+=this.dy;this.x+=Math.sin(this.subTimer*0.28)*3.2;if(this.subTimer<38)this.airTargetX=dino.x+dino.w/2;if(this.subTimer===38){this.state='breaker_dive';this.subTimer=0;this.dy=0;}return;}
+                if(this.state==='breaker_dive'){this.subTimer++;this.breakerGlow=28;this.armR=-1.55;this.y+=12;this.x+=(this.airTargetX-this.cx())*0.16;if(this.subTimer===7&&!this.breakerDiveHit){let bx={x:this.cx()-48,y:this.y+18,w:96,h:58};if(checkAABB(dino,bx)){this.breakerDiveHit=true;this.hurtP(1);dino.dy=-8;}visualEffects.push(new Effect(this.airTargetX,this.y+44,'explosion',true,30));}if(this.y>=this.baseY-8){this.y=this.baseY-8;this.dy=-12;this.state='breaker_finisher';this.subTimer=0;}return;}
+                if(this.state==='breaker_finisher'){this.subTimer++;this.swordDrawn=true;this.faceP();this.swordAngle=-2.0;this.y+=this.dy;this.dy+=0.65;if(this.subTimer===7){this.slashT=12;this.swingHit=false;}if(this.slashT>0){this.slashT--;this.swing(74);}if(this.y>=this.baseY){this.y=this.baseY;this.dy=0;this.grounded=true;shakeTimer=18;this.toIdle(42);}return;}
+                // Guard/parry.
+                if(this.state==='guard_prep'){this.physics();this.faceP();this.swordDrawn=true;this.swordAngle=-1.15;this.subTimer++;if(this.subTimer>=18){this.state='guard';this.subTimer=0;this.guardHits=0;this.guardCounter=false;}return;}
+                if(this.state==='guard'){this.physics();this.faceP();this.swordDrawn=true;this.swordAngle=-1.2;this.subTimer++;let d=this.dir(),box={x:d<0?this.x-34:this.x+this.w,y:this.y-8,w:34,h:this.h+16};for(let i=projectiles.length-1;i>=0;i--){let pr=projectiles[i];if(!pr||pr.owner!==1||!checkAABB(pr,box))continue;projectiles.splice(i,1);this.guardHits++;visualEffects.push(new Effect(pr.x,pr.y,'parry',d<0));}if(this.guardHits>0&&!this.guardCounter){this.guardCounter=true;this.subTimer=18;this.x+=d*18;this.slashT=12;this.swingHit=false;this.swordAngle=-0.15;}if(this.guardCounter){this.slashT--;this.swing(72);if(this.slashT<=0){this.guardCounter=false;this.subTimer=32;}}if(this.subTimer>58)this.toIdle(30);return;}
+                if(this.state==='streak_prep'){this.physics();this.faceP();this.swordDrawn=true;this.exceed=1;this.breakerGlow=24;this.subTimer++;if(this.subTimer>34){this.state='streak_go';this.subTimer=0;this.dashDir=this.dir();this.dashHit=false;}return;}
+                if(this.state==='streak_go'){this.subTimer++;this.x+=this.dashDir*(this.phase===2?17:14);this.y=this.baseY;this.swordDrawn=true;this.swordAngle=-1.25;let hb={x:this.dashDir>0?this.x:this.x-24,y:this.y+12,w:this.w+24,h:45};if(!this.dashHit&&checkAABB(dino,hb)){this.dashHit=true;this.hurtP(1);}if(this.subTimer>64||this.x<-this.w||this.x>canvas.width){this.x=Math.max(8,Math.min(canvas.width-this.w-8,this.x));this.toIdle(34);}return;}
+                if(this.state==='blue_prep'){this.physics();this.faceP();this.gunDrawn=true;this.gunAngle=-0.10;this.subTimer++;if(this.subTimer>32){this.state='blue_fire';this.subTimer=0;this.shots=0;}return;}
+                if(this.state==='blue_fire'){this.physics();this.gunDrawn=true;this.gunAngle=-0.10;this.subTimer++;let total=this.phase===2?5:3;if(this.subTimer%10===1&&this.shots<total){this.shots++;this.fireBlueRose(this.shots===total,(this.shots-(total+1)/2)*0.045);}if(this.shots>=total&&this.subTimer>total*10+12)this.toIdle(38);return;}
+                if(this.state==='breaker_prep'){this.physics();this.faceP();this.armR=-0.90;this.breakerGlow=24;this.subTimer++;if(this.subTimer>38){this.state='breaker_fire';this.subTimer=0;this.waveCount=0;}return;}
+                if(this.state==='breaker_fire'){this.physics();this.armR=-1.18;this.breakerGlow=24;this.subTimer++;let total=this.phase===2?3:2;if(this.subTimer%18===1&&this.waveCount<total){this.waveCount++;this.fireBreakerWave();}if(this.waveCount>=total&&this.subTimer>total*18+16)this.toIdle(40);return;}
+                if(this.state==='gerbera_prep'){this.subTimer++;if(this.subTimer===1)this.dy=-12.5;this.physics();this.armR=-0.68;this.breakerGlow=24;if(this.subTimer===24)this.fireGerberaFan();if(this.subTimer>62&&this.grounded)this.toIdle(40);return;}
+                if(this.state==='dt_wake'){this.subTimer++;this.y=this.baseY;this.armR=-0.35;this.breakerGlow=24;if(this.subTimer%18===0)visualEffects.push(new Effect(this.cx(),this.cy(),'lightning_burst',true,0.9));if(this.subTimer>82){this.invulnAll=false;this.toIdle(30);}return;}
+                if(this.state==='dt_blades_prep'){this.physics();this.faceP();this.gunDrawn=true;this.breakerGlow=24;this.subTimer++;if(this.subTimer>42){this.state='dt_blades_fire';this.subTimer=0;this.shots=0;}return;}
+                if(this.state==='dt_blades_fire'){this.physics();this.gunDrawn=true;this.subTimer++;if(this.subTimer%8===1&&this.shots<6){this.shots++;let sx=this.cx(),sy=this.y+16,tx=dino.x+dino.w/2,ty=dino.y+dino.h/2,a=Math.atan2(ty-sy,tx-sx)+(this.shots-3.5)*0.07,p=new BossProjectile(sx,sy,Math.cos(a)*10,Math.sin(a)*10,false,1);p.w=30;p.h=20;p.sonic=true;p.color='#B2EBF2';p.frail=true;bossProjectiles.push(p);}if(this.shots>=6&&this.subTimer>64)this.toIdle(30);return;}
+                if(this.state==='dt_buster_prep'){this.subTimer++;if(this.subTimer===1)this.dy=-14;this.physics();this.armR=-0.90;this.breakerGlow=24;if(this.subTimer>36){this.state='dt_buster_dive';this.subTimer=0;this.busterHit=false;this.y=112;this.dy=0;}return;}
+                if(this.state==='dt_buster_dive'){this.subTimer++;this.x+=((this.busterX-this.w/2)-this.x)*0.18;this.y+=11.5;this.armR=-1.10;this.breakerGlow=24;if(this.y>=this.baseY){this.y=this.baseY;this.dy=0;this.grounded=true;let impact={x:this.cx(),y:this.y+this.h};if(!this.busterHit&&Math.hypot((dino.x+dino.w/2)-impact.x,(dino.y+dino.h/2)-impact.y)<88){this.busterHit=true;this.hurtP(1);}for(let ss of[-1,1]){let p=new BossProjectile(impact.x,288,ss*11,0,true,1);p.w=58;p.h=32;p.color='#80DEEA';p.frail=true;bossProjectiles.push(p);}visualEffects.push(new Effect(impact.x,impact.y,'body_slam_shockwave',true,72));shakeTimer=Math.max(shakeTimer,18);this.state='dt_buster_recover';this.subTimer=0;}return;}
+                if(this.state==='dt_buster_recover'){this.subTimer++;if(this.subTimer>26)this.toIdle(32);return;}
+                if(this.state==='returning'){this.subTimer++;this.physics();this.faceP();this.x+= (this.cx()>dino.x+dino.w/2?1:-1)*(this.phase===2?5:4);this.swordDrawn=false;this.gunDrawn=false;this.breakerGlow=0;if(this.subTimer>=28)this.toIdle(34);return;}
+                this.toIdle(24);
+            }
+            draw(){
+                if(this.state==='streak_prep'){ctx.save();ctx.strokeStyle='rgba(255,82,82,0.72)';ctx.lineWidth=4;ctx.setLineDash([8,7]);ctx.beginPath();ctx.moveTo(this.cx(),this.y+44);ctx.lineTo(this.cx()+this.dir()*280,this.y+44);ctx.stroke();ctx.setLineDash([]);ctx.restore();}
+                if(this.state==='snatch_prep'||this.state==='snatch_pull'){let c=this.snatch;if(c){let hx=this.cx()+c.dir*c.len,hy=this.cy()+c.vy*c.len;ctx.save();ctx.strokeStyle='rgba(255,112,67,'+(0.45+0.3*Math.sin(frames*0.3))+')';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(this.cx()+this.dir()*16,this.y+45);ctx.lineTo(hx,hy);ctx.stroke();ctx.restore();}}
+                if(this.state==='dt_buster_prep'||this.state==='dt_buster_dive'){let px=this.busterX,a=0.42+0.32*Math.sin(frames*0.25);ctx.save();ctx.strokeStyle='rgba(128,222,234,'+a+')';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(px,319,76,12,0,0,Math.PI*2);ctx.stroke();ctx.restore();}
+                if(this.phase===2){ctx.save();ctx.globalAlpha=0.13+0.07*Math.sin(frames*0.17);ctx.fillStyle='#4DD0E1';ctx.beginPath();ctx.arc(this.cx(),this.cy(),54,0,Math.PI*2);ctx.fill();ctx.restore();}
+                drawNeroBody(this,this.x,this.y);
+                let barW=106,bx=this.cx()-barW/2,by=this.y-18,col=this.phase===2?'#80DEEA':'#EF5350';ctx.fillStyle='rgba(0,0,0,0.78)';ctx.fillRect(bx-2,by-2,barW+4,9);ctx.fillStyle=col;ctx.fillRect(bx,by,barW*Math.max(0,this.hp/this.maxHp),5);ctx.strokeStyle=this.phase===2?'#E0F7FA':'#FFCCBC';ctx.lineWidth=1;ctx.strokeRect(bx,by,barW,5);ctx.fillStyle='#FFFFFF';ctx.font='bold 11px Courier New';ctx.textAlign='center';ctx.fillText(this.name,this.cx(),by-5);ctx.textAlign='left';
+            }
+        }
         function setupWarArena(){
             mapTheme = 'war';
             platforms.length = 0; enemies.length = 0; obstacles.length = 0; bossProjectiles.length = 0;
@@ -8764,7 +9053,7 @@ class DilophosBoss {
                 this.burnTimer = 0; this.lastMeleeHit = -1; this.phase = 1; this.stage = 1; this._bag = null;
                 this.arm = 'scythe'; this.armR = 0; this.armL = 0; this.wing = 0;
                 this.slash = null; this.tel = null; this.combo = 0; this.dashV = 0; this.walk = 0;
-                this.wallSide = 0; this.wallT = 0; this.ghosts = [];
+                this.wallSide = 0; this.wallT = 0; this.wallReturnSlide = false; this.wallReturnVy = 0; this.ghosts = [];
                 this.crows = []; this.thrown = []; this.reaps = []; this.souls = [];
                 this.split = null; this.twin = null; this.splitDone = false;
                 this.chain = null; this.gate = null; this.ultX = 0;
@@ -8904,6 +9193,7 @@ class DilophosBoss {
             // ---- BAY VE TUONG roi BAM len do cao ----
             toWall(side){
                 this.wallSide = side;
+                this.wallReturnSlide = false; this.wallReturnVy = 0;
                 this.x = side < 0 ? 62 : canvas.width - this.w - 62;
                 this.y = DTH_WALL_Y; this.dy = 0; this.wallT = 1;
                 this.facingLeft = side > 0;
@@ -9030,6 +9320,53 @@ class DilophosBoss {
                 this.state = c; this.subTimer = 0; this.combo = 0; this.faceP();
             }
             runSkill(){
+                // Returning after a wall-cling parry: stay on the wall first,
+                // then slide down to the ground before Death resumes attacking.
+                if (this.state === 'returning') {
+                    this.invulnAll = false;
+                    this.subTimer += 1;
+
+                    if (this.wallT > 0) {
+                        const wallX = this.wallSide < 0 ? 62 : canvas.width - this.w - 62;
+                        this.x += Math.sign(wallX - this.x) * Math.min(8, Math.abs(wallX - this.x));
+                        this.x = wallX;
+                        this.y = DTH_WALL_Y;
+                        this.dy = 0;
+
+                        // Do not drop or resume the AI while still attached to the wall.
+                        if (this.subTimer >= 24) {
+                            this.wallT = 0;
+                            this.wallReturnSlide = true;
+                            this.wallReturnVy = 2.2;
+                            this.subTimer = 0;
+                        }
+                        return;
+                    }
+
+                    if (this.wallReturnSlide) {
+                        this.x = this.wallSide < 0 ? 62 : canvas.width - this.w - 62;
+                        this.y += this.wallReturnVy;
+                        this.wallReturnVy = Math.min(10, this.wallReturnVy + 0.55);
+                        if (this.y >= this.baseY) {
+                            this.y = this.baseY;
+                            this.dy = 0;
+                            this.wallReturnSlide = false;
+                            this.wallSide = 0;
+                            this.subTimer = 0;
+                            this.toIdle(34);
+                        }
+                        return;
+                    }
+
+                    // Normal ground Returning: create a short gap before resuming attacks.
+                    const px = dino.x + dino.w / 2;
+                    const away = this.cx() >= px ? 1 : -1;
+                    this.x += away * 4.2;
+                    this.x = Math.max(58, Math.min(canvas.width - this.w - 58, this.x));
+                    if (this.subTimer >= 28) this.toIdle(34);
+                    return;
+                }
+
                 let d = this.dir(), st = this.state, sp = this.spd(); this.subTimer += sp;
                 let T = (n) => this.subTimer >= n && this.subTimer - sp < n;
                 // ============ CAP LUOI HAI: COMBO 5 NHAT ============
@@ -16159,7 +16496,7 @@ class GreatApeBoss {
             platforms.length = 0;
             grassField = [];
             forestScene = 'spider';
-            spiderTree = { trunkX: canvas.width * 0.52, canopyBottom: 74 };
+            spiderTree = { trunkX: canvas.width * (12/23), canopyBottom: 74 };
             platforms.push({ x: -60, w: canvas.width + 160, top: 320, h: 80 });
             platforms.push({ x: 130, w: 150, top: 240, h: 16, isLeaf: true, solid: true, leafTimer: 0, leafCd: 0, fallY: 0 });
             platforms.push({ x: 690, w: 150, top: 240, h: 16, isLeaf: true, solid: true, leafTimer: 0, leafCd: 0, fallY: 0 });
@@ -21905,6 +22242,7 @@ class PulsarCloneBoss {
             if (mapTheme === 'unity') { drawUnityEnv(); return; }
             if (mapTheme === 'vergil') { drawVergilEnv(); return; }
             if (mapTheme === 'dante') { drawDanteEnv(); return; }
+            if (mapTheme === 'nero') { drawNeroEnv(); return; }
             if (mapTheme === 'war') { drawWarEnv(); return; }
             if (mapTheme === 'death') { drawDeathEnv(); return; }
             if (mapTheme === 'artorias') { drawArtoriasEnv(); return; }
@@ -22056,6 +22394,21 @@ class PulsarCloneBoss {
                     ctx.fillStyle = `rgba(255, 69, 0, ${1 - this.timer/30})`; ctx.fill();
                     ctx.beginPath(); ctx.arc(this.x, this.y, r * 0.6, 0, Math.PI*2);
                     ctx.fillStyle = `rgba(255, 255, 0, ${1 - this.timer/30})`; ctx.fill();
+                } else if (this.type === 'body_slam_shockwave') {
+                    // Song xung kich nam sat mat dat: radius trung khop voi vung gay sat thuong.
+                    const progress = Math.min(1, this.timer / 18);
+                    const radius = (this.radius || 40) * progress;
+                    const alpha = Math.max(0, 1 - this.timer / 28);
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.scale(1, 0.42);
+                    ctx.shadowBlur = 14; ctx.shadowColor = '#FFD600';
+                    ctx.strokeStyle = `rgba(255, 193, 7, ${alpha})`; ctx.lineWidth = 5;
+                    ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.stroke();
+                    ctx.shadowBlur = 0;
+                    ctx.strokeStyle = `rgba(255, 249, 196, ${alpha * 0.95})`; ctx.lineWidth = 1.8;
+                    ctx.beginPath(); ctx.arc(0, 0, Math.max(0, radius - 6), 0, Math.PI * 2); ctx.stroke();
+                    ctx.restore();
                 } else if (this.type === 'exp_blue') {
                     let r = this.radius > 0 ? this.radius * (this.timer/20) : this.timer * 10;
                     ctx.beginPath(); ctx.arc(this.x, this.y, r, 0, Math.PI*2); ctx.fillStyle = `rgba(41, 121, 255, ${1 - this.timer/30})`; ctx.fill();
@@ -22089,8 +22442,10 @@ class PulsarCloneBoss {
         class FloatingText {
             constructor(x, y, text) { this.x = x; this.y = y; this.text = text; this.life = 60; }
             draw() {
-                ctx.fillStyle = `rgba(255, 215, 0, ${this.life/60})`;
-                ctx.font = "bold 18px Courier New"; ctx.fillText(this.text, this.x, this.y);
+                const isCritical = this.text.startsWith('CRITICAL');
+                ctx.fillStyle = isCritical ? `rgba(220, 40, 40, ${this.life/60})` : `rgba(255, 215, 0, ${this.life/60})`;
+                ctx.font = "bold 18px Courier New";
+                ctx.fillText(isCritical ? `💥 ${this.text}` : this.text, this.x, this.y);
             }
             update() { this.y -= 1; this.life--; }
         }
@@ -22141,6 +22496,13 @@ class PulsarCloneBoss {
                 else if (this.type === 9) { ctx.shadowBlur = 8; ctx.shadowColor = "#FF1744"; ctx.fillStyle = "#FF1744"; ctx.fillRect(this.x, this.y, this.w, this.h); ctx.strokeStyle = "white"; ctx.lineWidth = 1.5; ctx.strokeRect(this.x, this.y, this.w, this.h); }
                 else if (this.type === 7 || this.type === 8) { ctx.translate(this.x + this.w/2, this.y + this.h/2); let chh = this.h / 2, chw = this.w / 2; ctx.shadowBlur = 12; ctx.shadowColor = "#E0F7FA"; ctx.fillStyle = "rgba(255, 255, 255, 0.92)"; ctx.beginPath(); ctx.moveTo(-chw, -chh); ctx.quadraticCurveTo(chw + 16, 0, -chw, chh); ctx.quadraticCurveTo(0, 0, -chw, -chh); ctx.closePath(); ctx.fill(); ctx.strokeStyle = this.type === 8 ? "#FFEB3B" : "#00E5FF"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-chw, -chh); ctx.quadraticCurveTo(chw + 16, 0, -chw, chh); ctx.stroke(); }
                 else { ctx.shadowBlur = 5; ctx.shadowColor = "#00E5FF"; ctx.fillStyle = "#00E5FF"; ctx.fillRect(this.x, this.y, this.w, this.h); ctx.strokeStyle = "white"; ctx.lineWidth = 1.5; ctx.strokeRect(this.x, this.y, this.w, this.h); }
+                if(this.pulsar||this._fromStar){
+                    const _tier=this._pulsarTier||1;
+                    if(_tier>=2){
+                      const cx=this.x+this.w/2,cy=this.y+this.h/2,rr=Math.max(this.w,this.h)*(_tier>=3?1.15:.82);
+                      ctx.save();ctx.translate(cx,cy);ctx.rotate(frames*.08);ctx.strokeStyle=_tier>=3?'rgba(225,250,255,.95)':'rgba(150,220,255,.82)';ctx.lineWidth=_tier>=3?2.4:1.5;ctx.shadowBlur=_tier>=3?14:7;ctx.shadowColor='#8DE7FF';ctx.beginPath();ctx.ellipse(0,0,rr,rr*.38,0,0,Math.PI*2);ctx.stroke();if(_tier>=3){ctx.rotate(Math.PI/2);ctx.beginPath();ctx.ellipse(0,0,rr*.9,rr*.30,0,0,Math.PI*2);ctx.stroke();}ctx.restore();
+                    }
+                }
                 ctx.restore();
             }
             update() { this.x += this.speed; this.y += this.vy; }
@@ -22164,7 +22526,15 @@ class PulsarCloneBoss {
                 else if (type === 12) { this.w = 10 * sScale; this.h = 10 * sScale; this.speed = 14 * dir; }
                 else if (type === 13) { this.w = 16 * sScale; this.h = 16 * sScale; this.speed = 12 * dir; }
                 else { this.speed = ((type > 0) ? 15 : 13) * dir; }
-                this.hitIds = new Set(); 
+                this.hitIds = new Set();
+                // PULSAR: damage scales continuously with travel distance.
+                // Reference playfield ≈23 cm wide: every 6 cm adds +1 damage.
+                // J: 1→3 at 18 cm. Star Shot: 1→2 at 12 cm.
+                if (this.pulsar || this._fromStar) {
+                    this._pulsarStartX = x; this._pulsarStartY = y;
+                    this._pulsarTravel = 0;
+                    this._pulsarMaxDist = this.pulsar ? canvas.width * (18/23) : canvas.width * (12/23);
+                }
                 // NGAM: chinh huong ban ve muc tieu gan nhat, GIOI HAN goc +-20 do (dan bay THANG, van co the hut)
                 if (this.owner === 1 && gameState !== 'pvp' && (autoAimEnabled || combatStance === 1 || hoverAiming())) {
                     let tgt = (combatStance === 1 || hoverAiming()) ? bossAimTarget(x, y) : aimTarget(x, y, dir);
@@ -22182,9 +22552,85 @@ class PulsarCloneBoss {
                     }
                 }
             }
-            draw() { 
+            draw() {
                 ctx.save();
-                if (this.type === 2) {
+
+                // PULSAR METEOR: all real Pulsar shots use one consistent comet-like projectile.
+                // Color continuously shifts yellow -> orange -> red as travel damage scales.
+                if (this.pulsar || this._fromStar) {
+                    const cx = this.x + this.w / 2, cy = this.y + this.h / 2;
+                    const spd = Math.hypot(this.speed || 0, this.vy || 0) || 1;
+                    const dx = (this.speed || 0) / spd, dy = (this.vy || 0) / spd;
+                    const t = Math.max(0, Math.min(1, this._pulsarRangeT || 0));
+                    const tier = this._pulsarTier || 1;
+
+                    // Warm progression: yellow at tier 1, orange in the middle, red at max.
+                    const hue = Math.max(0, 52 - 52 * t);
+                    const core = `hsl(${hue}, 100%, 62%)`;
+                    const hot = `hsl(${Math.min(58, hue + 10)}, 100%, 78%)`;
+                    const tail = `hsla(${hue}, 100%, 58%, 0.72)`;
+
+                    ctx.save();
+                    ctx.translate(cx, cy);
+                    ctx.rotate(Math.atan2(dy, dx));
+
+                    // Long comet tail: more intense at higher damage tier.
+                    const tailLen = (this.pulsar ? 5.5 : 4.2) * Math.max(this.w, this.h) * (1 + t * 0.8);
+                    const tailW = Math.max(2, Math.max(this.w, this.h) * (0.42 + t * 0.10));
+                    const grad = ctx.createLinearGradient(-tailLen, 0, 2, 0);
+                    grad.addColorStop(0, `hsla(${hue},100%,58%,0)`);
+                    grad.addColorStop(0.48, tail);
+                    grad.addColorStop(1, `hsla(${hue},100%,78%,0.95)`);
+                    ctx.shadowBlur = 18 + tier * 7;
+                    ctx.shadowColor = core;
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.moveTo(-tailLen, 0);
+                    ctx.quadraticCurveTo(-tailLen * 0.35, -tailW, 1, -tailW * 0.45);
+                    ctx.lineTo(1, tailW * 0.45);
+                    ctx.quadraticCurveTo(-tailLen * 0.35, tailW, -tailLen, 0);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Meteor head: irregular pointed body instead of a square bullet.
+                    const r = Math.max(4, Math.max(this.w, this.h) * (0.46 + t * 0.08));
+                    ctx.shadowBlur = 20 + tier * 8;
+                    ctx.shadowColor = core;
+                    ctx.fillStyle = core;
+                    ctx.beginPath();
+                    ctx.moveTo(r * 1.15, 0);
+                    ctx.lineTo(r * 0.35, -r * 0.72);
+                    ctx.lineTo(-r * 0.78, -r * 0.35);
+                    ctx.lineTo(-r * 0.98, r * 0.20);
+                    ctx.lineTo(-r * 0.30, r * 0.76);
+                    ctx.lineTo(r * 0.72, r * 0.46);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // White-hot core.
+                    ctx.fillStyle = hot;
+                    ctx.beginPath();
+                    ctx.arc(r * 0.24, -r * 0.04, r * 0.38, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = "#FFFDE7";
+                    ctx.beginPath();
+                    ctx.arc(r * 0.34, -r * 0.07, r * 0.18, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Higher tiers get visible sparks, making the damage state readable.
+                    const sparks = this.pulsar ? (tier === 1 ? 2 : tier === 2 ? 4 : 7) : (tier === 1 ? 2 : 5);
+                    for (let k = 0; k < sparks; k++) {
+                        const a = (frames * 0.16) + k * 2.399;
+                        const dist = r * (1.3 + ((k * 0.47) % 1.8));
+                        const sx = -dist * 0.55 + Math.cos(a) * r * 0.25;
+                        const sy = Math.sin(a) * r * 0.48;
+                        ctx.fillStyle = `hsla(${hue},100%,76%,${0.45 + 0.45 * t})`;
+                        ctx.beginPath();
+                        ctx.arc(sx, sy, Math.max(1, r * (0.055 + t * 0.025)), 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                } else if (this.type === 2) {
                     // NAC CHARGE 2: cau nang luong CUC TO, loi trang, 2 vong xoay nguoc chieu, co duoi keo
                     let cx0 = this.x + this.w/2, cy0 = this.y + this.h/2, R = Math.max(this.w, this.h) * 0.72;
                     let dirp = (this.speed || 1) >= 0 ? 1 : -1;
@@ -22277,6 +22723,23 @@ class PulsarCloneBoss {
                 ctx.restore();
             }
             update() {
+                if (this.pulsar || this._fromStar) {
+                    this._pulsarTravel = (this._pulsarTravel || 0) + Math.hypot(this.speed || 0, this.vy || 0);
+                    const _sixCm = Math.max(1, canvas.width * (6/23));
+                    const _maxTier = this.pulsar ? 3 : 2;
+                    const _tier = Math.min(_maxTier, 1 + Math.floor(this._pulsarTravel / _sixCm));
+                    this._pulsarTier = Math.max(1, _tier);
+                    this._pulsarRangeT = Math.max(0, Math.min(1, this._pulsarTravel / (_sixCm * (_maxTier - 1 || 1))));
+                    if ((this._pulsarLastVisualTier || 1) < _tier) {
+                      this._pulsarLastVisualTier = _tier;
+                      if (window.pulsarRangeTierVisual) {
+                        const r = canvas.getBoundingClientRect();
+                        const sx = r.left + ((this.x + this.w/2) / canvas.width) * r.width;
+                        const sy = r.top + ((this.y + this.h/2) / canvas.height) * r.height;
+                        window.pulsarRangeTierVisual(sx, sy, _tier);
+                      }
+                    }
+                }
                 if (this.type === 12) { this.zigT = (this.zigT || 0) + 1.4; this.zigBaseY = (this.zigBaseY !== undefined ? this.zigBaseY : this.y) + (this.zigVy || 0); this.x += this.speed; this.y = this.zigBaseY + Math.sin(this.zigT + (this.zigPhase || 0)) * 9; return; }
                 this.x += this.speed; this.y += this.vy;
                 if (this.bounce) {
@@ -22659,10 +23122,92 @@ class PulsarCloneBoss {
 // ===== PLAYER (co che chien dau: dan, stance, jump, dash, charge, channel, ultimate) =====
 // Nap TRUOC script chinh.
 
+        function installFirstStrikeHook(b) {
+            if (!b || b._firstStrikeHooked || !Object.prototype.hasOwnProperty.call(b, 'hp')) return;
+            b._firstStrikeHooked = true;
+            if (typeof b.maxHp !== 'number' || b.maxHp <= 0) b.maxHp = b.hp;
+            let _hp = b.hp;
+            Object.defineProperty(b, 'hp', {
+                configurable: true, enumerable: true,
+                get(){ return _hp; },
+                set(v){
+                    let old = _hp;
+                    if (v < old && !b._firstStrikeUsed && hasRune('firststrike') && !b.invulnAll) {
+                        let bonus = Math.ceil((b.maxHp || old) * 0.20);
+                        _hp = Math.max(0, v - bonus);
+                        b._firstStrikeUsed = true;
+                        if (typeof floatingTexts !== 'undefined') floatingTexts.push(new FloatingText(b.x + b.w/2 - 25, b.y - 22, 'FIRST STRIKE!'));
+                    } else { _hp = v; }
+                }
+            });
+        }
+        function installFirstStrikeHooks() {
+            if (typeof bosses !== 'undefined') bosses.forEach(installFirstStrikeHook);
+        }
+        function damageBossWithFirstStrike(b, amount) {
+            if (!b || b.invulnAll) return false;
+            installFirstStrikeHook(b);
+            let dealt = amount;
+            b.hp -= dealt;
+            return true;
+        }
+
+        // PULSAR: damage tang lien tuc theo quang duong bay.
+        // J: 1 -> 3 dmg, toi da khi bay ~90% chieu rong man.
+        // Star Shot: 1 -> 2 dmg, toi da khi bay ~52% chieu rong man (tu giua ra goc).
+        function pulsarScaledDamage(proj) {
+            if (!proj || (!proj.pulsar && !proj._fromStar)) return proj ? (proj.dmg || 1) : 1;
+            // ~23 cm visible playfield; +1 damage every 6 cm, continuous in between.
+            const sixCm = Math.max(1, canvas.width * (6/23));
+            const maxDmg = proj.pulsar ? 3 : 2;
+            const t = Math.max(0, Math.min(maxDmg - 1, (proj._pulsarTravel || 0) / sixCm));
+            return 1 + t;
+        }
+        // Critical Strike chi ap dung cho DAMAGE TU DAN. Khong ap dung cho melee, parry, block,
+        // Body Slam, projectile clash hay cac hieu ung noi tai/phan ung khac.
+        function damageBossFromAmmo(b, amount) {
+            if (!b || b.invulnAll) return false;
+            installFirstStrikeHook(b);
+            let dealt = amount;
+            // Nova + Critical Strike share ONE 25% Crit roll on the original hit.
+            // If it Crits, the original projectile AND the Nova splash use the same Crit state.
+            const sharedCrit = (hasRune('critstrike') || hasRune('explshot')) && Math.random() < 0.25;
+            b._novaSharedCrit = !!sharedCrit;
+            if (sharedCrit) {
+                dealt *= 2;
+                if (typeof floatingTexts !== 'undefined') floatingTexts.push(new FloatingText(b.x + b.w/2 - 42, b.y - 28, 'CRITICAL!'));
+                visualEffects.push(new Effect(b.x + b.w/2, b.y + b.h/2, 'parry', false));
+            }
+            b.hp -= dealt;
+            return true;
+        }
+        // Prism: Critical Strike chi ap dung len 3 vien/projectile goc, KHONG ap dung len Khuc Xa.
+        function damagePrismBossWithRunes(b, proj, multiplier = 1) {
+            if (!b || b.invulnAll || !proj) return false;
+            installFirstStrikeHook(b);
+            let base = (proj.dmg || 0) * multiplier;
+            let totalPrism = prismDmg(proj, b) * multiplier;
+            let passiveBonus = Math.max(0, totalPrism - base);
+            let baseDealt = base;
+            // Critical Strike va NOVA dung CHUNG MOT lan roll Crit 25% cho cung damage vien dan goc.
+            // Neu Crit: ca 3 vien goc va Nova cua cung hit deu Crit; neu khong: ca hai deu khong Crit.
+            // Chi damage 3 vien goc bi nhan; Prism passive/Khuc Xa khong bi Crit.
+            const sharedCrit = (hasRune('explshot') || hasRune('critstrike')) && Math.random() < 0.25;
+            let critMultiplier = sharedCrit ? 2 : 1;
+            b._novaSharedCrit = !!sharedCrit;
+            if (critMultiplier > 1) {
+                baseDealt *= critMultiplier;
+                if (typeof floatingTexts !== 'undefined') floatingTexts.push(new FloatingText(b.x + b.w/2 - 52, b.y - 28, critMultiplier === 4 ? 'CRITICAL x4!' : 'CRITICAL x2!'));
+                visualEffects.push(new Effect(b.x + b.w/2, b.y + b.h/2, 'parry', false));
+            }
+            b.hp -= baseDealt + passiveBonus;
+            return true;
+        }
+
         class Player {
             constructor(id, x, form, ammoType, isFacingLeft = false) {
                 this.id = id; this.x = x; this.baseY = 276; this.y = 276; this.w = 40; this.h = 44; 
-                this.dy = 0; this.gravity = 0.65; this.jumpPower = -12.5; this.hoverTimer = 0; this.hoverArmed = false; this.hoverShot = 0; this._hoverKPrev = false; 
+                this.dy = 0; this.gravity = 0.65; this.jumpPower = -12.5; this.jumpCount = 0; this.bodySlamArmed = false; this.bodySlamActive = false; this.bodySlamJumpCount = 0; this.hoverTimer = 0; this.hoverArmed = false; this.hoverShot = 0; this._hoverKPrev = false; 
                 this.maxHp = 5 + (typeof hasRune==="function" && hasRune("hp") ? 4 : 0); this.hp = this.maxHp; this.bulletDmg = 1;
                 this.runeShield = 0; this.usedRevive = false; this.maxGrewOnce = false; this.channelGuardUsed = false;
                 this.shieldEnergy = 100; this.parryWindow = 0; this.petShieldTimer = 0;
@@ -23111,7 +23656,7 @@ class PulsarCloneBoss {
                             } else {
                                 obstacles.forEach(o => { if(checkAABB(laserRect, o)) { o.hp -= laserDmgToDeal; o.burnTimer = 180; } });
                                 enemies.forEach(e => { if(checkAABB(laserRect, e)) { e.hp -= laserDmgToDeal; e.burnTimer = 180; } });
-                                bosses.forEach(b => { if(checkAABB(laserRect, b) && !b.invulnAll) { b.hp -= laserDmgToDeal; b.burnTimer = 180; } });
+                                bosses.forEach(b => { if(checkAABB(laserRect, b) && !b.invulnAll) { damageBossFromAmmo(b, laserDmgToDeal); b.burnTimer = 180; } });
                             }
                         }
                     } else { 
@@ -23151,7 +23696,7 @@ class PulsarCloneBoss {
                             } else {
                                 obstacles.forEach(o => { if(checkAABB(laserRect, o)) { o.hp -= laserDmgToDeal * 2; } });
                                 enemies.forEach(e => { if(checkAABB(laserRect, e)) { e.hp -= laserDmgToDeal; } });
-                                bosses.forEach(b => { if(checkAABB(laserRect, b) && !b.invulnAll) { b.hp -= laserDmgToDeal; } });
+                                bosses.forEach(b => { if(checkAABB(laserRect, b) && !b.invulnAll) { damageBossFromAmmo(b, laserDmgToDeal); } });
                             }
                         }
                     }
@@ -23582,6 +24127,35 @@ class PulsarCloneBoss {
                 }
                 ctx.restore(); ctx.globalAlpha = 1;
             }
+            triggerBodySlamImpact() {
+                if (!this.bodySlamActive) return;
+
+                // Game hien tai dung pixel lam don vi toa do; 40px la ban kinh 2cm cua rune.
+                const tripleSlam = this.bodySlamJumpCount >= 3;
+                const slamRadius = tripleSlam ? 80 : 40;
+                const slamDamage = tripleSlam ? 6 : 3;
+                const impactX = this.x + this.w / 2;
+                const impactY = this.y + this.h;
+                const withinImpactRadius = (target) => {
+                    const nearestX = Math.max(target.x, Math.min(impactX, target.x + target.w));
+                    const nearestY = Math.max(target.y, Math.min(impactY, target.y + target.h));
+                    return Math.hypot(nearestX - impactX, nearestY - impactY) <= slamRadius;
+                };
+
+                enemies.forEach(enemy => { if (withinImpactRadius(enemy)) enemy.hp -= slamDamage; });
+                bosses.forEach(boss => {
+                    if (!boss.invulnAll && withinImpactRadius(boss)) damageBossWithFirstStrike(boss, slamDamage);
+                });
+                visualEffects.push(new Effect(impactX, impactY, 'body_slam_shockwave', true, slamRadius));
+                floatingTexts.push(new FloatingText(impactX - (tripleSlam ? 34 : 18), impactY - 20, tripleSlam ? 'MEGA SLAM! -6' : 'BODY SLAM! -3'));
+                this.invincible = true;
+                this.invTimer = Math.max(this.invTimer, 15); // 0.25s at 60 FPS
+                this.bodySlamActive = false;
+                this.bodySlamArmed = false;
+                this.bodySlamJumpCount = 0;
+                shakeTimer = Math.max(shakeTimer, 8);
+            }
+
             update() {
                 this.tickClawJCircles();
                 this.tickClawSwords();
@@ -23590,7 +24164,7 @@ class PulsarCloneBoss {
                 this.tickPulsar();
                 if (this.jcState) { this.updateJC(); return; }
                 let sScale = this.getFormScale();
-                let crouchKey = keys['KeyS'];
+                let crouchKey = keys['KeyS'] || keys['ArrowDown'];
                 let fireKey = keys['KeyJ'];
                 let chargeKey = keys['KeyK'];
                 let shootKey = fireKey || chargeKey;
@@ -23602,6 +24176,7 @@ class PulsarCloneBoss {
                         let mv = 0;
                         if (this.webTimer <= 0) { if (keys['KeyA'] || keys['ArrowLeft']) mv -= 6; if (keys['KeyD'] || keys['ArrowRight']) mv += 6; }
                         if (mapTheme === 'ocean' && (this.y + this.h) > OCEAN_SURF + 4) mv *= 0.62;   // duoi nuoc di cham hon
+                        if (hasRune('hyperspeed')) mv *= 1.5;
                         let hmove = mv + dashVx;
                         this.x += hmove;
                         dashVx *= 0.82; if (Math.abs(dashVx) < 0.5) dashVx = 0;
@@ -23692,11 +24267,22 @@ class PulsarCloneBoss {
                 if (this.isCrouching !== _wasCrouch && this.grounded) this.y += (this.isCrouching ? 20 : -20) * sScale;
                 if (doDrop) { this.dropTimer = 16; this.dropFromTop = this.y + this.h; this.grounded = false; if (this.dy < 1) this.dy = 1; }
 
+                // Body Slam chi bat khi dang tren khong sau it nhat lan nhay thu hai.
+                // Dat toc do roi truc tiep de khong bi gioi han boi gravity/crouch thuong.
+                if (hasRune('bodyslam') && crouchKey && !this.grounded && this.jumpCount >= 2 && !this.bodySlamActive) {
+                    this.bodySlamActive = true;
+                    this.bodySlamArmed = true;
+                    this.bodySlamJumpCount = this.jumpCount;
+                    this.hoverTimer = 0;
+                    this.hoverArmed = false;
+                    this.dy = Math.max(this.dy, 22);
+                }
+
                 if (this.pulsarChannel) {
                     if (crouchKey && !this.grounded) { this.dy += 2.2; }
-                    else { this.dy += this.gravity; if (!this.grounded && this.dy > 2.2) this.dy = 2.2; }
+                    else { this.dy += this.gravity * (hasRune('hyperspeed') ? 1.5 : 1); if (!this.grounded && this.dy > 2.2 * (hasRune('hyperspeed') ? 1.5 : 1)) this.dy = 2.2 * (hasRune('hyperspeed') ? 1.5 : 1); }
                     this.y += this.dy;
-                    if (this.y >= 320 - this.h) { this.y = 320 - this.h; this.dy = 0; this.grounded = true; this.canDoubleJump = false; }
+                    if (this.y >= 320 - this.h) { this.y = 320 - this.h; this.dy = 0; this.grounded = true; this.canDoubleJump = false; this.triggerBodySlamImpact(); this.jumpCount = 0; this.bodySlamArmed = false; }
                 } else {
                 if (this.grounded){ this.hoverArmed = false; this.hoverTimer = 0; }
                 if (hasRune('hover') && this.hoverArmed && this.hoverTimer <= 0 && this.dy >= 0){
@@ -23716,7 +24302,7 @@ class PulsarCloneBoss {
                     this._hoverKPrev = chargeKey;
                 }
                 else if (mapTheme === 'ocean' && (this.y + this.h) > OCEAN_SURF + 4){ this.dy += 0.20; if (crouchKey) this.dy += 0.60; if (this.dy > 3.4) this.dy = 3.4; }   // DUOI NUOC: chim cham, nang
-                else { this.dy += this.gravity; if (crouchKey && !this.grounded) this.dy += 1.0; }
+                else { this.dy += this.gravity * (hasRune('hyperspeed') ? 1.5 : 1); if (crouchKey && !this.grounded) this.dy += 1.0 * (hasRune('hyperspeed') ? 1.5 : 1); }
                 if ((mapTheme === 'forest' || mapTheme === 'volcano' || mapTheme === 'aegis' || mapTheme === 'slashcave' || mapTheme === 'tetris' || mapTheme === 'shrine' || mapTheme === 'trio' || mapTheme === 'ocean' || mapTheme === 'unity') && (gameState === 'normal' || gameState === 'test_boss' || gameState === 'boss_rush')) {
                     if (this.dropTimer > 0) this.dropTimer--;
                     this.y += this.dy;
@@ -23731,9 +24317,10 @@ class PulsarCloneBoss {
                     }
                     if (landTop !== Infinity) {
                         if (landPf && landPf.isLeaf && !this.grounded && this.dy > 3) landPf.leafTimer += Math.min(28, this.dy * 2.2);
-                        this.y = landTop - this.h; this.dy = 0; this.grounded = true; this.canDoubleJump = false;
+                        this.y = landTop - this.h; this.dy = 0; this.grounded = true; this.canDoubleJump = false; this.triggerBodySlamImpact(); this.jumpCount = 0; this.bodySlamArmed = false;
                     }
                     else { this.grounded = false; if (feet > 344 && mapTheme !== 'tetris' && mapTheme !== 'ocean') {
+                        // FALL HAZARDS: vuc nui va dung nham deu gay 2 dmg; cac ho roi khac van theo damage mac dinh.
                         // KHIEN KHI CHANNEL C2: roi ho thi MAT trang thai channel nhung KHONG mat mau
                         let _inChan = (this.clawChannel || this.rapidChannel || this.normalLaserChannel || this.fireChannel || this.lightChannel || this.splitChannel || this.pulsarChannel || this.boomChannel);
                         if (hasRune('chanshldx') && _inChan && this.chanInvul > 0) {   // CHI trong cua so 2 giay dau
@@ -23745,7 +24332,7 @@ class PulsarCloneBoss {
                             this.chanInvul = 0;
                             floatingTexts.push(new FloatingText(this.x, this.y - 16, "THOÁT CHANNEL"));
                         }
-                        else { if (!this.invincible) this.takeDamage(3); floatingTexts.push(new FloatingText(this.x, this.y - 16, "-3!")); if (SFX.hit) SFX.hit(); }
+                        else { let fallDmg = (mapTheme === 'aegis' || mapTheme === 'volcano') ? 2 : 3; if (!this.invincible) this.takeDamage(fallDmg); floatingTexts.push(new FloatingText(this.x, this.y - 16, "-" + fallDmg + "!")); if (SFX.hit) SFX.hit(); }
                         this.dy = -16; this.canDoubleJump = true; this.y = 344 - this.h;   // nay MANH hon cu nhay thuong (-12.5) de thoat han khoi ho
                         visualEffects.push(new Effect(this.x + this.w/2, 340, 'explosion', true, 14));
                     } }
@@ -23766,7 +24353,7 @@ class PulsarCloneBoss {
                         for (let cc=lc; cc<=rc; cc++){ if (cc<0||cc>=tetris.cols) continue; if (headRow>=0 && headRow<tetris.rows && tetris.grid[headRow][cc]){ this.y = tetris.worldTop + (headRow+1)*tetris.cell; this.dy = 0; break; } } }
                 } else {
                     this.y += this.dy;
-                    if (this.y >= 320 - this.h) { this.y = 320 - this.h; this.dy = 0; this.grounded = true; this.canDoubleJump = false; }
+                    if (this.y >= 320 - this.h) { this.y = 320 - this.h; this.dy = 0; this.grounded = true; this.canDoubleJump = false; this.triggerBodySlamImpact(); this.jumpCount = 0; this.bodySlamArmed = false; }
                 }
                 }
                 
@@ -24051,11 +24638,11 @@ class PulsarCloneBoss {
                             bosses.forEach(b => { 
                                 if(checkAABB(rect, b)) { 
                                     if (b.invulnAll) { visualEffects.push(new Effect(b.x + b.w/2, b.y, 'parry', false)); }
-                                    else if (b.name === "AEGIS REX") { if (b.shieldBrokenTimer > 0) { b.hp -= 1; hitAny=true; } else { b.hitShield(3, b.x + b.w/2, b.y + b.h/2); } }
+                                    else if (b.name === "AEGIS REX") { if (b.shieldBrokenTimer > 0) { damageBossWithFirstStrike(b, 1); hitAny=true; } else { b.hitShield(3, b.x + b.w/2, b.y + b.h/2); } }
                                     else if (b.name === "HELIOS REX" && (b.shieldTimer > 0 || b.spamShieldTimer > 0 || b.state.includes('clone_dash') || b.state === 'clone_bounce_back' || b.state === 'clone_wait')) {
                                         visualEffects.push(new Effect(b.x - 10, b.y + 20, 'parry', false));
                                     } else {
-                                        b.hp -= 1; hitAny=true; 
+                                        damageBossWithFirstStrike(b, 1); hitAny=true; 
                                     }
                                 } 
                             });
@@ -24087,10 +24674,10 @@ class PulsarCloneBoss {
                         if (checkAABB(rect, b)) {
                             this._meleeHits.add(b);
                             if (b.invulnAll) { visualEffects.push(new Effect(b.x + b.w/2, b.y, 'parry', false)); }
-                            else if (b.name === "AEGIS REX") { if (b.shieldBrokenTimer > 0) { b.hp -= dmg; hitAny = true; } else { b.hitShield(3, b.x + b.w/2, b.y + b.h/2); } }
+                            else if (b.name === "AEGIS REX") { if (b.shieldBrokenTimer > 0) { damageBossWithFirstStrike(b, dmg); hitAny = true; } else { b.hitShield(3, b.x + b.w/2, b.y + b.h/2); } }
                             else if (b.name === "HELIOS REX" && (b.shieldTimer > 0 || b.spamShieldTimer > 0 || b.state.includes('clone_dash') || b.state === 'clone_bounce_back' || b.state === 'clone_wait') && b.shieldHp > 0) {
                                 visualEffects.push(new Effect(b.x - 10, b.y + 20, 'parry', false)); b.shieldHp--;
-                            } else { b.hp -= dmg; hitAny = true; }
+                            } else { damageBossWithFirstStrike(b, dmg); hitAny = true; }
                         }
                     });
                 }
@@ -24506,7 +25093,7 @@ class PulsarCloneBoss {
                 if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(620, 0.15, 'triangle', 0.2, 900);
             }
             _pulsarEmitRound(st) {
-                for (let i = 0; i < 5; i++) { let a = st.angle + i * (Math.PI*2/5), sp = 8; let p = new Projectile(st.x, st.y, 1, 6, 0, 0, 1, this.id); p.speed = Math.cos(a)*sp; p.vy = Math.sin(a)*sp; p._fromStar = true; projectiles.push(p); }
+                for (let i = 0; i < 5; i++) { let a = st.angle + i * (Math.PI*2/5), sp = 8; let p = new Projectile(st.x, st.y, 1, 6, 0, 0, 1, this.id); p.speed = Math.cos(a)*sp; p.vy = Math.sin(a)*sp; p._fromStar = true; p._pulsarTravel=0; p._pulsarMaxDist=canvas.width*0.52; p._pulsarTier=1; projectiles.push(p); }
                 if (typeof SFX !== 'undefined' && SFX.shoot && frames % 4 === 0) SFX.shoot(3);
             }
             tickPulsar() {
@@ -24689,7 +25276,7 @@ class PulsarCloneBoss {
                 if (gameState !== 'pvp') {
                     obstacles.forEach(o => { if (checkAABB(ar, o)) o.hp -= 3; });
                     enemies.forEach(e => { if (checkAABB(ar, e)) { e.hp -= 3; e.burnTimer = 90; } });
-                    bosses.forEach(b => { if (!b.invulnAll && checkAABB(ar, b)) { b.hp -= 3; b.burnTimer = 90; } });
+                    bosses.forEach(b => { if (!b.invulnAll && checkAABB(ar, b)) { damageBossWithFirstStrike(b, 3); b.burnTimer = 90; } });
                 } else { let t2 = this.id === 1 ? dino2 : dino;
                     if (checkAABB(ar, t2)) { if (!t2.isShielding()) t2.takeDamage(1); else visualEffects.push(new Effect(t2.x, t2.y, 'parry')); } }
                 visualEffects.push(new Effect(cxp, cyp, 'explosion', true, 40));
@@ -24838,8 +25425,8 @@ class PulsarCloneBoss {
             let mcards = [
                 { x: 44,  fill: "#FFB74D", tc: "#5D4037", name: "SA MAC", d1: "Xuong rong", d2: "" },
                 { x: 228, fill: "#66BB6A", tc: "#1B5E20", name: "RUNG",  d1: "Platform + HO", d2: "(roi: -3)" },
-                { x: 412, fill: "#FF7043", tc: "#4E1500", name: "DUNG NHAM", d1: "Nham + phun", d2: "(-3 mau)" },
-                { x: 596, fill: "#7E8CB0", tc: "#12203E", name: "DINH NUI", d1: "Cot cao + vuc", d2: "(roi vuc: -3)" },
+                { x: 412, fill: "#FF7043", tc: "#4E1500", name: "DUNG NHAM", d1: "Nham + phun", d2: "(roi: -2)" },
+                { x: 596, fill: "#7E8CB0", tc: "#12203E", name: "DINH NUI", d1: "Cot cao + vuc", d2: "(roi vuc: -2)" },
                 { x: 780, fill: "#9575CD", tc: "#311B92", name: "SONG SINH", d1: "4 Clone", d2: "(doi dia hinh)" }
             ];
             for (let cd of mcards) {
@@ -26297,7 +26884,7 @@ class PulsarCloneBoss {
                     null, null, null, null,
                     ["VERGIL", 51, "#7E57C2", "#4527A0", "#EDE7F6", "#B388FF"],
                     ["DANTE",  52, "#8D3B26", "#3E1008", "#FFE0B2", "#FF7043"],
-                    null, null,
+                    ["NERO",   60, "#276B8C", "#102531", "#E0F7FA", "#80DEEA"], null,
                     ["DANTE ⚔ VERGIL", 57, "#5D3F8C", "#1A1030", "#FFE082", "#B388FF"], null ] },
                 { title: "— DARK SOULS —", tc: "#B0BEC5", items: [
                     null, null, null, null,
@@ -26672,7 +27259,12 @@ class PulsarCloneBoss {
             { id:'chanshldx',name:'KHIÊN KHI CHANNEL • C2', nameEn:'CHANNEL GUARD • C2', icon:'⧖', cost:2, desc:'Tốn 2 ô. Như C1, thêm: vừa vào channel là được 2 giây MIỄN SÁT THƯƠNG hoàn toàn — không đòn nào ngắt được channel trong lúc đó', descEn:'Costs 2 slots. Like C1, plus: entering a channel grants 2 seconds of full damage immunity — nothing can break the channel during it' },
             { id:'bulletclash', name:'VA CHẠM ĐẠN', nameEn:'PROJECTILE CLASH', icon:'✸', desc:'Bắn vỡ được MỌI loại đạn địch. Đạn nhỏ 1 máu, đạn to vừa (kể cả đạn đổi hướng) 3 máu, đạn cực to 5 máu — bắn đủ số phát là vỡ; sát thương thừa của viên đạn vẫn bay tiếp. Đạn xuyên quét sạch cả đường bay, chỉ bị đạn xuyên của địch chặn', descEn:'Breaks EVERY enemy projectile. Small bullets 1 HP, medium (incl. redirecting orbs) 3 HP, huge 5 HP — chip them down; leftover damage keeps flying. Pierce clears the whole lane, stopped only by an enemy pierce shot' },
             { id:'hover',       name:'LƠ LỬNG', nameEn:'HOVER', icon:'☁', desc:'Nhảy tới đỉnh cao thì đứng yên trên không 2 giây (vẫn di chuyển/bắn/nhảy tiếp; bấm xuống để hạ nhanh). Trong lúc lơ lửng được TỰ NGẮM rộng như Trickster, và bấm K (nút Charge) để đòn charge BUNG RA NGAY thay vì phải giữ — mỗi lần lơ lửng 1 phát. Bắn thường (J) vẫn dùng như bình thường', descEn:'At a jump apex, hover in mid-air for 2s (still move/shoot/double-jump; press down to drop fast). While hovering you gain Trickster-wide AUTO-AIM, and tapping K (the Charge key) releases a Charge attack INSTANTLY instead of holding — once per hover. Normal fire (J) is unchanged' },
-            { id:'explshot',    name:'AWAKENED: NOVA', nameEn:'AWAKENED: NOVA', icon:'💥', cost:2, ammoRune:true, desc:'Tốn 2 ô. NÂNG CẤP ĐẠN — dùng được với MỌI loại đạn. Đòn đánh của bạn nổ lan 1 dmg sang những mục tiêu đứng cạnh (con trúng trực tiếp không ăn thêm), nên dọn bầy nhanh hơn hẳn. Mỗi loại đạn còn được một phần thưởng riêng: đạn xuyên nổ ở từng lần va chạm, lửa nổ to gấp đôi, sét nổ theo số lần giật, kiếm và lưỡi quay đều mạnh thêm', descEn:'Costs 2 slots. AMMO UPGRADE — works with EVERY ammo type. Your attacks splash 1 dmg onto nearby targets (the one hit directly takes no extra), so packs melt much faster. Each ammo also gets its own bonus: piercing shots detonate on every hit, fire blasts double in size, bolts nova per chain, swords and blades all hit harder' },
+            { id:'triplejump', name:'NHẢY BA', nameEn:'TRIPLE JUMP', icon:'⤴', desc:'Tốn 1 ô. Cho phép nhảy lần thứ ba khi đang ở trên không.', descEn:'Costs 1 slot. Allows a third jump while airborne.' },
+            { id:'bodyslam', name:'BODY SLAM', nameEn:'BODY SLAM', icon:'💥', desc:'Tốn 1 ô. Khi đang ở trên không và cúi để đáp xuống nhanh: cú đáp từ lần nhảy thứ 2 gây 3 sát thương trong bán kính 2cm; nếu đang ở lần nhảy thứ 3 trở lên gây 6 sát thương trong bán kính 4cm. Nhận 0.25 giây bất tử sau khi đáp.', descEn:'Costs 1 slot. While airborne, crouch to drop fast: a landing from the second jump deals 3 damage within a 2cm radius; a landing from the third jump or later deals 6 damage within a 4cm radius. Grants 0.25s invulnerability after landing.' },
+            { id:'firststrike', name:'ĐÒN ĐẦU TIÊN', nameEn:'FIRST STRIKE', icon:'⚔', desc:'Tốn 1 ô. Đòn đầu tiên đánh trúng mỗi Boss gây thêm sát thương bằng 20% máu tối đa của Boss đó.', descEn:'Costs 1 slot. The first attack to hit each Boss deals bonus damage equal to 20% of that Boss’s maximum HP.' },
+            { id:'critstrike', name:'💥 CRITICAL STRIKE', nameEn:'💥 CRITICAL STRIKE', icon:'💥', desc:'Tốn 1 ô. Mỗi đòn đánh có 25% tỉ lệ chí mạng, gây gấp đôi sát thương.', descEn:'Costs 1 slot. Every attack has a 25% critical chance to deal double damage.' },
+            { id:'hyperspeed', name:'SIÊU TỐC', nameEn:'HYPER SPEED', icon:'⚡', desc:'Tốn 1 ô. Tốc độ di chuyển tăng 1.5 lần. Nhảy cao hơn 1.5 lần; tổng thời gian nhảy không đổi.', descEn:'Costs 1 slot. Movement speed is 1.5x. Jump height is 1.5x higher while total jump time remains unchanged.' },
+            { id:'explshot',    name:'AWAKENED: NOVA', nameEn:'AWAKENED: NOVA', icon:'💥', cost:2, ammoRune:true, desc:'Tốn 2 ô. NÂNG CẤP ĐẠN — dùng được với MỌI loại đạn. Đòn đánh vẫn gây sát thương trực tiếp như bình thường. Đòn gốc và Nova dùng chung một lần roll 25% CRIT: nếu Crit thì cả viên đạn gốc và vụ nổ Nova cùng gây gấp đôi sát thương; Nova Crit còn tăng bán kính 18%. Nova nổ lan 1 dmg lên các mục tiêu đứng cạnh, mục tiêu trúng trực tiếp không ăn thêm.', descEn:'Costs 2 slots. AMMO UPGRADE — works with EVERY ammo type. Attacks still deal their normal direct damage. The original hit and Nova share one 25% CRIT roll: if it Crits, both the original projectile/hit and the Nova splash deal double damage; Nova Crit also increases the blast radius by 18%. Nova splashes 1 damage to nearby targets, and the direct target takes no extra splash damage.' },
             { id:'headbutt',    name:'HÚC ĐẦU', nameEn:'HEADBUTT', icon:'🐏', desc:'Lướt tạo lớp khiên bán nguyệt trước mặt suốt cú lướt, PARRY như khiên (mạnh hơn 50%, đẩy boss lại). Ở phái Royal Guard khiên lướt này tồn tại lâu gấp đôi', descEn:'Dashing makes a half-moon shield in front for the whole dash that PARRIES like your shield (50% stronger, knocks bosses back). In Royal Guard this dash-shield lasts twice as long' },
             { id:'pet',      name:'ĐỆ CHIM • C1',      nameEn:'BIRD PET • C1',        icon:'🦖', desc:'Đệ chim bay theo, mỗi 2 giây bắn 3 tia Split DẪN ĐƯỜNG — lượn ~1s rồi lao vào địch, ưu tiên địch mới (1 dmg/tia)', descEn:'Bird pet follows you; every 2s fires 3 homing Split rays — loiter ~1s then dive, prioritizing new enemies (1 dmg/ray)' },
             { id:'petx',     name:'ĐỆ CHIM • C2',      nameEn:'BIRD PET • C2',        icon:'✦', cost:2, desc:'Tốn 2 ô. Cùng loạt Split DẪN ĐƯỜNG như C1 nhưng bắn mỗi 1 giây (gấp đôi nhịp)', descEn:'Costs 2 slots. Same homing Split volley as C1 but every 1s (double rate)' },
@@ -26688,6 +27280,7 @@ class PulsarCloneBoss {
             { id:'pet6x',    name:'ĐỆ SAO XOAY • C2',  nameEn:'ORBIT STAR PET • C2',  icon:'✺', cost:2, desc:'Tốn 2 ô. Như C1 nhưng giữ được tới 7 VÒNG SAO lan toả cùng lúc — phủ kín từ sát người ra tới rất xa', descEn:'Costs 2 slots. Like C1 but holds up to 7 expanding star rings at once — covers from point-blank all the way out' },
         ];
         let runeSlots = [null, null];
+        let firstStrikeUsed = false;
         (function(){ try { let sv = JSON.parse(localStorage.getItem('dino_runes') || '[]'); runeSlots = [sv[0]||null, sv[1]||null]; } catch(e){} })();
         let runePicker = null;   // null = dong, 0/1 = dang chon cho o nao
         let runeLevelPick = null; // null = dong; = chi so PET_FAMILIES dang mo bang chon Cap
@@ -26757,7 +27350,7 @@ class PulsarCloneBoss {
         // THUC TINH — rune manh, an tron 2 o
         const RUNE_CAT_OF = {
             hp:'surv', maxgrow:'surv', fullheal:'surv', redbird:'surv', shield:'surv',
-            bulletclash:'fight', hover:'fight', headbutt:'fight', afterimg:'auto'
+            bulletclash:'fight', hover:'fight', triplejump:'fight', bodyslam:'fight', firststrike:'fight', hyperspeed:'fight', headbutt:'fight', afterimg:'auto'
         };
         // phan nhom cho cac "ho" 2 cap (đệ / hoi sinh / tan anh / ...)
         const FAM_CAT_OF = {
@@ -27499,7 +28092,7 @@ class PulsarCloneBoss {
             duelMode = false; duelOver = 0; duelWinner = null;
             obstacles.length = 0; enemies.length = 0; hearts.length = 0; projectiles.length = 0; bossProjectiles.length = 0; bosses.length = 0; boomerangs.length = 0; smBlades.length = 0; smClone = null; floatingTexts.length = 0; visualEffects.length = 0; platforms.length = 0; lavaGeysers.length = 0; forestBossQueue.length = 0; forestQueueInit = false; cloneGauntlet = false; gauntletGate = null; summitLastBand = 2; summitForkCd = 0; summitApproach = null; volcanoApproach = null; noDmgStreak = 0; pvpDeathTimer = -1; shieldCharge = 0;
             fireBrands = [];
-            activeLightnings.length = 0; spawnTimerCactus = 60; spawnTimerEnemy = 100; noDamageTaken = true; resetTimBoss(); ultCharge = (ultTestFill || hasRune("instult") || hasRune("instultx")) ? 100 : 0; paused = false; hitstopTimer = 0; dodgeCd = 0; grazeFlashTimer = 0; perfectParryCd = 0; flashKind = 0; stylePoints = 0; styleRankIdx = 0; styleLastTag = ''; styleFlash = 0; styleGrace = 0; sssArmed = true; laserFireTimer = 0; laserEngaged = false; laserBlockFlag = false; lavaFlood = 0;
+            activeLightnings.length = 0; spawnTimerCactus = 60; spawnTimerEnemy = 100; noDamageTaken = true; resetTimBoss(); ultCharge = (ultTestFill || hasRune("instult") || hasRune("instultx")) ? 100 : 0; paused = false; hitstopTimer = 0; dodgeCd = 0; grazeFlashTimer = 0; perfectParryCd = 0; flashKind = 0; stylePoints = 0; styleRankIdx = 0; firstStrikeUsed = false; styleLastTag = ''; styleFlash = 0; styleGrace = 0; sssArmed = true; laserFireTimer = 0; laserEngaged = false; laserBlockFlag = false; lavaFlood = 0;
             
             dino = new Player(1, 80, currentForm, currentAmmoType, false);
             if (mode === 'pvp') {
@@ -27857,7 +28450,7 @@ class PulsarCloneBoss {
                 if ((gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss') && dino.webTimer <= 0) {
                     if (mapTheme === 'ocean' && (dino.y + dino.h) > OCEAN_SURF + 4) {   // BOI: dap nuoc len; gan mat nuoc thi bat cao de dap len la beo
                         let _near = (dino.y + dino.h) - OCEAN_SURF < 70;
-                        dino.dy = _near ? -11.5 : -6.4; dino.grounded = false; dino.canDoubleJump = true; SFX.jump();
+                        dino.dy = (hasRune('hyperspeed') ? 1.5 : 1) * (_near ? -11.5 : -6.4); dino.grounded = false; dino.canDoubleJump = true; dino.jumpCount = 1; SFX.jump();
                     }
                     // RYUENJIN: dang o duoi dat, vua chem xong trong 0.5s -> bam NHAY thanh cu chem hat len
                     else if (currentAmmoType === 5 && dino.grounded && (dino.clawRiseWindow || 0) > 0 && !dino.isOverheated && dino.ammo > 0 && !dino.ultActive) { dino.ryuenjin(); }
@@ -27882,9 +28475,9 @@ class PulsarCloneBoss {
                             SFX.jump();
                         }
                     }
-                    else if (dino.grounded) { dino.dy = dino.jumpPower; dino.grounded = false; dino.canDoubleJump = true; dino.hoverArmed = true; SFX.jump(); }
+                    else if (dino.grounded) { dino.dy = dino.jumpPower * (hasRune('hyperspeed') ? 1.5 : 1); dino.grounded = false; dino.canDoubleJump = true; dino.jumpCount = 1; dino.bodySlamArmed = false; dino.bodySlamActive = false; dino.bodySlamJumpCount = 0; dino.hoverArmed = true; SFX.jump(); }
                     else if (dino.hoverTimer > 0) { dino.hoverTimer = 0; dino.hoverArmed = false; dino.dy = dino.jumpPower * 0.85; dino.canDoubleJump = false; SFX.jump(); }
-                    else if (dino.canDoubleJump) { dino.dy = dino.jumpPower * 0.85; dino.canDoubleJump = false; dino.hoverArmed = false; SFX.jump(); }
+                    else if (dino.canDoubleJump || (hasRune('triplejump') && dino.jumpCount < 3)) { dino.dy = dino.jumpPower * (hasRune('hyperspeed') ? 1.5 : 1) * 0.85; dino.canDoubleJump = false; dino.jumpCount = (dino.jumpCount || 1) + 1; dino.hoverArmed = false; SFX.jump(); }
                 } else if (gameState === 'custom_menu') {
                     if (previewDino.grounded) { previewDino.dy = dino.jumpPower; previewDino.grounded = false; }
                 }
@@ -28269,13 +28862,18 @@ class PulsarCloneBoss {
         // ============================ @@HE-NOVA ============================
         // Vu no lan cua rune AWAKENED: NOVA
         function novaBlast(x, y, r, dmg, exclude, selfDmg, kind) {
-            visualEffects.push(new Effect(x, y, kind || 'explosion', true, r));
+            // NOVA chi tao damage cho CAC MUC TIEU XUNG QUANH; muc tieu chinh da an damage dan goc
+            // se nam trong exclude. Nova dung chung Crit state voi vien dan goc cua cung hit.
+            const sharedCrit = !!((exclude && exclude.size) ? Array.from(exclude).some(o => o && o._novaSharedCrit) : false);
+            const blastR = r * (sharedCrit ? 1.18 : 1);
+            const blastDmg = dmg * (sharedCrit ? 2 : 1);
+            visualEffects.push(new Effect(x, y, kind || 'explosion', true, blastR));
             if (gameState === 'pvp') return;
-            let rect = { x: x - r, y: y - r, w: r * 2, h: r * 2 };
+            let rect = { x: x - blastR, y: y - blastR, w: blastR * 2, h: blastR * 2 };
             let apply = (o) => {
                 if (!o || o.invulnAll) return;
                 let was = (exclude && exclude.has) ? exclude.has(o) : false;
-                let d = was ? (selfDmg || 0) : dmg;
+                let d = was ? (selfDmg || 0) : blastDmg;
                 if (d > 0 && checkAABB(rect, o)) o.hp -= d;
             };
             obstacles.forEach(apply);
@@ -28338,9 +28936,9 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                         } else {
                             if (nearest.name === "AEGIS REX") {
                                 if (nearest.invulnAll) { visualEffects.push(new Effect(nearest.x + nearest.w/2, nearest.y, 'parry', false)); }
-                                else if (nearest.shieldBrokenTimer > 0) { nearest.hp -= 3; }
+                                else if (nearest.shieldBrokenTimer > 0) { if (bosses.includes(nearest)) damageBossWithFirstStrike(nearest, 3); else nearest.hp -= 3; }
                                 else { nearest.hitShield(count >= 3 ? 6 : (count >= 2 ? 5 : 1), nearest.x + nearest.w/2, nearest.y + nearest.h/2); }
-                            } else { nearest.hp -= 3; }
+                            } else { if (bosses.includes(nearest)) damageBossWithFirstStrike(nearest, 3); else nearest.hp -= 3; }
                             // HUT MAU: VOLT dem theo TICK chu khong theo dmg.
                             // Boss = 3 tick moi lan tia giat (charge 3 tia -> 9 tick); quai thuong = 1 tick.
                             if (hasRune('redbird')){ if (bosses.includes(nearest)) voltBossTicks += 3; else voltTrashTicks += 1; }
@@ -28668,7 +29266,7 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                         visualEffects.push(new Effect(o.x - 10, o.y + 20, 'parry', false)); o.shieldHp--; return;
                     }
                 }
-                o.hp -= dmg; any = true;
+                if (isBoss) damageBossWithFirstStrike(o, dmg); else o.hp -= dmg; any = true;
             };
             obstacles.forEach(o => one(o, false));
             enemies.forEach(o => one(o, false));
@@ -28929,12 +29527,13 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         }
         // ============================ @@HE-PRISM ============================
         // PRISM — KHUC XA TICH TU
-        // Manh dan Prism LUON 2 dmg, charge hay khong deu vay.
-        // Nhung cu 3 lan trung CUNG MOT muc tieu thi no chiu them 1 don KHUC XA:
-        //   lan trung thu 3 -> +1 | thu 6 -> +2 | thu 9 -> +3 | thu 12 -> +4 ... khong gioi han.
-        // Chi la don CONG THEM tai dung nhip do, khong phai buff vinh vien.
+        // Prism: moi 3 lan trung cung muc tieu tao 1 don KHUC XA.
+        // Noi tai chi tang toi da 3 cap: +1 / +2 / +3, khong tang vo han.
+        // O cap 3, cac moc 3 hit tiep theo van tao Khuc Xa x3, nhung khong vuot qua cap 3.
         // Ngung ban thi tich tu ro ri het -> phai duy tri ap luc len 1 muc tieu.
         const PRISM_STEP = 3;        // bao nhieu lan trung thi no 1 don
+        const PRISM_MAX_TIER = 3;    // toi da 3 cap noi tai
+        const PRISM_MAX_HITS = PRISM_STEP * PRISM_MAX_TIER; // 9 hit de dat cap 3
         const PRISM_HOLD = 180;      // giu nguyen 3 giay sau lan trung cuoi
         const PRISM_BLEED = 12;      // sau do cu 12 frame ro ri 1 lan tich
         const PRISM_COL = ["#80DEEA", "#4DD0E1", "#FFF176", "#FFB74D", "#FF80AB", "#E040FB", "#FFFFFF"];
@@ -28943,9 +29542,19 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         // Goi DUNG MOT LAN moi cap (dan, muc tieu), ngay tai cho tru mau.
         function prismDmg(proj, o) {
             if (!proj || !proj.prism || !o) return proj ? proj.dmg : 0;
-            o._pxN = (o._pxN || 0) + 1; o._pxT = PRISM_HOLD; o._pxB = 0;
-            if (o._pxN % PRISM_STEP !== 0) return proj.dmg;
-            let burst = o._pxN / PRISM_STEP;
+            let prev = o._pxN || 0;
+            let next = Math.min(PRISM_MAX_HITS, prev + 1);
+            o._pxN = next; o._pxT = PRISM_HOLD; o._pxB = 0;
+            // Khi da dat cap 3, moi moc 3 hit tiep theo van cho Khuc Xa x3.
+            // _pxN duoc giu o 9 de hien thi cap 3 va khong tang damage vo han.
+            let isStep = (next % PRISM_STEP === 0) && (next !== prev);
+            if (!isStep && prev < PRISM_MAX_HITS) return proj.dmg;
+            if (!isStep && prev >= PRISM_MAX_HITS) {
+                o._pxN = PRISM_MAX_HITS;
+                o._pxExtra = (o._pxExtra || 0) + 1;
+                if (o._pxExtra % PRISM_STEP !== 0) return proj.dmg;
+            }
+            let burst = Math.min(PRISM_MAX_TIER, Math.floor(Math.max(next, PRISM_MAX_HITS) / PRISM_STEP));
             o._pxFlash = 20;
             floatingTexts.push(new FloatingText(o.x + o.w / 2 - 52, o.y - 30, "KHUC XA x" + burst + "  -" + burst));
             visualEffects.push(new Effect(o.x + o.w / 2, o.y + o.h / 2, 'parry', false));
@@ -28959,7 +29568,7 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                 if (!o._pxN) continue;
                 if (o._pxT > 0) { o._pxT--; continue; }
                 o._pxB = (o._pxB || 0) + 1;
-                if (o._pxB >= PRISM_BLEED) { o._pxB = 0; o._pxN--; }
+                if (o._pxB >= PRISM_BLEED) { o._pxB = 0; o._pxN--; if (o._pxN < PRISM_MAX_HITS) o._pxExtra = 0; }
             }
         }
         function drawPrismStacks() {
@@ -29275,6 +29884,7 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                 else if (testBossSelection === 50) { setupUnityArena(); bosses.push(new UnityCloneBoss(1)); }
                 else if (testBossSelection === 51) { setupVergilArena(); bosses.push(new VergilBoss(1)); }
                 else if (testBossSelection === 52) { setupDanteArena(); bosses.push(new DanteBoss(1)); }
+                else if (testBossSelection === 60) { setupNeroArena(); bosses.push(new NeroBoss(1)); }
                 else if (testBossSelection === 53) { setupWarArena(); bosses.push(new WarBoss(1)); }
                 else if (testBossSelection === 54) { setupDeathArena(); bosses.push(new DeathBoss(1)); }
                 else if (testBossSelection === 58) { bosses.push(new PulsarCloneBoss(1)); }
@@ -29653,23 +30263,23 @@ function checkPvPCollisions() {
                         if (isDashing) parryGainUlt(false);   // chan don lao -> +5% chieu cuoi
 
                         if (b.name === "SPINOSAURUS" && (b.state === 'spin_dash_1' || b.state === 'spin_dash_2')) {
-                            b.hp -= parryDmg; b.lastMeleeHit = dino.meleeID;
+                            damageBossWithFirstStrike(b, parryDmg); b.lastMeleeHit = dino.meleeID;
                             visualEffects.push(new Effect(sX, sY + 30, 'parry')); addStyle(15, 'parry'); shakeTimer = 20;
                             if (b.state === 'spin_dash_1') b.state = 'spin_bounce_back';
                             else b.state = 'stunned_return';
                         } else if (b.name === "HELIOS REX" && (b.state === 'clone_dash_1' || b.state === 'clone_dash_2')) {
-                            b.hp -= parryDmg; b.lastMeleeHit = dino.meleeID;
+                            damageBossWithFirstStrike(b, parryDmg); b.lastMeleeHit = dino.meleeID;
                             visualEffects.push(new Effect(sX, sY + 30, 'parry')); addStyle(isDashing ? 15 : 6, 'parry'); shakeTimer = 20;
                             if (b.state === 'clone_dash_1') { b.state = 'clone_bounce_back'; } 
                             else { b.state = 'clone_return'; b.willSurpriseShoot = true; }
                         } else if (b.name === "AEGIS REX" && (b.state === 'charging' || b.state === 'charge_recoil')) {
-                            b.hp -= parryDmg; b.lastMeleeHit = dino.meleeID;
+                            damageBossWithFirstStrike(b, parryDmg); b.lastMeleeHit = dino.meleeID;
                             visualEffects.push(new Effect(sX, sY + 30, 'parry')); addStyle(6, 'parry'); shakeTimer = 14;
                         } else if (b.name === "T-REX BOSS" && b.state === 'dashing') {
-                            b.hp -= parryDmg; b.lastMeleeHit = dino.meleeID; visualEffects.push(new Effect(sX, sY + 30, 'parry')); addStyle(6, 'parry'); shakeTimer = 14;
+                            damageBossWithFirstStrike(b, parryDmg); b.lastMeleeHit = dino.meleeID; visualEffects.push(new Effect(sX, sY + 30, 'parry')); addStyle(6, 'parry'); shakeTimer = 14;
                             b.state = 'retreat_out'; b.retDir = b.dashDir || -1;
                         } else if (b.name === "TRICERATOPS BOSS" && b.state === 'charging') {
-                            b.hp -= parryDmg; b.lastMeleeHit = dino.meleeID; visualEffects.push(new Effect(sX, sY + 30, 'parry')); addStyle(6, 'parry'); shakeTimer = 14;
+                            damageBossWithFirstStrike(b, parryDmg); b.lastMeleeHit = dino.meleeID; visualEffects.push(new Effect(sX, sY + 30, 'parry')); addStyle(6, 'parry'); shakeTimer = 14;
                             b.state = 'charge_recoil'; b.retDir = b.chgDir || -1; b.subStateTimer = 20;
                         } else if (b.name === "SLASH BEAST" && (
                             b.state === 'charging' || b.state === 'charge_recoil' ||
@@ -29679,7 +30289,7 @@ function checkPvPCollisions() {
                             b.state === 'pillar_claw' || b.state === 'pillar_claw_fall' ||
                             b.state === 'grab_go' || b.state === 'grab_hold' || b.state === 'grab_throw'
                         )) {
-                            b.hp -= parryDmg; b.lastMeleeHit = dino.meleeID;
+                            damageBossWithFirstStrike(b, parryDmg); b.lastMeleeHit = dino.meleeID;
                             visualEffects.push(new Effect(sX, sY + 30, 'parry'));
                             addStyle(isDashing ? 15 : 6, 'parry'); shakeTimer = 16; b.rushCount++;
                             const airReturn = (
@@ -29692,9 +30302,9 @@ function checkPvPCollisions() {
                             b.vx = airReturn ? (b.vx || 0) : (b.vx || 0);
                         } else if (b.name === "VOLT REX") {
                             // Parry: dash xuyen qua nguoi, KHONG doi state; van gay dmg parry
-                            b.hp -= parryDmg; b.lastMeleeHit = dino.meleeID; visualEffects.push(new Effect(sX, sY + 30, 'parry')); addStyle(6, 'parry');
+                            damageBossWithFirstStrike(b, parryDmg); b.lastMeleeHit = dino.meleeID; visualEffects.push(new Effect(sX, sY + 30, 'parry')); addStyle(6, 'parry');
                         } else {
-                            b.hp -= parryDmg; b.lastMeleeHit = dino.meleeID;
+                            damageBossWithFirstStrike(b, parryDmg); b.lastMeleeHit = dino.meleeID;
                             visualEffects.push(new Effect(sX, sY + 30, 'parry')); addStyle(isDashing ? 15 : 6, 'parry');
                             
                             if (b.state !== 'idle' && b.state !== 'entering' && b.state !== 'returning_place' && !b.state.includes('spin') && !b.state.includes('stun') && !b.state.includes('clone_') && !b.state.includes('retreat')) {
@@ -29749,7 +30359,7 @@ function checkPvPCollisions() {
                             let ar2 = { x: ex - 70, y: ey - 70, w: 140, h: 140 };
                             obstacles.forEach(o => { if (checkAABB(ar2, o)) o.hp -= 3; });
                             enemies.forEach(e => { if (checkAABB(ar2, e)) { e.hp -= 3; e.burnTimer = 90; } });
-                            bosses.forEach(b => { if (!b.invulnAll && checkAABB(ar2, b)) { b.hp -= 3; b.burnTimer = 90; } });
+                            bosses.forEach(b => { if (!b.invulnAll && checkAABB(ar2, b)) { damageBossWithFirstStrike(b, 3); b.burnTimer = 90; } });
                         } else { let t3 = proj.owner === 1 ? dino2 : dino;
                             if (Math.hypot((t3.x+t3.w/2)-ex, (t3.y+t3.h/2)-ey) < 70) { if (!t3.isShielding()) t3.takeDamage(1); else visualEffects.push(new Effect(t3.x, t3.y, 'parry')); } }
                         if (typeof SFX !== 'undefined' && SFX.hit) SFX.hit();
@@ -29767,16 +30377,18 @@ function checkPvPCollisions() {
                         proj.vy = (proj.vy||0) + ((dy0/dd*9 - (proj.vy||0)) * 0.22); }
                 }
                 
+                const _pulsarDmg = pulsarScaledDamage(proj);
+                const _pulsarProj = (proj.pulsar || proj._fromStar) ? Object.assign(Object.create(Object.getPrototypeOf(proj)), proj, { dmg: _pulsarDmg }) : proj;
                 for (let o = obstacles.length - 1; o >= 0; o--) { 
                     if (checkAABB(proj, obstacles[o]) && !proj.hitIds.has(obstacles[o])) { 
-                        proj.hitIds.add(obstacles[o]); obstacles[o].hp -= prismDmg(proj, obstacles[o]); if (proj.type === 11) obstacles[o].burnTimer = 120; projHit = true;
+                        proj.hitIds.add(obstacles[o]); obstacles[o].hp -= prismDmg(_pulsarProj, obstacles[o]); if (proj.type === 11) obstacles[o].burnTimer = 120; projHit = true;
                         if (proj.type !== 2 && proj.pierceCount <= 0) break; 
                     } 
                 }
                 if (!projHit || proj.type === 2 || proj.pierceCount > 0) {
                     for (let e = enemies.length - 1; e >= 0; e--) { 
                         if (checkAABB(proj, enemies[e]) && !proj.hitIds.has(enemies[e])) { 
-                            proj.hitIds.add(enemies[e]); enemies[e].hp -= prismDmg(proj, enemies[e]); if (proj.type === 11) enemies[e].burnTimer = 120; projHit = true;
+                            proj.hitIds.add(enemies[e]); enemies[e].hp -= prismDmg(_pulsarProj, enemies[e]); if (proj.type === 11) enemies[e].burnTimer = 120; projHit = true;
                             if (proj.type !== 2 && proj.pierceCount <= 0) break; 
                         } 
                     }
@@ -29787,7 +30399,7 @@ function checkPvPCollisions() {
                             if (bosses[b].headWeak && proj.y < bosses[b].y + (bosses[b].headZone || 100)) {
                                 bosses[b].headHits = (bosses[b].headHits || 0) + 1;
                                 if (bosses[b].headHits >= 3) {
-                                    bosses[b].hp -= 1; bosses[b].headHits = 0;
+                                    damageBossWithFirstStrike(bosses[b], 1); bosses[b].headHits = 0;
                                     visualEffects.push(new Effect(proj.x, proj.y, 'explosion'));
                                 }
                             }
@@ -29801,18 +30413,18 @@ function checkPvPCollisions() {
                                         proj.hitIds.add(bosses[b]); bosses[b].jitter = 6; bosses[b].dodgeCharges--; bosses[b].dodgeReCd = 90;   // NE (het 3 lan thi dinh)
                                         visualEffects.push(new Effect(bosses[b].x + bosses[b].w/2, proj.y, 'lightning_shock'));
                                     } else {
-                                        proj.hitIds.add(bosses[b]); bosses[b].hp -= prismDmg(proj, bosses[b]); if (proj.type === 11) bosses[b].burnTimer = 120; projHit = true;
+                                        proj.hitIds.add(bosses[b]); damagePrismBossWithRunes(bosses[b], _pulsarProj); if (proj.type === 11) bosses[b].burnTimer = 120; projHit = true;
                                     }
                                 }
                             } else if (bosses[b].role === 'block' && bosses[b].shieldHits > 0) {
                                 // KHIEN cua con VANG: lua/xuyen xuyen thang, set bi chan nhung no mat mau, thuong thi tan khien
-                                if (proj.type===11 || proj.type===2 || proj.pierceCount>0){ proj.hitIds.add(bosses[b]); bosses[b].hp -= prismDmg(proj, bosses[b]); if (proj.type===11) bosses[b].burnTimer=120; projHit=true; }
-                                else if (proj.type===4){ proj.hitIds.add(bosses[b]); bosses[b].hp -= 1; visualEffects.push(new Effect(bosses[b].x+bosses[b].w/2, proj.y, 'lightning_shock')); projHit=true; }
+                                if (proj.type===11 || proj.type===2 || proj.pierceCount>0){ proj.hitIds.add(bosses[b]); damageBossFromAmmo(bosses[b], prismDmg(_pulsarProj, bosses[b])); if (proj.type===11) bosses[b].burnTimer=120; projHit=true; }
+                                else if (proj.type===4){ proj.hitIds.add(bosses[b]); damageBossWithFirstStrike(bosses[b], 1); visualEffects.push(new Effect(bosses[b].x+bosses[b].w/2, proj.y, 'lightning_shock')); projHit=true; }
                                 else { proj.hitIds.add(bosses[b]); bosses[b].shieldHits--; if (bosses[b].shieldHits<=0){ bosses[b].shieldRegen=200; visualEffects.push(new Effect(bosses[b].x+bosses[b].w/2, bosses[b].y, 'explosion', true, 14)); } else visualEffects.push(new Effect(bosses[b].x+(bosses[b].facingLeft?0:bosses[b].w), proj.y, 'parry')); projHit=true; }
                             } else if (bosses[b].name === "AEGIS REX") {
                                 proj.hitIds.add(bosses[b]);
                                 if (bosses[b].invulnAll) { visualEffects.push(new Effect(bosses[b].x + bosses[b].w/2, proj.y, 'parry', false)); }
-                                else if (bosses[b].shieldBrokenTimer > 0) { bosses[b].hp -= prismDmg(proj, bosses[b]); if (proj.type === 11) bosses[b].burnTimer = 120; }
+                                else if (bosses[b].shieldBrokenTimer > 0) { damageBossFromAmmo(bosses[b], prismDmg(_pulsarProj, bosses[b])); if (proj.type === 11) bosses[b].burnTimer = 120; }
                                 else { bosses[b].hitShield(aegisShieldDmg(proj), bosses[b].x + (bosses[b].facingLeft ? 0 : bosses[b].w), proj.y); }
                                 projHit = true;
                             } else if (bosses[b].name === "HELIOS REX" && (bosses[b].shieldTimer > 0 || bosses[b].spamShieldTimer > 0 || bosses[b].state.includes('clone_dash') || bosses[b].state === 'clone_bounce_back' || bosses[b].state === 'clone_wait') && proj.type !== 2 && proj.pierceCount <= 0) {
@@ -29821,12 +30433,12 @@ function checkPvPCollisions() {
                                     bosses[b].shieldHp--;
                                     projHit = true; 
                                 } else {
-                                    proj.hitIds.add(bosses[b]); bosses[b].hp -= prismDmg(proj, bosses[b]); if (proj.type === 11) bosses[b].burnTimer = 120; projHit = true;
+                                    proj.hitIds.add(bosses[b]); damagePrismBossWithRunes(bosses[b], _pulsarProj); if (proj.type === 11) bosses[b].burnTimer = 120; projHit = true;
                                 }
                             } else {
                                 proj.hitIds.add(bosses[b]);
                                 let _dmgMul = (bosses[b].dmgMul || 1) * ((bosses[b].name === "SIEGE GOLIATH" && bosses[b].state === 'overheat') ? 2 : 1);   // CUA SO QUA NHIET: dmg gap doi
-                                bosses[b].hp -= prismDmg(proj, bosses[b]) * _dmgMul; if (proj.type === 11) bosses[b].burnTimer = 120; projHit = true;
+                                damagePrismBossWithRunes(bosses[b], _pulsarProj, _dmgMul); if (proj.type === 11) bosses[b].burnTimer = 120; projHit = true;
                             }
                             if (proj.type !== 2 && proj.pierceCount <= 0) break;
                         } 
@@ -29860,7 +30472,7 @@ function checkPvPCollisions() {
                         let ar = { x: fx0 - RAD, y: fy0 - RAD, w: RAD*2, h: RAD*2 };
                         obstacles.forEach(o => { if (checkAABB(ar, o)) o.hp -= CORE; });
                         enemies.forEach(e => { if (checkAABB(ar, e)) e.hp -= CORE; });
-                        bosses.forEach(b => { if (!b.invulnAll && checkAABB(ar, b)) b.hp -= CORE; });
+                        bosses.forEach(b => { if (!b.invulnAll && checkAABB(ar, b)) damageBossWithFirstStrike(b, CORE); });
                     }
                     for (let k = 0; k < NF; k++) {
                         let a = (k / NF) * Math.PI * 2 + Math.random() * 0.4, sp = 7.5;
@@ -29897,7 +30509,7 @@ function checkPvPCollisions() {
                                 let _ex = (o) => _skip ? _skip.has(o) : false;
                                 obstacles.forEach(o => { if(!_ex(o) && checkAABB(aoeRect, o)) o.hp -= expDmg; });
                                 enemies.forEach(e => { if(!_ex(e) && checkAABB(aoeRect, e)) e.hp -= expDmg; });
-                                bosses.forEach(b => { if(!_ex(b) && checkAABB(aoeRect, b)) b.hp -= expDmg; });
+                                bosses.forEach(b => { if(!_ex(b) && checkAABB(aoeRect, b)) damageBossWithFirstStrike(b, expDmg); });
                             } else {
                                 let target = proj.owner === 1 ? dino2 : dino;
                                 if(checkAABB(aoeRect, target)) {
@@ -29956,7 +30568,7 @@ function checkPvPCollisions() {
                         platforms.length = 0; lavaGeysers.length = 0;
                         if (mapTheme === 'plateau' || mapTheme === 'dune' || mapTheme === 'dragoon' ||
                             mapTheme === 'forge' || mapTheme === 'chrono' || mapTheme === 'shrine' ||
-                            mapTheme === 'unity' || mapTheme === 'vergil' || mapTheme === 'dante' || mapTheme === 'war' || mapTheme === 'death' || mapTheme === 'artorias' || mapTheme === 'slashcave' ||
+                            mapTheme === 'unity' || mapTheme === 'vergil' || mapTheme === 'dante' || mapTheme === 'nero' || mapTheme === 'war' || mapTheme === 'death' || mapTheme === 'artorias' || mapTheme === 'slashcave' ||
                             mapTheme === 'trio' || mapTheme === 'ocean' || mapTheme === 'tetris') mapTheme = 'desert';
                         if (mapTheme === 'forest')      { platforms.push({ x: -60, w: canvas.width + 160, top: 320, h: 80 }); forestNextChunk = false; }
                         else if (mapTheme === 'volcano'){ platforms.push({ x: -60, w: canvas.width + 160, top: 320, h: 80, volcano: true }); volcanoNextChunk = true; }
@@ -30034,6 +30646,7 @@ function checkPvPCollisions() {
                 }
 
                 function loop() {
+            installFirstStrikeHooks();
             if (gameState === 'menu') { startDojo(); return; }   // menu = SAN TAP chay that
             if (gameState === 'map_select') { drawMapSelect(); return; }
             if (gameState === 'br_select') { drawBrSelect(); return; }
