@@ -74,33 +74,44 @@
     </style>
 
 <script>
-/* Pulsar range-tier visual feedback: visible meteor-style tier flash. */
+/* Pulsar range-tier visual feedback: subtle energy ring at each damage tier. */
 (function(){
- if(window.__pulsarRangeVisualsInstalled)return; window.__pulsarRangeVisualsInstalled=true;
- window.pulsarRangeTierVisual=function(x,y,tier){
-   const e=document.createElement('div');
-   e.className='pulsar-range-flash '+(tier>=3?'pulsar-range-tier3':'pulsar-range-tier2');
-   e.style.left=x+'px'; e.style.top=y+'px';
-   document.body.appendChild(e);
-   setTimeout(()=>e.remove(),260);
- };
+  if (window.__pulsarRangeVisualsInstalled) return;
+  window.__pulsarRangeVisualsInstalled = true;
+
+  window.pulsarRangeTierVisual = function(x, y, tier, maxTier){
+    const cls = tier >= maxTier ? 'pulsar-range-flash pulsar-range-tier3'
+              : 'pulsar-range-flash pulsar-range-tier2';
+    const el = document.createElement('div');
+    el.className = cls;
+    el.style.left = (x || 0) + 'px';
+    el.style.top = (y || 0) + 'px';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 180);
+  };
 })();
 </script>
 <style>
 .pulsar-range-flash{
- position:fixed;width:28px;height:28px;border:3px solid rgba(255,90,45,.98);
- border-radius:50%;transform:translate(-50%,-50%) scale(.25);pointer-events:none;
- z-index:99999;animation:pulsarRangePulse .26s ease-out forwards;
- box-shadow:0 0 14px rgba(255,60,30,.95),0 0 30px rgba(255,180,60,.55)
+  position:fixed;
+  width:18px;height:18px;
+  border:2px solid rgba(180,220,255,.9);
+  border-radius:50%;
+  transform:translate(-50%,-50%) scale(.35);
+  pointer-events:none;
+  z-index:99999;
+  animation:pulsarRangePulse .16s ease-out forwards;
+  box-shadow:0 0 8px rgba(150,210,255,.9);
 }
 .pulsar-range-tier3{
- width:44px;height:44px;border-width:4px;
- box-shadow:0 0 20px rgba(255,30,20,1),0 0 42px rgba(255,150,40,.75)
+  width:30px;height:30px;
+  border-width:3px;
+  box-shadow:0 0 16px rgba(220,240,255,1);
 }
 @keyframes pulsarRangePulse{
- 0%{opacity:0;transform:translate(-50%,-50%) scale(.25)}
- 16%{opacity:1}
- 100%{opacity:0;transform:translate(-50%,-50%) scale(1.8)}
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}
+  20%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.55)}
 }
 </style>
 
@@ -4831,7 +4842,7 @@ class DilophosBoss {
                 // ===== RIPPER: khoanh nua ban do (trai / giua / phai) roi CHEM, 3 dmg =====
                 if (st === 'u_ripper'){
                     if (this.subTimer === 16){
-                        let W = canvas.width * (12/23), px = dino.x + dino.w/2;
+                        let W = canvas.width * 0.52, px = dino.x + dino.w/2;
                         // chon o CHUA nguoi choi -> ep phai chay sang mien khac
                         let opts = [0, (canvas.width - W)/2, canvas.width - W];
                         let pick = opts[0], bestD = 1e9;
@@ -16496,7 +16507,7 @@ class GreatApeBoss {
             platforms.length = 0;
             grassField = [];
             forestScene = 'spider';
-            spiderTree = { trunkX: canvas.width * (12/23), canopyBottom: 74 };
+            spiderTree = { trunkX: canvas.width * 0.52, canopyBottom: 74 };
             platforms.push({ x: -60, w: canvas.width + 160, top: 320, h: 80 });
             platforms.push({ x: 130, w: 150, top: 240, h: 16, isLeaf: true, solid: true, leafTimer: 0, leafCd: 0, fallY: 0 });
             platforms.push({ x: 690, w: 150, top: 240, h: 16, isLeaf: true, solid: true, leafTimer: 0, leafCd: 0, fallY: 0 });
@@ -22496,13 +22507,6 @@ class PulsarCloneBoss {
                 else if (this.type === 9) { ctx.shadowBlur = 8; ctx.shadowColor = "#FF1744"; ctx.fillStyle = "#FF1744"; ctx.fillRect(this.x, this.y, this.w, this.h); ctx.strokeStyle = "white"; ctx.lineWidth = 1.5; ctx.strokeRect(this.x, this.y, this.w, this.h); }
                 else if (this.type === 7 || this.type === 8) { ctx.translate(this.x + this.w/2, this.y + this.h/2); let chh = this.h / 2, chw = this.w / 2; ctx.shadowBlur = 12; ctx.shadowColor = "#E0F7FA"; ctx.fillStyle = "rgba(255, 255, 255, 0.92)"; ctx.beginPath(); ctx.moveTo(-chw, -chh); ctx.quadraticCurveTo(chw + 16, 0, -chw, chh); ctx.quadraticCurveTo(0, 0, -chw, -chh); ctx.closePath(); ctx.fill(); ctx.strokeStyle = this.type === 8 ? "#FFEB3B" : "#00E5FF"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-chw, -chh); ctx.quadraticCurveTo(chw + 16, 0, -chw, chh); ctx.stroke(); }
                 else { ctx.shadowBlur = 5; ctx.shadowColor = "#00E5FF"; ctx.fillStyle = "#00E5FF"; ctx.fillRect(this.x, this.y, this.w, this.h); ctx.strokeStyle = "white"; ctx.lineWidth = 1.5; ctx.strokeRect(this.x, this.y, this.w, this.h); }
-                if(this.pulsar||this._fromStar){
-                    const _tier=this._pulsarTier||1;
-                    if(_tier>=2){
-                      const cx=this.x+this.w/2,cy=this.y+this.h/2,rr=Math.max(this.w,this.h)*(_tier>=3?1.15:.82);
-                      ctx.save();ctx.translate(cx,cy);ctx.rotate(frames*.08);ctx.strokeStyle=_tier>=3?'rgba(225,250,255,.95)':'rgba(150,220,255,.82)';ctx.lineWidth=_tier>=3?2.4:1.5;ctx.shadowBlur=_tier>=3?14:7;ctx.shadowColor='#8DE7FF';ctx.beginPath();ctx.ellipse(0,0,rr,rr*.38,0,0,Math.PI*2);ctx.stroke();if(_tier>=3){ctx.rotate(Math.PI/2);ctx.beginPath();ctx.ellipse(0,0,rr*.9,rr*.30,0,0,Math.PI*2);ctx.stroke();}ctx.restore();
-                    }
-                }
                 ctx.restore();
             }
             update() { this.x += this.speed; this.y += this.vy; }
@@ -22527,13 +22531,12 @@ class PulsarCloneBoss {
                 else if (type === 13) { this.w = 16 * sScale; this.h = 16 * sScale; this.speed = 12 * dir; }
                 else { this.speed = ((type > 0) ? 15 : 13) * dir; }
                 this.hitIds = new Set();
-                // PULSAR: damage scales continuously with travel distance.
-                // Reference playfield ≈23 cm wide: every 6 cm adds +1 damage.
-                // J: 1→3 at 18 cm. Star Shot: 1→2 at 12 cm.
+                // PULSAR: damage scale theo quang duong bay. J dat toi da 3 dmg khi bay xa;
+                // Star Shot dat toi da 2 dmg khi bay ra toi khu vuc goc. Scale lien tuc, khong nhay moc.
                 if (this.pulsar || this._fromStar) {
                     this._pulsarStartX = x; this._pulsarStartY = y;
                     this._pulsarTravel = 0;
-                    this._pulsarMaxDist = this.pulsar ? canvas.width * (18/23) : canvas.width * (12/23);
+                    this._pulsarMaxDist = this.pulsar ? canvas.width * 0.90 : canvas.width * 0.52;
                 }
                 // NGAM: chinh huong ban ve muc tieu gan nhat, GIOI HAN goc +-20 do (dan bay THANG, van co the hut)
                 if (this.owner === 1 && gameState !== 'pvp' && (autoAimEnabled || combatStance === 1 || hoverAiming())) {
@@ -22552,85 +22555,9 @@ class PulsarCloneBoss {
                     }
                 }
             }
-            draw() {
+            draw() { 
                 ctx.save();
-
-                // PULSAR METEOR: all real Pulsar shots use one consistent comet-like projectile.
-                // Color continuously shifts yellow -> orange -> red as travel damage scales.
-                if (this.pulsar || this._fromStar) {
-                    const cx = this.x + this.w / 2, cy = this.y + this.h / 2;
-                    const spd = Math.hypot(this.speed || 0, this.vy || 0) || 1;
-                    const dx = (this.speed || 0) / spd, dy = (this.vy || 0) / spd;
-                    const t = Math.max(0, Math.min(1, this._pulsarRangeT || 0));
-                    const tier = this._pulsarTier || 1;
-
-                    // Warm progression: yellow at tier 1, orange in the middle, red at max.
-                    const hue = Math.max(0, 52 - 52 * t);
-                    const core = `hsl(${hue}, 100%, 62%)`;
-                    const hot = `hsl(${Math.min(58, hue + 10)}, 100%, 78%)`;
-                    const tail = `hsla(${hue}, 100%, 58%, 0.72)`;
-
-                    ctx.save();
-                    ctx.translate(cx, cy);
-                    ctx.rotate(Math.atan2(dy, dx));
-
-                    // Long comet tail: more intense at higher damage tier.
-                    const tailLen = (this.pulsar ? 5.5 : 4.2) * Math.max(this.w, this.h) * (1 + t * 0.8);
-                    const tailW = Math.max(2, Math.max(this.w, this.h) * (0.42 + t * 0.10));
-                    const grad = ctx.createLinearGradient(-tailLen, 0, 2, 0);
-                    grad.addColorStop(0, `hsla(${hue},100%,58%,0)`);
-                    grad.addColorStop(0.48, tail);
-                    grad.addColorStop(1, `hsla(${hue},100%,78%,0.95)`);
-                    ctx.shadowBlur = 18 + tier * 7;
-                    ctx.shadowColor = core;
-                    ctx.fillStyle = grad;
-                    ctx.beginPath();
-                    ctx.moveTo(-tailLen, 0);
-                    ctx.quadraticCurveTo(-tailLen * 0.35, -tailW, 1, -tailW * 0.45);
-                    ctx.lineTo(1, tailW * 0.45);
-                    ctx.quadraticCurveTo(-tailLen * 0.35, tailW, -tailLen, 0);
-                    ctx.closePath();
-                    ctx.fill();
-
-                    // Meteor head: irregular pointed body instead of a square bullet.
-                    const r = Math.max(4, Math.max(this.w, this.h) * (0.46 + t * 0.08));
-                    ctx.shadowBlur = 20 + tier * 8;
-                    ctx.shadowColor = core;
-                    ctx.fillStyle = core;
-                    ctx.beginPath();
-                    ctx.moveTo(r * 1.15, 0);
-                    ctx.lineTo(r * 0.35, -r * 0.72);
-                    ctx.lineTo(-r * 0.78, -r * 0.35);
-                    ctx.lineTo(-r * 0.98, r * 0.20);
-                    ctx.lineTo(-r * 0.30, r * 0.76);
-                    ctx.lineTo(r * 0.72, r * 0.46);
-                    ctx.closePath();
-                    ctx.fill();
-
-                    // White-hot core.
-                    ctx.fillStyle = hot;
-                    ctx.beginPath();
-                    ctx.arc(r * 0.24, -r * 0.04, r * 0.38, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = "#FFFDE7";
-                    ctx.beginPath();
-                    ctx.arc(r * 0.34, -r * 0.07, r * 0.18, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    // Higher tiers get visible sparks, making the damage state readable.
-                    const sparks = this.pulsar ? (tier === 1 ? 2 : tier === 2 ? 4 : 7) : (tier === 1 ? 2 : 5);
-                    for (let k = 0; k < sparks; k++) {
-                        const a = (frames * 0.16) + k * 2.399;
-                        const dist = r * (1.3 + ((k * 0.47) % 1.8));
-                        const sx = -dist * 0.55 + Math.cos(a) * r * 0.25;
-                        const sy = Math.sin(a) * r * 0.48;
-                        ctx.fillStyle = `hsla(${hue},100%,76%,${0.45 + 0.45 * t})`;
-                        ctx.beginPath();
-                        ctx.arc(sx, sy, Math.max(1, r * (0.055 + t * 0.025)), 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                    ctx.restore();
-                } else if (this.type === 2) {
+                if (this.type === 2) {
                     // NAC CHARGE 2: cau nang luong CUC TO, loi trang, 2 vong xoay nguoc chieu, co duoi keo
                     let cx0 = this.x + this.w/2, cy0 = this.y + this.h/2, R = Math.max(this.w, this.h) * 0.72;
                     let dirp = (this.speed || 1) >= 0 ? 1 : -1;
@@ -22724,21 +22651,7 @@ class PulsarCloneBoss {
             }
             update() {
                 if (this.pulsar || this._fromStar) {
-                    this._pulsarTravel = (this._pulsarTravel || 0) + Math.hypot(this.speed || 0, this.vy || 0);
-                    const _sixCm = Math.max(1, canvas.width * (6/23));
-                    const _maxTier = this.pulsar ? 3 : 2;
-                    const _tier = Math.min(_maxTier, 1 + Math.floor(this._pulsarTravel / _sixCm));
-                    this._pulsarTier = Math.max(1, _tier);
-                    this._pulsarRangeT = Math.max(0, Math.min(1, this._pulsarTravel / (_sixCm * (_maxTier - 1 || 1))));
-                    if ((this._pulsarLastVisualTier || 1) < _tier) {
-                      this._pulsarLastVisualTier = _tier;
-                      if (window.pulsarRangeTierVisual) {
-                        const r = canvas.getBoundingClientRect();
-                        const sx = r.left + ((this.x + this.w/2) / canvas.width) * r.width;
-                        const sy = r.top + ((this.y + this.h/2) / canvas.height) * r.height;
-                        window.pulsarRangeTierVisual(sx, sy, _tier);
-                      }
-                    }
+                    this._pulsarTravel += Math.hypot(this.speed || 0, this.vy || 0);
                 }
                 if (this.type === 12) { this.zigT = (this.zigT || 0) + 1.4; this.zigBaseY = (this.zigBaseY !== undefined ? this.zigBaseY : this.y) + (this.zigVy || 0); this.x += this.speed; this.y = this.zigBaseY + Math.sin(this.zigT + (this.zigPhase || 0)) * 9; return; }
                 this.x += this.speed; this.y += this.vy;
@@ -23157,11 +23070,10 @@ class PulsarCloneBoss {
         // Star Shot: 1 -> 2 dmg, toi da khi bay ~52% chieu rong man (tu giua ra goc).
         function pulsarScaledDamage(proj) {
             if (!proj || (!proj.pulsar && !proj._fromStar)) return proj ? (proj.dmg || 1) : 1;
-            // ~23 cm visible playfield; +1 damage every 6 cm, continuous in between.
-            const sixCm = Math.max(1, canvas.width * (6/23));
+            const maxD = Math.max(1, proj._pulsarMaxDist || (proj.pulsar ? canvas.width * 0.90 : canvas.width * 0.52));
+            const t = Math.max(0, Math.min(1, (proj._pulsarTravel || 0) / maxD));
             const maxDmg = proj.pulsar ? 3 : 2;
-            const t = Math.max(0, Math.min(maxDmg - 1, (proj._pulsarTravel || 0) / sixCm));
-            return 1 + t;
+            return 1 + (maxDmg - 1) * t;
         }
         // Critical Strike chi ap dung cho DAMAGE TU DAN. Khong ap dung cho melee, parry, block,
         // Body Slam, projectile clash hay cac hieu ung noi tai/phan ung khac.
@@ -25093,7 +25005,7 @@ class PulsarCloneBoss {
                 if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(620, 0.15, 'triangle', 0.2, 900);
             }
             _pulsarEmitRound(st) {
-                for (let i = 0; i < 5; i++) { let a = st.angle + i * (Math.PI*2/5), sp = 8; let p = new Projectile(st.x, st.y, 1, 6, 0, 0, 1, this.id); p.speed = Math.cos(a)*sp; p.vy = Math.sin(a)*sp; p._fromStar = true; p._pulsarTravel=0; p._pulsarMaxDist=canvas.width*0.52; p._pulsarTier=1; projectiles.push(p); }
+                for (let i = 0; i < 5; i++) { let a = st.angle + i * (Math.PI*2/5), sp = 8; let p = new Projectile(st.x, st.y, 1, 6, 0, 0, 1, this.id); p.speed = Math.cos(a)*sp; p.vy = Math.sin(a)*sp; p._fromStar = true; projectiles.push(p); }
                 if (typeof SFX !== 'undefined' && SFX.shoot && frames % 4 === 0) SFX.shoot(3);
             }
             tickPulsar() {
@@ -25320,7 +25232,7 @@ class PulsarCloneBoss {
                 let pos = this.getShootPos();
                 let oc = overchargeT(this.aKeyHeldTime, 120);
                 let p = new Projectile(pos.x, pos.y - 8, 2, 3, 0, 0, pos.dir, this.id);
-                p.brand = true; p.oc = oc;
+                p.brand = true; p.oc = oc; p.infernoMax = (oc >= 0.999);
                 let sc3 = 1.35 + 0.5 * oc;
                 p.w = Math.round(p.w * sc3); p.h = Math.round(p.h * sc3); p.speed *= 0.72;
                 projectiles.push(p);
@@ -28349,6 +28261,31 @@ class PulsarCloneBoss {
             bp.clashHp = (s > 34) ? 5 : (s >= 22 ? 3 : 1);
             return bp.clashHp;
         }
+        // INFERNO MAX CHARGE — CHAIN REACTION:
+        // Khi Hoa An max charge phá một projectile của Boss, vụ nổ kéo/phá
+        // các projectile Boss ở gần. Chỉ tác động lên projectile của Boss.
+        function infernoMaxChain(x, y, source){
+            const R = 52;
+            let pulled = 0;
+            for (let i = bossProjectiles.length - 1; i >= 0; i--){
+                const bp = bossProjectiles[i];
+                if (!bp || bp === source || bp._infernoChainHit) continue;
+                const bx = bp.x + (bp.w || 16) / 2;
+                const by = bp.y + (bp.h || 16) / 2;
+                if (Math.hypot(bx - x, by - y) <= R){
+                    bp._infernoChainHit = true;
+                    bossProjectiles.splice(i, 1);
+                    visualEffects.push(new Effect(bx, by, 'explosion', true, 10));
+                    pulled++;
+                }
+            }
+            visualEffects.push(new Effect(x, y, 'explosion', true, pulled > 0 ? 54 : 42));
+            if (pulled > 0){
+                shakeTimer = Math.max(shakeTimer, 8);
+                floatingTexts.push(new FloatingText(x - 32, y - 24, "HỎA ẤN · DÂY CHUYỀN"));
+            }
+        }
+
         function updateBulletClash(){
             if (gameState === 'pvp') return;
             // DAU TRUONG UNITY: luon cho ban vo dan boss du khong gan rune Pha Dan.
@@ -28382,7 +28319,11 @@ class PulsarCloneBoss {
                         let dealt = Math.min(proj.dmg, hp);
                         o.clashHp = hp - proj.dmg;
                         proj.dmg -= dealt;
-                        if (o.clashHp <= 0){ o._clashDead = true; t.kill(); visualEffects.push(new Effect(ex, ey, 'explosion', true, 8)); }
+                        if (o.clashHp <= 0){
+                            o._clashDead = true; t.kill();
+                            visualEffects.push(new Effect(ex, ey, 'explosion', true, 8));
+                            if (proj.infernoMax) infernoMaxChain(ex, ey, o);
+                        }
                         else visualEffects.push(new Effect(ex, ey, 'explosion', true, 5));   // moi vo mot phan
                         if (proj.dmg <= 0){ projectiles.splice(pi, 1); break; }
                     }
