@@ -22837,14 +22837,27 @@ class PulsarCloneBoss {
                     // tren NEN DAT DE DUNG (platform thap, du rong), va ti le giam dan theo
                     // do phuc tap cua chunk thay vi cat han.
                     {
+                        // Dat o GIUA -> CUOI doan (55%-88%). Truoc day dat quanh giua nen o cac
+                        // doan ngan no roi ngay dau, nguoi choi vua tiep dat la no da o sau lung —
+                        // vua kho ban trung vua khong doa duoc ai.
+                        const datShooter = (sg, bx) => {
+                            let t = 0.55 + Math.random() * 0.33;
+                            let gx = bx + sg.dx + sg.w * t - 18;
+                            gx = Math.min(gx, bx + sg.dx + sg.w - 40);
+                            enemies.push(new ForestShooter(gx, sg.top - 48));
+                        };
                         let deDung = ground.filter(sg => sg.w >= 110);
-                        let tiLe = terrainTier === 2 ? 0.38 : (terrainTier === 1 ? 0.52 : 0.68);
-                        if (deDung.length && Math.random() < tiLe) {
-                            let seg = deDung[Math.floor(Math.random() * deDung.length)];
-                            // dat quanh GIUA nen dat, lech mot chut cho do may moc
-                            let gx = base + seg.dx + seg.w / 2 - 18 + (Math.random() - 0.5) * Math.min(60, seg.w * 0.3);
-                            enemies.push(new ForestShooter(gx, seg.top - 34));
-                        }
+                        let tiLe = terrainTier === 2 ? 0.72 : (terrainTier === 1 ? 0.85 : 0.95);
+                        if (deDung.length && Math.random() < tiLe) datShooter(deDung[Math.floor(Math.random()*deDung.length)], base);
+                        // doan dai thi cho THEM mot con nua o nua sau
+                        let rongNhat = deDung.filter(sg => sg.w >= 240);
+                        if (rongNhat.length && Math.random() < 0.45) datShooter(rongNhat[Math.floor(Math.random()*rongNhat.length)], base);
+                        // ---- SHOOTER TREN PLATFORM ----
+                        // Doan de thi gan nhu luon co; doan kho thi thua hon nhung van co, vi
+                        // shooter chi 1 mau nen no la muc tieu thuong chu khong phai vat can.
+                        let buc = c.filter(sg => sg.top < 300 && sg.w >= 90);
+                        let tiLeBuc = terrainTier === 2 ? 0.5 : (terrainTier === 1 ? 0.72 : 0.9);
+                        if (buc.length && Math.random() < tiLeBuc) datShooter(buc[Math.floor(Math.random()*buc.length)], base);
                     }
                     // Trai tim tren nen dat (de lay), chim do tam ban
                     if (Math.random() < 0.6) { let gs = c.filter(sg => sg.top >= 305); if (gs.length) { let g = gs[Math.floor(Math.random() * gs.length)]; let ht = new Heart(); ht.x = base + g.dx + g.w / 2 - 8; ht.y = g.top - 46 - Math.random() * 46; hearts.push(ht); } }
@@ -22865,9 +22878,10 @@ class PulsarCloneBoss {
                     platforms.push({ x: maxRight, w: noiW, top: 320, h: 80 });   // nen phang noi giua (ngan)
                     // Doan dat lien noi giua hai chunk la cho DE DUNG nhat map: khong phai
                     // nhay, khong co ho. Cho shooter dung o day, lech quanh giua mot chut.
-                    if (Math.random() < 0.5) {
-                        let gx = maxRight + noiW / 2 - 18 + (Math.random() - 0.5) * 46;
-                        enemies.push(new ForestShooter(gx, 320 - 34));
+                    if (Math.random() < 0.88) {
+                        // 58%-88% chieu dai doan noi, khong con dung ngay dau
+                        let gx = maxRight + noiW * (0.58 + Math.random() * 0.30) - 18;
+                        enemies.push(new ForestShooter(gx, 320 - 48));
                     }
                     forestNextChunk = true;
                 }
@@ -22883,15 +22897,36 @@ class PulsarCloneBoss {
                     let c = VOLCANO_CHUNKS[Math.floor(Math.random() * VOLCANO_CHUNKS.length)];
                     let base = maxRight + 40, cw = c[c.length - 1].dx + c[c.length - 1].w;
                     c.forEach(seg => platforms.push({ x: base + seg.dx, w: seg.w, top: seg.top, h: seg.top >= 305 ? 400 - seg.top : 20, volcano: true }));
-                    c.forEach(seg => { if (seg.top >= 305 && seg.w <= 150 && Math.random() < 0.55) lavaGeysers.push({ x: base + seg.dx + seg.w/2, top: seg.top, t: Math.floor(Math.random() * 120) }); });
+                    // Cot lua truoc day: 55% moi doan + LUON co o doan noi, va deu dat dung
+                    // GIUA doan — trung y het cho dat trai tim ben duoi. Ket qua la tim gan nhu
+                    // khong lay duoc. Gio thua hon va dat LECH khoi tam.
+                    c.forEach(seg => { if (seg.top >= 305 && seg.w <= 150 && Math.random() < 0.32) {
+                        let lech = (Math.random() < 0.5 ? -1 : 1) * seg.w * (0.22 + Math.random()*0.12);
+                        lavaGeysers.push({ x: base + seg.dx + seg.w/2 + lech, top: seg.top, t: Math.floor(Math.random() * 120) });
+                    } });
                     let nd = 2 + (Math.random() < 0.5 ? 1 : 0);
                     for (let k = 0; k < nd; k++) enemies.push(new LavaDino(base + 120 + Math.random() * Math.max(60, cw - 180)));
                     if (hasRune('redbird') && Math.random() < 0.5) { let pp = new Pterodactyl('red'); pp.x = base + cw * 0.5; pp.y = 150 + Math.random() * 70; pp.baseYF = pp.y; pp.forestBob = Math.random() * Math.PI * 2; pp.speedOverride = gameSpeed * 1.3; enemies.push(pp); }
-                    if (Math.random() < 0.5) { let gs = c.filter(sg => sg.top >= 305); if (gs.length) { let g = gs[Math.floor(Math.random() * gs.length)]; let ht = new Heart(); ht.x = base + g.dx + g.w / 2 - 8; ht.y = g.top - 48; hearts.push(ht); } }
+                    if (Math.random() < 0.6) {
+                        let gs = c.filter(sg => sg.top >= 305);
+                        if (gs.length) {
+                            let g = gs[Math.floor(Math.random() * gs.length)];
+                            // Thu vai vi tri, chon cho XA COT LUA nhat. Tim ma nam trong cot lua
+                            // thi coi nhu khong co tim.
+                            let tot = base + g.dx + g.w/2 - 8, xaNhat = -1;
+                            for (let k = 0; k < 7; k++){
+                                let ux = base + g.dx + g.w * (0.18 + 0.64*(k/6)) - 8;
+                                let xa = 1e9;
+                                for (let gy of lavaGeysers) xa = Math.min(xa, Math.abs(gy.x - (ux+8)));
+                                if (xa > xaNhat){ xaNhat = xa; tot = ux; }
+                            }
+                            if (xaNhat >= 46){ let ht = new Heart(); ht.x = tot; ht.y = g.top - 48; hearts.push(ht); }
+                        }
+                    }
                     volcanoNextChunk = false;
                 } else {
                     platforms.push({ x: maxRight, w: 130, top: 320, h: 80, volcano: true });
-                    lavaGeysers.push({ x: maxRight + 65, top: 320, t: Math.floor(Math.random() * 120) });
+                    if (Math.random() < 0.55) lavaGeysers.push({ x: maxRight + 65, top: 320, t: Math.floor(Math.random() * 120) });
                     volcanoNextChunk = true;
                 }
             }
@@ -24340,7 +24375,8 @@ class PulsarCloneBoss {
 
         class ForestShooter {
             constructor(x, y) {
-                this.type = 'shooter'; this.w = 36; this.h = 34;
+                // Cao 34 nen dan bay tam nguc di ngay tren dau -> nang len 48.
+                this.type = 'shooter'; this.w = 36; this.h = 48;
                 this.x = x; this.y = y; this.hp = 1; this.maxHp = 1;   // ban tam xa -> giay, mot phat la bay
                 this.lastMeleeHit = -1; this.burnTimer = 0;
                 this.shootTimer = 45 + Math.floor(Math.random() * 60);
@@ -24428,8 +24464,28 @@ class PulsarCloneBoss {
                 ctx.fillStyle = "#FF5252"; ctx.fillRect(x + 10, y + 8, 2, 2); ctx.fillRect(x + 14, y + 8, 2, 2);
             }
             update() {
-                let dx = (dino.x + dino.w/2) - (this.x + this.w/2), dy = (dino.y + dino.h/2) - (this.y + this.h/2), d = Math.hypot(dx, dy) || 1;
-                this.x += dx/d * 2.3; this.y += dy/d * 2.3; this.flap += 0.4;
+                // Truoc day doi bay bam theo nguoi choi voi toc do khong doi -> no chi LO LUNG
+                // canh ben, khong bao gio thuc su tan cong. Gio: rinh mot nhip roi LAO THANG,
+                // huong bi KHOA luc bat dau lao nen ne duoc.
+                this.flap += 0.4;
+                if (this.pha === undefined){ this.pha = 'rinh'; this.chờ = 40 + Math.floor(Math.random()*30); }
+                let px = dino.x + dino.w/2, py = dino.y + dino.h/2;
+                let cx = this.x + this.w/2, cy = this.y + this.h/2;
+                if (this.pha === 'rinh'){
+                    // giu khoang cach phia tren nguoi choi, cho toi luc lao
+                    let mx = px + Math.cos(this.flap*0.25) * 70, my = py - 76;
+                    this.x += (mx - cx) * 0.045; this.y += (my - cy) * 0.05;
+                    if (--this.chờ <= 0){
+                        this.pha = 'lao';
+                        let dx0 = px - cx, dy0 = py - cy, d0 = Math.hypot(dx0, dy0) || 1;
+                        this.vx = dx0/d0 * 7.2; this.vy = dy0/d0 * 7.2;   // KHOA huong
+                        this.laoT = 0;
+                    }
+                } else {
+                    this.x += this.vx; this.y += this.vy; this.laoT++;
+                    if (this.laoT % 3 === 0) visualEffects.push(new Effect(cx, cy, 'explosion', true, 8));
+                    if (this.laoT > 34){ this.pha = 'rinh'; this.chờ = 46 + Math.floor(Math.random()*34); }
+                }
                 this.life--; if (this.life <= 0) this.hp = 0;
             }
         }
