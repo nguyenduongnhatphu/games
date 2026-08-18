@@ -24383,7 +24383,10 @@ class PulsarCloneBoss {
                 this.speedOverride = gameSpeed;
             }
             draw() {
-                let x = this.x, y = this.y;
+                // Than con nay chi cao 34px trong khi hop va cham la 48 (nang len de dan bay tam
+                // nguc con trung). Neu ve tu this.y thi chan no lo lung 14px tren mat dat — phai
+                // day hinh xuong cho khop, con hop van thua ra PHIA TREN dau.
+                let x = this.x, y = this.y + (this.h - 34);
                 ctx.fillStyle = "#000";
                 ctx.fillRect(x + 8, y + 8, 24, 18); ctx.fillRect(x, y, 16, 15); ctx.fillRect(x + 30, y + 13, 8, 6);
                 ctx.fillRect(x + 12, y + 24, 7, 10); ctx.fillRect(x + 22, y + 24, 7, 10);
@@ -27067,112 +27070,63 @@ class PulsarCloneBoss {
             ctx.fillStyle = "#1b1b1b"; ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "#FFD700"; ctx.font = "bold 30px Courier New"; ctx.textAlign = "center"; ctx.fillText("CHON MAP - CAMPAIGN", CX, 90);
             if (campaignTab === null) {
-                // Trang dau: hai the lon — AUTO RUN (gom 5 map cu) va DEFENSE
-                let ths = [
-                    { x: CX - 330, fill: "#FFB74D", tc: "#4E342E", n: "AUTO RUN", d1: "5 map chay tu dong", d2: "Sa mac · Rung · Dung nham" },
-                    { x: CX + 20,  fill: "#7986CB", tc: "#1A237E", n: "DEFENSE",  d1: "Thu thanh, map rong 2.5 man", d2: "Bao ve cu diem 5 mau" }
-                ];
-                for (let c of ths) {
-                    let hov = mouseX >= c.x && mouseX <= c.x + 310 && mouseY >= 150 && mouseY <= 280;
-                    ctx.fillStyle = c.fill; ctx.fillRect(c.x, 150, 310, 130);
-                    ctx.strokeStyle = hov ? "#fff" : "#000"; ctx.lineWidth = 4; ctx.strokeRect(c.x, 150, 310, 130);
-                    ctx.fillStyle = c.tc; ctx.font = "bold 24px Courier New"; ctx.fillText(c.n, c.x + 155, 200);
-                    ctx.font = "12px Courier New"; ctx.fillText(c.d1, c.x + 155, 228);
-                    ctx.fillText(c.d2, c.x + 155, 248);
+                let os = campaignO();
+                for (let c of os) {
+                    let hov = mouseX>=c.x && mouseX<=c.x+c.w && mouseY>=c.y && mouseY<=c.y+c.h;
+                    ctx.fillStyle = c.fill; ctx.fillRect(c.x, c.y, c.w, c.h);
+                    ctx.strokeStyle = hov ? "#fff" : "#000"; ctx.lineWidth = 4;
+                    ctx.strokeRect(c.x, c.y, c.w, c.h);
+                    // CAN GIUA O theo ca hai truc
+                    ctx.fillStyle = c.tc; ctx.textAlign = "center";
+                    ctx.font = "bold 21px Courier New";
+                    ctx.fillText(c.n, c.x + c.w/2, c.y + c.h/2 - 10);
+                    ctx.font = "bold 11px Courier New";
+                    if (c.d1) ctx.fillText(c.d1, c.x + c.w/2, c.y + c.h/2 + 14);
+                    if (c.d2) ctx.fillText(c.d2, c.x + c.w/2, c.y + c.h/2 + 30);
+                    ctx.textAlign = "left";
                 }
-                let bB0 = mouseX >= CX-100 && mouseX <= CX+100 && mouseY >= 330 && mouseY <= 370;
-                ctx.fillStyle = bB0 ? "#757575" : "#424242"; ctx.fillRect(CX-100, 330, 200, 40);
-                ctx.fillStyle = "white"; ctx.font = "bold 18px Courier New"; ctx.fillText(LANG[currentLang].back, CX, 355);
-                ctx.textAlign = "left"; return;
+                // nut QUAY LAI
+                ctx.fillStyle = "#424242"; ctx.fillRect(CX-100, 316, 200, 30);
+                ctx.strokeStyle = "#000"; ctx.lineWidth = 3; ctx.strokeRect(CX-100, 316, 200, 30);
+                ctx.fillStyle = "#fff"; ctx.font = "bold 16px Courier New"; ctx.textAlign = "center";
+                ctx.fillText(LT("QUAY LẠI","BACK"), CX, 337);
+                ctx.textAlign = "left";
+                return;
             }
-            let mcards = [
-                { x: 44,  fill: "#FFB74D", tc: "#5D4037", name: "SA MAC", d1: "Xuong rong", d2: "" },
-                { x: 228, fill: "#66BB6A", tc: "#1B5E20", name: "RUNG",  d1: "Platform + HO", d2: "(roi: -3)" },
-                { x: 412, fill: "#FF7043", tc: "#4E1500", name: "DUNG NHAM", d1: "Nham + phun", d2: "(roi: -2)" },
-                { x: 596, fill: "#7E8CB0", tc: "#12203E", name: "DINH NUI", d1: "Cot cao + vuc", d2: "(roi vuc: -2)" },
-                { x: 780, fill: "#9575CD", tc: "#311B92", name: "SONG SINH", d1: "4 Clone", d2: "(doi dia hinh)" }
-            ];
-            for (let cd of mcards) {
-                let hov = mouseX >= cd.x && mouseX <= cd.x+176 && mouseY >= 150 && mouseY <= 260;
-                ctx.fillStyle = cd.fill; ctx.fillRect(cd.x, 150, 176, 110); ctx.strokeStyle = hov ? "#fff" : "#000"; ctx.lineWidth = 4; ctx.strokeRect(cd.x, 150, 176, 110);
-                ctx.fillStyle = cd.tc; ctx.font = "bold 17px Courier New"; ctx.fillText(cd.name, cd.x+88, 194);
-                ctx.font = "11px Courier New"; ctx.fillText(cd.d1, cd.x+88, 219); if (cd.d2) ctx.fillText(cd.d2, cd.x+88, 237);
+            // ---- campaignTab === 'run': danh sach 5 map chay tu dong ----
+            {
+                const MS = [
+                    { t:"SA MẠC",    c:"#FFB74D", f:()=>{ mapTheme='desert';  startGame('normal'); } },
+                    { t:"RỪNG",      c:"#81C784", f:()=>{ mapTheme='forest';  startGame('normal'); } },
+                    { t:"DUNG NHAM", c:"#FF7043", f:()=>{ mapTheme='volcano'; startGame('normal'); } },
+                    { t:"ĐỈNH NÚI",  c:"#90CAF9", f:()=>{ mapTheme='dinhnui'; startGame('normal'); setupDinhNuiArena(); } },
+                    { t:"THỬ THÁCH BẢN SAO", c:"#CE93D8", f:()=>{ mapTheme='desert'; startGame('normal'); } }
+                ];
+                mapSelectO = [];
+                for (let i = 0; i < MS.length; i++){
+                    let x = CX - 330 + (i % 3) * 225, y = 108 + Math.floor(i/3) * 100;
+                    mapSelectO.push({ x:x, y:y, w:210, h:86, f:MS[i].f });
+                    let hov = mouseX>=x && mouseX<=x+210 && mouseY>=y && mouseY<=y+92;
+                    ctx.fillStyle = MS[i].c; ctx.fillRect(x, y, 210, 86);
+                    ctx.strokeStyle = hov ? "#fff" : "#000"; ctx.lineWidth = 4; ctx.strokeRect(x, y, 210, 86);
+                    ctx.fillStyle = "#212121"; ctx.font = "bold 16px Courier New"; ctx.textAlign = "center";
+                    ctx.fillText(MS[i].t, x + 105, y + 49);
+                    ctx.textAlign = "left";
+                }
+                ctx.fillStyle = "#424242"; ctx.fillRect(CX-100, 316, 200, 30);
+                ctx.strokeStyle = "#000"; ctx.lineWidth = 3; ctx.strokeRect(CX-100, 316, 200, 30);
+                ctx.fillStyle = "#fff"; ctx.font = "bold 16px Courier New"; ctx.textAlign = "center";
+                ctx.fillText(LT("QUAY LẠI","BACK"), CX, 337);
+                ctx.textAlign = "left";
             }
-            let bB = mouseX >= CX-100 && mouseX <= CX+100 && mouseY >= 330 && mouseY <= 370;
-            ctx.fillStyle = bB ? "#757575" : "#424242"; ctx.fillRect(CX-100, 330, 200, 40); ctx.fillStyle = "white"; ctx.font = "bold 18px Courier New"; ctx.fillText(LANG[currentLang].back, CX, 355);
-            ctx.textAlign = "left";
         }
-
-
-        // HUD GON cho SAN TAP: chi giu ĐẠN / KHIÊN / CHIÊU CUỐI / LƯỚT / PHÁI.
-        // Bo MAU, DIEM, HI, STREAK, nut MENU vi o san tap chung vo nghia.
-        function drawDojoHUD(){
-            const L = 14, BX = 108, BW = 120, y0 = 76, STEP = 20;
-            ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fillRect(0, y0 - 16, 268, 102);
-            ctx.textAlign = "left";
-            // --- DAN ---
-            let y = y0;
-            ctx.fillStyle = "#ECEFF1"; ctx.font = "bold 11px Courier New"; ctx.fillText(LANG[currentLang].ammo, L, y);
-            if (dino.isOverheated) { ctx.fillStyle = "#FF5252"; ctx.fillText(LANG[currentLang].reloading, BX, y); }
-            else if (dino.maxAmmo > 12) { ctx.fillStyle = ammoColors[dino.ammoType]; ctx.font = "bold 14px Courier New"; ctx.fillText(dino.ammo + "", BX, y + 1); }
-            else for (let i = 0; i < dino.maxAmmo; i++) {
-                ctx.fillStyle = i < dino.ammo ? ammoColors[dino.ammoType] : "rgba(255,255,255,0.18)";
-                ctx.fillRect(BX + i * 14, y - 9, 10, 10);
-            }
-            // --- KHIEN ---
-            y += STEP;
-            ctx.fillStyle = "#ECEFF1"; ctx.font = "bold 11px Courier New"; ctx.fillText(LANG[currentLang].shield, L, y);
-            ctx.fillStyle = "rgba(255,255,255,0.16)"; ctx.fillRect(BX, y - 9, BW, 10);
-            ctx.fillStyle = dino.shieldCd <= 0 ? "#00E676" : "#FFC107";
-            ctx.fillRect(BX, y - 9, Math.max(0, BW - dino.shieldCd * BW / 90), 10);
-            // --- CHIEU CUOI ---
-            y += STEP;
-            { let ultNames = ["OVERCHARGE","ATOMIC CORE","OVERDRIVE","PRISM NOVA","THUNDER GOD","JUDGEMENT CUT","SUPERNOVA"];
-              let uE = dino.ultActive ? (dino.ultAmmo === 2 ? (dino.ammo / Math.max(1, dino.maxAmmo) * 100) : ultCharge) : ultCharge;
-              let timedUlt = dino.fireReactorTimer > 0 || dino.lightningFormTimer > 0;
-              let uFull = ultCharge >= 100 && !dino.ultActive && !timedUlt;
-              ctx.fillStyle = "#FFD54F"; ctx.font = "bold 9px Courier New";
-              ctx.fillText(hasRune('shintrick') ? "ULT — KHOÁ" : (unityOn() ? (uniArmed > 0 ? "HỢP NHẤT — J/K" : "UNITY FUSION") : (ultNames[currentAmmoType] || LANG[currentLang].ult_word)), L, y);
-              if (unityOn()) drawUnityHud(L, y + 13);
-              ctx.fillStyle = "rgba(255,255,255,0.16)"; ctx.fillRect(BX, y - 9, BW, 10);
-              ctx.fillStyle = hasRune('shintrick') ? "#455A64" : ((unityOn() && uniArmed > 0) ? "#FFEB3B" : (dino.ultActive ? "#00E676" : (timedUlt ? "#FF5722" : (uFull ? (frames % 20 < 10 ? "#FFEB3B" : "#FF9800") : "#9C27B0"))));
-              ctx.fillRect(BX, y - 9, BW * Math.min(100, uE) / 100, 10); }
-            // --- PHAI ---
-            y += STEP;
-            { let SN = LANG[currentLang].stances, SC = ["#FF8F00", "#00ACC1", "#7E57C2"];
-              ctx.fillStyle = SC[combatStance]; ctx.font = "bold 11px Courier New";
-              ctx.fillText("◆ " + SN[combatStance], L, y);
-              ctx.fillStyle = "rgba(255,255,255,0.4)"; ctx.font = "9px Courier New"; ctx.fillText("[I] [O]", BX + 76, y); }
-            // --- LUOT ---
-            y += STEP;
-            { let dMax = combatStance === 1 ? 26 : 42, dReady = dashCd <= 0;
-              ctx.fillStyle = "#ECEFF1"; ctx.font = "bold 11px Courier New"; ctx.fillText(LANG[currentLang].dash, L, y);
-              ctx.fillStyle = "rgba(255,255,255,0.16)"; ctx.fillRect(BX, y - 9, BW, 9);
-              ctx.fillStyle = dReady ? "#00E5FF" : "#546E7A"; ctx.fillRect(BX, y - 9, BW * (1 - Math.max(0, dashCd) / dMax), 9); }
-            ctx.textAlign = "left";
-        }
+        let mapSelectO = [];
         function drawUI() {
-            if (dojoMode) { drawDojoHUD(); return; }   // SAN TAP: dung HUD gon rieng
-            if (gameState === 'pvp' || gameState === 'pvp_end') {
-                // UI PVP
-                // P1
+            if (gameState === 'pvp') {
                 ctx.fillStyle = "black"; ctx.font = "bold 18px Courier New";
                 ctx.textAlign = "left";
                 ctx.fillText("P1 HP: ", 20, 35);
-                ctx.fillStyle = "#E53935"; ctx.font = "bold 20px Courier New"; ctx.fillText("\u2665", 90, 35); ctx.fillStyle = dino.hp <= 1 ? "#FF5252" : "white"; ctx.font = "bold 18px Courier New"; ctx.fillText(Math.max(0,Math.ceil(dino.hp)) + "/" + dino.maxHp, 90 + 22, 34); { let _sh = dino.runeShield || 0; if (_sh > 0) { ctx.fillStyle = "#4FC3F7"; ctx.font = "16px Courier New"; ctx.fillText("\u2748".repeat(_sh), 90 + 78, 34); } } ctx.font = "bold 20px Courier New";
-                if (currentShieldType === 1 && dino) { let se = dino.shieldEnergy === undefined ? 100 : dino.shieldEnergy;
-                    ctx.fillStyle = "rgba(0,0,0,0.55)"; ctx.fillRect(90, 42, 120, 8);
-                    ctx.fillStyle = se >= 99.9 ? "#69F0AE" : (se > 20 ? "#4FC3F7" : "#FF5252"); ctx.fillRect(91, 43, 118 * (se / 100), 6);
-                    ctx.fillStyle = "#90A4AE"; ctx.font = "8px Courier New"; ctx.textAlign = "left"; ctx.fillText("KHIÊN (giữ L)", 90, 60); }
-                ctx.fillStyle = "black"; ctx.font = "bold 15px Courier New"; ctx.fillText(LANG[currentLang].ammo, 20, 65);
-                if (dino.isOverheated) { ctx.fillStyle = "red"; ctx.fillText(LANG[currentLang].reloading, 80, 65); } 
-                else { 
-                    if (dino.maxAmmo > 12) { ctx.fillStyle = ammoColors[dino.ammoType]; ctx.font = "bold 18px Courier New"; ctx.fillText(dino.ammo + "", 84, 66); ctx.fillStyle = "#fff"; ctx.font = "bold 12px Courier New"; ctx.fillText("VIÊN", 118, 65); }
-                    else for (let i = 0; i < dino.maxAmmo; i++) { 
-                        ctx.fillStyle = i < dino.ammo ? ammoColors[dino.ammoType] : "rgba(0,0,0,0.3)"; 
-                        ctx.fillRect(80 + i * 16, 53, 12, 12); 
-                    } 
-                }
+                for (let i = 0; i < dino.maxHp; i++) { ctx.fillStyle = i < dino.hp ? "#E53935" : "rgba(0,0,0,0.3)"; ctx.fillRect(90 + i*16, 22, 12, 12); }
                 ctx.fillStyle = "black"; ctx.fillText(LANG[currentLang].shield, 20, 85);
                 ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(90, 75, 90, 10);
                 ctx.fillStyle = dino.shieldCd <= 0 ? "#00FF00" : "#FFC107";
@@ -28785,6 +28739,259 @@ class PulsarCloneBoss {
             ctx.textAlign = "left";
         }
 
+        // ======================= @@HE-LOTRINH =======================
+        // BAN THO cua che do Route-like. Nguoi choi di theo mot lo trinh phan nhanh; moi o la
+        // MOT boss rut ngau nhien kem dau truong rieng cua no. MAU GIU NGUYEN giua cac chang —
+        // do la thu bien chuoi tran roi rac thanh mot lan choi lien mach.
+        // CHUA lam (co y): o nghi, o thuong rune, kinh te giua chang, va doan map chay truoc boss.
+        let routeMap = null, routeLop = 0, routeO = 0, routeHp = 0, routeXong = 0, routeDuong = -1, routeMapDaDi = [];
+        // ===== LO TRINH THEO MAP =====
+        // Boss dau tien LUON la T-Rex hoac Ptero. Sau do nguoi choi chon 1 trong 4 CON DUONG
+        // ung voi 4 map; moi duong di theo dung THU TU TRONG MENU TEST BOSS — von da xep tu de
+        // den kho san. Doi khi nhanh ra mot O AN (Clone hoac boss tu the gioi khac: DMC, LOL, DS).
+        // Chang cuoi cua moi duong la boss COLOSSAL cua map do.
+        const ROUTE_MO = [ [0,'T-REX','#E64A19'], [1,'PTERO','#5E35B1'] ];
+        // ===== 4 BAC DO KHO + COLOSSAL =====
+        // Moi con duong chay qua DUNG bon bac roi toi Colossal. Xep bac dua tren THU TU GOC
+        // trong menu Test Boss (von da xep tu de den kho san) chu khong dua tren thanh mau —
+        // T-Rex mau giay la vi no ra doi truoc khi co Rune, khong phai vi no de.
+        const BAC_TEN = ['DỄ', 'KHÁ DỄ', 'BÌNH THƯỜNG', 'KHÓ'];
+        const BAC_MAU = ['#8BC34A', '#FFD54F', '#FF9800', '#EF5350'];
+        const ROUTE_DUONG = [
+            // Sa mac truoc day moi bac chi co DUNG MOT con nen lan nao cung y het nhau.
+            // Gio moi bac nhieu lua chon, va cac BOSS DOI (id 6-11) duoc xep dung do kho cua no.
+            // Scarab Lord giu nguyen vi tri ke cuoi. Quetzal khong kho nen co ban doi rieng.
+            { ten:'SA MẠC', mau:'#FFB74D', bac:[
+                [[2,'TRICERA'],[1,'PTERO']],
+                [[3,'SPINO'],[6,'T-REX + PTERO'],[9,'PTERO + TRICERA']],
+                [[12,'QUETZAL'],[8,'T-REX + SPINO'],[11,'TRICERA + SPINO'],[62,'QUETZAL + TRICERA']],
+                [[43,'SCARAB LORD'],[63,'QUETZAL + SPINO']] ],
+              cuoi:[4,'GODZILLA'] },
+            { ten:'RỪNG', mau:'#81C784', bac:[
+                [[13,'SERPENT'],[15,'ĐẠI BÀNG']], [[14,'DILOPHOS'],[18,'NHỆN']],
+                [[16,'BƯỚM ĐÊM'],[45,'ECHO STALKER']], [[41,'IAI RAPTOR'],[35,'CỰ VIÊN'],[46,'SPORE CROWN']] ],
+              cuoi:[19,'TITAN RỪNG'] },
+            { ten:'ĐỈNH NÚI', mau:'#90CAF9', bac:[
+                [[32,'THẠCH ƯNG'],[28,'BĂNG NHA']], [[25,'PHONG LONG'],[33,'CỰ THẠCH']],
+                [[29,'KIM CANG REX'],[22,'AEGIS REX']], [[42,'SIEGE GOLIATH'],[59,'SLASH BEAST']] ],
+              cuoi:[34,'SƠN THẦN'] },
+            { ten:'DUNG NHAM', mau:'#FF7043', bac:[
+                [[24,'HỎA XÀ'],[26,'MAGMOR']], [[47,'HOẢ LANG'],[27,'THẠCH TRỤ REX']],
+                [[48,'DIÊM THƯƠNG'],[23,'ARCANA REX']], [[49,'HOẢ TÂM'],[30,'HỎA LONG'],[40,'MAGMA DRAGOON']] ],
+              cuoi:[31,'HẮC LONG VƯƠNG'] }
+        ];
+        // O AN: Clone va cac boss tu the gioi khac
+        const ROUTE_AN_CLONE = [ [5,'HELIOS REX'],[21,'VULCAN REX'],[20,'EREBUS REX'],
+                                 [37,'VOLT REX'],[50,'UNITY CLONE'],[58,'PULSAR CLONE'] ];
+        const ROUTE_AN_KHACH = [ [51,'VERGIL'],[52,'DANTE'],[60,'NERO'],
+                                 [53,'WAR'],[54,'DEATH'],[56,'ARTORIAS'],[61,'YASUO'] ];
+        const ROUTE_AN_DB    = [ [36,'TETRIS'],[38,'3 KHỦNG LONG'],[39,'MOSASAURUS'],[44,'CHRONO REX'] ];
+        // O an dat theo CHANG: Clone (nang nhat) o chang 6, boss khu Dac Biet o chang 4-5.
+        // Khach (DMC/LOL/DS) van chi nam SAU Colossal.
+        function routeRutAn(chang){
+            let bo, kind;
+            if (chang >= 5){ bo = ROUTE_AN_CLONE; kind='clone'; }
+            else { bo = ROUTE_AN_DB; kind='db'; }
+            let b = bo[Math.floor(Math.random()*bo.length)];
+            return { id:b[0], ten:b[1], mau: kind==='db'?'#CE93D8':'#B39DDB', an:true, kind:kind };
+        }
+        // Nhanh RE SANG MAP KHAC. Luat: moi run chi cham toi TOI DA 3 map. Da di qua map nao
+        // thi van quay lai duoc map do, nhung khong mo them map thu tu — nhu vay nguoi choi tu
+        // ve duong theo boss minh muon danh ma van khong quet sach ca game trong mot lan.
+        const ROUTE_MAP_TOI_DA = 3;
+        function routeReMap(bac){
+            let daCo = routeMapDaDi || [];
+            let ungVien = [];
+            for (let i = 0; i < ROUTE_DUONG.length; i++){
+                if (i === routeDuong) continue;
+                if (daCo.length >= ROUTE_MAP_TOI_DA && daCo.indexOf(i) < 0) continue;
+                ungVien.push(i);
+            }
+            if (!ungVien.length) return null;
+            let idx = ungVien[Math.floor(Math.random()*ungVien.length)];
+            let D = ROUTE_DUONG[idx];
+            let bo = D.bac[Math.min(bac, D.bac.length-1)];
+            let b = bo[Math.floor(Math.random()*bo.length)];
+            if (daCo.indexOf(idx) < 0) daCo.push(idx);
+            routeMapDaDi = daCo;
+            return { id:b[0], ten:b[1], nhan:D.ten, mau:D.mau, bac:bac, reMap:idx };
+        }
+        function routeTao(){
+            let mo = ROUTE_MO[Math.floor(Math.random()*ROUTE_MO.length)];
+            routeMap = [
+                [ { id:mo[0], ten:mo[1], mau:mo[2], xong:false } ],
+                ROUTE_DUONG.map((d,idx) => {
+                    // O nay VUA la lua chon con duong VUA la mot tran that: boss DE NHAT cua map do.
+                    // Truoc day no chi la mot nut chon duong truu tuong -> bam vao khong vao tran,
+                    // nguoi choi tuong la hong.
+                    let b = d.bac[0][0];
+                    return { duong:idx, id:b[0], ten:b[1], nhan:d.ten, mau:d.mau, chonDuong:true, bac:0, xong:false };
+                })
+            ];
+            routeDuong = -1; routeLop = 0; routeO = 0; routeXong = 0;
+            routeHp = dino ? dino.maxHp : 5;
+        }
+        // Chon mot con duong -> sinh not cac chang con lai cua duong do
+        function routeMoDuong(idx){
+            routeDuong = idx;
+            routeMapDaDi = [idx];
+            let D = ROUTE_DUONG[idx];
+            for (let b = 1; b < D.bac.length; b++){
+                let bo = D.bac[b];
+                let x = bo[Math.floor(Math.random()*bo.length)];
+                let hang = [ { id:x[0], ten:x[1], mau:BAC_MAU[b], bac:b, xong:false } ];
+                // Chang 4-5 (bac 2-3): re sang map khac HOAC o Dac Biet.
+                // Chang 6 (bac cuoi): o Clone.
+                if (b >= 2){
+                    let r = Math.random();
+                    if (r < 0.60){
+                        let rm = routeReMap(b);
+                        if (rm) hang.push(Object.assign(rm, { xong:false }));
+                        else hang.push(Object.assign(routeRutAn(b), { xong:false }));
+                    }
+                    else hang.push(Object.assign(routeRutAn(b), { xong:false }));
+                }
+                routeMap.push(hang);
+            }
+            // CHANG 6: Colossal cua map, HOAC mot Clone — nguoi choi tu chon con nao.
+            // Clone la nhom nang nhat trong cac boss dac biet nen dat ngang hang voi Colossal.
+            {
+                let hang6 = [ { id:D.cuoi[0], ten:D.cuoi[1], mau:'#FFD700', colossal:true, xong:false } ];
+                hang6.push(Object.assign(routeRutAn(5), { xong:false }));
+                routeMap.push(hang6);
+            }
+            let kh = ROUTE_AN_KHACH.slice();
+            for (let i = kh.length-1; i > 0; i--){ let j3 = Math.floor(Math.random()*(i+1)); let t = kh[i]; kh[i] = kh[j3]; kh[j3] = t; }
+            routeMap.push(kh.slice(0,2).map(b => ({ id:b[0], ten:b[1], mau:'#FF5252', an:true, kind:'khach', xong:false })));
+        }
+        function routeLayout(){
+            let ra = [], LOP = routeMap.length;
+            let x0 = 70, x1 = Math.min(canvas.width - 70, 70 + (LOP - 1) * 112);
+            for (let L = 0; L < LOP; L++){
+                let hang = routeMap[L], n = hang.length;
+                let px = x0 + (x1 - x0) * (L / (LOP - 1));
+                for (let k = 0; k < n; k++){
+                    let py = 196 + (k - (n-1)/2) * 66;
+                    ra.push({ L:L, k:k, o:hang[k], x:px, y:py, r:26 });
+                }
+            }
+            return ra;
+        }
+        function routeChonDuoc(L){ return L === routeLop; }
+        function drawRoute(){
+            ctx.fillStyle = '#0A0E16'; ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.textAlign='center';
+            ctx.fillStyle='#FFD54F'; ctx.font='bold 20px Courier New';
+            ctx.fillText(LT('LỘ TRÌNH','ROUTE'), canvas.width/2, 26);
+            ctx.fillStyle='#78909C'; ctx.font='11px Courier New';
+            ctx.fillText(LT('Boss đầu luôn là T-Rex/Ptero · chọn 1 trong 4 con đường · 💀 là ô ẩn hoặc Colossal',
+                            'First boss is always T-Rex/Ptero · pick 1 of 4 routes · 💀 = hidden or Colossal'), canvas.width/2, 44);
+            let L2 = routeLayout();
+            // duong noi
+            ctx.strokeStyle='rgba(255,255,255,0.16)'; ctx.lineWidth=2;
+            for (let a of L2) for (let b of L2){
+                if (b.L !== a.L + 1) continue;
+                ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+            }
+            for (let nd of L2){
+                let mo = nd.o.xong ? 0.32 : (routeChonDuoc(nd.L) ? 1 : 0.5);
+                ctx.save(); ctx.globalAlpha = mo;
+                ctx.fillStyle = nd.o.xong ? '#37474F' : nd.o.mau;
+                ctx.beginPath(); ctx.arc(nd.x, nd.y, nd.r, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = routeChonDuoc(nd.L) ? '#FFFFFF' : 'rgba(255,255,255,0.3)';
+                ctx.lineWidth = routeChonDuoc(nd.L) ? 3 : 1.5;
+                ctx.beginPath(); ctx.arc(nd.x, nd.y, nd.r, 0, Math.PI*2); ctx.stroke();
+                if (nd.o.an || nd.o.colossal){
+                    ctx.fillStyle='#FFF'; ctx.font='bold 15px Courier New';
+                    ctx.fillText('💀', nd.x, nd.y+5);
+                }
+                // AN TEN cac chang chua toi — chi hien chang hien tai va cac chang da qua
+                let hienTen = nd.o.xong || nd.L <= routeLop;
+                ctx.fillStyle='#ECEFF1'; ctx.font='bold 10px Courier New';
+                ctx.fillText(hienTen ? nd.o.ten : '???', nd.x, nd.y + nd.r + 14);
+                let nhan = nd.o.chonDuong ? LT('CON ĐƯỜNG','ROUTE')
+                         : nd.o.nhan ? nd.o.nhan
+                         : nd.o.bac !== undefined ? BAC_TEN[nd.o.bac]
+                         : nd.o.colossal ? 'COLOSSAL'
+                         : nd.o.an ? (nd.o.kind==='khach'?LT('KHÁCH','GUEST'):(nd.o.kind==='db'?LT('ĐẶC BIỆT','SPECIAL'):'CLONE'))
+                         : '';
+                if (nhan && hienTen){
+                    ctx.fillStyle = nd.o.colossal?'#FFD54F':(nd.o.an?'#FF8A80':'#B0BEC5');
+                    ctx.font='bold 8px Courier New';
+                    ctx.fillText(nhan, nd.x, nd.y + nd.r + 25);
+                }
+                ctx.restore();
+            }
+            // trang thai
+            ctx.fillStyle='#B0BEC5'; ctx.font='bold 13px Courier New';
+            ctx.fillText((routeDuong>=0?('['+ROUTE_DUONG[routeDuong].ten+']  '):'') + LT('Chặng ','Stage ') + (routeLop+1) + ' / ' + routeMap.length
+                       + '     ♥ ' + Math.max(0,Math.ceil(routeHp)), canvas.width/2, canvas.height - 24);
+            ctx.fillStyle='#546E7A'; ctx.font='10px Courier New';
+            ctx.fillText(LT('Bấm một ô sáng để vào trận','Click a lit node to enter'), canvas.width/2, canvas.height - 8);
+            ctx.textAlign='left';
+        }
+        function routeClick(mx,my){
+            for (let nd of routeLayout()){
+                if (!routeChonDuoc(nd.L) || nd.o.xong) continue;
+                if (Math.hypot(mx-nd.x, my-nd.y) > nd.r + 6) continue;
+                let chiSo = nd.k;
+                if (nd.o.chonDuong){
+                    routeMap[1] = [ routeMap[1][nd.k] ];
+                    routeMoDuong(nd.o.duong);
+                    chiSo = 0;          // lop nay vua rut con DUNG MOT o -> chi so phai la 0
+                }
+                // Truoc day dong `routeO = nd.k` chay SAU khoi tren nen ghi de mat chi so 0,
+                // roi routeThangChang() truy cap routeMap[1][2] khong ton tai -> nem loi va
+                // mat run ngay sau khi thang boss thu hai.
+                routeO = Math.max(0, Math.min(chiSo, routeMap[routeLop].length - 1));
+                testBossSelection = nd.o.id;
+                startGame('test_boss');
+                routeDangChay = true;
+                dino.hp = Math.max(1, Math.min(dino.maxHp, routeHp));
+                return true;
+            }
+            return false;
+        }
+        let routeDangChay = false, routeDaHien = false;
+        // Goi khi boss trong mot chang da chet
+        function routeThangChang(){
+            if (!routeDangChay) return;
+            // "Het boss" KHONG dong nghia voi "thang". Neu nguoi choi da chet thi bosses cung
+            // bi don sach -> truoc day no bi tinh la thang chang va cho di tiep.
+            if (dino.hp <= 0){ routeDangChay = false; routeDaHien = false; routeMap = null; return; }
+            routeDangChay = false; routeDaHien = false;
+            routeHp = Math.max(1, dino.hp);
+            let _hang = routeMap[routeLop] || [];
+            let _o = _hang[routeO] || _hang[0];
+            if (_o) _o.xong = true;
+            routeXong++;
+            routeLop++;
+            if (routeLop >= routeMap.length){ routeLop = routeMap.length - 1; gameVictory = true; gameState = 'gameover'; return; }
+            gameState = 'route';
+        }
+
+        // ===== TRANG DAU CHIEN DICH: MOT nguon toa do duy nhat cho ca VE lan BAM =====
+        // Truoc day phan ve va phan bam giu hai bo so rieng, sua mot ben la lech ben kia —
+        // dung cai loi da tung xay ra voi bang Rune. Gio ca hai deu doc tu day.
+        function campaignO(){
+            const W = 300, H = 96, GX = 20, GY = 14;
+            let x0 = CX - W - GX/2, y0 = 96;
+            return [
+                { x:x0,          y:y0,        w:W, h:H, id:'run',   fill:"#FFB74D", tc:"#4E342E",
+                  n:"AUTO RUN", d1:"5 map chay tu dong", d2:"Sa mac · Rung · Dung nham" },
+                { x:x0+W+GX,     y:y0,        w:W, h:H, id:'def',   fill:"#7986CB", tc:"#1A237E",
+                  n:"DEFENSE",  d1:"Thu thanh, map rong 2.5 man", d2:"Bao ve cu diem 5 mau" },
+                { x:x0,          y:y0+H+GY,   w:W, h:H, id:'route', fill:"#4DD0E1", tc:"#00363A",
+                  n:"LO TRINH", d1:"7 chang · 4 con duong theo map", d2:"Mau giu nguyen giua cac chang" },
+                { x:x0+W+GX,     y:y0+H+GY,   w:W, h:H, id:'trong', fill:"#37474F", tc:"#78909C",
+                  n:"— TRONG —", d1:"danh cho che do sau nay", d2:"" }
+            ];
+        }
+        function campaignBam(mx,my){
+            for (let c of campaignO())
+                if (mx>=c.x && mx<=c.x+c.w && my>=c.y && my<=c.y+c.h) return c.id;
+            return null;
+        }
         function drawTestMenu() {
             drawEnvironment(); ctx.fillStyle = "rgba(0,0,0,0.9)"; ctx.fillRect(0,0, canvas.width, canvas.height);
             ctx.textAlign = "center";
@@ -30340,9 +30547,16 @@ class PulsarCloneBoss {
         }, { passive: false });
         canvas.addEventListener('click', e => {
             SFX.init(); SFX.resume();
-            if (gameOver || gameVictory) { gameState = 'menu'; gameOver = false; gameVictory = false; paused = false; SFX.stopMusic(); setControlsVisible(true); return; }
+            if (gameOver || gameVictory) { if ((routeDangChay || routeMap) && dino && dino.hp <= 0){ routeDangChay = false; routeDaHien = false; routeMap = null; }
+                gameState = 'menu'; gameOver = false; gameVictory = false; paused = false; SFX.stopMusic(); setControlsVisible(true); return; }
             // SAN TAP: bam nut tren thanh menu gon
-            if (dojoMode) { if (dojoPick && dojoPickerClick()) return; menuPanelClick(); return; }
+            // SAN TAP chay nen nen `dojoMode` gan nhu luon bat. Neu de no nuot moi cu bam thi
+            // cac man hinh MENU toan trang (map_select, route, ...) khong the bam duoc — do la
+            // loi da xay ra. Nhung neu chi cho qua khi gameState==='menu' thi lai chet thanh menu
+            // cua chinh Dojo, vi startDojo() doi gameState sang trang thai choi that.
+            // Dung cach: LOAI TRU dung cac man menu toan trang, con lai giu nguyen hanh vi cu.
+            const _MAN_MENU = ['map_select','route','duel_tune','test_menu','br_select','custom_menu','selftest','pvp_setup'];
+            if (dojoMode && _MAN_MENU.indexOf(gameState) < 0) { if (dojoPick && dojoPickerClick()) return; menuPanelClick(); return; }
             if (gameState === 'menu') {
                 menuPanelClick();
             } else if (gameState === 'br_select') {
@@ -30354,12 +30568,18 @@ class PulsarCloneBoss {
             } else if (gameState === 'selftest') {
                 selfTestChay = false; gameState = 'test_menu';
             } else if (gameState === 'map_select') {
+                if (campaignTab === 'run') {
+                    for (let o of mapSelectO)
+                        if (mouseX>=o.x && mouseX<=o.x+o.w && mouseY>=o.y && mouseY<=o.y+o.h){ o.f(); return; }
+                    if (mouseX >= CX-100 && mouseX <= CX+100 && mouseY >= 316 && mouseY <= 346){ campaignTab = null; return; }
+                    return;
+                }
                 if (campaignTab === null) {
-                    if (mouseY >= 150 && mouseY <= 280 && mouseX >= CX-330 && mouseX <= CX-20) campaignTab = 'run';
-                    else if (mouseY >= 150 && mouseY <= 280 && mouseX >= CX+20 && mouseX <= CX+330) {
-                        startGame('normal'); setupDefenseArena();
-                    }
-                    else if (mouseX >= CX-100 && mouseX <= CX+100 && mouseY >= 330 && mouseY <= 370) gameState = 'menu';
+                    let id = campaignBam(mouseX, mouseY);
+                    if (id === 'route'){ routeTao(); gameState = 'route'; return; }
+                    if (id === 'run'){ campaignTab = 'run'; return; }
+                    if (id === 'def'){ startGame('normal'); setupDefenseArena(); return; }
+                    if (mouseX >= CX-100 && mouseX <= CX+100 && mouseY >= 316 && mouseY <= 346) gameState = 'menu';
                     return;
                 }
                 if (mouseY >= 150 && mouseY <= 260 && mouseX >= 44 && mouseX <= 220) { mapTheme = 'desert'; startGame('normal'); }
@@ -30443,6 +30663,8 @@ class PulsarCloneBoss {
                     }
                     else for (let sl = 0; sl < 2; sl++) { let y = 78 + sl * 152; if (mouseY >= y && mouseY <= y + 142) { quetRuneBatHopPhap(true); runePicker = sl; runeLevelPick = null; runeScroll = 0; break; } }
                 }
+            } else if (gameState === 'route') {
+                routeClick(mouseX, mouseY);
             } else if (gameState === 'duel_tune') {
                 duelTuneClick(mouseX, mouseY);
             } else if (gameState === 'test_menu') {
@@ -32915,6 +33137,13 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         }
 
         function spawnEntities() {
+            // LO TRINH: o che do test_boss, he thong tu hoi sinh boss khi bosses rong. Phai bat
+            // khoanh khac boss chet NGAY TAI DAY, truoc khi con moi kip xuat hien.
+            if (routeDangChay && gameState === 'test_boss'){
+                if (dino.hp <= 0){ routeDangChay = false; routeDaHien = false; routeMap = null; }
+                else if (bosses.length > 0) routeDaHien = true;
+                else if (routeDaHien){ routeDaHien = false; routeThangChang(); return; }
+            }
             if (bosses.length > 0) return; 
             
             if (gameState === 'test_boss') {
@@ -32933,6 +33162,9 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                 else if (testBossSelection === 10) { let b1 = new PteroBoss(1); let b2 = new SpinoBoss(1); offsetDoubleGroundBosses(b1,b2); bosses.push(b1,b2); }
                 else if (testBossSelection === 11) { let b1 = new TriceratopsBoss(1); let b2 = new SpinoBoss(1); offsetDoubleGroundBosses(b1,b2); bosses.push(b1,b2); }
                 else if (testBossSelection === 12) { bosses.push(new QuetzalBoss(1)); }
+                // Cap doi co QUETZAL: con nay bay va khong kho, ghep doi rat hop
+                else if (testBossSelection === 62) { let b1 = new QuetzalBoss(1); let b2 = new TriceratopsBoss(1); b1.x = canvas.width - 260; b2.x = canvas.width - 140; bosses.push(b1,b2); }
+                else if (testBossSelection === 63) { let b1 = new QuetzalBoss(1); let b2 = new SpinoBoss(1);       b1.x = canvas.width - 260; b2.x = canvas.width - 140; bosses.push(b1,b2); }
                 else if (testBossSelection === 13) { setupSwampArena(); bosses.push(new GreatSerpentBoss(1)); }
                 else if (testBossSelection === 14) { setupSerpentArena(); bosses.push(new DilophosBoss(1)); }
                 else if (testBossSelection === 15) { setupSerpentArena(); bosses.push(new StormEagleBoss(1)); }
@@ -33808,6 +34040,7 @@ function checkPvPCollisions() {
             if (gameState === 'br_select') { drawBrSelect(); return; }
             if (gameState === 'custom_menu') { drawCustomMenu(); frames++; drawLightningEffects(); return; } 
             if (gameState === 'test_menu') { drawTestMenu(); return; }
+            if (gameState === 'route') { drawRoute(); return; }
             if (gameState === 'duel_tune') { drawDuelTune(); return; }
             if (gameState === 'selftest') { drawSelfTest(); return; }
             if (gameState === 'pvp_setup') { drawPvPSetup(); return; }
@@ -34120,6 +34353,11 @@ function checkPvPCollisions() {
             // cap nhat rieng cua Pulsar nen co luc khong duoc goi -> sung dung im, khong bao gio
             // ban het 100 vien de tu gap lai.
             if (typeof dino !== 'undefined' && dino && dino.sentry) dino._tickSentry();
+            // LO TRINH: boss cua chang da chet -> ve ban do NGAY. Phai chan truoc spawnEntities,
+            // vi o che do test_boss he thong se tu hoi sinh boss khi bosses rong.
+            // CHI dua vao mau nguoi choi. `gameOver`/`gameVictory` cung bat khi HA DUOC boss
+            // nen dung chung se tuong nham la thua va xoa mat run.
+            if (routeDangChay && dino && dino.hp <= 0){ routeDangChay = false; routeDaHien = false; routeMap = null; }
             tickMinionProxy();
             if (typeof pet2TickLua === 'function'){ pet2TickDash(); pet2TickLua(); }
             if (defMode) defPlayerHits();
