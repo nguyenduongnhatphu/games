@@ -30046,7 +30046,7 @@ class PulsarCloneBoss {
               descEn:'Costs 2 slots. Like C1, plus: every non-crit adds +5% chance (resets on crit). Every point of missing HP adds +15% — at 1 HP it is 100%. At 100% chance, roll again at 25% for a SUPER CRIT dealing ×3 damage.' },
             { id:'endlesssmall', name:'ĐẠN VÔ TẬN', nameEn:'ENDLESS SHOTS', icon:'∞', cost:1, ammoRune:true, onlyAmmoAny:[0,2], desc:'Tốn 1 ô. ĐỘC QUYỀN PULSE và RAPIDFIRE. Bắn thường (J) không tốn đạn và không quá nhiệt, cho phép bắn vô hạn. Mỗi viên lệch ngẫu nhiên trong khoảng ±3° so với hướng ngắm.', descEn:'Costs 1 slot. PULSE and RAPIDFIRE ONLY. Normal fire (J) uses no ammo and never overheats, allowing unlimited shots. Each shot is randomly deviated by up to ±3° from the aim direction.' },
             { id:'hyperspeed', goiY:'voltdash', name:'SIÊU TỐC', nameEn:'HYPER SPEED', icon:'⚡', desc:'Tốn 1 ô. Tốc độ di chuyển tăng 1.5 lần. Nhảy cao hơn 1.5 lần; tổng thời gian nhảy không đổi.', descEn:'Costs 1 slot. Movement speed is 1.5x. Jump height is 1.5x higher while total jump time remains unchanged.' },
-            { id:'explshot',    name:'AWAKENED: NOVA', nameEn:'AWAKENED: NOVA', icon:'💥', cost:2, ammoRune:true, desc:'Tốn 2 ô. NÂNG CẤP ĐẠN — dùng được với MỌI loại đạn. Đòn đánh vẫn gây sát thương trực tiếp như bình thường. Đòn gốc và Nova dùng chung một lần roll 25% CRIT: nếu Crit thì cả viên đạn gốc và vụ nổ Nova cùng gây gấp đôi sát thương; Nova Crit còn tăng bán kính 18%. Nova nổ lan 1 dmg lên các mục tiêu đứng cạnh, mục tiêu trúng trực tiếp không ăn thêm.', descEn:'Costs 2 slots. AMMO UPGRADE — works with EVERY ammo type. Attacks still deal their normal direct damage. The original hit and Nova share one 25% CRIT roll: if it Crits, both the original projectile/hit and the Nova splash deal double damage; Nova Crit also increases the blast radius by 18%. Nova splashes 1 damage to nearby targets, and the direct target takes no extra splash damage.' },
+            { id:'explshot',    name:'AWAKENED: NOVA', nameEn:'AWAKENED: NOVA', icon:'💥', cost:2, ammoRune:true, desc:'Tốn 2 ô. NÂNG CẤP ĐẠN — dùng được với MỌI loại đạn. Đòn đánh vẫn gây sát thương trực tiếp như bình thường. Đòn gốc và Nova dùng chung một lần roll 25% CRIT: nếu Crit thì cả viên đạn gốc và vụ nổ Nova cùng gây gấp đôi sát thương; Nova Crit còn tăng bán kính 18%. Nova nổ lan 1 dmg lên các mục tiêu đứng cạnh, mục tiêu trúng trực tiếp không ăn thêm. DẤU ẤN: mỗi vụ nổ để lại một dấu ấn tại chỗ, 1 giây sau NỔ LẦN HAI gây 1 dmg lên MỌI mục tiêu trong đó — kể cả con vừa ăn đòn gốc. Bắn trải ra là rải bom khắp bản đồ.', descEn:'Costs 2 slots. AMMO UPGRADE — works with EVERY ammo type. Attacks still deal their normal direct damage. The original hit and Nova share one 25% CRIT roll: if it Crits, both the original projectile/hit and the Nova splash deal double damage; Nova Crit also increases the blast radius by 18%. MARK: every blast leaves a mark that detonates again 1 second later for 1 damage to EVERY target inside it, including the one that took the original hit. Nova splashes 1 damage to nearby targets, and the direct target takes no extra splash damage.' },
             { id:'headbutt',    name:'HÚC ĐẦU', nameEn:'HEADBUTT', icon:'🐏', desc:'Lướt tạo lớp khiên bán nguyệt trước mặt suốt cú lướt, PARRY như khiên (mạnh hơn 50%, đẩy boss lại). Ở phái Royal Guard khiên lướt này tồn tại lâu gấp đôi', descEn:'Dashing makes a half-moon shield in front for the whole dash that PARRIES like your shield (50% stronger, knocks bosses back). In Royal Guard this dash-shield lasts twice as long' },
             { id:'pet',      name:'ĐỆ CHIM • C1',      nameEn:'BIRD PET • C1',        icon:'🦖', desc:'Đệ chim bay theo, mỗi 1 giây tạo 2 viên Split DẪN ĐƯỜNG — lượn rồi lao vào địch, ưu tiên địch mới (1 dmg/viên)', descEn:'Bird pet follows you; every 1s creates 2 homing Split shots — loiter then dive, prioritizing new enemies (1 dmg/shot)' },
             { id:'petx',     name:'ĐỆ CHIM • C2',      nameEn:'BIRD PET • C2',        icon:'✦', cost:2, desc:'Tốn 2 ô. Mỗi 1 giây tạo 3 viên tấn công và 1 viên phòng thủ xoay quanh Đệ Chim; tối đa 5 viên phòng thủ. Khi đủ 5 stack, cả 5 viên sẽ đồng loạt tấn công kẻ địch.', descEn:'Costs 2 slots. Every 1s creates 3 attack shots and 1 defensive shot orbiting the Bird Pet; up to 5 defensive stacks. At 5 stacks, all 5 stored shots launch at the enemy together.' },
@@ -31393,7 +31393,7 @@ class PulsarCloneBoss {
             if (typeof quetRuneBatHopPhap === 'function') quetRuneBatHopPhap(false);
             if (mode !== 'test_boss' || testBossSelection !== 99) dojoMode = false;   // roi san tap khi vao che do that
             gameState = mode; frames = 0; score = 0; speedBonus = 0; gameSpeed = baseSpeed; gameOver = false; gameVictory = false; bossWaitTimer = 60; reviveOverlay = null; deathReviveLevel = 0; deathCineActive = false; deathCineFrame = 0; if (mode !== 'normal' && mode !== 'boss_rush') mapTheme = 'desert'; 
-            freeMove = false; dinoReturning = false; dashVx = 0; lastMoveTapDir = 0; dashCd = 0; stReset(); qsT = 0; qsMarks = []; qsFin = null; qsPerfect = false; qsFlash = 0;
+            freeMove = false; dinoReturning = false; dashVx = 0; lastMoveTapDir = 0; dashCd = 0; stReset(); novaBom = []; qsT = 0; qsMarks = []; qsFin = null; qsPerfect = false; qsFlash = 0;
             pet1Shots.length = 0; pet1GuardShots.length = 0; pet1Cd = 0; pet1N = 0; pet2Shots.length = 0; pet2OrbitMines.length = 0; pet2Cd = 0; pet2N = 0; if(typeof pet2Lua!=="undefined"){ pet2Lua.length = 0; pet2Dash = null; } afterimages.length = 0; birdBank = 0; birdSpendCd = 0; birdDmgAcc = 0; voltBossTicks = 0; voltTrashTicks = 0;
             pet3Cd = 600; pet3CooldownReduction = 0; pet3IdleFrames = 0; pet4Cd = 600; pet4Flash = 0; pet4Charges = 0; pet4SpendCd = 0; pet4NearDeathUsed=false; pet3X = 0; pet3Y = 0; pet4X = 0; pet4Y = 0;
             pet5Cd = 180; pet5Dash = null; pet5Charges = 0; pet5X = 0; pet5Y = 0; pet5A={x:0,y:0,cd:0,dash:null,charges:0}; pet5B={x:0,y:0,cd:180,dash:null,charges:0}; pet6Cd = 600; pet6Active = false; pet6Radius = 28; pet6Angle = 0; pet6X = 0; pet6Y = 0; pet6Rings = [];
@@ -32717,6 +32717,36 @@ function infernoMaxChain(x, y, source){
         // exclude: Set cac muc tieu DA an dmg goc -> khong an dmg no (tru khi selfDmg > 0)
         // ============================ @@HE-NOVA ============================
         // Vu no lan cua rune AWAKENED: NOVA
+        // ===== DAU AN NOVA: moi vu no de lai mot dau an, 1 giay sau NO LAN HAI =====
+        // Lan hai gay 1 dmg len MOI muc tieu trong ban kinh — khong tru muc tieu da an don goc.
+        const NOVA_HEN = 60;
+        let novaBom = [];
+        function novaHenGio(x, y, r){ novaBom.push({ x, y, r, t: NOVA_HEN }); }
+        function novaTickBom(){
+            for (let i = novaBom.length - 1; i >= 0; i--){
+                let b = novaBom[i]; b.t--;
+                if (b.t > 0) continue;
+                visualEffects.push(new Effect(b.x, b.y, 'explosion', true, b.r));
+                if (gameState !== 'pvp'){
+                    let rect = { x: b.x - b.r, y: b.y - b.r, w: b.r * 2, h: b.r * 2 };
+                    allTargets().forEach(o => { if (o && !o.invulnAll && o.hp > 0 && checkAABB(rect, o)) o.hp -= 1; });
+                }
+                if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(160, 0.06, 'sawtooth', 0.10, 70);
+                novaBom.splice(i, 1);
+            }
+        }
+        function novaVeBom(){
+            for (let b of novaBom){
+                let p = 1 - b.t / NOVA_HEN;                       // 0 -> 1 theo thoi gian
+                let a = 0.25 + 0.35 * p + 0.2 * Math.sin(b.t * 0.5);
+                ctx.save();
+                ctx.strokeStyle = "rgba(255,138,0," + Math.min(0.9, a).toFixed(2) + ")"; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(b.x, b.y, b.r * (0.45 + 0.55 * p), 0, 6.28); ctx.stroke();
+                ctx.fillStyle = "rgba(255,87,34," + (0.10 + 0.18 * p).toFixed(2) + ")";
+                ctx.beginPath(); ctx.arc(b.x, b.y, b.r * (0.45 + 0.55 * p), 0, 6.28); ctx.fill();
+                ctx.restore();
+            }
+        }
         function novaBlast(x, y, r, dmg, exclude, selfDmg, kind) {
             // NOVA chi tao damage cho CAC MUC TIEU XUNG QUANH; muc tieu chinh da an damage dan goc
             // se nam trong exclude. Nova dung chung Crit state voi vien dan goc cua cung hit.
@@ -32726,6 +32756,7 @@ function infernoMaxChain(x, y, source){
             const blastR = r * (sharedCrit ? 1.18 : 1);
             const blastDmg = dmg * (sharedCrit ? 2 : 1);
             visualEffects.push(new Effect(x, y, kind || 'explosion', true, blastR));
+            novaHenGio(x, y, blastR);
             if (gameState === 'pvp') return;
             let rect = { x: x - blastR, y: y - blastR, w: blastR * 2, h: blastR * 2 };
             let apply = (o) => {
@@ -34923,7 +34954,10 @@ function checkPvPCollisions() {
                     if (typeof SFX !== 'undefined' && SFX.glassBreak) SFX.glassBreak();
                 }
                 // AWAKENED: NOVA — dan XUYEN no o MOI lan va cham, khong doi den luc dan tan
-                if (projHit && hasRune('explshot') && (proj.type === 2 || proj.pierceCount > 0)) {
+                // Truoc day cong nay doi (proj.type === 2 || proj.pierceCount > 0) — tuc CHI dan XUYEN
+                // moi no. Do duoc: Pulse / Inferno / Rapidfire / Prism ban 20 giay ra DUNG 0 lan no,
+                // trong khi mo ta rune ghi "dung duoc voi MOI loai dan". Bo dieu kien do di.
+                if (projHit && hasRune('explshot')) {
                     let _nr = (proj.type === 7 || proj.type === 8) ? 46 : 34;   // nhat chem tam xa: no to hon mot chut
                     novaBlast(proj.x + proj.w/2, proj.y + proj.h/2, _nr, 1, proj.hitIds, 0, 'explosion');
                 }
@@ -35200,6 +35234,7 @@ function checkPvPCollisions() {
                 if (projRaNgoai(proj)) projectiles.splice(i, 1); }
 
             if (duelMode && dino){ dino.invincible = true; if (dino.invTimer < 30) dino.invTimer = 30; }
+            novaTickBom(); novaVeBom();
             drawUnityUlt(); qsVe();
             for (let i = visualEffects.length - 1; i >= 0; i--) { visualEffects[i].update(); visualEffects[i].draw(); if (visualEffects[i].timer >= (visualEffects[i].life || 30)) visualEffects.splice(i, 1); }
             for (let i = floatingTexts.length - 1; i >= 0; i--) { let ft = floatingTexts[i]; ft.update(); ft.draw(); if (ft.life <= 0) floatingTexts.splice(i, 1); }
