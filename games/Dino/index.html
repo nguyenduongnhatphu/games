@@ -25781,8 +25781,10 @@ class PulsarCloneBoss {
                 // nguoi choi mat CA Channel LAN Ult. Trickster von da co DPS cao va phan than
                 // hut aggro nen khong con can them mot don bung nua.
                 if (hasRune('shintrick')){
-                    floatingTexts.push(new FloatingText(this.x - 34, this.y - 30, "SHIN TRICKSTER: KHOÁ ULT"));
-                    if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(150, 0.12, 'square', 0.16, 90);
+                    // QUICKSILVER: bam lan nua trong luc dang bat = ket som
+                    if (qsT > 0) { qsKet(); return; }
+                    if (qsFin) return;
+                    if (!qsBatDau() && typeof SFX !== 'undefined' && SFX.tone) SFX.tone(150, 0.12, 'square', 0.16, 90);
                     return;
                 }
                 if (unityOn()){                                   // UNITY co chieu cuoi RIENG: hop nhat 3 vien ngoc
@@ -26270,6 +26272,9 @@ class PulsarCloneBoss {
                         if (this.webTimer > 0) { this.webTimer--; dashVx = 0; }
                         let mv = 0;
                         if (this.webTimer <= 0) { if (keys['KeyA'] || keys['ArrowLeft']) mv -= 6; if (keys['KeyD'] || keys['ArrowRight']) mv += 6; }
+                        // SHIN TRICKSTER: tren khong LUOT THAY THE di chuyen thuong. Chi bo di chuyen
+                        // khi dang thuc su luot — het charge thi tro lai dieu khien binh thuong.
+                        if (typeof stBat === 'function' && stBat() && !this.grounded && Math.abs(dashVx) > 2) mv = 0;
                         if (mapTheme === 'ocean' && (this.y + this.h) > OCEAN_SURF + 4) mv *= 0.62;   // duoi nuoc di cham hon
                         if (hasRune('hyperspeed')) mv *= 1.5;
                         let hmove = mv + dashVx;
@@ -27843,16 +27848,29 @@ class PulsarCloneBoss {
                 let timedUlt = dino.fireReactorTimer > 0 || dino.lightningFormTimer > 0;
                 let uFull = ultCharge >= 100 && !dino.ultActive && !timedUlt;
                 ctx.fillStyle = "black"; ctx.font = "bold 11px Courier New";
-                ctx.fillText(hasRune('shintrick') ? "ULT — KHOÁ" : (unityOn() ? (uniArmed > 0 ? "HỢP NHẤT — J/K" : "UNITY FUSION") : (ultNames[currentAmmoType] || LANG[currentLang].ult_word)), 20, 104);
+                ctx.fillText(hasRune('shintrick') ? (qsFin ? "QUICKSILVER — KẾT" : (qsT > 0 ? ("QUICKSILVER " + (qsT/60).toFixed(1) + "s · " + qsMarks.length + " VẾT · " + qsDemDao() + " DAO") : "QUICKSILVER")) : (unityOn() ? (uniArmed > 0 ? "HỢP NHẤT — J/K" : "UNITY FUSION") : (ultNames[currentAmmoType] || LANG[currentLang].ult_word)), 20, 104);
                 if (unityOn()) drawUnityHud(20, 104);
                 ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(120, 95, 120, 11);
-                ctx.fillStyle = hasRune('shintrick') ? "#455A64" : ((unityOn() && uniArmed > 0) ? "#FFEB3B" : (dino.ultActive ? (dino.ultAmmo === 0 ? "#00B0FF" : dino.ultAmmo === 1 ? "#FF1744" : dino.ultAmmo === 2 ? "#00E676" : "#FFEB3B") : (timedUlt ? (dino.fireReactorTimer > 0 ? "#FF5722" : "#00E5FF") : (uFull ? (frames % 20 < 10 ? "#FFEB3B" : "#FF9800") : "#9C27B0"))));
+                ctx.fillStyle = hasRune('shintrick') ? (qsDangBat() ? "#4DD0E1" : (ultCharge >= 100 ? "#00E5FF" : "#546E7A")) : ((unityOn() && uniArmed > 0) ? "#FFEB3B" : (dino.ultActive ? (dino.ultAmmo === 0 ? "#00B0FF" : dino.ultAmmo === 1 ? "#FF1744" : dino.ultAmmo === 2 ? "#00E676" : "#FFEB3B") : (timedUlt ? (dino.fireReactorTimer > 0 ? "#FF5722" : "#00E5FF") : (uFull ? (frames % 20 < 10 ? "#FFEB3B" : "#FF9800") : "#9C27B0"))));
                 ctx.fillRect(120, 95, 120 * Math.min(100, uE) / 100, 11);
                 ctx.strokeStyle = "black"; ctx.lineWidth = 1; ctx.strokeRect(120, 95, 120, 11);
                 { let SN = LANG[currentLang].stances, SC = ["#FF8F00", "#00ACC1", "#7E57C2"];
                   ctx.fillStyle = SC[combatStance]; ctx.font = "bold 13px Courier New"; ctx.fillText("◆ " + SN[combatStance], 20, 124);
                   ctx.fillStyle = "rgba(0,0,0,0.55)"; ctx.font = "9px Courier New"; ctx.fillText("[I]→ [O]←", 168, 124); }
-                { let dMax = combatStance === 1 ? 26 : 42, dReady = dashCd <= 0;
+                if (stBat()) {
+                  // SHIN TRICKSTER: 3 o charge thay cho mot thanh hoi
+                  ctx.fillStyle = "black"; ctx.font = "bold 11px Courier New"; ctx.fillText(LANG[currentLang].dash, 20, 140);
+                  for (let i = 0; i < ST_MAX; i++) {
+                      let ox = 120 + i * 42, day = i < stCharge;
+                      ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(ox, 131, 36, 9);
+                      if (day) { ctx.fillStyle = "#00E5FF"; ctx.fillRect(ox, 131, 36, 9); }
+                      else if (stKhoa <= 0 && i === stCharge) { ctx.fillStyle = "#00838F"; ctx.fillRect(ox, 131, 36 * (1 - Math.max(0, stHoi) / ST_HOI), 9); }
+                      ctx.strokeStyle = "black"; ctx.lineWidth = 1; ctx.strokeRect(ox, 131, 36, 9);
+                  }
+                  if (stKhoa > 0) { ctx.fillStyle = "#FF7043"; ctx.font = "bold 9px Courier New"; ctx.fillText("KHOÁ " + (stKhoa / 60).toFixed(1) + "s", 250, 139); }
+                  else if (stFreeAir && !dino.grounded) { ctx.fillStyle = "#FFD54F"; ctx.font = "bold 9px Courier New"; ctx.fillText("MIỄN PHÍ", 250, 139); }
+                }
+                else { let dMax = combatStance === 1 ? 26 : 42, dReady = dashCd <= 0;
                   ctx.fillStyle = "black"; ctx.font = "bold 11px Courier New"; ctx.fillText(LANG[currentLang].dash, 20, 140);
                   ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(120, 131, 120, 9);
                   ctx.fillStyle = dReady ? "#00E5FF" : "#546E7A"; ctx.fillRect(120, 131, 120 * (1 - Math.max(0, dashCd) / dMax), 9);
@@ -29173,7 +29191,7 @@ class PulsarCloneBoss {
                     ["5. KIM CANG REX", 29, "#FFD54F", "#37474F", "black"],
                     ["6. AEGIS REX", 22, "#40C4FF", "#0277BD"],
                     ["7. SIEGE GOLIATH", 42, "#78909C", "#263238", "#FFB300"],
-                    ["8. SƠN THẦN", 34, "#455A64", "#0D1418", "#FFEB3B"], ["9. SLASH BEAST", 59, "#9E9EAA", "#24252D", "#FFB74D"] ] },
+                    ["8. SLASH BEAST", 59, "#9E9EAA", "#24252D", "#FFB74D"], ["9. SƠN THẦN", 34, "#455A64", "#0D1418", "#FFEB3B"] ] },
                 { title: "— THỬ THÁCH BẢN SAO —", tc: "#FF8A80", items: [
                     ["1. HELIOS REX", 5, "#FF1744", "#D32F2F"], ["2. AEGIS REX", 22, "#40C4FF", "#0277BD"],
                     ["3. VULCAN REX", 21, "#FF6D00", "#BF360C"], ["4. EREBUS REX", 20, "#FF1744", "#B71C1C"],
@@ -30076,8 +30094,11 @@ class PulsarCloneBoss {
             descEn:'Costs 1 slot. EVERY ammo: the dash travels MUCH FARTHER (36 vs 22) and deals 3 damage to enemies you pass through. WITH VOLT it also fires a piercing BOLT from behind you for another 3. ⚡ Paired with HYPER SPEED: both go to 5. During Volt\'s Ultimate: 6.',
             goiY:'hyperspeed' });
         RUNES.push({ id:'shintrick', name:'SHIN TRICKSTER', nameEn:'SHIN TRICKSTER', icon:'🎯', cost:2, ammoRune:true, onlyStance:1,
-            desc:'Tốn 2 ô. ĐỘC QUYỀN TRICKSTER. Bắn thường KHÔNG giới hạn: không tốn đạn, không bao giờ quá nhiệt. Mở khoá luôn đòn Charge khi đứng Trickster (vốn chỉ Gunslinger mới charge được). Đổi lại: KHOÁ cả Channel LẪN Ult — bạn chỉ còn đòn thường, đòn Charge và phân thân của Trickster.',
-            descEn:'Costs 2 slots. TRICKSTER ONLY. Basic fire is unlimited: no ammo cost, never overheats. Also unlocks Charge attacks while in Trickster (normally Gunslinger-only). Trade-off: BOTH Channel and Ult are locked — you keep only basic fire, Charge, and the Trickster decoy.' });
+            desc:'Tốn 2 ô. ĐỘC QUYỀN TRICKSTER. Bắn thường KHÔNG giới hạn: không tốn đạn, không bao giờ quá nhiệt, và mở khoá đòn Charge ngay trong thế Trickster. '
+                 +'LƯỚT thành 3 charge: giữ lại ít nhất một thì hồi rất nhanh, xài cạn cả ba thì khoá 2 giây. '
+                 +'Lướt đâm vào kẻ địch = MUSTANG — đạp đầu bật lên, miễn sát thương lao vào, gây 2 dmg và trả lại một charge (nối được nhưng nảy thấp dần). '
+                 +'Trên không giữ hướng là tự lướt; cú lướt đầu mỗi lần rời mặt đất miễn phí. Bấm nhảy khi đang bay là lướt VỌT LÊN, bấm xuống là lướt SÀ XUỐNG — cả hai đều miễn phí nhưng KHÔNG có miễn thương. CHIÊU CUỐI RIÊNG — QUICKSILVER: DỪNG THỜI GIAN 8 giây. Kẻ địch và mọi đòn của chúng gần như bất động, riêng bạn chạy bình thường với 6 charge lướt. Lướt xuyên địch = Mustang 4 dmg và để lại một VẾT CẮT KHÔNG GIAN (tối đa 8). Bắn thì đạn bay một đoạn rồi TREO LƠ LỬNG giữa không trung — tha hồ dựng thế. Hết giờ (hoặc bấm U lần nữa) Dino lao qua toàn bộ vết cắt, mỗi vết nổ thành nhát chém 5 dmg, rồi thời gian chạy lại và toàn bộ dao treo bay tới cùng một lúc. Từ 5 vết trở lên thành PERFECT QUICKSILVER: chém 6 dmg và hồi 1 máu.',
+            descEn:'Costs 2 slots. TRICKSTER ONLY. Unlimited basic fire, no overheat, Charge unlocked in Trickster. Dash becomes 3 charges (fast regen if you keep one, 2s lockout if you spend all). Dashing into an enemy performs MUSTANG: kick off their head, ignore contact damage, deal 2 damage and refund a charge (chainable with diminishing height). In the air, holding a direction auto-dashes; the first air dash after leaving the ground is free. Press jump while airborne to rise-dash, hold down to dive-dash: both free, but no i-frames. Unique ultimate QUICKSILVER: TIME STOP for 8s — enemies and their attacks are near-frozen while you move freely with 6 dash charges. Bullets you fire travel briefly then hang in mid-air, all releasing at once when time resumes. Mustang deals 4 and always refunds while leaving a SPACE CUT. On expiry (or press U again) you streak through every cut, each bursting for 5 damage. Five or more cuts upgrades to PERFECT QUICKSILVER: 6 damage per cut and heal 1 HP.' });
         RUNES.push({ id:'unity', name:'UNITY', nameEn:'UNITY', icon:'◆', cost:2, ammoRune:true,
             desc:'Tốn 2 ô. Mang theo BA loại đạn cùng lúc, đổi ngay giữa trận bằng Q / E. Chiêu cuối HỢP NHẤT: ba viên ngọc gộp lại, đòn kế tiếp (J hoặc K) mang đặc tính gốc của cả ba hệ — 56 tổ hợp khác nhau. Đánh đổi: KHÓA Channel, bạn chỉ còn đòn thường và đòn Charge. Chọn 3 loại đạn ở bảng phía dưới.',
             descEn:'Costs 2 slots. Carry THREE ammo types at once, swap mid-fight with Q / E. FUSION ultimate: three gems merge and your next shot (J or K) carries the core trait of all three types — 56 combinations. Trade-off: Channel is LOCKED, leaving basic and charged shots. Pick your 3 types in the panel below.' });
@@ -31372,7 +31393,7 @@ class PulsarCloneBoss {
             if (typeof quetRuneBatHopPhap === 'function') quetRuneBatHopPhap(false);
             if (mode !== 'test_boss' || testBossSelection !== 99) dojoMode = false;   // roi san tap khi vao che do that
             gameState = mode; frames = 0; score = 0; speedBonus = 0; gameSpeed = baseSpeed; gameOver = false; gameVictory = false; bossWaitTimer = 60; reviveOverlay = null; deathReviveLevel = 0; deathCineActive = false; deathCineFrame = 0; if (mode !== 'normal' && mode !== 'boss_rush') mapTheme = 'desert'; 
-            freeMove = false; dinoReturning = false; dashVx = 0; lastMoveTapDir = 0; dashCd = 0;
+            freeMove = false; dinoReturning = false; dashVx = 0; lastMoveTapDir = 0; dashCd = 0; stReset(); qsT = 0; qsMarks = []; qsFin = null; qsPerfect = false; qsFlash = 0;
             pet1Shots.length = 0; pet1GuardShots.length = 0; pet1Cd = 0; pet1N = 0; pet2Shots.length = 0; pet2OrbitMines.length = 0; pet2Cd = 0; pet2N = 0; if(typeof pet2Lua!=="undefined"){ pet2Lua.length = 0; pet2Dash = null; } afterimages.length = 0; birdBank = 0; birdSpendCd = 0; birdDmgAcc = 0; voltBossTicks = 0; voltTrashTicks = 0;
             pet3Cd = 600; pet3CooldownReduction = 0; pet3IdleFrames = 0; pet4Cd = 600; pet4Flash = 0; pet4Charges = 0; pet4SpendCd = 0; pet4NearDeathUsed=false; pet3X = 0; pet3Y = 0; pet4X = 0; pet4Y = 0;
             pet5Cd = 180; pet5Dash = null; pet5Charges = 0; pet5X = 0; pet5Y = 0; pet5A={x:0,y:0,cd:0,dash:null,charges:0}; pet5B={x:0,y:0,cd:180,dash:null,charges:0}; pet6Cd = 600; pet6Active = false; pet6Radius = 28; pet6Angle = 0; pet6X = 0; pet6Y = 0; pet6Rings = [];
@@ -31947,11 +31968,279 @@ function infernoMaxChain(x, y, source){
                 ctx.restore();
             }
         }
-        function doDash() {
+        // ======================= @@HE-SHINTRICK =======================
+        // SHIN TRICKSTER — bo co dong. Chi bat khi deo rune 'shintrick'.
+        //  * 3 charge luot. Xai het ca 3 -> khoa ST_KHOA khung roi tra lai CA BA.
+        //    Con du charge thi moi charge hoi trong ST_HOI khung (nhanh) -> luot 2 cai lien tiep rat nhanh.
+        //  * MUSTANG: luot dam vao dich -> dap dau bat len, mien sat thuong va tra lai 1 charge.
+        //    Noi duoc nhung LUC NAY GIAM DAN trong cung mot luot tren khong.
+        //  * Tren khong giu huong = tu dong luot. Cu luot TREN KHONG DAU TIEN moi lan roi khoi
+        //    mat dat la MIEN PHI; tu cu thu hai moi tru charge.
+        //  * Tren khong bam xuong = luot xuong, luon mien phi NHUNG khong co i-frame.
+        // ---------------- QUICKSILVER (chieu cuoi rieng cua Shin Trickster) ----------------
+        const QS_DAI    = 480;     // 8 giay
+        const QS_CHARGE = 6;       // charge duoc cap ngay khi bat
+        const QS_DUNG   = 20;      // nhip dong bang cung luc kich hoat
+        const QS_NHICH  = 12;      // dich chi duoc chay 1 khung trong moi 12 -> "gan nhu khong nhuc nhich"
+        const QS_BAY    = 13;      // dan nguoi choi bay bay nhieu khung roi TREO LO LUNG (dao cua DIO)
+        const QS_VET_MAX= 8;       // tran so vet cat
+        const QS_DAO_MAX= 34;      // tran so dao treo tren khong
+        const QS_CACH   = 70;      // hai vet cat phai cach nhau it nhat bay nhieu px
+        const QS_MUS    = 4;       // Mustang trong ult
+        const QS_CHEM   = 5;       // moi vet cat khi ket thuc
+        const QS_CHEM_P = 6;       // ...neu dat PERFECT (>= 5 vet)
+        const QS_PERFECT= 5;       // so vet toi thieu de len Perfect
+        let qsT = 0, qsMarks = [], qsFin = null, qsPerfect = false, qsFlash = 0;
+        function qsDangBat(){ return qsT > 0 || !!qsFin; }
+        // THOI GIAN DUNG: dich va dan cua dich gan nhu bat dong; nguoi choi chay binh thuong.
+        function qsDungGio(){ return qsDangBat(); }
+        function qsChoDichChay(){ return !qsDungGio() || (frames % QS_NHICH === 0); }
+        function qsTran(){ return qsT > 0 ? QS_CHARGE : ST_MAX; }
+
+        const ST_MAX = 3;          // so charge
+        const ST_HOI = 26;         // khung de hoi 1 charge khi VAN CON du
+        const ST_KHOA = 120;       // 2 giay khoa khi xai can sach
+        const ST_NHIP = 14;        // khoang cach toi thieu giua 2 cu luot (chong bam giu spam)
+        const ST_NAY = [14.5, 11.5, 8.5, 5.5];   // luc bat cua Mustang lan 1 / 2 / 3 / 4+ trong cung luot bay
+        const ST_MUS_HO = 3;       // chi 3 lan dau duoc tra charge + luot mien phi -> chuoi CO diem dung
+        const ST_MUS_CD = 14;      // nhip cho giua hai cu dap, khong cho no no lien 4 khung
+        let stCharge = ST_MAX, stHoi = 0, stKhoa = 0, stFreeAir = true, stNay = 0, stXuongT = 0, stMusCd = 0;
+        function stBat(){ return typeof hasRune === 'function' && hasRune('shintrick'); }
+
+        // ===== QUICKSILVER =====
+        // Vet cat sinh ra TAI CHO DAP. Vi Mustang bat buoc cham duoc dich nen cac vet co xu huong
+        // dom cuc quanh boss -> neu qua gan vet cu thi DAY RA cho du QS_CACH, de cu ket con quet rong.
+        function qsThemVet(x, y){
+            // Mustang luon xay ra sat mat dat nen y gan nhu co dinh -> giai quyet cham nhau CHU YEU
+            // theo truc X, va khi het cho ngang thi NANG DAN LEN CAO. Ket qua la mot bac thang vet
+            // cat, cu ket quet cheo len rat de nhin.
+            for (let i = 0; i < 24; i++){
+                let gan = null;
+                for (let m of qsMarks) if (Math.hypot(m.x - x, m.y - y) < QS_CACH) { gan = m; break; }
+                if (!gan) break;
+                let huong = (x >= gan.x) ? 1 : -1;
+                x = gan.x + huong * QS_CACH;
+                if (x < 40 || x > canvas.width - 40){ x = gan.x - huong * QS_CACH; y -= QS_CACH; }
+                x = Math.max(40, Math.min(canvas.width - 40, x));
+                if (y < 80){ y = 300; }
+            }
+            x = Math.max(40, Math.min(canvas.width - 40, x));
+            y = Math.max(80, Math.min(330, y));
+            if (qsMarks.length >= QS_VET_MAX) return;   // tran vet: khong cho chuoi keo dai thanh vo han
+            qsMarks.push({ x, y, goc: Math.random() * Math.PI, t: 0 });
+            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(980, 0.06, 'square', 0.13, 1500);
+        }
+        // Vien dan dang treo: them mot vong sang + tia cang de nhin ra la no DANG DUNG
+        function qsVeDao(p){
+            let cx = p.x + (p.w || 8) / 2, cy = p.y + (p.h || 8) / 2;
+            let a = 0.35 + 0.25 * Math.sin(frames * 0.25 + cx * 0.05);
+            ctx.save();
+            ctx.strokeStyle = "rgba(180,240,255," + a.toFixed(2) + ")"; ctx.lineWidth = 1.4;
+            ctx.beginPath(); ctx.arc(cx, cy, 9 + Math.sin(frames * 0.2) * 1.5, 0, 6.28); ctx.stroke();
+            ctx.strokeStyle = "rgba(255,255,255," + (a * 0.5).toFixed(2) + ")";
+            ctx.beginPath(); ctx.moveTo(cx - 13, cy); ctx.lineTo(cx - 6, cy);
+            ctx.moveTo(cx + 6, cy); ctx.lineTo(cx + 13, cy); ctx.stroke();
+            ctx.restore();
+        }
+        function qsDemDao(){ let n = 0; for (let p of projectiles) if ((p._qsAge || 0) > QS_BAY) n++; return n; }
+        function qsBatDau(){
+            if (!stBat() || qsDangBat() || ultCharge < 100) return false;
+            ultCharge = 0;
+            qsT = QS_DAI; qsMarks = []; qsFin = null; qsPerfect = false;
+            stCharge = QS_CHARGE; stKhoa = 0; stHoi = 0; stNay = 0; stFreeAir = true;
+            hitstopTimer = Math.max(hitstopTimer || 0, QS_DUNG);
+            qsFlash = 10;
+            floatingTexts.push(new FloatingText(dino.x - 44, dino.y - 34, "QUICKSILVER"));
+            shakeTimer = Math.max(shakeTimer, 22);
+            if (typeof SFX !== 'undefined' && SFX.tone) { SFX.tone(1200, 0.35, 'square', 0.24, 300); SFX.tone(180, 0.5, 'sawtooth', 0.2, 90); }
+            return true;
+        }
+        // Bat dau cu ket: lao qua tat ca vet cat theo thu tu
+        function qsKet(){
+            if (qsFin) return;
+            qsT = 0;
+            qsPerfect = qsMarks.length >= QS_PERFECT;
+            if (!qsMarks.length) { qsThemVet(dino.x + dino.w/2, dino.y + dino.h/2); qsPerfect = false; }
+            qsFin = { i: 0, t: 0, no: [], x0: dino.x, y0: dino.y };
+            dino.invincible = true; dino.invTimer = Math.max(dino.invTimer || 0, 14);
+            floatingTexts.push(new FloatingText(dino.x - 60, dino.y - 52, qsPerfect ? "PERFECT QUICKSILVER!" : "QUICKSILVER END"));
+            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(qsPerfect ? 1500 : 900, 0.3, 'square', 0.26, 400);
+        }
+        function qsTick(){
+            if (qsFlash > 0) qsFlash--;
+            for (let m of qsMarks) m.t++;
+            if (qsT > 0) { qsT--; if (qsT === 0) qsKet(); }
+            if (!qsFin) return;
+            let F = qsFin; F.t++;
+            // Moi 7 khung nhay sang mot vet: lao toi, no thanh mot nhat chem lon
+            if (F.t % 7 === 1 && F.i < qsMarks.length){
+                let m = qsMarks[F.i];
+                dino.x = Math.max(0, Math.min(canvas.width - dino.w, m.x - dino.w/2));
+                dino.y = Math.max(40, Math.min(320 - dino.h, m.y - dino.h));
+                dino.dy = 0; dashVx = 0;
+                dino.invincible = true; dino.invTimer = Math.max(dino.invTimer || 0, 10);
+                spawnAfterimage();
+                let dmg = qsPerfect ? QS_CHEM_P : QS_CHEM;
+                // Vet cat trai rong khap man nen vung chem phai LON, neu khong thi cang danh gioi
+                // (vet cang xa nhau) lai cang nhieu nhat truot — phat nguoc dung thu minh thuong.
+                let R = { x: m.x - 150, y: m.y - 130, w: 300, h: 260 };
+                // Day la don CAT KHONG GIAN: BOSS luon dinh du vet cat o dau, vi neu chi tinh theo
+                // vung thi nguoi choi cang trai vet ra xa (choi cang gioi) lai cang nhieu nhat truot.
+                // Quai lat vat / vat can thi van tinh theo vung.
+                for (let b of bosses) if (b && b.hp > 0 && typeof dealDamage === 'function') dealDamage(b, dmg, 'flat');
+                for (let t of enemies.concat(obstacles)) if (t && t.hp > 0 && checkAABB(R, t) && typeof dealDamage === 'function') dealDamage(t, dmg, 'flat');
+                F.no.push({ x: m.x, y: m.y, goc: m.goc, t: 0 });
+                visualEffects.push(new Effect(m.x, m.y, 'explosion', true, 40));
+                shakeTimer = Math.max(shakeTimer, 12);
+                if (typeof addStyle === 'function') addStyle(qsPerfect ? 18 : 10, 'quicksilver');
+                if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(700 + F.i * 60, 0.09, 'square', 0.2, 1400);
+                F.i++;
+            }
+            for (let n of F.no) n.t++;
+            if (F.i >= qsMarks.length && F.t % 7 === 0){
+                if (qsPerfect){
+                    dino.hp = Math.min(dino.maxHp, dino.hp + 1);
+                    qsFlash = 8; shakeTimer = Math.max(shakeTimer, 26);
+                    if (typeof addStyle === 'function') addStyle(40, 'perfect');
+                    floatingTexts.push(new FloatingText(dino.x - 20, dino.y - 30, "+1 MÁU"));
+                }
+                qsFin = null; qsMarks = []; qsPerfect = false;
+                stCharge = ST_MAX; stKhoa = 0; stHoi = 0;
+            }
+        }
+        function qsVe(){
+            if (!qsDangBat() && qsFlash <= 0) return;
+            ctx.save();
+            // Man toi lai, chi con Dino va muc tieu sang
+            if (qsT > 0){
+                let m = Math.min(1, (QS_DAI - qsT) / 12) * 0.5;
+                ctx.fillStyle = "rgba(4,8,24," + m.toFixed(2) + ")"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                for (let t of bosses.concat(enemies)){
+                    if (!t || t.hp === undefined) continue;
+                    let g = ctx.createRadialGradient(t.x + t.w/2, t.y + t.h/2, 4, t.x + t.w/2, t.y + t.h/2, Math.max(t.w, t.h) * 1.1);
+                    g.addColorStop(0, "rgba(120,220,255,0.30)"); g.addColorStop(1, "rgba(120,220,255,0)");
+                    ctx.fillStyle = g; ctx.fillRect(t.x - t.w, t.y - t.h, t.w * 3, t.h * 3);
+                }
+                let gd = ctx.createRadialGradient(dino.x + dino.w/2, dino.y + dino.h/2, 4, dino.x + dino.w/2, dino.y + dino.h/2, 96);
+                gd.addColorStop(0, "rgba(180,255,255,0.34)"); gd.addColorStop(1, "rgba(180,255,255,0)");
+                ctx.fillStyle = gd; ctx.fillRect(dino.x - 96, dino.y - 96, 192 + dino.w, 192 + dino.h);
+            }
+            // Vet cat cho ket
+            for (let m of qsMarks){
+                let a = 0.5 + 0.28 * Math.sin(m.t * 0.16);
+                ctx.strokeStyle = "rgba(150,240,255," + a.toFixed(2) + ")"; ctx.lineWidth = 2.5;
+                for (let k = 0; k < 2; k++){
+                    let g = m.goc + k * Math.PI / 2;
+                    ctx.beginPath(); ctx.moveTo(m.x - Math.cos(g) * 26, m.y - Math.sin(g) * 26);
+                    ctx.lineTo(m.x + Math.cos(g) * 26, m.y + Math.sin(g) * 26); ctx.stroke();
+                }
+                ctx.fillStyle = "rgba(210,250,255,0.5)";
+                ctx.beginPath(); ctx.arc(m.x, m.y, 3.5, 0, 6.28); ctx.fill();
+            }
+            // Nhat chem lon khi ket
+            if (qsFin) for (let n of qsFin.no){
+                let a = Math.max(0, 1 - n.t / 22);
+                ctx.strokeStyle = "rgba(190,250,255," + (a * 0.9).toFixed(2) + ")"; ctx.lineWidth = 7 * a + 1;
+                for (let k = 0; k < 2; k++){
+                    let g = n.goc + k * Math.PI / 2, L = 140 + n.t * 6;
+                    ctx.beginPath(); ctx.moveTo(n.x - Math.cos(g) * L, n.y - Math.sin(g) * L);
+                    ctx.lineTo(n.x + Math.cos(g) * L, n.y + Math.sin(g) * L); ctx.stroke();
+                }
+            }
+            if (qsFlash > 0){ ctx.fillStyle = "rgba(255,255,255," + (qsFlash / 10 * 0.55).toFixed(2) + ")"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+            ctx.restore();
+        }
+        function stReset(){ stCharge = ST_MAX; stHoi = 0; stKhoa = 0; stFreeAir = true; stNay = 0; stXuongT = 0; stMusCd = 0; }
+        function stTick(){
+            if (!stBat()) return;
+            if (stXuongT > 0) stXuongT--; if (stMusCd > 0) stMusCd--;
+            if (stKhoa > 0) { stKhoa--; if (stKhoa === 0) stCharge = ST_MAX; }
+            else if (stCharge < qsTran()) { stHoi--; if (stHoi <= 0) { stCharge++; stHoi = ST_HOI; } }
+            if (dino && dino.grounded) { stFreeAir = true; stNay = 0; }   // cham dat = tra lai cu luot khong mien phi
+        }
+        // Tru charge. Tra ve false neu khong con.
+        function stTieu(){
+            if (stKhoa > 0 || stCharge <= 0) return false;
+            stCharge--;
+            if (stCharge === 0) stKhoa = ST_KHOA;
+            else stHoi = ST_HOI;   // moi cu luot DAT LAI dong ho hoi -> luot lien tuc thi thuc su can charge
+            return true;
+        }
+        function stCong(){ if (stKhoa > 0) { stKhoa = 0; stCharge = 1; } else if (stCharge < qsTran()) stCharge++; }
+        // MUSTANG: luot dam vao dich -> dap dau bat len
+        function stMustang(){
+            if (!stBat() || stMusCd > 0 || Math.abs(dashVx) < 2) return false;
+            let R = { x: dino.x - 4, y: dino.y, w: dino.w + 8, h: dino.h };
+            let ds = [];
+            for (let b of bosses) ds.push(b);
+            for (let e of enemies) ds.push(e);
+            for (let o of obstacles) ds.push(o);
+            if (typeof quetTrieuHoiTuDong === 'function') for (let b of bosses) { try { ds = ds.concat(quetTrieuHoiTuDong(b)); } catch(e){} }
+            for (let t of ds) {
+                if (!t || t.hp === undefined || t.hp <= 0) continue;
+                if (!checkAABB(R, t)) continue;
+                let luc = qsT > 0 ? ST_NAY[0] : ST_NAY[Math.min(stNay, ST_NAY.length - 1)];   // trong QUICKSILVER: khong giam luc nay
+                stNay++;
+                dino.dy = -luc; dino.grounded = false; dino.canDoubleJump = true;
+                dashVx = 0; dashCd = 0; stXuongT = 0;
+                dino.invincible = true; dino.invTimer = Math.max(dino.invTimer || 0, 22);
+                stMusCd = ST_MUS_CD;
+                // Chi BA cu dap dau duoc tra charge + luot mien phi. Tu cu thu tu tro di van dap
+                // duoc nhung phai TU TRA GIA -> chuoi co diem dung, khong thanh vong lap vo han.
+                if (qsT > 0) { stCong(); stFreeAir = true; qsThemVet(dino.x + dino.w/2, dino.y + dino.h); }   // trong ult: LUON tra charge, khong gioi han so lan
+                else if (stNay <= ST_MUS_HO) { stCong(); stFreeAir = true; }
+                if (typeof dealDamage === 'function') dealDamage(t, qsT > 0 ? QS_MUS : 2, 'flat');
+                visualEffects.push(new Effect(dino.x + dino.w/2, dino.y + dino.h, 'explosion', true, 20));
+                floatingTexts.push(new FloatingText(dino.x - 18, dino.y - 26, "MUSTANG"));
+                if (typeof addStyle === 'function') addStyle(10, 'mustang');
+                shakeTimer = Math.max(shakeTimer, 8);
+                if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(660, 0.08, 'square', 0.18, 900);
+                return true;
+            }
+            return false;
+        }
+        // LUOT LEN: cu nhay tren khong bien thanh mot cu bat vot len.
+        // Mien phi (khong ton charge) va KHONG co i-frame. Van tieu mot luot nhay nen
+        // khong the bay vo han — so lan bang dung so lan nhay von co (2, hoac 3 voi Nhay Ba).
+        const ST_LEN = -18.5;
+        function stLuotLen(){
+            if (!stBat()) return false;
+            dino.dy = ST_LEN; dashVx *= 0.5; stXuongT = 0;
+            spawnAfterimage();
+            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(720, 0.07, 'square', 0.15, 1080);
+            return true;
+        }
+        // LUOT XUONG: mien phi, KHONG co i-frame
+        function stLuotXuong(){
+            if (!stBat() || dino.grounded || stXuongT > 0) return false;
+            dino.dy = 23; stXuongT = 20; dashVx = 0;
+            spawnAfterimage();
+            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(280, 0.07, 'sawtooth', 0.14, 420);
+            return true;
+        }
+        // TREN KHONG giu huong -> tu dong luot
+        function stTuDongTrenKhong(){
+            if (!stBat() || dino.grounded || dino.jcState || dino.ultActive || dino.webTimer > 0) return;
+            if (!(gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss')) return;
+            if (keys['KeyS'] || keys['ArrowDown']) { stLuotXuong(); return; }
+            let dir = (keys['KeyA'] || keys['ArrowLeft']) ? -1 : ((keys['KeyD'] || keys['ArrowRight']) ? 1 : 0);
+            if (!dir) return;
+            if (dashCd > 0 || Math.abs(dashVx) > 2) return;              // cho cu truoc tan het
+            if (stFreeAir) stFreeAir = false;                            // cu dau tien sau khi roi dat: MIEN PHI
+            else if (!stTieu()) return;                                  // het charge -> tro ve di chuyen thuong
+            doDash(dir);
+        }
+
+        function doDash(epHuong) {
             if (dashCd > 0) return;
             if (!(gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss')) return;
             if (typeof dino === 'undefined' || !dino || dino.jcState || dino.webTimer > 0) return;
-            let dir = (keys['KeyA'] || keys['ArrowLeft']) ? -1 : ((keys['KeyD'] || keys['ArrowRight']) ? 1 : (dino.isFacingLeft ? -1 : 1));
+            let dir = epHuong || ((keys['KeyA'] || keys['ArrowLeft']) ? -1 : ((keys['KeyD'] || keys['ArrowRight']) ? 1 : (dino.isFacingLeft ? -1 : 1)));
+            // SHIN TRICKSTER: neu bam phim luot DUOI DAT thi tru charge; tren khong da tinh o stTuDongTrenKhong.
+            if (stBat() && !epHuong) {
+                if (!dino.grounded && (keys['KeyS'] || keys['ArrowDown'])) { stLuotXuong(); return; }
+                if (!stTieu()) return;
+            }
             dino.dashDir = dir;
             if (hasRune('headbutt')){ dino.dashShieldTimer = (combatStance===2 ? 32 : 16); dino.meleeID++; }   // HUC DAU: khien parry khi luot (Royal Guard x2)
             if (dino.lightningFormTimer > 0) {
@@ -31971,7 +32260,7 @@ function infernoMaxChain(x, y, source){
                 // ly do gi bo mot o cho no.
                 let _xa = hasRune('voltdash') ? 36 : 22;
                 dashVx = dir * _xa; if (mapTheme === 'ocean' && (dino.y + dino.h) > OCEAN_SURF + 4) dashVx *= 0.6;   // luot duoi nuoc cham hon
-                dashCd = (combatStance === 1 ? 26 : 42); // Trickster hoi luot nhanh hon
+                dashCd = stBat() ? ST_NHIP : (combatStance === 1 ? 26 : 42); // Trickster hoi luot nhanh hon; Shin Trickster dung he charge rieng
                 dino.invincible = true; if (dino.invTimer < 16) dino.invTimer = 16;
                 // ===== SWORDMASTER =====
                 if (hasRune('swordmaster')) {
@@ -32044,7 +32333,7 @@ function infernoMaxChain(x, y, source){
                     }
                     else if (dino.grounded) { dino.dy = dino.jumpPower * (hasRune('hyperspeed') ? 1.5 : 1); dino.grounded = false; dino.canDoubleJump = true; dino.jumpCount = 1; dino.bodySlamArmed = false; dino.bodySlamActive = false; dino.bodySlamJumpCount = 0; dino.hoverArmed = true; SFX.jump(); }
                     else if (dino.hoverTimer > 0) { dino.hoverTimer = 0; dino.hoverArmed = false; dino.dy = dino.jumpPower * 0.85; dino.canDoubleJump = false; SFX.jump(); }
-                    else if (dino.canDoubleJump || (hasRune('triplejump') && dino.jumpCount < 3)) { dino.dy = dino.jumpPower * (hasRune('hyperspeed') ? 1.5 : 1) * 0.85; dino.canDoubleJump = false; dino.jumpCount = (dino.jumpCount || 1) + 1; dino.hoverArmed = false; SFX.jump(); }
+                    else if (dino.canDoubleJump || (hasRune('triplejump') && dino.jumpCount < 3)) { dino.dy = stBat() ? ST_LEN : (dino.jumpPower * (hasRune('hyperspeed') ? 1.5 : 1) * 0.85); if (stBat()) stLuotLen(); dino.canDoubleJump = false; dino.jumpCount = (dino.jumpCount || 1) + 1; dino.hoverArmed = false; SFX.jump(); }
                 } else if (gameState === 'custom_menu') {
                     if (previewDino.grounded) { previewDino.dy = dino.jumpPower; previewDino.grounded = false; }
                 }
@@ -34877,31 +35166,41 @@ function checkPvPCollisions() {
                 // Thu nghiem: mang [1,2,3,4] chi tham duoc 1 va 3.
                 for (let i = obstacles.length - 1; i >= 0; i--) {
                     let obs = obstacles[i];
-                    obs.update(); obs.draw();
+                    if (qsChoDichChay()) obs.update();
+                    obs.draw();
                     if (obs.burnTimer > 0) { obs.burnTimer--; if (obs.burnTimer % 60 === 0) { obs.hp -= 1; visualEffects.push(new Effect(obs.x + obs.w/2, obs.y + obs.h/2, 'explosion', true, 10)); } }
                     if (obs.hp <= 0) { obstacles.splice(i, 1); score += 10; }
                     else if (obs.x + obs.w < 0) obstacles.splice(i, 1);
                 }
                 for (let i = enemies.length - 1; i >= 0; i--) {
                     let en = enemies[i];
-                    if (!(en._uFreeze > 0)) en.update();
+                    if (!(en._uFreeze > 0) && qsChoDichChay()) en.update();
                     en.draw();
                     if (en.burnTimer > 0) { en.burnTimer--; if (en.burnTimer % 60 === 0) { en.hp -= 1; visualEffects.push(new Effect(en.x + en.w/2, en.y + en.h/2, 'explosion', true, 10)); } }
                     if (en.hp <= 0) { handleEnemyDeath(en); enemies.splice(i, 1); }
                     else if (en.x + en.w < 0) enemies.splice(i, 1);
                 }
                 for (let i = hearts.length - 1; i >= 0; i--) { let h = hearts[i]; h.update(); h.draw(); if (h.x + h.w < 0) hearts.splice(i, 1); }
-                for (let i = bossProjectiles.length - 1; i >= 0; i--) { let bp = bossProjectiles[i]; bp.update(); bp.draw(); if (bossProjRaNgoai(bp)) bossProjectiles.splice(i, 1); }
+                for (let i = bossProjectiles.length - 1; i >= 0; i--) { let bp = bossProjectiles[i]; if (qsChoDichChay()) bp.update(); bp.draw(); if (bossProjRaNgoai(bp)) bossProjectiles.splice(i, 1); }
                 updateBulletClash();
                 tickTimBoss();
             }
 
             // Xoa dan theo bien THE GIOI, khong phai bien MAN HINH. Truoc day o nua sau
             // ban do (x > 1200) moi vien dan vua ban ra la bi xoa ngay -> "danh khong an gi".
-            for (let i = projectiles.length - 1; i >= 0; i--) { let proj = projectiles[i]; proj.update(); proj.draw(); if (projRaNgoai(proj)) projectiles.splice(i, 1); }
+            for (let i = projectiles.length - 1; i >= 0; i--) { let proj = projectiles[i];
+                // QUICKSILVER: dan bay QS_BAY khung roi DUNG LAI GIUA KHONG TRUNG nhu dao cua DIO.
+                // Het chieu, thoi gian chay lai -> tat ca cung bay tiep mot luc.
+                let treo = false;
+                if (qsDungGio()){ proj._qsAge = (proj._qsAge || 0) + 1; if (proj._qsAge > QS_BAY) treo = true; }
+                else proj._qsAge = 0;
+                if (!treo) proj.update();
+                proj.draw();
+                if (treo) qsVeDao(proj);
+                if (projRaNgoai(proj)) projectiles.splice(i, 1); }
 
             if (duelMode && dino){ dino.invincible = true; if (dino.invTimer < 30) dino.invTimer = 30; }
-            drawUnityUlt();
+            drawUnityUlt(); qsVe();
             for (let i = visualEffects.length - 1; i >= 0; i--) { visualEffects[i].update(); visualEffects[i].draw(); if (visualEffects[i].timer >= (visualEffects[i].life || 30)) visualEffects.splice(i, 1); }
             for (let i = floatingTexts.length - 1; i >= 0; i--) { let ft = floatingTexts[i]; ft.update(); ft.draw(); if (ft.life <= 0) floatingTexts.splice(i, 1); }
             
@@ -34990,7 +35289,7 @@ function checkPvPCollisions() {
                 if (bossProjectiles.length > bossSfxPrevBP) SFX.bossSkill();
                 bossSfxPrevBP = bossProjectiles.length;
                 bosses.forEach((b, _bi) => {
-                    if (!b.dying && !(b._uFreeze > 0)){
+                    if (!b.dying && !(b._uFreeze > 0) && qsChoDichChay()){
                         if (duelMode && bosses.length >= 2) bossDuelUpdate(b, bosses[(_bi + 1) % bosses.length]);
                         else bossUpdateWithTaunt(b);   // TAN ANH hut aggro | UNITY-Ripper: dang bi KHOA thi dung im
                     }
@@ -35097,6 +35396,7 @@ function checkPvPCollisions() {
             unitySync(); if (unitySwapCd > 0) unitySwapCd--;
             tickUnityUlt();
             if (dodgeCd > 0) dodgeCd--; if (perfectParryCd > 0) perfectParryCd--; if (dashCd > 0) dashCd--; if (dino.dashShieldTimer > 0) dino.dashShieldTimer--;
+            stTick(); stMustang(); stTuDongTrenKhong(); qsTick();   // @@HE-SHINTRICK
             if (dodgeCd <= 0 && !dino.invincible && !dino.isShielding() && !dino.jcState && (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss')) {
                 let dcx = dino.x + dino.w / 2, dcy = dino.y + dino.h / 2, gb = { x: dino.x - 16, y: dino.y - 16, w: dino.w + 32, h: dino.h + 32 };
                 for (let bp of bossProjectiles) {
