@@ -27986,9 +27986,12 @@ class PulsarCloneBoss {
                         // va cam bao nhieu khau cung duoc. Truoc day charge chi la mot loat burst.
                         // Charge KHONG dung chung bang dan va KHONG bi Overheat chan —
                         // hai he da tach roi nhau.
-                        if (this.rapidChannel){ this.rapidChannel = false; this.rfDroneCho = { dan: 0, laser: 0 }; if (this.rapidDrone) for (let _d of this.rapidDrone) _d.roi = 1; }
+                        if (this.rapidChannel){ this.rapidChannel = false; this.rfDroneCho = { dan: 0, laser: 0 }; if (this.rapidDrone) for (let _d of this.rapidDrone) rfTanCuoc(_d); }
                         else if (this.aKeyHeldTime >= 60) {
-                            let vien = Math.max(6, Math.round(this.aKeyHeldTime * 0.7));
+                            // 12 vien o moc 1 giay, len toi 24 o moc day (3 giay). Truoc day toi
+                            // lay 0.7 vien moi khung nen giu day ra 126 vien — do la thua huong
+                            // con so 100 vien cua chieu cuoi cu, khong phai muc tich duoc.
+                            let vien = Math.max(12, Math.min(24, Math.round(12 + (this.aKeyHeldTime - 60) / 10)));
                             this.sentries.push({ x: this.x + this.w/2, y: 320, dan: vien, cd: 0, mo: 0, xoay: 0,
                                                  goc: this.isFacingLeft ? Math.PI : 0, thu: 0 });
                             floatingTexts.push(new FloatingText(this.x - 26, this.y - 30, "SENTRY " + vien + " VIÊN"));
@@ -29104,6 +29107,10 @@ class PulsarCloneBoss {
                         if (Math.abs(d.y - my) > 26) d.cd = Math.max(d.cd, 4);   // chua vao cho thi chua ban
                         else if (d.cd <= 0){
                             // Len TIM o vien 40 chu khong phai 60 -> con 20 vien ban o muc cao nhat
+                            if (d.tan){
+                                if (d.tanBan >= RF_TAN_DAN){ d.roi = 1; continue; }
+                                d.tanBan++;
+                            }
                             let td = Math.max(0, Math.min(1, d.ban / RF_DRONE_TIM));
                             d.cd = Math.round(15 - 11 * td);            // 15 -> 4 khung, bang nguoi choi
                             d.ban++;
@@ -29154,6 +29161,7 @@ class PulsarCloneBoss {
                             }
                             if (d.quet.x < -30 || d.quet.x > canvas.width + 30){
                                 d.quet = null; d.cd = 30; d.luot++;      // nghi 0.5 giay
+                                if (d.tan){ d.tanQuet++; if (d.tanQuet >= RF_TAN_QUET){ d.roi = 1; continue; } }
                                 if (d.luot >= RF_DRONE_QUET){
                                     d.roi = 1;
                                     floatingTexts.push(new FloatingText(d.x - 30, d.y - 16, "DRONE XONG"));
@@ -29837,7 +29845,7 @@ class PulsarCloneBoss {
                     this.clawChannel = false; this.clawChannelHits = 0;
                     this.aKeyHeldTime = 0; this.chargeProgress = 0; this.attackCooldown = 20;
                 }
-                if (this.cryoChannel || this.clawChannel || this.rapidChannel || this.pulseLaserChannel || this.fireChannel || this.lightChannel || this.splitChannel || this.pulsarChannel || this.boomChannel) { if (this.pulsarChannel && this.pulsarStar && this.pulsarStar.onBody) this.pulsarStar = null; this.cryoChannel = false; this.cryoBaoT = 0; this.clawChannel = false; this.rapidChannel = false; this.pulseLaserChannel = false; this.fireChannel = false; this.lightChannel = false; this.splitChannel = false; this.pulsarChannel = false; this.boomChannel = false; this.boomChanLeft = 0; projectiles.forEach(p => { if (p.bounce) p.bounce = false; }); this.lightLinkTargets = null; this.laserActiveTimer = 0; this.clawChannelHits = 0; this.aKeyHeldTime = 0; this.chargeProgress = 0; floatingTexts.push(new FloatingText(this.x, this.y - 20, "NGAT CHANNEL!")); }
+                if (this.cryoChannel || this.clawChannel || this.rapidChannel || this.pulseLaserChannel || this.fireChannel || this.lightChannel || this.splitChannel || this.pulsarChannel || this.boomChannel) { if (this.pulsarChannel && this.pulsarStar && this.pulsarStar.onBody) this.pulsarStar = null; this.cryoChannel = false; this.cryoBaoT = 0; this.clawChannel = false; this.rapidChannel = false; this.rfDroneCho = { dan: 0, laser: 0 }; if (this.rapidDrone) for (let _d of this.rapidDrone) rfTanCuoc(_d); this.pulseLaserChannel = false; this.fireChannel = false; this.lightChannel = false; this.splitChannel = false; this.pulsarChannel = false; this.boomChannel = false; this.boomChanLeft = 0; projectiles.forEach(p => { if (p.bounce) p.bounce = false; }); this.lightLinkTargets = null; this.laserActiveTimer = 0; this.clawChannelHits = 0; this.aKeyHeldTime = 0; this.chargeProgress = 0; floatingTexts.push(new FloatingText(this.x, this.y - 20, "NGAT CHANNEL!")); }
                 this.hp -= amount; this.invincible = true; this.invTimer = 80; speedBonus = 0; shakeTimer = 15;
                 noDamageTaken = false; noDmgStreak = 0; stylePoints *= 0.45; styleLastTag = '';
                 shieldCharge = Math.max(0, shieldCharge - 300);   // trung don LUI 5 giay tien do la chan, khong xoa sach
@@ -30343,6 +30351,14 @@ class PulsarCloneBoss {
         const RF_DRONE_TIM = 40;   // len tim o vien thu 40 -> con 20 vien ban o muc tim
         const RF_DRONE_QUET = 3;   // drone laser quet 3 luot roi bay di
         const RF_DRONE_CHO = 180;  // 3 giay sau khi ca hai bien mat thi dieu cap moi xuong
+        // TAN CUOC: tha phim (hoac bi danh ngat) thi drone chua di ngay — con ban them
+        // toi da 5 vien / quet them 1 luot roi moi bay len. Giong Rapidfire cu: bi dap
+        // van con lai chut sat thuong.
+        const RF_TAN_DAN = 5, RF_TAN_QUET = 1;
+        function rfTanCuoc(d){
+            if (!d || d.roi || d.tan) return;
+            d.tan = 1; d.tanBan = 0; d.tanQuet = 0;
+        }
         const RF_CHUOI = 30;     // 30 vien lien tiep thi dan ve giua hoan toan
         const RF_NGUOI = 24;     // ngung ban 24 khung thi chuoi reset
         const RF_LECH = 7;       // do lech ban dau (do)
