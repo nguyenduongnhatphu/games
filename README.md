@@ -1,145 +1,75 @@
-# 🎮 Hans Games — trang web đăng game HTML
+# 🎮 Hans Games
 
-Trang web tĩnh 100%, không cần backend, không cần database. Chỉ có HTML/CSS/JS thuần nên chạy thẳng trên GitHub Pages miễn phí.
+Bộ sưu tập game HTML tự làm — chơi ngay trên trình duyệt, không cần cài đặt.
 
-```
-my-games/
-├── index.html      ← trang chủ: lưới game, tìm kiếm, lọc, dark mode
-├── play.html       ← trang chơi game (mỗi game 1 link riêng)
-├── style.css       ← toàn bộ giao diện
-├── games.json      ← ★ FILE DUY NHẤT BẠN CẦN SỬA khi thêm game
-├── .nojekyll       ← bắt buộc cho GitHub Pages
-└── games/
-    └── catch-the-box/
-        └── index.html   ← game demo (chơi thử được ngay)
-```
+**🔗 Chơi ngay:** [https://nguyenduongnhatphu.github.io/games/](https://nguyenduongnhatphu.github.io/games/)
+
+Hiện có **2 game**.
 
 ---
 
-## Phần 1 — Đưa lên mạng (GitHub Pages)
+## 🎰 Pit Boss
 
-Làm 1 lần duy nhất, khoảng 5 phút.
+> Balatro-like nhưng lõi là Blackjack.
 
-1. Vào [github.com/new](https://github.com/new), tạo repo tên **`my-games`**, để **Public**, không tick thêm gì.
-2. Ở màn hình tiếp theo bấm **uploading an existing file**.
-3. Kéo **toàn bộ nội dung bên trong** thư mục `my-games` (file `index.html`, `play.html`, `style.css`, `games.json`, `.nojekyll` và thư mục `games/`) thả vào trang → bấm **Commit changes**.
+| | |
+|---|---|
+| **Thể loại** | Rogue-Lite · Deck Builder · Casual |
+| **Cảm giác** | Xây bộ bài, đánh bài, sống sót qua các “pit” |
+| **Phù hợp** | Chơi nhẹ, có chút may rủi và xây dựng |
 
-   > ⚠️ Kéo *nội dung bên trong*, đừng kéo cả thư mục `my-games` vào — nếu không link sẽ thành `.../my-games/my-games/`.
-
-4. Vào tab **Settings → Pages**. Mục *Source* chọn **Deploy from a branch**, Branch chọn **main** + thư mục **/ (root)** → **Save**.
-5. Chờ 1–2 phút, web sẽ chạy tại:
-
-   ```
-   https://<tên-github-của-bạn>.github.io/my-games/
-   ```
-
-Từ lần sau, mỗi khi bạn upload/sửa file trên repo, web tự cập nhật sau ~1 phút.
-
-**Nếu bạn quen dùng Git:**
-
-```bash
-cd my-games
-git init && git add . && git commit -m "init"
-git branch -M main
-git remote add origin https://github.com/<username>/my-games.git
-git push -u origin main
-```
+➡️ [Chơi Pit Boss](https://nguyenduongnhatphu.github.io/games/play.html?id=pit-boss)
 
 ---
 
-## Phần 2 — Thêm một game HTML mới
+## 🦖 Dino (Pixel Dinosaur)
 
-Đây là phần bạn làm thường xuyên. Chỉ 3 bước.
+> Endless Runner “dị” với rất nhiều hệ thống chồng lên nhau.
 
-### Bước 1 — Bỏ game vào thư mục `games/`
+Đây **không phải** Dino Chrome đơn giản. Đây là sandbox hành động 2D pixel với:
 
-Tạo một thư mục con, đặt tên **không dấu, không khoảng trắng**, và **file chính phải tên `index.html`**:
+- Nhiều loại đạn hoàn toàn khác nhau
+- Hệ Charge / Channel / Ultimate riêng cho từng loại đạn
+- Hệ Rune (gồm cả rune độc quyền thay đổi hoàn toàn lối chơi)
+- Nhiều Boss với AI, phase và combo hợp kích
+- Chế độ Boss Rush, Test Boss, PvP, Defense, Dojo luyện tập…
+- Stylish rank, parry, graze, dash, khiên, pet…
 
-```
-games/
-└── ten-game-cua-ban/
-    └── index.html
-```
+Game thiên về **khám phá cơ chế** và thử nghiệm build hơn là chỉ chạy tránh chướng ngại vật.
 
-- **Game của bạn chỉ có 1 file HTML duy nhất?** → Hoàn hảo, đổi tên nó thành `index.html` và bỏ vào thư mục đó.
-- **Game có nhiều file** (`style.css`, `game.js`, `sprite.png`, âm thanh…)? → Bỏ hết vào cùng thư mục đó, giữ nguyên cấu trúc. Game của bạn tham chiếu file bằng **đường dẫn tương đối** (`<script src="game.js">`, `<img src="sprite.png">`) nên sẽ chạy y hệt như khi mở offline.
-- **Game export từ Unity / Godot / Construct / GDevelop?** → Bỏ nguyên folder build (đã có sẵn `index.html`) vào là được.
+➡️ [Chơi Dino](https://nguyenduongnhatphu.github.io/games/play.html?id=dino)
 
-### Bước 2 — Thêm một khối vào `games.json`
+### Hướng dẫn nhanh (Dino)
 
-Mở `games.json`, thêm một object mới vào mảng `games`. Nhớ **dấu phẩy `,`** ngăn cách giữa các game:
+| Mục | Phím / Cách dùng |
+|-----|------------------|
+| Di chuyển | `A` `D` hoặc `←` `→` |
+| Nhảy | `Space` / `W` |
+| Lướt | `Shift` |
+| Cúi | `S` |
+| Bắn thường | `J` |
+| Charge | Giữ `K` → thả để bắn theo mốc |
+| Channel | Giữ lâu hơn (một số loại đạn) |
+| Ultimate | Khi thanh đầy |
+| Khiên / Parry | `L` (parry đúng lúc rất mạnh) |
+| Đổi thế (Stance) | `I` / `O` (Gunslinger · Trickster · Royal Guard) |
+| Đổi đạn | Trong menu / Dojo hoặc bằng rune Unity |
 
-```json
-{
-  "id": "ten-game-cua-ban",
-  "title": "Tên Game Của Bạn",
-  "description": "Mô tả ngắn 1–2 câu, hiện ở thẻ game.",
-  "category": "Arcade",
-  "tags": ["puzzle", "2 người chơi"],
-  "path": "games/ten-game-cua-ban/index.html",
-  "thumbnail": "",
-  "emoji": "🚀",
-  "color": "#ff5c8a",
-  "controls": "WASD để di chuyển, Space để bắn",
-  "date": "2026-07-27"
-}
-```
-
-| Trường | Bắt buộc | Ý nghĩa |
-|---|---|---|
-| `id` | ✅ | Định danh duy nhất, cũng là link chia sẻ: `play.html?id=ten-game-cua-ban` |
-| `title` | ✅ | Tên hiển thị |
-| `path` | ✅ | Đường dẫn tới file HTML của game |
-| `description` | | Mô tả ngắn |
-| `category` | | Tự động sinh nút lọc ở trang chủ |
-| `tags` | | Dùng cho ô tìm kiếm, hiện 3 tag đầu trên thẻ |
-| `thumbnail` | | Ảnh bìa, ví dụ `games/ten-game/cover.png`. Để trống `""` thì dùng emoji + màu |
-| `emoji` / `color` | | Ảnh bìa dự phòng khi không có `thumbnail` |
-| `controls` | | Hướng dẫn phím, hiện dưới khung game |
-
-### Bước 3 — Upload lại lên GitHub
-
-Kéo thư mục game mới + file `games.json` đã sửa lên repo (hoặc `git push`). Xong.
-
-> 💡 **Mẹo:** nếu game mới không hiện ra, gần như chắc chắn là `games.json` sai cú pháp — thường là thiếu hoặc thừa dấu phẩy. Dán nội dung file vào [jsonlint.com](https://jsonlint.com) để kiểm tra trong 5 giây.
+**Mục tiêu:** Sống sót · Hạ boss · Thử build đạn + rune · Đạt Stylish cao.
 
 ---
 
-## Phần 3 — Chia sẻ
+## Ghi chú
 
-Mỗi game có link riêng, gửi thẳng cho bạn bè là chơi được ngay, không cần cài gì:
-
-```
-https://<username>.github.io/my-games/play.html?id=catch-the-box
-```
-
-Nút **🔗 Chia sẻ** trên trang chơi sẽ tự copy link vào clipboard (trên điện thoại thì mở luôn menu chia sẻ của hệ điều hành).
-
-**Ảnh preview khi share lên Facebook/Zalo/Discord:** thêm một file ảnh tên `og-image.png` (kích thước 1200×630) vào thư mục gốc — mọi link chia sẻ sẽ dùng ảnh đó. Vì trang web là tĩnh, tất cả game dùng chung một ảnh preview; muốn mỗi game có ảnh riêng thì cần build script sinh từng trang, nói mình nếu bạn cần.
+- Chơi tốt nhất trên **máy tính** (bàn phím). Mobile có hỗ trợ cảm ứng nhưng game phức tạp sẽ khó hơn.
+- Tất cả game chạy ngay trên trình duyệt, không cần tải về.
+- Nếu phím không ăn: click một cái vào khung game để lấy focus.
 
 ---
 
-## Chạy thử ở máy trước khi upload
+<div align="center">
 
-Đừng mở `index.html` bằng cách double-click — trình duyệt chặn `fetch()` trên giao thức `file://` nên `games.json` sẽ không đọc được. Hãy chạy một local server:
+**Tác giả:** Hans Rivera  
+**Trang chơi:** [nguyenduongnhatphu.github.io/games](https://nguyenduongnhatphu.github.io/games/)
 
-```bash
-cd my-games
-python -m http.server 8000
-```
-
-Rồi mở http://localhost:8000 . (Có Node thì dùng `npx serve` cũng được.)
-
----
-
-## Câu hỏi thường gặp
-
-**Game bàn phím không ăn phím?** → Bấm chuột một cái vào khung game để nó nhận focus. Trang đã tự xử lý việc này khi click.
-
-**Game bị cắt / méo?** → Khung game có tỉ lệ 16:10. Trong CSS, sửa `.stage { aspect-ratio: 16/10 }` sang tỉ lệ game của bạn (ví dụ `3/4` cho game dọc), hoặc dùng nút toàn màn hình.
-
-**Muốn đổi tên trang, màu chủ đạo?** → Tên/slogan sửa trong `games.json` phần `"site"`. Màu sửa biến `--accent` ở đầu `style.css`.
-
-**Dùng domain riêng?** → Settings → Pages → Custom domain, rồi trỏ CNAME ở nhà cung cấp domain.
-
-**Game nặng vài trăm MB?** → GitHub Pages giới hạn repo 1GB và mỗi file 100MB. Game HTML thường rất nhẹ nên hiếm khi chạm giới hạn.
+</div>
