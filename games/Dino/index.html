@@ -117,7 +117,7 @@
   UNITY CLONE Boss guong: doi 4 loai dan cua nguoi choi        @@HE-UNITY
   VERGIL      3 pha: Yamato / Doppelganger / Devil Trigger      @@HE-VERGIL
   DANTE       Doi 6 Devil Arm + Royal Guard + SDT               @@HE-DANTE
-  RUNE UNITY  Mang 3 loai dan, doi bang Q/E, khoa Channel+Ult  @@HE-RUNE-UNITY
+  RUNE UNITY  Mang 3 loai dan, doi bang Q/E, khoa Ult rieng     @@HE-RUNE-UNITY
   WAR         Darksiders: bo do phan 1 + Chaos Form            @@HE-WAR
   DEATH       Darksiders 2: luoi hai + chuy + Reaper Form      @@HE-DEATH
   DAU BOSS    Cho hai boss danh nhau (muon co che Tan Anh)     @@HE-DUEL
@@ -23680,6 +23680,10 @@ class PulsarCloneBoss {
                 if (this.state === 'claw_go'){ this.y = this.baseY; this.dy = 0;
                     this.x += this.claw.dir * (this.rage ? 22 : 18);
                     if (!this.claw.hit && checkAABB(dino, this)){ this.hurtP(1); this.claw.hit = true; }
+                    // CHOT AN TOAN: don nay khong co moc thoi gian nao khac, neu vi ly do gi
+                    // ma khong bao gio ra khoi bien thi boss se lao mai mai. Cat cung sau 4 giay.
+                    if (this.subTimer > 240){ this.clawPass = 0; this.claw = null;
+                        this.x = Math.max(10, Math.min(canvas.width - this.w - 10, this.x)); this.toIdle(40); return; }
                     if (this.x < -this.w - 20 || this.x > canvas.width + 20){
                         this.clawPass = (this.clawPass || 0) + 1;
                         if (this.clawPass >= (this.rage ? 3 : 2)){ this.clawPass = 0; this.claw = null; this.x = Math.max(10, Math.min(canvas.width - this.w - 10, this.x)); this.toIdle(40); }
@@ -27013,8 +27017,12 @@ class PulsarCloneBoss {
                     return;
                 }
                 if (this.ultActive || this.jcState || ultCharge < 100 || this.fireReactorTimer > 0 || this.lightningFormTimer > 0) return;
-                // TAM LUAN o GUNSLINGER: chieu cuoi bi khoa
-                if (typeof tlBat === 'function' && tlBat() && combatStance === 0){
+                // TAM LUAN: chieu cuoi bi khoa o CA BA THE. Ba the DA chua san toan bo bo
+                // ky nang lan chieu cuoi (Royal Guard chinh la xe tang), nen mo them ult nua la
+                // phat khong. Truoc day chi chan the 0: bam U o Trickster/Royal Guard van no ult
+                // xe tang goc, ma ult goc co dong combatStance = 0 -> nem nguoi choi ve
+                // Gunslinger kem xe tang, nhin nhu "dung duoc ult o Gunslinger".
+                if (typeof tlBat === 'function' && tlBat()){
                     floatingTexts.push(new FloatingText(this.x - 30, this.y - 30, "CHIÊU CUỐI BỊ KHOÁ"));
                     return;
                 }
@@ -27822,7 +27830,7 @@ class PulsarCloneBoss {
                 }
 
                 // Claw: giu charge qua 3s -> Judgement Cut nho lien tuc (rieng Gunslinger)
-                if (checkAmmo === 5 && chargeKey && combatStance === 0 && !this.isOverheated && !unityOn() && this.aKeyHeldTime >= 180) {
+                if (checkAmmo === 5 && chargeKey && combatStance === 0 && !this.isOverheated && this.aKeyHeldTime >= 180) {
                     if (!this.clawChannel) { this.clawChannel = true; this.clawSwordCd = 0;
                         if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(180, 0.2, 'sawtooth', 0.16, 90); }
                     // KIEM TRAN: trieu them 1 thanh moi nhip. SWORDMASTER: 30 thanh / 10 frame,
@@ -27834,7 +27842,7 @@ class PulsarCloneBoss {
                 }
 
                 // Rapid: giu charge qua 3s -> channel ban gacha lien tuc 6 vien/s
-                if (checkAmmo === 2 && chargeKey && combatStance === 0 && !this.isOverheated && !unityOn() && this.aKeyHeldTime >= 180) {
+                if (checkAmmo === 2 && chargeKey && combatStance === 0 && !this.isOverheated && this.aKeyHeldTime >= 180) {
                     this.rapidChannel = true;
                     // Dang Channel van TICH DAN nhung CHAM GAP DOI (moi 30 khung mot viec thay vi 15).
                     // Truoc day vao Channel la ngung tich han, nen giu lau khong duoc gi them.
@@ -27859,7 +27867,7 @@ class PulsarCloneBoss {
                 }
 
                 // Normal: giu charge qua 3s -> giu tia laser vo han (khong overheat) toi khi nha/nhan dmg
-                if (checkAmmo === 0 && chargeKey && combatStance === 0 && !this.isOverheated && !unityOn() && this.aKeyHeldTime >= 180) {
+                if (checkAmmo === 0 && chargeKey && combatStance === 0 && !this.isOverheated && this.aKeyHeldTime >= 180) {
                     if (!this.pulseLaserChannel) { this.pulseLaserChannel = true; this.laserType = 0; this.pulseLaserNac = 0; this.pulseLaserT = 0; }
                     // LASER QUA TAI: giu cang lau tia cang DAY va cang dau (3 nac)
                     this.pulseLaserT++;
@@ -27870,13 +27878,13 @@ class PulsarCloneBoss {
                 }
 
                 // Fire: giu charge qua 3s -> song nhiet hach xung moi 1s, 5 dmg toan man
-                if (checkAmmo === 1 && chargeKey && combatStance === 0 && !this.isOverheated && !unityOn() && this.aKeyHeldTime >= 180) {
+                if (checkAmmo === 1 && chargeKey && combatStance === 0 && !this.isOverheated && this.aKeyHeldTime >= 180) {
                     if (!this.fireChannel) { this.fireChannel = true; this.fireNukePulse(); this.fireChannelCd = 60; }
                     else { if (this.fireChannelCd > 0) this.fireChannelCd--; if (this.fireChannelCd <= 0) { this.fireNukePulse(); this.fireChannelCd = 60; } }
                 }
 
                 // Lightning: giu charge qua 3s -> xich set giat 4 muc tieu gan (giong don J cua ult cu)
-                if (checkAmmo === 4 && chargeKey && combatStance === 0 && !this.isOverheated && !unityOn() && this.aKeyHeldTime >= 180) {
+                if (checkAmmo === 4 && chargeKey && combatStance === 0 && !this.isOverheated && this.aKeyHeldTime >= 180) {
                     this.lightChannel = true;
                     let cxp = this.x + this.w/2, cyp = this.y + this.h/2;
                     this.lightLinkTargets = (typeof allTargets === 'function' ? allTargets() : [...bosses, ...enemies]).filter(o => !o.invulnAll).map(o => ({ o, d: Math.hypot((o.x+o.w/2)-cxp, (o.y+o.h/2)-cyp) })).sort((a,b)=>a.d-b.d).slice(0,4).map(z=>z.o);
@@ -27885,7 +27893,7 @@ class PulsarCloneBoss {
                 }
 
                 // Split: giu charge qua 3s -> 3 vien xuyen + nay kieu DVD, lap moi 1s
-                if (checkAmmo === 3 && chargeKey && combatStance === 0 && !this.isOverheated && !unityOn() && this.aKeyHeldTime >= 180) {
+                if (checkAmmo === 3 && chargeKey && combatStance === 0 && !this.isOverheated && this.aKeyHeldTime >= 180) {
                     if (!this.splitChannel) { this.splitChannel = true; this.fireSplitBounce(); this.splitChannelCd = 60; }
                     else { if (this.splitChannelCd > 0) this.splitChannelCd--; if (this.splitChannelCd <= 0) { this.fireSplitBounce(); this.splitChannelCd = 60; } }
                 }
@@ -27893,7 +27901,7 @@ class PulsarCloneBoss {
                 // Pulsar: GIU K la ngoi sao hien ra NGAY, giu cang lau thi xoay cang nhanh
                 // va ban cang nhieu. Truoc day phai giu du 3s sao moi moc, va no bi chot cung
                 // o 3 tia / 0.28 xoay nen giu them chang duoc gi.
-                if (checkAmmo === 6 && chargeKey && combatStance === 0 && !this.isOverheated && !unityOn()) {
+                if (checkAmmo === 6 && chargeKey && combatStance === 0 && !this.isOverheated) {
                     if (!this.pulsarStar) this.createPulsarStar(0, true);
                     let ST = this.pulsarStar;
                     if (ST && ST.onBody) {
@@ -27910,7 +27918,7 @@ class PulsarCloneBoss {
                 // BOOMERANG CHANNEL — TAM LUOI: 3 chiec nem lien tuc, phai bat lien tuc
                 // BOOMERANG CHANNEL — KHIEN LUOI: bat duoc thi nem lai NGAY, khong can giu phim nua
                 // WHISPER CHANNEL — nha lien tuc moi 0.5 giay
-                if (checkAmmo === 9 && chargeKey && combatStance === 0 && !this.isOverheated && !unityOn() && this.aKeyHeldTime >= 180) {
+                if (checkAmmo === 9 && chargeKey && combatStance === 0 && !this.isOverheated && this.aKeyHeldTime >= 180) {
                     if (!this.wsChannel){ this.wsChannel = true; this.wsChanT = 0;
                         floatingTexts.push(new FloatingText(this.x - 20, this.y - 30, "ĐỘC TẤU!"));
                         if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(260, 0.4, 'sawtooth', 0.22, 900); }
@@ -27930,7 +27938,7 @@ class PulsarCloneBoss {
                 }
                 // CRYO CHANNEL — BAO TUYET: 2 dmg/giay + 2 tang/giay len TOAN BO ban do.
                 // Dich dang dong bang thi VO ra, an them 3 dmg.
-                if (checkAmmo === 8 && chargeKey && combatStance === 0 && !this.isOverheated && !unityOn() && this.aKeyHeldTime >= 180) {
+                if (checkAmmo === 8 && chargeKey && combatStance === 0 && !this.isOverheated && this.aKeyHeldTime >= 180) {
                     if (!this.cryoChannel){ this.cryoChannel = true; this.cryoBaoT = 0;
                         floatingTexts.push(new FloatingText(this.x - 24, this.y - 30, "BÃO TUYẾT!"));
                         if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(200, 0.5, 'sawtooth', 0.2, 900); }
@@ -27946,7 +27954,7 @@ class PulsarCloneBoss {
                         if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(880, 0.06, 'triangle', 0.1, 1400);
                     }
                 }
-                if (checkAmmo === 7 && chargeKey && combatStance === 0 && !this.isOverheated && !unityOn() && this.aKeyHeldTime >= 180) {
+                if (checkAmmo === 7 && chargeKey && combatStance === 0 && !this.isOverheated && this.aKeyHeldTime >= 180) {
                     if (!this.boomChannel) {
                         this.boomChannel = true; this.boomChanLeft = 3; this.boomChanCd = 0; this.boomThrowCount = 0;
                         floatingTexts.push(new FloatingText(this.x - 20, this.y - 30, "KHIEN LUOI!"));
@@ -30486,10 +30494,23 @@ class PulsarCloneBoss {
             let want = unityPicks[unityIdx];
             if (currentAmmoType !== want) currentAmmoType = want;
         }
+        // Unity KHONG con khoa Channel (rune nay khong cho them thu hay co dong nao,
+        // khoa ca Channel la dat qua). Nhung dang Channel thi CAM doi dan: doi giua
+        // chung se de mot Channel he nay chay tiep bang co cua he khac.
+        function unityDangChannel(){
+            if (typeof dino === 'undefined' || !dino) return false;
+            return !!(dino.clawChannel || dino.rapidChannel || dino.pulseLaserChannel || dino.fireChannel
+                   || dino.lightChannel || dino.splitChannel || dino.pulsarChannel || dino.wsChannel
+                   || dino.cryoChannel || dino.boomChannel);
+        }
         function unitySwap(dir){
             if (!unityOn() || unitySwapCd > 0) return;
             if (typeof dino === 'undefined' || !dino) return;
             if (dino.jcState || dino.ultActive) return;
+            if (unityDangChannel()){
+                floatingTexts.push(new FloatingText(dino.x - 26, dino.y - 30, "ĐANG CHANNEL"));
+                return;
+            }
             unityIdx = (unityIdx + dir + 3) % 3;
             unitySwapCd = 22;
             let a = unityPicks[unityIdx];
@@ -32581,7 +32602,9 @@ class PulsarCloneBoss {
         // ======================= @@HE-TAMLUAN =======================
         // TAM LUAN — doc quyen RAPIDFIRE, 2 o. Moi THE lam mot viec khac han, va phan lon
         // thu cua no phai NAP o the nay roi DOI SANG the khac moi dung duoc.
-        //   GUNSLINGER : chi con J. Chieu cuoi va khien BI KHOA. Khong Quá Nhiệt.
+        //   CHIEU CUOI (U) va KHIEN TAY bi khoa o CA BA THE — ba the nay chinh la
+        //   bo ky nang day du, xe tang nam san trong Royal Guard.
+        //   GUNSLINGER : chi con J. Khong Quá Nhiệt.
         //   TRICKSTER  : vua vao la cam mot U SUNG (chua ban). Moi giay no +8 vien.
         //                Doi sang the khac -> u sung KHAI HOA. Trickster khong ban duoc gi.
         //                Kem Drone Laser quet lien tuc.
@@ -32735,8 +32758,8 @@ class PulsarCloneBoss {
         // Bo Overheat hoan toan. Doi lai: ban cang lau chan cang nang, mat nhay doi,
         // nhay bi giat nguoc, va trung don la dut mach ban.
         RUNES.push({ id:'trienlien', name:'TAM LUÂN', nameEn:'TRIAD DOCTRINE', icon:'☰', cost:2, ammoRune:true, onlyAmmo:2,
-            desc:'Tốn 2 ô. ĐỘC QUYỀN RAPIDFIRE. KHIÊN TAY BỊ KHOÁ Ở CẢ BA THẾ — bạn sống bằng Drone Khiên và vỏ xe tăng. Ba thế thành ba cỗ máy nuôi lẫn nhau — gần như mọi thứ phải NẠP ở thế này rồi ĐỔI SANG thế khác mới xài được. TRICKSTER (đi map): vừa vào là cắm một ụ súng chưa khai hoả, mỗi giây nó nạp thêm 8 viên; Drone Laser quét map liên tục thay bạn. Không bắn được gì ở thế này — bạn đang tích của để dành. Đổi thế thì ụ súng nhả hết. GUNSLINGER (công thủ): bắn thường không bao giờ Quá Nhiệt, và mỗi lần vào thế là Drone Khiên chắn toàn bộ 3 giây (hồi 8 giây). Đổi lại chiêu cuối bị KHOÁ, chạy chậm dần tới 1/3, nhảy bị giật ngược. ROYAL GUARD (câu giờ): hoá xe tăng 10 máu — không né được, chỉ đứng chịu đòn, nhưng có Drone 60 viên và đúng 1 quả pháo để giải tán đám đông hoặc phang boss. Bạn vào đây để hai thế kia kịp hồi. Nạp drone, hồi máu xe và nạp pháo chỉ chạy khi bạn đang ở thế khác.',
-            descEn:'Costs 2 slots. RAPIDFIRE ONLY. THE HAND SHIELD IS LOCKED IN ALL THREE STANCES — you survive on the Shield Drone and the tank hull instead. Three stances that feed each other — almost everything must be CHARGED in one stance and SPENT in another. TRICKSTER (travel): entering plants a turret that holds its fire and gains 8 rounds per second, while a Laser Drone sweeps the map for you. You cannot shoot here — you are banking ammunition. Leave the stance and the turret unloads everything. GUNSLINGER (offense/defense): normal fire never overheats, and every entry raises a Shield Drone that blocks everything for 3 seconds (8s cooldown). In exchange the ultimate is LOCKED, you slow to one third, and jumps kick you back. ROYAL GUARD (buying time): become a 10 HP tank — no dodging, you simply take the hits, but you carry a 60 round drone and exactly one artillery shell to break a crowd or hit a boss. You come here so the other two stances can recover. Drone reload, tank repair and shell reload only tick while you are in another stance.' });
+            desc:'Tốn 2 ô. ĐỘC QUYỀN RAPIDFIRE. CHIÊU CUỐI VÀ KHIÊN TAY BỊ KHOÁ Ở CẢ BA THẾ — bạn sống bằng Drone Khiên và vỏ xe tăng. Ba thế thành ba cỗ máy nuôi lẫn nhau — gần như mọi thứ phải NẠP ở thế này rồi ĐỔI SANG thế khác mới xài được. TRICKSTER (đi map): vừa vào là cắm một ụ súng chưa khai hoả, mỗi giây nó nạp thêm 8 viên; Drone Laser quét map liên tục thay bạn. Không bắn được gì ở thế này — bạn đang tích của để dành. Đổi thế thì ụ súng nhả hết. GUNSLINGER (công thủ): bắn thường không bao giờ Quá Nhiệt, và mỗi lần vào thế là Drone Khiên chắn toàn bộ 3 giây (hồi 8 giây). Đổi lại chiêu cuối bị KHOÁ, chạy chậm dần tới 1/3, nhảy bị giật ngược. ROYAL GUARD (câu giờ): hoá xe tăng 10 máu — không né được, chỉ đứng chịu đòn, nhưng có Drone 60 viên và đúng 1 quả pháo để giải tán đám đông hoặc phang boss. Bạn vào đây để hai thế kia kịp hồi. Nạp drone, hồi máu xe và nạp pháo chỉ chạy khi bạn đang ở thế khác.',
+            descEn:'Costs 2 slots. RAPIDFIRE ONLY. THE ULTIMATE AND THE HAND SHIELD ARE LOCKED IN ALL THREE STANCES — you survive on the Shield Drone and the tank hull instead. Three stances that feed each other — almost everything must be CHARGED in one stance and SPENT in another. TRICKSTER (travel): entering plants a turret that holds its fire and gains 8 rounds per second, while a Laser Drone sweeps the map for you. You cannot shoot here — you are banking ammunition. Leave the stance and the turret unloads everything. GUNSLINGER (offense/defense): normal fire never overheats, and every entry raises a Shield Drone that blocks everything for 3 seconds (8s cooldown). In exchange the ultimate is LOCKED, you slow to one third, and jumps kick you back. ROYAL GUARD (buying time): become a 10 HP tank — no dodging, you simply take the hits, but you carry a 60 round drone and exactly one artillery shell to break a crowd or hit a boss. You come here so the other two stances can recover. Drone reload, tank repair and shell reload only tick while you are in another stance.' });
         RUNES.push({ id:'swordmaster', name:'SWORDMASTER', nameEn:'SWORDMASTER', icon:'⚔', cost:2, ammoRune:true, onlyAmmo:5,
             desc:'Tốn 2 ô. ĐỘC QUYỀN DINOSWORD. Bản nâng cấp toàn diện cho bộ kiếm — tầm chém, phòng thủ khi lướt, và cả một người thứ hai đánh cùng bạn. Không kể ra hết ở đây: cầm thử một ván là hiểu tại sao DinoSword cần nó.',
             descEn:'Costs 2 slots. DINOSWORD ONLY. A complete overhaul of the sword kit — longer reach, defence while dashing, and a second fighter at your side. Not spelling it all out here: run one stage with it and you will see why DinoSword wants it.' });
@@ -32757,8 +32780,8 @@ class PulsarCloneBoss {
                  +'Trên không giữ hướng là tự lướt; cú lướt đầu mỗi lần rời mặt đất miễn phí. Bấm nhảy khi đang bay là lướt VỌT LÊN, bấm xuống là lướt SÀ XUỐNG — cả hai đều miễn phí nhưng KHÔNG có miễn thương. CHIÊU CUỐI RIÊNG — QUICKSILVER: DỪNG THỜI GIAN 8 giây. Kẻ địch và mọi đòn của chúng gần như bất động, riêng bạn chạy bình thường với 6 charge lướt. Lướt xuyên địch = Mustang 4 dmg và để lại một VẾT CẮT KHÔNG GIAN (tối đa 8). Bắn thì đạn bay một đoạn rồi TREO LƠ LỬNG giữa không trung — tha hồ dựng thế. Hết giờ (hoặc bấm U lần nữa) Dino lao qua toàn bộ vết cắt, mỗi vết nổ thành nhát chém 5 dmg, rồi thời gian chạy lại và toàn bộ dao treo bay tới cùng một lúc. Từ 5 vết trở lên thành PERFECT QUICKSILVER: chém 6 dmg và hồi 1 máu.',
             descEn:'Costs 2 slots. TRICKSTER ONLY. Unlimited basic fire, no overheat, Charge unlocked in Trickster. Dash becomes 3 charges (fast regen if you keep one, 2s lockout if you spend all). Dashing into an enemy performs MUSTANG: kick off their head, ignore contact damage, deal 2 damage and refund a charge (chainable with diminishing height). In the air, holding a direction auto-dashes; the first air dash after leaving the ground is free. Press jump while airborne to rise-dash, hold down to dive-dash: both free, but no i-frames. Unique ultimate QUICKSILVER: TIME STOP for 8s — enemies and their attacks are near-frozen while you move freely with 6 dash charges. Bullets you fire travel briefly then hang in mid-air, all releasing at once when time resumes. Mustang deals 4 and always refunds while leaving a SPACE CUT. On expiry (or press U again) you streak through every cut, each bursting for 5 damage. Five or more cuts upgrades to PERFECT QUICKSILVER: 6 damage per cut and heal 1 HP.' });
         RUNES.push({ id:'unity', name:'UNITY', nameEn:'UNITY', icon:'◆', cost:2, ammoRune:true,
-            desc:'Tốn 2 ô. Mang theo BA loại đạn cùng lúc, đổi ngay giữa trận bằng Q / E. Chiêu cuối HỢP NHẤT: ba viên ngọc gộp lại, đòn kế tiếp (J hoặc K) mang đặc tính gốc của cả ba hệ — 56 tổ hợp khác nhau. Đánh đổi: KHÓA Channel, bạn chỉ còn đòn thường và đòn Charge. Chọn 3 loại đạn ở bảng phía dưới.',
-            descEn:'Costs 2 slots. Carry THREE ammo types at once, swap mid-fight with Q / E. FUSION ultimate: three gems merge and your next shot (J or K) carries the core trait of all three types — 56 combinations. Trade-off: Channel is LOCKED, leaving basic and charged shots. Pick your 3 types in the panel below.' });
+            desc:'Tốn 2 ô. Mang theo BA loại đạn cùng lúc, đổi ngay giữa trận bằng Q / E. Chiêu cuối HỢP NHẤT: ba viên ngọc gộp lại, đòn kế tiếp (J hoặc K) mang đặc tính gốc của cả ba hệ — 56 tổ hợp khác nhau. Đánh đổi: chiêu cuối riêng của từng loại đạn bị thay bằng đòn Hợp Nhất. Không đổi được đạn khi đang Channel. Chọn 3 loại đạn ở bảng phía dưới.',
+            descEn:'Costs 2 slots. Carry THREE ammo types at once, swap mid-fight with Q / E. FUSION ultimate: three gems merge and your next shot (J or K) carries the core trait of all three types — 56 combinations. Trade-off: the ultimate of each type is replaced by the Fusion strike. You cannot swap types while channeling. Pick your 3 types in the panel below.' });
         // ---- Dieu kien bat buoc cua rune doc quyen ----
         function runeOnlyAmmo(id){ let r = RUNES.find(x => x.id === id); return (r && r.onlyAmmo !== undefined) ? r.onlyAmmo : -1; }
         function runeAmmoLabel(id){ let r = RUNES.find(x => x.id === id); if (r && Array.isArray(r.onlyAmmoAny)) return r.onlyAmmoAny.map(a => AMMO_NAMES[a]).join(' / '); return AMMO_NAMES[runeOnlyAmmo(id)] || ''; }
@@ -32893,10 +32916,10 @@ class PulsarCloneBoss {
         // TOM TAT LOI CHOI — mot cau noi RUNE NAY DOI CACH CHOI NHU THE NAO.
         // Khac voi desc (liet ke co che). O rune chi hien cai nay; chi tiet nam o bang kinh lup.
         const RUNE_TOM = {
-            trienlien: { vi:'Thay đổi mạnh về lối chơi của Rapidfire. Sử dụng các Stance đang có như những năng lực khác nhau và phải thay đổi Stance liên tục để tận dụng tối đa khả năng của Rune.',
-                         en:'A hard rewrite of how Rapidfire plays. Each stance becomes a different ability, and you must keep rotating stances to get anything out of it.' },
-            unity:      { vi:'Mang ba loại đạn cùng lúc và đổi giữa trận. Đổi lại Channel và Chiêu Cuối riêng của từng loại bị khoá, thay bằng một đòn Hợp Nhất chung.',
-                          en:'Carry three ammo types and swap mid-fight. In exchange each ammo loses its own Channel and Ultimate, replaced by one shared Fusion strike.' },
+            trienlien: { vi:'Thay đổi mạnh về lối chơi của Rapidfire. Ba thế đã chứa trọn bộ kỹ năng lẫn chiêu cuối, nên chiêu cuối và khiên tay bị khoá. Sử dụng các Stance đang có như những năng lực khác nhau và phải thay đổi Stance liên tục để tận dụng tối đa khả năng của Rune.',
+                         en:'A hard rewrite of how Rapidfire plays. The three stances already hold the full kit including the ultimate, so the ultimate and the hand shield are locked. Each stance becomes a different ability, and you must keep rotating stances to get anything out of it.' },
+            unity:      { vi:'Mang ba loại đạn cùng lúc và đổi giữa trận bằng Q / E. Đổi lại, chiêu cuối riêng của từng loại bị khoá và thay bằng một đòn Hợp Nhất chung mang đặc tính của cả ba hệ.',
+                          en:'Carry three ammo types and swap mid-fight with Q / E. In exchange each ammo loses its own Ultimate, replaced by one shared Fusion strike carrying all three traits.' },
             swordmaster:{ vi:'Nâng toàn bộ bộ kiếm DinoSword lên một bậc: tầm chém xa hơn, lướt có phòng thủ, và mỗi đòn ra thành hai nhát.',
                           en:'Upgrades the whole DinoSword kit: longer reach, defensive dashes, and every strike comes out twice.' },
             shintrick:  { vi:'Biến thế Trickster thành lối chơi cơ động tuyệt đối: bắn thường vô hạn, ba lần lướt liên tiếp, và một chiêu cuối dừng thời gian.',
@@ -39719,9 +39742,23 @@ function checkPvPCollisions() {
                         if (b.x < b.aaNeo - NEO_R) b.x = b.aaNeo - NEO_R;
                         if (b.grounded && b.aaNeoT < 80) b.aaNeoT = 0;
                     }
-                    // CHAN RA KHOI MAP — Dante tung bay han ra ngoai khi lao xuong.
-                    if (b.x < -20) b.x = -20;
-                    if (b.x > canvas.width - (b.w || 40) + 20) b.x = canvas.width - (b.w || 40) + 20;
+                    // @@HE-RAMAP — CHAN RA KHOI MAP. Dante tung bay han ra ngoai khi lao xuong.
+                    // KHONG duoc ghim CUNG: nhieu don la LAO XUYEN MAN (Bo Cap claw_go, ...) va
+                    // chi tinh la "da qua mot luot" khi x < -w-20 hoac x > width+20. Ghim cung o
+                    // -20 / width-w+20 lam hai moc do KHONG BAO GIO dung -> boss lao mai tai mep,
+                    // dung im vinh vien (do duoc: Bo Cap ket claw_go 866 khung o x=-20).
+                    // Nen dung LUOI AN TOAN CO GIO: cho ra ngoai tam RAMAP_TG khung roi moi keo ve.
+                    {
+                        const RAMAP_TG = 45, RAMAP_XA = 1200;
+                        let _bw = b.w || 40;
+                        let _ng = (b.x < -_bw - 40) || (b.x > canvas.width + 40);
+                        b._ngoaiT = _ng ? (b._ngoaiT || 0) + 1 : 0;
+                        if (b._ngoaiT > RAMAP_TG || b.x < -_bw - RAMAP_XA || b.x > canvas.width + RAMAP_XA){
+                            b._ngoaiT = 0;
+                            if (b.x < -20) b.x = -20;
+                            if (b.x > canvas.width - _bw + 20) b.x = canvas.width - _bw + 20;
+                        }
+                    }
                     b.draw();
                     if (b.cornerWarn > 0) drawCornerWarnRing(b);   // vong canh bao 1 giay truoc cu lao khi bi don goc
                     if (b.tier === 'colossal' && !b.dying) drawColossalTag(b);
