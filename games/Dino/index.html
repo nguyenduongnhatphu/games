@@ -92,7 +92,12 @@
 #lan_dong:hover,#lan_ngat:hover{background:#757575;}
 #lan_ra,#lan_vao{width:100%;box-sizing:border-box;background:#0a0d11;color:#cfe8ef;
   border:1px solid #2b3742;border-radius:5px;padding:8px;font-family:inherit;font-size:11px;}
-#lan_ra{height:86px;resize:none;margin-bottom:9px;}
+#lan_ra{height:52px;resize:none;margin-bottom:9px;}
+#lan_dande{color:#9aa6b2;font-size:11px;margin:10px 0 6px;letter-spacing:.5px;}
+#lan_bangdan{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:11px;}
+#lanui .lan_o{padding:6px 4px;font-size:10px;font-weight:bold;border:1px solid;border-radius:4px;
+  letter-spacing:.3px;transition:none;}
+#lanui .lan_o:hover{filter:brightness(1.18);}
 </style>
 </head>
 <body>
@@ -32849,56 +32854,137 @@ class PulsarCloneBoss {
 
 
 
+        /* ==================================================================
+           @@HE-PVPUI — MAN CHUAN BI PVP (ve lai)
+           ------------------------------------------------------------------
+           Ban cu hong hai cho, ca hai deu do map duoc keo cao them 160px:
+             1) camY = -160 nen ca man dang bi dich xuong 160px. Lop phu
+                fillRect(0,0,1000,560) vi the phu tu y=160 den y=720, tuc la
+                ho han 160px den o day man. Sua bang cach dung ve o TOA DO MAN
+                HINH: translate(camX, camY) de go phep tinh tien cua camera ra.
+             2) Nut nam o x 300..500 (tam 400) nhung chu lai ve o canvas.width/2
+                = 500, tuc dung ngay MEP PHAI cua nut. Sua bang cach moi nut tu
+                bao tam cua no.
+           Toa do nut de o MOT CHO (pvpNut) cho ca ve lan bam dung chung, khong
+           con canh hai danh sach so roi lech nhau.
+           ================================================================== */
+        function pvpNut(){
+            const gx = 500, gw = 240, gh = 44;
+            return {
+                p1Skin:  { l:{x:150,y:150,w:34,h:34}, r:{x:400,y:150,w:34,h:34} },
+                p1Dan:   { l:{x:150,y:222,w:34,h:34}, r:{x:400,y:222,w:34,h:34} },
+                p2Skin:  { l:{x:566,y:150,w:34,h:34}, r:{x:816,y:150,w:34,h:34} },
+                p2Dan:   { l:{x:566,y:222,w:34,h:34}, r:{x:816,y:222,w:34,h:34} },
+                danh:    { x:gx-gw/2, y:352, w:gw, h:gh },
+                lan:     { x:gx-gw/2, y:404, w:gw, h:gh },
+                ve:      { x:gx-gw/2, y:456, w:gw, h:gh }
+            };
+        }
+        function pvpTrong(n){ return mouseX >= n.x && mouseX <= n.x+n.w && mouseY >= n.y && mouseY <= n.y+n.h; }
+
+        function pvpHop(x, y, w, h, r, nen, vien){
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(x, y, w, h, r);
+            else ctx.rect(x, y, w, h);
+            if (nen){ ctx.fillStyle = nen; ctx.fill(); }
+            if (vien){ ctx.strokeStyle = vien; ctx.lineWidth = 2; ctx.stroke(); }
+        }
+        function pvpNutVe(n, chu, nen, nenSang, mauChu){
+            let s = pvpTrong(n);
+            pvpHop(n.x, n.y, n.w, n.h, 8, s ? nenSang : nen, s ? "#FFFFFF" : "rgba(255,255,255,0.25)");
+            ctx.fillStyle = mauChu || "#0d0d0d";
+            ctx.font = "bold 17px Consolas, monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.fillText(chu, n.x + n.w/2, n.y + n.h/2 + 1);
+        }
+        function pvpMuiTen(n, chu){
+            let s = pvpTrong(n);
+            pvpHop(n.x, n.y, n.w, n.h, 6, s ? "#FFD54F" : "#FFC107", null);
+            ctx.fillStyle = "#1a1a1a"; ctx.font = "bold 18px Consolas, monospace";
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.fillText(chu, n.x + n.w/2, n.y + n.h/2 + 1);
+        }
+
         function drawPvPSetup() {
-            drawEnvironment(); ctx.fillStyle = "rgba(0,0,0,0.85)"; ctx.fillRect(0,0, canvas.width, canvas.height);
-            ctx.fillStyle = "#00E5FF"; ctx.font = "bold 26px Consolas, monospace"; ctx.textAlign = "center"; ctx.fillText("PVP SETUP (P1 VS P2)", canvas.width/2, 40);
+            ctx.save();
+            const W = canvas.width, H = canvas.height, N = pvpNut();
+            const forms = ["NORMAL", "RUSH", "ULT", "BEYOND"];
 
-            let forms = ["NORMAL", "RUSH", "ULT", "BEYOND"];
-            let ammos = AMMO_NAMES;
+            // NEN DAC, khong dung drawEnvironment nua. Ly do: canh vat chi ve toi
+            // khoang y=400 (no ve theo he toa do the gioi, ma the gioi ket thuc o
+            // mat dat), phan con lai duoi day man khong ai son. Lop phu cu de alpha
+            // 0.85 nen cho co canh thi ra nau, cho khong co canh thi ra den thui —
+            // thanh mot dai den o day man dung bang 160px map vua noi cao them.
+            let nen = ctx.createLinearGradient(0, 0, 0, H);
+            nen.addColorStop(0, "#0b1017"); nen.addColorStop(0.55, "#0a0e14"); nen.addColorStop(1, "#05070a");
+            ctx.fillStyle = nen; ctx.fillRect(0, 0, W, H);
+            ctx.strokeStyle = "rgba(0,229,255,0.05)"; ctx.lineWidth = 1;
+            for (let x = 0; x <= W; x += 50){ ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+            for (let y = 0; y <= H; y += 50){ ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+            ctx.textBaseline = "middle";
 
-            ctx.font = "bold 18px Consolas, monospace";
+            ctx.fillStyle = "#00E5FF"; ctx.font = "bold 27px Consolas, monospace"; ctx.textAlign = "center";
+            ctx.fillText("ĐẤU PVP", W/2, 40);
+            ctx.font = "12px Consolas, monospace"; ctx.fillStyle = "#78909C";
+            ctx.fillText(lanMang ? "P1 = MÁY CHỦ PHÒNG   ·   P2 = MÁY KHÁCH" : "P1 BÊN TRÁI   ·   P2 BÊN PHẢI", W/2, 62);
 
-            // P1 SETUP (Left)
-            ctx.fillStyle = "#4CAF50"; ctx.fillText("PLAYER 1 (LEFT)", 230, 80);
-            ctx.fillStyle = "white"; ctx.fillText("SKIN:", 80, 130);
-            ctx.fillStyle = "#FFC107"; ctx.fillRect(150, 110, 30, 30); ctx.fillStyle = "black"; ctx.fillText("<", 165, 132);
-            ctx.fillStyle = "white"; ctx.fillText(forms[currentForm], 280, 130);
-            ctx.fillStyle = "#FFC107"; ctx.fillRect(380, 110, 30, 30); ctx.fillStyle = "black"; ctx.fillText(">", 395, 132);
+            // --- hai the ---
+            function the(x, ten, mau, skin, dan, nSkin, nDan, khoaDoi){
+                pvpHop(x, 92, 384, 172, 12, "rgba(255,255,255,0.045)", mau);
+                ctx.fillStyle = mau; ctx.font = "bold 16px Consolas, monospace"; ctx.textAlign = "center";
+                ctx.fillText(ten, x + 192, 114);
 
-            ctx.fillStyle = "white"; ctx.fillText("AMMO:", 80, 210);
-            ctx.fillStyle = "#FFC107"; ctx.fillRect(150, 190, 30, 30); ctx.fillStyle = "black"; ctx.fillText("<", 165, 212);
-            ctx.fillStyle = ammoColors[currentAmmoType]; ctx.fillText(ammos[currentAmmoType], 280, 210);
-            ctx.fillStyle = "#FFC107"; ctx.fillRect(380, 190, 30, 30); ctx.fillStyle = "black"; ctx.fillText(">", 395, 212);
+                ctx.font = "13px Consolas, monospace"; ctx.textAlign = "left"; ctx.fillStyle = "#90A4AE";
+                ctx.fillText("SKIN", x + 20, 167);
+                ctx.fillText("ĐẠN",  x + 20, 239);
 
-            // P2 SETUP (Right)
-            ctx.fillStyle = "#E53935"; ctx.fillText("PLAYER 2 (RIGHT)", 630, 80);
-            ctx.fillStyle = "white"; ctx.fillText("SKIN:", 480, 130);
-            ctx.fillStyle = "#FFC107"; ctx.fillRect(550, 110, 30, 30); ctx.fillStyle = "black"; ctx.fillText("<", 565, 132);
-            ctx.fillStyle = "white"; ctx.fillText(forms[p2Form], 680, 130);
-            ctx.fillStyle = "#FFC107"; ctx.fillRect(780, 110, 30, 30); ctx.fillStyle = "black"; ctx.fillText(">", 795, 132);
+                pvpMuiTen(nSkin.l, "‹"); pvpMuiTen(nSkin.r, "›");
+                ctx.textAlign = "center"; ctx.fillStyle = "#ECEFF1"; ctx.font = "bold 17px Consolas, monospace";
+                ctx.fillText(forms[skin], (nSkin.l.x + nSkin.r.x + nSkin.r.w)/2, 167);
 
-            ctx.fillStyle = "white"; ctx.fillText("AMMO:", 480, 210);
-            ctx.fillStyle = "#FFC107"; ctx.fillRect(550, 190, 30, 30); ctx.fillStyle = "black"; ctx.fillText("<", 565, 212);
-            ctx.fillStyle = ammoColors[p2AmmoType]; ctx.fillText(ammos[p2AmmoType], 680, 210);
-            ctx.fillStyle = "#FFC107"; ctx.fillRect(780, 190, 30, 30); ctx.fillStyle = "black"; ctx.fillText(">", 795, 212);
+                let tat = !lanDanBat[dan];
+                pvpMuiTen(nDan.l, "‹"); pvpMuiTen(nDan.r, "›");
+                ctx.fillStyle = tat ? "#546E7A" : ammoColors[dan];
+                ctx.fillText(AMMO_NAMES[dan], (nDan.l.x + nDan.r.x + nDan.r.w)/2, 239);
+                if (tat){
+                    ctx.font = "11px Consolas, monospace"; ctx.fillStyle = "#E53935";
+                    ctx.fillText("ĐẠN NÀY BỊ KHOÁ TRONG PHÒNG", (nDan.l.x + nDan.r.x + nDan.r.w)/2, 256);
+                }
+                if (khoaDoi){
+                    ctx.fillStyle = "rgba(6,9,13,0.55)"; pvpHop(x, 92, 384, 172, 12, "rgba(6,9,13,0.55)", null);
+                    ctx.fillStyle = "#B0BEC5"; ctx.font = "12px Consolas, monospace"; ctx.textAlign = "center";
+                    ctx.fillText("BÊN KIA TỰ CHỌN", x + 192, 258);
+                }
+            }
+            the(56,  "NGƯỜI CHƠI 1", "#4CAF50", currentForm, currentAmmoType, N.p1Skin, N.p1Dan, lanKhach());
+            the(560, "NGƯỜI CHƠI 2", "#E53935", p2Form,      p2AmmoType,      N.p2Skin, N.p2Dan, lanChu() );
 
-            // Start & Back
-            let btnStart = mouseX >= 300 && mouseX <= 500 && mouseY >= 280 && mouseY <= 320;
-            ctx.fillStyle = btnStart ? "#FBC02D" : "#FF9800"; ctx.fillRect(300, 280, 200, 40); ctx.fillStyle = "black"; ctx.fillText("FIGHT!", canvas.width/2, 305);
+            // --- dai dan cho phep ---
+            let cam = [];
+            for (let i = 0; i < AMMO_NAMES.length; i++) if (!lanDanBat[i]) cam.push(AMMO_NAMES[i]);
+            ctx.font = "11px Consolas, monospace"; ctx.textAlign = "center";
+            ctx.fillStyle = cam.length ? "#FF8A65" : "#546E7A";
+            ctx.fillText(cam.length ? ("ĐẠN BỊ KHOÁ: " + cam.join("  ")) : "TẤT CẢ 12 LOẠI ĐẠN ĐỀU MỞ", W/2, 292);
 
-            let btnLan = mouseX >= 300 && mouseX <= 500 && mouseY >= 340 && mouseY <= 380;
-            ctx.fillStyle = btnLan ? "#26C6DA" : "#00838F"; ctx.fillRect(300, 340, 200, 40);
-            ctx.fillStyle = "white"; ctx.fillText(lanMang ? "LAN: DA NOI" : "CHOI QUA LAN", canvas.width/2, 365);
-
-            let btnBack = mouseX >= 300 && mouseX <= 500 && mouseY >= 400 && mouseY <= 440;
-            ctx.fillStyle = btnBack ? "#757575" : "#424242"; ctx.fillRect(300, 400, 200, 40); ctx.fillStyle = "white"; ctx.fillText(LANG[currentLang].back, canvas.width/2, 425);
+            // --- ba nut ---
+            if (lanKhach()){
+                pvpHop(N.danh.x, N.danh.y, N.danh.w, N.danh.h, 8, "#263238", "rgba(255,255,255,0.15)");
+                ctx.fillStyle = "#78909C"; ctx.font = "bold 15px Consolas, monospace"; ctx.textAlign = "center";
+                ctx.fillText("CHỜ CHỦ PHÒNG", N.danh.x + N.danh.w/2, N.danh.y + N.danh.h/2 + 1);
+            } else {
+                pvpNutVe(N.danh, "VÀO TRẬN", "#FB8C00", "#FFB300");
+            }
+            pvpNutVe(N.lan, lanMang ? (lanVai === 'chu' ? "PHÒNG: CHỦ" : "PHÒNG: KHÁCH") : "CHƠI QUA LAN",
+                     lanMang ? "#00796B" : "#00838F", lanMang ? "#009688" : "#00ACC1", "#FFFFFF");
+            pvpNutVe(N.ve, LANG[currentLang].back, "#37474F", "#546E7A", "#FFFFFF");
 
             if (lanMang){
-                ctx.font = "13px Consolas, monospace"; ctx.fillStyle = "#4CAF50";
-                ctx.fillText("Ban dang la " + (lanVai === 'chu' ? "NGUOI CHOI 1 — bam FIGHT de bat dau" : "NGUOI CHOI 2 — cho chu phong bam FIGHT"), canvas.width/2, 465);
+                ctx.font = "12px Consolas, monospace"; ctx.textAlign = "center"; ctx.fillStyle = "#4CAF50";
+                ctx.fillText(lanVai === 'chu' ? "Đã nối. Bấm VÀO TRẬN, máy bên kia sẽ vào theo."
+                                              : "Đã nối. Chờ chủ phòng bắt đầu.", W/2, 520);
             }
 
-            ctx.textAlign = "left";
+            ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+            ctx.restore();
         }
 
 
@@ -34652,7 +34738,13 @@ class PulsarCloneBoss {
             let X = i => pad + i * (w + pad);
             return [
                 { x: X(0), y, w, h, c:"#2E7D32", hc:"#4CAF50", t: LANG[currentLang].play_normal, act:()=>{ dojoMode=false; gameState='map_select'; } },
-                { x: X(1), y, w, h, c:"#C62828", hc:"#E53935", t: LANG[currentLang].boss_rush,  act:()=>{ dojoMode=false; gameState='br_select'; } },
+                // Truoc day o day la BOSS RUSH. Boss Rush bay gio nam trong Route nen
+                // khong con ly do chiem mot o rieng o hang menu; man 'br_select' van
+                // giu nguyen trong file, chi la khong con nut vao thang tu day.
+                // Doi lai PVP moi co duong vao — truoc do man 'pvp_setup' da co san
+                // trong game nhung khong nut nao dan toi, tuc la khong ai bam vao duoc.
+                { x: X(1), y, w, h, c:"#C62828", hc:"#E53935", t: LT("ĐẤU PVP","PVP"),
+                  act:()=>{ dojoMode=false; gameState='pvp_setup'; } },
                 { x: X(2), y, w, h, c:"#F57C00", hc:"#FF9800", t: LANG[currentLang].test_boss,  act:()=>{ dojoMode=false; testMenuPage=0; gameState='test_menu'; } },
                 { x: X(3), y, w, h, c:"#1565C0", hc:"#1976D2", t: "CUSTOMIZE",                  act:()=>{ dojoMode=false; gameState='custom_menu'; resetPreview(); } },
                 { x: X(4), y, w, h, c:"#4E342E", hc:"#6D4C41", t: LT("ĐẶT LẠI","RESET"),        act:()=>{ startDojo(); } },
@@ -39472,31 +39564,29 @@ class PulsarCloneBoss {
                 else if (mouseY >= 150 && mouseY <= 260 && mouseX >= 780 && mouseX <= 956) { mapTheme = 'desert'; startGame('normal'); cloneGauntlet = true; setupGauntletPrep(0); }
                 else if (mouseX >= CX-100 && mouseX <= CX+100 && mouseY >= 330 && mouseY <= 370) campaignTab = null;
             } else if (gameState === 'pvp_setup') {
-                // P1 Controls
-                if (mouseY >= 110 && mouseY <= 140) {
-                    if (mouseX >= 150 && mouseX <= 180) currentForm = (currentForm - 1 + 4) % 4;
-                    else if (mouseX >= 380 && mouseX <= 410) currentForm = (currentForm + 1) % 4;
+                const N = pvpNut();
+                // Noi mang thi ai chinh nhan vat nay: chu khong dong vao P2, khach khong dong vao P1.
+                if (!lanKhach()){
+                    if (pvpTrong(N.p1Skin.l)) currentForm = (currentForm - 1 + 4) % 4;
+                    else if (pvpTrong(N.p1Skin.r)) currentForm = (currentForm + 1) % 4;
+                    else if (pvpTrong(N.p1Dan.l)) currentAmmoType = danKe(currentAmmoType, -1);
+                    else if (pvpTrong(N.p1Dan.r)) currentAmmoType = danKe(currentAmmoType, 1);
                 }
-                else if (mouseY >= 190 && mouseY <= 220) {
-                    if (mouseX >= 150 && mouseX <= 180) currentAmmoType = (currentAmmoType - 1 + AMMO_NAMES.length) % AMMO_NAMES.length;
-                    else if (mouseX >= 380 && mouseX <= 410) currentAmmoType = (currentAmmoType + 1) % AMMO_NAMES.length;
+                if (!lanChu()){
+                    if (pvpTrong(N.p2Skin.l)) p2Form = (p2Form - 1 + 4) % 4;
+                    else if (pvpTrong(N.p2Skin.r)) p2Form = (p2Form + 1) % 4;
+                    else if (pvpTrong(N.p2Dan.l)) p2AmmoType = danKe(p2AmmoType, -1);
+                    else if (pvpTrong(N.p2Dan.r)) p2AmmoType = danKe(p2AmmoType, 1);
                 }
-                // P2 Controls
-                if (mouseY >= 110 && mouseY <= 140) {
-                    if (mouseX >= 550 && mouseX <= 580) p2Form = (p2Form - 1 + 4) % 4;
-                    else if (mouseX >= 780 && mouseX <= 810) p2Form = (p2Form + 1) % 4;
-                }
-                else if (mouseY >= 190 && mouseY <= 220) {
-                    if (mouseX >= 550 && mouseX <= 580) p2AmmoType = (p2AmmoType - 1 + AMMO_NAMES.length) % AMMO_NAMES.length;
-                    else if (mouseX >= 780 && mouseX <= 810) p2AmmoType = (p2AmmoType + 1) % AMMO_NAMES.length;
-                }
-                
-                if (mouseX >= 300 && mouseX <= 500 && mouseY >= 280 && mouseY <= 320) {
+                if (pvpTrong(N.danh)) {
                     // Khach khong duoc tu bat dau: tran dau do CHU mo, khach se duoc keo vao.
-                    if (!lanKhach()){ lanCuA = {}; lanCuB = {}; startGame('pvp'); }
+                    if (!lanKhach()){
+                        currentAmmoType = danHopLe(currentAmmoType); p2AmmoType = danHopLe(p2AmmoType);
+                        lanCuA = {}; lanCuB = {}; startGame('pvp');
+                    }
                 }
-                else if (mouseX >= 300 && mouseX <= 500 && mouseY >= 340 && mouseY <= 380) { lanUiDung(); lanUiMoDong(true); }
-                else if (mouseX >= 300 && mouseX <= 500 && mouseY >= 400 && mouseY <= 440) gameState = 'menu';
+                else if (pvpTrong(N.lan)) { lanUiDung(); lanUiMoDong(true); }
+                else if (pvpTrong(N.ve)) gameState = 'menu';
 
             } else if (gameState === 'custom_menu') {
                 // --- dang mo picker rune: bat click trong picker truoc ---
@@ -40641,8 +40731,12 @@ function infernoMaxChain(x, y, source){
             // Man ghep phong co o nhap that. Neu khong chan thi go ma vao do se
             // dong thoi lam nhan vat nhay/ban lung tung o duoi.
             if (lanUiHien){ if (e.code === 'Escape') lanUiMoDong(false); return; }
-            if (lanPhimMayNay(e.code, true)) return;     // @@HE-LAN: phim nay la cua P2
-            keys[e.code] = true; 
+            keys[e.code] = true;
+            // MAY KHACH chi la mot cai tay cam: phim duoc ghi lai roi gui sang may
+            // chu, con moi phan ung deu do may chu quyet. Neu de doan duoi chay tiep
+            // thi ngay tai may khach se no ra hieu ung luot/nhay cua RIENG no — thu
+            // ma may chu khong he biet — nhap nhay roi bi anh chup xoa di ngay khung sau.
+            if (typeof lanKhach === 'function' && lanKhach() && gameState === 'pvp') return;
             
             // XE TANG: khong nhay, khong luot — doi lai co 10 giap.
             // TAM LUAN: VAN nhay hai bac binh thuong, chi bi giat nguoc moi cu nhay.
@@ -40713,7 +40807,6 @@ function infernoMaxChain(x, y, source){
         });
         window.addEventListener('keyup', e => {
             if (lanUiHien) return;
-            if (lanPhimMayNay(e.code, false)) return;    // @@HE-LAN: phim nay la cua P2
             keys[e.code] = false;
         });
 
@@ -41739,25 +41832,52 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         let lanRieng2 = { dashVx: 0, dashCd: 0, tapDir: 0, tapT: 0, khien: false };
 
         /* ------------------------------------------------------------------
-           @@HE-LAN — HAI NGUOI MOT MAY.
-           Khi chua noi mang thi P2 dung cum phim ben phai. Mui ten von la phim
-           phu cua P1 nen trong PvP phai CAT no khoi P1, neu khong mot phim se
-           day ca hai nguoi cung luc.
-           Khi da noi mang (lanMang bat) thi bo nay tat, `lanBoPhim2` do goi tin
-           tu may ben kia dien vao.
+           @@HE-LAN — MOI MAY MOT NGUOI, DUNG CHUNG MOT BO NUT.
+           Da co luc toi gan cho P2 mot cum phim rieng (mui ten + Numpad) de hai
+           nguoi ngoi chung mot ban phim. Bo di roi: choi qua mang thi moi ben
+           co ban phim cua minh, ai cung bam WASD + J/K/L + Space + Shift y het
+           khi choi mot minh — khong phai hoc them nut nao.
+           `lanBoPhim2` (bo phim cua nguoi choi 2) vi vay CHI do goi tin tu may
+           ben kia dien vao, khong con nguon nao khac.
            ------------------------------------------------------------------ */
-        const LAN_MAP2 = {
-            ArrowLeft: 'KeyA', ArrowRight: 'KeyD', ArrowUp: 'Space', ArrowDown: 'KeyS',
-            Numpad1: 'KeyJ', Numpad2: 'KeyK', Numpad3: 'KeyL', Numpad0: 'ShiftLeft',
-            Comma: 'KeyJ', Period: 'KeyK', Slash: 'KeyL', ShiftRight: 'ShiftLeft'
-        };
-        let lanMang = false;          // true khi phim P2 den tu mang, khong lay tu ban phim nua
-        function lanPhimMayNay(ma, xuong){
-            if (gameState !== 'pvp' || lanMang) return false;
-            let d = LAN_MAP2[ma];
-            if (!d) return false;
-            lanBoPhim2[d] = xuong;
-            return true;             // da nuot: dung cho P1 an phim nay nua
+        let lanMang = false;          // true khi dang noi mang
+
+        /* ------------------------------------------------------------------
+           @@HE-PHONGDAN — CHU PHONG KHOA LOAI DAN
+           Mot bang 12 o trong man ghep phong. O nao tat thi ca hai ben deu
+           khong con chon duoc loai dan do, va neu ai dang cam san no thi bi
+           day sang loai gan nhat con mo. Chi CHU PHONG duoc sua; may khach
+           nhan bang qua mang va chi xem.
+           Khong bao gio cho tat het: con dung mot loai thi thoi khong tat nua,
+           neu khong thi khong ai vao tran duoc.
+           ------------------------------------------------------------------ */
+        let lanDanBat = [];
+        for (let i = 0; i < AMMO_NAMES.length; i++) lanDanBat.push(true);
+        function danSoMo(){ let n = 0; for (let i = 0; i < lanDanBat.length; i++) if (lanDanBat[i]) n++; return n; }
+        function danHopLe(i){
+            if (lanDanBat[i]) return i;
+            for (let b = 1; b <= lanDanBat.length; b++){
+                let k = (i + b) % lanDanBat.length;
+                if (lanDanBat[k]) return k;
+            }
+            return i;
+        }
+        function danKe(i, buoc){                 // bam mui ten: nhay qua nhung loai bi khoa
+            let n = lanDanBat.length;
+            for (let b = 1; b <= n; b++){
+                let k = ((i + buoc * b) % n + n) % n;
+                if (lanDanBat[k]) return k;
+            }
+            return i;
+        }
+        function danDoi(i){                      // chi chu phong goi
+            if (lanMang && !lanChu()) return;
+            if (lanDanBat[i] && danSoMo() <= 1) return;
+            lanDanBat[i] = !lanDanBat[i];
+            currentAmmoType = danHopLe(currentAmmoType);
+            p2AmmoType = danHopLe(p2AmmoType);
+            lanGui({ v: 'd', d: lanDanBat.slice() });
+            lanBangDanVe();
         }
 
         /* ==================================================================
@@ -41792,20 +41912,68 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         function lanChu(){ return lanMang && lanVai === 'chu'; }
         function lanKhach(){ return lanMang && lanVai === 'khach'; }
 
-        // --- ma hoa/giai ma SDP cho gon de copy tay ---
-        function lanNen(o){
-            try { return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/=+$/, ''); }
-            catch(e){ return ''; }
+        /* ---------- MA BAT TAY ----------
+           Ban dau toi cu the nem ca doi tuong SDP vao base64: ra 864 ky tu, dan
+           qua Zalo thi bi ngat dong, doc cho nhau nghe thi khoi. Nhung SDP hau
+           het la khung co dinh — chi 5 thu la that su khac nhau moi lan: ufrag,
+           pwd, van tay DTLS, danh sach ung vien, va vai tro setup. Rut lay dung
+           nhung thu do roi dung lai khung o dau ben kia thi ma chi con ~165 ky
+           tu, ngan bang mot dong tin nhan.
+           Da thu that tren trinh duyet: ca hai che do (khong STUN va co STUN)
+           deu bat tay xong va gui duoc du lieu qua kenh. */
+        function lanNen(d){
+            try {
+                const g = re => (d.sdp.match(re) || [])[1] || '';
+                const fm = d.sdp.match(/a=fingerprint:(\S+) (\S+)/) || [];
+                const cs = [...d.sdp.matchAll(/a=candidate:\S+ \d+ (udp|tcp) \d+ (\S+) (\d+) typ (\S+)/gi)]
+                    .filter(m => m[1].toLowerCase() === 'udp')
+                    .map(m => m[4][0] + ',' + m[2] + ',' + m[3]);
+                return [d.type === 'offer' ? 'O' : 'A', g(/a=ice-ufrag:(\S+)/), g(/a=ice-pwd:(\S+)/),
+                        fm[1], (fm[2] || '').replace(/:/g, ''), g(/a=setup:(\S+)/), cs.join(';')].join('|');
+            } catch(e){ return ''; }
         }
         function lanBung(t){
-            try { return JSON.parse(decodeURIComponent(escape(atob(String(t).trim())))); }
-            catch(e){ return null; }
+            t = String(t).trim();
+            if (t.indexOf('|') < 0){                       // ma kieu cu (base64) van doc duoc
+                try { return JSON.parse(decodeURIComponent(escape(atob(t)))); } catch(e){ return null; }
+            }
+            try {
+                const a = t.split('|');
+                if (a.length < 7) return null;
+                const ty = a[0], u = a[1], p = a[2], alg = a[3], fp = a[4], st = a[5], cs = a[6];
+                if (!u || !p || !alg || !fp || !/^[0-9A-Fa-f]{2,}$/.test(fp)) return null;
+                let cand = '';
+                (cs ? cs.split(';') : []).forEach((c, i) => {
+                    const x = c.split(',');
+                    const typ = { h:'host', s:'srflx', r:'relay', p:'prflx' }[x[0]] || 'host';
+                    cand += 'a=candidate:' + (1000000 + i) + ' 1 udp ' +
+                            (typ === 'host' ? 2113937151 : 1677729535) + ' ' + x[1] + ' ' + x[2] +
+                            ' typ ' + typ + '\r\n';
+                });
+                return { type: ty === 'O' ? 'offer' : 'answer', sdp:
+                    'v=0\r\no=- 1 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\n' +
+                    'a=group:BUNDLE 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\n' +
+                    'm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\n' +
+                    cand + 'a=ice-ufrag:' + u + '\r\na=ice-pwd:' + p + '\r\na=ice-options:trickle\r\n' +
+                    'a=fingerprint:' + alg + ' ' + fp.match(/../g).join(':') + '\r\na=setup:' + st +
+                    '\r\na=mid:0\r\na=sctp-port:5000\r\na=max-message-size:262144\r\n' };
+            } catch(e){ return null; }
         }
 
+        // Cung mang thi khong can STUN: ung vien 'host' la du, va khong he lo
+        // dia chi ra ngoai. Khac mang thi phai co STUN de biet dia chi cong cua
+        // minh — doi lai may chu STUN nhin thay IP cong cua ban, nen de nguoi
+        // choi tu bat chu khong bat san.
+        let lanQuaMang = false;
+        function lanCauHinh(){
+            return lanQuaMang
+                ? { iceServers: [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }] }
+                : { iceServers: [] };
+        }
         function lanTaoKet(){
-            let pc = new RTCPeerConnection({ iceServers: [] });   // LAN: khong can STUN
+            let pc = new RTCPeerConnection(lanCauHinh());
             pc.oniceconnectionstatechange = () => {
-                if (['failed', 'disconnected', 'closed'].includes(pc.iceConnectionState)) lanNgat('Mat ket noi');
+                if (['failed', 'disconnected', 'closed'].includes(pc.iceConnectionState)) lanNgat('Mất kết nối');
             };
             return pc;
         }
@@ -41820,8 +41988,12 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         }
         function lanGanKenh(ch){
             lanKenh = ch;
-            ch.onopen = () => { lanTrangThai = 'noi'; lanMang = true; lanUiVe(); };
-            ch.onclose = () => lanNgat('Ben kia da thoat');
+            ch.onopen = () => {
+                lanTrangThai = 'noi'; lanMang = true;
+                if (lanVai === 'chu') lanGui({ v: 'd', d: lanDanBat.slice() });   // bao ngay luat phong
+                lanUiVe();
+            };
+            ch.onclose = () => lanNgat('Máy bên kia đã thoát');
             ch.onmessage = e => { try { lanNhanGoi(JSON.parse(e.data)); } catch(err){} };
         }
 
@@ -41835,12 +42007,12 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         }
         async function lanNhanTraLoi(ma){     // may CHU: dan ma tra loi vao
             let d = lanBung(ma);
-            if (!d || !d.type){ lanLoi = 'Ma tra loi khong doc duoc'; lanUiVe(); return; }
+            if (!d || !d.type){ lanLoi = 'Mã trả lời không đọc được'; lanUiVe(); return; }
             await lanKet.setRemoteDescription(d);
         }
         async function lanVaoPhong(ma){       // may KHACH: dan ma moi, sinh ma tra loi
             let d = lanBung(ma);
-            if (!d || !d.type){ lanLoi = 'Ma moi khong doc duoc'; lanUiVe(); return; }
+            if (!d || !d.type){ lanLoi = 'Mã mời không đọc được'; lanUiVe(); return; }
             lanVai = 'khach'; lanTrangThai = 'doi'; lanLoi = ''; lanUiVe();
             lanKet = lanTaoKet();
             lanKet.ondatachannel = e => lanGanKenh(e.channel);
@@ -41942,9 +42114,13 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                 let m = {};
                 for (let i = 0; i < g.k.length; i++) m[g.k[i]] = true;
                 lanBoPhim2 = m;
+            } else if (g.v === 'd' && lanKhach()){
+                lanDanBat = g.d.slice();
+                p2AmmoType = danHopLe(p2AmmoType); currentAmmoType = danHopLe(currentAmmoType);
+                lanBangDanVe();
             } else if (g.v === 'm' && lanKhach()){
                 if (g.g === 'pvp' && gameState !== 'pvp'){ lanUiMoDong(false); startGame('pvp'); lanCuA = {}; lanCuB = {}; }
-                else if (['pvp_end', 'pvp_menu', 'menu'].includes(g.g)) gameState = g.g;
+                else if (['pvp_end', 'pvp_setup', 'menu'].includes(g.g)) gameState = g.g;
             } else if (g.v === 's' && lanKhach()){
                 // Chu bam FIGHT truoc; khach dang o man ghep phong nen phai theo vao.
                 // Khong tu dung startGame o khach thi no se ngoi mai o menu.
@@ -41971,18 +42147,55 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             el.style.display = 'flex';
             let tt = document.getElementById('lan_tt');
             if (tt){
-                tt.textContent = lanLoi ? ('LOI: ' + lanLoi)
-                    : lanTrangThai === 'noi' ? ('DA NOI — ban la ' + (lanVai === 'chu' ? 'NGUOI CHOI 1 (chu phong)' : 'NGUOI CHOI 2 (khach)'))
-                    : lanTrangThai === 'doi' ? 'Dang cho ben kia...' : 'Chua noi';
+                tt.textContent = lanLoi ? ('LỖI: ' + lanLoi)
+                    : lanTrangThai === 'noi' ? ('ĐÃ NỐI — bạn là ' + (lanVai === 'chu' ? 'NGƯỜI CHƠI 1 (chủ phòng)' : 'NGƯỜI CHƠI 2 (khách)'))
+                    : lanTrangThai === 'doi' ? 'Đang chờ máy bên kia...' : 'Chưa nối';
                 tt.style.color = lanLoi ? '#E53935' : (lanTrangThai === 'noi' ? '#4CAF50' : '#FFC107');
             }
             let o = document.getElementById('lan_khu2');
             if (o) o.style.display = (lanVai === 'chu' && lanTrangThai !== 'noi') ? 'block' : 'none';
+            let c = document.getElementById('lan_che');
+            if (c){
+                c.textContent = lanQuaMang ? 'MẠNG: QUA INTERNET' : 'MẠNG: CÙNG WIFI (LAN)';
+                c.style.background = lanQuaMang ? '#5E35B1' : '#00838F';
+                c.style.color = '#fff';
+            }
+            lanBangDanVe();          // doi vai (chu/khach) thi bang dan phai doi theo
         }
         function lanUiMa(ma){
             let t = document.getElementById('lan_ra');
             if (t){ t.value = ma; }
             lanUiVe();
+        }
+        function lanBangDanDung(){
+            let o = document.getElementById('lan_bangdan');
+            if (!o || o.dataset.xong) return;
+            o.dataset.xong = '1';
+            let h = '';
+            for (let i = 0; i < AMMO_NAMES.length; i++)
+                h += '<button class="lan_o" data-i="' + i + '">' + AMMO_NAMES[i] + '</button>';
+            o.innerHTML = h;
+            let ds = o.querySelectorAll ? o.querySelectorAll('.lan_o') : [];
+            for (let i = 0; i < ds.length; i++){
+                ds[i].onclick = function(){ danDoi(parseInt(this.dataset.i, 10)); };
+            }
+            lanBangDanVe();
+        }
+        function lanBangDanVe(){
+            let o = document.getElementById('lan_bangdan');
+            if (!o || !o.querySelectorAll) return;
+            let ds = o.querySelectorAll('.lan_o'), chiXem = (lanMang && !lanChu());
+            for (let i = 0; i < ds.length; i++){
+                let k = parseInt(ds[i].dataset.i, 10), bat = !!lanDanBat[k];
+                ds[i].style.background = bat ? (ammoColors[k] || '#FFC107') : '#1b2027';
+                ds[i].style.color = bat ? '#0d0d0d' : '#4d5b68';
+                ds[i].style.borderColor = bat ? 'rgba(255,255,255,.55)' : '#2b3742';
+                ds[i].style.textDecoration = bat ? 'none' : 'line-through';
+                ds[i].style.cursor = chiXem ? 'not-allowed' : 'pointer';
+            }
+            let d = document.getElementById('lan_dande');
+            if (d) d.textContent = chiXem ? ('LUẬT PHÒNG — ' + danSoMo() + '/' + AMMO_NAMES.length + ' loại đạn (chủ phòng đặt)')
+                                          : ('LOẠI ĐẠN ĐƯỢC XÀI — bấm để tắt, còn ' + danSoMo() + '/' + AMMO_NAMES.length);
         }
         let lanUiHien = false;
         function lanUiMoDong(hien){ lanUiHien = hien; lanUiVe(); }
@@ -41993,20 +42206,29 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             el.dataset.xong = '1';
             el.innerHTML =
               '<div id="lan_hop">' +
-              '  <div id="lan_de">CHOI QUA MANG LAN</div>' +
-              '  <div id="lan_tt">Chua noi</div>' +
-              '  <div class="lan_hd">Mot may bam TAO PHONG roi gui MA cua minh sang may kia. May kia dan ma do vao o duoi va bam VAO PHONG, roi gui MA TRA LOI nguoc lai.</div>' +
-              '  <div class="lan_hang"><button id="lan_tao">TAO PHONG (P1)</button><button id="lan_sao">SAO CHEP MA</button></div>' +
-              '  <textarea id="lan_ra" readonly placeholder="Ma cua may nay se hien o day"></textarea>' +
-              '  <div class="lan_hang"><input id="lan_vao" placeholder="Dan ma cua may kia vao day"/></div>' +
-              '  <div class="lan_hang"><button id="lan_join">VAO PHONG (P2)</button><div id="lan_khu2" style="display:none"><button id="lan_nhan">NHAN MA TRA LOI</button></div></div>' +
-              '  <div class="lan_hang"><button id="lan_dong">DONG</button><button id="lan_ngat">NGAT</button></div>' +
+              '  <div id="lan_de">GHÉP PHÒNG</div>' +
+              '  <div id="lan_tt">Chưa nối</div>' +
+              '  <div class="lan_hd">' +
+              '    <b>Máy chủ phòng</b> bấm TẠO PHÒNG → gửi mã sang máy kia.<br>' +
+              '    <b>Máy khách</b> dán mã đó vào ô dưới → bấm VÀO PHÒNG → gửi mã mới hiện ra ngược lại.<br>' +
+              '    <b>Máy chủ phòng</b> dán mã trả lời vào ô dưới → bấm NHẬN MÃ TRẢ LỜI. Xong.' +
+              '  </div>' +
+              '  <div class="lan_hang"><button id="lan_che">MẠNG: CÙNG WIFI (LAN)</button></div>' +
+              '  <div class="lan_hang"><button id="lan_tao">TẠO PHÒNG (P1)</button><button id="lan_sao">SAO CHÉP MÃ</button></div>' +
+              '  <textarea id="lan_ra" readonly placeholder="Mã của máy này sẽ hiện ở đây"></textarea>' +
+              '  <div class="lan_hang"><input id="lan_vao" placeholder="Dán mã của máy kia vào đây"/></div>' +
+              '  <div class="lan_hang"><button id="lan_join">VÀO PHÒNG (P2)</button><div id="lan_khu2" style="display:none"><button id="lan_nhan">NHẬN MÃ TRẢ LỜI</button></div></div>' +
+              '  <div id="lan_dande">LOẠI ĐẠN ĐƯỢC XÀI TRONG PHÒNG</div>' +
+              '  <div id="lan_bangdan"></div>' +
+              '  <div class="lan_hang"><button id="lan_dong">ĐÓNG</button><button id="lan_ngat">NGẮT</button></div>' +
               '</div>';
             const B = i => document.getElementById(i);
+            B('lan_che').onclick = () => { lanQuaMang = !lanQuaMang; lanUiVe(); };
             B('lan_tao').onclick = () => lanMoPhong();
             B('lan_join').onclick = () => lanVaoPhong(B('lan_vao').value);
             B('lan_nhan').onclick = () => lanNhanTraLoi(B('lan_vao').value);
             B('lan_sao').onclick = () => { let t = B('lan_ra'); t.select(); try { document.execCommand('copy'); } catch(e){} };
+            lanBangDanDung();
             B('lan_dong').onclick = () => lanUiMoDong(false);
             B('lan_ngat').onclick = () => lanNgat('');
             lanUiVe();
@@ -42023,7 +42245,11 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
            y het cach lop dieu khien cam ung dang lam.
            So khung truoc voi khung nay de biet phim nao VUA bam / VUA nha.
            ------------------------------------------------------------------ */
-        const LAN_PHIM2 = ['Space', 'KeyW', 'KeyA', 'KeyD', 'KeyS', 'KeyJ', 'KeyK', 'KeyL', 'ShiftLeft'];
+        // Dung dung nhung phim ma nguoi choi mot minh van bam, ke ca cac phim thay
+        // the (mui ten thay A/D, Shift phai thay Shift trai) — de nguoi ben kia
+        // khong phai doi tay chi vi dang choi qua mang.
+        const LAN_PHIM2 = ['Space', 'KeyW', 'KeyA', 'KeyD', 'KeyS', 'KeyJ', 'KeyK', 'KeyL',
+                           'ShiftLeft', 'ShiftRight', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
         let lanPhim2Cu = {};
         function lanVienP2(){
             if (gameState !== 'pvp') { lanPhim2Cu = {}; return; }
