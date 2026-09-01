@@ -74,11 +74,34 @@
     </style>
 
 
+<style>
+/* @@HE-NET2 — man ghep phong LAN */
+#lanui{position:absolute;left:0;top:0;width:100%;height:100%;display:none;
+  align-items:center;justify-content:center;background:rgba(0,0,0,.82);z-index:60;
+  font-family:Consolas,monospace;}
+#lan_hop{width:min(680px,92%);background:#12161c;border:2px solid #00E5FF;border-radius:10px;
+  padding:18px 20px;box-shadow:0 0 26px rgba(0,229,255,.35);}
+#lan_de{color:#00E5FF;font-size:20px;font-weight:bold;letter-spacing:1px;margin-bottom:6px;}
+#lan_tt{font-size:14px;margin-bottom:10px;color:#FFC107;}
+.lan_hd{color:#9aa6b2;font-size:12px;line-height:1.55;margin-bottom:12px;}
+.lan_hang{display:flex;gap:8px;align-items:center;margin-bottom:9px;flex-wrap:wrap;}
+#lanui button{background:#FF9800;color:#111;border:0;border-radius:5px;padding:8px 14px;
+  font-family:inherit;font-size:13px;font-weight:bold;cursor:pointer;}
+#lanui button:hover{background:#FBC02D;}
+#lan_dong,#lan_ngat{background:#424242;color:#fff;}
+#lan_dong:hover,#lan_ngat:hover{background:#757575;}
+#lan_ra,#lan_vao{width:100%;box-sizing:border-box;background:#0a0d11;color:#cfe8ef;
+  border:1px solid #2b3742;border-radius:5px;padding:8px;font-family:inherit;font-size:11px;}
+#lan_ra{height:86px;resize:none;margin-bottom:9px;}
+</style>
 </head>
 <body>
     <div id="stage">
         <canvas id="gameCanvas" width="1000" height="560"></canvas>
         <div id="tpad"></div>
+        <!-- @@HE-NET2: lop ghep phong. Dung DOM chu khong ve len canvas vi o day
+             can go/dan mot chuoi rat dai, ma canvas thi khong co o nhap that. -->
+        <div id="lanui"></div>
     </div>
     <div class="instructions" id="instruction-box"></div>
 
@@ -2007,7 +2030,11 @@
 
         class LavaSerpentBoss {
             constructor(level) {
-                this.hp = 75; this.maxHp = 75;
+                // Ha tu 75 xuong 30 va BO han khung bat tu luc lan duoi dung nham.
+                // Truoc day no bat kha xam pham o MOI trang thai tru 'breach', tuc nguoi choi
+                // chi danh duoc trong dung mot nhip nho, con lai la dung nhin — 75 mau trong
+                // dieu kien do keo tran danh dai luot thuot ma chang kho hon chut nao.
+                this.hp = 30; this.maxHp = 30;
                 this.w = 110; this.h = 64; this.name = "HOA XA";
                 this.lavaY = 330; this.x = 480; this.y = this.lavaY;
                 this.state = 'entering'; this.retState = 'submerged'; this.subTimer = 0; this.actionTimer = 80;
@@ -2052,7 +2079,7 @@
                     if (checkAABB(dino, { x: g.x - 12, y: g.y - 12, w: 24, h: 24 })) { if (!dino.isShielding()) dino.takeDamage(1); else parry(); this.globs.splice(i, 1); continue; }
                     if (g.t >= g.dur) { visualEffects.push(new Effect(g.tx, g.ty, 'explosion', true, 24)); for (let p of this.pillars()) { if (Math.abs((p.x + p.w/2) - g.tx) < 70) p.burn = 120; } this.globs.splice(i, 1); }
                 }
-                this.invulnAll = (this.state !== 'breach');
+                this.invulnAll = false;   // danh duoc o moi trang thai, ke ca khi dang lan
                 if (this.state === 'entering') { this.subTimer++; if (this.subTimer > 30) { this.state = 'intro'; this.subTimer = 0; } return; }
                 if (this.state === 'intro') { this.subTimer++; if (this.subTimer === 1) { floatingTexts.push(new FloatingText(400, 150, "HOA XA!")); if (SFX.bossEntry) SFX.bossEntry(); } if (this.subTimer > 46) { this.state = 'submerged'; this.actionTimer = 80; } return; }
                 if (this.state === 'submerged') {
@@ -2081,7 +2108,7 @@
                     let hx = this.arcX + this.arcDir * (u * 200 - 100), hy = this.lavaY - Math.sin(Math.min(1, u) * Math.PI) * 180;
                     this.x = hx - this.w/2; this.y = hy - this.h/2; this.facingLeft = this.arcDir < 0;
                     if (checkAABB(dino, this)) { if (!dino.isShielding()) dino.takeDamage(1); else parry(); }
-                    if (this.subTimer > 100) { this.state = 'submerged'; this.invulnAll = true; this.actionTimer = 90; this.wakeX = hx; this.y = this.lavaY; }
+                    if (this.subTimer > 100) { this.state = 'submerged'; this.actionTimer = 90; this.wakeX = hx; this.y = this.lavaY; }
                     return;
                 }
                 if (this.state === 'wave_warn') { this.subTimer++; if (this.subTimer > 96) { this.state = 'wave'; this.subTimer = 0; this.waveX = this.waveDir > 0 ? -60 : canvas.width + 60; shakeTimer = 12; } return; }
@@ -2164,7 +2191,7 @@
                 }
                 ctx.fillStyle = "black"; ctx.fillRect(canvas.width/2 - 150, 18, 300, 13);
                 ctx.fillStyle = "#FF6D00"; ctx.fillRect(canvas.width/2 - 148, 20, 296 * Math.max(0, this.hp/this.maxHp), 9);
-                ctx.fillStyle = "white"; ctx.font = "bold 12px Consolas, monospace"; ctx.textAlign = "center"; ctx.fillText(this.name + (this.invulnAll ? "  (LAN - BAT KHA XAM PHAM)" : "  (TROI - DANH DI!)"), canvas.width/2, 14); ctx.textAlign = "left";
+                ctx.fillStyle = "white"; ctx.font = "bold 12px Consolas, monospace"; ctx.textAlign = "center"; ctx.fillText(this.name + (this.state === 'submerged' ? "  (DANG LAN)" : "  (TROI - DANH DI!)"), canvas.width/2, 14); ctx.textAlign = "left";
             }
         }
 
@@ -19142,7 +19169,22 @@ class GreatApeBoss {
           // C3 (sketch3): HO KHONG LO - bat buoc di da nhay tren cao (T2/T3)
           [{dx:0,top:320,w:150},{dx:290,top:245,w:100},{dx:500,top:245,w:100},{dx:700,top:180,w:100},{dx:900,top:320,w:180}],
           // C4 (sketch4): kim tu thap - leo len dinh T3 roi tha xuong
-          [{dx:0,top:320,w:140},{dx:300,top:245,w:120},{dx:560,top:165,w:200},{dx:900,top:245,w:120},{dx:1180,top:320,w:140}]
+          [{dx:0,top:320,w:140},{dx:300,top:245,w:120},{dx:560,top:165,w:200},{dx:900,top:245,w:120},{dx:1180,top:320,w:140}],
+          // ===== DIA HINH MOI: CAO HON va DAI HON =====
+          // Bon doan cu chi cao toi top=160 (160px tren mat dat) va dai 1080-1320px, trong khi
+          // do vuon that cua nguoi choi la 114px moi nac, 195px hai nac — thua suc len tang
+          // top=60. Bon doan duoi day dung DUNG bac thang 320/240/150/60 da do, va keo dai
+          // gan gap doi de co nhung quang chay tren cao that su chu khong phai nhay len roi
+          // tut xuong ngay.
+          // C5 — THAP BA TANG: leo 240 -> 150 -> 60, chay mot doan dai tren dinh roi ha dan.
+          [{dx:0,top:320,w:180},{dx:290,top:240,w:130},{dx:550,top:150,w:130},
+           {dx:800,top:60,w:260},{dx:1200,top:150,w:140},{dx:1470,top:240,w:150},{dx:1760,top:320,w:220}],
+          // C6 — CAU CAO DAI: mot tuyen o tang 150 keo gan het doan, dut quang boi ba khe ho.
+          [{dx:0,top:320,w:160},{dx:270,top:240,w:120},{dx:520,top:150,w:300},
+           {dx:960,top:150,w:280},{dx:1380,top:150,w:260},{dx:1780,top:240,w:150},{dx:2060,top:320,w:220}],
+          // C7 — VUC SAU HAI BO CAO: hai khe rong bat buoc nhay dup ngay tren cao.
+          [{dx:0,top:320,w:170},{dx:300,top:200,w:140},{dx:700,top:200,w:140},
+           {dx:1040,top:110,w:160},{dx:1450,top:200,w:150},{dx:1760,top:320,w:240}]
         ];
         let forestNextChunk = false;
         // Forest balance rule: geometry carries the main difficulty; enemy density
@@ -19153,7 +19195,14 @@ class GreatApeBoss {
           [{dx:0,top:320,w:120},{dx:290,top:200,w:64},{dx:520,top:200,w:64},{dx:760,top:320,w:130}],
           [{dx:0,top:320,w:110},{dx:250,top:250,w:76},{dx:440,top:320,w:76},{dx:620,top:250,w:76},{dx:820,top:320,w:130}],
           [{dx:0,top:320,w:170},{dx:370,top:190,w:70},{dx:660,top:320,w:200}],
-          [{dx:0,top:320,w:120},{dx:270,top:240,w:74},{dx:470,top:175,w:120},{dx:730,top:245,w:74},{dx:920,top:320,w:130}]
+          [{dx:0,top:320,w:120},{dx:270,top:240,w:74},{dx:470,top:175,w:120},{dx:730,top:245,w:74},{dx:920,top:320,w:130}],
+          // ===== DIA HINH MOI: CAO HON va DAI HON =====
+          // C7 — COT LUA LEN DAN: bac thang deu 70px moi nac, leo mot mach tu 320 len 60.
+          [{dx:0,top:320,w:130},{dx:240,top:250,w:90},{dx:450,top:180,w:90},{dx:660,top:110,w:90},
+           {dx:870,top:60,w:200},{dx:1220,top:180,w:100},{dx:1450,top:300,w:110},{dx:1680,top:320,w:200}],
+          // C8 — DUONG CAO DAI TREN DUNG NHAM: mot manh 340px o tang 130, hai khe rong 240px.
+          [{dx:0,top:320,w:140},{dx:260,top:220,w:120},{dx:620,top:220,w:120},
+           {dx:980,top:130,w:340},{dx:1470,top:220,w:120},{dx:1790,top:320,w:220}]
         ];
         let volcanoNextChunk = true;
         let lavaGeysers = [];
@@ -25737,6 +25786,10 @@ class PulsarCloneBoss {
                             cC = "255,250,224"; edge = "rgba(58,40,6,0.92)";
                         } else if (this.tint === 'dark') {
                             cE = "18,14,26"; cC = "150,110,215"; edge = "rgba(28,10,54,0.92)"; aMul = 0.9;
+                        } else if (this.tint === 'set') {
+                            // LUOT SET: chinh nhat chem mang dien — long lam sang, loi trang,
+                            // vien xanh dam. Khong co vat the nao khac duoc sinh ra.
+                            cE = "79,195,247"; cC = "255,255,255"; edge = "rgba(1,87,155,0.92)";
                         } else if (this.tint === 'dragon') {
                             // PHAN THAN RONG: y het hinh dang nhat chem cua nguoi choi, doi sang
                             // tong LUA — long den do, loi sang cam, vien than den.
@@ -28006,7 +28059,9 @@ class PulsarCloneBoss {
                 // Thuoc do CHUAN: man choi rong 1000px = 23 cm  ->  1 cm = CM px (~43.5).
                 // Ban cu quy 1cm = 20px nen ban kinh nho hon mot nua so voi mo ta.
                 const tripleSlam = this.bodySlamJumpCount >= 3;
-                const slamRadius = tripleSlam ? CM * 4 : CM * 2;
+                let slamRadius = tripleSlam ? CM * 4 : CM * 2;
+                // BUA la vu khi cua suc nang: cu dap cua no phu rong hon han
+                if (typeof slamCanBat === 'function' && slamCanBat() && currentAmmoType === 11) slamRadius *= 1.45;
                 const slamDamage = tripleSlam ? 6 : 3;
                 const impactX = this.x + this.w / 2;
                 const impactY = this.y + this.h;
@@ -28023,6 +28078,8 @@ class PulsarCloneBoss {
                 });
                 visualEffects.push(new Effect(impactX, impactY, 'body_slam_shockwave', true, slamRadius));
                 floatingTexts.push(new FloatingText(impactX - (tripleSlam ? 34 : 18), impactY - 20, tripleSlam ? 'MEGA SLAM! -6' : 'BODY SLAM! -3'));
+                if (typeof slamCanBat === 'function' && slamCanBat() && this.id === 1)
+                    this.slamCanDuoi(impactX, impactY, tripleSlam);
                 this.invincible = true;
                 this.invTimer = Math.max(this.invTimer, 15); // 0.25s at 60 FPS
                 this.bodySlamActive = false;
@@ -28031,6 +28088,34 @@ class PulsarCloneBoss {
                 shakeTimer = Math.max(shakeTimer, 8);
             }
 
+            // @@HE-SLAMCAN — phan DUOI cu dap, moi vu khi mot kieu.
+            slamCanDuoi(ix, iy, to){
+                let sc = this.getFormScale();
+                if (currentAmmoType === 5){
+                    // KIEM — hai luoi kiem khi chay ngang hai ben tu cho cham dat
+                    for (let d = -1; d <= 1; d += 2){
+                        giaoSong.push({ x: ix + d * 26, y: iy - 26, dir: d,
+                                        r: (to ? 210 : 168) * sc, t: to ? 22 : 18, t0: to ? 22 : 18,
+                                        dmg: to ? 4 : 3, nho: 0, xuyen: 0, kiem: 1, hit: new Set() });
+                    }
+                    floatingTexts.push(new FloatingText(ix - 40, iy - 42, "KIẾM CHẤN"));
+                } else if (currentAmmoType === 10){
+                    // GIAO — cam giao xuong, mot song chan CHAY DOC theo huong dang quay
+                    let d = this.isFacingLeft ? -1 : 1;
+                    giaoSong.push({ x: ix + d * 20, y: iy - 30, dir: d,
+                                    r: (to ? 300 : 240) * sc, t: to ? 46 : 38, t0: to ? 46 : 38,
+                                    dmg: to ? 6 : 4, nho: 0, xuyen: 1, hit: new Set() });
+                    for (let k = 0; k < 5; k++)
+                        visualEffects.push(new Effect(ix + d * (30 + k * 44), iy - 6, 'explosion', d < 0, 16));
+                    floatingTexts.push(new FloatingText(ix - 44, iy - 42, "THƯƠNG CHẤN"));
+                } else if (currentAmmoType === 11){
+                    // BUA — goi mot tia set giang thang xuong diem cham
+                    if (typeof this.buaSet === 'function') this.buaSet(ix, iy, to ? 120 : 92, to ? 6 : 4);
+                    shakeTimer = Math.max(shakeTimer, to ? 26 : 18);
+                    floatingTexts.push(new FloatingText(ix - 40, iy - 42, "LÔI CHÙY"));
+                    if (typeof SFX !== 'undefined' && SFX.tone){ SFX.tone(2400, 0.10, 'square', 0.18, 600); SFX.tone(80, 0.30, 'sawtooth', 0.26, 40); }
+                }
+            }
             update() {
                 this.tickClawJCircles();
                 this.tickClawSwords();
@@ -28044,9 +28129,14 @@ class PulsarCloneBoss {
                 let chargeKey = keys['KeyK'];
                 let shootKey = fireKey || chargeKey;
 
-                if (this.id === 1 && gameState !== 'pvp') {
+                // @@HE-LAN — MO KHOA PVP.
+                // Truoc day dong nay la `this.id === 1 && gameState !== 'pvp'`, tuc khoa di
+                // chuyen cho NGUOI CHOI 2 va khoa luon CA CHE DO PVP. Do duoc: o gameState
+                // 'pvp', giu D 30 khung thi ca hai deu dung im 0px — che do PvP co man chon
+                // do, HUD hai ben, va cham va man ket thuc, nhung khong ai di lai duoc.
+                if (this.id === 1 || gameState === 'pvp') {
                     // DI CHUYEN TU DO A/D (+ mui ten) toan game — van ban/charge/khien binh thuong
-                    if (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss') {
+                    if (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss' || gameState === 'pvp') {
                         if (this.webTimer > 0) { this.webTimer--; dashVx = 0; }
                         let mv = 0;
                         if (this.webTimer <= 0) { let _v = this.tank ? 3.6 : 6;   // xe tang di cham hon
@@ -28282,6 +28372,7 @@ class PulsarCloneBoss {
                 }
 
                 if (this._hoiCho > 0) this._hoiCho--;
+                if (this._shipNoi > 0) this._shipNoi--;   // @@HE-SHIPBO: cua so noi nhat hai
                 if (typeof this.dswXoayTick === 'function') this.dswXoayTick();   // @@HE-XOAYKHONG
                 // @@HE-BUAUNITY: luong set phai chay DOC LAP voi loai dan dang cam. Unity xoay
                 // vong ba loai dan, nen ngay sau khi phong don Hop Nhat nguoi choi co the da
@@ -28340,14 +28431,14 @@ class PulsarCloneBoss {
                     let _dr = { x: this.x - 6, y: this.y + this.h - 12, w: this.w + 12, h: 34 };
                     this.clawStrikeRect = _dr; this.clawStrikeTimer = 3;
                     let _nb = hasRune('explshot') ? 1 : 0;
-                    if (this.clawDive % 8 === 0) this.meleeStrike(_dr, 1 + _nb);
+                    if (this.clawDive % 8 === 0) this.meleeStrike(_dr, 1 + _nb + (typeof slamCong === 'function' ? slamCong() : 0));
                     if (hasRune('explshot') || hasRune('bulletclash')) cutBossProjectiles(_dr);
                     if (this.grounded) {
                         this.clawDive = 0;
                         let _sc = this.getFormScale(), _R = 76 * _sc;
                         let _sr = { x: this.x + this.w/2 - _R, y: this.y + this.h - 28, w: _R*2, h: 36 };
                         visualEffects.push(new Effect(this.x + this.w/2, this.y + this.h, 'explosion', true, 26));
-                        this.meleeStrike(_sr, 3 + _nb);   // no dat khi tiep dat = don manh
+                        this.meleeStrike(_sr, 3 + _nb + (typeof slamCong === 'function' ? slamCong() : 0));   // no dat khi tiep dat = don manh
                         shakeTimer = Math.max(shakeTimer, 10);
                         if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(160, 0.22, 'sawtooth', 0.24, 90);
                     }
@@ -28862,6 +28953,8 @@ class PulsarCloneBoss {
                 this.giaoVK.veti.length = 0;
             }
             _giaoDanh(dmg, life, reach, hTop, hBot, cd, kieu, spinR, ton){
+                // @@HE-SLAMCAN: don DANH XUONG cua Giao la ho 'bo' (chuoi K bo xuong dat).
+                if (kieu === 'bo' && typeof slamCong === 'function') dmg += slamCong();
                 this.ammo = Math.max(0, this.ammo - (ton === undefined ? 1 : ton));
                 if (this.ammo <= 0){ this.isOverheated = true; this.overheatTimer = 75; }
                 let sc = this.getFormScale(), dir = this.isFacingLeft ? -1 : 1;
@@ -28896,7 +28989,15 @@ class PulsarCloneBoss {
                 this._giaoChuoi = Math.min(6, (this._giaoChuoi || 0) + 1);
                 if ((this._giaoCS || 0) > 0 && (this._giaoLuotNoi || 0) > 0){
                     this._giaoLuotNoi = 0;
-                    this._giaoDanh(3, 16, GIAO_LUOT2, 16, 16, 40, 'luot');   // boi ngay sau: kho hon nua
+                    // @@HE-SETCAN: don BOI (nhat thu hai cua chuoi Dash J J) cung mang dien
+                    let _t2 = (typeof setCanTam === 'function' ? setCanTam() : 1);
+                    let _R2 = Math.round(GIAO_LUOT2 * _t2);
+                    this._giaoDanh(3 + (typeof setCanDmg === 'function' ? setCanDmg() : 0), 16, _R2, 16, 16, 40, 'luot');
+                    if (typeof setCanBat === 'function' && setCanBat()){
+                        let d2 = this.isFacingLeft ? -1 : 1;
+                        let bx2 = this.x + this.w/2, by2 = this.y + this.h * 0.52;
+                        setCanTia(bx2, by2, bx2 + d2 * _R2, by2, 5, 14);
+                    }
                     this._giaoNhanh = 'ket'; return;
                 }
                 if ((this._giaoCS || 0) > 0 && (this._giaoQuatNoi || 0) > 0 && this.grounded){
@@ -28939,7 +29040,17 @@ class PulsarCloneBoss {
                 this._giaoQuatNoi = 1; this._giaoNhanh = 'xoay';   // S+J -> K = XOAY, S+J -> J = loat 3 choc
             }
             giaoLuot(){
-                this._giaoDanh(3, 15, GIAO_LUOT, 20, 20, 30, 'luot');   // phai canh goc giua cu luot
+                // @@HE-SETCAN: cu luot dam mang dien -> dam sau hon va nang tay hon
+                let _tm = (typeof setCanTam === 'function' ? setCanTam() : 1);
+                let _R  = Math.round(GIAO_LUOT * _tm);
+                this._giaoDanh(3 + (typeof setCanDmg === 'function' ? setCanDmg() : 0), 15, _R, 20, 20, 30, 'luot');
+                if (typeof setCanBat === 'function' && setCanBat()){
+                    // @@HE-SETFX: chi MOT tia chay doc than giao — cay giao dan dien.
+                    // Khong con cu no o mui, khong con vet chay duoi dat.
+                    let d = this.isFacingLeft ? -1 : 1;
+                    let cx0 = this.x + this.w/2, cy0 = this.y + this.h * 0.52;
+                    setCanTia(cx0, cy0, cx0 + d * _R, cy0, 5, 14);
+                }
                 this._giaoLuotNoi = 1; this._giaoNhanh = 'ket';
             }
             // ===== HAT LEN — bam NHAY ngay sau mot nhat J duoi dat (cung khuon Ryuenjin) =====
@@ -29423,7 +29534,7 @@ class PulsarCloneBoss {
                 this.invincible = true;
                 this.invTimer = Math.max(this.invTimer || 0, BUA_ROI_IFRAME);
                 this.buaRoi = { cham: 0 };
-                this._buaDanh(9, 900, BUA_TAM[1], 16, 66, 8, 'roi', 2, 1);   // 9 dmg, TON 2 DAN
+                this._buaDanh(9 + (typeof slamCong === 'function' ? slamCong() : 0), 900, BUA_TAM[1], 16, 66, 8, 'roi', 2, 1);
                 // Hitbox song toi khi cham dat, nhung HOAT ANH phai ngan — neu de T theo life
                 // (900 x 1.5 = 1350 khung) thi cay bua gan nhu dung yen, khong thay vung gi ca.
                 this._buaAnim = { kieu: 'roi', t: 0, T: 16, dir: this.isFacingLeft ? -1 : 1 };
@@ -30342,20 +30453,30 @@ class PulsarCloneBoss {
             // mang hinh mot mui ten gio kieu Trieu Van trong Musou Orochi.
             giaoTickMuiTen(){
                 let dangLuot = dangLuotHoacChop();
-                if (dangLuot && !this._giaoLuotTruoc && (this._giaoCS || 0) > 0 && !this.giaoMuiTen)
-                    this.giaoMuiTen = { t: 26, T: 26, dir: dashVx > 0 ? 1 : -1, hit: new Set() };
+                if (dangLuot && !this._giaoLuotTruoc && (this._giaoCS || 0) > 0 && !this.giaoMuiTen){
+                    // @@HE-SETCAN: mui ten mang dien -> song lau hon (bay xa hon) va nang hon
+                    let _st = (typeof setCanBat === 'function' && setCanBat());
+                    this.giaoMuiTen = { t: _st ? 34 : 26, T: _st ? 34 : 26, dir: dashVx > 0 ? 1 : -1, hit: new Set(), set: _st };
+
+                }
                 this._giaoLuotTruoc = dangLuot;
                 let A = this.giaoMuiTen; if (!A) return;
                 A.t--;
                 let cx = this.x + this.w/2, cy = this.y + this.h/2;
-                let rect = { x: A.dir > 0 ? cx - 20 : cx - 170, y: cy - 48, w: 190, h: 96 };
+                // @@HE-SETFX: mui ten mang dien thi ram tia doc duong bay, moi 3 khung mot tia
+                // @@HE-SETFX: mot tia chay DOC than mui ten, khong phai tia ban tung toe
+                if (A.set && A.t % 4 === 0 && typeof setCanTia === 'function')
+                    setCanTia(cx, cy, cx + A.dir * 150, cy, 3.5, 9);
+                let _w = 190 * (A.set ? (typeof setCanTam === 'function' ? setCanTam() : 1) : 1);
+                let rect = { x: A.dir > 0 ? cx - 20 : cx - (_w - 20), y: cy - 48, w: _w, h: 96 };
                 let ds = [];
                 for (let o of bosses) if (o && !o.dying && !o.invulnAll) ds.push(o);
                 for (let o of enemies) ds.push(o);
                 for (let o of ds){
                     if (A.hit.has(o) || !checkAABB(rect, o)) continue;
                     A.hit.add(o);
-                    let dm = 4 + giaoCong() + (hasRune('explshot') ? 1 : 0);   // NOVA tren can chien = +1 dmg
+                    let dm = 4 + giaoCong() + (hasRune('explshot') ? 1 : 0)
+                             + (A.set ? (typeof setCanDmg === 'function' ? setCanDmg() : 0) : 0);   // NOVA +1 | LUOT SET +2
                     if (typeof dealDamage === 'function') dealDamage(o, dm, 'ammo'); else o.hp -= dm;
                     this._giaoDong = Math.min(GIAO_DONG_MAX, (this._giaoDong || 0) + 1);
                     this._giaoDongT = GIAO_DONG_HET;
@@ -30669,7 +30790,12 @@ class PulsarCloneBoss {
                 return hitAny;
             }
             clawSlash() {
-                // DASH CHEM (Shippuuga): dang luot ma chem -> cu lao chem tam xa
+                // @@HE-SHIPBO — HAI DON RIENG, khong don nao nuot don nao:
+                //  1) DASH + J  = SHIPPUUGA goc (chem ngang xuyen thau) — van con nguyen.
+                //  2) J -> LUOT = CHEM LEN tu dong, roi J tiep = CHEM TAM XA.
+                // Nhanh (2) duoc kiem truoc vi luc do cua so `_shipNoi` dang mo; het cua so
+                // thi J trong luc luot lai roi ve dung Shippuuga goc.
+                if ((this._shipNoi || 0) > 0){ this.shippuugaBo(); return; }
                 if (this.grounded && dangLuotHoacChop()) { this.shippuuga(); return; }
                 // TREN KHONG: thay hoan toan nhat chem thuong (dung nhu X4 — Kuuenzan de len midair slash)
                 if (!this.grounded) { if (keys['KeyS']) this.hyouretsuzan(); else this.kuuenzan(); return; }
@@ -31046,18 +31172,68 @@ class PulsarCloneBoss {
                 if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; }
             }
             // ===== SHIPPUUGA — dash chem: lao toi, vet chem keo dai ra =====
+            // ===== SHIPPUUGA — DON GOC: dang luot ma bam J -> chem NGANG xuyen thau =====
+            // Don nay co tu dau, khong dinh gi toi chuoi J-Luot-J ben duoi.
             shippuuga() {
                 this.ammo--; this.attackCooldown = 24;
                 this.clawCombo = 0; this.clawComboWindow = 0; this.clawRiseWindow = 0;
                 let sScale = this.getFormScale(), dir = this.isFacingLeft ? -1 : 1;
                 dashVx = 13 * dir;                       // day tiep cu lao ve phia truoc
-                let reach = 150 * sScale, hTop = 6, hBot = 6;
-                let rect = dir === 1 ? { x: this.x + this.w - 8, y: this.y - hTop, w: reach, h: this.h + hTop + hBot }
-                                     : { x: this.x - reach + 8, y: this.y - hTop, w: reach, h: this.h + hTop + hBot };
-                this._slashFx('z_dash', dir === -1, 96 * sScale);
-                this._beginSlash(3, 15, dir, reach, hTop, hBot, 0);
+                // @@HE-SETCAN: tam voi rong ra la vi SAM SET bao quanh luoi lam nhat chem no to.
+                let ts = (typeof setCanTam === 'function' ? setCanTam() : 1);
+                let reach = 150 * sScale * ts, hTop = 6, hBot = 6;
+                this._slashFx('z_dash', dir === -1, 96 * sScale * ts);
+                this.setNhuomLuoi();
+                this._beginSlash(3 + (typeof setCanDmg === 'function' ? setCanDmg() : 0), 15, dir, reach, hTop, hBot, 0);
                 if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(560, 0.13, 'square', 0.18, 1400);
                 if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; }
+            }
+            // ===== CHEM LEN — nhat MOT cua chuoi J -> LUOT -> J =====
+            // Cu luot TU NO chem, va chi khi vua bam J truoc do (dang trong cua so combo).
+            shippuugaLen() {
+                this.ammo--; this.attackCooldown = 18;
+                this.clawCombo = 0; this.clawComboWindow = 0; this.clawRiseWindow = 0;
+                let sScale = this.getFormScale(), dir = this.isFacingLeft ? -1 : 1;
+                // KHONG dat lai dashVx: don nay duoc goi TU TRONG cu luot, cu luot da co van
+                // toc rieng (22, hoac 36 khi deo Luot Set). Dat 13 o day la HAM cu luot lai.
+                let ts = (typeof setCanTam === 'function' ? setCanTam() : 1);
+                let reach = 150 * sScale * ts, hTop = 40, hBot = 2;   // no ra phia TREN
+                this._slashFx('z_rise', dir === -1, 104 * sScale * ts);
+                this.setNhuomLuoi();
+                this._beginSlash(3 + (typeof setCanDmg === 'function' ? setCanDmg() : 0), 15, dir, reach, hTop, hBot, 0);
+                this._shipNoi = 26;                       // cua so bam J de noi nhat CHEM TAM XA
+                if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(680, 0.12, 'square', 0.18, 1600);
+                if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; }
+            }
+            // ===== SHIPPUUGA nhat HAI: CHEM TAM XA — nhat chem bay ra khoi tay =====
+            shippuugaBo() {
+                this.ammo--; this.attackCooldown = 28;
+                this._shipNoi = 0;
+                let sScale = this.getFormScale(), dir = this.isFacingLeft ? -1 : 1;
+                let ts = (typeof setCanTam === 'function' ? setCanTam() : 1);
+                let _st = (typeof setCanBat === 'function' && setCanBat());
+                // BO XUONG — noi tiep nhip da hat len o nhat mot, no ra phia DUOI.
+                this._slashFx('z_big', dir === -1, 118 * sScale * ts);
+                this.setNhuomLuoi();
+                this._beginSlash(4 + (typeof setCanDmg === 'function' ? setCanDmg() : 0), 16, dir,
+                                 132 * sScale * ts, 4, 34, 0);
+                if (typeof giaoSong !== 'undefined'){
+                    giaoSong.push({ x: this.x + this.w/2 + dir * 34, y: this.y + this.h * 0.52,
+                                    dir: dir, r: (_st ? 340 : 260) * sScale,
+                                    t: _st ? 26 : 22, t0: _st ? 26 : 22,
+                                    dmg: (_st ? 7 : 5) + (hasRune('explshot') ? 1 : 0),
+                                    nho: 0, xuyen: 1, kiem: 1, set: _st, hit: new Set() });
+                }
+                shakeTimer = Math.max(shakeTimer, 10);
+                floatingTexts.push(new FloatingText(this.x - 30, this.y - 30, _st ? "LÔI PHONG" : "LIỆT PHONG"));
+                if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(760, 0.14, 'square', 0.20, 1800);
+                if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; }
+            }
+            // @@HE-SETFX — nhuom nhat chem vua tao sang TONG DIEN. Khong sinh vat the nao,
+            // chi doi mau cua chinh vet chem do.
+            setNhuomLuoi(){
+                if (!(typeof setCanBat === 'function' && setCanBat())) return;
+                if (this._fxE) for (let e of this._fxE) e.tint = 'set';
             }
             // ===== RUNE LO LUNG: mot phat CHARGE MUC GIUA an lien, khong phai giu phim =====
             hoverMidCharge(ammo) {
@@ -32710,8 +32886,17 @@ class PulsarCloneBoss {
             let btnStart = mouseX >= 300 && mouseX <= 500 && mouseY >= 280 && mouseY <= 320;
             ctx.fillStyle = btnStart ? "#FBC02D" : "#FF9800"; ctx.fillRect(300, 280, 200, 40); ctx.fillStyle = "black"; ctx.fillText("FIGHT!", canvas.width/2, 305);
 
-            let btnBack = mouseX >= 300 && mouseX <= 500 && mouseY >= 340 && mouseY <= 380;
-            ctx.fillStyle = btnBack ? "#757575" : "#424242"; ctx.fillRect(300, 340, 200, 40); ctx.fillStyle = "white"; ctx.fillText(LANG[currentLang].back, canvas.width/2, 365);
+            let btnLan = mouseX >= 300 && mouseX <= 500 && mouseY >= 340 && mouseY <= 380;
+            ctx.fillStyle = btnLan ? "#26C6DA" : "#00838F"; ctx.fillRect(300, 340, 200, 40);
+            ctx.fillStyle = "white"; ctx.fillText(lanMang ? "LAN: DA NOI" : "CHOI QUA LAN", canvas.width/2, 365);
+
+            let btnBack = mouseX >= 300 && mouseX <= 500 && mouseY >= 400 && mouseY <= 440;
+            ctx.fillStyle = btnBack ? "#757575" : "#424242"; ctx.fillRect(300, 400, 200, 40); ctx.fillStyle = "white"; ctx.fillText(LANG[currentLang].back, canvas.width/2, 425);
+
+            if (lanMang){
+                ctx.font = "13px Consolas, monospace"; ctx.fillStyle = "#4CAF50";
+                ctx.fillText("Ban dang la " + (lanVai === 'chu' ? "NGUOI CHOI 1 — bam FIGHT de bat dau" : "NGUOI CHOI 2 — cho chu phong bam FIGHT"), canvas.width/2, 465);
+            }
 
             ctx.textAlign = "left";
         }
@@ -35514,7 +35699,7 @@ class PulsarCloneBoss {
             { id:'bulletclash', name:'VA CHẠM ĐẠN', nameEn:'PROJECTILE CLASH', icon:'✸', desc:'Bắn vỡ được MỌI loại đạn địch. Đạn nhỏ 1 máu, đạn to vừa (kể cả đạn đổi hướng) 3 máu, đạn cực to 5 máu — bắn đủ số phát là vỡ; sát thương thừa của viên đạn vẫn bay tiếp. Đạn xuyên quét sạch cả đường bay, chỉ bị đạn xuyên của địch chặn', descEn:'Breaks EVERY enemy projectile. Small bullets 1 HP, medium (incl. redirecting orbs) 3 HP, huge 5 HP — chip them down; leftover damage keeps flying. Pierce clears the whole lane, stopped only by an enemy pierce shot' },
             { id:'hover',       name:'LƠ LỬNG', nameEn:'HOVER', icon:'☁', desc:'Nhảy tới đỉnh cao thì đứng yên trên không 2 giây (vẫn di chuyển/bắn/nhảy tiếp; bấm xuống để hạ nhanh). Trong lúc lơ lửng được TỰ NGẮM rộng như Trickster, và bấm K (nút Charge) để đòn charge BUNG RA NGAY thay vì phải giữ — mỗi lần lơ lửng 1 phát. Bắn thường (J) vẫn dùng như bình thường', descEn:'At a jump apex, hover in mid-air for 2s (still move/shoot/double-jump; press down to drop fast). While hovering you gain Trickster-wide AUTO-AIM, and tapping K (the Charge key) releases a Charge attack INSTANTLY instead of holding — once per hover. Normal fire (J) is unchanged' },
             { id:'triplejump', name:'NHẢY BA', nameEn:'TRIPLE JUMP', icon:'⤴', desc:'Tốn 1 ô. Cho phép nhảy lần thứ BA khi đang ở trên không. Cú thứ ba bật yếu hơn hai cú đầu — chỉ 85% lực nhảy — nên nó để cứu độ cao chứ không phải để lên cao hơn. Cộng dồn với Siêu Tốc: mang cả hai thì mỗi cú nhảy đều mạnh thêm 50%.', descEn:'Costs 1 slot. Grants a THIRD jump while airborne. The third leap is weaker than the first two at 85% jump force, so it saves height rather than gaining it. Stacks with Hyper Speed: with both, every jump is 50% stronger.' },
-            { id:'bodyslam', name:'BODY SLAM', nameEn:'BODY SLAM', icon:'💥', desc:'Tốn 1 ô. Khi đang ở trên không và cúi để đáp xuống nhanh: cú đáp từ lần nhảy thứ 2 gây 3 sát thương trong bán kính 2cm; nếu đang ở lần nhảy thứ 3 trở lên gây 6 sát thương trong bán kính 4cm. Nhận 0.25 giây bất tử sau khi đáp.', descEn:'Costs 1 slot. While airborne, crouch to drop fast: a landing from the second jump deals 3 damage within a 2cm radius; a landing from the third jump or later deals 6 damage within a 4cm radius. Grants 0.25s invulnerability after landing.' },
+            { id:'bodyslam', name:'BODY SLAM', nameEn:'BODY SLAM', icon:'💥', desc:'Tốn 1 ô. Khi đang ở trên không và cúi để đáp xuống nhanh: cú đáp từ lần nhảy thứ 2 gây 3 sát thương trong bán kính 2cm; nếu đang ở lần nhảy thứ 3 trở lên gây 6 sát thương trong bán kính 4cm. Nhận 0.25 giây bất tử sau khi đáp.\n\nVỚI VŨ KHÍ CẬN CHIẾN: các đòn ĐÁNH XUỐNG vẫn giữ nguyên và được +2 sát thương — Hyouretsuzan của Kiếm, chuỗi K bổ xuống của Giáo, cú bổ của Búa. Ngoài ra cú đập có thêm đuôi riêng: KIẾM bắn hai lưỡi kiếm khí chạy ngang hai bên, GIÁO cắm xuống tạo sóng chấn xuyên chạy dọc, BÚA nở rộng gấp rưỡi và gọi một tia sét giáng xuống.', descEn:'Costs 1 slot. While airborne, crouch to drop fast: a landing from the second jump deals 3 damage within a 2cm radius; a landing from the third jump or later deals 6 damage within a 4cm radius. Grants 0.25s invulnerability after landing.' },
             { id:'firststrike', name:'ĐÒN ĐẦU TIÊN', nameEn:'FIRST STRIKE', icon:'⚔', desc:'Tốn 1 ô. Đòn đầu tiên đánh trúng mỗi Boss gây thêm sát thương bằng 20% máu tối đa của Boss đó.', descEn:'Costs 1 slot. The first attack to hit each Boss deals bonus damage equal to 20% of that Boss’s maximum HP.' },
             { id:'critstrike', name:'💥 CHÍ MẠNG', nameEn:'💥 CRITICAL STRIKE', icon:'💥', desc:'Tốn 1 ô. Mỗi đòn đánh có 25% tỉ lệ chí mạng, gây gấp đôi sát thương. Mỗi đòn KHÔNG chí mạng cộng dồn thêm +5% tỉ lệ cho đòn sau — chí mạng xong thì về lại 25%.', descEn:'Costs 1 slot. Every attack has a 25% critical chance to deal double damage. Every non-crit adds +5% to the next roll; the bonus resets once you crit.' },
             { id:'critstrikex', name:'💥 CHÍ MẠNG • C2', nameEn:'💥 CRITICAL STRIKE • C2', icon:'💥', cost:2,
@@ -35726,7 +35911,7 @@ class PulsarCloneBoss {
         function clawSwordCap(){ return hasRune('swordmaster') ? 30 : 20; }
         function clawSwordTick(){ return hasRune('swordmaster') ? 10 : 15; }
         RUNES.push({ id:'voltdash', name:'LƯỚT SÉT', nameEn:'LIGHTNING DASH', icon:'⚡', cost:1,
-            desc:'Tốn 1 ô. MỌI loại đạn: cú lướt đi xa hơn hẳn (36 thay vì 22) và gây 3 sát thương cho kẻ địch bạn lướt xuyên qua. CẦM VOLT thì lướt còn phóng thêm một TIA SÉT từ sau lưng ra trước, xuyên mọi mục tiêu, 3 sát thương nữa. Ghép SIÊU TỐC thì cả hai lên 5. Trong Lightning Form của Volt cả hai lên 6. Với MJÖLNIR thì nó mở hàng sấm 7cm: hai combo Dash+J và J→Dash giáng 10 cột sét trước mặt, mỗi cột 1 sát thương kèm choáng — rune không tăng tốc hay tầm lướt của Búa, nó là hiệu ứng sạc búa trước cú đập.',
+            desc:'Tốn 1 ô. MỌI loại đạn: cú lướt đi xa hơn hẳn (36 thay vì 22) và gây 3 sát thương cho kẻ địch bạn lướt xuyên qua. CẦM VOLT thì lướt còn phóng thêm một TIA SÉT từ sau lưng ra trước, xuyên mọi mục tiêu, 3 sát thương nữa. Ghép SIÊU TỐC thì cả hai lên 5. Trong Lightning Form của Volt cả hai lên 6. Với MJÖLNIR thì nó mở hàng sấm 7cm: hai combo Dash+J và J→Dash giáng 10 cột sét trước mặt, mỗi cột 1 sát thương kèm choáng — rune không tăng tốc hay tầm lướt của Búa, nó là hiệu ứng sạc búa trước cú đập.\n\nVỚI VŨ KHÍ CẬN CHIẾN: rune không sinh thêm tia sét rời nào. Nó chỉ làm hai việc — cộng sát thương, và nhuộm chính nhát chém sang tông điện khiến nhát đó nở to ra 28%. KIẾM — cả hai nhát của chuỗi Lướt Chém đều +2, lưỡi kiếm khí của nhát hai bay 340 thay vì 260. GIÁO — Lướt Đâm và nhát bồi đều +2 và sâu thêm 28%, có một tia chạy dọc thân giáo; Mũi Tên Khí bay lâu hơn, rộng hơn, +2. BÚA — vốn đã có sấm sét, không đụng vào.',
             descEn:'Costs 1 slot. EVERY ammo: the dash travels much farther (36 vs 22) and deals 3 damage to enemies you pass through. WITH VOLT it also fires a piercing BOLT from behind you for another 3. Paired with HYPER SPEED both go to 5; inside Volt Lightning Form both go to 6. With MJOLNIR it unlocks the 7cm thunder row: the Dash+J and J-then-Dash combos drop 10 pillars of lightning in front of you for 1 damage and a stun each — the rune does not change the hammer dash speed or range, it is the charge effect on the hammer before the slam.',
             goiY:'hyperspeed' });
         RUNES.push({ id:'shintrick', name:'SHIN TRICKSTER', nameEn:'SHIN TRICKSTER', icon:'🎯', cost:2, ammoRune:true, onlyStance:1,
@@ -36133,7 +36318,8 @@ class PulsarCloneBoss {
                 '>KUUENZAN [trên không + J] — Chém xoay vòng 360°. 3 sát thương.',
                 '>HYOURETSUZAN [trên không + S + J] — Cắm kiếm lao thẳng từ trên trời xuống, chạm đất nổ sóng chấn động. 3 sát thương.',
                 '>RYUENJIN [dưới đất, nhảy ngay sau khi chém J] — Vung kiếm hất tung thượng thiên chém bay lên trời. 3 sát thương.',
-                '>SHIPPUUGA [đang lướt + J] — Lướt chém xuyên thấu tầm xa. 3 sát thương.',
+                '>SHIPPUUGA [đang lướt + J] — Lướt chém ngang xuyên thấu tầm xa. 3 sát thương.',
+                '>CHUỖI J → LƯỚT → J — Vừa bấm J rồi lướt ngay (trong cửa sổ combo) thì cú lướt TỰ CHÉM LÊN, hất địch tung lên, 3 sát thương, không cần bấm gì thêm. Bấm J trong 26 khung sau đó để nối nhát hai: BỔ XUỐNG 4 sát thương và một lưỡi KIẾM KHÍ bay ngang về phía trước, 5 sát thương, xuyên, tầm 260. Lướt trơn không có J dẫn trước thì vẫn là cú lướt bình thường, và bấm J lúc đó vẫn ra Shippuuga gốc.',
                 '#BẮN THƯỜNG [J]',
                 '-Combo 3 nhát chém đất chuẩn mực. Nhát 1 chém dọc 3 sát thương tầm 70px, nhát 2 chém ngang 3 sát thương tầm 100px, nhát 3 đại trảm bổ đôi 4 sát thương tầm 126px.',
                 '#TÍCH LỰC [K] — tối đa 2s (120f)',
@@ -39305,8 +39491,12 @@ class PulsarCloneBoss {
                     else if (mouseX >= 780 && mouseX <= 810) p2AmmoType = (p2AmmoType + 1) % AMMO_NAMES.length;
                 }
                 
-                if (mouseX >= 300 && mouseX <= 500 && mouseY >= 280 && mouseY <= 320) startGame('pvp');
-                else if (mouseX >= 300 && mouseX <= 500 && mouseY >= 340 && mouseY <= 380) gameState = 'menu';
+                if (mouseX >= 300 && mouseX <= 500 && mouseY >= 280 && mouseY <= 320) {
+                    // Khach khong duoc tu bat dau: tran dau do CHU mo, khach se duoc keo vao.
+                    if (!lanKhach()){ lanCuA = {}; lanCuB = {}; startGame('pvp'); }
+                }
+                else if (mouseX >= 300 && mouseX <= 500 && mouseY >= 340 && mouseY <= 380) { lanUiDung(); lanUiMoDong(true); }
+                else if (mouseX >= 300 && mouseX <= 500 && mouseY >= 400 && mouseY <= 440) gameState = 'menu';
 
             } else if (gameState === 'custom_menu') {
                 // --- dang mo picker rune: bat click trong picker truoc ---
@@ -39468,7 +39658,7 @@ class PulsarCloneBoss {
                 if (typeof grassField !== 'undefined') grassField = [];
                 platforms.length = 0;
             }
-            freeMove = false; dinoReturning = false; dashVx = 0; lastMoveTapDir = 0; dashCd = 0; stReset(); unitySwapCd = 0; uniChamT = 0; uniChoHoi = 0; sdtBat = false; sdtKhoan = null; sdtVot = null; sdtNhap = []; sdtCd = 0; sdtXoe = 0; if (typeof dragReset === 'function') dragReset(); novaBom = []; khienManh = []; khienLuotHit = new Set(); qsT = 0; qsMarks = []; qsFin = null; qsPerfect = false; qsFlash = 0;
+            freeMove = false; dinoReturning = false; dashVx = 0; lastMoveTapDir = 0; dashCd = 0; stReset(); unitySwapCd = 0; uniChamT = 0; uniChoHoi = 0; if (typeof setTia !== 'undefined'){ setTia.length = 0; setTan.length = 0; setVet.length = 0; } sdtBat = false; sdtKhoan = null; sdtVot = null; sdtNhap = []; sdtCd = 0; sdtXoe = 0; if (typeof dragReset === 'function') dragReset(); novaBom = []; khienManh = []; khienLuotHit = new Set(); qsT = 0; qsMarks = []; qsFin = null; qsPerfect = false; qsFlash = 0;
             pet1Shots.length = 0; pet1GuardShots.length = 0; pet1Cd = 0; pet1N = 0; pet2Shots.length = 0; pet2OrbitMines.length = 0; pet2Cd = 0; pet2N = 0; if(typeof pet2Lua!=="undefined"){ pet2Lua.length = 0; pet2Dash = null; } afterimages.length = 0; birdBank = 0; birdSpendCd = 0; birdDmgAcc = 0; voltBossTicks = 0; voltTrashTicks = 0;
             pet3Cd = 600; pet3CooldownReduction = 0; pet3IdleFrames = 0; pet4Cd = 600; pet4Flash = 0; pet4Charges = 0; pet4SpendCd = 0; pet4NearDeathUsed=false; pet3X = 0; pet3Y = 0; pet4X = 0; pet4Y = 0;
             pet5Cd = 180; pet5Dash = null; pet5Charges = 0; pet5X = 0; pet5Y = 0; pet5A={x:0,y:0,cd:0,dash:null,charges:0}; pet5B={x:0,y:0,cd:180,dash:null,charges:0}; pet6Cd = 600; pet6Active = false; pet6Radius = 28; pet6Angle = 0; pet6X = 0; pet6Y = 0; pet6Rings = [];
@@ -40335,7 +40525,7 @@ function infernoMaxChain(x, y, source){
         function doDash(epHuong) {
             if (dashCd > 0) return;
             if (typeof dino !== 'undefined' && dino && dino.tank) return;   // xe tang khong luot duoc
-            if (!(gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss')) return;
+            if (!(gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss' || gameState === 'pvp')) return;
             if (typeof dino === 'undefined' || !dino || dino.jcState || dino.webTimer > 0) return;
             let dir = epHuong || ((keys['KeyA'] || keys['ArrowLeft']) ? -1 : ((keys['KeyD'] || keys['ArrowRight']) ? 1 : (dino.isFacingLeft ? -1 : 1)));
             // SHIN TRICKSTER: neu bam phim luot DUOI DAT thi tru charge; tren khong da tinh o stTuDongTrenKhong.
@@ -40405,6 +40595,14 @@ function infernoMaxChain(x, y, source){
                 }
             }
             spawnAfterimage();
+            // @@HE-SHIPBO — DINOSWORD, chuoi  J -> LUOT -> J.
+            // Cu luot TU NO chem, khong phai bam gi. NHUNG chi trong COMBO: phai vua bam J
+            // truoc do, tuc `clawComboWindow` con mo. Luot khong co J dan truoc thi van chi
+            // la mot cu luot tron.
+            if (dino.id === 1 && currentAmmoType === 5 && dino.grounded
+                && (dino.clawComboWindow || 0) > 0
+                && !dino.isOverheated && dino.ammo > 0 && !dino.ultActive && !dino.clawUltState
+                && typeof dino.shippuugaLen === 'function') dino.shippuugaLen();
         }
         window.addEventListener('keydown', e => { 
             SFX.init(); SFX.resume();
@@ -40440,6 +40638,10 @@ function infernoMaxChain(x, y, source){
                 else if (e.code === 'KeyS' || e.code === 'ArrowDown') sdtGhiNhap('X');
             }
             if (['Space', 'KeyW', 'KeyS', 'KeyJ', 'KeyK', 'KeyL', 'KeyA', 'KeyD', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
+            // Man ghep phong co o nhap that. Neu khong chan thi go ma vao do se
+            // dong thoi lam nhan vat nhay/ban lung tung o duoi.
+            if (lanUiHien){ if (e.code === 'Escape') lanUiMoDong(false); return; }
+            if (lanPhimMayNay(e.code, true)) return;     // @@HE-LAN: phim nay la cua P2
             keys[e.code] = true; 
             
             // XE TANG: khong nhay, khong luot — doi lai co 10 giap.
@@ -40449,7 +40651,7 @@ function infernoMaxChain(x, y, source){
                 dashVx += (dino.isFacingLeft ? 1 : -1) * 9;                 // giat nguoc
             }
             if (['Space', 'KeyW'].includes(e.code) && !(dino && dino.tank)) {
-                if ((gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss') && dino.webTimer <= 0) {
+                if ((gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss' || gameState === 'pvp') && dino.webTimer <= 0) {
                     if (mapTheme === 'ocean' && (dino.y + dino.h) > OCEAN_SURF + 4) {   // BOI: dap nuoc len; gan mat nuoc thi bat cao de dap len la beo
                         let _near = (dino.y + dino.h) - OCEAN_SURF < 70;
                         dino.dy = (hasRune('hyperspeed') ? 1.5 : 1) * (_near ? -11.5 : -6.4); dino.grounded = false; dino.canDoubleJump = true; dino.jumpCount = 1; SFX.jump();
@@ -40495,21 +40697,25 @@ function infernoMaxChain(x, y, source){
                 }
             }
             if (['KeyA', 'ArrowLeft'].includes(e.code)) {
-                if ((gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss') && !e.repeat && !e.fromStick) handleMoveTap(-1);
+                if ((gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss' || gameState === 'pvp') && !e.repeat && !e.fromStick) handleMoveTap(-1);
             }
             if (['KeyD', 'ArrowRight'].includes(e.code)) {
-                if ((gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss') && !e.repeat && !e.fromStick) handleMoveTap(1);
+                if ((gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss' || gameState === 'pvp') && !e.repeat && !e.fromStick) handleMoveTap(1);
             }
             if ((e.code === 'ShiftLeft' || e.code === 'ShiftRight') && !e.repeat) doDash();
             if (e.code === 'KeyL') {
-                if (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss') {
+                if (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss' || gameState === 'pvp') {
                     if (currentShieldType === 0 && dino.shieldCd <= 0 && dino.meleeTimer <= 0 && (hasRune('chanshld') || hasRune('chanshldx') || (!dino.clawChannel && !dino.rapidChannel && !dino.pulseLaserChannel && !dino.fireChannel && !dino.lightChannel && !dino.splitChannel && !dino.pulsarChannel))) { dino.meleeTimer = (combatStance === 2) ? 45 : 30; dino.shieldCd = shieldCdNguoiChoi(); dino.meleeID++; }
                 } else if (gameState === 'custom_menu') {
                     if (previewDino.shieldTimer <= 0) { previewDino.shieldTimer = 30; }
                 }
             }
         });
-        window.addEventListener('keyup', e => keys[e.code] = false);
+        window.addEventListener('keyup', e => {
+            if (lanUiHien) return;
+            if (lanPhimMayNay(e.code, false)) return;    // @@HE-LAN: phim nay la cua P2
+            keys[e.code] = false;
+        });
 
         /* ==================================================================
            @@HE-MOBILE — DIEU KHIEN CAM UNG
@@ -41519,6 +41725,347 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
 
         let dino = new Player(1, 80, currentForm, currentAmmoType, false);
         let dino2 = new Player(2, 640, p2Form, p2AmmoType, true);
+        // ===================== @@HE-LAN — HAI NGUOI CHOI DOC LAP =====================
+        // Truoc khi noi mang duoc, P2 phai dieu khien duoc rieng da. Do duoc:
+        //   - class Player (5563 dong) KHONG bam cung vao bien `dino` cho nao ca, no chi
+        //     doc bo phim toan cuc `keys` o 20 cho -> gan nhu da trung lap san.
+        //   - Nhung cac ham NGOAI class thi bam cung: doDash dung `dino` 55 lan, unitySwap 21,
+        //     unityFire 10, voltDashBat 6. Bam luot o may P2 se lam P1 luot.
+        // Sua 92 cho do thi rui ro cao. `dino` lai khai bao bang `let`, nen re hon nhieu:
+        // TRONG LUC cap nhat P2, doi tam `dino` sang dino2 va thay ruot cua `keys` bang bo
+        // phim cua P2, xong tra lai. Khong dong mot dong nao trong doDash/unityFire/...
+        let lanBoPhim2 = {};          // bo phim cua P2 (may khach gui sang, hoac ban phim thu hai)
+        let lanDangChay2 = false;
+        let lanRieng2 = { dashVx: 0, dashCd: 0, tapDir: 0, tapT: 0, khien: false };
+
+        /* ------------------------------------------------------------------
+           @@HE-LAN — HAI NGUOI MOT MAY.
+           Khi chua noi mang thi P2 dung cum phim ben phai. Mui ten von la phim
+           phu cua P1 nen trong PvP phai CAT no khoi P1, neu khong mot phim se
+           day ca hai nguoi cung luc.
+           Khi da noi mang (lanMang bat) thi bo nay tat, `lanBoPhim2` do goi tin
+           tu may ben kia dien vao.
+           ------------------------------------------------------------------ */
+        const LAN_MAP2 = {
+            ArrowLeft: 'KeyA', ArrowRight: 'KeyD', ArrowUp: 'Space', ArrowDown: 'KeyS',
+            Numpad1: 'KeyJ', Numpad2: 'KeyK', Numpad3: 'KeyL', Numpad0: 'ShiftLeft',
+            Comma: 'KeyJ', Period: 'KeyK', Slash: 'KeyL', ShiftRight: 'ShiftLeft'
+        };
+        let lanMang = false;          // true khi phim P2 den tu mang, khong lay tu ban phim nua
+        function lanPhimMayNay(ma, xuong){
+            if (gameState !== 'pvp' || lanMang) return false;
+            let d = LAN_MAP2[ma];
+            if (!d) return false;
+            lanBoPhim2[d] = xuong;
+            return true;             // da nuot: dung cho P1 an phim nay nua
+        }
+
+        /* ==================================================================
+           @@HE-NET2 — CHOI QUA MANG LAN (WebRTC DataChannel)
+           ------------------------------------------------------------------
+           KHONG co may chu. Hai may noi thang voi nhau bang WebRTC, phan bat
+           tay lam thu cong: may CHU sinh ra mot ma moi, nguoi choi tu gui ma
+           do sang may kia (Zalo, chat, USB, doc cho nhau nghe...), may KHACH
+           dan vao roi tra lai mot ma tra loi. Vi chi chay trong mang noi bo
+           nen khong khai bao STUN/TURN: ung vien "host" (dia chi 192.168.x.x)
+           la du.
+
+           MO HINH DONG BO — MAY CHU CAM QUYEN.
+           Ban dau toi tinh cho ca hai may cung mo phong roi chi trao doi phim,
+           nhung trong file nay co 588 cho goi Math.random(): hai may se re
+           nhanh khac nhau chi sau vai giay. Nen:
+             - MAY CHU  chay toan bo mo phong, va gui ANH CHUP trang thai.
+             - MAY KHACH khong mo phong nguoi choi nao ca, chi gui phim cua no
+               len va VE lai anh chup nhan duoc.
+           Nho vay hai man hinh khong bao gio le nhau, va moi thu ngau nhien
+           (bui, tia lua, chi so) deu do mot ben quyet.
+
+           ANH CHUP GUI DANG SAI KHAC: Player co 109 truong don gian (1791 byte
+           neu gui het). Moi khung thuc te chi vai truong doi, nen chi gui phan
+           doi — con khoang 100-200 byte moi khung.
+           ================================================================== */
+        let lanKet = null;          // RTCPeerConnection
+        let lanKenh = null;         // RTCDataChannel
+        let lanVai = '';            // 'chu' | 'khach'
+        let lanTrangThai = 'tat';   // tat | doi | noi | loi
+        let lanLoi = '';
+        function lanChu(){ return lanMang && lanVai === 'chu'; }
+        function lanKhach(){ return lanMang && lanVai === 'khach'; }
+
+        // --- ma hoa/giai ma SDP cho gon de copy tay ---
+        function lanNen(o){
+            try { return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/=+$/, ''); }
+            catch(e){ return ''; }
+        }
+        function lanBung(t){
+            try { return JSON.parse(decodeURIComponent(escape(atob(String(t).trim())))); }
+            catch(e){ return null; }
+        }
+
+        function lanTaoKet(){
+            let pc = new RTCPeerConnection({ iceServers: [] });   // LAN: khong can STUN
+            pc.oniceconnectionstatechange = () => {
+                if (['failed', 'disconnected', 'closed'].includes(pc.iceConnectionState)) lanNgat('Mat ket noi');
+            };
+            return pc;
+        }
+        function lanChoIce(pc){
+            return new Promise(ok => {
+                if (pc.iceGatheringState === 'complete') return ok();
+                let xong = false;
+                const tra = () => { if (!xong){ xong = true; ok(); } };
+                pc.onicegatheringstatechange = () => { if (pc.iceGatheringState === 'complete') tra(); };
+                setTimeout(tra, 2500);        // du ung vien LAN roi, khong cho lau
+            });
+        }
+        function lanGanKenh(ch){
+            lanKenh = ch;
+            ch.onopen = () => { lanTrangThai = 'noi'; lanMang = true; lanUiVe(); };
+            ch.onclose = () => lanNgat('Ben kia da thoat');
+            ch.onmessage = e => { try { lanNhanGoi(JSON.parse(e.data)); } catch(err){} };
+        }
+
+        async function lanMoPhong(){          // may CHU: sinh ma moi
+            lanVai = 'chu'; lanTrangThai = 'doi'; lanLoi = ''; lanUiVe();
+            lanKet = lanTaoKet();
+            lanGanKenh(lanKet.createDataChannel('dino', { ordered: false, maxRetransmits: 0 }));
+            await lanKet.setLocalDescription(await lanKet.createOffer());
+            await lanChoIce(lanKet);
+            lanUiMa(lanNen(lanKet.localDescription));
+        }
+        async function lanNhanTraLoi(ma){     // may CHU: dan ma tra loi vao
+            let d = lanBung(ma);
+            if (!d || !d.type){ lanLoi = 'Ma tra loi khong doc duoc'; lanUiVe(); return; }
+            await lanKet.setRemoteDescription(d);
+        }
+        async function lanVaoPhong(ma){       // may KHACH: dan ma moi, sinh ma tra loi
+            let d = lanBung(ma);
+            if (!d || !d.type){ lanLoi = 'Ma moi khong doc duoc'; lanUiVe(); return; }
+            lanVai = 'khach'; lanTrangThai = 'doi'; lanLoi = ''; lanUiVe();
+            lanKet = lanTaoKet();
+            lanKet.ondatachannel = e => lanGanKenh(e.channel);
+            await lanKet.setRemoteDescription(d);
+            await lanKet.setLocalDescription(await lanKet.createAnswer());
+            await lanChoIce(lanKet);
+            lanUiMa(lanNen(lanKet.localDescription));
+        }
+        function lanNgat(vi){
+            lanLoi = vi || '';
+            lanMang = false; lanVai = ''; lanTrangThai = lanLoi ? 'loi' : 'tat';
+            try { lanKenh && lanKenh.close(); } catch(e){}
+            try { lanKet && lanKet.close(); } catch(e){}
+            lanKenh = null; lanKet = null; lanBoPhim2 = {}; lanPhim2Cu = {};
+            lanUiVe();
+        }
+        function lanGui(o){
+            if (lanKenh && lanKenh.readyState === 'open'){
+                try { lanKenh.send(JSON.stringify(o)); } catch(e){}
+            }
+        }
+
+        /* ---------- ANH CHUP: sai khac tren cac truong don gian ---------- */
+        const LAN_BO_QUA = { id: 1, w: 1, h: 1 };
+        let lanCuA = {}, lanCuB = {};
+        function lanChup(ng, cu){
+            let d = null;
+            for (const k in ng){
+                if (LAN_BO_QUA[k]) continue;
+                let v = ng[k], t = typeof v;
+                if (t !== 'number' && t !== 'boolean' && t !== 'string') continue;
+                if (t === 'number') v = Math.round(v * 100) / 100;   // bot byte, mat 0.01px khong ai thay
+                if (cu[k] === v) continue;
+                cu[k] = v; (d || (d = {}))[k] = v;
+            }
+            return d;
+        }
+        function lanDap(ng, d){ if (!d || !ng) return; for (const k in d) ng[k] = d[k]; }
+
+        function lanChupDan(){
+            let r = [];
+            for (let i = 0; i < projectiles.length; i++){
+                let q = projectiles[i], o = {};
+                for (const k in q){
+                    let v = q[k], t = typeof v;
+                    if (t === 'number') o[k] = Math.round(v * 100) / 100;
+                    else if (t === 'boolean' || t === 'string') o[k] = v;
+                }
+                r.push(o);
+            }
+            return r;
+        }
+        function lanDapDan(ds){
+            if (!ds) return;
+            projectiles.length = 0;
+            for (let i = 0; i < ds.length; i++){
+                let q = Object.create(Projectile.prototype);
+                Object.assign(q, ds[i]);
+                if (!q.hitIds) q.hitIds = new Set();
+                projectiles.push(q);
+            }
+        }
+
+        // Anh chup chi duoc gui trong nhanh 'pvp'. Nhung luc mot ben chet, chu
+        // nhay sang 'pvp_end' va tu do khong con goi nao ra nua — khach se ket o
+        // man dau mai. Nen doi man hinh phai duoc bao rieng, tu ngoai vong PvP.
+        let lanManCu = '';
+        function lanNhipTrangThai(){
+            if (!lanChu()) return;
+            if (gameState === lanManCu) return;
+            lanManCu = gameState;
+            lanGui({ v: 'm', g: gameState });
+        }
+        let lanKhungGui = 0;
+        // Kenh chay che do KHONG bao dam (ordered:false, maxRetransmits:0) de khong bi
+        // nghen dau hang khi rot mot goi. Doi lai: goi nao rot thi phan SAI KHAC trong
+        // no mat luon, va vi ben gui da ghi gia tri moi vao bo nho so sanh nen no khong
+        // bao gio gui lai — hai may lech vinh vien. Do duoc: mat 20% goi thi P1 lech 18px
+        // va khong tu lanh. Nen cu nua giay lai gui mot ANH CHUP DAY DU de xoa sach moi
+        // sai lech tich tu. Ton them ~7 KB/s, trong mang noi bo la khong dang ke.
+        const LAN_MOC = 30;
+        function lanNhipChu(){                 // goi moi khung o may CHU
+            if (!lanChu()) return;
+            if ((++lanKhungGui % LAN_MOC) === 0){ lanCuA = {}; lanCuB = {}; }
+            let a = lanChup(dino, lanCuA), b = lanChup(dino2, lanCuB);
+            lanGui({ v: 's', t: lanKhungGui, a: a, b: b, p: lanChupDan(), g: gameState });
+        }
+        function lanNhipKhach(){               // goi moi khung o may KHACH
+            if (!lanKhach()) return;
+            let ds = [];
+            for (const k in keys) if (keys[k]) ds.push(k);
+            lanGui({ v: 'k', k: ds });
+        }
+        let lanGoiCuoi = null;
+        function lanNhanGoi(g){
+            if (!g) return;
+            if (g.v === 'k' && lanChu()){
+                // MAY CHU nhan phim cua may khach -> do thang vao bo phim cua P2.
+                let m = {};
+                for (let i = 0; i < g.k.length; i++) m[g.k[i]] = true;
+                lanBoPhim2 = m;
+            } else if (g.v === 'm' && lanKhach()){
+                if (g.g === 'pvp' && gameState !== 'pvp'){ lanUiMoDong(false); startGame('pvp'); lanCuA = {}; lanCuB = {}; }
+                else if (['pvp_end', 'pvp_menu', 'menu'].includes(g.g)) gameState = g.g;
+            } else if (g.v === 's' && lanKhach()){
+                // Chu bam FIGHT truoc; khach dang o man ghep phong nen phai theo vao.
+                // Khong tu dung startGame o khach thi no se ngoi mai o menu.
+                if (g.g === 'pvp' && gameState !== 'pvp'){
+                    lanUiMoDong(false);
+                    startGame('pvp');
+                    lanCuA = {}; lanCuB = {};
+                }
+                lanGoiCuoi = g;
+            }
+        }
+        function lanApAnhChup(){               // may KHACH: dap anh chup len sau khi ve
+            if (!lanKhach() || !lanGoiCuoi) return;
+            let g = lanGoiCuoi; lanGoiCuoi = null;
+            lanDap(dino, g.a); lanDap(dino2, g.b); lanDapDan(g.p);
+            if (g.g && g.g !== gameState && ['pvp', 'pvp_end'].includes(g.g)) gameState = g.g;
+        }
+
+        /* ---------- MAN GHEP PHONG (lop DOM de bo cuc, vi canvas khong go chu duoc) ---------- */
+        function lanUiVe(){
+            let el = document.getElementById('lanui');
+            if (!el) return;
+            if (!lanUiHien){ el.style.display = 'none'; return; }
+            el.style.display = 'flex';
+            let tt = document.getElementById('lan_tt');
+            if (tt){
+                tt.textContent = lanLoi ? ('LOI: ' + lanLoi)
+                    : lanTrangThai === 'noi' ? ('DA NOI — ban la ' + (lanVai === 'chu' ? 'NGUOI CHOI 1 (chu phong)' : 'NGUOI CHOI 2 (khach)'))
+                    : lanTrangThai === 'doi' ? 'Dang cho ben kia...' : 'Chua noi';
+                tt.style.color = lanLoi ? '#E53935' : (lanTrangThai === 'noi' ? '#4CAF50' : '#FFC107');
+            }
+            let o = document.getElementById('lan_khu2');
+            if (o) o.style.display = (lanVai === 'chu' && lanTrangThai !== 'noi') ? 'block' : 'none';
+        }
+        function lanUiMa(ma){
+            let t = document.getElementById('lan_ra');
+            if (t){ t.value = ma; }
+            lanUiVe();
+        }
+        let lanUiHien = false;
+        function lanUiMoDong(hien){ lanUiHien = hien; lanUiVe(); }
+
+        function lanUiDung(){
+            let el = document.getElementById('lanui');
+            if (!el || el.dataset.xong) return;
+            el.dataset.xong = '1';
+            el.innerHTML =
+              '<div id="lan_hop">' +
+              '  <div id="lan_de">CHOI QUA MANG LAN</div>' +
+              '  <div id="lan_tt">Chua noi</div>' +
+              '  <div class="lan_hd">Mot may bam TAO PHONG roi gui MA cua minh sang may kia. May kia dan ma do vao o duoi va bam VAO PHONG, roi gui MA TRA LOI nguoc lai.</div>' +
+              '  <div class="lan_hang"><button id="lan_tao">TAO PHONG (P1)</button><button id="lan_sao">SAO CHEP MA</button></div>' +
+              '  <textarea id="lan_ra" readonly placeholder="Ma cua may nay se hien o day"></textarea>' +
+              '  <div class="lan_hang"><input id="lan_vao" placeholder="Dan ma cua may kia vao day"/></div>' +
+              '  <div class="lan_hang"><button id="lan_join">VAO PHONG (P2)</button><div id="lan_khu2" style="display:none"><button id="lan_nhan">NHAN MA TRA LOI</button></div></div>' +
+              '  <div class="lan_hang"><button id="lan_dong">DONG</button><button id="lan_ngat">NGAT</button></div>' +
+              '</div>';
+            const B = i => document.getElementById(i);
+            B('lan_tao').onclick = () => lanMoPhong();
+            B('lan_join').onclick = () => lanVaoPhong(B('lan_vao').value);
+            B('lan_nhan').onclick = () => lanNhanTraLoi(B('lan_vao').value);
+            B('lan_sao').onclick = () => { let t = B('lan_ra'); t.select(); try { document.execCommand('copy'); } catch(e){} };
+            B('lan_dong').onclick = () => lanUiMoDong(false);
+            B('lan_ngat').onclick = () => lanNgat('');
+            lanUiVe();
+        }
+
+
+        /* ------------------------------------------------------------------
+           @@HE-LAN — BO PHAT SU KIEN VIEN CHO P2.
+           Cac dong tac "mot phat" (nhay, luot, khien, go A/D hai cai de luot)
+           KHONG nam trong update() ma nam trong bo bat keydown. Bo do lam viec
+           tren bien toan cuc `dino`, nen cach re nhat de P2 dung DUNG duong di
+           do — nhay hai nac, Ryuenjin, treo boomerang, dich chuyen Void... —
+           la phat ra keydown/keyup that su trong luc `dino` dang tro ve P2,
+           y het cach lop dieu khien cam ung dang lam.
+           So khung truoc voi khung nay de biet phim nao VUA bam / VUA nha.
+           ------------------------------------------------------------------ */
+        const LAN_PHIM2 = ['Space', 'KeyW', 'KeyA', 'KeyD', 'KeyS', 'KeyJ', 'KeyK', 'KeyL', 'ShiftLeft'];
+        let lanPhim2Cu = {};
+        function lanVienP2(){
+            if (gameState !== 'pvp') { lanPhim2Cu = {}; return; }
+            for (let i = 0; i < LAN_PHIM2.length; i++){
+                let ma = LAN_PHIM2[i];
+                let moi = !!lanBoPhim2[ma], cu = !!lanPhim2Cu[ma];
+                if (moi === cu) continue;
+                lanPhim2Cu[ma] = moi;
+                lanVoiP2(() => {
+                    window.dispatchEvent(new KeyboardEvent(moi ? 'keydown' : 'keyup', { code: ma, bubbles: false }));
+                });
+            }
+        }
+        function lanVoiP2(fn){
+            if (lanDangChay2) return fn();          // tranh long nhau
+            lanDangChay2 = true;
+            let cuDino = dino, cuKeys = {};
+            for (const k in keys){ cuKeys[k] = keys[k]; delete keys[k]; }
+            Object.assign(keys, lanBoPhim2);
+            dino = dino2;
+            // Cac bien duoi day nam o pham vi toan cuc nhung THUC CHAT la trang thai
+            // rieng cua mot nguoi choi. Neu khong doi thi hai ben dung chung mot hoi
+            // luot, chung mot van toc luot, chung ca bo dem "go hai lan de luot" —
+            // P2 luot thi P1 bi truot theo va nguoc lai. Doi giong het cach doi `keys`.
+            let cuDashVx = dashVx, cuDashCd = dashCd, cuTapDir = lastMoveTapDir,
+                cuTapT = lastMoveTapTime, cuKhien = activeShieldWasHeld, cuDan = currentAmmoType;
+            dashVx = lanRieng2.dashVx; dashCd = lanRieng2.dashCd;
+            lastMoveTapDir = lanRieng2.tapDir; lastMoveTapTime = lanRieng2.tapT;
+            activeShieldWasHeld = lanRieng2.khien; currentAmmoType = p2AmmoType;
+            try { fn(); }
+            finally {
+                lanRieng2.dashVx = dashVx; lanRieng2.dashCd = dashCd;
+                lanRieng2.tapDir = lastMoveTapDir; lanRieng2.tapT = lastMoveTapTime;
+                lanRieng2.khien = activeShieldWasHeld;
+                dashVx = cuDashVx; dashCd = cuDashCd; lastMoveTapDir = cuTapDir;
+                lastMoveTapTime = cuTapT; activeShieldWasHeld = cuKhien; currentAmmoType = cuDan;
+                dino = cuDino;
+                for (const k in keys) delete keys[k];
+                Object.assign(keys, cuKeys);
+                lanDangChay2 = false;
+            }
+        }
 
         const obstacles = []; const enemies = []; const hearts = []; const projectiles = []; const bossProjectiles = []; const floatingTexts = [];
         // @@HE-DRAGON: bo dem SO PHAT DAN DA BAN RA. Truoc day phan than do bang cach xem
@@ -41585,6 +42132,134 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             boss._daCan = !dungXa;
             return dungXa;
         }
+        // ===== @@HE-SLAMCAN — BODY SLAM x VU KHI CAN CHIEN =====
+        // Rune Body Slam von chi la mot cu roi + vong xung, khong dinh dang gi toi cay vu khi.
+        // Voi Kiem va Bua no con DE LEN don lao xuong san co cua chinh vu khi do (do duoc:
+        // ca hai cung kich hoat khi giu S tren khong). Gio cay vu khi DINH NGHIA cu dap:
+        //   KIEM — nen dat xong ban hai luoi kiem khi chay ngang hai ben
+        //   GIAO — cam giao xuong, mot song chan chay doc theo huong dang quay
+        //   BUA  — ban kinh no rong hon, va goi mot tia set giang xuong diem cham
+        // Rune GIU NGUYEN cac don goc — Hyouretsuzan cua Kiem, chuoi K-bo cua Giao, cu bo
+        // cua Bua deu la TRUC COMBO, xoa di la hong ca bo chieu. Rune lam hai viec khac:
+        // cong +2 cho chinh nhung don DANH XUONG do, va them mot duoi rieng cho cu dap.
+        function slamCanBat(){
+            return typeof hasRune === 'function' && hasRune('bodyslam')
+                && typeof giaoLaCanChien === 'function' && giaoLaCanChien(currentAmmoType);
+        }
+        const SLAM_CONG = 2;
+        function slamCong(){ return slamCanBat() ? SLAM_CONG : 0; }
+        // ===== @@HE-SETCAN — LUOT SET x VU KHI CAN CHIEN =====
+        // Cac don J-luot / luot-J la BAN SAC cua ba cay nay, nen rune KHONG dap them mot
+        // hieu ung rieng ben canh cu luot. No NGAM DIEN vao chinh nhung don do:
+        //   KIEM — Shippuuga (luot chem): tam voi va sat thuong deu tang
+        //   GIAO — Luot dam va Mui ten khi: dam sau hon, bay xa hon, nang hon
+        //   BUA  — von da co sam set san, khong dong vao
+        function setCanBat(){
+            return typeof hasRune === 'function' && hasRune('voltdash')
+                && typeof giaoLaCanChien === 'function' && giaoLaCanChien(currentAmmoType);
+        }
+        function setCanDmg(){ return setCanBat() ? 2 : 0; }
+        // ===== @@HE-SETFX — HINH ANH SAM SET cua LUOT SET tren vu khi can chien =====
+        // Ban dau toi chi ram bon cham 'lightning_shock' chung chung — no khong doc ra la set,
+        // chi la vai dom sang. Gio dung mot he rieng:
+        //   TIA   — duong gay khuc nhieu doan, ba lop long nhau (quang xanh -> lam -> loi trang),
+        //           co NHANH RE moc ra giua duong nhu set that
+        //   TAN   — dom dien van ra, bay theo quan tinh roi tat
+        //   VET   — vet chay xanh nam tren mat dat doc duong luot, mo dan
+        let setTia = [], setTan = [], setVet = [];
+        function setCanTia(x1, y1, x2, y2, day, doi){
+            setTia.push({ x1, y1, x2, y2, day: day || 4, t: doi || 10, T: doi || 10,
+                          seed: Math.random() * 99, nhanh: Math.random() < 0.75 });
+        }
+        function setCanTan(x, y, n, tan){
+            for (let i = 0; i < n; i++){
+                let a = Math.random() * 6.28, v = 1.4 + Math.random() * (tan || 4);
+                setTan.push({ x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 1,
+                              t: 12 + Math.random() * 10, T: 22 });
+            }
+        }
+        // (da bo setCanVetDat va setCanNo: nguoi choi thay cu 'no set' khong khop voi
+        //  nhat chem va trong ky. Gio chi con TIA chay doc than vu khi.)
+        // ---- ve mot duong set gay khuc, ba lop ----
+        function setVeTia(T2){
+            let u = T2.t / T2.T;
+            let dx = T2.x2 - T2.x1, dy = T2.y2 - T2.y1, L = Math.hypot(dx, dy) || 1;
+            let nx = -dy / L, ny = dx / L;
+            const N = 7;
+            const duong = (bien, lech) => {
+                ctx.beginPath();
+                for (let i = 0; i <= N; i++){
+                    let q = i / N;
+                    let l = (i === 0 || i === N) ? 0
+                          : Math.sin(T2.seed + i * 2.3 + frames * 0.35) * bien * (1 - Math.abs(q * 2 - 1));
+                    ctx.lineTo(T2.x1 + dx * q + nx * (l + lech), T2.y1 + dy * q + ny * (l + lech));
+                }
+                ctx.stroke();
+            };
+            ctx.save();
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            // lop ngoai — quang xanh rong
+            ctx.globalAlpha = 0.28 * u; ctx.strokeStyle = "#4FC3F7"; ctx.lineWidth = T2.day * 3.4;
+            duong(16, 0);
+            // lop giua — lam sang
+            ctx.globalAlpha = 0.65 * u; ctx.strokeStyle = "#B3E5FC"; ctx.lineWidth = T2.day * 1.7;
+            duong(16, 0);
+            // loi trang
+            ctx.globalAlpha = Math.min(1, 1.15 * u); ctx.strokeStyle = "#FFFFFF"; ctx.lineWidth = T2.day * 0.7;
+            duong(16, 0);
+            // nhanh re
+            if (T2.nhanh){
+                ctx.globalAlpha = 0.55 * u; ctx.strokeStyle = "#E1F5FE"; ctx.lineWidth = T2.day * 0.6;
+                let q0 = 0.42 + (T2.seed % 1) * 0.25;
+                let bx = T2.x1 + dx * q0, by = T2.y1 + dy * q0;
+                let ex = bx + dx * 0.30 + nx * 40 * ((T2.seed % 2) ? 1 : -1);
+                let ey = by + dy * 0.30 + ny * 40 * ((T2.seed % 2) ? 1 : -1);
+                ctx.beginPath();
+                ctx.moveTo(bx, by);
+                ctx.lineTo((bx + ex) / 2 + nx * 12, (by + ey) / 2 + ny * 12);
+                ctx.lineTo(ex, ey);
+                ctx.stroke();
+            }
+            ctx.restore(); ctx.globalAlpha = 1;
+        }
+        function setCanTickFx(){
+            for (let i = setTia.length - 1; i >= 0; i--) if (--setTia[i].t <= 0) setTia.splice(i, 1);
+            for (let i = setTan.length - 1; i >= 0; i--){
+                let d = setTan[i]; d.t--; d.x += d.vx; d.y += d.vy; d.vy += 0.22; d.vx *= 0.94;
+                if (d.t <= 0) setTan.splice(i, 1);
+            }
+            for (let i = setVet.length - 1; i >= 0; i--) if (--setVet[i].t <= 0) setVet.splice(i, 1);
+        }
+        function setCanVeFx(){
+            // vet chay tren mat dat
+            for (let v of setVet){
+                let u = v.t / v.T;
+                ctx.save();
+                ctx.globalAlpha = 0.35 * u; ctx.strokeStyle = "#4FC3F7"; ctx.lineWidth = 6 * u + 1;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                for (let i = 0; i <= 8; i++){
+                    let q = i / 8, px = v.x + v.dir * v.dai * q;
+                    let py = 318 - Math.abs(Math.sin(v.seed + i * 1.7 + frames * 0.2)) * 7 * u;
+                    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+                ctx.globalAlpha = 0.8 * u; ctx.strokeStyle = "#FFFFFF"; ctx.lineWidth = 1.6;
+                ctx.stroke();
+                ctx.restore();
+            }
+            for (let T2 of setTia) setVeTia(T2);
+            // tan dien
+            ctx.save();
+            for (let d of setTan){
+                let u = d.t / d.T;
+                ctx.globalAlpha = 0.9 * u;
+                ctx.fillStyle = (d.t % 4 < 2) ? "#FFFFFF" : "#4FC3F7";
+                ctx.fillRect(d.x - 1.5, d.y - 1.5, 3 + 2 * u, 3 + 2 * u);
+            }
+            ctx.restore(); ctx.globalAlpha = 1;
+        }
+        function setCanTam(){ return setCanBat() ? 1.28 : 1; }
         function bossAimTarget(px, py) {
             let best = null, bestD = Infinity;
             let pool = (typeof bosses !== 'undefined' && bosses.length) ? bosses : enemies;
@@ -44118,7 +44793,22 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                     }
                     if (mapTheme === 'forest') {
                         setupSerpentArena();
-                        if (!forestQueueInit) { let mids = [GreatSerpentBoss, DilophosBoss, StormEagleBoss, PoisonMothBoss, IndominusBoss, GiantSpiderBoss, GreatApeBoss, EchoStalkerBoss, SporeCrownBoss]; for (let i = mids.length - 1; i > 0; i--) { let j = Math.floor(Math.random() * (i + 1)); let tmp = mids[i]; mids[i] = mids[j]; mids[j] = tmp; } forestBossQueue = mids; forestBossQueue.push(ForestTitanBoss); forestQueueInit = true; }
+                        if (!forestQueueInit) {
+                            // Truoc day day la mot cu XAO TRON TOAN BO 9 con: Great Ape (130 mau),
+                            // Spore Crown (110) hay Echo Stalker (106) hoan toan co the roi vao
+                            // tran DAU TIEN o bossLevel 1, ngay canh Dilophos (75 mau). Khong he
+                            // co thu tu do kho nao ca — dung nhu nguoi choi thay.
+                            // Gio chia BA BAC va chi xao tron TRONG tung bac, giu nguyen thu tu
+                            // giua cac bac. Van ngau nhien de moi lan choi mot khac, nhung khong
+                            // bao gio nem con nang nhat vao mat nguoi choi ngay tu dau.
+                            const tron = (a) => { for (let i = a.length - 1; i > 0; i--) { let j = Math.floor(Math.random() * (i + 1)); let t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+                            let bac1 = tron([DilophosBoss, StormEagleBoss, PoisonMothBoss]);           // 75 mau, nho, don gian
+                            let bac2 = tron([GreatSerpentBoss, GiantSpiderBoss, IndominusBoss]);       // 75 mau nhung chieu kho hon
+                            let bac3 = tron([EchoStalkerBoss, SporeCrownBoss, GreatApeBoss]);          // 106 / 110 / 130 mau
+                            forestBossQueue = bac1.concat(bac2, bac3);
+                            forestBossQueue.push(ForestTitanBoss);                                     // 250 mau — tran ket
+                            forestQueueInit = true;
+                        }
                         let FB = forestBossQueue.shift() || ForestTitanBoss;
                         if (FB === GreatApeBoss) setupApeArena();
                         else if (FB === GiantSpiderBoss) setupSpiderArena();
@@ -44784,6 +45474,7 @@ function checkPvPCollisions() {
                 function loop() {
                     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
             installFirstStrikeHooks();
+            lanNhipTrangThai();          // @@HE-NET2: chu bao man hinh cho khach theo
             if (gameState === 'menu') { startDojo(); return; }   // menu = SAN TAP chay that
             if (gameState === 'map_select') { drawMapSelect(); return; }
             if (gameState === 'br_select') { drawBrSelect(); return; }
@@ -44905,6 +45596,7 @@ function checkPvPCollisions() {
             if (typeof dtTick === 'function'){ dtTick(); }
             if (typeof sdtTick === 'function') sdtTick();
             if (typeof dragDanTick === 'function') dragDanTick();
+            if (typeof setCanTickFx === 'function'){ setCanTickFx(); setCanVeFx(); }   // @@HE-SETFX
             if (typeof dtVe === 'function') dtVe();
             if (typeof allTargets === 'function') allTargets().forEach(o => { if (o && o._dtCd > 0) o._dtCd--; });
             // VOID: dang tren khong ma bam XUONG thi tele xuong NGAY, khong phai bam luot.
@@ -45155,7 +45847,7 @@ function checkPvPCollisions() {
                 oceanCamY += (_t - oceanCamY) * 0.10;
             }
             if (typeof dino.dsTick === 'function') dino.dsTick();
-            dino.update();
+            if (!(typeof lanKhach === 'function' && lanKhach())) dino.update();   // @@HE-NET2: may khach khong mo phong
             if (dino.ammo < 0) dino.ammo = 0;   // san the luc: hien -1 tren HUD la vo nghia
             if (typeof sdtTickSau === 'function') sdtTickSau();
             dino.draw();
@@ -45250,9 +45942,17 @@ function checkPvPCollisions() {
             if (hitstopTimer <= 0 && grazeFlashTimer > 0) { grazeFlashTimer--; drawGrazeFlash(); }
             
             if (gameState === 'pvp') {
-                dino2.update(); dino2.draw();
-                checkPvPCollisions();
-                if (pvpDeathTimer < 0 && (dino.hp <= 0 || dino2.hp <= 0)) pvpDeathTimer = 0;
+                lanNhipKhach();                         // @@HE-NET2: khach gui phim cua minh len
+                if (!lanKhach()){
+                    if (lanRieng2.dashCd > 0) lanRieng2.dashCd--;   // @@HE-LAN: hoi luot rieng cua P2
+                    lanVienP2();                            // @@HE-LAN: phat keydown/keyup vien cho P2
+                    lanVoiP2(() => { dino2.update(); });   // @@HE-LAN: P2 chay voi bo phim rieng
+                }
+                dino2.draw();
+                if (!lanKhach()) checkPvPCollisions();
+                lanNhipChu();                           // @@HE-NET2: chu gui anh chup xuong
+                lanApAnhChup();                         // @@HE-NET2: khach dap anh chup len
+                if (!lanKhach() && pvpDeathTimer < 0 && (dino.hp <= 0 || dino2.hp <= 0)) pvpDeathTimer = 0;
                 if (pvpDeathTimer >= 0) {
                     pvpDeathTimer++;
                     if (pvpDeathTimer % 4 === 1) {
