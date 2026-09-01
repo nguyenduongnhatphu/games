@@ -82,7 +82,8 @@
 #lan_hop{width:min(680px,92%);background:#12161c;border:2px solid #00E5FF;border-radius:10px;
   padding:18px 20px;box-shadow:0 0 26px rgba(0,229,255,.35);}
 #lan_de{color:#00E5FF;font-size:20px;font-weight:bold;letter-spacing:1px;margin-bottom:6px;}
-#lan_tt{font-size:14px;margin-bottom:10px;color:#FFC107;}
+#lan_tt{font-size:13px;margin-bottom:4px;color:#FFC107;line-height:1.45;}
+#lan_may{font-size:10.5px;color:#5f7080;margin-bottom:10px;font-family:inherit;letter-spacing:.2px;}
 .lan_hd{color:#9aa6b2;font-size:12px;line-height:1.55;margin-bottom:12px;}
 .lan_hang{display:flex;gap:8px;align-items:center;margin-bottom:9px;flex-wrap:wrap;}
 #lanui button{background:#FF9800;color:#111;border:0;border-radius:5px;padding:8px 14px;
@@ -41970,11 +41971,29 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                 ? { iceServers: [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }] }
                 : { iceServers: [] };
         }
+        /* LOI DA SUA — 'disconnected' KHONG PHAI la hong.
+           Truoc day dong nay bat ca 'disconnected' roi goi lanNgat. Nhung
+           'disconnected' la trang thai THOANG QUA hoan toan binh thuong trong
+           luc ICE con do duong, nhat la qua Wi-Fi. lanNgat thi dong va gan
+           lanKet = null. Ket qua: may chu tao ma xong, ICE chop mot cai sang
+           'disconnected', ket noi bi xoa mat, den luc dan ma tra loi vao thi
+           lanKet.setRemoteDescription goi tren null -> loi nem ra trong onclick,
+           khong ai bat, khong hien gi ca. Nguoi choi chi thay bam nut xong
+           khong co chuyen gi xay ra. Gio chi ngat khi that su 'failed'/'closed',
+           va MOI buoc deu co bat loi de hien ra man hinh. */
+        let lanDangNgat = false;
         function lanTaoKet(){
             let pc = new RTCPeerConnection(lanCauHinh());
             pc.oniceconnectionstatechange = () => {
-                if (['failed', 'disconnected', 'closed'].includes(pc.iceConnectionState)) lanNgat('Mất kết nối');
+                let t = pc.iceConnectionState;
+                if (t === 'failed') lanNgat(lanQuaMang
+                    ? 'ICE thất bại — mạng hai bên có thể chặn, cần TURN'
+                    : 'ICE thất bại — thử bật MẠNG: QUA INTERNET rồi tạo lại mã');
+                else if (t === 'closed') lanNgat('Kết nối đã đóng');
+                lanUiVe();
             };
+            pc.onconnectionstatechange = () => lanUiVe();
+            pc.onicecandidate = () => lanUiVe();
             return pc;
         }
         function lanChoIce(pc){
@@ -41983,13 +42002,13 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                 let xong = false;
                 const tra = () => { if (!xong){ xong = true; ok(); } };
                 pc.onicegatheringstatechange = () => { if (pc.iceGatheringState === 'complete') tra(); };
-                setTimeout(tra, 2500);        // du ung vien LAN roi, khong cho lau
+                setTimeout(tra, 4000);        // Wi-Fi cham hon LAN day, cho rong tay mot chut
             });
         }
         function lanGanKenh(ch){
             lanKenh = ch;
             ch.onopen = () => {
-                lanTrangThai = 'noi'; lanMang = true;
+                lanTrangThai = 'noi'; lanMang = true; lanBuoc = 3; lanBan = '';
                 if (lanVai === 'chu') lanGui({ v: 'd', d: lanDanBat.slice() });   // bao ngay luat phong
                 lanUiVe();
             };
@@ -41997,36 +42016,65 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             ch.onmessage = e => { try { lanNhanGoi(JSON.parse(e.data)); } catch(err){} };
         }
 
+        let lanBuoc = 0;      // 0 chua bat dau | 1 chu da co ma | 2 khach da co ma tra loi | 3 xong
+        let lanBan = '';      // dong chu "dang lam gi do", de nguoi choi khong tuong may treo
         async function lanMoPhong(){          // may CHU: sinh ma moi
-            lanVai = 'chu'; lanTrangThai = 'doi'; lanLoi = ''; lanUiVe();
-            lanKet = lanTaoKet();
-            lanGanKenh(lanKet.createDataChannel('dino', { ordered: false, maxRetransmits: 0 }));
-            await lanKet.setLocalDescription(await lanKet.createOffer());
-            await lanChoIce(lanKet);
-            lanUiMa(lanNen(lanKet.localDescription));
+            try {
+                lanVai = 'chu'; lanTrangThai = 'doi'; lanLoi = ''; lanBuoc = 0;
+                lanBan = 'Đang gom địa chỉ mạng...'; lanUiMa(''); lanUiVe();
+                lanKet = lanTaoKet();
+                lanGanKenh(lanKet.createDataChannel('dino', { ordered: false, maxRetransmits: 0 }));
+                await lanKet.setLocalDescription(await lanKet.createOffer());
+                await lanChoIce(lanKet);
+                let ma = lanNen(lanKet.localDescription);
+                if (!ma){ throw new Error('không nén được mã'); }
+                lanBuoc = 1; lanBan = ''; lanUiMa(ma);
+            } catch(e){ lanLoi = 'Tạo phòng hỏng: ' + (e && e.message || e); lanBan = ''; lanUiVe(); }
         }
         async function lanNhanTraLoi(ma){     // may CHU: dan ma tra loi vao
-            let d = lanBung(ma);
-            if (!d || !d.type){ lanLoi = 'Mã trả lời không đọc được'; lanUiVe(); return; }
-            await lanKet.setRemoteDescription(d);
+            try {
+                if (lanVai !== 'chu' || !lanKet){ lanLoi = 'Chưa tạo phòng — bấm TẠO PHÒNG trước'; lanUiVe(); return; }
+                if (lanKet.signalingState !== 'have-local-offer'){
+                    lanLoi = 'Đã nhận mã trả lời rồi (' + lanKet.signalingState + ')'; lanUiVe(); return;
+                }
+                let d = lanBung(ma);
+                if (!d || d.type !== 'answer'){
+                    lanLoi = d ? 'Đây là mã MỜI, không phải mã TRẢ LỜI' : 'Mã trả lời không đọc được';
+                    lanUiVe(); return;
+                }
+                lanBan = 'Đang nối...'; lanUiVe();
+                await lanKet.setRemoteDescription(d);
+                lanBuoc = 2; lanBan = ''; lanUiVe();
+            } catch(e){ lanLoi = 'Nhận mã hỏng: ' + (e && e.message || e); lanBan = ''; lanUiVe(); }
         }
         async function lanVaoPhong(ma){       // may KHACH: dan ma moi, sinh ma tra loi
-            let d = lanBung(ma);
-            if (!d || !d.type){ lanLoi = 'Mã mời không đọc được'; lanUiVe(); return; }
-            lanVai = 'khach'; lanTrangThai = 'doi'; lanLoi = ''; lanUiVe();
-            lanKet = lanTaoKet();
-            lanKet.ondatachannel = e => lanGanKenh(e.channel);
-            await lanKet.setRemoteDescription(d);
-            await lanKet.setLocalDescription(await lanKet.createAnswer());
-            await lanChoIce(lanKet);
-            lanUiMa(lanNen(lanKet.localDescription));
+            try {
+                let d = lanBung(ma);
+                if (!d || d.type !== 'offer'){
+                    lanLoi = d ? 'Đây là mã TRẢ LỜI, không phải mã MỜI' : 'Mã mời không đọc được';
+                    lanUiVe(); return;
+                }
+                lanVai = 'khach'; lanTrangThai = 'doi'; lanLoi = ''; lanBuoc = 0;
+                lanBan = 'Đang gom địa chỉ mạng...'; lanUiMa(''); lanUiVe();
+                lanKet = lanTaoKet();
+                lanKet.ondatachannel = e => lanGanKenh(e.channel);
+                await lanKet.setRemoteDescription(d);
+                await lanKet.setLocalDescription(await lanKet.createAnswer());
+                await lanChoIce(lanKet);
+                let tra = lanNen(lanKet.localDescription);
+                if (!tra){ throw new Error('không nén được mã trả lời'); }
+                lanBuoc = 2; lanBan = ''; lanUiMa(tra);
+            } catch(e){ lanLoi = 'Vào phòng hỏng: ' + (e && e.message || e); lanBan = ''; lanUiVe(); }
         }
         function lanNgat(vi){
+            if (lanDangNgat) return;          // pc.close() lai ban ve oniceconnectionstatechange -> tu goi lai chinh minh
+            lanDangNgat = true;
             lanLoi = vi || '';
-            lanMang = false; lanVai = ''; lanTrangThai = lanLoi ? 'loi' : 'tat';
+            lanMang = false; lanVai = ''; lanTrangThai = lanLoi ? 'loi' : 'tat'; lanBuoc = 0; lanBan = '';
             try { lanKenh && lanKenh.close(); } catch(e){}
             try { lanKet && lanKet.close(); } catch(e){}
             lanKenh = null; lanKet = null; lanBoPhim2 = {}; lanPhim2Cu = {};
+            lanDangNgat = false;
             lanUiVe();
         }
         function lanGui(o){
@@ -42140,6 +42188,33 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         }
 
         /* ---------- MAN GHEP PHONG (lop DOM de bo cuc, vi canvas khong go chu duoc) ---------- */
+        /* Truoc day man nay im nhu thoc: bam nut xong khong biet no dang lam gi,
+           hong o dau, hay dang cho ai. Ba dong duoi day tra loi dung ba cau hoi do:
+           BUOC — den luot ai lam gi; TINH TRANG — ket noi dang o dau; MAY — so lieu
+           that cua WebRTC de con biet duong ma lan. */
+        function lanBuocChu(){
+            if (lanTrangThai === 'noi') return 'XONG — đã nối, đóng bảng này rồi bấm VÀO TRẬN';
+            if (lanVai === 'chu'){
+                if (lanBuoc >= 2) return 'BƯỚC 3/3 — đã nhận mã trả lời, đang chờ nối xong...';
+                if (lanBuoc === 1) return 'BƯỚC 2/3 — gửi mã trên cho máy kia, rồi dán MÃ TRẢ LỜI của họ vào ô dưới và bấm NHẬN MÃ TRẢ LỜI';
+                return 'BƯỚC 1/3 — đang tạo mã mời...';
+            }
+            if (lanVai === 'khach'){
+                if (lanBuoc >= 2) return 'BƯỚC 3/3 — gửi mã trên về cho chủ phòng, rồi chờ họ bấm NHẬN MÃ TRẢ LỜI';
+                return 'BƯỚC 2/3 — đang tạo mã trả lời...';
+            }
+            return 'BƯỚC 1/3 — máy chủ phòng bấm TẠO PHÒNG. Máy kia dán mã nhận được vào ô dưới rồi bấm VÀO PHÒNG.';
+        }
+        function lanMayChu(){
+            if (!lanKet) return 'chưa mở kết nối';
+            let sd = lanKet.localDescription ? lanNen(lanKet.localDescription) : '';
+            let n = sd ? ((sd.split('|')[6] || '').split(';').filter(Boolean).length) : 0;
+            let loai = sd ? (sd.split('|')[6] || '').split(';').filter(Boolean)
+                            .map(c => ({h:'nội bộ', s:'công cộng', r:'trung chuyển'}[c[0]] || c[0]) ).join('+') : '';
+            return 'ICE ' + lanKet.iceConnectionState + ' · gom ' + lanKet.iceGatheringState +
+                   ' · ' + n + ' địa chỉ' + (loai ? ' (' + loai + ')' : '') +
+                   ' · kênh ' + (lanKenh ? lanKenh.readyState : 'chưa có');
+        }
         function lanUiVe(){
             let el = document.getElementById('lanui');
             if (!el) return;
@@ -42148,10 +42223,16 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             let tt = document.getElementById('lan_tt');
             if (tt){
                 tt.textContent = lanLoi ? ('LỖI: ' + lanLoi)
+                    : lanBan ? lanBan
                     : lanTrangThai === 'noi' ? ('ĐÃ NỐI — bạn là ' + (lanVai === 'chu' ? 'NGƯỜI CHƠI 1 (chủ phòng)' : 'NGƯỜI CHƠI 2 (khách)'))
-                    : lanTrangThai === 'doi' ? 'Đang chờ máy bên kia...' : 'Chưa nối';
+                    : lanBuocChu();
                 tt.style.color = lanLoi ? '#E53935' : (lanTrangThai === 'noi' ? '#4CAF50' : '#FFC107');
             }
+            let ky = document.getElementById('lan_may');
+            if (ky){ ky.textContent = lanMayChu(); }
+            let ra = document.getElementById('lan_ra');
+            if (ra) ra.placeholder = lanBan || (lanVai ? 'Mã của máy này sẽ hiện ở đây' :
+                     'Bấm TẠO PHÒNG (nếu bạn mở phòng) hoặc dán mã rồi bấm VÀO PHÒNG');
             let o = document.getElementById('lan_khu2');
             if (o) o.style.display = (lanVai === 'chu' && lanTrangThai !== 'noi') ? 'block' : 'none';
             let c = document.getElementById('lan_che');
@@ -42198,6 +42279,7 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                                           : ('LOẠI ĐẠN ĐƯỢC XÀI — bấm để tắt, còn ' + danSoMo() + '/' + AMMO_NAMES.length);
         }
         let lanUiHien = false;
+        let lanDongHo = null;
         function lanUiMoDong(hien){ lanUiHien = hien; lanUiVe(); }
 
         function lanUiDung(){
@@ -42208,6 +42290,7 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
               '<div id="lan_hop">' +
               '  <div id="lan_de">GHÉP PHÒNG</div>' +
               '  <div id="lan_tt">Chưa nối</div>' +
+              '  <div id="lan_may">chưa mở kết nối</div>' +
               '  <div class="lan_hd">' +
               '    <b>Máy chủ phòng</b> bấm TẠO PHÒNG → gửi mã sang máy kia.<br>' +
               '    <b>Máy khách</b> dán mã đó vào ô dưới → bấm VÀO PHÒNG → gửi mã mới hiện ra ngược lại.<br>' +
@@ -42229,6 +42312,10 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             B('lan_nhan').onclick = () => lanNhanTraLoi(B('lan_vao').value);
             B('lan_sao').onclick = () => { let t = B('lan_ra'); t.select(); try { document.execCommand('copy'); } catch(e){} };
             lanBangDanDung();
+            // WebRTC doi trang thai ngam (dang do duong, dang bat tay DTLS...) ma khong
+            // ban su kien nao huu ich, nen cu nua giay ve lai mot lan de nguoi choi
+            // nhin thay no CO nhuc nhich chu khong phai treo.
+            if (!lanDongHo) lanDongHo = setInterval(() => { if (lanUiHien) lanUiVe(); }, 500);
             B('lan_dong').onclick = () => lanUiMoDong(false);
             B('lan_ngat').onclick = () => lanNgat('');
             lanUiVe();
