@@ -68861,11 +68861,10 @@ class PulsarCloneBoss {
             ctx.restore();
             // --- THANH CUON ---
             if (L.maxScroll > 0) {
-                let bx = gx + cols * cw + 6, bh = L.viewH;
-                ctx.fillStyle = "rgba(255,255,255,0.10)"; ctx.fillRect(bx, L.top, 8, bh);
-                let th = Math.max(28, bh * (L.viewH / L.contentH));
-                let ty = L.top + (bh - th) * (runeScroll / L.maxScroll);
-                ctx.fillStyle = "#00E5FF"; ctx.fillRect(bx, ty, 8, th);
+                let T = runeThanhCuon(L), bx = T.bx, bh = T.bh, th = T.th, ty = T.ty;
+                let _hv = (_runeKeo !== null) || (mouseX >= bx - 6 && mouseX <= bx + 14 && mouseY >= T.top && mouseY <= T.top + bh);
+                ctx.fillStyle = _hv ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.10)"; ctx.fillRect(bx, L.top, 8, bh);
+                ctx.fillStyle = (_runeKeo !== null) ? "#80F0FF" : "#00E5FF"; ctx.fillRect(bx - (_hv ? 1 : 0), ty, 8 + (_hv ? 2 : 0), th);
                 // mui ten bao con noi dung o tren / duoi
                 ctx.fillStyle = "#00E5FF"; ctx.textAlign = "center"; ctx.font = "bold 12px Consolas, monospace";
                 if (runeScroll > 2) ctx.fillText("▲", bx + 4, L.top - 2);
@@ -73135,6 +73134,14 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
         // ============================================================================
 
         function runeViewBot(){ return 26; }
+        // Hinh hoc THANH CUON cua bang Rune — dung chung cho ve va cho KEO bang chuot
+        function runeThanhCuon(L){
+            let bx = L.gx + L.cols * L.cw + 6, bh = L.viewH;
+            let th = Math.max(28, bh * (L.viewH / L.contentH));
+            let ty = L.top + (bh - th) * (L.maxScroll > 0 ? runeScroll / L.maxScroll : 0);
+            return { bx, bh, th, ty, top: L.top };
+        }
+        let _runeKeo = null, _nuotClick = false;   // dang keo thanh cuon: { lech } = diem nam tren thanh truot
         function runePickerLayout(){
             let g = runeGridGeom(), cols = g.cols, cw = g.cw, ch = g.ch, gx = g.gx;
             let items = pickerItems(), cells = [], y = 0, heads = [];
@@ -77651,7 +77658,30 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
         }
         canvas.addEventListener('mousemove', e => { 
             let q = canvasPos(e.clientX, e.clientY); mouseX = q.x; mouseY = q.y;
+            if (_runeKeo !== null){
+                if (runePicker === null || runeLevelPick !== null){ _runeKeo = null; return; }
+                let L = runePickerLayout(), T = runeThanhCuon(L);
+                let u = (mouseY - _runeKeo - T.top) / Math.max(1, T.bh - T.th);
+                runeScroll = Math.max(0, Math.min(L.maxScroll, u * L.maxScroll));
+            }
         });
+        // BAM VA KEO thanh cuon cua bang Rune (bam vao ranh thi nhay toi cho do roi keo tiep)
+        canvas.addEventListener('mousedown', e => {
+            if (runePicker === null || runeLevelPick !== null || runeXem) return;
+            let q = canvasPos(e.clientX, e.clientY);
+            let L = runePickerLayout(); if (L.maxScroll <= 0) return;
+            let T = runeThanhCuon(L);
+            if (q.x < T.bx - 8 || q.x > T.bx + 16 || q.y < T.top - 4 || q.y > T.top + T.bh + 4) return;
+            if (q.y >= T.ty && q.y <= T.ty + T.th) _runeKeo = q.y - T.ty;
+            else {
+                _runeKeo = T.th / 2;
+                let u = (q.y - _runeKeo - T.top) / Math.max(1, T.bh - T.th);
+                runeScroll = Math.max(0, Math.min(L.maxScroll, u * L.maxScroll));
+            }
+            _nuotClick = true;                  // cu bam nay KHONG duoc tinh la bam ra ngoai de dong bang
+            e.preventDefault();
+        });
+        window.addEventListener('mouseup', () => { _runeKeo = null; });
         let _tScrollY = null;
         // Cham vao canvas: cap nhat toa do TRUOC khi su kien click chay, de menu bam dung o.
         canvas.addEventListener('touchstart', e => {
@@ -77695,6 +77725,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
         }, { passive: false });
         canvas.addEventListener('click', e => {
             SFX.init(); SFX.resume();
+            if (_nuotClick){ _nuotClick = false; return; }   // vua bam / keo thanh cuon Rune
             // MAN HINH THANG cua Defense phai bat TRUOC moi thu khac, neu khong nhanh
             // gameOver/gameVictory hoac dojoMode se nuot cu bam.
             if (typeof defMode !== 'undefined' && defMode && defManHinh === 1){
