@@ -68881,7 +68881,14 @@ class PulsarCloneBoss {
 
         function runeLevelCards(){
             let fam = PET_FAMILIES[runeLevelPick];
-            let cardW=300, cardH=156, gap=44, totalW=cardW*2+gap, x0=CX-totalW/2, y0=112;
+            // Chieu cao the TU TINH theo so dong mo ta dai nhat — truoc day co dinh 156px nen mo ta
+            // dai tran ra ngoai khung va de len dong huong dan ben duoi.
+            let cardW = Math.min(400, Math.floor((canvas.width - 80) / 2)), gap = 36, totalW = cardW*2 + gap, x0 = CX - totalW/2, y0 = 104;
+            ctx.save(); ctx.font = "14px Consolas, monospace";
+            let dong = 0;
+            for (let id of [fam.c1, fam.c2]){ let r = RUNES.find(x=>x.id===id); if (r) dong = Math.max(dong, wrapLines(RDESC(r), cardW - 40).length); }
+            ctx.restore();
+            let cardH = Math.min(canvas.height - y0 - 60, 96 + dong * 20 + 34);
             return { fam, cardW, cardH, y0, cards:[ {id:fam.c1, lvl:LT('CẤP 1','LEVEL 1'), lv2:false, slots:1, x:x0}, {id:fam.c2, lvl:LT('CẤP 2','LEVEL 2'), lv2:true, slots:2, x:x0+cardW+gap} ] };
         }
 
@@ -68917,7 +68924,7 @@ class PulsarCloneBoss {
         }
         function drawRuneLevelChooser(){
             let L = runeLevelCards(), fam=L.fam;
-            ctx.fillStyle = "rgba(0,0,0,0.78)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "rgba(4,8,12,0.93)"; ctx.fillRect(0,0,canvas.width,canvas.height);
             ctx.textAlign = "center"; ctx.fillStyle = "#00E5FF"; ctx.font = "bold 22px Consolas, monospace";
             ctx.fillText(fam.icon + "  " + RNAME(fam) + LT(" — CHỌN CẤP"," — CHOOSE LEVEL"), CX, 74);
             for (let c of L.cards){
@@ -68928,14 +68935,17 @@ class PulsarCloneBoss {
                 ctx.fillRect(c.x, L.y0, L.cardW, L.cardH);
                 ctx.strokeStyle = equipped ? "#66BB6A" : (hov ? "#00E5FF" : "#546E7A"); ctx.lineWidth = 3; ctx.strokeRect(c.x, L.y0, L.cardW, L.cardH);
                 ctx.textAlign = "left";
-                ctx.font = "40px Consolas, monospace"; ctx.fillStyle = "#FFF"; ctx.fillText(fam.icon, c.x+18, L.y0+54);
-                ctx.font = "bold 22px Consolas, monospace"; ctx.fillStyle = c.lv2 ? "#FFD54F" : "#B3E5FC"; ctx.fillText(c.lvl, c.x+80, L.y0+34);
-                ctx.font = "12px Consolas, monospace"; ctx.fillStyle = "#90A4AE"; ctx.fillText(LT("Tốn "+c.slots+" ô rune","Costs "+c.slots+" slot"+(c.slots>1?"s":"")), c.x+80, L.y0+54);
-                ctx.font = "13px Consolas, monospace"; ctx.fillStyle = "#E8EAF6"; wrapText(RDESC(r), c.x+18, L.y0+84, L.cardW-36, 18);
+                ctx.font = "40px Consolas, monospace"; ctx.fillStyle = "#FFF"; ctx.fillText(fam.icon, c.x+20, L.y0+56);
+                ctx.font = "bold 22px Consolas, monospace"; ctx.fillStyle = c.lv2 ? "#FFD54F" : "#B3E5FC"; ctx.fillText(c.lvl, c.x+82, L.y0+36);
+                ctx.font = "12px Consolas, monospace"; ctx.fillStyle = "#90A4AE"; ctx.fillText(LT("Tốn "+c.slots+" ô rune","Costs "+c.slots+" slot"+(c.slots>1?"s":"")), c.x+82, L.y0+56);
+                ctx.strokeStyle = "rgba(144,164,174,0.35)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(c.x+18, L.y0+76); ctx.lineTo(c.x+L.cardW-18, L.y0+76); ctx.stroke();
+                ctx.font = "14px Consolas, monospace"; ctx.fillStyle = "#E8EAF6";
+                { let _d = wrapLines(RDESC(r), L.cardW-40), _max = Math.floor((L.cardH - 96 - 30) / 20);
+                  for (let i = 0; i < Math.min(_d.length, _max); i++) ctx.fillText(_d[i], c.x+20, L.y0+100+i*20); }
                 if (equipped){ ctx.textAlign="center"; ctx.fillStyle="#69F0AE"; ctx.font="bold 13px Consolas, monospace"; ctx.fillText(LT("✓ ĐANG DÙNG","✓ EQUIPPED"), c.x+L.cardW/2, L.y0+L.cardH-14); ctx.textAlign="left"; }
             }
             ctx.textAlign = "center"; ctx.fillStyle = "#B0BEC5"; ctx.font = "12px Consolas, monospace";
-            ctx.fillText(LT("Bấm 1 cấp để trang bị  —  bấm ra ngoài để quay lại","Click a level to equip  —  click outside to go back"), CX, L.y0+L.cardH+34);
+            ctx.fillText(LT("Bấm 1 cấp để trang bị  —  bấm ra ngoài để quay lại","Click a level to equip  —  click outside to go back"), CX, L.y0+L.cardH+28);
             ctx.textAlign = "left";
         }
 
