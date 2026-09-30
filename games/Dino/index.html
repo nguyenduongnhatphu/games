@@ -40425,6 +40425,12 @@ class PulsarCloneBoss {
                 this.timer++;
                 // BAM THEO CHU: nhat chem di theo nguoi choi ke ca khi nhay/chay, khong bi tre nhip
                 if (this.follow) { this.x = this.follow.x + this.follow.w/2; this.y = this.follow.y + this.follow.h/2; }
+                // Vet chem cua nhat TRUOC: nguoi choi da sang nhat moi (swordPose moi) nen khong ai dem tiep dong ho
+                // cua tu the cu -> vet cu DUNG HINH giua chung toi het life (loi "ket Effect" o J -> Luot -> J).
+                // Tu dem tiep (mot lan moi khung) de no quet xong va mo di dung nhip.
+                if (this.pose && this.follow && this.follow.swordPose !== this.pose && this.pose.t > 0 && this.pose._tf !== frames){
+                    this.pose._tf = frames; this.pose.t--;
+                }
             }
             draw() {
                 if (this.type === 'parry') {
@@ -46861,6 +46867,9 @@ class PulsarCloneBoss {
                 if (this.grounded && dangLuotHoacChop()) { this.shippuuga(); return; }
                 // TREN KHONG: thay hoan toan nhat chem thuong (dung nhu X4 — Kuuenzan de len midair slash)
                 if (!this.grounded) { if (keys['KeyS']) this.hyouretsuzan(); else this.kuuenzan(); return; }
+                // CUI + J: CHEM NGANG sat dat — ra nhanh hon, voi xa hon mot chut, sat thuong nhu nhat thuong.
+                // KHONG phai combo: xong la khoa hoi don dai hon nen khong spam lien tuc duoc.
+                if (keys['KeyS'] || keys['ArrowDown']) { this.clawCui(); return; }
 
                 this.ammo--;
                 let sScale = this.getFormScale();
@@ -46883,6 +46892,16 @@ class PulsarCloneBoss {
                 if (step >= 2) { this.clawCombo = 0; this.clawComboWindow = 0; this.attackCooldown = 40; }   // xong combo -> khoa
                 else           { this.clawCombo = step + 1; this.clawComboWindow = 46; this.attackCooldown = 20; }
 
+                if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; }
+            },
+            clawCui() {
+                this.ammo--;
+                let sScale = this.getFormScale(), dir = this.isFacingLeft ? -1 : 1;
+                this._slashFx('z_horz', dir === -1, 118 * sScale);
+                this._beginSlash(3, 9, dir, 116 * sScale, 4, 8, 0);          // nhat ngang thuong: 12 khung, tam 100
+                if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(560, 0.06, 'square', 0.12, 1000);
+                this.clawCombo = 0; this.clawComboWindow = 0; this.clawRiseWindow = 0;
+                this.attackCooldown = 32;                                    // khong noi combo, khong spam
                 if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; }
             },
             // ===== KUUENZAN — chem xoay vong tren khong =====
@@ -73313,6 +73332,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '#BĂNG ĐẠN',
                 '-6 điểm thể lực. Mỗi đòn chém tiêu hao 1 và tự hồi phục.',
                 '#NỘI TẠI — BỘ VÕ KHÍ ẨN',
+                '>CHÉM NGANG [cúi + J] — Chém ngang sát đất, ra nhanh và với xa hơn nhát thường một chút, 3 sát thương. Không nối combo nên không spam liên tục được.',
                 '>KUUENZAN [trên không + J] — Chém xoay vòng 360°. 3 sát thương.',
                 '>HYOURETSUZAN [trên không + S + J] — Cắm kiếm lao thẳng từ trên trời xuống, chạm đất nổ sóng chấn động. 3 sát thương.',
                 '>RYUENJIN [dưới đất, nhảy ngay sau khi chém J] — Vung kiếm hất tung thượng thiên chém bay lên trời. 3 sát thương.',
@@ -73753,6 +73773,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '#MAGAZINE',
                 '-6 stamina points. Each slash costs 1 and they regenerate on their own.',
                 '#PASSIVE — HIDDEN ARSENAL',
+                '>LOW SWEEP [crouch + J] — A horizontal cut along the ground, a little faster and longer than a normal slash, 3 damage. It does not chain into the combo, so it cannot be spammed.',
                 '>KUUENZAN [airborne + J] — A 360° spinning slash. 3 damage.',
                 '>HYOURETSUZAN [airborne + S + J] — Plunge sword-first from the sky, detonating a shockwave on landing. 3 damage.',
                 '>RYUENJIN [grounded, jump right after a J slash] — A rising slash that carries you skyward. 3 damage.',
