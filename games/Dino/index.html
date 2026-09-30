@@ -45708,9 +45708,21 @@ class PulsarCloneBoss {
             let e = s < d0 * K ? s / K : (s < d0 * K + d1 ? d0 + (s - d0 * K) : d0 + d1 + (s - d0 * K - d1) / K2);
             return [A, fr, d0, d1, d2, tot, Math.min(tot, e)];
         }
+        /* DAM THAT (Stinger): kiem CHI THANG ra truoc ngay tu dau, rut lui mot nhip roi DAM toi bang ca canh tay,
+           giu mot chut roi moi thu ve vai. Khong con doan "lay da" quay tu vai qua dau nhu mot cu vung. */
+        function dswDam(pose){
+            let pr = Math.max(0, Math.min(1, 1 - pose.t / pose.t0)), F = Math.PI / 2;
+            let dx = pr < 0.18 ? -12 * dswEase(pr / 0.18)
+                   : pr < 0.38 ? -12 + 46 * (1 - Math.pow(1 - (pr - 0.18) / 0.20, 3))
+                   : pr < 0.70 ? 34 : 34 * (1 - dswEase((pr - 0.70) / 0.30));
+            let ang = pr < 0.70 ? F : F + (DSW_REST - F) * dswEase((pr - 0.70) / 0.30);
+            let trail = (pr >= 0.18 && pr < 0.55) ? 1 : (pr < 0.70 && pr >= 0.55 ? 1 - (pr - 0.55) / 0.15 : 0);
+            return { ang, dx, trail, grip: pr < 0.70 ? 1 : 1 - (pr - 0.70) / 0.30 };
+        }
         // Goc hien tai cua luoi kiem. pose = { kind, t, t0, from } hoac null.
         function dswAngle(pose){
             if (!pose || !pose.t0) return DSW_REST;
+            if (pose.kind === 'z_thrust') return dswDam(pose).ang;
             if (typeof DSW_NGANG !== 'undefined' && DSW_NGANG[pose.kind]) return dswNgangPha(pose).ang;
             let [A, fr, d0, d1, d2, tot, e] = dswRun(pose);
             if (tot < 0.001) return DSW_REST;
@@ -45761,6 +45773,7 @@ class PulsarCloneBoss {
         // Vet chem dung ham nay de khong ve cu lay da / thu kiem thanh mot vet chem nguoc.
         function dswAngleCat(pose){
             if (!pose || !pose.t0) return DSW_REST;
+            if (pose.kind === 'z_thrust') return Math.PI / 2;
             let [A, fr, d0, d1, d2, tot, e] = dswRun(pose);
             if (e <= d0) return A[0];
             if (e >= d0 + d1) return A[1];
@@ -45769,6 +45782,7 @@ class PulsarCloneBoss {
         // Do "dang cam vung" 0..1 — dich chuoi kiem tu vai xuong tay trong luc danh.
         function dswGrip(pose){
             if (!pose || !pose.t0) return 0;
+            if (pose.kind === 'z_thrust') return dswDam(pose).grip;
             { let G = dswNgangPha(pose); if (G) return G.pr < DSW_NGANG_HET ? Math.min(1, G.pr / DSW_NGANG_LAY) : Math.max(0, 1 - (G.pr - DSW_NGANG_HET) / (1 - DSW_NGANG_HET)); }
             let [, , d0, d1, d2, tot, e] = dswRun(pose);
             if (tot < 0.001) return 0;
@@ -45779,6 +45793,7 @@ class PulsarCloneBoss {
         // Do DAM cua vet chem (kiem anh mo): 0 khi lay da, 1 trong luc chem, tat nhanh khi thu kiem.
         function dswTrail(pose){
             if (!pose || !pose.t0) return 0;
+            if (pose.kind === 'z_thrust') return dswDam(pose).trail;
             let [, , d0, d1, d2, tot, e] = dswRun(pose);
             if (tot < 0.001) return 0;
             /* @@HE-KIEMNGANG: pha LAY DA khong de vet. Truoc day vet hien tu 55% quang lay da, ma
@@ -45833,47 +45848,59 @@ class PulsarCloneBoss {
         function drawDinoSwordArt(bx, by, P, pose, tier){
             let ang = dswAngle(pose), w = dswGrip(pose);
             let px = bx + 29 + 4 * w, py = by + 17 + 3 * w;
+            if (pose && pose.t0 && pose.kind === 'z_thrust') px += dswDam(pose).dx;   // DAM: ca canh tay day kiem toi
             tier = tier || 0;
             ctx.save();
             ctx.translate(px, py); ctx.rotate(ang);
             { let G = dswNgangPha(pose); if (G && G.len < 0.999) ctx.scale(1, Math.max(0.12, G.len)); }   // @@HE-KIEMNGANG: luoi chi vao man hinh thi co lai
 
             if (tier === 3){
-                // ===== KATANA (Yamato) — uchigatana dai, luoi cong nhe, tsuba bau duc =====
-                let L = 62, W = 3.2;
-                // tsuka: can den quan day cheo mau xanh tham
-                ctx.fillStyle = "#12131C"; ctx.fillRect(-2.8, -1, 5.6, 17);
-                ctx.strokeStyle = "#2D3E63"; ctx.lineWidth = 1.1;
-                for (let k = 0; k < 5; k++){
-                    ctx.beginPath(); ctx.moveTo(-2.8, 0.5 + k * 3.2); ctx.lineTo(2.8, 2.6 + k * 3.2); ctx.stroke();
-                    ctx.beginPath(); ctx.moveTo(2.8, 0.5 + k * 3.2); ctx.lineTo(-2.8, 2.6 + k * 3.2); ctx.stroke();
+                // ===== KATANA THAT — mot canh, CONG (sori) ve phia song, ban luoi deu tu habaki toi mui,
+                // mui KISSAKI vat goc co duong yokote, tsuba tron nho, chuoi dai quan day kieu hishigami =====
+                const L = 72, W = 3.6, SORI = 5.2, B0 = -8;          // chieu dai luoi, be ngang, do cong, goc luoi
+                const cong = (u) => SORI * u * u;                     // do lech ve phia SONG (x+) theo chieu dai
+                // tsuka dai (hai tay cam) quan day cheo + samegawa
+                ctx.fillStyle = "#EDE7D9"; ctx.fillRect(-2.9, -1, 5.8, 21);
+                ctx.fillStyle = "#15161E";
+                for (let k = 0; k < 6; k++){
+                    ctx.beginPath(); ctx.moveTo(-2.9, k * 3.4); ctx.lineTo(2.9, 1.7 + k * 3.4); ctx.lineTo(2.9, 3.2 + k * 3.4); ctx.lineTo(-2.9, 1.5 + k * 3.4); ctx.closePath(); ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(2.9, k * 3.4); ctx.lineTo(-2.9, 1.7 + k * 3.4); ctx.lineTo(-2.9, 3.2 + k * 3.4); ctx.lineTo(2.9, 1.5 + k * 3.4); ctx.closePath(); ctx.fill();
                 }
-                ctx.fillStyle = "#C9A227"; ctx.fillRect(-3.2, 15, 6.4, 3);          // kashira
-                // tsuba bau duc + habaki
-                ctx.fillStyle = "#1B2440"; ctx.strokeStyle = "#C9A227"; ctx.lineWidth = 1.2;
-                ctx.beginPath(); ctx.ellipse(0, -2, 8.5, 3.4, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = "#C9A227"; ctx.fillRect(-2.2, -7, 4.4, 5);
-                // LUOI: song thang o lung, luoi cong nhe, mui kissaki vat cheo
-                let gk = ctx.createLinearGradient(-3, 0, 3, 0);
-                gk.addColorStop(0, "#F4F8FC"); gk.addColorStop(0.55, "#D6E2EC"); gk.addColorStop(1, "#8FA3B4");
+                ctx.fillStyle = "#B8952B"; ctx.fillRect(-3.3, 19.5, 6.6, 3);            // kashira
+                ctx.fillRect(-3.1, -1.8, 6.2, 1.6);                                       // fuchi
+                // tsuba tron nho + seppa + habaki
+                ctx.fillStyle = "#23262E"; ctx.strokeStyle = "#B8952B"; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.ellipse(0, -3.2, 7.2, 2.6, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = "#D4B24C"; ctx.fillRect(-W * 0.5 - 0.6, -8.4, W + 1.2, 4.6);   // habaki
+                // THAN LUOI: song (x+) va canh cat (x-) chay song song, cong dan ve phia song
+                let spine = [], edge = [], N = 14, uY = L - 9;     // doan than chinh truoc kissaki
+                for (let i = 0; i <= N; i++){
+                    let u = i / N, y = B0 - u * (uY + B0), c = cong(u * uY / L);
+                    spine.push([W * 0.5 + c, y]); edge.push([-W * 0.5 + c, y]);
+                }
+                let tipC = cong(1), yk = B0 - (uY + B0);            // duong yokote
+                let tip = [W * 0.5 + tipC - 0.4, -L];                // mui nam lech ve phia SONG
+                let gk = ctx.createLinearGradient(-W, 0, W, 0);
+                gk.addColorStop(0, "#FFFFFF"); gk.addColorStop(0.38, "#E3EBF2"); gk.addColorStop(0.62, "#B9C7D3"); gk.addColorStop(1, "#7E90A0");
                 ctx.beginPath();
-                ctx.moveTo(-W, -7);
-                ctx.quadraticCurveTo(-W - 1.5, -L * 0.62, -W * 0.55, -L + 5);
-                ctx.lineTo(0, -L);                                    // kissaki
-                ctx.quadraticCurveTo(W * 0.9, -L * 0.60, W, -7);
+                ctx.moveTo(edge[0][0], edge[0][1]);
+                for (let i = 1; i <= N; i++) ctx.lineTo(edge[i][0], edge[i][1]);
+                ctx.quadraticCurveTo(-W * 0.5 + tipC + 0.6, yk - 6, tip[0], tip[1]);   // fukura cong ra mui
+                ctx.lineTo(spine[N][0], spine[N][1]);
+                for (let i = N - 1; i >= 0; i--) ctx.lineTo(spine[i][0], spine[i][1]);
                 ctx.closePath();
                 ctx.fillStyle = gk; ctx.fill();
-                ctx.strokeStyle = "#6E8194"; ctx.lineWidth = 0.9; ctx.stroke();
-                // hamon: duong ram chay doc canh cat
-                ctx.strokeStyle = "#FFFFFF"; ctx.globalAlpha = 0.85; ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(-W * 0.45, -9);
-                for (let k = 0; k < 9; k++)
-                    ctx.quadraticCurveTo(-W * 0.9, -13 - k * 5.4, -W * 0.4, -16 - k * 5.4);
+                ctx.strokeStyle = "#5E7182"; ctx.lineWidth = 0.9; ctx.stroke();
+                // hamon (song ram) chay doc canh cat
+                ctx.strokeStyle = "#FFFFFF"; ctx.globalAlpha = 0.9; ctx.lineWidth = 1.1;
+                ctx.beginPath(); ctx.moveTo(edge[0][0] + 1.1, edge[0][1]);
+                for (let i = 1; i <= N; i++) ctx.lineTo(edge[i][0] + 1.1 + (i % 2 ? 0.55 : 0), edge[i][1]);
                 ctx.stroke();
-                // shinogi: song noi giua than luoi
-                ctx.globalAlpha = 0.55; ctx.strokeStyle = "#EAF2F8"; ctx.lineWidth = 0.9;
-                ctx.beginPath(); ctx.moveTo(W * 0.35, -9); ctx.lineTo(W * 0.15, -L + 8); ctx.stroke();
+                // shinogi (song noi) + yokote
+                ctx.globalAlpha = 0.6; ctx.strokeStyle = "#F2F7FB"; ctx.lineWidth = 0.8;
+                ctx.beginPath(); ctx.moveTo(spine[0][0] - 1.3, spine[0][1]);
+                for (let i = 1; i <= N; i++) ctx.lineTo(spine[i][0] - 1.3, spine[i][1]);
+                ctx.lineTo(-W * 0.5 + tipC + 0.8, yk); ctx.stroke();
                 ctx.globalAlpha = 1;
             } else if (tier === 2){
                 // ===== SWORDMASTER — truong kiem: luoi dai, thon, chan kiem hinh canh, chuoi boc vang =====
@@ -46164,6 +46191,16 @@ class PulsarCloneBoss {
             ctx.restore();
         }
         function katVeVong(p){
+            if (p.katPhong && p.katPhong.length){
+                ctx.save();
+                for (const S of p.katPhong){
+                    if (S.t <= 0) continue;
+                    ctx.globalAlpha = S.pha === 'vang' ? Math.max(0, 1 - S.t / 32) : 0.95;
+                    ctx.shadowBlur = 8; ctx.shadowColor = '#B3E5FC';
+                    katVeLuoi(S.x - Math.cos(S.a) * 20, S.y - Math.sin(S.a) * 20, S.a, 30, 0.9);
+                }
+                ctx.restore();
+            }
             if (!p.katVong) return;
             let V = p.katVong, cx = p.x + p.w/2, cy = p.y + p.h/2;
             ctx.save();
@@ -46184,6 +46221,7 @@ class PulsarCloneBoss {
                khong dat hoi don nao — nen no bi goi lai 50 lan/giay va `katJ` bi dat lai ve 1
                mai mai: do duoc katJ = 1 suot 50 khung. Dang tich roi thi thoi. */
             if (p.katJ > 0) return;
+            if (p.katKhoan || (p._katNuotJ || 0) > 0) return;   // Deep Stinger dang chay / vua ket som bang J
             /* DASH -> J giu nguyen don chem co san cua Kiem (Shippuuga). J THU HAI ngay sau
                do moi la cu chem LEN hat tung. Rapid Slash la J -> DASH, xu ly trong `katTick`.
                Ban truoc toi lam nguoc: Dash -> J thanh Rapid Slash, mat luon don goc. */
@@ -46241,7 +46279,7 @@ class PulsarCloneBoss {
                 // 1.25-1.75s — LUOT LEN, chem mot nhat, roi chem loan xa quanh nguoi
                 let tam = KAT_TAM0 + KAT_TAM_THEM;
                 p.dy = KAT_LOAN_VOT; p.grounded = false; p.canDoubleJump = true;
-                katFx(p, 'z_rise', tam);        // moc 2: LUOT LEN roi chem
+                katFx(p, 'z_horz', tam);        // moc 2: LUOT LEN roi chem NGANG
                 p._beginSlash(KAT_CHEM_THUONG, 12, dir, tam, 34, 24, 0);
                 // "chem mot phat ngang roi THU KIEM VE, sau do tu dung vo van nhat chem"
                 p.katLoan = { t: 0, n: 0, cho: KAT_LOAN_CHO };
@@ -46254,8 +46292,8 @@ class PulsarCloneBoss {
                 /* CHAM J = nhat chem thuong, va HAI nhat lien nhau la XUONG roi LEN. */
                 if ((p.katCS || 0) <= 0) p.katBuoc = 0;
                 let xuong = (p.katBuoc || 0) === 0;
-                katFx(p, xuong ? 'z_vert' : 'z_rise', KAT_TAM0);
-                p._beginSlash(KAT_CHEM_THUONG, 10, dir, KAT_TAM0, xuong ? 14 : 30, xuong ? 30 : 14, 0);
+                katFx(p, 'z_horz', KAT_TAM0);   // Hans: J charge LUON la vung NGANG
+                p._beginSlash(KAT_CHEM_THUONG, 10, dir, KAT_TAM0, 22, 22, 0);
                 p.katBuoc = xuong ? 1 : 0; p.katCS = 40;
                 p.clawRiseWindow = 38;          // van mo cua so NHAY -> RYUENJIN cua Kiem
                 p.attackCooldown = 14;
@@ -46317,7 +46355,7 @@ class PulsarCloneBoss {
             if (p.isOverheated || p.ammo <= 0) return;
             p.ammo = Math.max(0, p.ammo - 1);
             let dir = p.isFacingLeft ? -1 : 1;
-            if (sau){ p.katKhoan = { t: 0, dir: dir, hit: {} }; p.attackCooldown = 20;
+            if (sau){ p.katKhoan = { t: 0, dir: dir, hit: {}, jCu: !!keys['KeyJ'], kCu: !!keys['KeyK'] }; p.attackCooldown = 20;
                       floatingTexts.push(new FloatingText(p.x - 28, p.y - 34, "DEEP STINGER")); return; }
             /* Stinger la mot cu DAM: luot xa hon han (46 -> 118px), va kiem khi ban ra la
                mot MUI DAM det chu khong phai vet quet cong. */
@@ -46533,8 +46571,18 @@ class PulsarCloneBoss {
                 }
             }
             // Deep Stinger: mui khoan, lai duoc, xuyen qua dich
+            if ((p._katNuotJ || 0) > 0) p._katNuotJ--;
             if (p.katKhoan){
                 let K = p.katKhoan; K.t++;
+                /* Bam J hoac K giua chung = KET THUC SOM: ra ngay nhat Judgement Cut ket don, du sat thuong va hieu
+                   ung nhu luc het 3 giay. Nuot luon cu bam do de no khong ra them mot don J / K nua. */
+                { let jN = !!keys['KeyJ'], kN = !!keys['KeyK'];
+                  if (K.t > 6 && K.t <= KAT_C4_KHUNG && ((jN && !K.jCu) || (kN && !K.kCu))){
+                      K.t = KAT_C4_KHUNG + 1;
+                      if (kN) p._hoverNuot = true;                 // K dang giu: khong dem charge, nha ra khong ra don
+                      if (jN){ p.katJ = 0; p.katJSan = 0; p._katNuotJ = 14; }
+                  }
+                  K.jCu = jN; K.kCu = kN; }
                 let mv = ((keys['KeyD']||keys['ArrowRight'])?1:0) - ((keys['KeyA']||keys['ArrowLeft'])?1:0);
                 if (mv){ K.dir = mv; p.isFacingLeft = (mv < 0); }
                 p.x += K.dir * 6;
@@ -46593,19 +46641,78 @@ class PulsarCloneBoss {
                 }
             }
             for (const o of katMuc()) if (o && o._katCd > 0) o._katCd--;
+            katTickPhong(p);
         }
+        /* NHA CHANNEL: tung thanh kiem dang bay quanh nguoi PHONG thang toi ke dich (tu bam duoi, chia ra cac
+           muc tieu gan). Kiem cham DAN cua dich thi chem vo vien dan do nhung BI VANG RA, mat luon — muon co
+           lai thi phai Channel tich lai. */
+        const KAT_PHONG_TOC = 17, KAT_PHONG_SONG = 100;
         function katNhaChannel(p){
             if (!p.katVong) return;
-            let n = p.katVong.n; p.katVong = null;
-            let m = null, d0 = 1e9, cx = p.x + p.w/2;
-            for (const o of katMuc()){
-                if (!o || o.hp === undefined || o.hp <= 0) continue;
-                let d = Math.abs((o.x + (o.w||20)/2) - cx);
-                if (d < d0){ d0 = d; m = o; }
+            let V = p.katVong, n = V.n; p.katVong = null;
+            let cx = p.x + p.w/2, cy = p.y + p.h/2;
+            let ds = katMuc().filter(o => o && o.hp !== undefined && o.hp > 0 && !o.invulnAll)
+                             .sort((a, b) => Math.abs((a.x + (a.w||20)/2) - cx) - Math.abs((b.x + (b.w||20)/2) - cx));
+            if (!p.katPhong) p.katPhong = [];
+            for (let i = 0; i < n; i++){
+                let a = V.t * 0.11 + i * (Math.PI*2 / Math.max(1, n));
+                let o = ds.length ? ds[i % Math.min(ds.length, 3)] : null;        // chia toi da 3 muc tieu gan nhat
+                p.katPhong.push({ x: cx + Math.cos(a)*76, y: cy + Math.sin(a)*60, a: a + Math.PI/2, o, t: -i * 4,
+                                  vx: (p.isFacingLeft ? -1 : 1) * 6, vy: -2, pha: 'bay' });
             }
-            if (m) m.hp -= n * KAT_CH_BAN;
             floatingTexts.push(new FloatingText(p.x - 20, p.y - 34, n + " KIẾM PHÓNG"));
-            shakeTimer = Math.max(shakeTimer, 18);
+            shakeTimer = Math.max(shakeTimer, 12);
+            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(1500, 0.12, 'triangle', 0.14, 2600);
+        }
+        function katTickPhong(p){
+            if (!p.katPhong || !p.katPhong.length) return;
+            for (let i = p.katPhong.length - 1; i >= 0; i--){
+                let S = p.katPhong[i]; S.t++;
+                if (S.t <= 0) continue;                                       // cho luot phong (lech nhip tung thanh)
+                if (S.pha === 'vang'){                                        // bi dan danh vang: xoay tit, roi, mo dan
+                    S.vy += 0.5; S.x += S.vx; S.y += S.vy; S.a += 0.6;
+                    if (S.t > 32) p.katPhong.splice(i, 1);
+                    continue;
+                }
+                let o = S.o;
+                if (!o || o.hp === undefined || o.hp <= 0){
+                    let cx = p.x + p.w/2, best = null, bd = 1e9;
+                    for (const q of katMuc()){ if (!q || q.hp === undefined || q.hp <= 0 || q.invulnAll) continue;
+                        let d = Math.abs((q.x + (q.w||20)/2) - cx); if (d < bd){ bd = d; best = q; } }
+                    S.o = o = best;
+                }
+                if (o){
+                    let tx = o.x + (o.w||20)/2, ty = o.y + (o.h||20)/2, dx = tx - S.x, dy = ty - S.y, l = Math.hypot(dx, dy) || 1;
+                    S.vx += (dx / l * KAT_PHONG_TOC - S.vx) * 0.35; S.vy += (dy / l * KAT_PHONG_TOC - S.vy) * 0.35;
+                }
+                S.x += S.vx; S.y += S.vy; S.a = Math.atan2(S.vy, S.vx);
+                // cham DAN dich: chem vo vien dan, kiem bi vang ra
+                let vang = false;
+                if (typeof bossProjectiles !== 'undefined') for (let k = bossProjectiles.length - 1; k >= 0; k--){
+                    let b = bossProjectiles[k]; if (!b) continue;
+                    let bx = b.x + (b.w||16)/2, by = b.y + (b.h||16)/2;
+                    if (Math.abs(bx - S.x) < 20 + (b.w||16)/2 && Math.abs(by - S.y) < 20 + (b.h||16)/2){
+                        visualEffects.push(new Effect(bx, by, 'parry', false));
+                        bossProjectiles.splice(k, 1); vang = true; break;
+                    }
+                }
+                if (vang){
+                    S.pha = 'vang'; S.t = 0; S.vx = -S.vx * 0.45 + (Math.random() - 0.5) * 3; S.vy = -7;
+                    if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(1900, 0.05, 'square', 0.12, 700);
+                    continue;
+                }
+                if (o){
+                    let ox = Math.max(o.x, Math.min(S.x, o.x + (o.w||20))), oy = Math.max(o.y, Math.min(S.y, o.y + (o.h||20)));
+                    if (Math.hypot(ox - S.x, oy - S.y) < 18){
+                        o.hp -= KAT_CH_BAN;
+                        katVeCat(p, S.x, S.y, 34, S.a + Math.PI/2);
+                        visualEffects.push(new Effect(S.x, S.y, 'explosion', true, 14));
+                        if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(1100, 0.05, 'square', 0.12, 1800);
+                        p.katPhong.splice(i, 1); continue;
+                    }
+                }
+                if (S.t > KAT_PHONG_SONG) p.katPhong.splice(i, 1);
+            }
         }
         function katUltMo(){
             return (typeof styleRankNow === 'function') && styleRankNow() >= KAT_ULT_HANG;
@@ -73367,10 +73474,10 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '>chạm K — STINGER — lướt tới 118px rồi đâm. 4 sát thương, tầm 150px.',
                 '>0.5s (30f) — DRIVE — hai vầng trăng xanh bay đi, 4 sát thương mỗi vầng.',
                 '>1s (60f) — ROUND TRIP — ném kiếm cắm tại chỗ địch, xoay và cắt 1 sát thương mỗi 0.5s, tổng 10.',
-                '>1.5s (90f) — DEEP STINGER — xoáy như mũi khoan đâm xuyên, lái được, kéo dài 3 giây, đâm trúng 2 lần x 3 sát thương. Hết giờ nổ một nhát Judgement Cut quanh người 5 sát thương bán kính 150px — nên phải lái sao cho lúc đó đang ở cạnh địch.',
+                '>1.5s (90f) — DEEP STINGER — xoáy như mũi khoan đâm xuyên, lái được, kéo dài 3 giây, đâm trúng 2 lần x 3 sát thương. Hết giờ nổ một nhát Judgement Cut quanh người 5 sát thương bán kính 150px — nên phải lái sao cho lúc đó đang ở cạnh địch. Bấm J hoặc K giữa chừng để kết thúc sớm — ra ngay nhát Judgement Cut kết đòn đầy đủ.',
                 '>2s (120f) — JUDGEMENT CUT END — lướt tới rồi cắt nát một vùng bán kính 230px. 10 sát thương, miễn thương 70 khung suốt đòn.',
                 '#KATANA — DUY TRÌ SẠC',
-                '-Kiếm triệu ra tự xoay quanh người, tối đa 5 cây, mỗi cây chạm địch 1 sát thương. Thả phím thì cả bầy phóng vào mục tiêu gần nhất.',
+                '-Kiếm triệu ra tự xoay quanh người, tối đa 5 cây, mỗi cây chạm địch 1 sát thương. Thả phím thì từng cây bay tới kẻ địch gần nhất (chia tối đa 3 mục tiêu), mỗi cây 4 sát thương. Cây nào chạm đạn địch thì chém vỡ đạn nhưng bị văng ra — phải Channel lại mới có kiếm mới.',
                 '#KATANA — CHIÊU CUỐI',
                 '-BỊ KHOÁ cho tới khi đạt hạng Style S. Đây là cái giá của bộ đòn: mạnh ngay từ đầu trận, nhưng muốn dùng chiêu cuối thì phải đánh cho đẹp.'
             ],
@@ -73807,10 +73914,10 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '>tap K — STINGER — dash 118px then thrust. 4 damage, 150px.',
                 '>0.5s (30f) — DRIVE — two blue crescents, 4 damage each.',
                 '>1s (60f) — ROUND TRIP — throw the sword to spin in place on the target, 1 damage every 0.5s, 10 total.',
-                '>1.5s (90f) — DEEP STINGER — a steerable drilling thrust lasting 3 seconds that connects twice for 3 damage. When it ends it bursts into a Judgement Cut for 5 damage in a 150px radius, so steer to be next to the target by then.',
+                '>1.5s (90f) — DEEP STINGER — a steerable drilling thrust lasting 3 seconds that connects twice for 3 damage. When it ends it bursts into a Judgement Cut for 5 damage in a 150px radius, so steer to be next to the target by then. Press J or K mid-way to end it early with the full Judgement Cut finisher.',
                 '>2s (120f) — JUDGEMENT CUT END — dash in and shred a 230px radius. 10 damage with 70 frames of invulnerability throughout.',
                 '#KATANA — CHANNEL',
-                '-Summoned swords orbit you, up to 5, each dealing 1 damage on contact. Release and the whole flock launches at the nearest target.',
+                '-Summoned swords orbit you, up to 5, each dealing 1 damage on contact. Release and they fly at the nearest enemies (up to 3 targets) for 4 each. A sword that meets an enemy bullet cuts it down but is knocked away — Channel again to summon more.',
                 '#KATANA — ULTIMATE',
                 '-LOCKED until you reach Style rank S. That is the price of the set: strong from the opening bell, but the ultimate has to be earned by fighting well.'
             ],
