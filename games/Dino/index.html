@@ -64460,11 +64460,11 @@ class PulsarCloneBoss {
             hienhat:{ T: 10, hit: 3, hoi: 6, ton: 1, a0: 1.3, a1: -2.4, nguoc: 1, am: 120, treo: 1, sty: 'lh_ngat',
                    bat: (ng) => { ng.dy = Math.min(ng.dy || 0, -8.5); },
                    fn: (ng) => lhHienBat(ng, 'hat', 4) },
-            // luot J J J: chem NGANG lien tuc, doi chieu moi nhat
-            l1:  { T: 9, hit: 4, hoi: 6, ton: 1, ngang: LH_NGANG_TOI, am: 280, sty: 'luot',
-                   fn: (ng, D) => lhHopNguoi(ng, -60, 156, 40, 8, 4, D.hitSet) },
-            l2:  { T: 9, hit: 4, hoi: 6, ton: 1, ngang: LH_NGANG_LUI, nguoc: 1, am: 300, sty: 'luot',
-                   fn: (ng, D) => lhHopNguoi(ng, -60, 156, 40, 8, 4, D.hitSet) },
+            // luot J J J: chem NGANG lien tuc, doi chieu moi nhat — luoi hai VUON DAI (dai 1.6) nen nhat chem dai han nhat thuong
+            l1:  { T: 9, hit: 4, hoi: 6, ton: 1, ngang: LH_NGANG_TOI, dai: 1.6, am: 280, sty: 'luot',
+                   fn: (ng, D) => lhHopNguoi(ng, -90, 236, 44, 8, 4, D.hitSet) },
+            l2:  { T: 9, hit: 4, hoi: 6, ton: 1, ngang: LH_NGANG_LUI, dai: 1.6, nguoc: 1, am: 300, sty: 'luot',
+                   fn: (ng, D) => lhHopNguoi(ng, -90, 236, 44, 8, 4, D.hitSet) },
             // J roi LUOT: chem tu duoi len (nguoc) phong song chan dong
             songluot:{ T: 14, hit: 7, hoi: 14, ton: 1, a0: 1.4, a1: -2.4, nguoc: 1, am: 140, ket: true, sty: 'luot',
                    fn: (ng) => lhSongBat(ng, 260, 5) },
@@ -64498,6 +64498,7 @@ class PulsarCloneBoss {
         /* ---------- NHAP PHIM J (bat CANH phim, dem NHIP) ---------- */
         function lhTickJ(ng){
             let jNay = !!keys['KeyJ'];
+            if (jNay && !lh.jCu && lh.nem && lhNemThu()){ lh.jCu = jNay; return; }   // J khi luoi hai dang xoay = thu som
             if (jNay && !lh.jCu){
                 // canh phim: dang chem / thu hoi -> LIEN; ranh roi thi xet khoang cach tu luc het thu hoi
                 // bam trong luc dang chem / thu hoi: GIU hang toi khi ranh (nhat sau ra ngay khi het thu hoi)
@@ -64606,16 +64607,63 @@ class PulsarCloneBoss {
             lh.luotDu = 30; lh.luotBuoc = 0;
         }
 
-        /* ---------- NEM LUOI HAI: xoay tai cho cach 5cm trong 1 giay roi bay ve ---------- */
+        /* ---------- NEM LUOI HAI: bay ra 5cm roi xoay tai cho 1 giay roi bay ve ----------
+           Hans: "J - J J nem ra thi KEO quai ve cho luoi hai va khong che o do; truoc day no bo qua khu vuc o giua."
+           Gio luoi hai BAY tu tay ra (pha 'di'), moi con no quet qua tren duong bay deu bi MOC lai, keo ve dung
+           cho luoi hai va KHONG CHE (dung hinh) suot luc xoay. Bam J them lan nua khi dang xoay = THU LUOI HAI
+           SOM — con da bi moc van giu khong che toi het thoi gian cu, chi la khong an them nhat nao. */
+        const LH_NEM_TOC = 24, LH_NEM_KEO = 10;
         function lhNemBat(ng){
-            let d = lhDir(ng);
-            lh.nem = { x: ng.x + ng.w / 2 + d * 5 * LH_CM, y: ng.y + ng.h * 0.4, t: 0, T: 60, pha: 'xoay', goc: 0, hit: new Set(), choang: new Set(), d };
+            let d = lhDir(ng), x0 = ng.x + ng.w / 2 + d * 20;
+            lh.nem = { x: x0, y: ng.y + ng.h * 0.4, x1: ng.x + ng.w / 2 + d * 5 * LH_CM, t: 0, T: 60, pha: 'di', goc: 0,
+                       hit: new Set(), choang: new Set(), moc: new Set(), d };
             lhSfx(420, 0.3, 'triangle', 0.16, 900);
+        }
+        // moc them moi con dang cham luoi hai (moi con choang ngay lan dau bi moc)
+        function lhNemMoc(N){
+            for (let o of lhDs()){
+                if (o.x + (o.w || 20) < N.x - 62 || o.x > N.x + 62 || o.y + (o.h || 20) < N.y - 62 || o.y > N.y + 62) continue;
+                if (o.invulnAll || N.moc.has(o)) continue;
+                N.moc.add(o);
+                if (!N.choang.has(o)){ N.choang.add(o); if (typeof venKhoa === 'function') venKhoa(o, 30); }
+            }
+        }
+        // keo moi con da bi moc ve tam luoi hai va giu khong che
+        function lhNemKeo(N, giu){
+            for (let o of N.moc){
+                if (!o || o.hp === undefined || o.hp <= 0){ N.moc.delete(o); continue; }
+                let ox = o.x + (o.w || 20) / 2, dx = N.x - ox;
+                o.x += Math.max(-LH_NEM_KEO, Math.min(LH_NEM_KEO, dx * 0.35));
+                if (typeof worldL === 'function') o.x = Math.max(worldL(), Math.min(worldR() - (o.w || 20), o.x));
+                if (bosses.indexOf(o) < 0){      // quai nho: keo ca theo chieu doc
+                    let oy = o.y + (o.h || 20) / 2; o.y += Math.max(-LH_NEM_KEO, Math.min(LH_NEM_KEO, (N.y - oy) * 0.35));
+                }
+                if (typeof venKhoa === 'function') venKhoa(o, giu);
+            }
+        }
+        function lhNemThu(){                     // J lan nua khi dang xoay: thu luoi hai som, KHONG ngat khong che
+            let N = lh && lh.nem; if (!N || N.pha !== 'xoay') return false;
+            let con = Math.max(0, N.T - N.t);
+            for (let o of N.moc) if (o && o.hp > 0 && typeof venKhoa === 'function') venKhoa(o, con + 20);
+            N.pha = 've'; N.moc.clear();
+            lhSfx(700, 0.1, 'triangle', 0.12, 400);
+            return true;
         }
         function lhTickNem(ng){
             let N = lh.nem; if (!N) return;
             N.t++; N.goc += 0.55;
+            if (N.pha === 'di'){
+                N.t = 0;                                             // thoi gian xoay chi tinh tu luc toi noi
+                let dx = N.x1 - N.x, st = Math.sign(dx) * Math.min(Math.abs(dx), LH_NEM_TOC);
+                // quet tung doan nho de khong lot con nao o GIUA duong bay
+                for (let k = 0; k < 3; k++){ N.x += st / 3; lhNemMoc(N); }
+                lhNemKeo(N, 30);
+                if (Math.abs(N.x1 - N.x) < 1){ N.x = N.x1; N.pha = 'xoay'; N.t = 1; }
+                return;
+            }
             if (N.pha === 'xoay'){
+                lhNemMoc(N);
+                lhNemKeo(N, 20);
                 if (N.t % 15 === 1){
                     N.hit = new Set();
                     lhHop(N.x - 62, N.y - 62, N.x + 62, N.y + 62, 2, N.hit, o => {
@@ -64623,7 +64671,7 @@ class PulsarCloneBoss {
                     });
                     lhSfx(600 + (N.t % 30) * 8, 0.05, 'square', 0.08, 900);
                 }
-                if (N.t >= N.T) N.pha = 've';
+                if (N.t >= N.T){ N.pha = 've'; N.moc.clear(); }
             } else {
                 let tx = ng.x + ng.w / 2, ty = ng.y + ng.h * 0.4, dx = tx - N.x, dy = ty - N.y, l = Math.hypot(dx, dy);
                 if (l < 22){ lh.nem = null; lhChu(ng.x - 10, ng.y - 26, "BẮT!", "CATCH!"); return; }
@@ -65279,22 +65327,134 @@ class PulsarCloneBoss {
                 if (V.t >= V.T) Th.vung = null;
             }
         }
-        /* ---------- CHANNEL: nguoi chem ngang + than chet chem doc, di chuyen tu do ---------- */
+        /* ---------- CHANNEL: BAY QUA TRANG ----------
+           Hans: "Channel cua luoi hai doi thanh trieu goi 5 con qua trang di tan cong ke dich o gan. Moi con co dong tac
+           danh rieng, 2 dmg moi lan moi hai giay. Tan cong XEN KE thay vi cung luc, va target nhieu ke dich khac nhau
+           neu thay khong can cung danh vi thua thai."
+           - Moi con 120 khung (2 giay) danh mot lan; nhip ban dau lech nhau 24 khung -> 5 con thay nhau, khong bao gio
+             cung mot luc.
+           - Chon muc tieu: con it qua dang nham nhat, gan nhat; BO QUA con ma so don dang bay toi da du giet no.
+           - Nam kieu danh: mo tu tren xuong · luot ngang cao vuot · xoay oc · dam thang · vong ra sau lung chem canh. */
+        const LH_QUA_N = 5, LH_QUA_NHIP = 120, LH_QUA_LECH = 24, LH_QUA_DMG = 2, LH_QUA_TAM = 460;
+        const LH_QUA_KIEU = ['mo', 'vuot', 'xoay', 'dam', 'canh'];
         function lhChBat(ng){
             if (!lh) lh = lhMoi();
             lh.dang = null; lh.hoi = 0; lh.khien = null;
-            lh.ch = { t: 0, hitA: new Set(), hitB: new Set() };
-            lhChu(ng.x - 20, ng.y - 30, "TỬ THẦN SONG TRẢM!", "REAPER'S DUET!");
+            let cx = ng.x + ng.w / 2, qua = [];
+            for (let i = 0; i < LH_QUA_N; i++)
+                qua.push({ i, kieu: LH_QUA_KIEU[i], x: cx, y: ng.y + ng.h / 2, pha: 'bay', cd: 20 + i * LH_QUA_LECH, muc: null, t: 0, vo: 0, huong: 1, trung: false });
+            lh.ch = { t: 0, qua };
+            lhChu(ng.x - 20, ng.y - 30, "BẦY QUẠ TRẮNG!", "WHITE CROWS!");
+            lhSfx(900, 0.2, 'triangle', 0.14, 1400);
+        }
+        function lhQuaNha(ng, Q, C){                  // cho dau cua moi con: vong quanh tren dau nguoi choi
+            let a = Q.i * (Math.PI * 2 / LH_QUA_N) + C.t * 0.035;
+            return { x: ng.x + ng.w / 2 + Math.cos(a) * 58, y: ng.y - 34 + Math.sin(a) * 16 };
+        }
+        function lhQuaChon(ng, Q, C){
+            // Moi con qua GIU muc tieu rieng (Q.chon) — chia deu bay qua cho cac ke dich trong tam, con nao da
+            // du qua lo (so don dang bay toi >= mau con lai) thi khong ai xuc vao them.
+            let cx = ng.x + ng.w / 2, ds = [];
+            for (let o of lhDs()){
+                if (!o || o.invulnAll || o.hp === undefined || o.hp <= 0) continue;
+                let ox = o.x + (o.w || 20) / 2;
+                if (Math.abs(ox - cx) > LH_QUA_TAM) continue;
+                let bay = C.qua.filter(q => q !== Q && q.muc === o && (q.pha === 'lao' || q.pha === 'danh') && !q.trung).length;
+                if (bay * LH_QUA_DMG >= o.hp) continue;              // cac con khac dang bay toi da du giet no
+                let giu = C.qua.filter(q => q !== Q && q.chon === o).length;
+                ds.push({ o, giu, cu: o === Q.chon ? 0 : 1, kc: Math.hypot(ox - Q.x, (o.y + (o.h || 20) / 2) - Q.y) });
+            }
+            if (!ds.length) return null;
+            let it = Math.min(...ds.map(e => e.giu));
+            let ung = ds.filter(e => e.giu === it);
+            // muc tieu cu van o nhom it qua nhat thi giu nguyen, khong thi lay con gan nhat trong nhom do
+            ung.sort((a, b) => a.cu - b.cu || a.kc - b.kc);
+            Q.chon = ung[0].o;
+            return Q.chon;
         }
         function lhTickCh(ng){
             let C = lh.ch; if (!C) return;
-            if (!keys['KeyK']){ lh.ch = null; lh.chTat = 4; return; }   // nha K: tat channel, va K-nha khong duoc ra them don
+            if (!keys['KeyK']){ lh.ch = null; lh.chTat = 4; return; }   // nha K: qua bay di, va K-nha khong duoc ra them don
             C.t++;
-            let p = C.t % 30;
-            if (p === 6){ C.hitA = new Set(); lhHopNguoi(ng, -10, 124, 36, 6, 2, C.hitA); lhSfx(220, 0.08, 'sawtooth', 0.14, 90); }
-            if (p === 21){ C.hitB = new Set(); lhHopNguoi(ng, 10, 164, 110, 8, 2, C.hitB); lhSfx(120, 0.1, 'sawtooth', 0.16, 60); }
+            for (let Q of C.qua){
+                Q.vo += 0.45; if (Q.cd > 0) Q.cd--;
+                let nha = lhQuaNha(ng, Q, C);
+                if (Q.pha === 'bay'){
+                    Q.x += (nha.x - Q.x) * 0.18; Q.y += (nha.y - Q.y) * 0.18;
+                    if (Q.cd <= 0){
+                        let o = lhQuaChon(ng, Q, C);
+                        if (o){ Q.muc = o; Q.pha = 'lao'; Q.t = 0; Q.trung = false; Q.cd = LH_QUA_NHIP; Q.x0 = Q.x; Q.y0 = Q.y; }
+                        else Q.cd = 20;
+                    }
+                    continue;
+                }
+                let o = Q.muc;
+                if (!o || o.hp === undefined || o.hp <= 0){ Q.pha = 've'; Q.muc = null; }
+                Q.t++;
+                if (Q.pha === 'lao'){
+                    let tx = o.x + (o.w || 20) / 2, ty = o.y + (o.h || 20) * 0.4;
+                    Q.huong = tx >= Q.x ? 1 : -1;
+                    // moi kieu mot duong bay toi muc tieu
+                    let gx = tx, gy = ty, u = Math.min(1, Q.t / 22);
+                    if (Q.kieu === 'mo')    { gy = ty - 70 * (1 - u); }                        // bay len cao roi MO xuong
+                    if (Q.kieu === 'vuot')  { gx = tx - Q.huong * 60 * (1 - u); gy = ty - 20; }  // luot ngang sat dau
+                    if (Q.kieu === 'xoay')  { gx = tx + Math.cos(Q.t * 0.5) * 50 * (1 - u); gy = ty + Math.sin(Q.t * 0.5) * 40 * (1 - u); }
+                    if (Q.kieu === 'canh')  { gx = tx + Q.huong * 50 * (1 - u); gy = ty - 30 * (1 - u); }   // vong ra SAU LUNG
+                    let dx = gx - Q.x, dy = gy - Q.y, l = Math.hypot(dx, dy) || 1, v = Q.kieu === 'dam' ? 15 : 11;
+                    if (l > v){ Q.x += dx / l * v; Q.y += dy / l * v; } else { Q.x = gx; Q.y = gy; }
+                    if ((Math.hypot(tx - Q.x, ty - Q.y) < 26 && Q.t > 6) || Q.t > 70){
+                        if (!Q.trung && Q.t <= 70){
+                            Q.trung = true;
+                            lhDanh(o, LH_QUA_DMG);
+                            lhImpact(tx, ty, Q.kieu === 'mo' ? 1.2 : Q.kieu === 'vuot' ? 0.1 : -0.8, false);
+                            lhSfx(1200 + Q.i * 90, 0.06, 'square', 0.1, 600);
+                        }
+                        Q.pha = 'danh'; Q.t = 0;
+                    }
+                } else if (Q.pha === 'danh'){
+                    // DONG TAC DANH RIENG: mo 3 cai · cao ngang · xoay tron · huc lui · chem canh
+                    let tx = o ? o.x + (o.w || 20) / 2 : Q.x, ty = o ? o.y + (o.h || 20) * 0.4 : Q.y;
+                    if (Q.kieu === 'mo')   { Q.y = ty - 8 + Math.abs(Math.sin(Q.t * 0.9)) * -14; Q.x = tx; }
+                    if (Q.kieu === 'vuot') { Q.x = tx + Q.huong * (Q.t * 5 - 30); Q.y = ty - 18; }
+                    if (Q.kieu === 'xoay') { Q.x = tx + Math.cos(Q.t * 0.7) * 24; Q.y = ty + Math.sin(Q.t * 0.7) * 24; }
+                    if (Q.kieu === 'dam')  { Q.x = tx - Q.huong * (Q.t < 5 ? Q.t * 4 : (10 - Q.t) * 4); Q.y = ty; }
+                    if (Q.kieu === 'canh') { Q.x = tx - Q.huong * 10; Q.y = ty - 10 - Q.t * 2; }
+                    if (Q.t >= 10){ Q.pha = 've'; Q.t = 0; }
+                } else {                                                   // 've': bay ve dan
+                    let dx = nha.x - Q.x, dy = nha.y - Q.y, l = Math.hypot(dx, dy) || 1;
+                    Q.huong = dx >= 0 ? 1 : -1;
+                    if (l < 12){ Q.pha = 'bay'; Q.muc = null; }
+                    else { Q.x += dx / l * Math.min(l, 10); Q.y += dy / l * Math.min(l, 10); }
+                }
+            }
             ng.attackCooldown = Math.max(ng.attackCooldown || 0, 3);
             lhStyDat('kgiu');
+        }
+        function lhVeQua(Q){
+            let x = Q.x, y = Q.y, h = Q.huong || 1, vo = Math.sin(Q.vo) * (Q.pha === 'danh' ? 1.3 : 1);
+            ctx.save();
+            ctx.translate(x, y); ctx.scale(h * 1.35, 1.35);
+            if (Q.pha === 'lao' || Q.pha === 'danh'){ ctx.rotate(Q.kieu === 'mo' ? 0.6 : Q.kieu === 'xoay' ? Q.t * 0.4 : 0.15); }
+            ctx.globalAlpha = 0.95;
+            // vet sang tim khi dang lao
+            if (Q.pha === 'lao'){ ctx.fillStyle = "rgba(206,147,216,0.35)"; ctx.beginPath(); ctx.ellipse(-16, 0, 16, 4, 0, 0, 6.28); ctx.fill(); }
+            // canh xa (sau than)
+            ctx.fillStyle = "#CFD8DC";
+            ctx.beginPath(); ctx.moveTo(-2, -2); ctx.lineTo(-10, -4 - 12 * vo); ctx.lineTo(4, -3); ctx.closePath(); ctx.fill();
+            // than + dau
+            ctx.fillStyle = "#FAFAFA";
+            ctx.beginPath(); ctx.ellipse(0, 0, 9, 5, -0.15, 0, 6.28); ctx.fill();
+            ctx.beginPath(); ctx.arc(8, -3, 4.2, 0, 6.28); ctx.fill();
+            // duoi
+            ctx.beginPath(); ctx.moveTo(-8, -1); ctx.lineTo(-16, -4); ctx.lineTo(-15, 3); ctx.closePath(); ctx.fill();
+            // mo + mat
+            ctx.fillStyle = "#90A4AE"; ctx.beginPath(); ctx.moveTo(11, -4); ctx.lineTo(17, -2); ctx.lineTo(11, -1); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = "#8E24AA"; ctx.fillRect(8.5, -4.5, 1.8, 1.8);
+            // canh gan (truoc than)
+            ctx.fillStyle = "#FFFFFF";
+            ctx.beginPath(); ctx.moveTo(-3, 0); ctx.lineTo(-12, -2 - 14 * vo); ctx.lineTo(-1, -12 * vo * 0.4); ctx.lineTo(5, -1); ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = "rgba(120,144,156,0.8)"; ctx.lineWidth = 0.8; ctx.stroke();
+            ctx.restore();
         }
 
         /* ---------- CHIEU CUOI: NGUNG DONG + GHI TEN ---------- */
@@ -65506,7 +65666,7 @@ class PulsarCloneBoss {
                 return a;
             }
             if (lh.khien) return lh.ang = (lh.ang || 0) + 0.62;
-            if (lh.ch){ let p = (lh.ch.t % 30) / 30; return lh.ang = (p < 0.35) ? (-1.25 + 2.5 * (p / 0.35)) : 1.25 - (p - 0.35) * 1.4; }
+            if (lh.ch) return lh.ang = -2.2 + Math.sin(lh.ch.t * 0.05) * 0.08;   // channel qua: gio cao luoi hai chi huy bay qua
             // thu hoi: duoi dan ve tu the nghi (dung goc gan nhat, khong quay nguoc ca vong)
             let a = lh.ang;
             while (a - LH_NGHI > Math.PI) a -= Math.PI * 2;
@@ -65607,12 +65767,8 @@ class PulsarCloneBoss {
                 let p0 = D.m.ngang[0], p1 = D.m.ngang[1];
                 ngang = { phi: p0 + (p1 - p0) * e, phi0: p0, nguoc: D.m.nguoc, thap: D.m.thap, xuoi: p1 < p0 };
                 lh.ang = 0.15;                                   // xong nhat ngang thi thu hoi ve tu the nghi tu day
-            } else if (lh.ch){
-                let p = (lh.ch.t % 30) / 30, q = Math.min(1, p / 0.35);
-                ngang = { phi: 2.7 - 3.6 * (q * q * (3 - 2 * q)), phi0: 2.7, nguoc: 0, thap: 0, xuoi: true };
-                lh.ang = 0.15;
             }
-            if (ngang){ lh.vetGoc.length = 0; lhVeNgang(ng, d, ngang, L); }
+            if (ngang){ lh.vetGoc.length = 0; lhVeNgang(ng, d, ngang, L * ((D && D.m.dai) || 1)); }
             else {
                 let a = lhGocNguoi(), nguoc = !!(D && D.m.nguoc);
                 let keo = 0;
@@ -65815,12 +65971,8 @@ class PulsarCloneBoss {
                 ctx.beginPath(); ctx.ellipse(ng.x + ng.w / 2, ng.y + ng.h / 2, ng.w * (cap2 ? 1.3 : 1), ng.h * (cap2 ? 1.2 : 0.9), 0, 0, 6.28); ctx.fill();
                 ctx.restore();
             }
-            // channel: than chet dung sau lung chem doc lien tuc
-            if (lh.ch){
-                let d = lhDir(ng), p = lh.ch.t % 30;
-                let armR = p < 13 ? 0.5 - 1.1 * (p / 13) : Math.min(2.3, -0.6 + 2.9 * ((p - 13) / 8));
-                lhVeThanChet(ng.x + ng.w / 2 - d * 34, ng.y + ng.h + 2, d, armR, 'dai', null, 0.62, 1, 0);
-            }
+            // channel: bay qua trang
+            if (lh.ch && lh.ch.qua) for (const Q of lh.ch.qua) lhVeQua(Q);
             for (const V of lh.vet) lhVeVet(V);
             for (const H of lh.hien) lhVeHien(H);
             for (const X of lh.xac){
@@ -73482,10 +73634,10 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '-Bấm LIỀN (trong lúc đang chém hoặc ngay sau) hay DỪNG MỘT NHỊP (lưỡi hái loé tím) rồi bấm — hai cách ra hai nhánh khác nhau. Để quá lâu thì combo bắt đầu lại.',
                 '#CHÉM [J]',
                 '>J J J — chém xuống 3 · chém ngang ngược 3 · bổ 6.',
-                '>J . J J — chém 3 · xoay chém 4 · NÉM lưỡi hái xoay tại chỗ 1 giây (2 mỗi 0.25s, choáng 0.5s).',
+                '>J . J J — chém 3 · xoay chém 4 · NÉM lưỡi hái bay ra 5cm, MÓC mọi kẻ địch trên đường bay kéo về chỗ nó rồi xoay 1 giây giữ khống chế (2 mỗi 0.25s). Bấm J lần nữa để thu lưỡi hái sớm — kẻ địch vẫn bị khống chế tới hết thời gian.',
                 '>J J . J — chém 3 · 3 · thần chết hiện ra sau lưng xoay ngang 5, xoay vòng chém xuống 6, xoay ngược chém lên 7 và phóng một đợt SÓNG lớn 4 bay gần hết màn hình.',
                 '>J rồi NHẢY — nhảy lên chém hất 3. Trên không J J J: hất 3 · ngang 3 · chém xuống 6. Trên không J J . J: thần chết chém hất kẻ địch 4 và bạn bật lên nối combo. Bấm K trong combo trên không: ĐẬP XUỐNG 5.',
-                '>Lướt J J J — chém ngang 4 mỗi nhát. J rồi Lướt — SÓNG CHẤN ĐỘNG tím 5.',
+                '>Lướt J J J — chém ngang DÀI (lưỡi hái vươn dài ra) 4 mỗi nhát. J rồi Lướt — SÓNG CHẤN ĐỘNG tím 5.',
                 '>Cúi J — một vòng ngang dài 3 (đang hiện thân: thần chết chém thêm 5, tốn 2).',
                 '>J rồi chạm K — chém ngang 3 rồi ĐẠP 2 vào kẻ địch, bật ngược ra xa phía sau (bất tử lúc bật).',
                 '#TÍCH LỰC [K]',
@@ -73494,8 +73646,8 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '>1s — LƯỚT LÙI xa, thần chết lao tới chém 3 nhát 4.',
                 '>1.5s — KHIÊN XOAY 2 giây chặn đạn, rồi hất lên ra sóng 7cm.',
                 '>2.25s — CỬA ĐỊA NGỤC: 5–7 linh hồn truy đuổi, mỗi con làm chậm. Kẻ địch thường bị hạ bằng linh hồn thành XÁC BỊ ĐIỀU KHIỂN, lao sang phe bạn rồi đồng quy vu tận (6).',
-                '#CHANNEL — TỬ THẦN SONG TRẢM (giữ K từ 3s)',
-                '-Bạn chém ngang, thần chết chém dọc liên tục, vẫn đi lại được.',
+                '#CHANNEL — BẦY QUẠ TRẮNG (giữ K từ 3s)',
+                '-5 con quạ trắng bay quanh bạn, lần lượt lao vào kẻ địch gần đó, mỗi con 2 sát thương mỗi 2 giây, mỗi con một kiểu đánh riêng. Chúng thay phiên nhau và tự chia nhau ra nhiều mục tiêu. Vẫn đi lại được.',
                 '#POWER DEATH [I / O]',
                 '-Cầm Lưỡi hái thì Power khoá sang DEATH. Đánh trúng tích NỘ.',
                 '-Cấp 1 (nộ đầy): HIỆN THÂN 10 giây — chém nhanh hơn, thu hồi nhanh hơn, thần chết chém theo mỗi nhát.',
@@ -73919,10 +74071,10 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '-Press STRAIGHT ON (while cutting or right after) or PAUSE A BEAT (the blade flashes purple) and then press — the two lead to different branches. Wait too long and the combo restarts.',
                 '#CUTS [J]',
                 '>J J J — down-cut 3 · reverse sweep 3 · cleave 6.',
-                '>J . J J — cut 3 · spin cut 4 · THROW the scythe to spin in place for 1s (2 every 0.25s, 0.5s stun).',
+                '>J . J J — cut 3 · spin cut 4 · THROW the scythe 5cm out: it HOOKS every enemy along its flight, drags them to where it spins and holds them for 1s (2 every 0.25s). Press J again to recall it early — they stay controlled until the time runs out.',
                 '>J J . J — cut 3 · 3 · the Reaper appears behind you: spinning sweep 5, full-circle down-cut 6, reverse rising cut 7 that unleashes a huge WAVE for 4 across almost the whole screen.',
                 '>J then JUMP — leap into a rising cut 3. Air J J J: rise 3 · sweep 3 · down-cut 6. Air J J . J: the Reaper launches the enemy for 4 and you hop up to keep going. K during an air combo: SLAM down for 5.',
-                '>Dash J J J — sweeps of 4. J then Dash — a purple SHOCKWAVE for 5.',
+                '>Dash J J J — LONG sweeps (the blade reaches much further) of 4. J then Dash — a purple SHOCKWAVE for 5.',
                 '>Crouch J — a long low circle for 3 (manifested: the Reaper adds 5, costs 2).',
                 '>J then tap K — a horizontal slash for 3, then a KICK for 2 that springs you far backward (invulnerable while flipping).',
                 '#CHARGE [K]',
@@ -73931,8 +74083,8 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '>1s — long BACKSTEP while the Reaper charges in for three cuts of 4.',
                 '>1.5s — SPINNING GUARD for 2s that eats bullets, then a 7cm wave.',
                 '>2.25s — HELL RIFT: 5–7 homing souls, each one slows. Normal enemies killed by souls become PUPPETS that switch sides and ram an enemy for 6.',
-                '#CHANNEL — REAPER\'S DUET (hold K from 3s)',
-                '-You sweep, the Reaper cleaves, over and over, and you can still move.',
+                '#CHANNEL — WHITE CROWS (hold K from 3s)',
+                '-5 white crows circle you and take turns diving at nearby enemies: 2 damage every 2 seconds each, every crow with its own attack. They alternate and spread across several targets. You can still move.',
                 '#POWER DEATH [I / O]',
                 '-Holding the Scythe locks the Power to DEATH. Hits build RAGE.',
                 '-Tier 1 (full rage): MANIFEST for 10s — faster cuts and recovery, the Reaper follows up every swing.',
