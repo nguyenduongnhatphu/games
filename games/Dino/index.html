@@ -2571,7 +2571,7 @@
                         this.starHold = (this.starHold || 0) + 1;                      // sao chi giu duoc ~1.7s neu khong ban
                         if (this.starHold > 100) { visualEffects.push(new Effect(st.x, st.y, 'explosion', true, 34)); dino.pulsarStar = null; this.starHold = 0; blocked = false;
                             floatingTexts.push(new FloatingText(st.x, st.y - 24, "SAO VO!")); }
-                        for (let i = projectiles.length - 1; i >= 0; i--) {
+                        if (dino.pulsarStar === st) for (let i = projectiles.length - 1; i >= 0; i--) {   // sao vua vo o tren thi khong con do dan
                             let p = projectiles[i];
                             if (Math.abs((p.x + p.w/2) - st.x) < 50 && Math.abs((p.y + p.h/2) - st.y) < 50) {
                                 this.starHits++; projectiles.splice(i, 1);
@@ -2707,6 +2707,7 @@
                 this.baseX = canvas.width - 160; this.baseY = 320 - this.h;
                 this.x = canvas.width; this.y = this.baseY; this.dy = 0; this.grounded = true;
                 this.state = 'entering'; this.actionTimer = 60; this.name = "HELIOS REX";
+                this.retState = 'idle';   // parry chung ep state -> khong co nhanh 'returning' thi boss dung im vinh vien
                 this.shieldTimer = 0; this.laserTimer = 0; this.chargeTimer = 0; this.chargeType = 3; this.maxChargeTimer = 90;
                 this.jumpCooldown = 0; this.lastMeleeHit = -1; this.subTimer = 0; this.lastSkill = ''; this.burnTimer = 0;
                 this.spamShieldTimer = 0; this.spamShieldCd = 0;
@@ -22108,6 +22109,7 @@
             }
         }
 
+        const ARC_TRANG = { entering: 1, intro: 1, shuffle: 1, deal: 1, window: 1, resolve: 1, recover: 1 };
         class ArcanaRexBoss {
             constructor(level) {
                 this.hp = 125; this.maxHp = 125;
@@ -22327,6 +22329,9 @@
                     }
                 }
                 // ---- state machine ----
+                // Parry chung cua game ep state = 'returning' — Arcana khong co trang thai do nen
+                // truoc day DUNG IM VINH VIEN. Tra ve don dang ra (giu nguyen chu ky bai).
+                if (!ARC_TRANG[this.state]) this.state = this._st || 'shuffle'; else this._st = this.state;
                 if (this.state === 'entering') { this.y += 6; if (this.y >= this.hoverY) { this.y = this.hoverY; this.state = 'intro'; this.subTimer = 0; } }
                 else if (this.state === 'intro') { this.subTimer++; if (this.subTimer === 1) { floatingTexts.push(new FloatingText(this.x + this.w/2 - 40, this.y + this.h + 12, "ARCANA REX!")); if (SFX.bossEntry) SFX.bossEntry(); } if (this.subTimer > 46) { this.state = 'shuffle'; this.subTimer = 0; } }
                 else if (this.state === 'shuffle') { this.x += (this.hoverX - this.x) * 0.15; if (this.y < this.groundY) this.y = Math.min(this.groundY, this.y + 7); this.subTimer++; if (this.subTimer > 130) { this.state = 'deal'; this.subTimer = 0; } }
@@ -51556,6 +51561,12 @@ class PulsarCloneBoss {
         }
         function trdFx(o){ if (trd) trd.fx.push(o); }
 
+        /* Co "nhanh dang mo" cua Giao (_giaoLuotNoi / _giaoQuatNoi / _giaoNhanh) chi duoc xoa khi
+           chinh Giao dung toi, con cua so _giaoCS thi MOI don _giaoDanh — ke ca don cua Trident —
+           deu lam moi lai. Nen mot cu luot J / S+J / J tren khong tu truoc do cu treo co mai, va
+           vai nut J/K sau (giua chuoi Trident) bi nhuong nham cho Giao -> ra don Giao thay vi don
+           Trident. Trident da nhan input thi bo cac co do di. */
+        function trdBoNhanhGiao(ng){ ng._giaoLuotNoi = 0; ng._giaoQuatNoi = 0; ng._giaoNhanh = 0; }
         /* ---------- COMBO J (duoi dat) ---------- */
         // tra ve true neu Trident da xu ly cu J; false = de GIAO lam (cui / tren khong / luot / cua so rieng cua Giao)
         function trdJ(ng){
@@ -51567,6 +51578,7 @@ class PulsarCloneBoss {
             if ((ng._giaoCS || 0) > 0 && ((ng._giaoLuotNoi || 0) > 0 || (ng._giaoQuatNoi || 0) > 0)) return false;
             if (ng.giaoMua || ng.giaoLao || ng.giaoUlt || ng.giaoBoXuong || trd.viec) return true;
             if (ng.isOverheated || ng.ammo <= 0) return true;
+            trdBoNhanhGiao(ng);
             if (trd.chuoiT <= 0 || /K/.test(trd.chuoi) || trd.chuoi.length >= 4) trd.chuoi = '';
             trd.chuoi += 'J'; trd.chuoiT = GIAO_CS;
             let n = trd.chuoi.length;
@@ -51595,6 +51607,7 @@ class PulsarCloneBoss {
             // --- K boi vao chuoi J ---
             if (hg < 15 && trd.chuoiT > 0 && trd.chuoi && ng.grounded && !ng.isOverheated && ng.ammo > 0){
                 let s = trd.chuoi, d = ng.isFacingLeft ? -1 : 1;
+                trdBoNhanhGiao(ng);
                 if (s === 'J'){                                                 // J K : XOAY NGUOI HAT TUNG
                     ng._giaoDanh(4, 18, 160, 80, 24, 24, 'hat');
                     let cx = ng.x + ng.w / 2;
@@ -51637,6 +51650,7 @@ class PulsarCloneBoss {
             if (hg < 15 && (keys['KeyS'] || keys['ArrowDown'])) return false;   // S + K cua Giao
             if (hg < 15 && (ng._giaoCS || 0) > 0 && ng._giaoNhanh && !trd.chuoi) return false;   // nhanh rieng cua Giao (cui J / luot J)
             trd.chuoi = '';
+            trdBoNhanhGiao(ng);
             if (!og) return true;
             let d = ng.isFacingLeft ? -1 : 1, cx = ng.x + ng.w / 2, cy = ng.y + ng.h * 0.52;
             if (hg < 30){                                                       // CHAM K: choc + GIAO KHI hinh dinh ba
@@ -51763,7 +51777,7 @@ class PulsarCloneBoss {
                 trdHop(Math.min(I.x0, tip), ng.y - 6, Math.max(I.x0, tip), ng.y + ng.h + 6, 6, I.hit);
                 return;
             }
-            if (I.t > 30){ trd.I = null; trd.Icd = TRD_I_CD; }
+            if (I.t > 30){ trd.I = null; trd.Icd = TRD_I_CD; dashVx = 0; }   // du van toc cu dam khong duoc tinh la LUOT (-> don luot cua Giao)
         }
         function trdTickViec(ng){
             let V = trd.viec; if (!V) return;
@@ -85263,7 +85277,12 @@ function checkPvPCollisions() {
                                 shakeTimer = 16;
                             }
                             else if (b.state !== 'idle' && b.state !== 'entering' && b.state !== 'returning_place' && !b.state.includes('spin') && !b.state.includes('stun') && !b.state.includes('clone_') && !b.state.includes('retreat')) {
-                                b.state = (b.retState || 'returning'); if (b.actionTimer !== undefined) b.actionTimer = Math.max(b.actionTimer || 0, 30); shakeTimer = 20; 
+                                b.state = (b.retState || 'returning'); if (b.actionTimer !== undefined) b.actionTimer = Math.max(b.actionTimer || 0, 30); shakeTimer = 20;
+                                // Bi parry GIUA TROI (vd Triceratops dang slam_up): nhanh 'returning'/retState
+                                // cua phan lon boss khong he dung toi y -> boss TREO lo lung roi danh chieu mat
+                                // dat tren khong. Dung lai co che keo-ve-dat cua don hat tung (boss co trong
+                                // luc rieng hoac tu bay thi wkgTickHat tu nhuong quyen).
+                                if (typeof wkgHatTung === 'function' && b.baseY !== undefined && b.y < b.baseY - 1) wkgHatTung(b, 0);
                             }
                         }
                     }
