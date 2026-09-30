@@ -53704,7 +53704,7 @@ class PulsarCloneBoss {
                 if (this.buaCho > 0) this.buaCho--;
                 if (this.buaKK > 0 && (this.buaCS || 0) <= 0) this.buaKK = 0;
                 if (this.buaTia && --this.buaTia.t <= 0) this.buaTia = null;
-                if (this.buaKhung > 0){ this.buaKhung--; this.dy = Math.min(this.dy, 0.6); }
+                if (this.buaKhung > 0){ this.buaKhung--; if (!bamXuongKhong(this)) this.dy = Math.min(this.dy, 0.6); }
                 if (this._buaAnim && !(this.buaKhung > 0 && this._buaAnim.t / this._buaAnim.T >= 0.72)
                     && ++this._buaAnim.t >= this._buaAnim.T){
                     this._buaAnim = null;
@@ -56866,7 +56866,7 @@ class PulsarCloneBoss {
                             let khe = T.dir > 0 ? (o.x - mep) : (mep - (o.x + (o.w||20)));
                             if (khe > 22 && T.t < VEN_C4_LAO){
                                 this.x += T.dir * Math.min(26, Math.max(9, khe * 0.34));
-                                this.dy = Math.min(this.dy, 0.5);
+                                if (!bamXuongKhong(this)) this.dy = Math.min(this.dy, 0.5);
                             } else {
                                 // DAP MOT PHAT. Tong 14 = dung tran can chien, y nhu ban cu
                                 // (10 + 4) chi khac la khong con phu thuoc vao cai tuong.
@@ -63844,6 +63844,8 @@ class PulsarCloneBoss {
             dsawTick(){
                 if (this.dsawDong === undefined) this.dsawDong = DSAW_DONG;
                 if ((this._dsawXoay || 0) > 0){                     // @@HE-LOLUNG2: het vong xoay thi CHEM XUONG
+                    // nhan Xuong: bo doan lao lo lung, CHEM XUONG ngay roi roi nhanh
+                    if (bamXuongKhong(this) && this._dsawXoay > Math.round(DSAW_XOAY_T * 0.45) + 1) this._dsawXoay = Math.round(DSAW_XOAY_T * 0.45) + 1;
                     this._dsawXoay--;
                     let _M = this._dsawXoayMuc;                     // @@HE-LOLUNG3: lao toi muc tieu
                     if (_M && _M.hp > 0 && this._dsawXoay > Math.round(DSAW_XOAY_T * 0.45)){
@@ -65442,7 +65444,7 @@ class PulsarCloneBoss {
             // dem nhip nhat chem
             if (lh.dang){
                 let D = lh.dang; D.t++;
-                if (D.m.treo && !ng.grounded) ng.dy = Math.min(ng.dy || 0, 0.8);
+                if (D.m.treo && !ng.grounded && !bamXuongKhong(ng)) ng.dy = Math.min(ng.dy || 0, 0.8);
                 if (D.t === D.hit && D.m.fn){
                     // huong vet cat cua impact: nhat ngang -> nam ngang; chem xuong / hat len -> nghieng theo chieu vung
                     lhFxGoc = D.m.ngang ? (D.m.nguoc ? -0.12 : 0.12) : (D.m.a1 > D.m.a0 ? 1.05 : -1.05) * D.dir;
@@ -65466,7 +65468,7 @@ class PulsarCloneBoss {
             /* @@HE-LHDAN — Hans: "nguoi choi chi lo lung tren khong khi bat dau chem thuong thay vi mac dinh".
                Truoc day nhay chem hat (J len, chuoi 'u') cung treo nguoi lai toi 45 khung — tuc la cu nhay
                len la lo lung. Gio chi treo khi DA vung it nhat mot nhat chem thuong tren khong (chuoi 'k...'). */
-            if (!ng.grounded && !lh.dang && /^k/.test(lh.chuoi) && (lh.hoi > 0 || lh.rh <= LH_NGAT)) ng.dy = Math.min(ng.dy || 0, 0.3);
+            if (!ng.grounded && !lh.dang && /^k/.test(lh.chuoi) && (lh.hoi > 0 || lh.rh <= LH_NGAT) && !bamXuongKhong(ng)) ng.dy = Math.min(ng.dy || 0, 0.3);
             // cua so luot J J J
             if (typeof dashVx !== 'undefined' && Math.abs(dashVx) > 2 && lh.luotDu > 0) lh.luotDu = 30;
             else if (lh.luotDu > 0) lh.luotDu--;
@@ -81882,6 +81884,10 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         function checkAABB(r1, r2) { return r1.x < r2.x + r2.w && r1.x + r1.w > r2.x && r1.y < r2.y + r2.h && r1.y + r1.h > r2.y; }
         // Hieu ung do don ve o PHIA NGUOI CHOI DANG QUAY MAT. Truoc day 63 cho ghi cung
         // dino.x + dino.w nen khi quay trai, tia parry bay ra sau lung.
+        /* NHAN XUONG = ROI NHANH: moi trang thai "treo lo lung" cua vu khi (Luoi hai, Bua, Venom...)
+           nhuong lai khi nguoi choi dang giu nut Xuong tren khong — giong rune LO LUNG. Trong luc
+           cap nhat P2 (PvP) `keys` da duoc doi sang phim cua P2 nen dung chung duoc. */
+        function bamXuongKhong(ng){ return !!ng && !ng.grounded && !!(keys['KeyS'] || keys['ArrowDown']); }
         function parryX(){ return (typeof dino !== 'undefined' && dino && dino.isFacingLeft) ? dino.x : dino.x + dino.w; }
         /* @@HE-DON — MOT ham `parry` chung. Truoc day 19 boss moi con tu khai bao mot ban
            `let parry = () => ...` Y HET NHAU trong update(), con cac boss dung `hurtP` chung
