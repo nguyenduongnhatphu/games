@@ -57350,10 +57350,10 @@ class PulsarCloneBoss {
               mo:['+40% sát thương lên kẻ địch DƯỚI 50% máu.','+40% sát thương lên kẻ địch DƯỚI 50% máu.','+40% sát thương lên kẻ địch DƯỚI 50% máu.'], moEn:['+40% damage against enemies BELOW 50% health.','+40% damage against enemies BELOW 50% health.','+40% damage against enemies BELOW 50% health.'],
               tom:'KHÔNG CÓ CẤP. Nửa sau trận mới là lúc của nó — hợp với phát kết liễu.',
               tomEn:'NO LEVELS. It comes alive in the second half of the fight — built for the finishing blow.' },
-            { id:'stand', loai:'he', xong:true, khongCap:true, ten:'STAND', tenEn:'STAND',
-              mo:['Một con khủng long mờ lơ lửng sau lưng. Mỗi đòn trúng có tỉ lệ để nó đánh lại Y HỆT đòn đó (cùng sát thương, bắn chéo từ trên xuống): 5% với đòn 1 sát thương, tăng dần tới 60% với đòn 200 sát thương.','Một con khủng long mờ lơ lửng sau lưng. Mỗi đòn trúng có tỉ lệ để nó đánh lại Y HỆT đòn đó (cùng sát thương, bắn chéo từ trên xuống): 5% với đòn 1 sát thương, tăng dần tới 60% với đòn 200 sát thương.','Một con khủng long mờ lơ lửng sau lưng. Mỗi đòn trúng có tỉ lệ để nó đánh lại Y HỆT đòn đó (cùng sát thương, bắn chéo từ trên xuống): 5% với đòn 1 sát thương, tăng dần tới 60% với đòn 200 sát thương.'], moEn:['A faint dinosaur floats behind you. Every hit has a chance for it to repeat THAT EXACT attack (same damage, fired at an angle from above): 5% for a 1-damage hit, rising to 60% for a 200-damage hit.','A faint dinosaur floats behind you. Every hit has a chance for it to repeat THAT EXACT attack (same damage, fired at an angle from above): 5% for a 1-damage hit, rising to 60% for a 200-damage hit.','A faint dinosaur floats behind you. Every hit has a chance for it to repeat THAT EXACT attack (same damage, fired at an angle from above): 5% for a 1-damage hit, rising to 60% for a 200-damage hit.'],
-              tom:'KHÔNG CÓ CẤP. Đòn càng to thì Stand càng hay ra tay — một phát Railgun 200 sát thương có hơn nửa cơ hội được đánh hai lần.',
-              tomEn:'NO LEVELS. The bigger the blow, the more often the Stand joins in — a 200-damage Railgun shot has better than even odds of landing twice.' },
+            { id:'stand', loai:'he', xong:true, capMax:2, ten:'STAND', tenEn:'STAND',
+              mo:['Một con khủng long mờ lơ lửng sau lưng. Mỗi đòn trúng có tỉ lệ để nó đánh lại Y HỆT đòn đó (cùng sát thương, bắn chéo từ trên xuống): 5% với đòn 1 sát thương, tăng dần tới 60% với đòn 200 sát thương.','CỘNG DỒN: đòn nào Stand không ra tay thì tỉ lệ của đòn đó được cộng vào đòn kế tiếp, tới khi nó ra tay mới về 0. Đòn 60% hụt một lần thì lần thứ hai chắc chắn ra. Đây là cấp cao nhất.','CỘNG DỒN: đòn nào Stand không ra tay thì tỉ lệ của đòn đó được cộng vào đòn kế tiếp, tới khi nó ra tay mới về 0. Đòn 60% hụt một lần thì lần thứ hai chắc chắn ra. Đây là cấp cao nhất.'], moEn:['A faint dinosaur floats behind you. Every hit has a chance for it to repeat THAT EXACT attack (same damage, fired at an angle from above): 5% for a 1-damage hit, rising to 60% for a 200-damage hit.','STACKING: whenever the Stand does not join in, that hit\'s chance carries over onto the next one until it finally strikes, then resets. A 60% hit that misses once is guaranteed on the second. This is the top level.','STACKING: whenever the Stand does not join in, that hit\'s chance carries over onto the next one until it finally strikes, then resets. A 60% hit that misses once is guaranteed on the second. This is the top level.'],
+              tom:'Hai cấp. Đòn càng to thì Stand càng hay ra tay — một phát Railgun 200 sát thương có hơn nửa cơ hội được đánh hai lần. Cấp 2 giữ lại tỉ lệ đã hụt cho đòn sau.',
+              tomEn:'Two levels. The bigger the blow, the more often the Stand joins in — a 200-damage Railgun shot has better than even odds of landing twice. Level 2 keeps the missed chance for the next hit.' },
             /* @@HE-VOCUC — Hans: "Vo cuc kiem cho Module. Tang 50% sat thuong chi mang. Tang 20% chi mang co cong don voi cac loai chi mang khac". */
             { id:'vocuc', loai:'he', xong:true, capMax:2, ten:'VÔ CỰC KIẾM', tenEn:'INFINITY BLADE',
               mo:['+20% tỉ lệ chí mạng (cộng thẳng vào mọi nguồn khác). Không có rune chí mạng: chí mạng gây ×1.5. Có rune: ×2 thành ×2.5, siêu chí mạng ×3 thành ×3.5.','Sát thương chí mạng NHÂN 1.5: không rune thì chí mạng gây ×2; có rune thì ×2 thành ×3, siêu chí mạng ×3 thành ×4.5. Đây là cấp cao nhất.','Sát thương chí mạng NHÂN 1.5: không rune thì chí mạng gây ×2; có rune thì ×2 thành ×3, siêu chí mạng ×3 thành ×4.5. Đây là cấp cao nhất.'], moEn:['+20% critical chance (added straight on top of every other source). Without a crit rune, crits deal ×1.5. With one: ×2 becomes ×2.5, a ×3 super crit becomes ×3.5.','Critical damage is MULTIPLIED by 1.5: without a rune crits deal ×2; with one, ×2 becomes ×3 and a ×3 super crit becomes ×4.5. This is the top level.','Critical damage is MULTIPLIED by 1.5: without a rune crits deal ×2; with one, ×2 becomes ×3 and a ×3 super crit becomes ×4.5. This is the top level.'],
@@ -58384,7 +58384,7 @@ class PulsarCloneBoss {
         // ---------------- STAND ----------------
         const CUS_ST_PAL = { bd:"#B8BEE8", hd:"#CDD2F5", dk:"#6A6FA8", lt:"#FFFFFF", foot:"#5A5E96", spk:"#E1BEE7",
                              out:"#3B2F6B", rim:"#F3E5F5", eye:"#FFFFFF", pup:"#7C4DFF", aura:null, crest:0 };
-        let cusStand = { x: null, y: null, cd: 0, sang: 0, don: [] };
+        let cusStand = { x: null, y: null, cd: 0, sang: 0, don: [], tich: 0 };
         function cusStandBat(){ return cusCapCua('stand') > 0; }
         function cusStandTiLe(D){ let d = Math.max(1, Math.min(200, D)); return 0.05 + 0.55 * (d - 1) / 199; }
         function cusStandMieng(){
@@ -58397,7 +58397,11 @@ class PulsarCloneBoss {
             if (owner !== undefined && owner !== 1) return;
             if (typeof dino === 'undefined' || !dino || cusStand.x === null) return;
             if (cusStand.cd > 0) return;
-            if (Math.random() >= cusStandTiLe(D)) return;
+            // CAP 2 — CONG DON: ti le cua don hut duoc cong vao don ke tiep, ra tay thi ve 0
+            let p = cusStandTiLe(D), cd2 = cusCapCua('stand') >= 2;
+            if (cd2) p += cusStand.tich || 0;
+            if (Math.random() >= p){ if (cd2) cusStand.tich = p; return; }
+            cusStand.tich = 0;
             cusStand.cd = 10; cusStand.sang = 16;
             let m = cusStandMieng();
             cusStand.don.push({ o: o, D: Math.round(D), kieu: kieu, t: 0, x: m.x, y: m.y, x0: m.x, y0: m.y,
@@ -77640,7 +77644,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
             if (typeof rgcKho !== 'undefined'){ rgcKho = 0; rgcDam = null; }                         // @@HE-RGC
             if (typeof cusTl !== 'undefined') cusTl = null;                                       // @@HE-CUSTL
             if (typeof cusAcNo !== 'undefined'){ cusAcNo.length = 0; cusAcPhan.length = 0; if (typeof novaAcSong !== 'undefined') novaAcSong.length = 0; for (let o of cusAcDs) if (o) o._acDay = null; cusAcDs.length = 0; }   // @@HE-CUSAC
-            if (typeof cusStand !== 'undefined'){ cusStand.x = null; cusStand.don.length = 0; cusStand.cd = 0; }   // @@HE-CUSHE3
+            if (typeof cusStand !== 'undefined'){ cusStand.x = null; cusStand.don.length = 0; cusStand.cd = 0; cusStand.tich = 0; }   // @@HE-CUSHE3
             if (typeof cusUzu !== 'undefined'){ cusUzu = null; cusUzDan = [[], [], [], [], []]; cusUzA = 0; }   // @@HE-CUSUZ
             if (typeof cusMt !== 'undefined'){ cusMt = null; cusMtTen.length = 0; }   // @@HE-CUSMT
             if (typeof gaeTro !== 'undefined'){ gaeTro.length = 0; gaeChop = 0; }   // @@HE-GAEL
