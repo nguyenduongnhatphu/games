@@ -42030,6 +42030,10 @@ class PulsarCloneBoss {
                 if (typeof tlBat === 'function' && tlBat() && this.id === 1) return false;
                 if (this.meleeTimer > 0 || (this.dashShieldTimer||0) > 0) return true;
                 if (typeof smBlades !== 'undefined') { for (let bl of smBlades) if (bl.owner === this && bl.t > 0) return true; }
+                // XOAY CON (khien cua Nhu Y Kim Co Bong): banh xe gay quay kin 360 do. Truoc day no chi xoa DAN
+                // trong ban kinh, con moi don CAN CHIEN / song dat / cot troi tu duoi len cua boss van hoi
+                // isShielding() -> false nen xuyen thang qua. Dang xoay thi do duoc moi huong.
+                if (this.id === 1 && typeof wkgSpin !== 'undefined' && wkgSpin && typeof wkgBat === 'function' && wkgBat()) return true;
                 return false;
             }
             
