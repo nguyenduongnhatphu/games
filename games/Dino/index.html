@@ -49389,6 +49389,18 @@ class PulsarCloneBoss {
 
         function giaoEase(u){ return 1 - Math.pow(1 - u, 3); }
         function giaoLay(kf, u, thang){
+            /* Hai don 'quet' / 'xoay' cua bang GIAO_KF da doi sang khung 3D cua cay gay (a, b, len, gx...). Doc no bang
+               cong thuc {ang, ext} cu thi ra NaN -> ctx.translate(NaN) bi bo qua va CAY GIAO VE LOI RA MEP TRAI man hinh
+               (Hans: "Spear doi khi mat cai Spear o tren khong"). Quy doi khung 3D ve goc 2D tren man hinh. */
+            if (kf[0].ang === undefined && kf[0].a !== undefined && typeof wkgLay === 'function'){
+                let T = wkgLay(kf, u), cb = Math.cos(T.b || 0);
+                if (Math.abs(cb) < 0.17) cb = cb < 0 ? -0.17 : 0.17;
+                let ca = Math.cos(T.a || 0), sa = Math.sin(T.a || 0);
+                // giu goc lien tuc (khong nhay qua lai +-pi) de don xoay quay tron dung mot vong
+                let ang = Math.atan2(sa, ca * cb);
+                ang += Math.PI * 2 * Math.round(((T.a || 0) - ang) / (Math.PI * 2));
+                return { ang, ext: (T.gx || 0) * 1.2 };
+            }
             if (u <= kf[0].t) return { ang: kf[0].ang, ext: kf[0].ext };
             for (let i = 1; i < kf.length; i++){
                 if (u <= kf[i].t){
@@ -52626,6 +52638,12 @@ class PulsarCloneBoss {
                 let _tm = (typeof setCanTam === 'function' ? setCanTam() : 1);
                 let _R  = Math.round(GIAO_LUOT * _tm);
                 this._giaoDanh(3 + (typeof setCanDmg === 'function' ? setCanDmg() : 0), 15, _R, 20, 20, 30, 'luot');
+                // LUOT + J: cu luot keo dai GAP DOI va BAT TU suot doan lao
+                if (typeof dashVx !== 'undefined'){
+                    let _d = this.isFacingLeft ? -1 : 1;
+                    dashVx = _d * Math.max(Math.abs(dashVx) * 2.4, 30);
+                }
+                this.invincible = true; this.invTimer = Math.max(this.invTimer || 0, 22);
                 if (typeof setCanBat === 'function' && setCanBat()){
                     // @@HE-SETFX: chi MOT tia chay doc than giao — cay giao dan dien.
                     // Khong con cu no o mui, khong con vet chay duoi dat.
