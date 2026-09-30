@@ -57392,12 +57392,12 @@ class PulsarCloneBoss {
                     'Instead of destroying them, the blast BLOWS enemy projectiles in the parry zone back the way it is facing; they damage any enemy they hit. Pushed targets take +1, wall slams +2. Fully charged (3 seconds): an ENORMOUS push that throws them across the whole screen.'],
               tom:'Súng ngắn của đám đông: đứng sát để ngắt đòn và đẩy boss vào tường, sạc lâu để thổi bay cả màn hình. Cấp 2 phá đạn, cấp 3 thổi ngược đạn.',
               tomEn:'A crowd shotgun: stand close to break attacks and pin bosses to the wall, charge long to blow the whole screen away. Level 2 destroys projectiles, level 3 blows them back.' },
-            /* @@HE-CUSCG — khong cap: "cap" cua no la do KEO va so mui ten dat len day. */
-            { id:'cung', loai:'nl', xong:true, khongCap:true, moMuon:true, ten:'CUNG', tenEn:'BOW',
-              mo:['Cung bắn VÔ HẠN, không tốn đạn, không quá nhiệt. Giữ J để KÉO, nhả là bắn. Kéo nhẹ rất yếu: nhả trước 0.5 giây thì mũi tên chỉ 1 sát thương, bay ngắn (chạm J là khoảng 5cm) rồi rơi xuống đất. Kéo 0.5 giây: bay hết map, 3 sát thương · 0.75 giây: 4 · 1 giây: 5 và XUYÊN PHÁ (xuyên mọi kẻ địch, cắt vỡ đạn trên đường bay). Bấm K để đặt thêm một mũi tên lên dây (tối đa 5) — cả loạt bắn cùng lúc, toả hẹp hơn Phi Tiêu một chút; bắn xong dây về 1 mũi.', 'Cung bắn VÔ HẠN, không tốn đạn, không quá nhiệt. Giữ J để KÉO, nhả là bắn. Kéo nhẹ rất yếu: nhả trước 0.5 giây thì mũi tên chỉ 1 sát thương, bay ngắn (chạm J là khoảng 5cm) rồi rơi xuống đất. Kéo 0.5 giây: bay hết map, 3 sát thương · 0.75 giây: 4 · 1 giây: 5 và XUYÊN PHÁ (xuyên mọi kẻ địch, cắt vỡ đạn trên đường bay). Bấm K để đặt thêm một mũi tên lên dây (tối đa 5) — cả loạt bắn cùng lúc, toả hẹp hơn Phi Tiêu một chút; bắn xong dây về 1 mũi.', 'Cung bắn VÔ HẠN, không tốn đạn, không quá nhiệt. Giữ J để KÉO, nhả là bắn. Kéo nhẹ rất yếu: nhả trước 0.5 giây thì mũi tên chỉ 1 sát thương, bay ngắn (chạm J là khoảng 5cm) rồi rơi xuống đất. Kéo 0.5 giây: bay hết map, 3 sát thương · 0.75 giây: 4 · 1 giây: 5 và XUYÊN PHÁ (xuyên mọi kẻ địch, cắt vỡ đạn trên đường bay). Bấm K để đặt thêm một mũi tên lên dây (tối đa 5) — cả loạt bắn cùng lúc, toả hẹp hơn Phi Tiêu một chút; bắn xong dây về 1 mũi.'],
-              moEn:['The bow fires FOREVER: no ammo, no overheat. Hold J to DRAW, release to loose. A light draw is weak: release before 0.5s and the arrow deals 1 damage, flies short (a tap is about 5cm) and drops. Draw 0.5s: crosses the whole map for 3 damage · 0.75s: 4 · 1s: 5 and PIERCING (goes through every enemy and cuts enemy projectiles on its path). Press K to nock one more arrow (up to 5) — the whole volley flies at once, fanning slightly tighter than Needles; after the shot the string is back to 1 arrow.', 'The bow fires FOREVER: no ammo, no overheat. Hold J to DRAW, release to loose. A light draw is weak: release before 0.5s and the arrow deals 1 damage, flies short (a tap is about 5cm) and drops. Draw 0.5s: crosses the whole map for 3 damage · 0.75s: 4 · 1s: 5 and PIERCING (goes through every enemy and cuts enemy projectiles on its path). Press K to nock one more arrow (up to 5) — the whole volley flies at once, fanning slightly tighter than Needles; after the shot the string is back to 1 arrow.', 'The bow fires FOREVER: no ammo, no overheat. Hold J to DRAW, release to loose. A light draw is weak: release before 0.5s and the arrow deals 1 damage, flies short (a tap is about 5cm) and drops. Draw 0.5s: crosses the whole map for 3 damage · 0.75s: 4 · 1s: 5 and PIERCING (goes through every enemy and cuts enemy projectiles on its path). Press K to nock one more arrow (up to 5) — the whole volley flies at once, fanning slightly tighter than Needles; after the shot the string is back to 1 arrow.'],
-              tom:'CUSTOM ĐẶC BIỆT — trong Lộ trình chỉ xuất hiện khi mọi nhánh Custom có cấp đã lên cấp 2, hoặc có nhánh đã lên cấp 3. KHÔNG CÓ CẤP. Không bao giờ hết đạn, nhưng mỗi phát đáng giá phải KÉO đủ lâu — đứng kéo là đứng yên chịu đòn. Chồng thêm mũi bằng K để một loạt kéo căng quét sạch cả hàng.',
-              tomEn:'SPECIAL CUSTOM — in Route it only shows up once every levelled Custom branch you own is level 2, or one of them has reached level 3. NO LEVELS. Never runs dry, but every shot worth firing has to be DRAWN — and drawing means standing still under fire. Stack arrows with K so one full draw sweeps the whole line.' },
+            /* @@HE-CUSCG — CUNG co 3 cap: so mui ten toi da tren day 1 / 3 / 5 (cusCgMax). */
+            { id:'cung', loai:'nl', xong:true, ten:'CUNG', tenEn:'BOW',
+              mo:['Cung bắn VÔ HẠN, không tốn đạn, không quá nhiệt. Giữ J để KÉO, nhả là bắn. Kéo nhẹ rất yếu: nhả trước 0.5 giây thì mũi tên chỉ 1 sát thương, bay ngắn (chạm J là khoảng 5cm) rồi rơi xuống đất. Kéo 0.5 giây: bay hết map, 3 sát thương · 0.75 giây: 4 · 1 giây: 5 và XUYÊN PHÁ (xuyên mọi kẻ địch, cắt vỡ đạn trên đường bay). Mỗi lần bắn chỉ MỘT mũi tên.', 'Bấm K để đặt thêm một mũi tên lên dây (tối đa 3) — cả loạt bắn cùng lúc, toả hẹp hơn Phi Tiêu một chút; bắn xong dây về 1 mũi.', 'Tối đa 5 mũi tên trên dây.'],
+              moEn:['The bow fires FOREVER: no ammo, no overheat. Hold J to DRAW, release to loose. A light draw is weak: release before 0.5s and the arrow deals 1 damage, flies short (a tap is about 5cm) and drops. Draw 0.5s: crosses the whole map for 3 damage · 0.75s: 4 · 1s: 5 and PIERCING (goes through every enemy and cuts enemy projectiles on its path). ONE arrow per shot.', 'Press K to nock one more arrow (up to 3) — the whole volley flies at once, fanning slightly tighter than Needles; after the shot the string is back to 1 arrow.', 'Up to 5 arrows on the string.'],
+              tom:'Không bao giờ hết đạn, nhưng mỗi phát đáng giá phải KÉO đủ lâu — đứng kéo là đứng yên chịu đòn. Cấp 1 bắn 1 mũi, cấp 2 chồng tới 3 mũi, cấp 3 tới 5 mũi bằng K để một loạt kéo căng quét sạch cả hàng.',
+              tomEn:'Never runs dry, but every shot worth firing has to be DRAWN — and drawing means standing still under fire. Level 1 fires 1 arrow, level 2 stacks up to 3 with K, level 3 up to 5 so one full draw sweeps the whole line.' },
             /* @@HE-CUSPT — module LAI: `ca: true` = hien o CA hai hang va khoa CA hai o. */
             { id:'phitieu', loai:'nl', ca:true, xong:false, tach:true, khongCap:true, ten:'PHI TIÊU', tenEn:'NEEDLES',
               mo:['Ném kim mảnh: 1 sát thương, XUYÊN 1 lần. Băng 2 kim, hồi 1 kim mỗi giây — ném cả hai là QUÁ NHIỆT 1.5 giây. Mỗi mũi kim trúng cộng dồn VĨNH VIỄN vào vết CHẢY MÁU: 1 kim = 1 sát thương/giây, 3 kim = 2, 6 kim = 3, 10 kim = 4… tối đa 10/giây (55 kim). Chảy máu kéo dài 3 giây nếu không bị đâm thêm. Giữ K 0.75 / 1.5 / 2.25 / 3 giây rồi nhả: phóng 2 / 4 / 6 / 8 kim hình quạt.','Ném kim mảnh: 1 sát thương, XUYÊN 1 lần. Băng 2 kim, hồi 1 kim mỗi giây — ném cả hai là QUÁ NHIỆT 1.5 giây. Mỗi mũi kim trúng cộng dồn VĨNH VIỄN vào vết CHẢY MÁU: 1 kim = 1 sát thương/giây, 3 kim = 2, 6 kim = 3, 10 kim = 4… tối đa 10/giây (55 kim). Chảy máu kéo dài 3 giây nếu không bị đâm thêm. Giữ K 0.75 / 1.5 / 2.25 / 3 giây rồi nhả: phóng 2 / 4 / 6 / 8 kim hình quạt.','Ném kim mảnh: 1 sát thương, XUYÊN 1 lần. Băng 2 kim, hồi 1 kim mỗi giây — ném cả hai là QUÁ NHIỆT 1.5 giây. Mỗi mũi kim trúng cộng dồn VĨNH VIỄN vào vết CHẢY MÁU: 1 kim = 1 sát thương/giây, 3 kim = 2, 6 kim = 3, 10 kim = 4… tối đa 10/giây (55 kim). Chảy máu kéo dài 3 giây nếu không bị đâm thêm. Giữ K 0.75 / 1.5 / 2.25 / 3 giây rồi nhả: phóng 2 / 4 / 6 / 8 kim hình quạt.'],
@@ -59078,7 +59078,8 @@ class PulsarCloneBoss {
         const CUS_CG_MOC   = [[60, 5], [45, 4], [30, 3]];   // khung keo -> sat thuong
         const CUS_CG_XUYEN = 60;                       // 1 giay: xuyen pha
         const CUS_CG_GAN   = 5;                        // cm: tam cua cu cham J
-        const CUS_CG_MAX   = 5;                        // toi da 5 mui tren day
+        const CUS_CG_MAX   = 5;                        // toi da 5 mui tren day (cap 3)
+        function cusCgMax(){ let c = (typeof cusCapCua === 'function') ? cusCapCua('cung') : 3; return c >= 3 ? 5 : (c === 2 ? 3 : 1); }   // cap 1/2/3 -> 1/3/5 mui
         const CUS_CG_HOI   = 12;                       // nghi giua hai phat (0.2 giay)
         let cusCgDan = [];                             // mui ten dang bay / cam dat
         function cusCgBat(){ return typeof cusCapCua === 'function' && cusCapCua('cung') > 0; }
@@ -59090,7 +59091,7 @@ class PulsarCloneBoss {
         }
         function cusCgBan(ng, t){
             let pos = ng.getShootPos(), dir = pos.dir < 0 ? -1 : 1;
-            let n = Math.max(1, Math.min(CUS_CG_MAX, ng.cusCgTen || 1)), dmg = cusCgDmg(t), xuyen = t >= CUS_CG_XUYEN;
+            let n = Math.max(1, Math.min(cusCgMax(), ng.cusCgTen || 1)), dmg = cusCgDmg(t), xuyen = t >= CUS_CG_XUYEN;
             let u = Math.min(1, t / CUS_CG_FULL), v = 11 + 15 * u + (xuyen ? 5 : 0), b = cusCgGoc();
             ng.cusLot = (ng.cusLot || 0) + 1;
             for (let i = 0; i < n; i++){
@@ -59181,7 +59182,7 @@ class PulsarCloneBoss {
         function cusCgVeCung(ng){
             if (!ng || ng.ammoType !== CUS_DAN || !cusCgBat()) return;
             let pos = ng.getShootPos(), d = pos.dir < 0 ? -1 : 1;
-            let t = ng.cusCgKeo ? (ng.cusCgT || 0) : 0, u = Math.min(1, t / CUS_CG_XUYEN), n = Math.max(1, Math.min(CUS_CG_MAX, ng.cusCgTen || 1));
+            let t = ng.cusCgKeo ? (ng.cusCgT || 0) : 0, u = Math.min(1, t / CUS_CG_XUYEN), n = Math.max(1, Math.min(cusCgMax(), ng.cusCgTen || 1));
             let mau = cusCgMau(ng.cusCgKeo ? cusCgDmg(t) : 1);
             let bx = pos.x - d * 4, by = pos.y, H = 26, keo = 4 + 16 * u, cong = 9 + 5 * u;
             ctx.save();
@@ -63043,7 +63044,7 @@ class PulsarCloneBoss {
                 if ((this.cusCgHoi || 0) > 0) this.cusCgHoi--;
                 if (giuK && !this._cusCgPhimK){
                     let n = this.cusCgTen || 1;
-                    if (n < CUS_CG_MAX){
+                    if (n < cusCgMax()){
                         this.cusCgTen = n + 1;
                         floatingTexts.push(new FloatingText(this.x - 14, this.y - 30, "+1 " + LT("TÊN", "ARROW") + " (" + this.cusCgTen + ")"));
                         if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(900 + 120 * n, 0.05, 'triangle', 0.10, 1300);
@@ -63335,7 +63336,10 @@ class PulsarCloneBoss {
                 }
                 // @@HE-CUSCH — vao/ra Channel. Giu K qua moc thi mo; nha K la dong va NHA DON.
                 if ((this.id === 1 || (gameState === 'pvp' && (cusLapDung() !== cusLap || cusLap.ch !== 'nuke'))) && cusChBat()){   // @@HE-PVPCUS · @@HE-P2KHOA: P2 co Channel Custom (tru Bom Nguyen Tu)
-                    if (chargeKey && this.aKeyHeldTime >= cusChMoc()){
+                    // RAILGUN: giu CA J (len nac) LAN K (dien tu gia toc) thi KHONG mo Channel —
+                    // vua tich phat ban vua chay nhanh vua Channel thi qua ba dao.
+                    let _rgKep = cusRgBat() && fireKey;
+                    if (chargeKey && this.aKeyHeldTime >= cusChMoc() && (this.cusCh || !_rgKep)){
                         if (!this.cusCh){ this.cusCh = 1; cusChVao(this); }
                         cusChTick(this);
                     } else if (this.cusCh){
@@ -63376,7 +63380,7 @@ class PulsarCloneBoss {
                     // @@HE-CUSCG — so mui tren day + nac dang keo
                     let _n = dino.cusCgTen || 1, _t = dino.cusCgKeo ? (dino.cusCgT || 0) : 0;
                     ctx.fillStyle = "#FFE0B2";
-                    ctx.fillText("➶ " + _n + "/" + CUS_CG_MAX + " · ∞", 200, 64);
+                    ctx.fillText("➶ " + _n + "/" + cusCgMax() + " · ∞", 200, 64);
                     if (dino.cusCgKeo){ ctx.fillStyle = cusCgMau(cusCgDmg(_t));
                         ctx.fillText(LT("KÉO ", "DRAW ") + cusCgDmg(_t) + " dmg" + (_t >= CUS_CG_XUYEN ? LT(" · XUYÊN", " · PIERCE") : (_t >= CUS_CG_FULL ? LT(" · hết map", " · full map") : "")), 200, 80); }
                 } else if (cusPtBat()){
@@ -70152,7 +70156,11 @@ class PulsarCloneBoss {
                         T(vhhCham(o(0.5)) === 0, 'khong deo rune thi khong cham');
                         // CUNG
                         let M = cusNCTim('cung');
-                        T(M && M.loai === 'nl' && M.xong && M.khongCap, 'CUNG la module NANG LUC, khong cap');
+                        T(M && M.loai === 'nl' && M.xong && !M.khongCap && !M.moMuon && M.mo.length === 3, 'CUNG la module NANG LUC, 3 cap, khong mo muon');
+                        { let _tn = cusThuNghiem, _cc = cusCap.cung; cusLap = { nl: 'cung', he: null, x: null, ch: null }; cusThuNghiem = false;
+                          let _m = [1, 2, 3].map(c => { cusCap.cung = c; return cusCgMax(); });
+                          cusThuNghiem = _tn; if (_cc === undefined) delete cusCap.cung; else cusCap.cung = _cc;
+                          T(_m.join('/') === '1/3/5', 'CUNG cap 1/2/3: toi da 1/3/5 mui ten', _m.join('/')); }
                         cusLap = { nl: 'cung', he: null, x: null, ch: null }; currentAmmoType = CUS_DAN;
                         T(cusCgBat() && cusBangDan() === 1 && jkKep(CUS_DAN), 'lap CUNG: bang 1 o, J va K dung cung luc');
                         T([1, 20, 30, 45, 60, 90].map(cusCgDmg).join('/') === '1/1/3/4/5/5', 'sat thuong theo do keo: 1 · 3 (0.5s) · 4 (0.75s) · 5 (1s)');
@@ -70163,13 +70171,12 @@ class PulsarCloneBoss {
                         T(V.length === 5 && V.every(D => D.dmg === 5 && D.xuyen) && Math.abs((g[1] - g[0]) - cusPtGoc() * 0.8) < 1e-6,
                           '5 mui ten ban cung luc, keo 1s = 5 + xuyen pha, toa hep hon Phi Tieu (0.8 lan)');
                         cusCgDan.length = _d0;
-                        // @@HE-CUSCG2 — Lo trinh: CUNG mo muon
+                        // Lo trinh: CUNG la nhanh co cap binh thuong — khong con mo muon
                         { let _R = R14; try {
-                            R14 = { cusKho: { tachtia: 1, bang: 2, railgun: 3 }, nutXong: 5 }; let m1 = r14NcHopLe(M);
-                            R14.cusKho.tachtia = 2; let m2 = r14NcHopLe(M);
-                            R14.cusKho = { tachtia: 1, dot: 3 }; let m3 = r14NcHopLe(M);
-                            R14.cusKho = { railgun: 3 }; let m4 = r14NcHopLe(M); R14.nutXong = 9; let m5 = r14NcHopLe(M);
-                            T(!m1 && m2 && m3 && !m4 && m5, 'Lo trinh: CUNG chi ra khi moi nhanh co cap >= 2 hoac co nhanh cap 3 (khong cap thi tu nut 9)', [m1, m2, m3, m4, m5].join('/'));
+                            R14 = { cusKho: {}, nutXong: 1 }; let m1 = r14NcHopLe(M);
+                            R14.cusKho = { cung: 1 }; let m2 = r14NcHopLe(M);
+                            R14.cusKho = { cung: 2 }; let m3 = r14NcHopLe(M);
+                            T(m1 && m2 && !m3, 'Lo trinh: CUNG ra ngay tu dau, len cap 1 -> 2 -> 3 nhu nhanh thuong', [m1, m2, m3].join('/'));
                           } finally { R14 = _R; } }
                       } catch(e){ loi = e.message; }
                       T(!loi, 'khong nem loi', loi);
