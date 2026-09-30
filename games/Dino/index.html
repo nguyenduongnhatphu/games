@@ -54706,7 +54706,7 @@ class PulsarCloneBoss {
            Moi don day MOT ban ghi vao M.fx: midasTick dem nhip, midasVe ve ra. Dung lai
            `midasVeNamDam()` co san de nam dam cua don moi va cua cu dam manh la CUNG MOT
            hinh — ve rieng thi thanh hai kieu tay khac nhau trong cung mot vu khi. */
-        const MIDAS_FX_DAI = { thuong: 16, xa: 20, hasho: 22, shoryu: 28, hado: 20, denjin: 26 };
+        const MIDAS_FX_DAI = { thuong: 9, thuong3: 14, xa: 20, hasho: 22, shoryu: 28, hado: 20, denjin: 26, dat: 16 };
         /* NO KHI CHAM — sat thuong LAN quanh diem no. Phai goi tu CA HAI duong va cham
            (PvE va PvP) chu khong chi mot, vi day la hai ham rieng biet — dung cai bay da
            mac nhieu lan trong he PvP. */
@@ -54904,7 +54904,7 @@ class PulsarCloneBoss {
             }
         }
 
-        function midasFx(ng, kieu, to){
+        function midasFx(ng, kieu, to, tay){
             let M = midasCua(ng); if (!M) return;
             if (!M.fx) M.fx = [];
             /* `to` = ban DENJIN. KHONG phong to hinh: nam dam bi keo to len nhin nhu tay
@@ -54913,8 +54913,8 @@ class PulsarCloneBoss {
                voi cua don — nhung thu that su co kich thuoc trong tran dau. */
             let sc = (typeof ng.getFormScale === 'function') ? ng.getFormScale() : 1;
             M.fx.push({ kieu: kieu, t: 0, tong: MIDAS_FX_DAI[kieu] || 18, denjin: to ? 1 : 0,
-                        dir: ng.isFacingLeft ? -1 : 1, sc: sc,
-                        x: ng.x + ng.w / 2, y: ng.y + ng.h / 2, ng: ng });
+                        dir: ng.isFacingLeft ? -1 : 1, sc: sc, tay: tay || 'phai',
+                        x: ng.x + ng.w / 2, y: ng.y + ng.h / 2 + (tay === 'trai' ? 6 : 0), ng: ng });
             while (M.fx.length > 6) M.fx.shift();
         }
 
@@ -55035,7 +55035,19 @@ class PulsarCloneBoss {
                     continue;
                 }
                 let tien = 22 * f.sc, ban = 26, cung = 0.85;
+                if (f.kieu === 'dat'){
+                    // nam dam CHIA THANG XUONG, cam vao mat dat truoc chan
+                    let px = f.x + f.dir * 16 * f.sc, py = f.y + (4 + 18 * ea) * f.sc;
+                    ctx.save(); ctx.translate(px, py); ctx.rotate(Math.PI / 2); ctx.translate(-px, -py);
+                    midasVeNamDam({ x: px, y: py, sc: f.sc, dir: 1 }, 0, mo);
+                    ctx.restore();
+                    ctx.save(); ctx.globalAlpha = mo * 0.7; ctx.strokeStyle = '#FFD54F'; ctx.lineWidth = 3 * f.sc;
+                    ctx.beginPath(); ctx.ellipse(px, f.y + 24 * f.sc, (10 + 40 * ea) * f.sc, (3 + 8 * ea) * f.sc, 0, 0, Math.PI * 2); ctx.stroke();
+                    ctx.restore();
+                    continue;
+                }
                 if (f.kieu === 'thuong'){ tien = (20 + 42 * ea) * f.sc; ban = 24; }
+                else if (f.kieu === 'thuong3'){ tien = (20 + 72 * ea) * f.sc; ban = 30; cung = 0.8; }
                 else if (f.kieu === 'xa'){ tien = (24 + 104 * ea) * f.sc; ban = 30; cung = 0.7; }
                 else if (f.kieu === 'hasho'){ tien = (16 + 62 * ea) * f.sc; ban = 34; cung = 1.15; }
                 else if (f.kieu === 'hado'){ tien = (18 + 34 * ea) * f.sc; ban = 28; cung = 0.95; }
@@ -55141,6 +55153,7 @@ class PulsarCloneBoss {
             let dir = ng.isFacingLeft ? -1 : 1;
             let sc = (typeof ng.getFormScale === 'function') ? ng.getFormScale() : 1;
             ng.attackCooldown = 28;
+            if (typeof dashVx !== 'undefined') dashVx = dir * Math.max(Math.abs(dashVx) * 2, 24);   // LUOT + J lao xa hon cu luot thuong
             ng._beginSlash(MIDAS_LD_DMG, 13, dir, Math.round(MIDAS_LD_TAM * sc), 22, 22, 0);
             midasFx(ng, 'xa');
             if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(380, 0.12, 'square', 0.22, 620);
@@ -55156,7 +55169,6 @@ class PulsarCloneBoss {
             M.tt = { hit: new Set() };
             ng.dy = 17;
             if (typeof slamLaoBat === 'function') slamLaoBat(ng);   // @@HE-SLAMLAO
-            midasFx(ng, 'thuong');
             if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(160, 0.14, 'sawtooth', 0.24, 60);
             return true;
         }
@@ -55173,6 +55185,7 @@ class PulsarCloneBoss {
                                 mau: '#FFD54F', midas: 1, hit: new Set() });
             }
             shakeTimer = Math.max(shakeTimer, 16);
+            midasFx(ng, 'dat');
             if (typeof visualEffects !== 'undefined' && typeof Effect === 'function')
                 visualEffects.push(new Effect(cx, ng.y + ng.h, 'explosion', true, 26));
             if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(100, 0.2, 'square', 0.26, 50);
@@ -55322,16 +55335,39 @@ class PulsarCloneBoss {
         }
 
         // DAM THUONG — khong tieu thanh tich, khong Overheat, tam giu nguyen tam nen.
+        /* JJJ — DAM PHAI · TRAI · PHAI rat nhanh; nhat thu ba voi XA hon va nang hon, xong moi khoa hoi don.
+           Bam J trong luc con hoi don ngan thi XEP HANG (midasTick tu ra), de ba cu dam noi lien mach. */
+        const MIDAS_CB_CUA = 26, MIDAS_CB_CD = 8, MIDAS_CB3_TAM = 1.6, MIDAS_CB3_DMG = 3;
         function midasDamThuong(ng){
             if (!ng || ng.ammoType !== MIDAS_DAN) return false;
-            if (ng.hp <= 0 || ng.isOverheated || ng.attackCooldown > 0) return false;
+            if (ng.hp <= 0 || ng.isOverheated) return false;
+            let M = midasCua(ng);
+            if (ng.attackCooldown > 0){ if (ng.attackCooldown <= 10) M.jCho = 12; return false; }
             let sc = (typeof ng.getFormScale === 'function') ? ng.getFormScale() : 1;
             let dir = ng.isFacingLeft ? -1 : 1;
-            ng.attackCooldown = MIDAS_THUONG_CD;
-            ng._beginSlash(MIDAS_THUONG_DMG, 12, dir, Math.round(MIDAS_TAM_NEN * sc), 20, 20, 0);
-            midasFx(ng, 'thuong');
-            midasCua(ng).damT = frames;      // mo cua so noi sang DAM LUOT
-            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(520, 0.06, 'square', 0.14, 820);
+            let b = (frames - (M.cbT || -999)) <= MIDAS_CB_CUA ? (M.cb || 0) : 0;
+            let cuoi = b === 2;
+            ng.attackCooldown = cuoi ? MIDAS_THUONG_CD : MIDAS_CB_CD;
+            ng._beginSlash(cuoi ? MIDAS_CB3_DMG : MIDAS_THUONG_DMG, cuoi ? 12 : 8, dir,
+                           Math.round(MIDAS_TAM_NEN * sc * (cuoi ? MIDAS_CB3_TAM : 1)), 20, 20, 0);
+            midasFx(ng, cuoi ? 'thuong3' : 'thuong', false, b === 1 ? 'trai' : 'phai');
+            M.cb = cuoi ? 0 : b + 1; M.cbT = frames;
+            M.damT = frames;      // mo cua so noi sang DAM LUOT
+            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(cuoi ? 380 : 520 + b * 60, cuoi ? 0.09 : 0.05, 'square', 0.14, cuoi ? 620 : 820);
+            return true;
+        }
+        // XUONG + J duoi dat: DAM XUONG DAT — nam dam chia thang xuong, chan dong hai ben chan
+        function midasDamDat(ng){
+            if (!ng || ng.ammoType !== MIDAS_DAN || ng.isOverheated || ng.attackCooldown > 0) return false;
+            let sc = (typeof ng.getFormScale === 'function') ? ng.getFormScale() : 1;
+            ng.attackCooldown = 24;
+            let cx = ng.x + ng.w / 2, R = 78 * sc;
+            ng._beginSlash(MIDAS_THUONG_DMG + 1, 10, 1, 0, 0, 0, R);
+            midasFx(ng, 'dat');
+            shakeTimer = Math.max(shakeTimer, 8);
+            if (typeof visualEffects !== 'undefined' && typeof Effect === 'function')
+                visualEffects.push(new Effect(cx + (ng.isFacingLeft ? -1 : 1) * 14, ng.y + ng.h, 'explosion', true, 20));
+            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(120, 0.14, 'square', 0.24, 60);
             return true;
         }
 
@@ -55389,6 +55425,7 @@ class PulsarCloneBoss {
             if (M.denjinCd > 0) M.denjinCd--;
             if (M.denjinCua > 0) M.denjinCua--;   // @@HE-MIDAS-DENJIN
             if (M.shoCd > 0) M.shoCd--;
+            if (M.jCho > 0){ M.jCho--; if (ng.attackCooldown <= 0 && !M.kame && !M.haki){ M.jCho = 0; midasDamThuong(ng); } }
             if (M.kame){ midasKameTick(ng, M); return; }   // dang trong cutscene thi khong lam gi khac
             if (M.haki){                                   // @@HE-HAKI: dung yen gong, roi dam
                 let K = M.haki; K.t++; ng._hakiGong = true;
@@ -55904,6 +55941,28 @@ class PulsarCloneBoss {
             ctx.restore();
         }
         // Anh vang theo bac — ve sau than nguoi choi
+        /* NAM DAM LA VU KHI: hai gang tay vang luon nam tren tay khung long (tay truoc sang, tay sau toi hon),
+           khong con hien ra tu khong khi luc dam. Tay nao dang ra don thi an di (do fx ve cu dam cua no). */
+        function midasVeTay(ng, M){
+            if (M.dam || M.kame || M.haki) return;
+            let sc = (typeof ng.getFormScale === 'function') ? ng.getFormScale() : 1;
+            let dir = ng.isFacingLeft ? -1 : 1, cx = ng.x + ng.w / 2, cy = ng.y + ng.h / 2;
+            let ban = { phai: false, trai: false };
+            if (M.fx) for (let f of M.fx) if (f.ng === ng && f.t < f.tong){
+                if (f.kieu === 'dat' || f.kieu === 'shoryu' || f.kieu === 'xa' || f.kieu === 'hasho' || f.kieu === 'hado') ban.phai = true;
+                else if (f.kieu === 'thuong' || f.kieu === 'thuong3') ban[f.tay || 'phai'] = true;
+            }
+            if (M.tt){                       // THIEN TRUY: nam dam chia thang xuong suot doan lao
+                let px = cx + dir * 8 * sc, py = cy + 20 * sc;
+                ctx.save(); ctx.translate(px, py); ctx.rotate(Math.PI / 2); ctx.translate(-px, -py);
+                midasVeNamDam({ x: px, y: py, sc, dir: 1 }, 0, 1);
+                ctx.restore();
+                ban.phai = true;
+            }
+            let nhun = ng.grounded ? Math.sin(frames * 0.12) * 1.2 : 0;
+            if (!ban.trai){ ctx.save(); ctx.globalAlpha = 0.8; midasVeNamDam({ x: cx, y: cy + 6 + nhun, sc: sc * 0.62, dir }, 12 * sc, 0.8); ctx.restore(); }
+            if (!ban.phai) midasVeNamDam({ x: cx, y: cy + 2 - nhun, sc: sc * 0.66, dir }, 18 * sc, 1);
+        }
         function midasVe(ng){
             if (!ng || ng.ammoType !== MIDAS_DAN) return;
             let M = midasCua(ng), bac = midasBac(ng);
@@ -55939,6 +55998,7 @@ class PulsarCloneBoss {
             else midasVeSac(ng, M);          // chua dam thi dang tich -> hao quang + con so
             if (M.kame) midasVeKame(ng, M);
             if (M.dl)   midasVeDamLuot(ng, M);
+            midasVeTay(ng, M);               // GANG TAY VANG luon deo tren hai tay
             midasVeFx(ng, M);                // @@HE-MIDAS-VE: nam dam + vet xe gio cua bo don moi
             // vien chuong Hadoken tu ve trong Projectile.draw(), khong goi o day nua
             if (M.no > 0){
@@ -73655,7 +73715,11 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '#NỘI TẠI — ĂN ĐÒN LÀ CỘNG',
                 '-Mỗi điểm máu mất đi cộng thẳng vào cú đấm: 10 khi đánh quái, 1 khi đấu người.',
                 '-Đây là vũ khí duy nhất coi việc bị đánh là tài nguyên. Đứng chịu trận có lợi, nhưng chịu quá tay thì chết trước khi kịp đấm.',
-                '#BẮN THƯỜNG [J] — XẢ',
+                '#ĐẤM [J]',
+                '>J J J — đấm PHẢI · TRÁI · PHẢI thật nhanh (2 · 2 · 3), cú thứ ba vươn xa gấp rưỡi rồi mới nghỉ tay. Hai găng tay luôn đeo trên tay.',
+                '>Xuống + J — đấm chỉa thẳng xuống đất (3). Trên không: lao xuống, chạm đất nổ hai làn sóng.',
+                '>Lướt + J — lao tới xa hơn cú lướt thường, 4 sát thương.',
+                '#CÚ ĐẤM TÍCH (nhả K) — XẢ',
                 '>đấm — toàn bộ số đã tích, tầm 70px cộng 6px cho mỗi điểm sát thương, trần 900px.',
                 '>từ 30 sát thương trở lên — SÓNG XUNG KÍCH — cú đấm chẻ mặt đất, đẩy một loạt mặt sóng chạy dọc mặt đất, càng ra xa càng cao.',
                 '>giết gọn một phát — nạn nhân bị thổi văng khỏi bản đồ.',
@@ -74095,7 +74159,11 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '#PASSIVE — GETTING HIT PAYS',
                 '-Every point of health you lose goes straight into the punch: 10 against monsters, 1 against another player.',
                 '-This is the only weapon that treats being hit as income. Standing and taking it pays, but take too much and you die before you swing.',
-                '#PRIMARY [J] — RELEASE',
+                '#PUNCHES [J]',
+                '>J J J — a fast RIGHT · LEFT · RIGHT (2 · 2 · 3); the third reaches half again as far before you reset. Both gauntlets stay on your hands.',
+                '>Down + J — a punch straight into the ground (3). In the air: dive down and split two ground waves on landing.',
+                '>Dash + J — lunges further than a plain dash, 4 damage.',
+                '#BANKED PUNCH (release K) — RELEASE',
                 '>punch — the entire bank, reaching 70px plus 6px per point of damage, capped at 900px.',
                 '>from 30 damage up — SHOCKWAVE — the punch splits the ground and drives a train of surface waves outward, each taller than the last.',
                 '>a one shot kill — blows the victim clean off the map.',
@@ -79117,6 +79185,7 @@ function infernoMaxChain(x, y, source){
                 else if (midasKhop(dino, ['lui','tien']))  { midasGhi(dino,'J'); if (midasHado(dino))  return; }
                 else if (midasKhop(dino, ['xuong','tien'])){ midasGhi(dino,'J'); if (midasHasho(dino)) return; }
                 else if (midasKhop(dino, ['J','tien']))    { midasGhi(dino,'J'); if (midasDamXa(dino)) return; }
+                if (dino.grounded && (keys['KeyS'] || keys['ArrowDown'])){ midasGhi(dino, 'J'); if (midasDamDat(dino)) return; }
                 midasGhi(dino, 'J');
                 dino.clawRiseWindow = 38;      // mo cua so bam NHAY -> SHORYUKEN
                 // J gio LUON la dam thuong; cu dam manh da chuyen sang NHA phim K.
