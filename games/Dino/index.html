@@ -26825,20 +26825,41 @@ class ZeroBoss {
     bui(n, mau){ let a = []; for (let i = 0; i < n; i++) a.push({ x: this.cx() + (Math.random() - 0.5) * 30, y: this.y + this.h, vx: (Math.random() - 0.5) * 3, vy: Math.random() * 2, t: 0, song: 18, mau: mau, r: 3 }); return a; }
 
     /* ================= TANG TAN CONG ================= */
+    /* CHON DON THEO TINH HUONG (boss EX) — khong boc ngau nhien nua. Doc vi tri / hanh vi cua
+       nguoi choi roi lay don DAU TIEN con hoi xong trong danh sach uu tien cua tinh huong do;
+       hoi chieu (cd) tu xoay vong cac lua chon. */
     chon(){
-        let k = this.khe(), tren = this.tren(), ds = [];
-        const them = (t, w, dk) => { if (dk !== false && !(this.cd[t] > 0)) ds.push([t, w]); };
-        if (this.docKhien > 18){ this.docKhien = 0; if (!(this.cd.rakuhouha > 0)) return 'rakuhouha'; return 'hyouretsuzan'; }
-        if (this.docBan >= 2){ this.docBan = 0; if (!(this.cd.shippuuga > 0)) return 'shippuuga'; }
-        if (tren){ them('ryuenjin', 30, this.gap() < 170); them('kuuenzan', 20, this.gap() < 220); them('hyouretsuzan', 10); }
-        if (k < 90){ them('combo', 40); them('ryuenjin', 12); them('raijingeki', 14); them('kuuenzan', 8); them('rakuhouha', 7, this.hp < this.maxHp * 0.6); }
-        else if (k < 210){ them('shippuuga', 26); them('raijingeki', 22); them('hyouretsuzan', 16); them('rakuhouha', 12, this.hp < this.maxHp * 0.8); }
-        else { them('shippuuga', 30); them('hyouretsuzan', 20); them('rakuhouha', 14); }
-        if (!ds.length) return null;
-        let tong = 0; for (const e of ds) tong += e[1];
-        let r = Math.random() * tong;
-        for (const e of ds){ r -= e[1]; if (r <= 0) return e[0]; }
-        return ds[0][0];
+        let k = this.khe(), g = this.gap(), tren = this.tren();
+        const co = t => !!t && !(this.cd[t] > 0);
+        const lay = (...ds) => ds.find(co) || null;
+        let mau = this.hp / this.maxHp;
+        let huong = Math.sign((dino.x + dino.w / 2) - this.cx());                  // phia nguoi choi
+        let chayXa = Math.abs(this._pvx || 0) > 1.5 && Math.sign(this._pvx) === huong;   // dang chay ra xa
+        let sac = (dino.chargeProgress || 0) > 40;                                   // dang tu Charge
+        let hoDon = dino.isOverheated || (dino.attackCooldown || 0) > 18;            // vua vung don / qua nhiet
+        let goc = dino.x < 90 || dino.x + dino.w > canvas.width - 90;                // bi don vao goc
+        // gio khien lau -> pha khien; ban lien tuc -> luot xuyen dan
+        if (this.docKhien > 18){ this.docKhien = 0; return lay('rakuhouha', 'hyouretsuzan', 'combo'); }
+        if (this.docBan >= 2){ this.docBan = 0; let t = lay(k < 90 ? 'combo' : 'shippuuga', 'raijingeki'); if (t) return t; }
+        if (tren){
+            if (g < 120) return lay('ryuenjin', 'kuuenzan', 'hyouretsuzan');        // ngay tren dau: bat len
+            if (g < 220) return lay('kuuenzan', 'hyouretsuzan', g < 170 && 'ryuenjin');
+            return lay('hyouretsuzan', 'shippuuga');                                // xa tren khong: dam tu tren xuong
+        }
+        if (k < 90){                                                                // TAM CAN CHIEN
+            if (goc)   return lay('combo', 'raijingeki', 'ryuenjin', 'kuuenzan');    // ghim vao goc
+            if (hoDon) return lay('combo', 'ryuenjin', 'raijingeki');                // phat so ho
+            if (sac)   return lay('raijingeki', 'combo', 'ryuenjin');                // ngat Charge nhanh nhat
+            return lay('combo', mau < 0.6 && 'rakuhouha', 'ryuenjin', 'raijingeki', 'kuuenzan');
+        }
+        if (k < 210){                                                               // TAM TRUNG
+            if (chayXa || sac) return lay('shippuuga', 'raijingeki', 'hyouretsuzan');   // duoi theo / cat Charge
+            if (hoDon) return lay('shippuuga', 'raijingeki');
+            return lay('raijingeki', 'hyouretsuzan', mau < 0.8 && 'rakuhouha', 'shippuuga');
+        }
+        // XA
+        if (sac || chayXa) return lay('shippuuga', 'hyouretsuzan', 'rakuhouha');
+        return lay(mau < 0.8 && 'rakuhouha', 'shippuuga', 'hyouretsuzan');
     }
     batDon(t){
         this.aS = t; this.aT = 0; this.hit.clear(); this.trungDon = false; this.noi = null;
@@ -26862,6 +26883,7 @@ class ZeroBoss {
     }
     tickDon(){
         for (const k in this.cd) if (this.cd[k] > 0) this.cd[k]--;
+        this._pvx = (this._px === undefined) ? 0 : this._pvx * 0.8 + (dino.x - this._px) * 0.2; this._px = dino.x;   // van toc ngang (lam muot) cua nguoi choi
         if (this.aS === 'khong'){
             if (this.aNghi > 0){ this.aNghi--; return false; }
             if (!this.grounded) return false;
@@ -26883,7 +26905,7 @@ class ZeroBoss {
             if (T >= 34 && T < 40) this.chem(80, 60, 0, 'c', -6);
             if (T > 46){
                 // trung don thi NOI: nguoi choi bi day len khong -> Ryuenjin; tren dat -> Raijingeki
-                let noi = this.trungDon ? (this.tren() || Math.random() < 0.4 ? 'ryuenjin' : 'raijingeki') : null;
+                let noi = this.trungDon ? (!dino.grounded ? 'ryuenjin' : 'raijingeki') : null;
                 this.hetDon(CD.combo, noi);
             }
         } else if (A === 'shippuuga'){
@@ -26909,7 +26931,7 @@ class ZeroBoss {
             if (T >= 30 || (T > 8 && this.vy >= 0)){
                 // DINH NHAY: noi tren khong — nguoi choi van o gan thi xoay Kuuenzan hoac dam bang xuong
                 let noi = null;
-                if (this.gap() < 260) noi = (dino.grounded || Math.random() < 0.5) ? 'hyouretsuzan' : 'hienkyaku';
+                if (this.gap() < 260) noi = (dino.grounded || dino.y + dino.h > this.y + this.h) ? 'hyouretsuzan' : 'hienkyaku';   // duoi minh -> dam xuong, ngang tam -> luot chem
                 this.hetDon(CD.ryuenjin, noi);
             }
         } else if (A === 'hyouretsuzan'){
