@@ -49937,19 +49937,10 @@ class PulsarCloneBoss {
                 floatingTexts.push(new FloatingText(ng.x - 20, ng.y - 32, "PHÓNG CÔN +" + bonus));
                 return;
             }
-            // --- tren khong ---
-            if (!ng.grounded){
-                // DAP DAU: LAO TOI trong 9 khung roi bat lui 5cm. Mien thuong suot doan lao.
-                // Khong dich chuyen mot phat — nhin nhu an gian va nguoi choi khong doc duoc.
-                if (ng._wkgDap) return;
-                let m = wkgMucGan(ng);
-                ng.invincible = true; ng.invTimer = Math.max(ng.invTimer || 0, 26);
-                ng._wkgDap = { t: 0, T: 9, muc: m, xong: 0 };
-                ng.attackCooldown = 22;
-                return;
-            }
+            // --- tren khong: J danh CHUOI KICH CON y nhu duoi dat (roi tu nhien, khong lo lung).
+            //     Cu LAO TOI DAP DAU truoc day cua J tren khong gio nam o phim K (xem wkgK). ---
             // --- cui J: CHOC CON, phong than gay dam ve truoc ---
-            if (keys['KeyS'] || keys['ArrowDown']){
+            if (ng.grounded && (keys['KeyS'] || keys['ArrowDown'])){
                 wkgDanh(ng, { dmg: 3, life: 14, reach: 300, hTop: 8, hBot: 8, cd: 20, kf: 'choc' });
                 wkgThu = 10;                                 // phai thu gay ve moi di duoc
                 return;
@@ -50006,9 +49997,19 @@ class PulsarCloneBoss {
                 }
             }
             if (!og) return;
-            // --- tren khong: keo dai gay bo xuong ---
+            // --- tren khong, CHAM K ---
             if (!ng.grounded && !wkgCon && !wkgMay && hg < 15){
-                wkgDanh(ng, { dmg: 4, life: 16, reach: 230, hTop: 10, hBot: 52, cd: 26, kf: 'bo' });
+                // Xuong + K: keo dai gay BO XUONG
+                if (keys['KeyS'] || keys['ArrowDown']){
+                    wkgDanh(ng, { dmg: 4, life: 16, reach: 230, hTop: 10, hBot: 52, cd: 26, kf: 'bo' });
+                    return;
+                }
+                // K: DAP DAU — LAO TOI trong 9 khung roi bat lui 5cm, mien thuong suot doan lao
+                if (ng._wkgDap || !og) return;
+                let m = wkgMucGan(ng);
+                ng.invincible = true; ng.invTimer = Math.max(ng.invTimer || 0, 26);
+                ng._wkgDap = { t: 0, T: 9, muc: m, xong: 0 };
+                ng.attackCooldown = 22;
                 return;
             }
             ng._wkgK = 0;
@@ -72965,7 +72966,7 @@ class PulsarCloneBoss {
            chu ASCII — "DOC QUYEN GIAO." co dau nen KHONG go duoc, va ca dong tom tat tro thanh
            dung ba chu do. Vi vay cau dau PHAI la mot cau co noi dung. */
         RUNES.push({ id:'wukong', name:'SON WUKONG', nameEn:'SON WUKONG', icon:'\u{1F9AF}', cost:2, ammoRune:true, onlyAmmo:10,
-            desc:'Tốn 2 ô. Thay trọn bộ đòn của Giáo bằng NHƯ Ý KIM CÔ BỔNG và khoá Power sang SON WUKONG (thế đánh đứng yên ở Gunslinger).\n\nCHUỖI J J J J J — VŨ HOA: bốn nhát vung ngang quanh người rồi một cú nhảy lên giáng xuống. 2-2-2-2-4.\n\nHÀO QUANG: cứ 4 đòn trúng mà chưa ăn đòn thì lên một nấc, tối đa 3 nấc, mỗi nấc +1 sát thương cho MỌI đòn. Nấc 1 hai đầu gậy đỏ, nấc 2 thân gậy nổi vân vàng, nấc 3 người chơi bốc quầng lửa. Ăn một đòn là về 0.\n\nBẤM K — LẬP CÔN: cắm gậy xuống đất rồi đứng lên ngọn, cao đúng tầm một cú nhảy. Bấm tiếp thì cột dài thêm một nấc, tối đa ba nấc; đứng được 2 giây rồi cột tự hạ. CÚI để thu gậy xuống đất bất cứ lúc nào — thu gậy không đặt lại đồng hồ. Nhảy vẫn là nhảy bình thường.\n\nTRÊN CỘT BẤM J — KÍCH CÔN: nắm lấy chính cây cột đang đứng, xoay hai vòng rồi giáng xuống, người chơi rơi chậm theo. Tầm quét bằng ĐÚNG CHIỀU DÀI CÂY CỘT. 6 / 10 / 14 sát thương theo nấc.\n\nTRÊN CỘT MÀ LƯỚT — CÂN ĐẨU VÂN: thu gậy, cưỡi mây bay tự do 5 giây. Trên mây bấm J giáng sét thẳng xuống dưới đám mây, 4 sát thương, mỗi giây một lần. Bấm NHẢY để TRUỴ CÔN: lao thẳng xuống, thân gậy quét phía dưới, 5 sát thương, miễn thương lúc lao.\n\nJ → K: lùi một bước rồi vung mạnh 4. K lần nữa: cắm gậy đưa người lên cao rồi giáng xuống 8.\n\nJ → LƯỚT — TOÀN CÔN: vung một nhát 3, lướt tới rồi giáng thêm 4.\n\nCÚI J: phóng dài thân gậy chọc 3, bấm tiếp để chọc liên tục; phải thu gậy về mới đi được.\n\nTRÊN KHÔNG: J lao tới đạp đầu kẻ địch 2 rồi bật lùi (miễn thương lúc lao); K kéo dài gậy bổ xuống 4. LƯỚT + J lao tới đâm 3.\n\nKHIÊN BỊ THAY BẰNG XOAY CÔN: quay gậy thành một bánh xe DỰNG chắn trước mặt 2 giây, chặn sạch đạn và gây 2 sát thương mỗi giây, hồi 2 giây. Xoay xong bấm J phóng gậy 3 — chặn 1-3 viên +1, 4-6 viên +2, nhiều hơn +3.\n\nCÚI HAI NHỊP RỒI LƯỚT: để lại một PHÂN THÂN MỒI 1 máu ở chỗ cũ, kẻ địch xông vào thì bị nó gõ 1. Hồi 3 giây.\n\nGIỮ K: 0.5-1 giây VÒNG CHỐNG YÊU — xoay gậy kẻ một vòng 3 sát thương, để lại vòng bán kính 3cm đốt 2 sát thương mỗi giây trong 3 giây. 1-2 giây TRIỆU CÂN ĐẨU VÂN treo trên đầu kẻ địch giáng sét 3 sát thương mỗi giây trong 3-4 giây. 2-3 giây LỐC CÔN — ba vòng xoay 4 mỗi vòng rồi một cú 5 đẩy LỐC XOÁY quét ngang, 5 sát thương và hất tung; ai chết trong lốc thì bị cuốn khỏi màn hình.\n\nCHANNEL: hai PHÂN THÂN đánh bằng chính bộ não đối kháng của game, cứ 5 giây thêm một con. Chúng đánh rồi lùi ra một đoạn ngắn, nghỉ 2 giây rồi vào lại. Đòn thường 1, đòn mạnh 2.\n\nCHIÊU CUỐI: ném gậy lên trời cho phóng to cực đại rồi đâm xuống đất, 100 sát thương. Sau đó 10 giây mọi đòn +1.',
+            desc:'Tốn 2 ô. Thay trọn bộ đòn của Giáo bằng NHƯ Ý KIM CÔ BỔNG và khoá Power sang SON WUKONG (thế đánh đứng yên ở Gunslinger).\n\nCHUỖI J J J J J — VŨ HOA: bốn nhát vung ngang quanh người rồi một cú nhảy lên giáng xuống. 2-2-2-2-4. Trên không bấm J cũng ra chuỗi này (rơi bình thường, không lơ lửng); bấm K trên không = ĐẬP ĐẦU lao tới đánh, Xuống + K trên không = kéo dài gậy bổ xuống.\n\nHÀO QUANG: cứ 4 đòn trúng mà chưa ăn đòn thì lên một nấc, tối đa 3 nấc, mỗi nấc +1 sát thương cho MỌI đòn. Nấc 1 hai đầu gậy đỏ, nấc 2 thân gậy nổi vân vàng, nấc 3 người chơi bốc quầng lửa. Ăn một đòn là về 0.\n\nBẤM K — LẬP CÔN: cắm gậy xuống đất rồi đứng lên ngọn, cao đúng tầm một cú nhảy. Bấm tiếp thì cột dài thêm một nấc, tối đa ba nấc; đứng được 2 giây rồi cột tự hạ. CÚI để thu gậy xuống đất bất cứ lúc nào — thu gậy không đặt lại đồng hồ. Nhảy vẫn là nhảy bình thường.\n\nTRÊN CỘT BẤM J — KÍCH CÔN: nắm lấy chính cây cột đang đứng, xoay hai vòng rồi giáng xuống, người chơi rơi chậm theo. Tầm quét bằng ĐÚNG CHIỀU DÀI CÂY CỘT. 6 / 10 / 14 sát thương theo nấc.\n\nTRÊN CỘT MÀ LƯỚT — CÂN ĐẨU VÂN: thu gậy, cưỡi mây bay tự do 5 giây. Trên mây bấm J giáng sét thẳng xuống dưới đám mây, 4 sát thương, mỗi giây một lần. Bấm NHẢY để TRUỴ CÔN: lao thẳng xuống, thân gậy quét phía dưới, 5 sát thương, miễn thương lúc lao.\n\nJ → K: lùi một bước rồi vung mạnh 4. K lần nữa: cắm gậy đưa người lên cao rồi giáng xuống 8.\n\nJ → LƯỚT — TOÀN CÔN: vung một nhát 3, lướt tới rồi giáng thêm 4.\n\nCÚI J: phóng dài thân gậy chọc 3, bấm tiếp để chọc liên tục; phải thu gậy về mới đi được.\n\nTRÊN KHÔNG: J lao tới đạp đầu kẻ địch 2 rồi bật lùi (miễn thương lúc lao); K kéo dài gậy bổ xuống 4. LƯỚT + J lao tới đâm 3.\n\nKHIÊN BỊ THAY BẰNG XOAY CÔN: quay gậy thành một bánh xe DỰNG chắn trước mặt 2 giây, chặn sạch đạn và gây 2 sát thương mỗi giây, hồi 2 giây. Xoay xong bấm J phóng gậy 3 — chặn 1-3 viên +1, 4-6 viên +2, nhiều hơn +3.\n\nCÚI HAI NHỊP RỒI LƯỚT: để lại một PHÂN THÂN MỒI 1 máu ở chỗ cũ, kẻ địch xông vào thì bị nó gõ 1. Hồi 3 giây.\n\nGIỮ K: 0.5-1 giây VÒNG CHỐNG YÊU — xoay gậy kẻ một vòng 3 sát thương, để lại vòng bán kính 3cm đốt 2 sát thương mỗi giây trong 3 giây. 1-2 giây TRIỆU CÂN ĐẨU VÂN treo trên đầu kẻ địch giáng sét 3 sát thương mỗi giây trong 3-4 giây. 2-3 giây LỐC CÔN — ba vòng xoay 4 mỗi vòng rồi một cú 5 đẩy LỐC XOÁY quét ngang, 5 sát thương và hất tung; ai chết trong lốc thì bị cuốn khỏi màn hình.\n\nCHANNEL: hai PHÂN THÂN đánh bằng chính bộ não đối kháng của game, cứ 5 giây thêm một con. Chúng đánh rồi lùi ra một đoạn ngắn, nghỉ 2 giây rồi vào lại. Đòn thường 1, đòn mạnh 2.\n\nCHIÊU CUỐI: ném gậy lên trời cho phóng to cực đại rồi đâm xuống đất, 100 sát thương. Sau đó 10 giây mọi đòn +1.',
             descEn:'Costs 2 slots. SPEAR ONLY. Replaces the whole spear kit with the Ruyi Jingu Bang and locks the Power to SON WUKONG. K plants the staff and you stand on its tip (three tiers); dash from up there to ride the Somersault Cloud; the shield becomes a spinning wheel that cuts bullets. Landing hits without taking damage builds a 3-tier HALO, +1 damage per tier.' });
 RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', cost:2, ammoRune:true, onlyAmmo:10,   // @@HE-TRIDENT
             desc:'Tốn 2 ô. Biến Giáo thành ĐINH BA của hải thần và khoá Power sang MUSOU.\n\nCOMBO: J J J J vung · vung · chọc · chọc. J K K vung rồi xoay người HẤT TUNG, nhảy lên CHÉM XUỐNG. J J K K vung · vung · ĐÂM XUYÊN ra sau lưng rồi quay lại đâm. J J J K vung · vung · chọc XIÊN kẻ địch rồi VUNG HẤT BAY (đập tường +1). Vung 2 · chọc 4 · đòn K bồi 4. Các đòn khác (cúi, trên không, lướt) giữ như Giáo.\n\nK: chạm = chọc kèm GIÁO KHÍ hình đinh ba (4). 0.5s LIÊN HOÀN THƯƠNG 3-5 mũi (3). 1s CỘT NƯỚC 3-5 cột (3), từ 1.5s thêm cú đâm (4) đẩy ra CON SÓNG (3). 1.75s ném đinh ba TÁCH 3 GIÁO (6), từ 2.25s thêm THỦY CẦU (5). 2.5s THỦY LAO khoá kẻ địch 1.5s (2 mỗi 0.5s). CHANNEL: CƯỠI SÓNG, sóng quét qua gây 4.\n\nCHIÊU CUỐI: LINH HỒN NGỌN GIÁO — hải thần hiện ra phóng đinh ba, ghim kẻ địch tới cuối bản đồ, 100 sát thương + choáng 2 giây.',
