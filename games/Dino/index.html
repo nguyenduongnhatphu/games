@@ -48248,7 +48248,7 @@ class PulsarCloneBoss {
             let _nv = (typeof hasRune === 'function' && hasRune('explshot'));
             let cxp = p.x + p.w / 2, cyp = p.y + p.h / 2;
             // 1) No nho quanh nguoi (chi an khi co dich dung sat) — khong con la nguon dmg chinh
-            let aoeD = 2 + (_nv ? 2 : 0);   // bat luoi: 2 sat thuong (nerf -1)
+            let aoeD = 3 + (_nv ? 2 : 0);   // bat luoi: 3 sat thuong
             let R = (78 + (_nv ? 30 : 0)) * (p.getFormScale ? p.getFormScale() : 1);
             boomApply({ x: cxp - R, y: cyp - R, w: R * 2, h: R * 2 }, aoeD, new Set());
             visualEffects.push(new Effect(cxp, cyp, 'explosion', true, R));
@@ -48262,7 +48262,7 @@ class PulsarCloneBoss {
             // 2) NEM NGUOC CO NGAM: bat duoc la nem thang vao dich gan nhat, mien phi dan
             let chain = (b.chain || 0) + 1;
             let inCh = !!p.boomChannel;
-            let cd = inCh ? 5 : 4;                            // Khien Luoi manh hon
+            let cd = inCh ? 4 : 3;                            // Khien Luoi manh hon (nerf -1: 4/5 -> 3/4)
             let nb = throwBoomerang(p, { dmg: cd, charge: 0.55, twice: true, aim: true, fitRange: true });
             nb.chain = chain; nb.counter = true; nb.paid = b.paid;
             p.boomOut = (p.boomOut || 0) + 1;
@@ -57678,11 +57678,34 @@ class PulsarCloneBoss {
         /* O THU BA (`x`) chi song khi deo rune `cus3o`. No nhan CA HAI loai, nen day la
            cho duy nhat hai nhanh CUNG LOAI (NO + KHUC XA) gap duoc nhau — dung nhu ghi
            trong ban thiet ke, va dung la cap toi se do dau tien. */
-        let cusLap = { nl: null, he: null, x: null, ch: null };   // dang lap nhanh nao (ch = Channel)
+        let cusLap = { nl: null, he: null, x: null, ch: null, nl2: null, he2: null };   // dang lap nhanh nao (ch = Channel; nl2/he2 = rune SONG HE)
         /* Chua co Route nen moi thu deu o che do THU NGHIEM: nhanh nao lap vao cung chay
            thang cap 3. Khi dung Route that thi co doi co nay ve false va doc `cusCap`. */
         let cusThuNghiem = true;
         function cusOBa(){ return typeof hasRune === 'function' && hasRune('cus3o'); }
+        /* @@HE-SONGHE — rune SONG HE: hai o NANG LUC + hai o HIEU UNG.
+           Hai hieu ung luon chay cung luc (va mo duoc cac COMBO cung loai: BANG + NO...).
+           Hai nang luc: neu ca hai deu chi CHINH VIEN DAN THUONG (Bang Dan / Tach Tia / Tam Xa)
+           thi chay chung luon — vd Tach Tia + Tam Xa = ba vien xuyen lon dan. Con lai moi nang
+           luc khac deu THAY HAN cach ban (Railgun, Laser, Cua, Cung...), hai cai do khong the
+           cung nam tren mot nong sung — nen chi MOT LOI chay mot luc va Q / E doi loi. */
+        const CUS_SH_BOTRO = { bangdan: 1, tachtia: 1, tamxa: 1 };
+        let cusSHChon = 0, cusSHCd = 0;          // 0 = loi 1 (o nl) dang chay, 1 = loi 2 (o nl2)
+        function cusSH(){ return typeof hasRune === 'function' && hasRune('cussh'); }
+        function cusSHHaiLoi(){ return cusSH() && !!cusLap.nl && !!cusLap.nl2 && !(CUS_SH_BOTRO[cusLap.nl] && CUS_SH_BOTRO[cusLap.nl2]); }
+        function cusSHNghi(){ return cusSHHaiLoi() ? (cusSHChon ? cusLap.nl : cusLap.nl2) : null; }
+        function cusSHDoi(ng){
+            if (!cusSHHaiLoi() || cusSHCd > 0 || !ng) return false;
+            if (ng.cwKhoa || ng.cusRgGiu || ng.jcState || ng.ultActive) return false;     // dang giua mot don thi khong rut loi
+            cusSHChon = cusSHChon ? 0 : 1; cusSHCd = 30;
+            ng.cusRgGiu = false; ng.cusRgT = 0; ng.cwGiu = 0; ng.cwRo = 0; ng.chargeProgress = 0; ng.aKeyHeldTime = 0;
+            ng.isOverheated = false; ng.overheatTimer = 0;
+            let id = cusSHChon ? cusLap.nl2 : cusLap.nl, it = cusNCTim(id);
+            floatingTexts.push(new FloatingText(ng.x - 30, ng.y - 34, LT("LÕI: ", "CORE: ") + (it ? cusTen(it) : '?')));
+            visualEffects.push(new Effect(ng.x + ng.w / 2, ng.y + ng.h / 2, 'parry', false));
+            if (typeof SFX !== 'undefined' && SFX.tone){ SFX.tone(660, 0.07, 'square', 0.12, 990); SFX.tone(990, 0.09, 'triangle', 0.10, 1320); }
+            return true;
+        }
         /* @@HE-TACHDAN — bo lap AO cua hai loai dan moi. Custom khong con Phi Tieu / Kiem Vu. */
         const CUS_LAP_PT = { nl: 'phitieu', he: 'phitieu', x: null, ch: null };
         const CUS_LAP_KV = { nl: 'kiemvu', he: 'kiemvu', x: null, ch: null };
@@ -57699,8 +57722,10 @@ class PulsarCloneBoss {
             let L = cusLapDung();
             if (L !== cusLap) return (L.nl === id || L.he === id) ? 3 : 0;   // loai dan rieng: khong cap, luon du
             if (CUS_TACH[id]) return 0;                                       // Custom khong con hai module nay
-            let co = (cusLap.nl === id) || (cusLap.he === id) || (cusLap.x === id && cusOBa());
+            let co = (cusLap.nl === id) || (cusLap.he === id) || (cusLap.x === id && cusOBa())
+                  || ((cusLap.nl2 === id || cusLap.he2 === id) && cusSH());          // @@HE-SONGHE
             if (!co) return 0;
+            if (id === cusSHNghi()) return 0;                                        // @@HE-SONGHE: loi dang nghi
             return Math.min(cusCapToiDa(id), cusThuNghiem ? 3 : Math.max(0, Math.min(3, cusCap[id] || 0)));
         }
         // @@HE-NO2: module co `capMax` (vd NO chi toi cap 2)
@@ -57724,7 +57749,9 @@ class PulsarCloneBoss {
                                cusLap = { nl: (a && a.loai === 'nl' && a.xong) ? v.nl : null,
                                           he: (b && (b.loai === 'he' || b.ca) && b.xong) ? v.he : null,
                                           x:  (c && c.xong) ? v.x : null,
-                                          ch: (d && d.xong) ? v.ch : null };
+                                          ch: (d && d.xong) ? v.ch : null,
+                                          nl2: (cusNCTim(v.nl2) && cusNCTim(v.nl2).loai === 'nl' && !cusNCTim(v.nl2).ca && cusNCTim(v.nl2).xong && v.nl2 !== v.nl) ? v.nl2 : null,
+                                          he2: (cusNCTim(v.he2) && cusNCTim(v.he2).loai === 'he' && !cusNCTim(v.he2).ca && cusNCTim(v.he2).xong && v.he2 !== v.he) ? v.he2 : null };
                            } } catch(e){} }
         // ---- Cac chi so doi theo nhanh BANG DAN ----
         // @@HE-CUSMC — MAN CUOI
@@ -58262,7 +58289,8 @@ class PulsarCloneBoss {
         function cusModLap(hang, it){
             if (hang === 'ult') return it.id === 'vankiem' || it.id === 'baovu' || cusUltChon === it.id;
             if (hang === 'ch')  return it.id === 'vuongkho' || it.id === 'thienla' || cusLap.ch === it.id;
-            return (cusLap[hang] === it.id) || (cusLap.x === it.id && cusOBa());
+            return (cusLap[hang] === it.id) || (cusLap.x === it.id && cusOBa())
+                || ((hang === 'nl' || hang === 'he') && cusLap[hang + '2'] === it.id && cusSH());   // @@HE-SONGHE
         }
         function cusModMo(hang, it, cap){
             let m = (currentLang === 'en' && it.moEn) ? it.moEn : it.mo;
@@ -58331,11 +58359,18 @@ class PulsarCloneBoss {
             ctx.fillStyle = "#B0BEC5"; ctx.font = "bold 18px Consolas, monospace";
             ctx.fillText(LT("NÂNG CẤP CUSTOM", "CUSTOM UPGRADES"), L.L, L.PY + 28);
             ctx.fillStyle = "#78909C"; ctx.font = "11px Consolas, monospace";
-            ctx.fillText(LT("Mỗi bảng lắp MỘT · bấm lại để tháo · rê chuột xem chi tiết · lăn chuột để cuộn",
+            ctx.fillText((typeof cusSH === 'function' && cusSH())
+                         ? LT("SONG HỆ: Năng lực và Hiệu ứng lắp HAI · bấm lại để tháo · rê chuột xem chi tiết",
+                              "DUAL CORE: two Abilities and two Effects · click again to unequip · hover for details")
+                         : LT("Mỗi bảng lắp MỘT · bấm lại để tháo · rê chuột xem chi tiết · lăn chuột để cuộn",
                             "One per panel · click again to unequip · hover for details · scroll to see more"),
                          L.L, L.PY + 46);
             ctx.textAlign = "right"; ctx.font = "bold 11px Consolas, monospace";
-            if (cusOBa()){
+            if (cusSH()){
+                ctx.fillStyle = "#FFD54F";
+                let _l = cusSHHaiLoi() ? LT("hai lõi — Q / E đổi", "two cores — Q / E swaps") : LT("2 năng lực + 2 hiệu ứng", "2 abilities + 2 effects");
+                ctx.fillText(LT("◆ SONG HỆ: ", "◆ DUAL CORE: ") + _l, L.PX + L.PW - 44, L.PY + 28);
+            } else if (cusOBa()){
                 ctx.fillStyle = "#FFD54F";
                 ctx.fillText(LT("◆ Ô THỨ BA: ", "◆ THIRD SLOT: ")
                              + (cusLap.x ? cusTen(cusNCTim(cusLap.x)) : LT("trống","empty")), L.PX + L.PW - 44, L.PY + 28);
@@ -58381,7 +58416,8 @@ class PulsarCloneBoss {
                 let lap = cusModLap(c.hang, c.it), cap = cusModCap(c.hang, c.it);
                 let hov = mouseX >= c.x && mouseX <= c.x + c.w && mouseY >= c.y && mouseY <= c.y + c.h;
                 if (hov) ro = c;
-                let oba = (c.hang === 'nl' || c.hang === 'he') && cusLap.x === c.it.id && cusOBa();
+                let oba = (c.hang === 'nl' || c.hang === 'he') && ((cusLap.x === c.it.id && cusOBa()) || (cusLap[c.hang + '2'] === c.it.id && cusSH()));
+                let _nghi = lap && c.hang === 'nl' && c.it.id === cusSHNghi();      // @@HE-SONGHE: loi dang nghi
                 ctx.fillStyle = lap ? "rgba(38,50,56,0.95)" : (hov ? "rgba(255,255,255,0.09)" : "rgba(255,255,255,0.035)");
                 ctx.fillRect(c.x, c.y, c.w, c.h);
                 ctx.strokeStyle = lap ? h.mau : (hov ? "rgba(255,255,255,0.40)" : "rgba(255,255,255,0.10)");
@@ -58391,7 +58427,7 @@ class PulsarCloneBoss {
                 // TEN + CAP tren CUNG MOT DONG
                 // module KHONG CO CAP thi hien dau tron tran, khong kem so — neu khong no
                 // se doi '●3' va nguoi choi tuong no nang cap duoc.
-                let nhan = lap ? (c.it.khongCap ? "●" : (oba ? ("◆" + cap) : ("●" + cap))) : "";
+                let nhan = lap ? (_nghi ? LT("NGHỈ", "IDLE") : (c.it.khongCap ? "●" : (oba ? ("◆" + cap) : ("●" + cap)))) : "";
                 ctx.font = "bold 10px Consolas, monospace";
                 let wn = nhan ? ctx.measureText(nhan).width + 8 : 0;
                 if (nhan){
@@ -58423,10 +58459,12 @@ class PulsarCloneBoss {
                 let ds = [];
                 for (let h of L.hang){
                     let ten = "—";
-                    for (let it of h.ds) if (cusModLap(h.key, it)) ten = cusModTen(it);
+                    let _ts = []; for (let it of h.ds) if (cusModLap(h.key, it)) _ts.push(cusModTen(it));
+                    if (_ts.length) ten = _ts.join(" + ");
                     ds.push(h.ten.split(" —")[0] + ": " + ten);
                 }
                 if (cusOBa() && cusLap.x) ds.push(LT("Ô BA: ","SLOT 3: ") + cusTen(cusNCTim(cusLap.x)));
+                if (cusSHHaiLoi()) ds.push(LT("LÕI ĐANG CHẠY: ","ACTIVE CORE: ") + cusTen(cusNCTim(cusSHChon ? cusLap.nl2 : cusLap.nl)));
                 wrapText(LT("Đang lắp — ","Equipped — ") + ds.join("   ·   "), T.x + 10, T.y + 18, T.w - 20, 14);
             }
             ctx.restore();
@@ -58446,7 +58484,8 @@ class PulsarCloneBoss {
            vua SAI vua de trong mot khoang lon trong khung mo ta. */
         function cusMoTaDan(){
             let ds = [];
-            for (let it of [cusNCTim(cusLap.nl), cusNCTim(cusLap.he), (cusOBa() ? cusNCTim(cusLap.x) : null)])
+            for (let it of [cusNCTim(cusLap.nl), cusNCTim(cusLap.he), (cusOBa() ? cusNCTim(cusLap.x) : null),
+                            (cusSH() ? cusNCTim(cusLap.nl2) : null), (cusSH() ? cusNCTim(cusLap.he2) : null)])
                 if (it) ds.push("▸ " + cusTen(it) + " — " + cusMo(it, cusCapCua(it.id)));
             if (cusLap.ch){
                 let C = cusChTim(cusLap.ch);
@@ -58476,8 +58515,12 @@ class PulsarCloneBoss {
             }
             if ((loai === 'nl' || loai === 'he') && (_laLai(cusLap.nl) || _laLai(cusLap.he))){ cusLap.nl = null; cusLap.he = null; }
             if (cusLap.x === it.id && cusOBa()){ cusLap.x = null; return false; }
-            if (cusLap[loai] === it.id){ cusLap[loai] = null; return false; }
+            // @@HE-SONGHE — o thu hai cung loai
+            let _o2 = (loai === 'nl' || loai === 'he') ? loai + '2' : null;
+            if (_o2 && cusLap[_o2] === it.id && cusSH()){ cusLap[_o2] = null; return false; }
+            if (cusLap[loai] === it.id){ cusLap[loai] = null; if (_o2 && cusSH() && cusLap[_o2]){ cusLap[loai] = cusLap[_o2]; cusLap[_o2] = null; } cusSHChon = 0; return false; }
             if (!cusLap[loai]){ cusLap[loai] = it.id; return true; }
+            if (_o2 && cusSH() && !cusLap[_o2]){ cusLap[_o2] = it.id; cusSHChon = 0; return true; }
             if (cusOBa() && !cusLap.x){ cusLap.x = it.id; return true; }
             cusLap[loai] = it.id; return true;
         }
@@ -63606,6 +63649,7 @@ class PulsarCloneBoss {
                     if (this.ammo > _cmx) this.ammo = _cmx;
                 }
                 if (this.cusCd > 0) this.cusCd--;
+                if (this.id === 1 && cusSHCd > 0) cusSHCd--;   // @@HE-SONGHE
                 if (cusQdBat()) this.cusQdNapDan();          // @@HE-CUSQD — khong qua nhiet
                 let _cOk = (fireKey && (this.aKeyHeldTime === 0 || jkKep(checkAmmo)) && this.laserActiveTimer <= 0 && !this.jcState);   // @@HE-JKKEP
                 /* @@HE-CUSCW — CHAINSAW nuot han nhip ban: khong co vien nao ra ca, va no
@@ -63659,6 +63703,14 @@ class PulsarCloneBoss {
                gi thay doi tren HUD thi nguoi choi khong biet minh vua duoc cai gi. */
             veHudThem(){
                 ctx.font = "bold 12px Consolas, monospace";
+                // @@HE-SONGHE — loi dang chay
+                if (typeof cusSHHaiLoi === 'function' && cusSHHaiLoi()){
+                    let _a = cusNCTim(cusSHChon ? cusLap.nl2 : cusLap.nl), _b = cusNCTim(cusSHChon ? cusLap.nl : cusLap.nl2);
+                    ctx.fillStyle = "#FFD54F"; ctx.fillText("⧉ " + (_a ? cusTen(_a) : '?'), 200, 48);
+                    ctx.fillStyle = "#78909C"; ctx.font = "10px Consolas, monospace";
+                    ctx.fillText("Q/E → " + (_b ? cusTen(_b) : '?') + (cusSHCd > 0 ? " …" : ""), 200 + ctx.measureText("⧉ " + (_a ? cusTen(_a) : '?')).width * 1.2 + 10, 48);
+                    ctx.font = "bold 12px Consolas, monospace";
+                }
                 if (cusLaserBat()){
                     // @@HE-CUSLZ — kho tru khong con nghia gi voi LASER; cho hien so TIA tich san
                     let _t = dino.cusLzKho || 0;
@@ -67110,7 +67162,7 @@ class PulsarCloneBoss {
             const forms = ["NORMAL", "RUSH", "ULTIMATE", "BEYOND"];
             const formDesc = currentLang==="en" ? ["Balanced baseline","Agile, blue spikes","Strong, dark, aura","Peak: horns + scales"] : ["Cơ bản, cân bằng", "Nhanh nhẹn, gai xanh", "Mạnh, tối màu, hào quang", "Đỉnh cao, sừng + vảy"];
             const ammos = AMMO_NAMES;
-            const ammoDesc = currentLang==="en" ? ["The Charge specialist. Hold longer and it keeps evolving — heavy round, piercing round, then a fission burst. Tap-firing is just filler.","The all-rounder. Almost everything splashes, so it clears packs and chews through bosses alike, and what it touches keeps burning.","Infinite ammo, but every shot starts wide. Keep the trigger down and the spread walks inward — thirty rounds in it is a purple laser firing twice as fast.","The strange one. Shards split, bounce and pierce, and the longer you stay on one target the harder it detonates. Learn it to use it.","Crowd king. Bolts leap from one enemy to the next, so the bigger the swarm the better. One-on-one with a boss it runs dry.","A close-range swordsman. There is a whole combo system hidden in your jump, dash and direction keys — go find it yourself.","You do not shoot enemies, you feed a star. It swallows every bullet near it and spits them back out in all directions, multiplied.","Throw it, then catch it yourself. A clean catch hurls it straight back into their face; a miss leaves you empty-handed.","Pure control. Every shot stacks frost; five stacks freeze. Then choose: leave them frozen, or shatter the ice for a burst.","Four rounds, no reload. The fourth is always the loudest — it executes on what they have already lost. Every hit leaves a mark for the rest of the kit.", "A melee weapon. J and K chain into each other like a Musou combo. Reach is 1.5x the sword but it has no ranged attack at all, so its answer to flying bosses is the air combo.", "A heavy melee weapon. Carrying it slows you to 85%; throwing it puts you at 120% but leaves you unable to attack. Every move has uncancellable recovery, and slams land where the hammer head hits.","The melee specialist. J J J throws a fast right-left-right chain, Down+J drives a fist into the ground, Dash+J lunges. Hold K to bank damage over time — every point of health you lose is added too — then release K to throw the whole bank in one punch.","Mid-range melee. Web slows and binds to force an opening, then whip strings, spike bursts and a grab-slam pour everything into that opening.","The unfinished gun — the weakest in the roster, by design. Six rounds a second, and emptying its six-round magazine overheats it on the spot. Holding K banks rounds into a separate store that fires half again as fast and ignores heat.","A chainsaw swung like a sword — and swinging a chainsaw is a terrible way to use one, so the slashes are pathetic. Everything lives on K: release it and the engine kicks in, and the whole moveset changes tier by tier for as long as the engine bar lasts.","Thin needles that pierce once. Every hit adds a PERMANENT bleed stack — the longer the fight, the harder it bleeds. K fans out a spread of needles; the Channel strings a net across the map, the ultimate is a storm of needles.","No ammo at all until you make it: hold K to forge swords that hover on your back, then J launches them. Swords block bullets on their own, and a full set of six becomes a shield. Channel opens the Gate of Treasure, the ultimate drops ten thousand swords.","Death's scythe. Cuts land fast but recover SLOWLY, and every combo branches on RHYTHM: press straight on, or pause a beat (the blade flashes purple) and press. Holding it locks the Power to DEATH — hits build rage, I/O calls the Reaper to fight at your side."] : ["Vua của đòn Charge. Giữ càng lâu càng biến hoá: viên to, viên xuyên, rồi vỡ thành chùm mảnh. Bắn thường chỉ để cầm chừng.","Đa dụng nhất bảng. Gần như đòn nào cũng nổ lan nên vừa dọn bầy vừa gặm boss, và thứ gì dính lửa cũng cháy tiếp một lúc.","Vô hạn đạn, nhưng bắn phát nào cũng tản. Giữ liên tục thì đạn khép dần vào giữa — đủ ba mươi viên nó thành tia laser tím, nhịp bắn nhanh gấp đôi.","Loại lắt léo nhất. Đạn tách, nảy, xuyên, và càng bám riết một mục tiêu thì đòn nổ càng đau. Phải hiểu cơ chế mới xài được.","Ông vua dọn bầy. Sét tự nhảy từ con này sang con khác, càng đông càng lời. Nhưng tay đôi với boss thì hụt hơi.","Kiếm sĩ cận chiến. Có nguyên một hệ combo giấu trong nút nhảy, nút lướt và hướng bấm — tự tìm ra mới vui.","Bạn không bắn kẻ địch, bạn nuôi một ngôi sao. Sao hút mọi viên đạn quanh nó rồi bắn trả gấp bội ra khắp hướng.","Ném đi rồi phải tự bắt. Bắt gọn thì lưỡi bay ngược vào mặt kẻ địch, hụt thì trắng tay ngồi chờ. Càng liều càng lãi.","Thuần khống chế. Mỗi phát cộng một tầng băng, đủ 5 tầng thì đóng băng. Rồi tự chọn: để yên mà khống, hay đập vỡ lấy sát thương.","Bốn viên, không nạp lại. Viên thứ tư luôn là viên to nhất — nó ăn theo lượng máu đối thủ đã mất. Mỗi phát trúng để lại một dấu ấn cho các đòn sau.", "Vũ khí cận chiến. J và K nối nhau thành combo kiểu Musou. Tầm đánh gấp rưỡi Kiếm nhưng hoàn toàn không có đòn tầm xa, nên cách với tới boss bay là combo trên không.", "Vũ khí cận chiến hạng nặng. Cầm búa thì chạy nhảy còn 85%, ném búa đi thì lên 120% nhưng không đánh được gì. Mọi đòn đều có khung khựng không huỷ, và cú nện nổ ngay chỗ đầu búa chạm đất.","Chuyên gia cận chiến. J J J đấm nhanh phải-trái-phải, Xuống+J nện nắm đấm xuống đất, Lướt+J lao tới đấm. Giữ K tích sát thương theo thời gian — mỗi điểm máu mất đi cũng được cộng vào — rồi nhả K tung toàn bộ vào một cú đấm.","Cận chiến tầm trung. Tơ làm chậm rồi trói để mở khoảng trống, sau đó chuỗi quất, gai bung và cú tóm-đạp dồn hết vào khoảng trống đó.","Khẩu chưa xong — yếu nhất bảng, và đó là chủ ý. 6 viên mỗi giây, cạn băng 6 viên là quá nhiệt ngay. Giữ K trữ đạn vào một kho riêng; xả kho thì bắn nhanh gấp rưỡi và không sợ nóng.","Cưa máy vung như kiếm — mà vung cưa thì phế thật, nên nhát chém chỉ 1 sát thương. Tất cả nằm ở phím K: nhả ra là nổ máy, và cả bộ đòn đổi nấc theo thời gian giữ, chạy được chừng nào thanh động cơ còn xăng.","Kim mảnh xuyên một lần. Mỗi mũi trúng cộng một vết CHẢY MÁU VĨNH VIỄN — trận càng dài máu chảy càng nhiều. K phóng quạt kim, Channel giăng lưới dây kín map, chiêu cuối là cơn mưa kim.","Không có đạn cho tới khi tự rèn: giữ K sinh kiếm lơ lửng sau lưng, J phóng kiếm đi. Kiếm tự bay ra chặn đạn, đủ sáu thanh thì thành khiên. Channel mở Vương Khố, chiêu cuối là Vạn Kiếm Quy Tông.","Lưỡi hái của thần chết. Chém ra rất nhanh nhưng THU HỒI CHẬM, và combo nào cũng rẽ nhánh theo NHỊP: bấm liền, hay dừng một nhịp (lưỡi loé tím) rồi bấm. Cầm nó thì Power khoá sang DEATH — đánh trúng tích nộ, I/O gọi thần chết ra đánh cùng."];
+            const ammoDesc = currentLang==="en" ? ["The Charge specialist. Hold longer and it keeps evolving — heavy round, piercing round, then a fission burst. Tap-firing is just filler.","The all-rounder. Almost everything splashes, so it clears packs and chews through bosses alike, and what it touches keeps burning.","Infinite ammo, but every shot starts wide. Keep the trigger down and the spread walks inward — thirty rounds in it is a purple laser firing twice as fast.","The strange one. Shards split, bounce and pierce, and the longer you stay on one target the harder it detonates. Learn it to use it.","Crowd king. Bolts leap from one enemy to the next, so the bigger the swarm the better. One-on-one with a boss it runs dry.","A close-range swordsman. There is a whole combo system hidden in your jump, dash and direction keys — go find it yourself.","You do not shoot enemies, you feed a star. It swallows every bullet near it and spits them back out in all directions, multiplied.","Throw it, then catch it yourself. A clean catch hurls it straight back into their face; a miss leaves you empty-handed.","Pure control. Every shot stacks frost; five stacks freeze. Then choose: leave them frozen, or shatter the ice for a burst.","Four rounds, no reload. The fourth is always the loudest — it executes on what they have already lost. Every hit leaves a mark for the rest of the kit.", "A melee weapon. J and K chain into each other like a Musou combo. Reach is 1.5x the sword but it has no ranged attack at all, so its answer to flying bosses is the air combo.", "A heavy melee weapon. Carrying it slows you to 85%; throwing it puts you at 120% but leaves you unable to attack. Every move has uncancellable recovery, and slams land where the hammer head hits.","J J J = right-left-right. Hold K to bank damage (lost health and parries add to it), release K to spend it all. HIDDEN INPUTS (Fwd = facing): Back Fwd J Hadoken · Down Fwd J Hashogeki · Back Down Fwd J Kamehameha (needs 50) · J then Jump Shoryuken · J Fwd J long jab · Down J ground punch · Dash J lunge · Down Down Denjin · In air: Down J Heaven Drop, Up Up Down J Stomp. Magnifier: numbers.","Mid-range melee. Web slows and binds to force an opening, then whip strings, spike bursts and a grab-slam pour everything into that opening.","The unfinished gun — the weakest in the roster, by design. Six rounds a second, and emptying its six-round magazine overheats it on the spot. Holding K banks rounds into a separate store that fires half again as fast and ignores heat.","A chainsaw swung like a sword — and swinging a chainsaw is a terrible way to use one, so the slashes are pathetic. Everything lives on K: release it and the engine kicks in, and the whole moveset changes tier by tier for as long as the engine bar lasts.","Thin needles that pierce once. Every hit adds a PERMANENT bleed stack — the longer the fight, the harder it bleeds. K fans out a spread of needles; the Channel strings a net across the map, the ultimate is a storm of needles.","No ammo at all until you make it: hold K to forge swords that hover on your back, then J launches them. Swords block bullets on their own, and a full set of six becomes a shield. Channel opens the Gate of Treasure, the ultimate drops ten thousand swords.","Death's scythe. Cuts land fast but recover SLOWLY, and every combo branches on RHYTHM: press straight on, or pause a beat (the blade flashes purple) and press. Holding it locks the Power to DEATH — hits build rage, I/O calls the Reaper to fight at your side."] : ["Vua của đòn Charge. Giữ càng lâu càng biến hoá: viên to, viên xuyên, rồi vỡ thành chùm mảnh. Bắn thường chỉ để cầm chừng.","Đa dụng nhất bảng. Gần như đòn nào cũng nổ lan nên vừa dọn bầy vừa gặm boss, và thứ gì dính lửa cũng cháy tiếp một lúc.","Vô hạn đạn, nhưng bắn phát nào cũng tản. Giữ liên tục thì đạn khép dần vào giữa — đủ ba mươi viên nó thành tia laser tím, nhịp bắn nhanh gấp đôi.","Loại lắt léo nhất. Đạn tách, nảy, xuyên, và càng bám riết một mục tiêu thì đòn nổ càng đau. Phải hiểu cơ chế mới xài được.","Ông vua dọn bầy. Sét tự nhảy từ con này sang con khác, càng đông càng lời. Nhưng tay đôi với boss thì hụt hơi.","Kiếm sĩ cận chiến. Có nguyên một hệ combo giấu trong nút nhảy, nút lướt và hướng bấm — tự tìm ra mới vui.","Bạn không bắn kẻ địch, bạn nuôi một ngôi sao. Sao hút mọi viên đạn quanh nó rồi bắn trả gấp bội ra khắp hướng.","Ném đi rồi phải tự bắt. Bắt gọn thì lưỡi bay ngược vào mặt kẻ địch, hụt thì trắng tay ngồi chờ. Càng liều càng lãi.","Thuần khống chế. Mỗi phát cộng một tầng băng, đủ 5 tầng thì đóng băng. Rồi tự chọn: để yên mà khống, hay đập vỡ lấy sát thương.","Bốn viên, không nạp lại. Viên thứ tư luôn là viên to nhất — nó ăn theo lượng máu đối thủ đã mất. Mỗi phát trúng để lại một dấu ấn cho các đòn sau.", "Vũ khí cận chiến. J và K nối nhau thành combo kiểu Musou. Tầm đánh gấp rưỡi Kiếm nhưng hoàn toàn không có đòn tầm xa, nên cách với tới boss bay là combo trên không.", "Vũ khí cận chiến hạng nặng. Cầm búa thì chạy nhảy còn 85%, ném búa đi thì lên 120% nhưng không đánh được gì. Mọi đòn đều có khung khựng không huỷ, và cú nện nổ ngay chỗ đầu búa chạm đất.","J J J đấm phải-trái-phải. Giữ K tích sát thương (mất máu, đỡ đòn cũng cộng), nhả K xả hết. LỆNH ẨN (Tiến = hướng mặt): Lùi Tiến J Hadoken · Xuống Tiến J Hashogeki · Lùi Xuống Tiến J Kamehameha (cần 50) · J rồi Nhảy Shoryuken · J Tiến J đấm vói · Xuống J nện đất · Lướt J lao đấm · Xuống Xuống Denjin · Trên không: Xuống J Thiên Truy, Lên Lên Xuống J Nhảy Đạp. Kính lúp: số liệu.","Cận chiến tầm trung. Tơ làm chậm rồi trói để mở khoảng trống, sau đó chuỗi quất, gai bung và cú tóm-đạp dồn hết vào khoảng trống đó.","Khẩu chưa xong — yếu nhất bảng, và đó là chủ ý. 6 viên mỗi giây, cạn băng 6 viên là quá nhiệt ngay. Giữ K trữ đạn vào một kho riêng; xả kho thì bắn nhanh gấp rưỡi và không sợ nóng.","Cưa máy vung như kiếm — mà vung cưa thì phế thật, nên nhát chém chỉ 1 sát thương. Tất cả nằm ở phím K: nhả ra là nổ máy, và cả bộ đòn đổi nấc theo thời gian giữ, chạy được chừng nào thanh động cơ còn xăng.","Kim mảnh xuyên một lần. Mỗi mũi trúng cộng một vết CHẢY MÁU VĨNH VIỄN — trận càng dài máu chảy càng nhiều. K phóng quạt kim, Channel giăng lưới dây kín map, chiêu cuối là cơn mưa kim.","Không có đạn cho tới khi tự rèn: giữ K sinh kiếm lơ lửng sau lưng, J phóng kiếm đi. Kiếm tự bay ra chặn đạn, đủ sáu thanh thì thành khiên. Channel mở Vương Khố, chiêu cuối là Vạn Kiếm Quy Tông.","Lưỡi hái của thần chết. Chém ra rất nhanh nhưng THU HỒI CHẬM, và combo nào cũng rẽ nhánh theo NHỊP: bấm liền, hay dừng một nhịp (lưỡi loé tím) rồi bấm. Cầm nó thì Power khoá sang DEATH — đánh trúng tích nộ, I/O gọi thần chết ra đánh cùng."];
             const SHIELDS = currentLang==="en" ? ["PARRY","ACTIVE SHIELD"] : ["ĐỠ ĐÒN", "KHIÊN CHỦ ĐỘNG"];
             const shieldDesc = currentLang==="en" ? ["Time it right: block 1 hit + parry counter.","Hold up to 1.5s, 4s cooldown. Trade-off: no parry."] : ["Bấm đúng lúc: chặn 1 đòn + phản đòn (parry).", "Giữ tối đa 1,5s, sạc 4s. Đổi lại: mất phản đòn."];
 
@@ -67128,7 +67180,8 @@ class PulsarCloneBoss {
                 ctx.fillStyle = valColor; ctx.font = "bold 15px Consolas, monospace"; ctx.fillText(value, 546, cy + 19);
                 ctx.fillStyle = "#90A4AE"; ctx.font = "11px Consolas, monospace"; ctx.textAlign = "left";
                 ctx.save(); ctx.beginPath(); ctx.rect(336, cy + 32, 330, descH || 104); ctx.clip();
-                wrapText(desc, 340, cy + 46, 320, 14);
+                if (desc && desc.length > 300){ ctx.font = "10px Consolas, monospace"; wrapText(desc, 340, cy + 44, 322, 12); }   // mo ta dai (Midas + lenh an): chu nho de vua khung
+                else wrapText(desc, 340, cy + 46, 320, 14);
                 ctx.restore();
             }
 
@@ -70114,6 +70167,23 @@ class PulsarCloneBoss {
                           'STAND: ti le 5% (1) -> 60% (200)', cusStandTiLe(100).toFixed(3) + ' o 100');
                     } finally { cusLap = _lap; cusThuNghiem = _tn; }
                 }
+                // @@HE-SONGHE — rune hai loi
+                if (typeof cusSH === 'function'){
+                    G('RUNE SONG HE');
+                    let _rs = runeSlots.slice(), _lap = cusLap, _ch = cusSHChon, _ca = currentAmmoType, _tn = cusThuNghiem;
+                    try {
+                        currentAmmoType = CUS_DAN; runeSlots[0] = 'cussh'; runeSlots[1] = null; cusThuNghiem = true;
+                        cusLap = { nl: 'railgun', he: 'bang', x: null, ch: null, nl2: 'chainsaw', he2: 'no' }; cusSHChon = 0;
+                        T(cusCapCua('bang') > 0 && cusCapCua('no') > 0, 'hai HIEU UNG chay cung luc');
+                        T(cusCapCua('railgun') > 0 && cusCapCua('chainsaw') === 0, 'hai loi thay cach ban: chi loi dang chon chay');
+                        cusSHChon = 1;
+                        T(cusCapCua('railgun') === 0 && cusCapCua('chainsaw') > 0, 'Q / E doi loi');
+                        cusLap = { nl: 'tachtia', he: null, x: null, ch: null, nl2: 'tamxa', he2: null };
+                        T(cusCapCua('tachtia') > 0 && cusCapCua('tamxa') > 0, 'hai nang luc chi chinh vien dan thi chay chung');
+                        runeSlots[0] = null;
+                        T(cusCapCua('tamxa') === 0, 'thao rune thi o thu hai tat');
+                    } finally { runeSlots[0] = _rs[0]; runeSlots[1] = _rs[1]; cusLap = _lap; cusSHChon = _ch; currentAmmoType = _ca; cusThuNghiem = _tn; }
+                }
                 // @@HE-LUU — lua chon Custom nap lai duoc sau khi tat game
                 if (typeof cusNapLuu === 'function'){
                     G('LUU LUA CHON');
@@ -71736,14 +71806,16 @@ class PulsarCloneBoss {
             let y3 = y2 + 26 + soHangRune * 36 + 14, cw = Math.min(170, (W - 10) / 4 - 8), i3 = 0;
             for (let k in R14.cusKho){
                 let n = cusNCTim(k) || cusChTim(k); if (!n) continue;
-                let o = CUS_CH.indexOf(n) >= 0 ? 'ch' : n.loai, on = cusLap[o] === k || (cusLap.x === k);
+                let o = CUS_CH.indexOf(n) >= 0 ? 'ch' : n.loai, on = cusLap[o] === k || (cusLap.x === k) || (o !== 'ch' && cusLap[o + '2'] === k);
                 let cap = R14.cusKho[k];
                 nut.push({ x: x + (i3 % 4) * (cw + 8), y: y3 + 18 + Math.floor(i3 / 4) * 36, w: cw, h: 30,
                     t: (currentLang === 'en' ? n.tenEn : n.ten) + (n.khongCap ? '' : ' C' + cap) + ' [' + (o === 'nl' ? LT('NL', 'ABL') : o === 'he' ? LT('HU', 'EFF') : 'CH') + ']', on: on, nhom: 'cus',
                     bam: () => {
                         if (cusLap[o] === k) cusLap[o] = null;
                         else if (cusLap.x === k) cusLap.x = null;
+                        else if (o !== 'ch' && cusLap[o + '2'] === k) cusLap[o + '2'] = null;
                         else if (!cusLap[o]) cusLap[o] = k;
+                        else if (o !== 'ch' && cusSH() && !cusLap[o + '2']) cusLap[o + '2'] = k;   // rune SONG HE
                         else if (o !== 'ch' && cusOBa() && !cusLap.x) cusLap.x = k;   // rune O THU BA: o thu ba nhan ca hai loai
                         else cusLap[o] = k;
                     } });
@@ -72956,7 +73028,7 @@ class PulsarCloneBoss {
             { id: 'mien',   ten: 'VƯƠNG MIỆN',     tenEn: 'CROWN',          mo: 'Vương miện vàng nạm đá, hơi lệch.', moEn: 'A gem-set golden crown, slightly crooked.' },
             { id: 'kabuto', ten: 'MŨ SAMURAI',     tenEn: 'KABUTO',         mo: 'Mũ kabuto có trăng lưỡi liềm vàng trước trán.', moEn: 'A kabuto helmet with a golden crescent crest.' },
             { id: 'giap',   ten: 'GIÁP NGỰC',      tenEn: 'CHEST ARMOR',    mo: 'Giáp thép ốp ngực và vai, đinh tán sáng.', moEn: 'Steel chest plate and pauldron with shiny rivets.' },
-            { id: 'khan',   ten: 'KHĂN QUÀNG',     tenEn: 'SCARF',          mo: 'Khăn quàng đỏ bay phấp phới — càng chạy nhanh càng bay.', moEn: 'A red scarf that flutters harder the faster you go.' },
+            { id: 'khan',   ten: 'KHĂN QUÀNG',     tenEn: 'SCARF',          mo: 'Khăn quàng xanh sọc trắng bay phấp phới — càng chạy nhanh càng bay.', moEn: 'A striped teal scarf that flutters harder the faster you go.' },
             { id: 'vit',    ten: 'VỊT CAO SU',     tenEn: 'RUBBER DUCK',    mo: 'Một con vịt cao su vàng ngồi trên đầu. Không để làm gì cả.', moEn: 'A yellow rubber duck sitting on your head. It does nothing.' }
         ];
         let phuKien = Math.max(0, Math.min(PHU_KIEN.length - 1, parseInt(localStorage.getItem("dino_phukien")) || 0));
@@ -72982,58 +73054,148 @@ class PulsarCloneBoss {
                 ctx.beginPath(); ctx.moveTo(bx + 34, hy + 3.6); ctx.quadraticCurveTo(bx + 42, hy - 1.6, bx + 49, hy + 4.8); ctx.stroke();
                 ctx.fillStyle = '#FF6F00'; ctx.beginPath(); ctx.arc(bx + 41, hy + 1.5, 1.8, 0, 6.28); ctx.fill();
             } else if (K.id === 'kinh'){
-                ctx.fillStyle = '#111'; ctx.beginPath();
-                ctx.moveTo(bx + 39, hy + 3.5); ctx.lineTo(bx + 51, hy + 5); ctx.lineTo(bx + 50, hy + 9.5); ctx.quadraticCurveTo(bx + 44, hy + 11, bx + 40, hy + 8.5); ctx.closePath(); ctx.fill();
-                ctx.strokeStyle = '#111'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(bx + 39, hy + 5); ctx.lineTo(bx + 33, hy + 6); ctx.stroke();
-                ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.fillRect(bx + 42, hy + 5, 3, 1.2); ctx.fillRect(bx + 46, hy + 5.6, 1.5, 1);
+                // KINH RAM kieu "deal with it": gong den day, hai trong vuong to, quai vong ra sau dau
+                ctx.fillStyle = '#0B0B0B'; ctx.strokeStyle = '#0B0B0B'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(bx + 35, hy + 4); ctx.lineTo(bx + 26, hy + 6); ctx.stroke();        // quai
+                ctx.fillRect(bx + 34, hy + 2, 22, 3.2);                                                         // gong
+                ctx.fillRect(bx + 37, hy + 2, 8.5, 8); ctx.fillRect(bx + 47.5, hy + 2, 8, 8);                  // hai trong
+                ctx.fillRect(bx + 38, hy + 10, 6.5, 1.6); ctx.fillRect(bx + 48.5, hy + 10, 6, 1.6);             // day trong bac thang
+                // lop phan chieu chay ngang theo thoi gian
+                let ph = (frames % 140) / 140;
+                ctx.fillStyle = 'rgba(120,200,255,0.35)'; ctx.fillRect(bx + 37.5, hy + 5.5, 7.5, 2); ctx.fillRect(bx + 48, hy + 5.5, 7, 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.fillRect(bx + 38.5, hy + 3.2, 2.2, 2.2); ctx.fillRect(bx + 49, hy + 3.2, 2.2, 2.2);
+                if (ph < 0.25){ let gx = bx + 37 + ph * 4 * 18; ctx.globalAlpha = 0.8; ctx.fillRect(gx, hy + 2.5, 1.3, 7); ctx.globalAlpha = 1; }
             } else if (K.id === 'mien'){
-                ctx.save(); ctx.translate(bx + 40, hy + 1); ctx.rotate(-0.18);
-                ctx.fillStyle = '#FFC400'; ctx.strokeStyle = '#8D6E00'; ctx.lineWidth = 0.9;
-                ctx.beginPath(); ctx.moveTo(-7, 2); ctx.lineTo(-7, -5); ctx.lineTo(-3.5, -1.5); ctx.lineTo(0, -8); ctx.lineTo(3.5, -1.5); ctx.lineTo(7, -5); ctx.lineTo(7, 2); ctx.closePath(); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#E53935'; ctx.beginPath(); ctx.arc(0, -1, 1.6, 0, 6.28); ctx.fill();
-                ctx.fillStyle = '#29B6F6'; ctx.beginPath(); ctx.arc(-4.5, 0, 1.1, 0, 6.28); ctx.arc(4.5, 0, 1.1, 0, 6.28); ctx.fill();
-                if (frames % 50 < 6){ ctx.fillStyle = '#FFF'; ctx.fillRect(1, -7, 1.5, 1.5); }
+                // VUONG MIEN vang to, 5 mui co ngoc o dinh, dai nam da, hoi lech
+                ctx.save(); ctx.translate(bx + 43, hy + 0.5); ctx.rotate(-0.2 + Math.sin(frames * 0.09) * 0.03);
+                let g = ctx.createLinearGradient(0, -14, 0, 3);
+                g.addColorStop(0, '#FFF59D'); g.addColorStop(0.45, '#FFC400'); g.addColorStop(1, '#B8860B');
+                ctx.fillStyle = g; ctx.strokeStyle = '#6D4C00'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(-11, 3); ctx.lineTo(-12, -9); ctx.lineTo(-6.5, -3); ctx.lineTo(-3.5, -12);
+                ctx.lineTo(0, -4); ctx.lineTo(3.5, -12); ctx.lineTo(6.5, -3); ctx.lineTo(12, -9); ctx.lineTo(11, 3); ctx.closePath();
+                ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#B8860B'; ctx.fillRect(-11, -0.5, 22, 3.5); ctx.strokeRect(-11, -0.5, 22, 3.5);   // dai
+                ctx.fillStyle = '#FFF8E1';
+                for (const [tx, ty] of [[-12, -9], [-3.5, -12], [3.5, -12], [12, -9]]){ ctx.beginPath(); ctx.arc(tx, ty, 1.5, 0, 6.28); ctx.fill(); }
+                ctx.fillStyle = '#E53935'; ctx.beginPath(); ctx.moveTo(0, -3.5); ctx.lineTo(2.2, 1.2); ctx.lineTo(0, 3.5); ctx.lineTo(-2.2, 1.2); ctx.closePath(); ctx.fill();
+                ctx.fillStyle = '#29B6F6'; ctx.beginPath(); ctx.arc(-6.5, 1.2, 1.5, 0, 6.28); ctx.fill();
+                ctx.fillStyle = '#66BB6A'; ctx.beginPath(); ctx.arc(6.5, 1.2, 1.5, 0, 6.28); ctx.fill();
+                // tia lap lanh
+                let tw = frames % 70;
+                if (tw < 14){ let k = 1 - Math.abs(tw - 7) / 7; ctx.strokeStyle = 'rgba(255,255,255,' + k.toFixed(2) + ')'; ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.moveTo(3.5, -16 - 3 * k); ctx.lineTo(3.5, -8 + 3 * k); ctx.moveTo(-0.5 - 3 * k, -12); ctx.lineTo(7.5 + 3 * k, -12); ctx.stroke(); }
                 ctx.restore();
             } else if (K.id === 'kabuto'){
-                ctx.fillStyle = '#263238'; ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
-                ctx.beginPath(); ctx.moveTo(bx + 31, hy + 6); ctx.quadraticCurveTo(bx + 40, hy - 8, bx + 50, hy + 5); ctx.lineTo(bx + 31, hy + 6); ctx.closePath(); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#37474F'; ctx.beginPath(); ctx.moveTo(bx + 31, hy + 5); ctx.lineTo(bx + 25, hy + 11); ctx.lineTo(bx + 33, hy + 10); ctx.closePath(); ctx.fill(); ctx.stroke();   // shikoro
-                ctx.strokeStyle = '#FFC400'; ctx.lineWidth = 2;                                                   // maedate
-                ctx.beginPath(); ctx.moveTo(bx + 42, hy - 1); ctx.quadraticCurveTo(bx + 34, hy - 12, bx + 30, hy - 16); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(bx + 42, hy - 1); ctx.quadraticCurveTo(bx + 50, hy - 12, bx + 55, hy - 15); ctx.stroke();
-                ctx.fillStyle = '#FFC400'; ctx.beginPath(); ctx.arc(bx + 42, hy, 1.8, 0, 6.28); ctx.fill();
+                // MU SAMURAI: chom son mai den, vanh do, tam che gay nhieu lop, hai tai lat va trang luoi liem vang lon
+                ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+                // shikoro — 3 lop che gay xoe ra sau
+                for (let l = 2; l >= 0; l--){
+                    ctx.fillStyle = l % 2 ? '#B71C1C' : '#1C1C1C';
+                    ctx.beginPath(); ctx.moveTo(bx + 32, hy + 2 + l * 3); ctx.quadraticCurveTo(bx + 27, hy + 4 + l * 3, bx + 25 - l, hy + 8 + l * 3.4);
+                    ctx.lineTo(bx + 27 - l, hy + 11 + l * 3.4); ctx.quadraticCurveTo(bx + 29, hy + 7 + l * 3, bx + 34, hy + 5 + l * 3); ctx.closePath(); ctx.fill(); ctx.stroke();
+                }
+                // chom mu
+                let g = ctx.createLinearGradient(bx + 32, hy - 9, bx + 50, hy + 4);
+                g.addColorStop(0, '#455A64'); g.addColorStop(0.5, '#1C1C1C'); g.addColorStop(1, '#000');
+                ctx.fillStyle = g;
+                ctx.beginPath(); ctx.moveTo(bx + 30, hy + 4); ctx.bezierCurveTo(bx + 31, hy - 10, bx + 52, hy - 10, bx + 54, hy + 3); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 0.8;     // gan chom
+                for (let r = 0; r < 4; r++){ ctx.beginPath(); ctx.moveTo(bx + 36 + r * 4.5, hy - 5 + Math.abs(r - 1.5)); ctx.lineTo(bx + 34 + r * 5, hy + 3); ctx.stroke(); }
+                // vanh + luoi trai nho chia ra truoc
+                ctx.fillStyle = '#B71C1C'; ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(bx + 29, hy + 2.5); ctx.lineTo(bx + 55, hy + 1.5); ctx.lineTo(bx + 59, hy + 4.5); ctx.lineTo(bx + 29, hy + 5.5); ctx.closePath(); ctx.fill(); ctx.stroke();
+                // fukigaeshi — tai lat ben hong
+                ctx.fillStyle = '#1C1C1C'; ctx.beginPath(); ctx.moveTo(bx + 31, hy + 3); ctx.lineTo(bx + 27, hy - 3); ctx.lineTo(bx + 33, hy - 1); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#FFC400'; ctx.beginPath(); ctx.arc(bx + 30, hy - 0.5, 1.1, 0, 6.28); ctx.fill();
+                // maedate — trang luoi liem vang lon + mon tron
+                let mg = ctx.createLinearGradient(bx + 30, hy - 22, bx + 56, hy - 2);
+                mg.addColorStop(0, '#FFF59D'); mg.addColorStop(1, '#FF8F00');
+                ctx.fillStyle = mg; ctx.strokeStyle = '#8D6E00'; ctx.lineWidth = 0.9;
+                ctx.beginPath(); ctx.moveTo(bx + 44, hy - 4);
+                ctx.quadraticCurveTo(bx + 33, hy - 9, bx + 28, hy - 22);
+                ctx.quadraticCurveTo(bx + 37, hy - 13, bx + 44, hy - 7.5);
+                ctx.quadraticCurveTo(bx + 51, hy - 13, bx + 60, hy - 22);
+                ctx.quadraticCurveTo(bx + 55, hy - 9, bx + 44, hy - 4); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#FFC400'; ctx.beginPath(); ctx.arc(bx + 44, hy - 3.5, 2.8, 0, 6.28); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#B71C1C'; ctx.beginPath(); ctx.arc(bx + 44, hy - 3.5, 1.2, 0, 6.28); ctx.fill();
             } else if (K.id === 'giap'){
-                let gy = hy + 10 - cs * 1;
-                let g = ctx.createLinearGradient(bx + 16, gy, bx + 34, gy + 16);
-                g.addColorStop(0, '#ECEFF1'); g.addColorStop(0.5, '#90A4AE'); g.addColorStop(1, '#546E7A');
-                ctx.fillStyle = g; ctx.strokeStyle = '#263238'; ctx.lineWidth = 1;
-                ctx.beginPath(); ctx.moveTo(bx + 18, gy + 4); ctx.quadraticCurveTo(bx + 26, gy - 2, bx + 34, gy + 4);
-                ctx.lineTo(bx + 33, gy + 16); ctx.quadraticCurveTo(bx + 26, gy + 20, bx + 19, gy + 16); ctx.closePath(); ctx.fill(); ctx.stroke();
-                ctx.beginPath(); ctx.arc(bx + 22, gy + 4, 5.5, Math.PI, 0); ctx.closePath(); ctx.fill(); ctx.stroke();   // vai
+                // GIAP NGUC: tam nguc thep lon nhieu lop, vai giap tron, vien vang va huy hieu giua
+                let gy = hy + 9 - cs * 1;
+                let g = ctx.createLinearGradient(bx + 10, gy, bx + 40, gy + 24);
+                g.addColorStop(0, '#F5F7F8'); g.addColorStop(0.45, '#9EAFB8'); g.addColorStop(1, '#455A64');
+                ctx.fillStyle = g; ctx.strokeStyle = '#1C262B'; ctx.lineWidth = 1.1;
+                ctx.beginPath(); ctx.moveTo(bx + 12, gy + 5); ctx.quadraticCurveTo(bx + 26, gy - 3, bx + 39, gy + 4);
+                ctx.lineTo(bx + 38, gy + 20); ctx.quadraticCurveTo(bx + 26, gy + 27, bx + 13, gy + 20); ctx.closePath(); ctx.fill(); ctx.stroke();
+                // cac lop van ngang
+                ctx.strokeStyle = 'rgba(28,38,43,0.55)'; ctx.lineWidth = 0.9;
+                for (let r = 1; r <= 3; r++){ let yy = gy + 4 + r * 4.5; ctx.beginPath(); ctx.moveTo(bx + 13, yy); ctx.quadraticCurveTo(bx + 26, yy + 3, bx + 38, yy); ctx.stroke(); }
+                // vien vang
+                ctx.strokeStyle = '#FFC400'; ctx.lineWidth = 1.3;
+                ctx.beginPath(); ctx.moveTo(bx + 12, gy + 5); ctx.quadraticCurveTo(bx + 26, gy - 3, bx + 39, gy + 4); ctx.stroke();
+                // huy hieu
+                ctx.fillStyle = '#FFC400'; ctx.strokeStyle = '#6D4C00'; ctx.lineWidth = 0.8;
+                ctx.beginPath(); ctx.moveTo(bx + 26, gy + 5); ctx.lineTo(bx + 30, gy + 8); ctx.lineTo(bx + 29, gy + 13); ctx.lineTo(bx + 26, gy + 15); ctx.lineTo(bx + 23, gy + 13); ctx.lineTo(bx + 22, gy + 8); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#E53935'; ctx.beginPath(); ctx.arc(bx + 26, gy + 10, 1.6, 0, 6.28); ctx.fill();
+                // vai giap 2 tang
+                let vg = ctx.createRadialGradient(bx + 17, gy - 1, 1, bx + 18, gy + 2, 10);
+                vg.addColorStop(0, '#FFFFFF'); vg.addColorStop(0.5, '#B0BEC5'); vg.addColorStop(1, '#455A64');
+                ctx.fillStyle = vg; ctx.strokeStyle = '#1C262B'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.ellipse(bx + 18, gy + 3, 9, 6.5, -0.2, Math.PI, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(bx + 18, gy + 6, 8, 4.5, -0.2, Math.PI * 0.95, Math.PI * 0.05, true); ctx.stroke();
+                ctx.strokeStyle = '#FFC400'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(bx + 18, gy + 3, 9, 6.5, -0.2, Math.PI, 0); ctx.stroke();
                 ctx.fillStyle = '#FFF';
-                for (const [rx, ry] of [[21, 8], [31, 8], [21, 14], [31, 14]]) { ctx.beginPath(); ctx.arc(bx + rx, gy + ry, 0.9, 0, 6.28); ctx.fill(); }
+                for (const [rx, ry] of [[15, 9], [37, 8], [15, 18], [37, 18], [13, 0], [22, -1.5]]) { ctx.beginPath(); ctx.arc(bx + rx, gy + ry, 1, 0, 6.28); ctx.fill(); }
+                if (frames % 90 < 8){ ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillRect(bx + 16 + (frames % 90) * 2.4, gy + 3, 1.5, 15); }
             } else if (K.id === 'khan'){
-                let toc = Math.min(1, (Math.abs((typeof dashVx !== 'undefined') ? dashVx : 0) + ((keys['KeyA'] || keys['KeyD']) ? 4 : 0)) / 10);
-                let nx = bx + 33, ny = hy + 12;
-                ctx.fillStyle = '#E53935'; ctx.strokeStyle = '#7F0000'; ctx.lineWidth = 0.8;
-                ctx.beginPath(); ctx.ellipse(nx, ny, 5, 3.4, 0.3, 0, 6.28); ctx.fill(); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(nx - 3, ny - 1);
-                for (let i = 1; i <= 6; i++){
-                    let u = i / 6, w = Math.sin(frames * 0.35 - i * 0.9) * (2 + 5 * u) * (0.4 + toc);
-                    ctx.lineTo(nx - 3 - u * (16 + 12 * toc), ny - 1 + u * (6 - 8 * toc) + w);
-                }
-                for (let i = 6; i >= 0; i--){
-                    let u = i / 6, w = Math.sin(frames * 0.35 - i * 0.9) * (2 + 5 * u) * (0.4 + toc);
-                    ctx.lineTo(nx - 3 - u * (16 + 12 * toc), ny + 3 + u * (6 - 8 * toc) + w);
-                }
-                ctx.closePath(); ctx.fill(); ctx.stroke();
+                // KHAN QUANG to: vong quan day quanh co, hai duoi dai co soc trang va tua o mut
+                let toc = Math.min(1, (Math.abs((typeof dashVx !== 'undefined') ? dashVx : 0) + ((keys['KeyA'] || keys['KeyD'] || keys['ArrowLeft'] || keys['ArrowRight']) ? 4 : 0)) / 10);
+                let nx = bx + 32, ny = hy + 14;
+                const duoi = (lech, dai, pha) => {
+                    let tren = [], duoiP = [];
+                    for (let i = 0; i <= 8; i++){
+                        let u = i / 8, w = Math.sin(frames * 0.33 - i * 0.85 + pha) * (1.5 + 6 * u) * (0.35 + toc);
+                        let x = nx - 3 - u * (dai + 16 * toc), y = ny + lech + u * (9 - 12 * toc) + w;
+                        tren.push([x, y - 2.6 + u * 0.6]); duoiP.push([x, y + 2.6 - u * 0.6]);
+                    }
+                    ctx.fillStyle = '#00ACC1'; ctx.strokeStyle = '#004D57'; ctx.lineWidth = 0.9;
+                    ctx.beginPath(); ctx.moveTo(tren[0][0], tren[0][1]);
+                    for (const q of tren) ctx.lineTo(q[0], q[1]);
+                    for (let i = duoiP.length - 1; i >= 0; i--) ctx.lineTo(duoiP[i][0], duoiP[i][1]);
+                    ctx.closePath(); ctx.fill(); ctx.stroke();
+                    ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 1.1;          // soc trang
+                    for (const k of [3, 6]){ ctx.beginPath(); ctx.moveTo(tren[k][0], tren[k][1]); ctx.lineTo(duoiP[k][0], duoiP[k][1]); ctx.stroke(); }
+                    ctx.strokeStyle = '#E0F7FA'; ctx.lineWidth = 0.8;                         // tua
+                    let m = tren[8], n = duoiP[8];
+                    for (let t = 0; t <= 3; t++){ let x = m[0] + (n[0] - m[0]) * t / 3, y = m[1] + (n[1] - m[1]) * t / 3; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 3, y + 1 + w0(t)); ctx.stroke(); }
+                };
+                const w0 = (t) => Math.sin(frames * 0.5 + t) * 1.2;
+                duoi(4, 20, 1.3);        // duoi sau (ve truoc)
+                duoi(0, 26, 0);
+                // vong quan quanh co
+                ctx.fillStyle = '#00BCD4'; ctx.strokeStyle = '#004D57'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.ellipse(nx + 1, ny, 7.5, 5, 0.35, 0, 6.28); ctx.fill(); ctx.stroke();
+                ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 1.2;
+                ctx.beginPath(); ctx.ellipse(nx + 1, ny, 7.5, 5, 0.35, -0.6, 0.9); ctx.stroke();
+                ctx.fillStyle = '#00838F'; ctx.beginPath(); ctx.arc(nx - 3, ny + 1, 2.6, 0, 6.28); ctx.fill(); ctx.stroke();   // nut that
             } else if (K.id === 'vit'){
-                let vy = hy - 4 + (bay ? -2 : Math.abs(Math.sin(frames * 0.13)) * -1.5);
-                ctx.fillStyle = '#FFEB3B'; ctx.strokeStyle = '#F9A825'; ctx.lineWidth = 0.8;
-                ctx.beginPath(); ctx.ellipse(bx + 40, vy, 6, 3.6, 0, 0, 6.28); ctx.fill(); ctx.stroke();
-                ctx.beginPath(); ctx.arc(bx + 44, vy - 4, 3.2, 0, 6.28); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#FF7043'; ctx.beginPath(); ctx.moveTo(bx + 47, vy - 4.5); ctx.lineTo(bx + 50, vy - 3.6); ctx.lineTo(bx + 47, vy - 2.6); ctx.closePath(); ctx.fill();
-                ctx.fillStyle = '#000'; ctx.fillRect(bx + 44.6, vy - 5.4, 1, 1);
+                // VIT CAO SU to gap ruoi, nhun nhay theo buoc chay, nhay len thi vit chim lai
+                let vy = hy - 3 + (bay ? -3 : Math.abs(Math.sin(frames * 0.13)) * -2.5);
+                ctx.save(); ctx.translate(bx + 42, vy); ctx.rotate(bay ? -0.25 : Math.sin(frames * 0.13) * 0.08); ctx.scale(1.55, 1.55);
+                ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.beginPath(); ctx.ellipse(0, 4, 6, 1.4, 0, 0, 6.28); ctx.fill();   // bong
+                let g = ctx.createRadialGradient(-1, -2, 1, 0, 0, 8);
+                g.addColorStop(0, '#FFF9C4'); g.addColorStop(0.6, '#FFEB3B'); g.addColorStop(1, '#FBC02D');
+                ctx.fillStyle = g; ctx.strokeStyle = '#E6A100'; ctx.lineWidth = 0.6;
+                ctx.beginPath(); ctx.moveTo(-6.5, -1); ctx.quadraticCurveTo(-8, -4, -5.5, -3.5);             // duoi vem
+                ctx.quadraticCurveTo(-6, 3.5, 0, 3.5); ctx.quadraticCurveTo(6.5, 3.5, 6, -1);
+                ctx.quadraticCurveTo(2, -2, -6.5, -1); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.arc(3.6, -4.6, 3.4, 0, 6.28); ctx.fill(); ctx.stroke();                  // dau
+                ctx.fillStyle = '#FBC02D'; ctx.beginPath(); ctx.ellipse(-1, 0, 3, 1.6, -0.3, 0, 6.28); ctx.fill();   // canh
+                ctx.fillStyle = '#FF7043'; ctx.beginPath(); ctx.moveTo(6.3, -5); ctx.quadraticCurveTo(9.6, -4.6, 9.4, -3.6); ctx.quadraticCurveTo(8, -2.8, 6.2, -3.2); ctx.closePath(); ctx.fill();
+                ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(4.6, -5.4, 0.8, 0, 6.28); ctx.fill();
+                ctx.fillStyle = '#FFF'; ctx.fillRect(4.8, -5.9, 0.4, 0.4);
+                ctx.fillStyle = 'rgba(255,138,128,0.6)'; ctx.beginPath(); ctx.arc(4.4, -3.4, 0.8, 0, 6.28); ctx.fill();   // ma hong
+                ctx.restore();
             }
             ctx.restore();
         }
@@ -73223,6 +73385,12 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
               desc:'Tốn 2 ô. CHỈ DÙNG ĐƯỢC VỚI CUSTOM. Mở ô nâng cấp THỨ BA cho khẩu Custom, và ô đó nhận CẢ HAI loại — năng lực hay hiệu ứng đều được.\n\nĐây là thứ duy nhất phá được luật gốc của cây nâng cấp: bình thường bạn chỉ lắp được đúng một NĂNG LỰC và một HIỆU ỨNG, nên hai nhánh cùng loại không bao giờ gặp nhau. Với ô thứ ba thì NỔ đứng cạnh KHÚC XẠ được, TÁCH TIA đứng cạnh TẦM XA được.\n\nGiá của nó là toàn bộ hàng phòng thủ: hai ô rune nghĩa là không máu, không khiên, không hồi sinh. Bạn đổi khả năng sống sót lấy một khẩu súng đi tới tận cùng.',
               descEn:'Costs 2 slots. CUSTOM ONLY. Opens a THIRD upgrade slot for the Custom gun, and that slot takes EITHER type — capability or effect.\n\nIt is the only thing that breaks the tree\'s founding rule: normally you equip exactly one CAPABILITY and one EFFECT, so two branches of the same type never meet. With the third slot, DETONATE can sit beside REFRACTION, SPLIT SHOT beside LONG SHOT.\n\nThe price is your entire defensive line: two rune slots means no health, no shield, no revive. You trade survivability for a gun taken all the way.' });
 
+        /* @@HE-SONGHE — rune hai loi: 2 NANG LUC + 2 HIEU UNG cho Custom. Cung gia 2 o voi O THU BA
+           (nen hai rune khong bao gio di chung). O Thu Ba cho MOT o tu do; Song He cho HAI o nhung
+           moi o chi nhan dung loai cua no. */
+        RUNES.push({ id:'cussh', name:'SONG HỆ', nameEn:'DUAL CORE', icon:'⧉', cost:2, ammoRune:true, onlyAmmo:CUS_DAN,
+              desc:'Tốn 2 ô. CHỈ DÙNG ĐƯỢC VỚI CUSTOM. Mở thêm MỘT ô NĂNG LỰC và MỘT ô HIỆU ỨNG — lắp được 2 năng lực + 2 hiệu ứng.\n\nHai HIỆU ỨNG luôn chạy cùng lúc, và mở được các COMBO cùng loại (BĂNG + NỔ: vụ nổ đập vỡ băng).\n\nHai NĂNG LỰC: nếu cả hai đều chỉ chỉnh viên đạn thường (BĂNG ĐẠN / TÁCH TIA / TẦM XA) thì chạy chung — Tách Tia + Tầm Xa là ba viên xuyên lớn dần. Còn lại mỗi năng lực khác đều THAY HẲN cách bắn, nên mỗi lúc chỉ một LÕI chạy: bấm Q / E để rút lõi kia ra (0.5 giây hồi, không đổi được giữa một đòn). Railgun tích nấc rồi rút Cưa Máy khi địch áp sát — đó là trò chơi của rune này.\n\nGiá vẫn là toàn bộ hàng phòng thủ: hai ô rune.',
+              descEn:'Costs 2 slots. CUSTOM ONLY. Adds one more ABILITY slot and one more EFFECT slot — equip 2 abilities + 2 effects.\n\nBoth EFFECTS always run together, unlocking same-type COMBOS (FROST + DETONATE: the blast shatters ice).\n\nTwo ABILITIES: if both only tune the plain round (MAGAZINE / SPLIT SHOT / LONG SHOT) they run together — Split Shot + Long Shot is three growing piercing rounds. Every other ability REPLACES how the gun fires, so only one CORE runs at a time: press Q / E to swap to the other (0.5s cooldown, not mid-move). Charge a Railgun, then pull the Chainsaw when they close in — that is what this rune is for.\n\nThe price is still your whole defensive line: two rune slots.' });
         /* @@HE-KHOAPOWER — hai rune duoi day song bang viec DOI THE, ma VOID va DRAGON
            TRIGGER deu ghim the o Gunslinger. Danh dau de picker khoa luon. */
         { let _r;
@@ -73299,7 +73467,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
         // mot Power. Truoc day chung nam lan trong muc THUC TINH (vi deu la ammoRune) hoac
         // roi vao muc CHIEN DAU (Chan Long, Hu Vo — hai rune 1 o), nen nguoi choi phai doc
         // het mo ta moi biet cai nao can gi. Gio gom han thanh mot muc.
-        const RUNE_DOCQUYEN = new Set(['trienlien','katana','swordmaster','shintrick','huvo','chanlong','cus3o','rgcounter']);
+        const RUNE_DOCQUYEN = new Set(['trienlien','katana','swordmaster','shintrick','huvo','chanlong','cus3o','cussh','rgcounter']);
         const RUNE_CATS = [
             /* Muc THU NGHIEM dat LEN DAU danh sach — day la cong cu Hans mo ra de xem bo don,
                nen no phai o ngay cho voi tay toi chu khong phai cuoi mot danh sach dai. Nhan da
@@ -73942,6 +74110,16 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '>J J J — đấm PHẢI · TRÁI · PHẢI thật nhanh (2 · 2 · 3), cú thứ ba vươn xa gấp rưỡi rồi mới nghỉ tay. Hai găng tay luôn đeo trên tay.',
                 '>Xuống + J — đấm chỉa thẳng xuống đất (3). Trên không: lao xuống, chạm đất nổ hai làn sóng.',
                 '>Lướt + J — lao tới xa hơn cú lướt thường, 4 sát thương.',
+                '#LỆNH ẨN (kiểu Street Fighter — Tiến/Lùi tính theo hướng mặt)',
+                '>Lùi Tiến J — HADOKEN — chưởng bay 200px, 5 sát thương, chạm là nổ lan 3 quanh điểm nổ.',
+                '>Xuống Tiến J — HASHOGEKI — chưởng tay đẩy, 3 sát thương, đẩy lùi 60px.',
+                '>J rồi Nhảy — SHORYUKEN — đấm móc bay lên, 2 sát thương trúng HAI lần. Hồi 1 giây.',
+                '>J Tiến J — ĐẤM VÓI — 4 sát thương, tầm 140px.',
+                '>Lùi Xuống Tiến J — KAMEHAMEHA — cần ít nhất 50 điểm tích. Đứng nạp rồi xả chưởng quét cả màn, dồn đối thủ vào góc, ăn trọn số đã tích rồi nổ thêm 10. Tiêu sạch thanh tích.',
+                '>Xuống Xuống — DENJIN — nạp thẳng 5 vào thanh tích (hồi 3 giây) và mở cửa sổ ĐIỆN 2 giây: Hadoken / Hashogeki / Shoryuken trong lúc này to và xa gấp 1.7, +5 sát thương, tiêu 5 điểm tích.',
+                '>Trên không: Xuống J — THIÊN TRUY — lao xuống 3 sát thương, chạm đất tách 2 làn sóng.',
+                '>Trên không: Lên Lên Xuống J — NHẢY ĐẠP — dậm xuống mục tiêu gần, 5 sát thương, kèm khung bất tử ngắn.',
+                '>Đỡ đòn — PARRY — đỡ trúng +3 vào thanh tích, đỡ chuẩn (Perfect) +6.',
                 '#CÚ ĐẤM TÍCH (nhả K) — XẢ',
                 '>đấm — toàn bộ số đã tích, tầm 70px cộng 6px cho mỗi điểm sát thương, trần 900px.',
                 '>từ 30 sát thương trở lên — SÓNG XUNG KÍCH — cú đấm chẻ mặt đất, đẩy một loạt mặt sóng chạy dọc mặt đất, càng ra xa càng cao.',
@@ -74386,6 +74564,16 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '>J J J — a fast RIGHT · LEFT · RIGHT (2 · 2 · 3); the third reaches half again as far before you reset. Both gauntlets stay on your hands.',
                 '>Down + J — a punch straight into the ground (3). In the air: dive down and split two ground waves on landing.',
                 '>Dash + J — lunges further than a plain dash, 4 damage.',
+                '#HIDDEN INPUTS (Street Fighter style — Forward/Back are relative to facing)',
+                '>Back Fwd J — HADOKEN — a 200px fireball, 5 damage, bursting for 3 around the point of impact.',
+                '>Down Fwd J — HASHOGEKI — a palm strike, 3 damage, pushing back 60px.',
+                '>J then Jump — SHORYUKEN — a rising uppercut, 2 damage landing TWICE. 1 second cooldown.',
+                '>J Fwd J — LONG JAB — 4 damage, 140px reach.',
+                '>Back Down Fwd J — KAMEHAMEHA — needs at least 50 banked. Stand and charge, then a beam sweeps the screen, pins the target in a corner, deals your whole bank and a final 10-damage blast. Empties the bank.',
+                '>Down Down — DENJIN — adds 5 to the bank (3 second cooldown) and opens a 2 second ELECTRIC window: Hadoken / Hashogeki / Shoryuken become 1.7x bigger and longer, +5 damage, costing 5 banked.',
+                '>In air: Down J — HEAVEN DROP — dive for 3, splitting 2 ground waves on landing.',
+                '>In air: Up Up Down J — STOMP — drop onto a nearby target for 5, with brief invulnerability.',
+                '>Shield — PARRY — a block adds +3 to the bank, a Perfect parry +6.',
                 '#BANKED PUNCH (release K) — RELEASE',
                 '>punch — the entire bank, reaching 70px plus 6px per point of damage, capped at 900px.',
                 '>from 30 damage up — SHOCKWAVE — the punch splits the ground and drives a train of surface waves outward, each taller than the last.',
@@ -79448,6 +79636,10 @@ function infernoMaxChain(x, y, source){
             if ((e.code === 'KeyJ' || e.code === 'KeyK') && !e.repeat && uniArmed > 0 &&
                 (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss'
                  || gameState === 'pvp')) unityFire();
+            // @@HE-SONGHE — Q / E doi LOI khi deo Song He (Unity cung gia 2 o nen khong bao gio trung)
+            if ((e.code === 'KeyQ' || e.code === 'KeyE') && !e.repeat && typeof cusSH === 'function' && cusSH()
+                && typeof dino !== 'undefined' && dino && dino.ammoType === CUS_DAN
+                && (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss')){ cusSHDoi(dino); return; }
             if ((e.code === 'KeyQ' || e.code === 'KeyE') && !e.repeat &&
                 (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss'
                  || gameState === 'pvp')) unitySwap(e.code === 'KeyE' ? 1 : -1);
