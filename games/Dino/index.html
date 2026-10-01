@@ -42002,7 +42002,7 @@ class PulsarCloneBoss {
             constructor(id, x, form, ammoType, isFacingLeft = false) {
                 this.id = id; this.x = x; this.baseY = 276; this.y = 276; this.w = 40; this.h = 44; 
                 this.dy = 0; this.gravity = 0.65; this.jumpPower = -12.5; this.jumpCount = 0; this.bodySlamArmed = false; this.bodySlamActive = false; this.bodySlamJumpCount = 0; this.hoverTimer = 0; this.hoverArmed = false; this.hoverShot = 0; this._hoverKPrev = false; 
-                this.maxHp = 5 + (typeof hasRune==="function" && hasRune("hp") ? 4 : 0); this.hp = this.maxHp; this.bulletDmg = 1;
+                this.maxHp = 5 + (typeof hasRune==="function" && hasRune("hp") ? 4 : 0) + (typeof dangMauThem === 'function' ? dangMauThem(form) : 0); this.hp = this.maxHp; this.bulletDmg = 1;
                 this.runeShield = 0; this.usedRevive = false; this.maxGrewOnce = false; this.channelGuardUsed = false;
                 this.shieldEnergy = 100; this.parryWindow = 0; this.petShieldTimer = 0;
                 this.ammoType = ammoType; this.form = form;
@@ -42588,6 +42588,7 @@ class PulsarCloneBoss {
                 // chuyen cho NGUOI CHOI 2 va khoa luon CA CHE DO PVP. Do duoc: o gameState
                 // 'pvp', giu D 30 khung thi ca hai deu dung im 0px — che do PvP co man chon
                 // do, HUD hai ben, va cham va man ket thuc, nhung khong ai di lai duoc.
+                dangTick(this);   // @@HE-DANG — noi tai nho cua hinh dang
                 if (this.id === 1 || gameState === 'pvp') {
                     // DI CHUYEN TU DO A/D (+ mui ten) toan game — van ban/charge/khien binh thuong
                     if (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss' || gameState === 'pvp') {
@@ -42606,6 +42607,7 @@ class PulsarCloneBoss {
                         if (typeof stBat === 'function' && stBat() && !this.grounded && Math.abs(dashVx) > 2) mv = 0;
                         if (mapTheme === 'ocean' && (this.y + this.h) > OCEAN_SURF + 4 && !(typeof bienTuiKhi === 'function' && bienTuiKhi())) mv *= 0.62;   // duoi nuoc di cham hon
                         if (hasRune('hyperspeed')) mv *= 1.5;
+                        if (dangCua(this) === 1) mv *= DANG_RUSH_CHAY;   // @@HE-DANG: RUSH nhanh chan
                         if (typeof asHeSoChay === 'function') mv *= asHeSoChay(this);   // @@HE-APSUAT: dang qua nhiet chay +50%
                         { let _vkM = vkMoc(currentAmmoType, 'heSoChay'); if (_vkM) mv = _vkM.call(this, mv); }   // @@KHOI-VK — he so chay rieng cua vu khi
                         if (this.id === 1 && this._voidTe) mv = 0;   // dang chuan bi dich chuyen: dung im
@@ -43199,7 +43201,8 @@ class PulsarCloneBoss {
                     visualEffects.push(new Effect(this.x + this.w/2, this.y + this.h/2, 'parry'));
                     return;
                 }
-                if (this.invincible){ if (this.id === 1 && typeof tdNeTrung === 'function') tdNeTrung(this); return; }   // @@HE-TUDIA2: don trung luc dang ne (khung bat tu) = ne hoan hao
+                if (this.invincible){ if (this.id === 1 && typeof tdNeTrung === 'function') tdNeTrung(this); return; }   // @@HE-TUDIA2
+                if (dangVayChan(this)) return;   // @@HE-DANG: BEYOND — vay chan tron mot don: don trung luc dang ne (khung bat tu) = ne hoan hao
                 /* @@HE-CUSKV — du 6 thanh kiem tren lung thi ket khien chan tron don.
                    @@HE-KVCHAN — Hans: "Kiem vu co that su chan duoc don lao toi cua Boss khong? ...
                    No luon UU TIEN chan truoc cac loai khac. Va khi chan ke dich cho nhan 1 chut dmg (4)".
@@ -67368,7 +67371,15 @@ class PulsarCloneBoss {
             ctx.fillStyle = "#00E5FF"; ctx.font = "bold 24px Consolas, monospace"; ctx.textAlign = "center"; ctx.fillText("CUSTOMIZE YOUR DINO", CX, 32);
 
             const forms = ["NORMAL", "RUSH", "ULTIMATE", "BEYOND"];
-            const formDesc = currentLang==="en" ? ["Balanced baseline","Agile, blue spikes","Strong, dark, aura","Peak: horns + scales"] : ["Cơ bản, cân bằng", "Nhanh nhẹn, gai xanh", "Mạnh, tối màu, hào quang", "Đỉnh cao, sừng + vảy"];
+            const formDesc = currentLang==="en"
+                ? ["Small and nimble — 5 HP. Passive: dash recovers 15% faster.",
+                   "Agile, blue spikes — 5 HP. Passive: run 6% faster.",
+                   "Big, dark, aura — 6 HP (bigger body, easier to hit). Passive: the aura burns small monsters standing close, 1 damage a second (not bosses).",
+                   "Peak: horns + scales — 6 HP (bigger body). Passive: 25s without being hit grows a SCALE that blocks one hit (max 1)."]
+                : ["Nhỏ gọn — 5 máu. Nội tại: hồi lướt nhanh hơn 15%.",
+                   "Nhanh nhẹn, gai xanh — 5 máu. Nội tại: chạy nhanh hơn 6%.",
+                   "To, tối màu, hào quang — 6 máu (người to hơn, dễ trúng đòn hơn). Nội tại: hào quang đốt quái thường đứng sát 1 sát thương mỗi giây (không tính boss).",
+                   "Đỉnh cao, sừng + vảy — 6 máu (người to hơn). Nội tại: 25 giây không dính đòn thì mọc một lớp VẢY chặn trọn một đòn (tối đa 1)."];
             const ammos = AMMO_NAMES;
             const ammoDesc = currentLang==="en" ? ["The Charge specialist. Hold longer and it keeps evolving — heavy round, piercing round, then a fission burst. Tap-firing is just filler.","The all-rounder. Almost everything splashes, so it clears packs and chews through bosses alike, and what it touches keeps burning.","Infinite ammo, but every shot starts wide. Keep the trigger down and the spread walks inward — thirty rounds in it is a purple laser firing twice as fast.","The strange one. Shards split, bounce and pierce, and the longer you stay on one target the harder it detonates. Learn it to use it.","Crowd king. Bolts leap from one enemy to the next, so the bigger the swarm the better. One-on-one with a boss it runs dry.","A close-range swordsman. There is a whole combo system hidden in your jump, dash and direction keys — go find it yourself.","You do not shoot enemies, you feed a star. It swallows every bullet near it and spits them back out in all directions, multiplied.","Throw it, then catch it yourself. A clean catch hurls it straight back into their face; a miss leaves you empty-handed.","Pure control. Every shot stacks frost; five stacks freeze. Then choose: leave them frozen, or shatter the ice for a burst.","Four rounds, no reload. The fourth is always the loudest — it executes on what they have already lost. Every hit leaves a mark for the rest of the kit.", "A melee weapon. J and K chain into each other like a Musou combo. Reach is 1.5x the sword but it has no ranged attack at all, so its answer to flying bosses is the air combo.", "A heavy melee weapon. Carrying it slows you to 85%; throwing it puts you at 120% but leaves you unable to attack. Every move has uncancellable recovery, and slams land where the hammer head hits.","J J J = right-left-right. Hold K to bank damage (lost health and parries add to it), release K to spend it all. HIDDEN INPUTS (Fwd = facing): Back Fwd J Hadoken · Down Fwd J Hashogeki · Back Down Fwd J Kamehameha (needs 50) · J then Jump Shoryuken · J Fwd J long jab · Down J ground punch · Dash J lunge · Down Down Denjin · In air: Down J Heaven Drop, Up Up Down J Stomp. Magnifier: numbers.","Mid-range melee. Web slows and binds to force an opening, then whip strings, spike bursts and a grab-slam pour everything into that opening.","The unfinished gun — the weakest in the roster, by design. Six rounds a second, and emptying its six-round magazine overheats it on the spot. Holding K banks rounds into a separate store that fires half again as fast and ignores heat.","A chainsaw swung like a sword — and swinging a chainsaw is a terrible way to use one, so the slashes are pathetic. Everything lives on K: release it and the engine kicks in, and the whole moveset changes tier by tier for as long as the engine bar lasts.","Thin needles that pierce once. Every hit adds a PERMANENT bleed stack — the longer the fight, the harder it bleeds. K fans out a spread of needles; the Channel strings a net across the map, the ultimate is a storm of needles.","No ammo at all until you make it: hold K to forge swords that hover on your back, then J launches them. Swords block bullets on their own, and a full set of six becomes a shield. Channel opens the Gate of Treasure, the ultimate drops ten thousand swords.","Death's scythe. Cuts land fast but recover SLOWLY, and every combo branches on RHYTHM: press straight on, or pause a beat (the blade flashes purple) and press. Holding it locks the Power to DEATH — hits build rage, I/O calls the Reaper to fight at your side."] : ["Vua của đòn Charge. Giữ càng lâu càng biến hoá: viên to, viên xuyên, rồi vỡ thành chùm mảnh. Bắn thường chỉ để cầm chừng.","Đa dụng nhất bảng. Gần như đòn nào cũng nổ lan nên vừa dọn bầy vừa gặm boss, và thứ gì dính lửa cũng cháy tiếp một lúc.","Vô hạn đạn, nhưng bắn phát nào cũng tản. Giữ liên tục thì đạn khép dần vào giữa — đủ ba mươi viên nó thành tia laser tím, nhịp bắn nhanh gấp đôi.","Loại lắt léo nhất. Đạn tách, nảy, xuyên, và càng bám riết một mục tiêu thì đòn nổ càng đau. Phải hiểu cơ chế mới xài được.","Ông vua dọn bầy. Sét tự nhảy từ con này sang con khác, càng đông càng lời. Nhưng tay đôi với boss thì hụt hơi.","Kiếm sĩ cận chiến. Có nguyên một hệ combo giấu trong nút nhảy, nút lướt và hướng bấm — tự tìm ra mới vui.","Bạn không bắn kẻ địch, bạn nuôi một ngôi sao. Sao hút mọi viên đạn quanh nó rồi bắn trả gấp bội ra khắp hướng.","Ném đi rồi phải tự bắt. Bắt gọn thì lưỡi bay ngược vào mặt kẻ địch, hụt thì trắng tay ngồi chờ. Càng liều càng lãi.","Thuần khống chế. Mỗi phát cộng một tầng băng, đủ 5 tầng thì đóng băng. Rồi tự chọn: để yên mà khống, hay đập vỡ lấy sát thương.","Bốn viên, không nạp lại. Viên thứ tư luôn là viên to nhất — nó ăn theo lượng máu đối thủ đã mất. Mỗi phát trúng để lại một dấu ấn cho các đòn sau.", "Vũ khí cận chiến. J và K nối nhau thành combo kiểu Musou. Tầm đánh gấp rưỡi Kiếm nhưng hoàn toàn không có đòn tầm xa, nên cách với tới boss bay là combo trên không.", "Vũ khí cận chiến hạng nặng. Cầm búa thì chạy nhảy còn 85%, ném búa đi thì lên 120% nhưng không đánh được gì. Mọi đòn đều có khung khựng không huỷ, và cú nện nổ ngay chỗ đầu búa chạm đất.","J J J đấm phải-trái-phải. Giữ K tích sát thương (mất máu, đỡ đòn cũng cộng), nhả K xả hết. LỆNH ẨN (Tiến = hướng mặt): Lùi Tiến J Hadoken · Xuống Tiến J Hashogeki · Lùi Xuống Tiến J Kamehameha (cần 50) · J rồi Nhảy Shoryuken · J Tiến J đấm vói · Xuống J nện đất · Lướt J lao đấm · Xuống Xuống Denjin · Trên không: Xuống J Thiên Truy, Lên Lên Xuống J Nhảy Đạp. Kính lúp: số liệu.","Cận chiến tầm trung. Tơ làm chậm rồi trói để mở khoảng trống, sau đó chuỗi quất, gai bung và cú tóm-đạp dồn hết vào khoảng trống đó.","Khẩu chưa xong — yếu nhất bảng, và đó là chủ ý. 6 viên mỗi giây, cạn băng 6 viên là quá nhiệt ngay. Giữ K trữ đạn vào một kho riêng; xả kho thì bắn nhanh gấp rưỡi và không sợ nóng.","Cưa máy vung như kiếm — mà vung cưa thì phế thật, nên nhát chém chỉ 1 sát thương. Tất cả nằm ở phím K: nhả ra là nổ máy, và cả bộ đòn đổi nấc theo thời gian giữ, chạy được chừng nào thanh động cơ còn xăng.","Kim mảnh xuyên một lần. Mỗi mũi trúng cộng một vết CHẢY MÁU VĨNH VIỄN — trận càng dài máu chảy càng nhiều. K phóng quạt kim, Channel giăng lưới dây kín map, chiêu cuối là cơn mưa kim.","Không có đạn cho tới khi tự rèn: giữ K sinh kiếm lơ lửng sau lưng, J phóng kiếm đi. Kiếm tự bay ra chặn đạn, đủ sáu thanh thì thành khiên. Channel mở Vương Khố, chiêu cuối là Vạn Kiếm Quy Tông.","Lưỡi hái của thần chết. Chém ra rất nhanh nhưng THU HỒI CHẬM, và combo nào cũng rẽ nhánh theo NHỊP: bấm liền, hay dừng một nhịp (lưỡi loé tím) rồi bấm. Cầm nó thì Power khoá sang DEATH — đánh trúng tích nộ, I/O gọi thần chết ra đánh cùng."];
             const SHIELDS = currentLang==="en" ? ["PARRY","ACTIVE SHIELD"] : ["ĐỠ ĐÒN", "KHIÊN CHỦ ĐỘNG"];
@@ -71662,7 +71673,7 @@ class PulsarCloneBoss {
         function r14LopHienTai(){ return R14.lopDs[R14.lop] || r14TaoLop(R14.lop); }
         // ---------------- VAO TRAN ----------------
         function r14MauToiDa(){
-            let goc = 5 + (hasRune('hp') ? 4 : 0);
+            let goc = 5 + (hasRune('hp') ? 4 : 0) + dangMauThem(currentForm);
             return goc + R14.themMau + Math.min(R14.runeMauCong, Math.max(0, 10 - goc));
         }
         function r14VaoTran(o){
@@ -73233,6 +73244,63 @@ class PulsarCloneBoss {
         const keys = {}; let mouseX = 0, mouseY = 0;
 
         let currentForm = parseInt(localStorage.getItem("dino_current_form")) || 0;
+        /* ===================== @@HE-DANG — NOI TAI NHO CUA HINH DANG =====================
+           Hans: "noi tai nho thoi, giup duoc mot chut. Nerf mau thi chi o dang nho, lon hon thi
+           phai nhieu mau hon". Hai dang LON (ULTIMATE / BEYOND) to gap 1.35 lan nen de trung
+           hon han — bu lai +1 mau. Hai dang nho giu 5 mau va duoc mot chut linh hoat.
+             NORMAL   — Gon nhe: hoi luot nhanh hon 15%.
+             RUSH     — Nhanh chan: chay nhanh hon 6%.
+             ULTIMATE — +1 mau · Hao quang: quai thuong (khong phai boss) dung sat bi dot 1 sat thuong moi giay.
+             BEYOND   — +1 mau · Vay: 25 giay khong dinh don thi moc mot lop vay chan tron MOT don (toi da 1).
+           PvP khong dinh: mau PvP lay theo luat tran, va ca bon noi tai deu khong dung toi doi thu. */
+        const DANG_NOR_LUOT = 0.85, DANG_RUSH_CHAY = 1.06;
+        const DANG_HQ_R = 46, DANG_HQ_NHIP = 60, DANG_VAY_CHO = 1500;
+        function dangCua(ng){ return ng && ng.id === 1 ? currentForm : (ng ? ng.form : 0); }
+        function dangMauThem(f){ return (f === 2 || f === 3) ? 1 : 0; }
+        function dangTick(ng){
+            if (!ng || ng.id !== 1 || gameState === 'pvp') return;
+            let f = currentForm;
+            if (f === 2 && frames % DANG_HQ_NHIP === 0 && typeof enemies !== 'undefined'){
+                let cx = ng.x + ng.w / 2, cy = ng.y + ng.h / 2;
+                for (let e of enemies){
+                    if (!e || e.hp === undefined || e.hp <= 0 || e.invulnAll) continue;
+                    let ex = e.x + (e.w||20) / 2, ey = e.y + (e.h||20) / 2;
+                    if (Math.abs(ex - cx) > DANG_HQ_R + (e.w||20) / 2 || Math.abs(ey - cy) > DANG_HQ_R + (e.h||20) / 2) continue;
+                    if (typeof dealDamage === 'function') dealDamage(e, 1, 'ammo'); else e.hp -= 1;
+                    visualEffects.push(new Effect(ex, ey, 'explosion', true, 8));
+                }
+            }
+            if (f === 3){
+                ng.dangVayT = (ng.dangVayT || 0) + 1;
+                if (!ng.dangVay && ng.dangVayT >= DANG_VAY_CHO){
+                    ng.dangVay = 1;
+                    floatingTexts.push(new FloatingText(ng.x - 10, ng.y - 30, LT("VẢY", "SCALE")));
+                    if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(1200, 0.08, 'triangle', 0.10, 1600);
+                }
+            } else { ng.dangVay = 0; ng.dangVayT = 0; }
+        }
+        function dangVayChan(ng){
+            if (!ng || ng.id !== 1 || gameState === 'pvp' || currentForm !== 3) return false;
+            ng.dangVayT = 0;                                   // dinh don (du chan hay khong) la dem lai tu dau
+            if (!ng.dangVay) return false;
+            ng.dangVay = 0; ng.invincible = true; ng.invTimer = Math.max(ng.invTimer || 0, 40);
+            floatingTexts.push(new FloatingText(ng.x - 20, ng.y - 30, LT("VẢY CHẶN!", "SCALE BLOCK!")));
+            visualEffects.push(new Effect(ng.x + ng.w / 2, ng.y + ng.h / 2, 'parry'));
+            return true;
+        }
+        // ve: vong hao quang mo (ULT) va lop vay sang (BEYOND) — goi trong veDauAnDang
+        function dangVeNoiTai(ng, cx, cy){
+            if (!ng || ng.id !== 1) return;
+            if (currentForm === 2 && gameState !== 'pvp'){
+                ctx.strokeStyle = 'rgba(255,82,82,' + (0.18 + 0.1 * Math.sin(frames * 0.12)).toFixed(3) + ')'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(cx, cy, DANG_HQ_R, 0, 6.28); ctx.stroke();
+            }
+            if (currentForm === 3 && ng.dangVay){
+                ctx.strokeStyle = 'rgba(206,147,216,' + (0.45 + 0.25 * Math.sin(frames * 0.15)).toFixed(3) + ')'; ctx.lineWidth = 2;
+                for (let k = 0; k < 6; k++){ let a = k * Math.PI / 3 + frames * 0.02;
+                    ctx.beginPath(); ctx.arc(cx + Math.cos(a) * 30, cy + Math.sin(a) * 26, 5, 0, 6.28); ctx.stroke(); }
+            }
+        }
         /* ===================== PHU KIEN (thuan trang tri, khong doi chi so) =====================
            Hans: "cac hinh dang kha phe... phu kien nhu Rau cua Ton Ngo Khong tren dau hay ao giap tren nguoi khung
            long cho vui". Chon o hang PHU KIEN trong Customize, luu vao localStorage. */
@@ -73455,6 +73523,7 @@ class PulsarCloneBoss {
             let luot = (typeof dashVx !== 'undefined') && Math.abs(dashVx) > 3;
             let d = ng.isFacingLeft ? -1 : 1, cx = x + ng.w / 2, chan = y + ng.h;
             ctx.save();
+            dangVeNoiTai(ng, cx, y + ng.h / 2);   // @@HE-DANG
             if (form === 0 && (dangChay || luot)){
                 for (let k = 0; k < 3; k++){
                     let t = ((frames * 0.06 + k / 3) % 1);
@@ -79758,9 +79827,11 @@ function infernoMaxChain(x, y, source){
                     dino._tdNe = frames + 20;   // @@HE-TUDIA: dich chuyen cung la mot cu ne
                     dashVx = 0;
                     dashCd = stBat() ? ST_NHIP : (combatStance === 1 ? 26 : 42);
+                    if (currentForm === 0 && !stBat()) dashCd = Math.round(dashCd * DANG_NOR_LUOT);   // @@HE-DANG: NORMAL gon nhe
                 } else {
                 dashVx = dir * _xa; if (mapTheme === 'ocean' && (dino.y + dino.h) > OCEAN_SURF + 4) dashVx *= 0.6;   // luot duoi nuoc cham hon
                 dashCd = stBat() ? ST_NHIP : (combatStance === 1 ? 26 : 42); // Trickster hoi luot nhanh hon; Shin Trickster dung he charge rieng
+                if (currentForm === 0 && !stBat()) dashCd = Math.round(dashCd * DANG_NOR_LUOT);   // @@HE-DANG: NORMAL gon nhe
                 dino.invincible = true; if (dino.invTimer < 16) dino.invTimer = 16;
                 if (typeof lhLuot === 'function') lhLuot(dir);   // @@HE-LUOIHAI: J roi luot = song chan dong; luot roi J = chem ngang lien
                 }
