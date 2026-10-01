@@ -67203,11 +67203,12 @@ class PulsarCloneBoss {
              Luot (duoi dat)    DAM bang mui kiem 5
              Nhay J (duoi dat)  nhac kiem ve lung tren khong 9 · Nhay J (tren lung): bo xuong 7
              Luot J             lao toi CHEM NGANG cuc manh 10, day lui, PHA don lao cua dich, ton 3
-             K 0.5s  dam toi + lao nhe 8 · K 1s  chem cheo len 10 (day lui + PARRY, dung yen)
-             K 1.5s  tua mui kiem xuong dat sau lung roi quet len: chem 10 + SONG XUNG KICH 10
+             K 0.5s  thu kiem ra sau roi DAM XUYEN, lao xa bang mot cu luot 8 · K 1s  VUNG CHEM ngang chech len 10 (day lui + PARRY, dung yen)
+             K 1.5s  ha kiem nhe xuong dat roi vung tu duoi vong len (nguoc kim dong ho): chem 10 + SONG XUNG KICH 10
+             NOI TAI MA PHAP TRONG LUC: moi nhat trung ke dang bay ghim no xuong dat 0.75 giay · Bat mon = vo han the luc
              K 2s    CAM KIEM: vong tim co vao kiem -> moi ke dich dang bay bi KEO XUONG DAT 4 giay (2-3)
              K 2.5s+ BAT MON (hao quang do): 4.5 giay vung nhanh hon, di lai thoai mai hon
-             Channel cam kiem, moi 3 giay mot dot DIA CHAN: keo ke bay xuong (1-3), ke duoi dat 10 + cham 1s
+             Channel cam kiem, moi 3 giay mot dot DIA CHAN: moi ke 10 + cham 1s; ke dang bay bi keo xuong, cham dat them 1-3
              U       pha 1 chem quet ca man 30, mat dat nut, ke dich mat trong luc lo lung · pha 2 kiem bay len
                      giua troi giua set + hao quang tu tim, hut da & ke dich thanh qua cau roi DAP XUONG no 120.
            Trang thai rieng moi nguoi choi o `ng.dk`. Vong lap chinh goi dkChung() (song, ghim, chieu cuoi, ve).
@@ -67217,6 +67218,7 @@ class PulsarCloneBoss {
         const DK_BUFF_T = 270;                // bat mon 4.5 giay
         const DK_GHIM_T = 240;                // ghim xuong dat 4 giay
         const DK_CH_NHIP = 180;               // channel: 3 giay mot dot
+        const DK_TRONG = 45;                  // MA PHAP TRONG LUC: moi nhat trung ke dang bay ghim no xuong dat 0.75 giay
         const DK_TIERS = [[30, "#B0BEC5"], [60, "#90A4AE"], [90, "#B388FF"], [120, "#7C4DFF"], [150, "#FF5252"]];
         const DK_LUNG = [-2.0, 16, 4], DK_TAY = [1.83, 31, 20], DK_CAM = [Math.PI, 46, -26];
         const DK_MAU = [196, 206, 230];
@@ -67269,12 +67271,14 @@ class PulsarCloneBoss {
                 if (hit) hit.add(o);
                 if (dmg > 0){ dkDanh(o, dmg); let p = hitDiem(o, d, (y0 + y1) / 2); hitCat(p.x, p.y, d * -0.5, dmg >= 7, DK_MAU); }
                 if (fn) fn(o);
+                if (dmg > 0 && dkLaQuai(o) && dkDangBay(o)) dkGhim(o, DK_TRONG);   // MA PHAP TRONG LUC: chem trung ke bay la no rot
                 n++;
             }
             if (n) shakeTimer = Math.max(shakeTimer || 0, dmg >= 9 ? 10 : 6);
             return n;
         }
         function dkTon(ng, n){
+            if (ng.dk && ng.dk.buff > 0){ ng._hoiCho = 45; return; }      // BAT MON: vo han the luc
             ng.ammo = Math.max(0, ng.ammo - n); ng._hoiCho = 45;
             if (ng.ammo <= 0){ ng.isOverheated = true; ng.overheatTimer = 75; }
         }
@@ -67283,7 +67287,8 @@ class PulsarCloneBoss {
         const DK_M = {
             chem:  { T: 32, hit: 20, ton: 1, dmg: 7, het: 'dat', keys: [[0.45, -0.25, 26, 10, 'io'], [0.62, 1.83, 31, 20, 'in'], [1, 1.83, 31, 20]],
                      hop: [-10, 135, 70, 8], dat: 1, am: 120 },
-            nhac:  { T: 28, hit: 7, ton: 0, dmg: 7, het: 'lung', cho: 30, keys: [[0.28, -0.5, 28, 12, 'out'], [1, -2.0, 16, 4, 'io']],
+            // NHAC: day kiem len mot chut (mat dat nut) — khung lai — roi moi giat len. Nang, manh.
+            nhac:  { T: 38, hit: 20, ton: 0, dmg: 7, het: 'lung', cho: 22, nut: 7, keys: [[0.2, 1.7, 33, 15, 'out'], [0.4, 1.67, 33, 14], [0.56, -0.5, 28, 12, 'in'], [1, -2.0, 16, 4, 'io']],
                      hop: [-10, 130, 90, 6], am: 260 },
             nhacN: { T: 24, hit: 6, ton: 0, dmg: 9, het: 'lung', cho: 16, keys: [[0.3, -0.5, 28, 12, 'out'], [1, -2.0, 16, 4, 'io']],
                      hop: [-20, 132, 100, 40], am: 280 },
@@ -67291,18 +67296,22 @@ class PulsarCloneBoss {
                      hop: [-10, 125, 40, 0], xuong: 1, am: 110 },
             dam2:  { T: 16, hit: 5, ton: 0, dmg: 5, het: 'dat', keys: [[0.3, 1.6, 42, 22, 'out'], [0.7, 1.6, 42, 22], [1, 1.83, 31, 20, 'io']],
                      hop: [0, 152, 8, 0], am: 420 },
-            ngang: { T: 30, hit: 13, ton: 3, dmg: 10, het: 'lung', cho: 14, ngang: 1, hop: [-70, 178, 40, 6], day: 44, pha: 1, am: 90 },
-            dam:   { T: 26, hit: 11, ton: 1, dmg: 8, het: 'lung', cho: 12, keys: [[0.3, 1.6, 20, 22, 'out'], [0.45, 1.6, 48, 22, 'in'], [0.7, 1.6, 48, 22], [1, -2.0, 16, 4, 'io']],
-                     hop: [0, 162, 10, 0], day: 18, lao: 9, am: 360 },
-            cheo:  { T: 50, hit: 28, ton: 1, dmg: 10, het: 'lung', cho: 12, dung: 1, keys: [[0.48, 1.95, 26, 22, 'io'], [0.62, -0.3, 33, 12, 'in'], [0.8, -0.3, 33, 12], [1, -2.0, 16, 4, 'io']],
-                     hop: [-10, 150, 90, 6], day: 34, parry: [0.36, 0.68], am: 150 },
-            quet:  { T: 60, hit: 34, ton: 2, dmg: 10, het: 'lung', cho: 12, dung: 1, keys: [[0.3, -1.85, 18, 22, 'io'], [0.45, -1.85, 18, 22], [0.6, 0.7, 33, 14, 'in'], [0.78, 0.7, 33, 14], [1, -2.0, 16, 4, 'io']],
+            // ngang: [het lay da, het vung, bat dau thu, nghieng mat phang (am = chech len)]
+            ngang: { T: 30, hit: 13, ton: 3, dmg: 10, het: 'lung', cho: 14, ngang: [0.25, 0.5, 0.62, 0], lao: 15, hop: [-70, 178, 40, 6], day: 44, pha: 1, am: 90 },
+            // K 0.5s: THU kiem ra sau mot chut roi DAM XUYEN, lao xa bang mot cu luot; hop di theo nguoi suot doan lao
+            dam:   { T: 30, hit: 12, ton: 1, dmg: 8, het: 'lung', cho: 12, keys: [[0.33, 1.42, 2, 18, 'io'], [0.42, 1.6, 52, 22, 'in'], [0.72, 1.6, 50, 22], [1, -2.0, 16, 4, 'io']],
+                     hop: [-20, 150, 10, 0], keoDai: 9, day: 12, laoLuc: 22, am: 360 },
+            // K 1s: VUNG CHEM — chem NGANG nhung chech len mot chut, lay da cham roi vung nhanh
+            cheo:  { T: 50, hit: 28, ton: 1, dmg: 10, het: 'lung', cho: 12, dung: 1, ngang: [0.45, 0.62, 0.74, -0.38],
+                     hop: [-40, 160, 90, 6], day: 34, parry: [0.36, 0.68], am: 150 },
+            // K 1.5s: ha kiem nhe xuong dat truoc mat roi vung tu DUOI vong len NGUOC chieu kim dong ho
+            quet:  { T: 60, hit: 34, ton: 2, dmg: 10, het: 'lung', cho: 12, dung: 1, keys: [[0.3, 2.0, 26, 8, 'io'], [0.42, 2.0, 26, 8], [0.6, -0.7, 30, 10, 'in'], [0.78, -0.7, 30, 10], [1, -2.0, 16, 4, 'io']],
                      hop: [-90, 150, 100, 6], song: 1, am: 100 },
             cam:   { T: 70, hit: 25, ton: 2, dmg: 0, het: 'cam', dung: 1, keys: [[0.25, 0.15, 30, -4, 'io'], [0.36, Math.PI, 46, -26, 'in'], [1, Math.PI, 46, -26]], am: 70 },
             buff:  { T: 36, hit: 14, ton: 2, dmg: 0, het: 'lung', keys: [[0.4, 0.1, 30, -2, 'io'], [0.75, 0.1, 30, -2], [1, -2.0, 16, 4, 'io']], am: 200 },
             kenh:  { T: 24, hit: 9, ton: 0, dmg: 0, het: 'kenh', dung: 1, keys: [[0.3, 0.15, 30, -4, 'io'], [0.4, Math.PI, 46, -26, 'in'], [1, Math.PI, 46, -26]], am: 70 },
             nho:   { T: 22, hit: 99, ton: 0, dmg: 0, het: 'lung', keys: [[1, -2.0, 16, 4, 'io']] },
-            nho2:  { T: 30, hit: 99, ton: 0, dmg: 0, het: 'lung', keys: [[1, -2.0, 16, 4, 'io']] }
+            nho2:  { T: 40, hit: 99, ton: 0, dmg: 0, het: 'lung', nut: 8, keys: [[0.22, 1.7, 33, 15, 'out'], [0.42, 1.67, 33, 14], [1, -2.0, 16, 4, 'io']] }
         };
         function dkEm(u, em){
             if (em === 'in') return u * u * u;
@@ -67329,14 +67338,14 @@ class PulsarCloneBoss {
             if (!A){ let p = dkTuThe(dk); return { ang: p[0], px: p[1], py: p[2], nen: 1 }; }
             let u = Math.min(1, A.t / A.T), m = A.m;
             if (m.ngang){
-                // 2.5D: kiem quay quanh truc dung, phi = 0 chia thang ra truoc
-                let phi;
-                if (u < 0.25) phi = -2.6 + (u / 0.25) * 0.2;
-                else if (u < 0.5) phi = -2.4 + dkEm((u - 0.25) / 0.25, 'in') * 3.8;
+                // 2.5D: kiem quay quanh truc dung, phi = 0 chia thang ra truoc. ng[3] nghieng mat phang vung (am = chech len)
+                let G = m.ngang, a0 = Math.PI / 2 + G[3], phi;
+                if (u < G[0]) phi = -2.3 - dkEm(u / G[0], 'out') * 0.4;
+                else if (u < G[1]) phi = -2.7 + dkEm((u - G[0]) / (G[1] - G[0]), 'in') * 4.1;
                 else phi = 1.4;
-                if (u < 0.62) return { ang: Math.PI / 2, px: 30, py: 20, nen: Math.cos(phi), phi };
-                let v = dkEm((u - 0.62) / 0.38, 'io');
-                return { ang: Math.PI / 2 + (DK_LUNG[0] - Math.PI / 2) * v, px: 30 + (DK_LUNG[1] - 30) * v, py: 20 + (DK_LUNG[2] - 20) * v, nen: Math.cos(1.4) + (1 - Math.cos(1.4)) * v };
+                if (u < G[2]) return { ang: a0, px: 30, py: 20, nen: Math.cos(phi), phi };
+                let v = dkEm((u - G[2]) / (1 - G[2]), 'io');
+                return { ang: a0 + (DK_LUNG[0] - a0) * v, px: 30 + (DK_LUNG[1] - 30) * v, py: 20 + (DK_LUNG[2] - 20) * v, nen: Math.cos(1.4) + (1 - Math.cos(1.4)) * v };
             }
             let ks = [[0, A.k0[0], A.k0[1], A.k0[2]]].concat(m.keys);
             let i = 1; while (i < ks.length - 1 && u > ks[i][0]) i++;
@@ -67356,12 +67365,11 @@ class PulsarCloneBoss {
             dk.A = { kieu, m, t: 0, T, hit, k0: [p.ang, p.px, p.py], set: new Set(), dir: dkDir(ng), them: them || {} };
             if (m.ton) dkTon(ng, m.ton);
             ng._hoiCho = 45;
-            if (m.lao && typeof dashVx !== 'undefined') dashVx = dkDir(ng) * m.lao;
-            if (m.ngang && typeof dashVx !== 'undefined') dashVx = dkDir(ng) * 15;
+
             if (m.am) dkSfx(m.am, 0.16, 'sawtooth', 0.18, m.am * 0.45);
             return true;
         }
-        function dkRaDon(ng, A){
+        function dkHopDon(ng, A){
             let m = A.m, d = dkDir(ng), dmg = (A.them.dmg || m.dmg);
             if (m.hop){
                 let h = m.hop, duoi = m.xuong ? Math.max(h[3], 326 - (ng.y + ng.h)) : h[3];
@@ -67371,6 +67379,10 @@ class PulsarCloneBoss {
                     if (m.parry && dkLaQuai(o) && typeof venKhoa === 'function') venKhoa(o, 14);
                 });
             }
+        }
+        function dkRaDon(ng, A){
+            let m = A.m, d = dkDir(ng);
+            dkHopDon(ng, A);
             if (m.dat || (m.xuong && ng.grounded)){
                 let t = dkTG(ng, 31 + 88, 44);
                 hitDat(t.x, 320, 1, DK_MAU);
@@ -67456,9 +67468,11 @@ class PulsarCloneBoss {
             for (let o of dkDs()){
                 if (!dkLaQuai(o) && gameState !== 'pvp') continue;
                 if (dkLaQuai(o) && dkDangBay(o)){
+                    // ke dang bay: an 10 NGAY, bi keo xuong, cham dat thi them mot dot 1-3
                     let dmg = dkLaBoss(o) ? (((o.w || 40) * (o.h || 40) >= 12000) ? 3 : 2) : 1;
-                    dkDanh(o, dmg); dkGhim(o, 30);
-                    hitCat(o.x + (o.w || 20) / 2, o.y + (o.h || 20) / 2, Math.PI / 2, false, [179, 136, 255]);
+                    dkDanh(o, 10); o._wsCham = Math.max(o._wsCham || 0, 60); dkGhim(o, 30);
+                    dkHen.push({ o, t: 7, dmg });
+                    hitCat(o.x + (o.w || 20) / 2, o.y + (o.h || 20) / 2, Math.PI / 2, true, [179, 136, 255]);
                 } else {
                     if (Math.abs((o.x + (o.w || 20) / 2) - t.x) > 520) continue;
                     dkDanh(o, 10); o._wsCham = Math.max(o._wsCham || 0, 60);
@@ -67473,7 +67487,7 @@ class PulsarCloneBoss {
         function dkTick(ng, fireKey, chargeKey, crouchKey){
             let dk = dkCua(ng);
             if (dk.ult) return;
-            if (dk.buff > 0) dk.buff--;
+            if (dk.buff > 0){ dk.buff--; ng.ammo = ng.maxAmmo; ng.isOverheated = false; }   // BAT MON: vo han the luc
             if (dk.cho > 0) dk.cho--;
             // suc nhay: cham nhu Bua; dang dung yen thi khong nhay
             ng.jumpPower = dkDungYen(dk) ? 0 : -12.5 * (dk.buff > 0 ? 0.95 : DK_CHAY);
@@ -67487,7 +67501,14 @@ class PulsarCloneBoss {
             if (dk.A){
                 let A = dk.A; A.t++;
                 { let p = dkPose(ng); if (p){ (A.vet || (A.vet = [])).push(p); if (A.vet.length > 6) A.vet.shift(); } }
+                if (A.m.nut && A.t === Math.round(A.m.nut * A.T / A.m.T) && ng.grounded) dkNutDat(ng);
+                if (A.m.laoLuc && A.t === A.hit - 1 && typeof dashVx !== 'undefined'){
+                    dashVx = dkDir(ng) * A.m.laoLuc;                       // lao xa bang mot cu luot thuong
+                    ng.invincible = true; ng.invTimer = Math.max(ng.invTimer || 0, 12);
+                }
+                if (A.m.lao && A.t === 1 && typeof dashVx !== 'undefined') dashVx = dkDir(ng) * A.m.lao;
                 if (A.t === A.hit) dkRaDon(ng, A);
+                else if (A.m.keoDai && A.t > A.hit && A.t <= A.hit + A.m.keoDai) dkHopDon(ng, A);   // DAM XUYEN: hop theo nguoi suot doan lao
                 if (A.m.xuong && A.t < A.hit){ ng.dy = Math.max(ng.dy || 0, 11); if (ng.grounded && A.t > 3){ A.t = A.hit - 1; } }
                 if (A.t >= A.T) dkXong(ng, A);
             }
@@ -67531,7 +67552,7 @@ class PulsarCloneBoss {
             if (h >= 150) dkBatDau(ng, 'buff');
             else if (h >= 120){ if (dkBatDau(ng, 'cam')) dkChu(ng.x - 26, ng.y - 40, "CẮM KIẾM", "PLANT"); }
             else if (h >= 90) dkBatDau(ng, 'quet');
-            else if (h >= 60){ if (dkBatDau(ng, 'cheo')) dkChu(ng.x - 26, ng.y - 40, "NGHỊCH TRẢM!", "RISING CLEAVE!"); }
+            else if (h >= 60){ if (dkBatDau(ng, 'cheo')) dkChu(ng.x - 26, ng.y - 40, "VUNG TRẢM!", "WIDE CLEAVE!"); }
             else if (h >= 30) dkBatDau(ng, 'dam');
         }
         function dkParry(ng){
@@ -67558,13 +67579,18 @@ class PulsarCloneBoss {
             ng._uFreeze = Math.max(ng._uFreeze || 0, 2);
             if (ng.id === 1 && typeof dashVx !== 'undefined') dashVx = 0;
             let tay = dkTG(ng, 31, 20);
+            // MOI ke dich tren man (ke ca con moi xuat hien truoc luc dap) mat trong luc, lo lung roi bi hut vao
+            if (U.t < 150) for (let o of dkDs()){
+                if (U.ds.indexOf(o) >= 0) continue;
+                U.ds.push(o);
+                if (dkLaQuai(o)){ o._dkNoi = { t: 0, y0: o.y, x0: o.x, keo: null }; dkBocUpd(o); }
+                if (U.t > 20) dkDanh(o, 30);                       // den muon sau nhat quet: van an nhat quet
+            }
             if (U.t === 20){
                 // PHA 1 — chem quet ca man
-                U.ds = dkDs().slice(0, 16);
                 for (let o of U.ds){
                     dkDanh(o, 30);
                     hitCat(o.x + (o.w || 20) / 2, o.y + (o.h || 20) / 2, 0, true, DK_MAU);
-                    if (dkLaQuai(o)){ o._dkNoi = { t: 0, y0: o.y, x0: o.x, keo: null }; dkBocUpd(o); }
                 }
                 for (let i = 0; i < 9; i++) U.nut.push({ x: camX + 40 + i * (canvas.width - 80) / 8 + (Math.random() - 0.5) * 40, l: 30 + Math.random() * 40, s: Math.random() });
                 shakeTimer = Math.max(shakeTimer || 0, 26);
@@ -67614,7 +67640,16 @@ class PulsarCloneBoss {
         }
 
         /* ---------- PHAN CHUNG (vong lap chinh) ---------- */
-        let dkSong = [], dkVong = [], dkSongTron = [];
+        let dkSong = [], dkVong = [], dkSongTron = [], dkHen = [], dkNut = [];
+        // nut dat duoi mui kiem luc DAY kiem len
+        function dkNutDat(ng){
+            let t = dkTG(ng, 31 + 86, 44), d = dkDir(ng);
+            let tia = []; for (let k = 0; k < 6; k++) tia.push({ a: -Math.PI / 2 + (k - 2.5) * 0.5 + (Math.random() - 0.5) * 0.3, l: 14 + Math.random() * 18 });
+            dkNut.push({ x: t.x, t: 0, T: 46, tia, d });
+            hitDat(t.x, 320, 0, [161, 136, 127]);
+            shakeTimer = Math.max(shakeTimer || 0, 7);
+            dkSfx(70, 0.22, 'sawtooth', 0.22, 40);
+        }
         function dkNguoi(){
             let ds = [];
             if (typeof dino !== 'undefined' && dino) ds.push(dino);
@@ -67639,6 +67674,7 @@ class PulsarCloneBoss {
                     if (S.hit.has(o)) continue;
                     if (o.x + (o.w || 20) < x0 || o.x > x1 || o.y + (o.h || 20) < y0 || o.y > 330) continue;
                     S.hit.add(o); dkDanh(o, S.dmg); dkDay(o, S.d, 16);
+                    if (dkLaQuai(o) && dkDangBay(o)) dkGhim(o, DK_TRONG);
                     hitCat(o.x + (o.w || 20) / 2, o.y + (o.h || 20) / 2, -S.d * 0.8, true, [179, 136, 255]);
                 }
                 if (typeof gdCatHop === 'function') gdCatHop({ x: x0, y: y0, w: S.rong, h: S.cao });
@@ -67646,6 +67682,9 @@ class PulsarCloneBoss {
             }
             for (let i = dkVong.length - 1; i >= 0; i--) if (++dkVong[i].t >= dkVong[i].T) dkVong.splice(i, 1);
             for (let i = dkSongTron.length - 1; i >= 0; i--) if (++dkSongTron[i].t >= dkSongTron[i].T) dkSongTron.splice(i, 1);
+            for (let i = dkNut.length - 1; i >= 0; i--) if (++dkNut[i].t >= dkNut[i].T) dkNut.splice(i, 1);
+            // channel: ke bay bi keo xuong, CHAM DAT thi them mot dot sat thuong
+            for (let i = dkHen.length - 1; i >= 0; i--){ let H = dkHen[i]; if (--H.t <= 0){ if (H.o.hp > 0){ dkDanh(H.o, H.dmg); hitDat(H.o.x + (H.o.w || 20) / 2, 320, 1, [179, 136, 255]); } dkHen.splice(i, 1); } }
             // ghim: dem nguoc + ap vi tri (con bi khoa _uFreeze khong goi update)
             if (typeof bosses !== 'undefined') for (let o of bosses.concat(enemies)){
                 if ((o._dkGhim || 0) > 0){
@@ -67710,7 +67749,7 @@ class PulsarCloneBoss {
                 ctx.strokeStyle = "rgba(225,235,255," + (0.75 * a).toFixed(2) + ")"; ctx.lineCap = 'round';
                 ctx.translate(x + 30, y + 8);
                 if (A.m.ngang){
-                    ctx.lineWidth = 9; ctx.beginPath(); ctx.ellipse(0, 6, 120, 20, 0, Math.PI * 0.9, Math.PI * 2.1); ctx.stroke();
+                    ctx.lineWidth = 9; ctx.beginPath(); ctx.ellipse(0, 6, 120, 20, A.m.ngang[3], Math.PI * 0.9, Math.PI * 2.1); ctx.stroke();
                 } else if (A.kieu === 'dam' || A.kieu === 'dam2'){
                     ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(10, 14); ctx.lineTo(130, 14); ctx.stroke();
                 } else if (A.vet && A.vet.length > 1){
@@ -67774,6 +67813,20 @@ class PulsarCloneBoss {
                 ctx.closePath(); ctx.fill();
                 ctx.restore();
             }
+            ctx.globalCompositeOperation = 'source-over';
+            for (const N of dkNut){
+                let a = 1 - N.t / N.T;
+                ctx.strokeStyle = "rgba(62,39,35," + (0.85 * a).toFixed(2) + ")"; ctx.lineWidth = 2.2;
+                for (const r of N.tia){
+                    ctx.beginPath(); ctx.moveTo(N.x, 321);
+                    let x = N.x, y = 321;
+                    for (let s = 1; s <= 3; s++){ x += Math.cos(r.a) * r.l / 3 * 1.6 + (s % 2 ? 2 : -2); y = 321 + Math.abs(Math.sin(r.a)) * r.l * 0.18 * s; ctx.lineTo(x, y); }
+                    ctx.stroke();
+                }
+                ctx.fillStyle = "rgba(141,110,99," + (0.7 * a).toFixed(2) + ")";
+                for (let k = 0; k < 5; k++){ let u = N.t / N.T; ctx.fillRect(N.x + (k - 2) * 7 * (1 + u * 2), 316 - 18 * u * (1 + (k % 2)), 4, 4); }
+            }
+            ctx.globalCompositeOperation = 'lighter';
             // dia chan (channel)
             for (const Q of dkSongTron){
                 let u = Q.t / Q.T, R = Q.R * dkEm(u, 'out'), a = 1 - u;
@@ -75864,22 +75917,23 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '#NỘI TẠI',
                 '-Kiếm có HAI TRẠNG THÁI: TRÊN LƯNG và DƯỚI ĐẤT (HUD có ghi). Chém xong kiếm nằm dưới đất ~2.5 giây rồi tự nhấc lên chậm.',
                 '-Vung chậm lúc đầu rồi giáng xuống rất nhanh. Tầm xa. Đi lại và nhảy chậm như Búa (85%), kiếm dưới đất còn chậm hơn.',
+                '-MA PHÁP TRỌNG LỰC: mọi nhát chém (và sóng) trúng kẻ đang bay đều ghim nó rơi xuống đất 0.75 giây — đứa nào bay thì đứa đó chết.',
                 '#ĐÒN J',
                 '-J (trên lưng): CHÉM XUỐNG. 7 sát thương, tốn 1. Kiếm cắm lại dưới đất.',
-                '-J (dưới đất): NHẤC KIẾM bằng lực — chém hất lên 7 sát thương, không tốn thể lực, hồi khá chậm (0.5s) trước nhát kế.',
+                '-J (dưới đất): NHẤC KIẾM bằng lực — đẩy kiếm nhích lên trước (mặt đất nứt), khựng lại rồi mới giật lên: chém hất lên 7 sát thương, không tốn thể lực, hồi khá chậm trước nhát kế.',
                 '-Lướt khi kiếm dưới đất: ĐÂM bằng mũi kiếm, 5 sát thương.',
                 '-Nhảy J (kiếm dưới đất): HỒI KIẾM — nhấc kiếm về lưng trên không, 9 sát thương. Nhảy J (trên lưng): bổ xuống 7.',
                 '-Lướt J: HOÀNH TẢO — lao tới chém ngang cực mạnh, 10 sát thương, đẩy lùi, PHÁ đòn lao của địch (chặn luôn đòn chạm). Tốn 3.',
                 '#TÍCH LỰC [K] — tối đa 3s (180f)',
-                '>0.5s (30f) — ĐÂM tới, lao nhẹ, đẩy lùi nhẹ. 8 sát thương, tốn 1.',
-                '>1s (60f) — NGHỊCH TRẢM — hạ kiếm chậm rồi chém chéo lên thật nhanh. 10 sát thương, đẩy lùi + PARRY. Đứng yên khi ra đòn. Tốn 1.',
-                '>1.5s (90f) — LIỆT ĐỊA TRẢM — tựa mũi kiếm xuống đất sau lưng rồi quét lên (chậm → nhanh): chém 10 + SÓNG XUNG KÍCH 10 bay dọc mặt đất. Đứng yên. Tốn 2.',
+                '>0.5s (30f) — ĐỘT KÍCH — thu kiếm ra sau một chút rồi ĐÂM XUYÊN, lao xa bằng một cú lướt (có khung bất tử ngắn), trúng mọi kẻ trên đường lao. 8 sát thương, đẩy lùi nhẹ, tốn 1.',
+                '>1s (60f) — VUNG TRẢM — lấy đà chậm rồi vung chém NGANG chếch lên thật nhanh. 10 sát thương, đẩy lùi + PARRY. Đứng yên khi ra đòn. Tốn 1.',
+                '>1.5s (90f) — LIỆT ĐỊA TRẢM — hạ kiếm nhẹ xuống đất rồi vung từ dưới vòng lên ngược chiều kim đồng hồ (chậm → nhanh): chém 10 + SÓNG XUNG KÍCH 10 bay dọc mặt đất. Đứng yên. Tốn 2.',
                 '>2s (120f) — TRỌNG ẤN — cắm kiếm, kiếm sáng tím, vòng tím co lại vào kiếm: MỌI kẻ đang bay bị kéo xuống đất 4 giây, không bay được. 2-3 sát thương tuỳ cỡ boss. Tốn 2.',
-                '>2.5s (150f) — BÁT MÔN — hào quang đỏ 4.5 giây: vung nhanh hơn ~25%, hồi nhanh hơn, đi lại thoải mái hơn. Tốn 2.',
+                '>2.5s (150f) — BÁT MÔN — hào quang đỏ 4.5 giây: VÔ HẠN THỂ LỰC, vung nhanh hơn ~25%, hồi nhanh hơn, đi lại thoải mái hơn.',
                 '#CHANNEL — ĐỊA CHẤN ẤN (giữ K từ 3s)',
-                '-Cắm kiếm, đứng yên. Mỗi 3 giây một đợt địa chấn: kẻ đang bay bị kéo xuống đất (quái nhỏ 1, boss 2-3 sát thương); kẻ dưới đất trong tầm sóng chịu 10 sát thương và bị làm chậm 1 giây. Khác Trọng Ấn: hết đợt chúng bay lại được, nhưng vẫn dính nhịp sau.',
+                '-Cắm kiếm, đứng yên. Mỗi 3 giây một đợt địa chấn: mọi kẻ địch chịu 10 sát thương và bị làm chậm 1 giây. Kẻ đang bay còn bị kéo xuống, chạm đất thì ăn thêm một đợt (quái nhỏ 1, boss 2-3). Khác Trọng Ấn: hết đợt chúng bay lại được, nhưng vẫn dính nhịp sau.',
                 '#CHIÊU CUỐI [U] — THIÊN ĐỊA NHẤT TRẢM · THIÊN THẠCH KIẾM',
-                '-Pha 1: chém quét cả màn hình, 30 sát thương. Mặt đất nứt, kẻ địch mất trọng lực lơ lửng.',
+                '-Pha 1: chém quét cả màn hình, 30 sát thương. Mặt đất nứt, MỌI kẻ địch trên màn (cả con xuất hiện giữa chừng) mất trọng lực lơ lửng.',
                 '-Pha 2: kiếm bay lên đỉnh trời giữa sấm sét và hào quang từ tím, hút đá và kẻ địch thành một quả cầu rồi đập xuống nổ 120 sát thương. Bất tử suốt chiêu.'
             ]
         ];
@@ -76363,22 +76417,23 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '#PASSIVE',
                 '-The blade has TWO STATES: ON YOUR BACK and IN THE GROUND (shown on the HUD). After a chop it stays in the ground ~2.5s, then is slowly lifted on its own.',
                 '-Swings start slow then crash down fast. Long reach. Walks and jumps slowly like the Hammer (85%), slower still with the blade down.',
+                '-GRAVITY MAGIC: every cut (and wave) that hits a flying enemy pins it to the ground for 0.75s — whoever flies, dies.',
                 '#J ATTACKS',
                 '-J (on back): DOWNWARD CHOP. 7 damage, costs 1. The blade stays in the ground.',
-                '-J (blade down): HEAVE — rip the sword up for a 7-damage rising cut, free, but slow (0.5s) to recover.',
+                '-J (blade down): HEAVE — pry the blade up a little first (the ground cracks), a beat, then rip it up: 7-damage rising cut, free, but slow to recover.',
                 '-Dash with the blade down: STAB with the tip, 5 damage.',
                 '-Jump J (blade down): RECOVER — heave it back onto your back in mid-air, 9 damage. Jump J (on back): falling chop 7.',
                 '-Dash J: CLEAVE — lunge into a brutal horizontal swing, 10 damage, knockback, BREAKS enemy rushes (and blocks contact hits). Costs 3.',
                 '#CHARGE [K] — max 3s (180f)',
-                '>0.5s (30f) — THRUST with a short lunge and light knockback. 8 damage, costs 1.',
-                '>1s (60f) — RISING CLEAVE — slow wind-up, then a fast diagonal upswing. 10 damage, knockback + PARRY. You stand still. Costs 1.',
-                '>1.5s (90f) — EARTH-RENDER — rest the tip in the ground behind you, then sweep up (slow → fast): 10 slash + a 10-damage SHOCKWAVE along the ground. Stand still. Costs 2.',
+                '>0.5s (30f) — PIERCING LUNGE — draw the sword back, then thrust through everything, lunging as far as a normal dash (brief i-frames). 8 damage, light knockback, costs 1.',
+                '>1s (60f) — WIDE CLEAVE — slow wind-up, then a fast horizontal swing angled slightly upward. 10 damage, knockback + PARRY. You stand still. Costs 1.',
+                '>1.5s (90f) — EARTH-RENDER — lower the blade gently to the ground, then swing it up from below counter-clockwise (slow → fast): 10 slash + a 10-damage SHOCKWAVE along the ground. Stand still. Costs 2.',
                 '>2s (120f) — GRAVITY SEAL — plant the sword; it glows purple and a purple ring collapses into it: EVERY flying enemy is dragged to the ground for 4s and cannot fly. 2-3 damage by boss size. Costs 2.',
-                '>2.5s (150f) — EIGHT GATES — red aura for 4.5s: ~25% faster swings, quicker recovery, freer movement. Costs 2.',
+                '>2.5s (150f) — EIGHT GATES — red aura for 4.5s: INFINITE STAMINA, ~25% faster swings, quicker recovery, freer movement.',
                 '#CHANNEL — QUAKE SEAL (hold K from 3s)',
-                '-Plant the sword and stand still. Every 3s a quake: flyers are dragged down (small mobs 1, bosses 2-3 damage); grounded enemies in range take 10 damage and are slowed for 1s. Unlike Gravity Seal they fly again afterwards, but the next pulse catches them.',
+                '-Plant the sword and stand still. Every 3s a quake: every enemy takes 10 damage and is slowed for 1s. Flyers are also dragged down and take another hit when they land (small mobs 1, bosses 2-3). Unlike Gravity Seal they fly again afterwards, but the next pulse catches them.',
                 '#ULTIMATE [U] — WORLD SPLITTER · METEOR BLADE',
-                '-Phase 1: a screen-wide sweep, 30 damage. The ground cracks and enemies lose gravity, floating.',
+                '-Phase 1: a screen-wide sweep, 30 damage. The ground cracks and EVERY enemy on screen (even ones arriving mid-move) loses gravity and floats.',
                 '-Phase 2: the sword soars to the top of the sky amid lightning and a purple magnetic aura, pulls rocks and enemies into a ball, then slams it down for a 120-damage explosion. Invincible throughout.'
             ]
         ];
