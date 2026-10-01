@@ -72428,7 +72428,7 @@ class PulsarCloneBoss {
         let KL = { boss: {}, route: { choi: 0, thang: 0, xaNhat: 0, nhanhNhat: 0 }, camp: { thang: 0 } };
         (function(){ try { let v = JSON.parse(localStorage.getItem('dino_kyluc') || 'null');
             if (v && typeof v === 'object'){ KL.boss = v.boss || {}; Object.assign(KL.route, v.route || {}); Object.assign(KL.camp, v.camp || {}); } } catch(e){} })();
-        function klDuocGhi(){ return !dojoMode && !(typeof battuBat === 'function' && battuBat()); }
+        function klDuocGhi(){ return !dojoMode && !(typeof battuBat === 'function' && battuBat()) && !(typeof cusSH === 'function' && cusSH()); }
         function klLuu(){ try { localStorage.setItem('dino_kyluc', JSON.stringify(KL)); } catch(e){} }
         function klSoBoss(){ return Object.keys(KL.boss).length; }
         // goi khi con boss CUOI cua mot tran chet
@@ -73636,9 +73636,9 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
         /* @@HE-SONGHE — rune hai loi: 2 NANG LUC + 2 HIEU UNG cho Custom. Cung gia 2 o voi O THU BA
            (nen hai rune khong bao gio di chung). O Thu Ba cho MOT o tu do; Song He cho HAI o nhung
            moi o chi nhan dung loai cua no. */
-        RUNES.push({ id:'cussh', name:'SONG HỆ', nameEn:'DUAL CORE', icon:'⧉', cost:2, ammoRune:true, onlyAmmo:CUS_DAN,
-              desc:'Tốn 2 ô. CHỈ DÙNG ĐƯỢC VỚI CUSTOM. Mở thêm MỘT ô NĂNG LỰC và MỘT ô HIỆU ỨNG — lắp được 2 năng lực + 2 hiệu ứng.\n\nHai NĂNG LỰC GỘP VÀO MỘT PHÁT BẮN. TÁCH TIA + TỎA: mỗi phát ra ba viên, viên nào xuyên qua địch cũng tỏa chùm. XOẮN SÓNG ĐÔI + TÁCH TIA: ba cặp viên xoắn. QUỸ ĐẠO + nhánh khác: mỗi phát thả nhiều sao vào vòng. Các nhánh đạn thường (Băng Đạn, Tách Tia, Tầm Xa, Tỏa, Xoắn Sóng Đôi, Quỹ Đạo, Màn Cuối) gộp với nhau tự do.\n\nVũ khí RAILGUN / LASER / CUNG gộp được với TÁCH TIA (thêm hai cột đạn / hai tia / mỗi mũi tách ra) hoặc TỎA (trúng là tỏa chùm). Cưa Máy và Khí Công Pháo không gộp với gì — bảng nâng cấp sẽ báo.\n\nHai HIỆU ỨNG luôn chạy cùng lúc và mở các COMBO cùng loại (BĂNG + NỔ: vụ nổ đập vỡ băng).\n\nGiá vẫn là toàn bộ hàng phòng thủ: hai ô rune.',
-              descEn:'Costs 2 slots. CUSTOM ONLY. Adds one more ABILITY slot and one more EFFECT slot — equip 2 abilities + 2 effects.\n\nBoth ABILITIES MERGE INTO ONE SHOT. SPLIT SHOT + BURST: three rounds per shot, and each one that pierces bursts. HELIX + SPLIT SHOT: three twisting pairs. ORBIT + anything: each shot drops several stars into the ring. Plain-round branches (Magazine, Split Shot, Long Shot, Burst, Helix, Orbit, Final Curtain) merge freely.\n\nThe RAILGUN / LASER / BOW weapons merge with SPLIT SHOT (two extra rails / two extra beams / every arrow splits) or BURST (a hit bursts). Chainsaw and Ki Cannon merge with nothing — the upgrade panel will say so.\n\nBoth EFFECTS always run together and unlock same-type COMBOS (FROST + DETONATE: the blast shatters ice).\n\nThe price is still your whole defensive line: two rune slots.' });
+        RUNES.push({ id:'cussh', name:'SONG HỆ • THỬ NGHIỆM', nameEn:'DUAL CORE • TEST', icon:'⧉', cost:2, ammoRune:true, onlyAmmo:CUS_DAN, cat:'test',
+              desc:'RUNE THỬ NGHIỆM — quá khỏe để chơi thật: phải nhập MÃ MỞ KHOÁ mới lắp được, và trong lúc đeo ĐIỂM KHÔNG ĐƯỢC LƯU. Tốn 2 ô. CHỈ DÙNG ĐƯỢC VỚI CUSTOM. Mở thêm MỘT ô NĂNG LỰC và MỘT ô HIỆU ỨNG — lắp được 2 năng lực + 2 hiệu ứng.\n\nHai NĂNG LỰC GỘP VÀO MỘT PHÁT BẮN. TÁCH TIA + TỎA: mỗi phát ra ba viên, viên nào xuyên qua địch cũng tỏa chùm. XOẮN SÓNG ĐÔI + TÁCH TIA: ba cặp viên xoắn. QUỸ ĐẠO + nhánh khác: mỗi phát thả nhiều sao vào vòng. Các nhánh đạn thường (Băng Đạn, Tách Tia, Tầm Xa, Tỏa, Xoắn Sóng Đôi, Quỹ Đạo, Màn Cuối) gộp với nhau tự do.\n\nVũ khí RAILGUN / LASER / CUNG gộp được với TÁCH TIA (thêm hai cột đạn / hai tia / mỗi mũi tách ra) hoặc TỎA (trúng là tỏa chùm). Cưa Máy và Khí Công Pháo không gộp với gì — bảng nâng cấp sẽ báo.\n\nHai HIỆU ỨNG luôn chạy cùng lúc và mở các COMBO cùng loại (BĂNG + NỔ: vụ nổ đập vỡ băng).\n\nGiá vẫn là toàn bộ hàng phòng thủ: hai ô rune.',
+              descEn:'TEST RUNE — too strong for real play: it needs the UNLOCK CODE to equip, and your SCORE IS NOT SAVED while it is on. Costs 2 slots. CUSTOM ONLY. Adds one more ABILITY slot and one more EFFECT slot — equip 2 abilities + 2 effects.\n\nBoth ABILITIES MERGE INTO ONE SHOT. SPLIT SHOT + BURST: three rounds per shot, and each one that pierces bursts. HELIX + SPLIT SHOT: three twisting pairs. ORBIT + anything: each shot drops several stars into the ring. Plain-round branches (Magazine, Split Shot, Long Shot, Burst, Helix, Orbit, Final Curtain) merge freely.\n\nThe RAILGUN / LASER / BOW weapons merge with SPLIT SHOT (two extra rails / two extra beams / every arrow splits) or BURST (a hit bursts). Chainsaw and Ki Cannon merge with nothing — the upgrade panel will say so.\n\nBoth EFFECTS always run together and unlock same-type COMBOS (FROST + DETONATE: the blast shatters ice).\n\nThe price is still your whole defensive line: two rune slots.' });
         /* @@HE-KHOAPOWER — hai rune duoi day song bang viec DOI THE, ma VOID va DRAGON
            TRIGGER deu ghim the o Gunslinger. Danh dau de picker khoa luon. */
         { let _r;
@@ -73715,7 +73715,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
         // mot Power. Truoc day chung nam lan trong muc THUC TINH (vi deu la ammoRune) hoac
         // roi vao muc CHIEN DAU (Chan Long, Hu Vo — hai rune 1 o), nen nguoi choi phai doc
         // het mo ta moi biet cai nao can gi. Gio gom han thanh mot muc.
-        const RUNE_DOCQUYEN = new Set(['trienlien','katana','swordmaster','shintrick','huvo','chanlong','cus3o','cussh','rgcounter']);
+        const RUNE_DOCQUYEN = new Set(['trienlien','katana','swordmaster','shintrick','huvo','chanlong','cus3o','rgcounter']);
         const RUNE_CATS = [
             /* Muc THU NGHIEM dat LEN DAU danh sach — day la cong cu Hans mo ra de xem bo don,
                nen no phai o ngay cho voi tay toi chu khong phai cuoi mot danh sach dai. Nhan da
@@ -73742,7 +73742,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 out.push({ kind:'family', fam:fam, famIdx:fi, name:RNAME(fam), icon:fam.icon,
                            desc:LT('Có 2 cấp — bấm để chọn','2 levels — click to choose'),
                            cat:(FAM_CAT_OF[fam.c1] || 'auto') }); }
-            for (let r of RUNES){ if (r.ammoRune) out.push({ id:r.id, name:RNAME(r), icon:r.icon, desc:RDESC(r), kind:'rune', ammo:true, cat:(RUNE_DOCQUYEN.has(r.id) ? 'doc' : 'awak') }); }
+            for (let r of RUNES){ if (r.ammoRune) out.push({ id:r.id, name:RNAME(r), icon:r.icon, desc:RDESC(r), kind:'rune', ammo:true, cat:(r.cat === 'test' ? 'test' : (RUNE_DOCQUYEN.has(r.id) ? 'doc' : 'awak')) }); }
             return out;
         }
         // ===== BO CUC BANG RUNE: MOT nguon toa do duy nhat cho ca VE lan BAM =====
@@ -77121,7 +77121,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
            tai sao khong co gi xay ra. */
         const BATTU_MA = '2401';
         let battuMa = null;
-        function battuMoMa(){ battuMa = { go: '', sai: 0 }; }
+        function battuMoMa(rune){ battuMa = { go: '', sai: 0, rune: rune || 'battu' }; }   // @@HE-SONGHE: dung chung cho moi rune THU NGHIEM
         function battuGo(k){
             if (!battuMa) return;
             if (battuMa.go.length < BATTU_MA.length) battuMa.go += k;
@@ -77135,9 +77135,10 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
         function battuXacNhan(){
             if (!battuMa) return;
             if (battuMa.go === BATTU_MA){
-                setRuneSlot('battu'); battuMa = null; runePicker = null; runeLevelPick = null;
+                let _rid = battuMa.rune || 'battu', _rr = RUNES.find(x => x.id === _rid);
+                setRuneSlot(_rid); battuMa = null; runePicker = null; runeLevelPick = null;
                 floatingTexts.push(new FloatingText(canvas.width/2 - 90, 96,
-                    LT('MỞ KHOÁ — ĐÃ LẮP BẤT TỬ', 'UNLOCKED — IMMORTAL EQUIPPED')));
+                    LT('MỞ KHOÁ — ĐÃ LẮP ', 'UNLOCKED — EQUIPPED ') + (_rr ? RNAME(_rr) : _rid)));
                 if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(980, 0.16, 'square', 0.16, 900);
             } else {
                 // SAI: dong bang va KHONG lap rune. Bang chon rune van mo de chon thu khac.
@@ -77179,7 +77180,8 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
             ctx.fillStyle = "#B0BEC5"; ctx.font = "bold 17px Consolas, monospace";
             ctx.fillText(LT("MÃ MỞ KHOÁ", "UNLOCK CODE"), o.x + o.w/2, o.y + 34);
             ctx.fillStyle = "#607D8B"; ctx.font = "11px Consolas, monospace";
-            ctx.fillText(LT("∞ BẤT TỬ · THỬ NGHIỆM", "∞ IMMORTAL · TEST"), o.x + o.w/2, o.y + 54);
+            { let _rr = RUNES.find(x => x.id === (battuMa.rune || 'battu'));
+              ctx.fillText(_rr ? (_rr.icon + ' ' + RNAME(_rr)) : LT("∞ BẤT TỬ · THỬ NGHIỆM", "∞ IMMORTAL · TEST"), o.x + o.w/2, o.y + 54); }
             // O HIEN MA — bon o vuong, o dang go thi sang
             let ow = 46, oh = 52, tx = o.x + o.w/2 - (ow*4 + 30)/2;
             for (let i = 0; i < 4; i++){
@@ -78523,7 +78525,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                             if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(150, 0.12, 'square', 0.18, 90);
                         }
                         /* @@HE-BATTU — rune nay khong lap thang duoc, phai qua bang ma. */
-                        else if (it.id === 'battu'){ battuMoMa(); }
+                        else if (it.id === 'battu' || it.id === 'cussh'){ battuMoMa(it.id); }   // rune THU NGHIEM: phai qua bang ma
                         else { setRuneSlot(it.id); runePicker = null; }
                         picked = true;
                     }
