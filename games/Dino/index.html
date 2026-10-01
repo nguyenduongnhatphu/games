@@ -64360,6 +64360,15 @@ class PulsarCloneBoss {
         const DSAW_QUY_NHIP  = 7;        // khoang giua hai nhat tay cua (khung)
         const DSAW_QUY_DASH  = 5;        // dash xuyen: 5 sat thuong / con
         const DSAW_QUY_DASHV = 8;        // di hon 8px trong mot khung = dang dash
+        /* @@HE-DSAW2 — bon mon moi (Hans duyet):
+             MAY NONG   — dang no may, moi nhat cua TRUNG cong 0.1 giay vao thanh dong co, toi da 2 giay moi lan no may.
+             GIAT DAY DE (Luot + J) — giat day de khi dang luot: chua no may thi no NAC 1, nap ngay 1 giay xang; hoi 4 giay.
+             CAY DAT (Xuong + J) — cam luoi xuong dat lao toi cay soi: may tat 1 nhip 2 sat thuong; dang no may 3 nhip x 2, lao xa gap doi.
+             NGHIEN (giu J khi dang no may) — cua dinh vao muc tieu, moi nhip 1 -> 2 -> 3 sat thuong, bi day lui dan, dot xang gap doi. */
+        const DSAW_NONG_CONG = 6, DSAW_NONG_TRAN = 120;
+        const DSAW_DE_NAP = 60, DSAW_DE_HOI = 240;
+        const DSAW_CAY_DMG = 2, DSAW_CAY_NHIP = 6;
+        const DSAW_NGHIEN_VAO = 20, DSAW_NGHIEN_NHIP = 15, DSAW_NGHIEN_TRAN = 3;
         function dsawBat(a){ return (a === undefined ? currentAmmoType : a) === DSAW_DAN; }
         /* Nac dang cam, tinh tu so khung da giu K. 0 = chua du de no may. */
         function dsawNacCua(giu){
@@ -64880,6 +64889,85 @@ class PulsarCloneBoss {
                     }
                 }
             },
+            /* ===================== @@HE-DSAW2 ===================== */
+            dsawMayNong(){
+                if ((this.dsawNac || 0) <= 0 || (this.dsawSac || 0) > 0) return;
+                if ((this._dsawNong || 0) >= DSAW_NONG_TRAN) return;
+                if (this._dsawNongF === frames) return;               // mot nhat chem nhieu muc tieu van chi tinh mot lan
+                this._dsawNongF = frames;
+                let c = Math.min(DSAW_NONG_CONG, DSAW_NONG_TRAN - (this._dsawNong || 0));
+                this._dsawNong = (this._dsawNong || 0) + c;
+                this.dsawDong = Math.min(DSAW_DONG, (this.dsawDong || 0) + c);
+            },
+            dsawGiatDe(){
+                this._dsawDeCd = DSAW_DE_HOI;
+                if ((this.dsawSac || 0) > 0){ this.dsawSac = 0; this.dsawDong = 0; }   // may chet: giat la song lai
+                this.dsawDong = Math.min(DSAW_DONG, (this.dsawDong || 0) + DSAW_DE_NAP);
+                if ((this.dsawNac || 0) <= 0){ this.dsawNac = 1; this._dsawNong = 0; this.dsawGiu = DSAW_NAC[1]; }
+                this.dsawChem(0);
+                this.attackCooldown = 16;
+                floatingTexts.push(new FloatingText(this.x - 34, this.y - 30, LT("GIẬT DÂY ĐỀ!", "PULL START!")));
+                shakeTimer = Math.max(shakeTimer, 8);
+                if (typeof SFX !== 'undefined' && SFX.tone){ SFX.tone(120, 0.10, 'sawtooth', 0.20, 260); SFX.tone(260, 0.22, 'sawtooth', 0.18, 520); }
+            },
+            dsawCayBat(){
+                let no = (this.dsawNac || 0) > 0, dir = this.isFacingLeft ? -1 : 1;
+                this._dsawCay = { t: 0, n: no ? 3 : 1, da: 0, dir: dir };
+                if (typeof dashVx !== 'undefined') dashVx = dir * (no ? 26 : 14);
+                this.attackCooldown = no ? 26 : 20;
+                this.dsawCombo = 0; this.dsawCua = 0;
+                floatingTexts.push(new FloatingText(this.x - 26, this.y - 30, LT("CÀY ĐẤT!", "PLOW!")));
+                if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(140, 0.25, 'sawtooth', 0.18, 90);
+            },
+            dsawTick2(giuJ){
+                if ((this._dsawDeCd || 0) > 0) this._dsawDeCd--;
+                // ---- CAY DAT ----
+                if (this._dsawCay){
+                    let C = this._dsawCay; C.t++;
+                    this.dsawKieu = 1; this.dsawVeT = 8; this.dsawVeT0 = 8;     // giu tu the cua chuc xuong
+                    if (C.t % DSAW_CAY_NHIP === 3 && C.da < C.n){
+                        C.da++;
+                        let sc = this.getFormScale(), x0 = this.x + this.w / 2;
+                        let rect = { x: C.dir > 0 ? x0 - 10 : x0 - 100 * sc, y: this.y + this.h - 40, w: 100 * sc + 10, h: 46 };
+                        if (this.meleeStrike(rect, DSAW_CAY_DMG)) this.dsawMayNong();
+                        for (let k = 0; k < 3; k++)
+                            visualEffects.push(new Effect(x0 + C.dir * (20 + Math.random() * 50), this.y + this.h - 4, 'explosion', true, 7 + Math.random() * 6));
+                        shakeTimer = Math.max(shakeTimer, 4);
+                    }
+                    if (C.t >= C.n * DSAW_CAY_NHIP + 6) this._dsawCay = null;
+                }
+                // ---- NGHIEN ----
+                let nac = this.dsawNac || 0;
+                this._dsawGiuJ = giuJ ? (this._dsawGiuJ || 0) + 1 : 0;
+                if (!this._dsawNghien && this._dsawGiuJ >= DSAW_NGHIEN_VAO && nac >= 1 && nac <= 3 && this.grounded
+                    && !this.dsawDamKhoa && !this._dsawCay && !this.dsawMua && !this.dsawQuy && (this.dsawSac || 0) <= 0){
+                    this._dsawNghien = { t: 0, nhip: 0 };
+                    floatingTexts.push(new FloatingText(this.x - 20, this.y - 30, LT("NGHIẾN!", "GRIND!")));
+                }
+                if (this._dsawNghien){
+                    let N = this._dsawNghien;
+                    if (!giuJ || (this.dsawNac || 0) <= 0 || (this.dsawSac || 0) > 0 || this.dsawDamKhoa){ this._dsawNghien = null; this.attackCooldown = Math.max(this.attackCooldown || 0, 14); }
+                    else {
+                        N.t++;
+                        let dir = this.isFacingLeft ? -1 : 1, sc = this.getFormScale();
+                        this.attackCooldown = Math.max(this.attackCooldown || 0, 2);
+                        this.dsawKieu = 2; this.dsawVeT = 8; this.dsawVeT0 = 8;   // giu tu the dam cua
+                        this.dsawDong = Math.max(0, (this.dsawDong || 0) - 1);    // dot xang GAP DOI (dsawTick da tru 1)
+                        if (N.t % DSAW_NGHIEN_NHIP === 0){
+                            N.nhip++;
+                            let d = Math.min(DSAW_NGHIEN_TRAN, N.nhip), x0 = this.x + this.w / 2;
+                            let rect = { x: dir > 0 ? x0 : x0 - 76 * sc, y: this.y + 6, w: 76 * sc, h: this.h - 6 };
+                            if (this.meleeStrike(rect, d)){
+                                this.x -= dir * 5;                                      // bi day lui dan
+                                let tx = x0 + dir * 60 * sc, ty = this.y + this.h * 0.5;
+                                for (let k = 0; k < 2; k++) visualEffects.push(new Effect(tx + (Math.random() - 0.5) * 14, ty + (Math.random() - 0.5) * 14, 'explosion', true, 6 + d * 2));
+                            }
+                            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(200 + d * 60, 0.06, 'sawtooth', 0.12, 120);
+                            shakeTimer = Math.max(shakeTimer, 2 + d);
+                        }
+                    }
+                }
+            },
             /* @@HE-LOLUNG2 — Lo Lung + DinoSaw: XOAY MOT VONG CUA quanh nguoi (tam 360 do, ban kinh 96) roi
                CHEM XUONG mot nhat duoi chan. Vong cua ve rieng (dsawVeXoay) de thay duoc tam danh tron. */
             dsawXoayVong(){
@@ -64905,6 +64993,18 @@ class PulsarCloneBoss {
                     return;
                 }
                 if (this.dsawDamKhoa) return;                 // dang ghim thi khong lam gi khac
+                if (this._dsawNghien || this._dsawCay) return;   // @@HE-DSAW2: dang nghien / dang cay
+                // @@HE-DSAW2 — LUOT + J: GIAT DAY DE
+                if (typeof dangLuotHoacChop === 'function' && dangLuotHoacChop() && (this._dsawDeCd || 0) <= 0 && !this.dsawMua){
+                    this.dsawGiatDe(); return;
+                }
+                // @@HE-DSAW2 — XUONG + J: CAY DAT
+                if (this.grounded && (keys['KeyS'] || keys['ArrowDown']) && (this.dsawNac || 0) < 4){
+                    if (this.isOverheated || this.ammo <= 0) return;
+                    this.ammo--; this.dsawCayBat();
+                    if (this.ammo <= 0){ this.isOverheated = true; this.overheatTimer = 55; }
+                    return;
+                }
                 /* NAC 4 — CUA TU THAN: Hans dat ro "KHONG CO CHEM o don nay". Cai luoi tu an
                    moi khung (xem `dsawTuTick`), nen J khong con lam gi ca. */
                 if ((this.dsawNac || 0) >= 4) return;
@@ -64940,7 +65040,10 @@ class PulsarCloneBoss {
         // ---- 4. MOC voi dong co ----
         vkDangKy(15, {
             ten: 'DINOSAW',
-            trungCan(o){ if (typeof dsawNovaMau === 'function') dsawNovaMau(this, o); },   // @@HE-NOVA3: dang no may -> Chay mau
+            trungCan(o){
+                if (typeof dsawNovaMau === 'function') dsawNovaMau(this, o);   // @@HE-NOVA3: dang no may -> Chay mau
+                this.dsawMayNong();                                              // @@HE-DSAW2
+            },
             // @@HE-LOLUNG2 — rune LO LUNG: nha K giua khong (xem hoverMidCharge)
             hoverSac(half){ this.dsawXoayVong(); },
             sacToiDa(){ return DSAW_MUA_MOC; },
@@ -64965,6 +65068,7 @@ class PulsarCloneBoss {
                     let nac = dsawNacCua(this.aKeyHeldTime);
                     if (nac > 0 && (this.dsawSac || 0) <= 0 && this.dsawDong > 0){
                         this.dsawNac = nac;
+                        this._dsawNong = 0;                 // @@HE-DSAW2: MAY NONG tinh lai tu dau moi lan no may
                         this.dsawGiu = this.aKeyHeldTime;   // nac XANH tinh sat thuong theo so nay
                         floatingTexts.push(new FloatingText(this.x - 34, this.y - 30, DSAW_NAC_TEN[nac] + "!"));
                         shakeTimer = Math.max(shakeTimer, 8 + nac * 3);
@@ -64997,6 +65101,7 @@ class PulsarCloneBoss {
             // thanh dong co + cua so combo + cu ghim
             moiKhung(checkAmmo, fireKey, chargeKey, crouchKey){
                 this.dsawTick();
+                this.dsawTick2(!!fireKey);   // @@HE-DSAW2
                 // nhat HAT LEN noi ngay sau nhat dau khi dang giu huong len
                 if ((this.dsawNoiLen || 0) > 0 && --this.dsawNoiLen === 0) this.dsawChem(4);
             },
@@ -67624,7 +67729,7 @@ class PulsarCloneBoss {
                    "To, tối màu, hào quang — 6 máu (người to hơn, dễ trúng đòn hơn). Nội tại: hào quang đốt quái thường đứng sát 1 sát thương mỗi giây (không tính boss).",
                    "Đỉnh cao, sừng + vảy — 6 máu (người to hơn). Nội tại: 25 giây không dính đòn thì mọc một lớp VẢY chặn trọn một đòn (tối đa 1)."];
             const ammos = AMMO_NAMES;
-            const ammoDesc = currentLang==="en" ? ["The Charge specialist. Hold longer and it keeps evolving — heavy round, piercing round, then a fission burst. Tap-firing is just filler.","The all-rounder. Almost everything splashes, so it clears packs and chews through bosses alike, and what it touches keeps burning.","Infinite ammo, but every shot starts wide. Keep the trigger down and the spread walks inward — thirty rounds in it is a purple laser firing twice as fast.","The strange one. Shards split, bounce and pierce, and the longer you stay on one target the harder it detonates. Learn it to use it.","Crowd king. Bolts leap from one enemy to the next, so the bigger the swarm the better. One-on-one with a boss it runs dry.","A close-range swordsman. There is a whole combo system hidden in your jump, dash and direction keys — go find it yourself.","You do not shoot enemies, you feed a star. It swallows every bullet near it and spits them back out in all directions, multiplied.","Throw it, then catch it yourself. A clean catch hurls it straight back into their face; a miss leaves you empty-handed.","Pure control. Every shot stacks frost; five stacks freeze. Then choose: leave them frozen, or shatter the ice for a burst.","Four rounds, no reload. The fourth is always the loudest — it executes on what they have already lost. Every hit leaves a mark for the rest of the kit.", "A melee weapon. J and K chain into each other like a Musou combo. Reach is 1.5x the sword but it has no ranged attack at all, so its answer to flying bosses is the air combo.", "A heavy melee weapon. Carrying it slows you to 85%; throwing it puts you at 120% but leaves you unable to attack. Every move has uncancellable recovery, and slams land where the hammer head hits.","J J J = right-left-right. Hold K to bank damage (lost health and parries add to it), release K to spend it all. HIDDEN INPUTS (Fwd = facing): Back Fwd J Hadoken · Down Fwd J Hashogeki · Back Down Fwd J Kamehameha (needs 50) · J then Jump Shoryuken · J Fwd J long jab · Down J ground punch · Dash J lunge · Down Down Denjin · In air: Down J Heaven Drop, Up Up Down J Stomp. Magnifier: numbers.","Mid-range melee. Web slows and binds to force an opening, then whip strings, spike bursts and a grab-slam pour everything into that opening.","The unfinished gun — the weakest in the roster, by design. Six rounds a second, and emptying its six-round magazine overheats it on the spot. Holding K banks rounds into a separate store that fires half again as fast and ignores heat.","A chainsaw swung like a sword — and swinging a chainsaw is a terrible way to use one, so the slashes are pathetic. Everything lives on K: release it and the engine kicks in, and the whole moveset changes tier by tier for as long as the engine bar lasts.","Thin needles that pierce once. Every hit adds a PERMANENT bleed stack — the longer the fight, the harder it bleeds. K fans out needles (point-blank pins twice as deep); Down+J rips every needle out for instant damage. The Channel strings a net across the map, the ultimate is a storm of needles.","No ammo until you make it: hold K to forge swords on your back. Tap J throws one, HOLD J fuses 1–6 into one strike (up to a Heaven Sword), Dash+J fans them all, Down+J plants a sword wall. Swords block bullets on their own (and glow, adding damage to a fusion); six make a shield. Channel opens the Gate of Treasure, the ultimate drops ten thousand swords.","Death's scythe. Cuts land fast but recover SLOWLY, and every combo branches on RHYTHM: press straight on, or pause a beat (the blade flashes purple) and press. Holding it locks the Power to DEATH — hits build rage, I/O calls the Reaper to fight at your side."] : ["Vua của đòn Charge. Giữ càng lâu càng biến hoá: viên to, viên xuyên, rồi vỡ thành chùm mảnh. Bắn thường chỉ để cầm chừng.","Đa dụng nhất bảng. Gần như đòn nào cũng nổ lan nên vừa dọn bầy vừa gặm boss, và thứ gì dính lửa cũng cháy tiếp một lúc.","Vô hạn đạn, nhưng bắn phát nào cũng tản. Giữ liên tục thì đạn khép dần vào giữa — đủ ba mươi viên nó thành tia laser tím, nhịp bắn nhanh gấp đôi.","Loại lắt léo nhất. Đạn tách, nảy, xuyên, và càng bám riết một mục tiêu thì đòn nổ càng đau. Phải hiểu cơ chế mới xài được.","Ông vua dọn bầy. Sét tự nhảy từ con này sang con khác, càng đông càng lời. Nhưng tay đôi với boss thì hụt hơi.","Kiếm sĩ cận chiến. Có nguyên một hệ combo giấu trong nút nhảy, nút lướt và hướng bấm — tự tìm ra mới vui.","Bạn không bắn kẻ địch, bạn nuôi một ngôi sao. Sao hút mọi viên đạn quanh nó rồi bắn trả gấp bội ra khắp hướng.","Ném đi rồi phải tự bắt. Bắt gọn thì lưỡi bay ngược vào mặt kẻ địch, hụt thì trắng tay ngồi chờ. Càng liều càng lãi.","Thuần khống chế. Mỗi phát cộng một tầng băng, đủ 5 tầng thì đóng băng. Rồi tự chọn: để yên mà khống, hay đập vỡ lấy sát thương.","Bốn viên, không nạp lại. Viên thứ tư luôn là viên to nhất — nó ăn theo lượng máu đối thủ đã mất. Mỗi phát trúng để lại một dấu ấn cho các đòn sau.", "Vũ khí cận chiến. J và K nối nhau thành combo kiểu Musou. Tầm đánh gấp rưỡi Kiếm nhưng hoàn toàn không có đòn tầm xa, nên cách với tới boss bay là combo trên không.", "Vũ khí cận chiến hạng nặng. Cầm búa thì chạy nhảy còn 85%, ném búa đi thì lên 120% nhưng không đánh được gì. Mọi đòn đều có khung khựng không huỷ, và cú nện nổ ngay chỗ đầu búa chạm đất.","J J J đấm phải-trái-phải. Giữ K tích sát thương (mất máu, đỡ đòn cũng cộng), nhả K xả hết. LỆNH ẨN (Tiến = hướng mặt): Lùi Tiến J Hadoken · Xuống Tiến J Hashogeki · Lùi Xuống Tiến J Kamehameha (cần 50) · J rồi Nhảy Shoryuken · J Tiến J đấm vói · Xuống J nện đất · Lướt J lao đấm · Xuống Xuống Denjin · Trên không: Xuống J Thiên Truy, Lên Lên Xuống J Nhảy Đạp. Kính lúp: số liệu.","Cận chiến tầm trung. Tơ làm chậm rồi trói để mở khoảng trống, sau đó chuỗi quất, gai bung và cú tóm-đạp dồn hết vào khoảng trống đó.","Khẩu chưa xong — yếu nhất bảng, và đó là chủ ý. 6 viên mỗi giây, cạn băng 6 viên là quá nhiệt ngay. Giữ K trữ đạn vào một kho riêng; xả kho thì bắn nhanh gấp rưỡi và không sợ nóng.","Cưa máy vung như kiếm — mà vung cưa thì phế thật, nên nhát chém chỉ 1 sát thương. Tất cả nằm ở phím K: nhả ra là nổ máy, và cả bộ đòn đổi nấc theo thời gian giữ, chạy được chừng nào thanh động cơ còn xăng.","Kim mảnh xuyên một lần. Mỗi mũi trúng cộng một vết CHẢY MÁU VĨNH VIỄN — trận càng dài máu chảy càng nhiều. K phóng quạt kim (sát mặt thì ghim sâu gấp đôi); Xuống+J rút hết kim lấy sát thương ngay. Channel giăng lưới dây kín map, chiêu cuối là cơn mưa kim.","Không có đạn cho tới khi tự rèn: giữ K sinh kiếm sau lưng. Chạm J ném một thanh, GIỮ J gộp 1–6 thanh thành một đòn (tới Thiên Kiếm), Lướt+J xoè quạt cả lưng, Xuống+J cắm tường kiếm. Kiếm tự chặn đạn (và phát sáng, cộng sát thương khi gộp); đủ sáu thanh thành khiên. Channel mở Vương Khố, chiêu cuối là Vạn Kiếm Quy Tông.","Lưỡi hái của thần chết. Chém ra rất nhanh nhưng THU HỒI CHẬM, và combo nào cũng rẽ nhánh theo NHỊP: bấm liền, hay dừng một nhịp (lưỡi loé tím) rồi bấm. Cầm nó thì Power khoá sang DEATH — đánh trúng tích nộ, I/O gọi thần chết ra đánh cùng."];
+            const ammoDesc = currentLang==="en" ? ["The Charge specialist. Hold longer and it keeps evolving — heavy round, piercing round, then a fission burst. Tap-firing is just filler.","The all-rounder. Almost everything splashes, so it clears packs and chews through bosses alike, and what it touches keeps burning.","Infinite ammo, but every shot starts wide. Keep the trigger down and the spread walks inward — thirty rounds in it is a purple laser firing twice as fast.","The strange one. Shards split, bounce and pierce, and the longer you stay on one target the harder it detonates. Learn it to use it.","Crowd king. Bolts leap from one enemy to the next, so the bigger the swarm the better. One-on-one with a boss it runs dry.","A close-range swordsman. There is a whole combo system hidden in your jump, dash and direction keys — go find it yourself.","You do not shoot enemies, you feed a star. It swallows every bullet near it and spits them back out in all directions, multiplied.","Throw it, then catch it yourself. A clean catch hurls it straight back into their face; a miss leaves you empty-handed.","Pure control. Every shot stacks frost; five stacks freeze. Then choose: leave them frozen, or shatter the ice for a burst.","Four rounds, no reload. The fourth is always the loudest — it executes on what they have already lost. Every hit leaves a mark for the rest of the kit.", "A melee weapon. J and K chain into each other like a Musou combo. Reach is 1.5x the sword but it has no ranged attack at all, so its answer to flying bosses is the air combo.", "A heavy melee weapon. Carrying it slows you to 85%; throwing it puts you at 120% but leaves you unable to attack. Every move has uncancellable recovery, and slams land where the hammer head hits.","J J J = right-left-right. Hold K to bank damage (lost health and parries add to it), release K to spend it all. HIDDEN INPUTS (Fwd = facing): Back Fwd J Hadoken · Down Fwd J Hashogeki · Back Down Fwd J Kamehameha (needs 50) · J then Jump Shoryuken · J Fwd J long jab · Down J ground punch · Dash J lunge · Down Down Denjin · In air: Down J Heaven Drop, Up Up Down J Stomp. Magnifier: numbers.","Mid-range melee. Web slows and binds to force an opening, then whip strings, spike bursts and a grab-slam pour everything into that opening.","The unfinished gun — the weakest in the roster, by design. Six rounds a second, and emptying its six-round magazine overheats it on the spot. Holding K banks rounds into a separate store that fires half again as fast and ignores heat.","A chainsaw swung like a sword — and swinging a chainsaw is a terrible way to use one, so the slashes are pathetic. Everything lives on the engine: release K (or Dash+J to pull-start) and the whole moveset changes tier by tier while fuel lasts; landing hits keeps it running. Down+J plows forward, holding J with the engine on grinds into the target.","Thin needles that pierce once. Every hit adds a PERMANENT bleed stack — the longer the fight, the harder it bleeds. K fans out needles (point-blank pins twice as deep); Down+J rips every needle out for instant damage. The Channel strings a net across the map, the ultimate is a storm of needles.","No ammo until you make it: hold K to forge swords on your back. Tap J throws one, HOLD J fuses 1–6 into one strike (up to a Heaven Sword), Dash+J fans them all, Down+J plants a sword wall. Swords block bullets on their own (and glow, adding damage to a fusion); six make a shield. Channel opens the Gate of Treasure, the ultimate drops ten thousand swords.","Death's scythe. Cuts land fast but recover SLOWLY, and every combo branches on RHYTHM: press straight on, or pause a beat (the blade flashes purple) and press. Holding it locks the Power to DEATH — hits build rage, I/O calls the Reaper to fight at your side."] : ["Vua của đòn Charge. Giữ càng lâu càng biến hoá: viên to, viên xuyên, rồi vỡ thành chùm mảnh. Bắn thường chỉ để cầm chừng.","Đa dụng nhất bảng. Gần như đòn nào cũng nổ lan nên vừa dọn bầy vừa gặm boss, và thứ gì dính lửa cũng cháy tiếp một lúc.","Vô hạn đạn, nhưng bắn phát nào cũng tản. Giữ liên tục thì đạn khép dần vào giữa — đủ ba mươi viên nó thành tia laser tím, nhịp bắn nhanh gấp đôi.","Loại lắt léo nhất. Đạn tách, nảy, xuyên, và càng bám riết một mục tiêu thì đòn nổ càng đau. Phải hiểu cơ chế mới xài được.","Ông vua dọn bầy. Sét tự nhảy từ con này sang con khác, càng đông càng lời. Nhưng tay đôi với boss thì hụt hơi.","Kiếm sĩ cận chiến. Có nguyên một hệ combo giấu trong nút nhảy, nút lướt và hướng bấm — tự tìm ra mới vui.","Bạn không bắn kẻ địch, bạn nuôi một ngôi sao. Sao hút mọi viên đạn quanh nó rồi bắn trả gấp bội ra khắp hướng.","Ném đi rồi phải tự bắt. Bắt gọn thì lưỡi bay ngược vào mặt kẻ địch, hụt thì trắng tay ngồi chờ. Càng liều càng lãi.","Thuần khống chế. Mỗi phát cộng một tầng băng, đủ 5 tầng thì đóng băng. Rồi tự chọn: để yên mà khống, hay đập vỡ lấy sát thương.","Bốn viên, không nạp lại. Viên thứ tư luôn là viên to nhất — nó ăn theo lượng máu đối thủ đã mất. Mỗi phát trúng để lại một dấu ấn cho các đòn sau.", "Vũ khí cận chiến. J và K nối nhau thành combo kiểu Musou. Tầm đánh gấp rưỡi Kiếm nhưng hoàn toàn không có đòn tầm xa, nên cách với tới boss bay là combo trên không.", "Vũ khí cận chiến hạng nặng. Cầm búa thì chạy nhảy còn 85%, ném búa đi thì lên 120% nhưng không đánh được gì. Mọi đòn đều có khung khựng không huỷ, và cú nện nổ ngay chỗ đầu búa chạm đất.","J J J đấm phải-trái-phải. Giữ K tích sát thương (mất máu, đỡ đòn cũng cộng), nhả K xả hết. LỆNH ẨN (Tiến = hướng mặt): Lùi Tiến J Hadoken · Xuống Tiến J Hashogeki · Lùi Xuống Tiến J Kamehameha (cần 50) · J rồi Nhảy Shoryuken · J Tiến J đấm vói · Xuống J nện đất · Lướt J lao đấm · Xuống Xuống Denjin · Trên không: Xuống J Thiên Truy, Lên Lên Xuống J Nhảy Đạp. Kính lúp: số liệu.","Cận chiến tầm trung. Tơ làm chậm rồi trói để mở khoảng trống, sau đó chuỗi quất, gai bung và cú tóm-đạp dồn hết vào khoảng trống đó.","Khẩu chưa xong — yếu nhất bảng, và đó là chủ ý. 6 viên mỗi giây, cạn băng 6 viên là quá nhiệt ngay. Giữ K trữ đạn vào một kho riêng; xả kho thì bắn nhanh gấp rưỡi và không sợ nóng.","Cưa máy vung như kiếm — mà vung cưa thì phế thật, nên nhát chém chỉ 1 sát thương. Tất cả nằm ở động cơ: nhả K (hoặc Lướt+J giật dây đề) là nổ máy, cả bộ đòn đổi nấc theo thời gian giữ, chạy chừng nào còn xăng — cưa trúng thì máy chạy lâu hơn. Xuống+J cày đất lao tới, giữ J khi nổ máy là nghiến vào mục tiêu.","Kim mảnh xuyên một lần. Mỗi mũi trúng cộng một vết CHẢY MÁU VĨNH VIỄN — trận càng dài máu chảy càng nhiều. K phóng quạt kim (sát mặt thì ghim sâu gấp đôi); Xuống+J rút hết kim lấy sát thương ngay. Channel giăng lưới dây kín map, chiêu cuối là cơn mưa kim.","Không có đạn cho tới khi tự rèn: giữ K sinh kiếm sau lưng. Chạm J ném một thanh, GIỮ J gộp 1–6 thanh thành một đòn (tới Thiên Kiếm), Lướt+J xoè quạt cả lưng, Xuống+J cắm tường kiếm. Kiếm tự chặn đạn (và phát sáng, cộng sát thương khi gộp); đủ sáu thanh thành khiên. Channel mở Vương Khố, chiêu cuối là Vạn Kiếm Quy Tông.","Lưỡi hái của thần chết. Chém ra rất nhanh nhưng THU HỒI CHẬM, và combo nào cũng rẽ nhánh theo NHỊP: bấm liền, hay dừng một nhịp (lưỡi loé tím) rồi bấm. Cầm nó thì Power khoá sang DEATH — đánh trúng tích nộ, I/O gọi thần chết ra đánh cùng."];
             const SHIELDS = currentLang==="en" ? ["PARRY","ACTIVE SHIELD"] : ["ĐỠ ĐÒN", "KHIÊN CHỦ ĐỘNG"];
             const shieldDesc = currentLang==="en" ? ["Time it right: block 1 hit + parry counter.","Hold up to 1.5s, 4s cooldown. Trade-off: no parry."] : ["Bấm đúng lúc: chặn 1 đòn + phản đòn (parry).", "Giữ tối đa 1,5s, sạc 4s. Đổi lại: mất phản đòn."];
 
@@ -74755,8 +74860,13 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
             [   // 15 DINOSAW
                 '#BĂNG ĐẠN',
                 '-5 viên. Thanh ĐỘNG CƠ 5 giây, chỉ tiêu khi máy nổ; chết máy thì 5 giây sau tự đầy.',
+                '#NỘI TẠI — MÁY NÓNG',
+                '-Đang nổ máy, mỗi nhát cưa TRÚNG cộng 0.1 giây vào thanh động cơ, tối đa 2 giây mỗi lần nổ máy. Cưa trúng liên tục thì máy chạy lâu hơn.',
                 '#BẮN THƯỜNG [J]',
                 '-Combo 1 / 1 / 5 sát thương, nhát 3 ghim kẻ địch. Nhảy + J: 2. J + lên: chém rồi hất lên +1.',
+                '>Lướt + J — GIẬT DÂY ĐỀ — chưa nổ máy thì nổ ngay NỔ MÁY, nạp 1 giây xăng (chết máy thì sống lại). Hồi 4 giây.',
+                '>Xuống + J — CÀY ĐẤT — cắm lưỡi xuống đất lao tới. Máy tắt: 1 nhịp 2 sát thương. Đang nổ máy: lao xa gấp đôi, 3 nhịp x 2.',
+                '>Giữ J khi đang nổ máy — NGHIẾN — cưa dính vào mục tiêu, mỗi 0.25 giây 1 → 2 → 3 sát thương, bị đẩy lùi dần, đốt xăng GẤP ĐÔI.',
                 '#TÍCH LỰC [K] — nhả ra là NỔ MÁY',
                 '>0.25s — NỔ MÁY: mọi đòn +2, đâm thành 10.',
                 '>0.5s — CƯA VÀNG: vung ra kiếm khí răng cưa, tầm 150px.',
@@ -75220,8 +75330,13 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
             [   // 15 DINOSAW
                 '#MAGAZINE',
                 '-5 rounds. A 5-second ENGINE bar that only drains while the engine runs; stall it and it refills 5 seconds later.',
+                '#PASSIVE — HOT ENGINE',
+                '-While the engine runs, every saw hit that LANDS adds 0.1s to the engine bar, up to 2 seconds per start. Keep connecting and it keeps running.',
                 '#BASIC ATTACK [J]',
                 '-Combo 1 / 1 / 5 damage, the third hit pins. Jump + J: 2. J + up: slash then launch +1.',
+                '>Dash + J — PULL START — starts the ENGINE if it is off and adds 1 second of fuel (revives a stalled engine). 4 second cooldown.',
+                '>Down + J — PLOW — dig the blade in and charge forward. Engine off: 1 tick of 2. Engine on: twice the distance, 3 ticks x 2.',
+                '>Hold J with the engine on — GRIND — the saw bites in, 1 → 2 → 3 damage every 0.25s, pushing you back, burning fuel TWICE as fast.',
                 '#CHARGE [K] — release to START THE ENGINE',
                 '>0.25s — ENGINE: every hit +2, the stab becomes 10.',
                 '>0.5s — GOLD SAW: throws a saw-tooth slash wave, 150px.',
