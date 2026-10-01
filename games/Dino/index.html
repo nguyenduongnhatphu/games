@@ -40471,6 +40471,59 @@ class PulsarCloneBoss {
                         }
                         ctx.restore();
                     }
+                } else if ((this.type === 'z_vert' || this.type === 'z_big' || this.type === 'z_rise' || this.type === 'z_dive' || this.type === 'z_spin' || this.type === 'z_kk' || this.type === 'z_kk2')
+                           && this.pose && this.pose.t0 && typeof dswAngleCat === 'function' && this.tint !== 'dragon') {
+                    /* VET CHEM CHUAN KIEM — cung mot kieu voi nhat NGANG: mot dai SANG DAC quet
+                       theo luoi kiem, mo dan ve phia duoi, day dan ve phia mui luoi, va mot MEP
+                       TRANG SAC o vien ngoai. Khong lam mo (shadowBlur) nen doc ra "sac" chu khong
+                       phai mot mang nhoe nhu ban cu. */
+                    let k = this.type, fade = dswTrail(this.pose);
+                    let A = DSW_ARC[k] || DSW_ARC.z_vert;
+                    if (fade > 0.01){
+                        let R = this.radius || 70;
+                        let cE = this.swordCol ? dswHexRGB(this.swordCol) : "198,208,219", cC = "255,255,255";
+                        if (this.tint === 'nova' || this.tint === 'mika'){ cE = dswHexRGB(DSW_GOLD); cC = "255,250,224"; }
+                        else if (this.tint === 'dark'){ cE = "60,40,90"; cC = "190,150,255"; }
+                        else if (this.tint === 'set'){ cE = "79,195,247"; }
+                        let sg = A[1] >= A[0] ? 1 : -1;
+                        let a1 = dswAngleCat(this.pose) - Math.PI / 2;
+                        let a0 = A[0] - Math.PI / 2;
+                        let tran = (k === 'z_spin') ? 3.4 : 2.5;          // duoi vet dai toi da (rad)
+                        if ((a1 - a0) * sg > tran) a0 = a1 - sg * tran;
+                        if ((a1 - a0) * sg > 0.04){
+                            let n = Math.max(4, Math.ceil(Math.abs(a1 - a0) / 0.08));
+                            ctx.save(); ctx.translate(this.x, this.y); if (this.isLeft) ctx.scale(-1, 1);
+                            ctx.globalCompositeOperation = 'lighter';
+                            let P = (t, k2) => [Math.cos(t) * R * k2, Math.sin(t) * R * k2];
+                            for (let i = 1; i <= n; i++){
+                                let t0 = a0 + (a1 - a0) * (i - 1) / n, t1 = a0 + (a1 - a0) * i / n, q = i / n;
+                                let ri = 0.80 - 0.30 * q;                     // dai day dan ve phia mui luoi
+                                let p0 = P(t0, 1), p1 = P(t1, 1), q0 = P(t0, ri + 0.03), q1 = P(t1, ri);
+                                ctx.fillStyle = "rgba(" + cE + "," + (0.72 * q * q * fade).toFixed(3) + ")";
+                                ctx.beginPath(); ctx.moveTo(p0[0], p0[1]); ctx.lineTo(p1[0], p1[1]); ctx.lineTo(q1[0], q1[1]); ctx.lineTo(q0[0], q0[1]); ctx.closePath(); ctx.fill();
+                            }
+                            // loi sang mong o giua dai
+                            ctx.lineCap = "round";
+                            for (let i = Math.floor(n * 0.5); i < n; i++){
+                                let t0 = a0 + (a1 - a0) * i / n, t1 = a0 + (a1 - a0) * (i + 1) / n, q = (i + 1) / n;
+                                ctx.strokeStyle = "rgba(" + cC + "," + (0.45 * q * fade).toFixed(3) + ")"; ctx.lineWidth = 1 + 1.6 * q;
+                                ctx.beginPath(); ctx.arc(0, 0, R * 0.84, Math.min(t0, t1), Math.max(t0, t1)); ctx.stroke();
+                            }
+                            // MEP SAC trang o vien ngoai, dam dan ve dau luoi
+                            for (let i = Math.floor(n * 0.35); i < n; i++){
+                                let t0 = a0 + (a1 - a0) * i / n, t1 = a0 + (a1 - a0) * (i + 1) / n, q = (i + 1) / n;
+                                ctx.strokeStyle = "rgba(" + cC + "," + (q * fade).toFixed(3) + ")"; ctx.lineWidth = 1 + 2.6 * q;
+                                ctx.beginPath(); ctx.arc(0, 0, R * 1.02, Math.min(t0, t1), Math.max(t0, t1)); ctx.stroke();
+                            }
+                            // tia loe o mui luoi khi dang quet
+                            if (fade > 0.6){
+                                let m = P(a1, 1.02);
+                                ctx.fillStyle = "rgba(255,255,255," + (0.8 * fade).toFixed(3) + ")";
+                                ctx.beginPath(); ctx.arc(m[0], m[1], 2.2 + R * 0.02, 0, 6.28); ctx.fill();
+                            }
+                            ctx.restore();
+                        }
+                    }
                 } else if (this.type === 'z_vert' || this.type === 'z_horz' || this.type === 'z_big' || this.type === 'z_rise' || this.type === 'z_dive' || this.type === 'z_spin' || this.type === 'z_dash' || this.type === 'z_thrust') {
                     // ===== KIEM ANH MO: 3 dai cung bam theo dung duong ma LUOI KIEM vua quet qua =====
                     // Neu co this.pose (do _beginSlash gan vao) thi goc doc thang tu dswAngle —
@@ -42743,6 +42796,7 @@ class PulsarCloneBoss {
                 if (this.clawComboWindow > 0) this.clawComboWindow--;   // het cua so -> combo Zero reset ve nhat 1
                 this.katanaTick();
                 if (this.clawRiseWindow > 0) this.clawRiseWindow--;     // cua so bam NHAY de ra Ryuenjin
+                if (this.kkCho) this.kkTick();                  // @@VK-DINOSWORD: luoi kiem khi cho nhat chem quet qua
                 if (this.crescent2) this.clawTickCrescent2();   // @@VK-DINOSWORD: luoi dao thu hai cua SWORDMASTER
                 // VUNG CHEM dang song: tinh lai theo vi tri HIEN TAI moi frame -> hitbox trung khop hoat anh
                 if (this.swordPose) { this.swordPose.t--; if (this.swordPose.t <= 0) this.swordPose = null; }
@@ -45717,7 +45771,11 @@ class PulsarCloneBoss {
             z_rise: [ 2.87, -0.38],   // RYUENJIN: chem hat nguoc len
             z_dive: [ 1.27,  3.32],   // HYOURETSUZAN: chuc luoi thang xuong
             z_dash: [ 0.72,  2.42],   // SHIPPUUGA: dam ngang ve phia truoc
-            z_far:  [-0.28,  2.55],   // NHAT CHEM XA (fireCrescent): bo dai roi thu ve
+            z_far:  [-0.28,  2.55],   // NHAT CHEM XA (Lao Xuyen): bo dai roi thu ve
+            /* KIEM KHI (fireCrescent): gio kiem cao qua dau roi BO THANG xuong truoc mat — mot nhat
+               manh, dut khoat; luoi khi bay ra dung luc luoi kiem quet qua phia truoc. */
+            z_kk:   [-0.95,  2.75],
+            z_kk2:  [ 2.60, -0.45],   // nhat thu hai cua DRIVE: hat nguoc len (hai nhat thanh hinh chu V)
             /* DAM THANG. Goc kiem = goc effect + pi/2, nen luoi chi THANG VE TRUOC la ~1.57.
                Cung nay gan nhu dung yen quanh do -> cay kiem giu ngang va DAM, thay vi quet
                mot vong. Truoc day Stinger muon 'z_dash' (cung [0.72, 2.42]) nen luoi vong
@@ -46575,8 +46633,10 @@ class PulsarCloneBoss {
             // Drive: hai vang trang xanh
             if (p.katDrive){
                 let D = p.katDrive; D.t++;
-                if (D.t % 10 === 0){
-                    if (typeof p.fireCrescent === 'function') p.fireCrescent(D.n === 1, 999, KAT_C2_DMG);
+                // Hai nhat NHANH GON: bo xuong (khung 1) roi hat nguoc len ngay (khung 8) — hai vang
+                // trang ra dung luc luoi kiem quet qua, thanh mot chu V.
+                if (D.t === 1 || D.t === 8){
+                    if (typeof p.fireCrescent === 'function') p.fireCrescent(D.n === 1, 999, KAT_C2_DMG, D.n === 1);
                     if (++D.n >= KAT_C2_SO) p.katDrive = null;
                 }
             }
@@ -47465,10 +47525,35 @@ class PulsarCloneBoss {
                 if (!(typeof setCanBat === 'function' && setCanBat())) return;
                 if (this._fxE) for (let e of this._fxE) e.tint = 'set';
             },
-            fireCrescent(big, pierce, dmg) {
+            fireCrescent(big, pierce, dmg, nguoc) {
                 this.ammo--; this.attackCooldown = big ? 25 : 18;
-                // DINOSWORD: nhat chem XA cung phai co dong tac vung kiem, khong chi bay luoi dao ra
-                this.swordSwing('z_far', big ? 17 : 13, 10);
+                /* DINOSWORD: nhat KIEM KHI la mot cu BO XUONG manh va dut khoat (nhanh, khong
+                   lung lang), co vet chem ro rang; luoi khi KHONG bay ra ngay luc bam ma doi toi
+                   khi luoi kiem quet qua phia truoc — nhin la thay chinh nhat chem phong no ra. */
+                let _k = nguoc ? 'z_kk2' : 'z_kk', _sc = this.getFormScale();
+                this._slashFx(_k, this.isFacingLeft, (big ? 116 : 96) * _sc);
+                this.swordSwing(_k, big ? 9 : 8, 12);
+                if (this._fxE){ for (let _e of this._fxE){ _e.pose = this.swordPose; _e.life = this.swordPose.t0 + 2;
+                    _e.swordCol = (typeof dswBladeCol === 'function') ? dswBladeCol() : null; } this._fxE = null; }
+                shakeTimer = Math.max(shakeTimer, big ? 7 : 4);
+                if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(big ? 520 : 680, 0.07, 'sawtooth', 0.14, big ? 160 : 220);
+                if (this.kkCho) this._kkBan(this.kkCho);          // nhat truoc chua kip ra thi cho ra luon
+                this.kkCho = { t: 0, big: big, pierce: pierce, dmg: dmg, pose: this.swordPose };
+                if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; }
+            },
+            // Luoi kiem da quet qua phia truoc (hoac het cho) thi moi phong luoi khi
+            kkTick(){
+                let C = this.kkCho; C.t++;
+                let qua = false;
+                if (this.swordPose === C.pose && typeof dswAngleCat === 'function'){
+                    let a = dswAngleCat(this.swordPose), A = DSW_ARC[C.pose.kind];
+                    qua = A[1] > A[0] ? a >= 1.35 : a <= 1.75;
+                } else qua = true;
+                if (qua || C.t >= 6) this._kkBan(C);
+            },
+            _kkBan(C){
+                this.kkCho = null;
+                let big = C.big, pierce = C.pierce, dmg = C.dmg;
                 let pos = this.getShootPos();
                 let p = new Projectile(pos.x, pos.y, dmg, big ? 8 : 7, 0, pierce, pos.dir, this.id);
                 p.critOk = 1;                       // kiem khi cung phai chi mang duoc
@@ -47489,7 +47574,6 @@ class PulsarCloneBoss {
                     // Colonel ban BA vong cung -> luoi dau + 2 luoi theo sau.
                     this.crescent2 = { t: Math.max(1, Math.round(CRESCENT_GAP / sp)), big: big, pierce: pierce, dmg: dmg, con: 1 };
                 }
-                if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; }
             },
             startClawUltimate() {
                 this.ammo = Math.max(0, this.ammo - 2); this.attackCooldown = 40;
