@@ -57637,10 +57637,10 @@ class PulsarCloneBoss {
               tom:'Nhánh DUY NHẤT không có tầm bắn. Đổi sạch tầm xa lấy một vòng cưa quanh mình — bù lại mỗi ngôi sao vừa là viên đạn vừa là mảnh khiên. Không quá nhiệt, hồi từng viên một, và tích trữ được vô hạn.',
               tomEn:'The ONLY branch with no range at all. Trades every bit of reach for a saw ring around you — and every star is both a round and a shard of shield. No overheat, one round at a time, and it stockpiles without limit.' },
             { id:'chainsaw', loai:'nl', xong:true, ten:'CHAINSAW', tenEn:'CHAINSAW',
-              mo:['Cầm hẳn một cái cưa máy. Băng đạn là 10 GIÂY xăng, giữ J là đốt. KHÔNG tự hồi — phải CÚI 3 lần liên tiếp để đề máy, sau đó máy TỰ đổ xăng (miễn là bạn ngừng cưa). 1 sát thương mỗi 0.25 giây, tầm 3cm trước mặt, và cứ giữ J liên tục 2 giây thì lưỡi cưa gió dài thêm 1cm. Giữ K để rồ cưa: 1.5 giây ra CƯA VÀNG (6 sát thương/giây trong 5 giây), 3 giây ra CƯA XANH (cưa trúng thì đâm xuyên, khoá kẻ địch 2 giây và xả 18 sát thương). Bấm J để dùng. Dùng xong là quá nhiệt ngay.',
+              mo:['Cầm hẳn một cái cưa máy. Băng đạn là 10 GIÂY xăng, giữ J là đốt. KHÔNG tự hồi — phải CÚI 3 lần liên tiếp để đề máy, sau đó máy TỰ đổ xăng (miễn là bạn ngừng cưa). 1 sát thương mỗi 0.25 giây, tầm 4cm trước mặt, và cứ giữ J liên tục 2 giây thì lưỡi cưa gió dài thêm 1cm. Giữ K để rồ cưa: 1.5 giây ra CƯA VÀNG (6 sát thương/giây trong 5 giây), 3 giây ra CƯA XANH (cưa trúng thì đâm xuyên, khoá kẻ địch 2 giây và xả 18 sát thương). Bấm J để dùng. Dùng xong là quá nhiệt ngay.',
                   'Máy khoẻ hơn: thời gian chờ xăng còn MỘT NỬA (đổ xăng nhanh gấp đôi).',
                   'Máy luôn nổ: xăng TỰ HỒI như một loại đạn thường — ngừng cưa 0.5 giây (vừa quá nhiệt thì 1.5 giây) là tự đổ, không cần cúi. Vẫn đổ nhanh gấp đôi.'],
-              moEn:['You carry an actual chainsaw. The magazine is 10 SECONDS of fuel and holding J burns it. It never refills on its own — you must CROUCH 3 times in a row to kick the engine over; after that it refuels itself, as long as you stop sawing. 1 damage every 0.25s, 3cm of reach, and every 2 seconds of unbroken sawing the invisible wind blade adds 1cm. Hold K to rev: 1.5s gives the YELLOW saw (6 damage/sec for 5 seconds), 3s gives the GREEN saw (connect and you punch through, pinning the target for 2 seconds and 18 damage). Press J to use it. Using it overheats the saw instantly.',
+              moEn:['You carry an actual chainsaw. The magazine is 10 SECONDS of fuel and holding J burns it. It never refills on its own — you must CROUCH 3 times in a row to kick the engine over; after that it refuels itself, as long as you stop sawing. 1 damage every 0.25s, 4cm of reach, and every 2 seconds of unbroken sawing the invisible wind blade adds 1cm. Hold K to rev: 1.5s gives the YELLOW saw (6 damage/sec for 5 seconds), 3s gives the GREEN saw (connect and you punch through, pinning the target for 2 seconds and 18 damage). Press J to use it. Using it overheats the saw instantly.',
                     'A stronger engine: the refuelling wait is HALVED (fuel pumps in twice as fast).',
                     'The engine never dies: fuel REGENERATES like ordinary ammo — stop sawing for 0.5s (1.5s after an overheat) and it refills on its own, no crouching. Still twice as fast.'],
               tom:'Nhánh cận chiến thật sự: không viên đạn nào, chỉ một cái hộp ngay trước mặt. Giá của nó là phải đứng sát, và là cái nghi thức cúi xuống đổ xăng giữa trận — tư thế hở nhất trong game (cấp 3 thì khỏi).',
@@ -58095,7 +58095,7 @@ class PulsarCloneBoss {
         const CW_BINH    = 600;   // binh xang 10 giay
         const CW_NHIP    = 15;    // 0.25 giay mot nhip -> 4 dmg/giay
         const CW_DMG     = 1;
-        const CW_TAM_CM  = 3;     // tam co ban 3cm truoc mat
+        const CW_TAM_CM  = 4;     // tam co ban 4cm truoc mat (Hans: "cho cai cua dai ra" — truoc la 3cm)
         const CW_GIO_MOI = 120;   // moi 2 giay giu J lien tuc thi luoi cua gio dai them
         const CW_GIO_CM  = 1;
         const CW_CAO     = 22;    // hop cua cao hon than nguoi bao nhieu (tren va duoi)
@@ -58123,7 +58123,7 @@ class PulsarCloneBoss {
         /* Chinh lai lan hai: ban dau to len 36x34 thi cai cua DE KIN con dino — doi tu
            "bi nguoi choi de" sang "de nguoi choi". Nay giu be ngang vua phai va DAY HAN RA
            PHIA TRUOC, de no nam trong tay chu khong nam tren nguc. */
-        const CW_VE_LUOI = 54;    // do dai thanh luoi that
+        const CW_VE_LUOI = 72;    // do dai thanh luoi that (truoc 54)
         const CW_VE_DAY  = 11;    // giu J thi cai cua duoc DUA RA truoc bao nhieu px
         const CW_VE_VONG = 46;    // ban kinh vanh RO CUA (truoc la 15 — qua nho)
         const CW_MAU_THAN  = { do: ['#C62828','#EF5350','#8E1B1B'],
@@ -64352,7 +64352,8 @@ class PulsarCloneBoss {
            tam danh THUC TE phu hop voi viec do." Nen hop an khong con la mot o vuong truoc
            mat nua ma phu dung vung cai cua gap doi quet qua: tu tay ra toi mui luoi, tu tren
            dau xuong ngang hong, va o BEN NAO cua dang o (luc xoay nguoi thi la sau lung). */
-        const DSAW_MUA_LUOI = 92;        // luoi cua luc mua: GAP DOI luoi thuong (46)
+        const DSAW_DAI = 1.35;           // Hans: "cho cai cua dai ra" — luoi va tam danh dai them 35%
+        const DSAW_MUA_LUOI = 124;       // luoi cua luc mua: GAP DOI luoi thuong (62)
         const DSAW_MUA_KHI  = 300;       // cua lien tuc 5 giay thi bat dau ra chem khi, cua vang
         /* CHIEU CUOI — QUY CUA. 10 giay. Chem khong hoi chieu, dash xuyen qua ke dich an 5,
            va moi diem mau mat trong luc do duoc tra lai khi het. */
@@ -64383,7 +64384,7 @@ class PulsarCloneBoss {
            mua bang ba giay dung im giu phim. */
         function dsawHopTu(ng){
             let sc = ng.getFormScale ? ng.getFormScale() : 1;
-            let tam = 62 * sc * DSAW_TU_TAM, d = ng.isFacingLeft ? -1 : 1;
+            let tam = 62 * sc * DSAW_DAI * DSAW_TU_TAM, d = ng.isFacingLeft ? -1 : 1;
             return { x: (d === 1 ? ng.x + ng.w - 6 : ng.x + 6 - tam), y: ng.y - 20,
                      w: tam, h: ng.h + 40 };
         }
@@ -64468,7 +64469,7 @@ class PulsarCloneBoss {
                 if (ng._dsawMuaD !== undefined && ng._dsawMuaD !== d && ng.dsawVet) ng.dsawVet.length = 0;
                 ng._dsawMuaD = d;
             }
-            let L = ng.dsawMua ? DSAW_MUA_LUOI : 46 * (nac >= 4 ? 1.35 : 1);
+            let L = ng.dsawMua ? DSAW_MUA_LUOI : 46 * DSAW_DAI * (nac >= 4 ? 1.35 : 1);
             // diem tay cam — cua xoay QUANH tay, nen moi goc deu ra tu day
             let px = ng.x + ng.w/2 + d * (14 + lao), py = ng.y + ng.h * (vung ? 0.48 : 0.58);
             if (ng.dsawMua){ px += (Math.random() - 0.5) * 3; py += (Math.random() - 0.5) * 3; }
@@ -64500,7 +64501,7 @@ class PulsarCloneBoss {
             // rang
             ctx.fillStyle = (nac >= 4) ? mau : "#ECEFF1";
             let toc = (dangNo || vung) ? 2.6 : 0, pha = toc ? ((frames * toc) % 8) : 0;
-            for (let t = 0; t < 12; t++){
+            for (let t = 0; t < 22; t++){
                 let off = 22 + t * 8 + pha; if (off > L + 8) continue;
                 ctx.fillRect(off - 1.5, -12, 3, 3);
                 ctx.fillRect(off - 1.5, 9, 3, 3);
@@ -64591,7 +64592,7 @@ class PulsarCloneBoss {
                    cua hop an (xem `dsawChem`), mo dan theo nhip vung — nhin vao la biet toi dau. */
                 if (vung && k === tay){
                     let sc = ng.getFormScale ? ng.getFormScale() : 1;
-                    let tam = ((ng.dsawKieu === 3) ? 84 : 62) * sc + 8;
+                    let tam = ((ng.dsawKieu === 3) ? 84 : 62) * sc * DSAW_DAI + 8;
                     ctx.save();
                     ctx.globalAlpha = 0.50 * (1 - u * 0.55);
                     dsawVeLuoi(ax, ay, gg, tam, 16, "#FFEB3B", pha);
@@ -64840,11 +64841,11 @@ class PulsarCloneBoss {
                 let nac = this.dsawNac || 0;
                 let cong = nac > 0 ? DSAW_NAC_CONG : 0;
                 let reach, hTop, hBot, dmg, life;
-                if (kieu === 0){ reach = 62*sc; hTop = 30; hBot =  8; dmg = DSAW_CHEM; life=12; }
-                else if (kieu === 1){ reach = 62*sc; hTop =  8; hBot = 26; dmg = DSAW_CHEM; life=12; }
-                else if (kieu === 3){ reach = 84*sc; hTop = 34; hBot = 34; dmg = DSAW_KHONG;  life=15; }
-                else if (kieu === 4){ reach = 58*sc; hTop = 40; hBot =  0; dmg = DSAW_LEN; life=12; }
-                else { reach = 74*sc; hTop = 12; hBot = 12; dmg = DSAW_DAM; life=14; }
+                if (kieu === 0){ reach = 62*sc*DSAW_DAI; hTop = 30; hBot =  8; dmg = DSAW_CHEM; life=12; }
+                else if (kieu === 1){ reach = 62*sc*DSAW_DAI; hTop =  8; hBot = 26; dmg = DSAW_CHEM; life=12; }
+                else if (kieu === 3){ reach = 84*sc*DSAW_DAI; hTop = 34; hBot = 34; dmg = DSAW_KHONG;  life=15; }
+                else if (kieu === 4){ reach = 58*sc*DSAW_DAI; hTop = 40; hBot =  0; dmg = DSAW_LEN; life=12; }
+                else { reach = 74*sc*DSAW_DAI; hTop = 12; hBot = 12; dmg = DSAW_DAM; life=14; }
                 if (kieu === 2 && nac >= 3){
                     /* NAC XANH: cu dam an 10-15 tuy da giu K bao lau trong khoang 1-2 giay. */
                     let u = Math.max(0, Math.min(1, ((this.dsawGiu || DSAW_NAC[3]) - DSAW_NAC[3]) / (DSAW_NAC[4] - DSAW_NAC[3])));
@@ -64928,7 +64929,7 @@ class PulsarCloneBoss {
                     if (C.t % DSAW_CAY_NHIP === 3 && C.da < C.n){
                         C.da++;
                         let sc = this.getFormScale(), x0 = this.x + this.w / 2;
-                        let rect = { x: C.dir > 0 ? x0 - 10 : x0 - 100 * sc, y: this.y + this.h - 40, w: 100 * sc + 10, h: 46 };
+                        let rect = { x: C.dir > 0 ? x0 - 10 : x0 - 100 * sc * DSAW_DAI, y: this.y + this.h - 40, w: 100 * sc * DSAW_DAI + 10, h: 46 };
                         if (this.meleeStrike(rect, DSAW_CAY_DMG)) this.dsawMayNong();
                         for (let k = 0; k < 3; k++)
                             visualEffects.push(new Effect(x0 + C.dir * (20 + Math.random() * 50), this.y + this.h - 4, 'explosion', true, 7 + Math.random() * 6));
@@ -64956,7 +64957,7 @@ class PulsarCloneBoss {
                         if (N.t % DSAW_NGHIEN_NHIP === 0){
                             N.nhip++;
                             let d = Math.min(DSAW_NGHIEN_TRAN, N.nhip), x0 = this.x + this.w / 2;
-                            let rect = { x: dir > 0 ? x0 : x0 - 76 * sc, y: this.y + 6, w: 76 * sc, h: this.h - 6 };
+                            let rect = { x: dir > 0 ? x0 : x0 - 76 * sc * DSAW_DAI, y: this.y + 6, w: 76 * sc * DSAW_DAI, h: this.h - 6 };
                             if (this.meleeStrike(rect, d)){
                                 this.x -= dir * 5;                                      // bi day lui dan
                                 let tx = x0 + dir * 60 * sc, ty = this.y + this.h * 0.5;
@@ -70863,7 +70864,7 @@ class PulsarCloneBoss {
                     T(DSAW_TU_DPS === 8 && DSAW_TU_TAM > 1.5,
                       'nac TU THAN: 8 sat thuong moi giay va tam dai han nhat chem',
                       DSAW_TU_DPS + ' dmg/giay, tam x' + DSAW_TU_TAM);
-                    T(DSAW_MUA_LUOI === 92 && DSAW_MUA_KHI === 300,
+                    T(DSAW_MUA_LUOI === Math.round(2 * 46 * DSAW_DAI) && DSAW_MUA_KHI === 300,
                       'MUA CUA: luoi gap doi, cua lien tuc 5 giay thi ra chem khi',
                       'luoi ' + DSAW_MUA_LUOI + 'px, chem khi tu ' + (DSAW_MUA_KHI/60) + 's');
                     T(60 / DSAW_MUA_NHIP === 4 && DSAW_MUA_MOC >= DSAW_NAC[4],
