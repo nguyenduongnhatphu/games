@@ -41982,6 +41982,7 @@ class PulsarCloneBoss {
            kha dac trung nen toi nghi can tach no ra lam mot vu khi moi." Luoi hai la LOAI DAN 18, can chien.
            Cam Luoi hai thi Power tu khoa sang DEATH (nhu luc con la rune), doi vu khi thi tra Power cu. */
         const LH_DAN = 18;
+        const DK_DAN = 19;   // @@VK-DAIKIEM: Dai kiem — vu khi can chien thu 20
         function laCusDan(a){ return a === CUS_DAN || a === PT_DAN || a === KV_DAN; }
         /* @@HE-THELUC — Hans: "Giao co so dan la 6, ap dung cho tat ca. Kiem gio nang so dan len 8,
            Swordmaster la 10 con Katana la 8. Bua len thanh 5." (truoc: Giao 5, Kiem 6, Bua 4) */
@@ -43361,8 +43362,8 @@ class PulsarCloneBoss {
               @@VK-DINOSWORD (5, kem rune SWORDMASTER + KATANA) · @@VK-PULSAR (6) · @@VK-BOOMERANG (7)
               @@VK-CRYO (8) · @@VK-WHISPER (9) · @@VK-SPEAR (10 Giao, kem rune NGO KHONG + TRIDENT)
               @@VK-MJOLNIR (11 Bua) · @@VK-MIDAS (12) · @@VK-VENOM (13)
-              @@VK-CUSTOM (14, dung chung cho PHI TIEU 16 + KIEM VU 17) · @@VK-DINOSAW (15) · @@VK-LUOIHAI (18)
-              DU CA 19 LOAI DAN — class Player khong con nhanh `checkAmmo === N` nao.
+              @@VK-CUSTOM (14, dung chung cho PHI TIEU 16 + KIEM VU 17) · @@VK-DINOSAW (15) · @@VK-LUOIHAI (18) · @@VK-DAIKIEM (19)
+              DU CA 20 LOAI DAN — class Player khong con nhanh `checkAmmo === N` nao.
 
            TRONG MOT KHOI, thu tu co dinh:
               1. HANG SO / BIEN rieng cua vu khi
@@ -49731,7 +49732,7 @@ class PulsarCloneBoss {
 
         function giaoCong(){ return Math.min(3, Math.floor(((typeof dino !== 'undefined' && dino && dino._giaoDong) || 0) / 4))
                                     + (typeof trdCong === 'function' ? trdCong() : 0); }   // @@HE-TRIDENT: hao quang MUSOU
-        function giaoLaCanChien(a){ return a === 5 || a === 10 || a === 11 || a === MIDAS_DAN || a === DSAW_DAN || a === LH_DAN; }
+        function giaoLaCanChien(a){ return a === 5 || a === 10 || a === 11 || a === MIDAS_DAN || a === DSAW_DAN || a === LH_DAN || a === DK_DAN; }
         // @@HE-GIAOUNITY — vong xoay cua chieu cuoi khi dang deo Unity
         const GIAO_UNI_T    = 156;  // 2.6 giay
         const GIAO_UNI_NHIP = 22;   // mot vong quay -> mot lan an don
@@ -67193,6 +67194,844 @@ class PulsarCloneBoss {
                 return mv;
             }
         });
+        /* =============================== @@VK-DAIKIEM (loai dan 19) ===============================
+           DAI KIEM — kiem hai luoi to, dai, nang. 3 the luc. Tam xa, ra don CHAM DAU roi roi xuong RAT NHANH
+           (trong luc keo), chem xong kiem NAM DUOI DAT mot luc — phai nhac len moi chem tiep. Chay / nhay cham
+           nhu Bua. Hai trang thai: 'lung' (vac tren lung) va 'dat' (mui kiem cham dat truoc mat).
+             J (tren lung)      CHEM XUONG 7 -> kiem nam duoi dat
+             J (duoi dat)       NHAC KIEM bang luc = chem hat len 7, thu hoi kha cham
+             Luot (duoi dat)    DAM bang mui kiem 5
+             Nhay J (duoi dat)  nhac kiem ve lung tren khong 9 · Nhay J (tren lung): bo xuong 7
+             Luot J             lao toi CHEM NGANG cuc manh 10, day lui, PHA don lao cua dich, ton 3
+             K 0.5s  thu kiem ra sau roi DAM XUYEN, lao xa gap ruoi cu luot 8 · K 1s  VUNG CHEM ngang chech len 10 (day lui + PARRY, dung yen)
+             K 1.5s  ha kiem nhe xuong dat sau lung roi vung tu duoi vong len (nguoc kim dong ho): chem 10 + SONG XUNG KICH 10
+             NOI TAI MA PHAP TRONG LUC: moi nhat trung ke dang bay ghim no xuong dat 0.75 giay · Bat mon = vo han the luc
+             K 2s    CAM KIEM: vong tim co vao kiem -> moi ke dich dang bay bi KEO XUONG DAT 4 giay (2-3)
+             K 2.5s+ BAT MON (hao quang do): 4.5 giay vung nhanh hon, di lai thoai mai hon
+             Channel cam kiem, moi 2 giay mot dot DIA CHAN: moi ke 10 + cham 1s; ke dang bay bi keo xuong, cham dat them 1-3
+             U       pha 1 chem quet ca man 30, mat dat nut, ke dich mat trong luc lo lung · pha 2 kiem bay len
+                     giua troi giua set + hao quang tu tim, hut da & ke dich thanh qua cau roi DAP XUONG no 120.
+           Trang thai rieng moi nguoi choi o `ng.dk`. Vong lap chinh goi dkChung() (song, ghim, chieu cuoi, ve).
+           ------------------------------------------------------------------------------------- */
+        const DK_CHAY = 0.85, DK_CHAY_DAT = 0.62, DK_CHAY_BUFF = 1.0;
+        const DK_DAT_T = 150;                 // kiem tu nhac len sau 2.5 giay nam duoi dat
+        const DK_BUFF_T = 270;                // bat mon 4.5 giay
+        const DK_GHIM_T = 240;                // ghim xuong dat 4 giay
+        const DK_CAM_T = 60;                  // Trong An: 1 giay dau ke dich KHONG tung duoc chieu, chieu dang tung bi huy
+        const DK_CH_NHIP = 120;               // channel: 2 giay mot dot
+        const DK_TRONG = 45;                  // MA PHAP TRONG LUC: moi nhat trung ke dang bay ghim no xuong dat 0.75 giay
+        const DK_TIERS = [[30, "#B0BEC5"], [60, "#90A4AE"], [90, "#B388FF"], [120, "#7C4DFF"], [150, "#FF5252"]];
+        const DK_LUNG = [-1.85, 16, 4], DK_TAY = [1.77, 31, 20], DK_CAM = [Math.PI, 48, -58];
+        const DK_MAU = [196, 206, 230];
+        function dkBat(ng){ return !!ng && (ng.id === 1 ? currentAmmoType : (ng.ammoType != null ? ng.ammoType : -1)) === DK_DAN; }
+        function dkMoi(){ return { trang: 'lung', A: null, datT: 0, cho: 0, buff: 0, ch: null, ult: null, jCu: false,
+                                   luotDu: 0, luotCu: false, kenh: false }; }
+        function dkCua(ng){ if (!ng.dk) ng.dk = dkMoi(); return ng.dk; }
+        function dkDir(ng){ return ng.isFacingLeft ? -1 : 1; }
+        function dkDs(){ return (typeof lhDs === 'function') ? lhDs() : trdDs(); }
+        function dkLaQuai(o){ return (typeof bosses !== 'undefined' && bosses.indexOf(o) >= 0) || (typeof enemies !== 'undefined' && enemies.indexOf(o) >= 0); }
+        function dkLaBoss(o){ return typeof bosses !== 'undefined' && bosses.indexOf(o) >= 0; }
+        function dkDangBay(o){ return (o.y + (o.h || 20)) < 320 - 12; }
+        function dkSfx(f, d, k, v, f2){ if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(f, d, k, v, f2); }
+        function dkChu(x, y, vi, en){ floatingTexts.push(new FloatingText(x, y, LT(vi, en))); }
+        // toa do than nguoi choi (he ve veTrenNguoi, luon quay phai) -> the gioi
+        function dkTG(ng, lx, ly){
+            let s = ng.getFormScale();
+            return { x: dkDir(ng) > 0 ? ng.x + lx * s : ng.x + ng.w - lx * s, y: ng.y + ly * s };
+        }
+        function dkDanh(o, dmg){
+            if (!o || o.hp === undefined || o.hp <= 0) return;
+            if (typeof dealDamage === 'function') dealDamage(o, dmg, 'ammo'); else o.hp -= dmg;
+        }
+        function dkDay(o, d, px){
+            if (!dkLaQuai(o)) return;
+            o.x += d * px * (dkLaBoss(o) ? 0.5 : 1);
+            o.x = Math.max(worldL() - (o.w || 20) * 0.5, Math.min(worldR() - (o.w || 20) * 0.5, o.x));
+        }
+        // PHA DON LAO: boss dang lao / vo / chem toi thi bi cat ngang
+        function dkPhaDon(o, ng){
+            if (!dkLaQuai(o)) return;
+            if (dkLaBoss(o) && typeof bossContactAttack === 'function' && bossContactAttack(o)){
+                if (typeof o.toIdle === 'function') o.toIdle(40); else o.state = 'idle';
+                if (o.dashVx !== undefined) o.dashVx = 0;
+                dkChu(o.x + (o.w || 40) / 2 - 30, o.y - 20, "PHÁ ĐÒN!", "BROKEN!");
+            }
+            if (typeof venKhoa === 'function') venKhoa(o, 24);
+        }
+        // hop danh theo nguoi choi (don vi than, nhan he so hinh dang)
+        function dkHop(ng, sau, truoc, tren, duoi, dmg, hit, fn){
+            let d = dkDir(ng), s = ng.getFormScale(), cx = ng.x + ng.w / 2;
+            let x0 = cx + d * sau * s, x1 = cx + d * truoc * s;
+            if (x0 > x1){ let t = x0; x0 = x1; x1 = t; }
+            let y0 = ng.y - tren * s, y1 = ng.y + ng.h + duoi;
+            if (typeof gdCatHop === 'function') gdCatHop({ x: x0, y: y0, w: x1 - x0, h: y1 - y0 });   // @@HE-GATDAN
+            let n = 0;
+            for (let o of dkDs()){
+                if (hit && hit.has(o)) continue;
+                if (o.x + (o.w || 20) < x0 || o.x > x1 || o.y + (o.h || 20) < y0 || o.y > y1) continue;
+                if (hit) hit.add(o);
+                if (dmg > 0){ dkDanh(o, dmg); let p = hitDiem(o, d, (y0 + y1) / 2); hitCat(p.x, p.y, d * -0.5, dmg >= 7, DK_MAU); }
+                if (fn) fn(o);
+                if (dmg > 0 && dkLaQuai(o) && dkDangBay(o)) dkGhim(o, DK_TRONG);   // MA PHAP TRONG LUC: chem trung ke bay la no rot
+                n++;
+            }
+            if (n) shakeTimer = Math.max(shakeTimer || 0, dmg >= 9 ? 10 : 6);
+            return n;
+        }
+        function dkTon(ng, n){
+            if (ng.dk && ng.dk.buff > 0){ ng._hoiCho = 45; return; }      // BAT MON: vo han the luc
+            ng.ammo = Math.max(0, ng.ammo - n); ng._hoiCho = 45;
+            if (ng.ammo <= 0){ ng.isOverheated = true; ng.overheatTimer = 75; }
+        }
+
+        /* ---------- HOAT ANH: moi don la day khoa [u, goc, px, py, em] (em = 'in' / 'out' / 'io'), khoa dau = tu the hien tai ---------- */
+        const DK_M = {
+            chem:  { T: 32, hit: 20, ton: 1, dmg: 7, het: 'dat', keys: [[0.45, -0.25, 26, 10, 'io'], [0.62, 1.77, 31, 20, 'in'], [1, 1.77, 31, 20]],
+                     hop: [-10, 168, 74, 8], dat: 1, am: 120 },
+            // NHAC: day kiem len mot chut (mat dat nut) — khung lai — roi moi giat len. Nang, manh.
+            nhac:  { T: 38, hit: 20, ton: 0, dmg: 7, het: 'lung', cho: 22, nut: 7, keys: [[0.2, 1.63, 33, 15, 'out'], [0.4, 1.6, 33, 14], [0.56, -0.5, 28, 12, 'in'], [1, -1.85, 16, 4, 'io']],
+                     hop: [-10, 162, 100, 6], am: 260 },
+            // NHAY khi kiem dang duoi dat: NHAC MANH len theo da nhay — 11, ton 2
+            nhacJ: { T: 24, hit: 6, ton: 2, dmg: 11, het: 'lung', cho: 14, keys: [[0.3, -0.5, 28, 12, 'out'], [1, -1.85, 16, 4, 'io']],
+                     hop: [-20, 168, 116, 40], day: 16, am: 200 },
+            nhacN: { T: 24, hit: 6, ton: 0, dmg: 9, het: 'lung', cho: 16, keys: [[0.3, -0.5, 28, 12, 'out'], [1, -1.85, 16, 4, 'io']],
+                     hop: [-20, 164, 110, 40], am: 280 },
+            roi:   { T: 22, hit: 12, ton: 1, dmg: 7, het: 'datNeu', keys: [[0.3, -0.4, 26, 10, 'out'], [0.55, 1.77, 31, 20, 'in'], [1, 1.77, 31, 20]],
+                     hop: [-10, 158, 40, 0], xuong: 1, am: 110 },
+            dam2:  { T: 16, hit: 5, ton: 0, dmg: 5, het: 'dat', keys: [[0.3, 1.6, 42, 22, 'out'], [0.7, 1.6, 42, 22], [1, 1.77, 31, 20, 'io']],
+                     hop: [0, 186, 8, 0], am: 420 },
+            // ngang: [het lay da, het vung, bat dau thu, nghieng mat phang (am = chech len)]
+            ngang: { T: 30, hit: 13, ton: 3, dmg: 10, het: 'lung', cho: 14, ngang: [0.25, 0.5, 0.62, 0], lao: 15, hop: [-80, 212, 44, 6], day: 44, pha: 1, am: 90 },
+            // K 0.5s: THU kiem ra sau mot chut roi DAM XUYEN, lao xa bang mot cu luot; hop di theo nguoi suot doan lao
+            dam:   { T: 30, hit: 12, ton: 1, dmg: 8, het: 'lung', cho: 12, keys: [[0.33, 1.42, 2, 18, 'io'], [0.42, 1.6, 52, 22, 'in'], [0.72, 1.6, 50, 22], [1, -1.85, 16, 4, 'io']],
+                     hop: [-20, 184, 10, 0], keoDai: 13, day: 12, laoLuc: 33, am: 360 },
+            // K 1s: VUNG CHEM — chem NGANG nhung chech len mot chut, lay da cham roi vung nhanh
+            cheo:  { T: 50, hit: 28, ton: 1, dmg: 10, het: 'lung', cho: 12, dung: 1, ngang: [0.45, 0.62, 0.74, -0.2],
+                     hop: [-50, 196, 80, 6], day: 34, parry: [0.36, 0.68], am: 150 },
+            // K 1.5s: tu the vac lung HA THANG kiem xuong dat sau lung (khong xoay vong) roi vung tu DUOI vong len (nguoc kim dong ho, kieu chem hat len cua Luoi hai);
+            // mui kiem miet qua mat dat (nut) ngay truoc khi ra don
+            quet:  { T: 60, hit: 34, ton: 2, dmg: 10, het: 'lung', cho: 12, dung: 1, nut: 32, nutX: 40, keys: [[0.3, -1.9, 20, 10, 'io'], [0.42, -1.9, 20, 10], [0.6, -0.7 - 2 * Math.PI, 30, 10, 'in'], [0.78, -0.7 - 2 * Math.PI, 30, 10], [1, -1.85 - 2 * Math.PI, 16, 4, 'io']],
+                     hop: [-120, 186, 110, 6], song: 1, am: 100 },
+            cam:   { T: 70, hit: 25, ton: 2, dmg: 0, het: 'cam', dung: 1, keys: [[0.25, 0.15, 30, -4, 'io'], [0.36, Math.PI, 48, -58, 'in'], [1, Math.PI, 48, -58]], am: 70 },
+            buff:  { T: 36, hit: 14, ton: 2, dmg: 0, het: 'lung', keys: [[0.4, 0.1, 30, -2, 'io'], [0.75, 0.1, 30, -2], [1, -1.85, 16, 4, 'io']], am: 200 },
+            kenh:  { T: 24, hit: 9, ton: 0, dmg: 0, het: 'kenh', dung: 1, keys: [[0.3, 0.15, 30, -4, 'io'], [0.4, Math.PI, 48, -58, 'in'], [1, Math.PI, 48, -58]], am: 70 },
+            nho:   { T: 22, hit: 99, ton: 0, dmg: 0, het: 'lung', keys: [[1, -1.85, 16, 4, 'io']] },
+            nho2:  { T: 40, hit: 99, ton: 0, dmg: 0, het: 'lung', nut: 8, keys: [[0.22, 1.63, 33, 15, 'out'], [0.42, 1.6, 33, 14], [1, -1.85, 16, 4, 'io']] }
+        };
+        function dkEm(u, em){
+            if (em === 'in') return u * u * u;
+            if (em === 'out') return 1 - Math.pow(1 - u, 3);
+            if (em === 'io') return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+            return u;
+        }
+        // tu the tinh: [goc, px, py]
+        function dkTuThe(dk){
+            if (dk.kenh) return DK_CAM.slice();
+            if (dk.trang === 'dat') return DK_TAY.slice();
+            if (dk.trang === 'cam') return DK_CAM.slice();
+            return DK_LUNG.slice();
+        }
+        function dkPose(ng){
+            let dk = ng.dk; if (!dk) return { ang: DK_LUNG[0], px: DK_LUNG[1], py: DK_LUNG[2], nen: 1 };
+            if (dk.ult && dk.ult.t >= 36) return null;        // kiem dang bay tren troi
+            if (dk.ult){
+                let u = dk.ult.t / 36;
+                let phi = u < 0.3 ? -2.6 : u < 0.7 ? -2.6 + dkEm((u - 0.3) / 0.4, 'in') * 4.0 : 1.4;
+                return { ang: Math.PI / 2, px: 30, py: 18, nen: Math.cos(phi), phi };
+            }
+            let A = dk.A;
+            if (!A){ let p = dkTuThe(dk); return { ang: p[0], px: p[1], py: p[2], nen: 1 }; }
+            let u = Math.min(1, A.t / A.T), m = A.m;
+            if (m.ngang){
+                // 2.5D: kiem quay quanh truc dung, phi = 0 chia thang ra truoc. ng[3] nghieng mat phang vung (am = chech len)
+                let G = m.ngang, a0 = Math.PI / 2 + G[3], phi;
+                if (u < G[0]) phi = -2.3 - dkEm(u / G[0], 'out') * 0.4;
+                else if (u < G[1]) phi = -2.7 + dkEm((u - G[0]) / (G[1] - G[0]), 'in') * 4.1;
+                else phi = 1.4;
+                if (u < G[2]) return { ang: a0, px: 30, py: 20, nen: Math.cos(phi), phi };
+                let v = dkEm((u - G[2]) / (1 - G[2]), 'io');
+                return { ang: a0 + (DK_LUNG[0] - a0) * v, px: 30 + (DK_LUNG[1] - 30) * v, py: 20 + (DK_LUNG[2] - 20) * v, nen: Math.cos(1.4) + (1 - Math.cos(1.4)) * v };
+            }
+            let ks = [[0, A.k0[0], A.k0[1], A.k0[2]]].concat(m.keys);
+            let i = 1; while (i < ks.length - 1 && u > ks[i][0]) i++;
+            let a = ks[i - 1], b = ks[i];
+            let w = b[0] > a[0] ? Math.max(0, Math.min(1, (u - a[0]) / (b[0] - a[0]))) : 1;
+            w = dkEm(w, b[4]);
+            return { ang: a[1] + (b[1] - a[1]) * w, px: a[2] + (b[2] - a[2]) * w, py: a[3] + (b[3] - a[3]) * w, nen: 1 };
+        }
+        function dkBan(dk){ return !!(dk.A || dk.cho > 0 || dk.ult); }
+        function dkDungYen(dk){ return !!((dk.A && dk.A.m.dung) || dk.kenh || dk.ult); }
+        function dkBatDau(ng, kieu, them){
+            let dk = dkCua(ng), m = DK_M[kieu];
+            if (m.ton && ng.ammo < m.ton){ dkChu(ng.x - 20, ng.y - 30, "HẾT THỂ LỰC", "NO STAMINA"); return false; }
+            let p = dkPose(ng) || { ang: DK_LUNG[0], px: DK_LUNG[1], py: DK_LUNG[2] };
+            let nhanh = dk.buff > 0 ? 0.75 : 1;
+            let T = Math.max(6, Math.round(m.T * nhanh)), hit = Math.min(T - 1, Math.round(m.hit * nhanh));
+            dk.A = { kieu, m, t: 0, T, hit, k0: [p.ang, p.px, p.py], set: new Set(), dir: dkDir(ng), them: them || {} };
+            if (m.ton) dkTon(ng, m.ton);
+            ng._hoiCho = 45;
+
+            if (m.am) dkSfx(m.am, 0.16, 'sawtooth', 0.18, m.am * 0.45);
+            return true;
+        }
+        function dkHopDon(ng, A){
+            let m = A.m, d = dkDir(ng), dmg = (A.them.dmg || m.dmg);
+            if (m.hop){
+                let h = m.hop, duoi = m.xuong ? Math.max(h[3], 326 - (ng.y + ng.h)) : h[3];
+                dkHop(ng, h[0], h[1], h[2], duoi, dmg, A.set, o => {
+                    if (m.day) dkDay(o, d, m.day);
+                    if (m.pha) dkPhaDon(o, ng);
+                    if (m.parry && dkLaQuai(o) && typeof venKhoa === 'function') venKhoa(o, 14);
+                });
+            }
+        }
+        function dkRaDon(ng, A){
+            let m = A.m, d = dkDir(ng);
+            dkHopDon(ng, A);
+            if (m.dat || (m.xuong && ng.grounded)){
+                let t = dkTG(ng, 31 + 118, 44);
+                hitDat(t.x, 320, 1, DK_MAU);
+                shakeTimer = Math.max(shakeTimer || 0, 12);
+            }
+            if (m.song){
+                let s = ng.getFormScale(), cx = ng.x + ng.w / 2;
+                dkSong.push({ x: cx + d * 40 * s, d, t: 0, T: 62, v: 10.5, cao: 120, rong: 60, dmg: 10, hit: new Set(), ng });
+                shakeTimer = Math.max(shakeTimer || 0, 14);
+                dkChu(ng.x - 30, ng.y - 44, "LIỆT ĐỊA TRẢM!", "EARTH-RENDER!");
+            }
+            if (A.kieu === 'cam'){ shakeTimer = Math.max(shakeTimer || 0, 16); let t = dkTG(ng, 48, 44); hitDat(t.x, 320, 1, [179, 136, 255]);
+                                   dkVong.push({ ng, x: t.x, y: 300, t: 0, T: A.T - A.hit, R: 260 }); }
+            if (A.kieu === 'kenh'){ shakeTimer = Math.max(shakeTimer || 0, 14); let t = dkTG(ng, 48, 44); hitDat(t.x, 320, 1, [179, 136, 255]); }
+            if (A.kieu === 'buff'){
+                ng.dk.buff = DK_BUFF_T;
+                dkChu(ng.x - 34, ng.y - 46, "BÁT MÔN ĐỘN GIÁP!", "EIGHT GATES!");
+                dkSfx(80, 0.5, 'sawtooth', 0.28, 220); shakeTimer = Math.max(shakeTimer || 0, 18);
+            }
+        }
+        function dkXong(ng, A){
+            let dk = ng.dk, m = A.m;
+            dk.A = null;
+            let het = m.het;
+            if (het === 'datNeu') het = ng.grounded ? 'dat' : 'lung';
+            if (het === 'cam'){ dk.trang = 'lung'; dkGhimTatCa(ng); dkBatDau(ng, 'nho'); return; }
+            if (het === 'kenh'){ dk.kenh = true; return; }
+            dk.trang = het;
+            if (het === 'dat') dk.datT = DK_DAT_T;
+            if (m.cho) dk.cho = Math.round(m.cho * (dk.buff > 0 ? 0.6 : 1));
+        }
+
+        /* ---------- GHIM XUONG DAT / LO LUNG: boc update() cua tung con de ghi de vi tri NGAY SAU khi no tu cap nhat ---------- */
+        function dkBocUpd(o){
+            if (o._dkBoc) return;
+            o._dkBoc = { cu: Object.prototype.hasOwnProperty.call(o, 'update') ? o.update : null };
+            let goc = o.update;
+            o.update = function(){ let r = goc.apply(this, arguments); dkApVT(this); return r; };
+        }
+        function dkGoBoc(o){
+            if (!o._dkBoc) return;
+            if (o._dkBoc.cu) o.update = o._dkBoc.cu; else delete o.update;
+            o._dkBoc = null;
+        }
+        function dkApVT(o){
+            if (o._dkNoi){
+                let N = o._dkNoi;
+                if (N.keo){ o.x += (N.keo.x - (o.w || 20) / 2 - o.x) * 0.12; o.y += (N.keo.y - (o.h || 20) / 2 - o.y) * 0.12; }
+                else o.y = N.y0 - 56 * Math.min(1, N.t / 24) - Math.sin(N.t * 0.12) * 4;
+                if (o.dy !== undefined) o.dy = 0;
+                return;
+            }
+            if ((o._dkGhim || 0) > 0){
+                let nen = 320 - (o.h || 20);
+                o._dkKeoK = Math.min(1, (o._dkKeoK || 0) + 0.2);      // 5 khung dau: bi GIAT xuong, sau do dinh chat mat dat
+                if (o.y < nen) o.y += (nen - o.y) * o._dkKeoK;
+                if (o.dy !== undefined && o.dy < 0) o.dy = 0;
+            }
+        }
+        function dkGhim(o, T){
+            if (!dkLaQuai(o)) return;
+            if (!((o._dkGhim || 0) > 0)) o._dkKeoK = 0;
+            o._dkGhim = Math.max(o._dkGhim || 0, T);
+            dkBocUpd(o);
+        }
+        // K 2s: moi ke DANG BAY bi keo xuong dat 4 giay, 2-3 sat thuong tuy co boss
+        // PHONG AN 1 giay: huy chieu dang tung, khong tung duoc chieu moi
+        function dkPhongAn(o){
+            if (!dkLaQuai(o)) return;
+            o._dkCam = DK_CAM_T;
+            if (dkLaBoss(o)){
+                dkHuyChieu(o);
+                if (o.dashVx !== undefined) o.dashVx = 0;
+            }
+            if (typeof venKhoa === 'function') venKhoa(o, DK_CAM_T);   // dong cung 1 giay: khong ra duoc chieu moi
+        }
+        // boss nao co trang thai 'idle' thi ep ve 'idle' (chieu dang tung bi huy han), con lai chi dong cung
+        function dkCoIdle(o){
+            let C = o.constructor; if (!C) return false;
+            if (C._dkIdle === undefined){ let src = ''; try { src = String(C); } catch(e){} C._dkIdle = null;
+                for (const st of ['idle', 'hovering', 'nghi', 'wait']) if (new RegExp("state\\s*=\\s*'" + st + "'").test(src)){ C._dkIdle = st; break; } }
+            return C._dkIdle;
+        }
+        function dkHuyChieu(o){
+            if (o.state === undefined || o.dying) return;
+            if (typeof o.toIdle === 'function'){ if (o.state !== 'idle') o.toIdle(DK_CAM_T); return; }
+            let nghi = dkCoIdle(o);
+            if (!nghi || o.state === nghi) return;
+            o.state = nghi; o.subTimer = 0;
+            if (o.actionTimer !== undefined) o.actionTimer = Math.max(o.actionTimer || 0, DK_CAM_T);
+            if (o.y !== undefined && o.baseY !== undefined && !dkDangBay(o)) o.y = Math.min(o.y, o.baseY);
+        }
+        function dkPhongAnTick(o){
+            if (!((o._dkCam || 0) > 0)) return;
+            o._dkCam--;
+            if (dkLaBoss(o)) dkHuyChieu(o);    // co chieu nao lot qua trong 1 giay: huy tiep
+        }
+        function dkGhimTatCa(ng){
+            let n = 0;
+            for (let o of dkDs()) dkPhongAn(o);
+            for (let o of dkDs()){
+                if (!dkLaQuai(o) || !dkDangBay(o)) continue;
+                let dmg = dkLaBoss(o) ? (((o.w || 40) * (o.h || 40) >= 12000) ? 3 : 2) : 2;
+                dkDanh(o, dmg); dkGhim(o, DK_GHIM_T); n++;
+                hitCat(o.x + (o.w || 20) / 2, o.y + (o.h || 20) / 2, Math.PI / 2, true, [179, 136, 255]);
+            }
+            dkChu(ng.x - 30, ng.y - 46, n ? "TRỌNG ẤN!" : "TRỌNG ẤN", n ? "GRAVITY SEAL!" : "GRAVITY SEAL");
+            dkSfx(55, 0.6, 'sawtooth', 0.3, 30);
+            shakeTimer = Math.max(shakeTimer || 0, 20);
+        }
+        // CHANNEL: mot dot dia chan
+        function dkDiaChan(ng){
+            let t = dkTG(ng, 48, 44);
+            dkSongTron.push({ x: t.x, t: 0, T: 40, R: 520 });
+            for (let o of dkDs()){
+                if (!dkLaQuai(o) && gameState !== 'pvp') continue;
+                if (dkLaQuai(o) && dkDangBay(o)){
+                    // ke dang bay: an 10 NGAY, bi keo xuong, cham dat thi them mot dot 1-3
+                    let dmg = dkLaBoss(o) ? (((o.w || 40) * (o.h || 40) >= 12000) ? 3 : 2) : 1;
+                    dkDanh(o, 10); o._wsCham = Math.max(o._wsCham || 0, 60); dkGhim(o, 30);
+                    dkHen.push({ o, t: 7, dmg });
+                    hitCat(o.x + (o.w || 20) / 2, o.y + (o.h || 20) / 2, Math.PI / 2, true, [179, 136, 255]);
+                } else {
+                    if (Math.abs((o.x + (o.w || 20) / 2) - t.x) > 520) continue;
+                    dkDanh(o, 10); o._wsCham = Math.max(o._wsCham || 0, 60);
+                    hitDat(o.x + (o.w || 20) / 2, 320, 0, [179, 136, 255]);
+                }
+            }
+            shakeTimer = Math.max(shakeTimer || 0, 18);
+            dkSfx(50, 0.5, 'sawtooth', 0.3, 28);
+        }
+
+        /* ---------- TICK NGUOI CHOI (goi tu moc moiKhung) ---------- */
+        function dkTick(ng, fireKey, chargeKey, crouchKey){
+            let dk = dkCua(ng);
+            if (dk.ult) return;
+            if (dk.buff > 0){ dk.buff--; ng.ammo = ng.maxAmmo; ng.isOverheated = false; }   // BAT MON: vo han the luc
+            if (dk.cho > 0) dk.cho--;
+            // suc nhay: cham nhu Bua; dang dung yen thi khong nhay
+            ng.jumpPower = dkDungYen(dk) ? 0 : -12.5 * (dk.buff > 0 ? 0.95 : DK_CHAY);
+            ng._dkNhay = true;
+            if (dkDungYen(dk) && typeof dashVx !== 'undefined') dashVx = 0;   // PvP: vong cua P2 da doi dashVx sang cua P2
+            // luot
+            let luot = (ng.id === 1 || gameState === 'pvp') && typeof dangLuotHoacChop === 'function' && dangLuotHoacChop();
+            if (luot) dk.luotDu = 14; else if (dk.luotDu > 0) dk.luotDu--;
+            let luotMoi = luot && !dk.luotCu; dk.luotCu = luot;
+            // hoat anh
+            if (dk.A){
+                let A = dk.A; A.t++;
+                { let p = dkPose(ng); if (p){ (A.vet || (A.vet = [])).push(p); if (A.vet.length > 6) A.vet.shift(); } }
+                if (A.m.nut && A.t === Math.round(A.m.nut * A.T / A.m.T) && ng.grounded) dkNutDat(ng, A.m.nutX);
+                if (A.m.laoLuc && A.t === A.hit - 1 && typeof dashVx !== 'undefined'){
+                    dashVx = dkDir(ng) * A.m.laoLuc;                       // lao xa GAP RUOI mot cu luot thuong
+                    ng.invincible = true; ng.invTimer = Math.max(ng.invTimer || 0, 16);
+                }
+                if (A.m.lao && A.t === 1 && typeof dashVx !== 'undefined') dashVx = dkDir(ng) * A.m.lao;
+                if (A.t === A.hit) dkRaDon(ng, A);
+                else if (A.m.keoDai && A.t > A.hit && A.t <= A.hit + A.m.keoDai) dkHopDon(ng, A);   // DAM XUYEN: hop theo nguoi suot doan lao
+                if (A.m.xuong && A.t < A.hit){ ng.dy = Math.max(ng.dy || 0, 11); if (ng.grounded && A.t > 3){ A.t = A.hit - 1; } }
+                if (A.t >= A.T) dkXong(ng, A);
+            }
+            // kiem nam duoi dat: tu nhac len khi het gio
+            if (!dk.A && dk.trang === 'dat' && !ng.grounded && (ng.dy || 0) < -2 && dk.datDat){
+                // vua nhay len khi kiem con duoi dat: nhac manh (het the luc thi chi nhac len, khong ra don)
+                if (ng.ammo >= 2 && !ng.isOverheated){ dkBatDau(ng, 'nhacJ'); dkChu(ng.x - 26, ng.y - 40, "BẠT SƠN!", "UPHEAVAL!"); }
+                else dkBatDau(ng, 'nho');
+            }
+            dk.datDat = !!ng.grounded;
+            if (!dk.A && dk.trang === 'dat'){
+                if (luotMoi && !ng.isOverheated){ dkBatDau(ng, 'dam2'); }
+                else if (--dk.datT <= 0) dkBatDau(ng, 'nho2');
+            }
+            // channel
+            if (dk.kenh){
+                if (!chargeKey){ dk.kenh = false; dk.ch = null; dkBatDau(ng, 'nho'); }
+                else {
+                    dk.ch = dk.ch || { t: 0 };
+                    dk.ch.t++;
+                    if (dk.ch.t === 20 || (dk.ch.t > 20 && (dk.ch.t - 20) % DK_CH_NHIP === 0)) dkDiaChan(ng);
+                }
+            }
+            // J: bat canh len
+            let jNay = !!fireKey, canh = jNay && !dk.jCu; dk.jCu = jNay;
+            // bam J trong luc dang vung / hoi: GIU 14 khung, het hoi la ra ngay (khong phai canh dung khung)
+            if (canh) dk.bufJ = 14; else if (dk.bufJ > 0) dk.bufJ--;
+            if (!(dk.bufJ > 0) || dk.A || dk.kenh || dk.cho > 0 || ng.isOverheated) return;
+            dk.bufJ = 0;
+            if (combatStance === 2 && !ng.tank) return;
+            if (dk.trang === 'dat'){
+                dkBatDau(ng, ng.grounded ? 'nhac' : 'nhacN');
+                if (!ng.grounded) dkChu(ng.x - 20, ng.y - 34, "HỒI KIẾM!", "RECOVER!");
+                return;
+            }
+            if (dk.luotDu > 0 && ng.ammo >= 3){
+                if (dkBatDau(ng, 'ngang')){ dk.luotDu = 0; dkChu(ng.x - 30, ng.y - 40, "HOÀNH TẢO!", "CLEAVE!"); }
+                return;
+            }
+            if (!ng.grounded){ dkBatDau(ng, 'roi'); return; }
+            dkBatDau(ng, 'chem');
+        }
+        function dkNhaK(ng){
+            let dk = dkCua(ng), h = ng.aKeyHeldTime;
+            if (dk.kenh || dk.ult) return;
+            if (dk.A || ng.isOverheated || ng.ammo <= 0) return;
+            if (h >= 150) dkBatDau(ng, 'buff');
+            else if (h >= 120){ if (dkBatDau(ng, 'cam')) dkChu(ng.x - 26, ng.y - 40, "CẮM KIẾM", "PLANT"); }
+            else if (h >= 90) dkBatDau(ng, 'quet');
+            else if (h >= 60){ if (dkBatDau(ng, 'cheo')) dkChu(ng.x - 26, ng.y - 40, "VUNG TRẢM!", "WIDE CLEAVE!"); }
+            else if (h >= 30) dkBatDau(ng, 'dam');
+        }
+        function dkParry(ng){
+            let dk = ng.dk; if (!dk || !dk.A) return false;
+            let A = dk.A, m = A.m, u = A.t / A.T;
+            if (m.parry && u >= m.parry[0] && u <= m.parry[1]) return true;
+            if (m.ngang && u >= 0.25 && u <= 0.6) return true;
+            return false;
+        }
+
+        /* ---------- CHIEU CUOI ---------- */
+        const DK_ULT_T = 200;
+        function dkUltBat(ng){
+            let dk = dkCua(ng);
+            if (dk.ult) return false;
+            dk.A = null; dk.kenh = false; dk.ch = null; dk.cho = 0; dk.trang = 'lung';
+            dk.ult = { t: 0, ds: [], da: [], nut: [], cx: worldCX(), qy: -40, kx: 0, ky: 0 };
+            dkSfx(70, 0.9, 'sawtooth', 0.32, 35);
+            return true;
+        }
+        function dkUltTick(ng){
+            let U = ng.dk.ult; U.t++;
+            ng.invincible = true; ng.invTimer = Math.max(ng.invTimer || 0, 12);
+            ng._uFreeze = Math.max(ng._uFreeze || 0, 2);
+            if (ng.id === 1 && typeof dashVx !== 'undefined') dashVx = 0;
+            let tay = dkTG(ng, 31, 20);
+            // MOI ke dich tren man (ke ca con moi xuat hien truoc luc dap) mat trong luc, lo lung roi bi hut vao
+            if (U.t < 150) for (let o of dkDs()){
+                if (U.ds.indexOf(o) >= 0) continue;
+                U.ds.push(o);
+                if (dkLaQuai(o)){ o._dkNoi = { t: 0, y0: o.y, x0: o.x, keo: null }; dkBocUpd(o); }
+                if (U.t > 20) dkDanh(o, 30);                       // den muon sau nhat quet: van an nhat quet
+            }
+            if (U.t === 20){
+                // PHA 1 — chem quet ca man
+                for (let o of U.ds){
+                    dkDanh(o, 30);
+                    hitCat(o.x + (o.w || 20) / 2, o.y + (o.h || 20) / 2, 0, true, DK_MAU);
+                }
+                for (let i = 0; i < 9; i++) U.nut.push({ x: camX + 40 + i * (canvas.width - 80) / 8 + (Math.random() - 0.5) * 40, l: 30 + Math.random() * 40, s: Math.random() });
+                shakeTimer = Math.max(shakeTimer || 0, 26);
+                dkChu(ng.x - 40, ng.y - 50, "THIÊN ĐỊA NHẤT TRẢM!", "WORLD SPLITTER!");
+                dkSfx(140, 0.5, 'sawtooth', 0.3, 50);
+            }
+            for (let o of U.ds) if (o._dkNoi){ o._dkNoi.t++; if (typeof venKhoa === 'function') venKhoa(o, 3); dkApVT(o); }
+            // PHA 2 — kiem bay len giua troi
+            let dinh = { x: worldCX(), y: -70 };
+            if (U.t >= 36 && U.t < 70){
+                let u = dkEm((U.t - 36) / 34, 'out');
+                U.kx = tay.x + (dinh.x - tay.x) * u; U.ky = tay.y + (dinh.y - tay.y) * u;
+            } else if (U.t >= 70 && U.t < 150){
+                U.kx = dinh.x; U.ky = dinh.y + Math.sin(U.t * 0.2) * 3;
+                let qua = { x: dinh.x, y: dinh.y + 96 };
+                U.qy = qua.y;
+                if (U.t % 4 === 0 && U.da.length < 26){
+                    let bx = camX + Math.random() * canvas.width;
+                    U.da.push({ x: bx, y: 318, r: 4 + Math.random() * 7, a: Math.random() * 6 });
+                }
+                for (let r of U.da){ r.x += (qua.x - r.x) * 0.07; r.y += (qua.y - r.y) * 0.07; r.a += 0.2; }
+                for (let o of U.ds) if (o._dkNoi) o._dkNoi.keo = qua;
+                if (U.t % 10 === 0) dkSfx(900 + Math.random() * 600, 0.08, 'square', 0.1, 300);
+            } else if (U.t >= 150 && U.t < 168){
+                let u = dkEm((U.t - 150) / 18, 'in');
+                U.kx = dinh.x; U.ky = dinh.y + (300 - 96 - dinh.y) * u;
+                U.qy = U.ky + 96;
+                let qua = { x: dinh.x, y: U.qy };
+                for (let r of U.da){ r.x += (qua.x - r.x) * 0.3; r.y += (qua.y - r.y) * 0.3; }
+                for (let o of U.ds) if (o._dkNoi) o._dkNoi.keo = qua;
+            } else if (U.t === 168){
+                for (let o of U.ds){
+                    if (o.hp !== undefined && o.hp > 0) dkDanh(o, 120);
+                    if (o._dkNoi){ o.x = o._dkNoi.x0; o.y = o._dkNoi.y0; o._dkNoi = null; if (!(o._dkGhim > 0)) dkGoBoc(o); }
+                }
+                U.no = { x: dinh.x, y: 300, t: 0 };
+                U.da = [];
+                shakeTimer = Math.max(shakeTimer || 0, 40);
+                dkChu(dinh.x - 50, 200, "THIÊN THẠCH KIẾM!", "METEOR BLADE!");
+                dkSfx(40, 1.0, 'sawtooth', 0.36, 20); dkSfx(1600, 0.4, 'square', 0.14, 200);
+            }
+            if (U.no) U.no.t++;
+            if (U.t >= DK_ULT_T){
+                for (let o of U.ds) if (o._dkNoi){ o.y = o._dkNoi.y0; o._dkNoi = null; dkGoBoc(o); }
+                ng.dk.ult = null;
+            }
+        }
+
+        /* ---------- PHAN CHUNG (vong lap chinh) ---------- */
+        let dkSong = [], dkVong = [], dkSongTron = [], dkHen = [], dkNut = [];
+        // nut dat duoi mui kiem luc DAY kiem len
+        function dkNutDat(ng, lx){
+            let t = dkTG(ng, lx === undefined ? 31 + 116 : lx, 44), d = dkDir(ng);
+            let tia = []; for (let k = 0; k < 6; k++) tia.push({ a: -Math.PI / 2 + (k - 2.5) * 0.5 + (Math.random() - 0.5) * 0.3, l: 14 + Math.random() * 18 });
+            dkNut.push({ x: t.x, t: 0, T: 46, tia, d });
+            hitDat(t.x, 320, 0, [161, 136, 127]);
+            shakeTimer = Math.max(shakeTimer || 0, 7);
+            dkSfx(70, 0.22, 'sawtooth', 0.22, 40);
+        }
+        function dkNguoi(){
+            let ds = [];
+            if (typeof dino !== 'undefined' && dino) ds.push(dino);
+            if (gameState === 'pvp' && typeof dino2 !== 'undefined' && dino2) ds.push(dino2);
+            return ds;
+        }
+        function dkChung(){
+            for (let ng of dkNguoi()){
+                if (!ng.dk) continue;
+                if (ng.dk.ult) dkUltTick(ng);
+                if (!dkBat(ng)){
+                    // doi vu khi: tra suc nhay, cat moi trang thai dang do
+                    if (ng._dkNhay){ ng.jumpPower = -12.5; ng._dkNhay = false; }
+                    if (!ng.dk.ult){ ng.dk.A = null; ng.dk.kenh = false; ng.dk.ch = null; ng.dk.trang = 'lung'; ng.dk.buff = 0; }
+                }
+            }
+            // song xung kich
+            for (let i = dkSong.length - 1; i >= 0; i--){
+                let S = dkSong[i]; S.t++; S.x += S.d * S.v;
+                let x0 = S.x - S.rong / 2, x1 = S.x + S.rong / 2, y0 = 320 - S.cao;
+                for (let o of dkDs()){
+                    if (S.hit.has(o)) continue;
+                    if (o.x + (o.w || 20) < x0 || o.x > x1 || o.y + (o.h || 20) < y0 || o.y > 330) continue;
+                    S.hit.add(o); dkDanh(o, S.dmg); dkDay(o, S.d, 16);
+                    if (dkLaQuai(o) && dkDangBay(o)) dkGhim(o, DK_TRONG);
+                    hitCat(o.x + (o.w || 20) / 2, o.y + (o.h || 20) / 2, -S.d * 0.8, true, [179, 136, 255]);
+                }
+                if (typeof gdCatHop === 'function') gdCatHop({ x: x0, y: y0, w: S.rong, h: S.cao });
+                if (S.t >= S.T) dkSong.splice(i, 1);
+            }
+            for (let i = dkVong.length - 1; i >= 0; i--) if (++dkVong[i].t >= dkVong[i].T) dkVong.splice(i, 1);
+            for (let i = dkSongTron.length - 1; i >= 0; i--) if (++dkSongTron[i].t >= dkSongTron[i].T) dkSongTron.splice(i, 1);
+            for (let i = dkNut.length - 1; i >= 0; i--) if (++dkNut[i].t >= dkNut[i].T) dkNut.splice(i, 1);
+            // channel: ke bay bi keo xuong, CHAM DAT thi them mot dot sat thuong
+            for (let i = dkHen.length - 1; i >= 0; i--){ let H = dkHen[i]; if (--H.t <= 0){ if (H.o.hp > 0){ dkDanh(H.o, H.dmg); hitDat(H.o.x + (H.o.w || 20) / 2, 320, 1, [179, 136, 255]); } dkHen.splice(i, 1); } }
+            // ghim: dem nguoc + ap vi tri (con bi khoa _uFreeze khong goi update)
+            if (typeof bosses !== 'undefined') for (let o of bosses.concat(enemies)){
+                dkPhongAnTick(o);
+                if ((o._dkGhim || 0) > 0){
+                    o._dkGhim--; dkApVT(o);
+                    if (o._dkGhim <= 0 && !o._dkNoi) dkGoBoc(o);
+                }
+            }
+            dkVe();
+        }
+
+        /* ---------- VE ---------- */
+        // goc toa do = giua chuoi kiem, luoi huong -y. Dai kiem: luoi thang hai canh co RANH MAU, chan ve khoi vuong,
+        // chuoi quan da nau, num tron.
+        function dkVeKiem(phat){
+            // luoi dai 108 (80 x 1.35), ca thanh to x1.2; chuoi + chan ve ve trong he x1.2, goc luoi o y = -14.4
+            const L = 108, W = 10.8, B = -14.4;
+            if (phat){ ctx.shadowBlur = 14; ctx.shadowColor = phat; }
+            ctx.save(); ctx.scale(1.2, 1.2);
+            // num
+            ctx.fillStyle = "#9E9E9E"; ctx.strokeStyle = "#37474F"; ctx.lineWidth = 1.2;
+            ctx.beginPath(); ctx.arc(0, 13, 3.8, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // chuoi quan da
+            ctx.fillStyle = "#6D4C41"; ctx.fillRect(-2.6, -6, 5.2, 16); ctx.strokeRect(-2.6, -6, 5.2, 16);
+            ctx.strokeStyle = "#3E2723"; ctx.lineWidth = 1;
+            for (let k = 0; k < 5; k++){ ctx.beginPath(); ctx.moveTo(-2.6, -5 + k * 3.2); ctx.lineTo(2.6, -3.4 + k * 3.2); ctx.stroke(); }
+            // chan ve khoi vuong
+            ctx.fillStyle = "#8D9AA5"; ctx.strokeStyle = "#263238"; ctx.lineWidth = 1.3;
+            ctx.fillRect(-13, -10.5, 26, 5); ctx.strokeRect(-13, -10.5, 26, 5);
+            ctx.fillStyle = "#B0BEC5"; ctx.fillRect(-4.5, -12, 9, 7.5); ctx.strokeRect(-4.5, -12, 9, 7.5);
+            ctx.restore();
+            // luoi
+            let g = ctx.createLinearGradient(-W / 2, 0, W / 2, 0);
+            g.addColorStop(0, "#ECEFF1"); g.addColorStop(0.45, "#CFD8DC"); g.addColorStop(0.55, "#B0BEC5"); g.addColorStop(1, "#78909C");
+            ctx.fillStyle = g; ctx.strokeStyle = "#37474F"; ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(-W / 2, B); ctx.lineTo(-W / 2, B - L + 16); ctx.lineTo(0, B - L); ctx.lineTo(W / 2, B - L + 16); ctx.lineTo(W / 2, B);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.shadowBlur = 0;
+            // ranh mau
+            ctx.strokeStyle = "#607D8B"; ctx.lineWidth = 1.8;
+            ctx.lineWidth = 2.2; ctx.beginPath(); ctx.moveTo(0, B - 3); ctx.lineTo(0, B - L + 26); ctx.stroke();
+            ctx.strokeStyle = "rgba(255,255,255,0.7)"; ctx.lineWidth = 0.8;
+            ctx.beginPath(); ctx.moveTo(-W / 2 + 1, B - 1); ctx.lineTo(-W / 2 + 1, B - L + 17); ctx.stroke();
+        }
+        function dkPhat(dk){
+            if (dk.buff > 0) return "#FF1744";
+            if (dk.kenh || (dk.A && (dk.A.kieu === 'cam' || dk.A.kieu === 'kenh'))) return "#B388FF";
+            return null;
+        }
+        // ve tren nguoi (he toa do than, luon quay phai)
+        function dkVeTrenNguoi(ng, x, y){
+            let dk = dkCua(ng), p = dkPose(ng);
+            if (!p) return;
+            ctx.save();
+            ctx.translate(x + p.px, y + p.py);
+            ctx.rotate(p.ang);
+            if (p.nen !== 1) ctx.scale(1, Math.abs(p.nen) < 0.12 ? (p.nen < 0 ? -0.12 : 0.12) : p.nen);
+            dkVeKiem(dkPhat(dk));
+            ctx.restore();
+            // vet chem
+            let A = dk.A;
+            if (A && A.t >= A.hit - 4 && A.t <= A.hit + 5 && A.m.dmg > 0){
+                let a = 1 - Math.abs(A.t - A.hit) / 6;
+                ctx.save(); ctx.globalCompositeOperation = 'lighter';
+                ctx.strokeStyle = "rgba(225,235,255," + (0.75 * a).toFixed(2) + ")"; ctx.lineCap = 'round';
+                ctx.translate(x + 30, y + 8);
+                if (A.m.ngang){
+                    ctx.lineWidth = 9; ctx.beginPath(); ctx.ellipse(0, 6, 150, 22, A.m.ngang[3], Math.PI * 0.9, Math.PI * 2.1); ctx.stroke();
+                } else if (A.kieu === 'dam' || A.kieu === 'dam2'){
+                    ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(10, 14); ctx.lineTo(160, 14); ctx.stroke();
+                } else if (A.vet && A.vet.length > 1){
+                    // vet cung theo goc kiem 5 khung gan nhat, quanh tay cam
+                    let q = A.vet[A.vet.length - 1], a0 = A.vet[0].ang - Math.PI / 2, a1 = q.ang - Math.PI / 2;
+                    ctx.translate(q.px - 30, q.py - 8);
+                    if (Math.abs(a1 - a0) > 0.05){
+                        ctx.lineWidth = 12; ctx.beginPath(); ctx.arc(0, 0, 100, Math.min(a0, a1), Math.max(a0, a1)); ctx.stroke();
+                        ctx.lineWidth = 4; ctx.strokeStyle = "rgba(179,136,255," + (0.6 * a).toFixed(2) + ")";
+                        ctx.beginPath(); ctx.arc(0, 0, 118, Math.min(a0, a1), Math.max(a0, a1)); ctx.stroke();
+                    }
+                }
+                ctx.restore();
+            }
+        }
+        function dkVe(){
+            // hao quang bat mon + ghim
+            for (let ng of dkNguoi()){
+                let dk = ng.dk; if (!dk || !dkBat(ng)) continue;
+                if (dk.buff > 0){
+                    let cx = ng.x + ng.w / 2, cy = ng.y + ng.h / 2, f = (typeof frames !== 'undefined' ? frames : 0);
+                    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+                    let g = ctx.createRadialGradient(cx, cy, 6, cx, cy, ng.h * 1.2);
+                    g.addColorStop(0, "rgba(255,23,68,0.35)"); g.addColorStop(1, "rgba(255,23,68,0)");
+                    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, ng.h * 1.2, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = "rgba(255,82,82,0.7)"; ctx.lineWidth = 2.5;
+                    for (let i = 0; i < 7; i++){
+                        let xx = cx + (i - 3) * 9, hh = 26 + Math.abs(Math.sin(f * 0.3 + i * 1.7)) * 30;
+                        ctx.beginPath(); ctx.moveTo(xx, ng.y + ng.h); ctx.quadraticCurveTo(xx + Math.sin(f * 0.2 + i) * 8, ng.y + ng.h - hh * 0.6, xx, ng.y + ng.h - hh - 10); ctx.stroke();
+                    }
+                    ctx.restore();
+                }
+                if (dk.kenh){
+                    let t = dkTG(ng, 48, 30), f = (typeof frames !== 'undefined' ? frames : 0);
+                    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+                    ctx.strokeStyle = "rgba(179,136,255,0.5)"; ctx.lineWidth = 3;
+                    let u = ((f % 30) / 30);
+                    ctx.beginPath(); ctx.ellipse(t.x, 320, 30 + u * 40, 6 + u * 6, 0, 0, Math.PI * 2); ctx.stroke();
+                    ctx.restore();
+                }
+            }
+            ctx.save(); ctx.globalCompositeOperation = 'lighter';
+            // vong tim co vao kiem
+            for (const V of dkVong){
+                let u = V.t / V.T, R = V.R * (1 - u) + 10;
+                ctx.strokeStyle = "rgba(179,136,255," + (0.35 + 0.5 * u).toFixed(2) + ")"; ctx.lineWidth = 3 + 5 * u;
+                ctx.beginPath(); ctx.arc(V.x, V.y - 20, R, 0, Math.PI * 2); ctx.stroke();
+                ctx.strokeStyle = "rgba(224,204,255," + (0.3 * u).toFixed(2) + ")"; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.arc(V.x, V.y - 20, R * 1.15, 0, Math.PI * 2); ctx.stroke();
+            }
+            // song xung kich: nua vang trang tim dung tren mat dat
+            for (const S of dkSong){
+                let a = 1 - S.t / S.T;
+                ctx.save(); ctx.translate(S.x, 320); ctx.scale(S.d, 1);
+                let g = ctx.createLinearGradient(-S.rong, 0, S.rong * 0.6, 0);
+                g.addColorStop(0, "rgba(179,136,255,0)"); g.addColorStop(1, "rgba(224,210,255," + (0.85 * a).toFixed(2) + ")");
+                ctx.fillStyle = g;
+                ctx.beginPath(); ctx.moveTo(-S.rong * 0.6, 0);
+                ctx.quadraticCurveTo(S.rong * 0.9, -S.cao * 0.4, -S.rong * 0.1, -S.cao);
+                ctx.quadraticCurveTo(S.rong * 0.35, -S.cao * 0.45, -S.rong * 0.2, 0);
+                ctx.closePath(); ctx.fill();
+                ctx.restore();
+            }
+            ctx.globalCompositeOperation = 'source-over';
+            for (const N of dkNut){
+                let a = 1 - N.t / N.T;
+                ctx.strokeStyle = "rgba(62,39,35," + (0.85 * a).toFixed(2) + ")"; ctx.lineWidth = 2.2;
+                for (const r of N.tia){
+                    ctx.beginPath(); ctx.moveTo(N.x, 321);
+                    let x = N.x, y = 321;
+                    for (let s = 1; s <= 3; s++){ x += Math.cos(r.a) * r.l / 3 * 1.6 + (s % 2 ? 2 : -2); y = 321 + Math.abs(Math.sin(r.a)) * r.l * 0.18 * s; ctx.lineTo(x, y); }
+                    ctx.stroke();
+                }
+                ctx.fillStyle = "rgba(141,110,99," + (0.7 * a).toFixed(2) + ")";
+                for (let k = 0; k < 5; k++){ let u = N.t / N.T; ctx.fillRect(N.x + (k - 2) * 7 * (1 + u * 2), 316 - 18 * u * (1 + (k % 2)), 4, 4); }
+            }
+            ctx.globalCompositeOperation = 'lighter';
+            // dia chan (channel)
+            for (const Q of dkSongTron){
+                let u = Q.t / Q.T, R = Q.R * dkEm(u, 'out'), a = 1 - u;
+                ctx.strokeStyle = "rgba(179,136,255," + (0.8 * a).toFixed(2) + ")"; ctx.lineWidth = 5;
+                ctx.beginPath(); ctx.ellipse(Q.x, 320, R, 10 + R * 0.04, 0, 0, Math.PI * 2); ctx.stroke();
+                ctx.fillStyle = "rgba(141,110,99," + (0.6 * a).toFixed(2) + ")";
+                for (let k = -4; k <= 4; k++){ if (!k) continue; let xx = Q.x + k * R / 4.5; ctx.fillRect(xx - 3, 312 - 10 * a, 6, 8); }
+            }
+            ctx.restore();
+            // ke bi ghim: xich tim keo xuong dat
+            if (typeof bosses !== 'undefined') for (let o of bosses.concat(enemies)){
+                if (!((o._dkGhim || 0) > 0)) continue;
+                let cx = o.x + (o.w || 20) / 2;
+                ctx.save(); ctx.strokeStyle = "rgba(179,136,255,0.75)"; ctx.lineWidth = 2; ctx.setLineDash([5, 4]);
+                ctx.beginPath(); ctx.moveTo(cx - 8, o.y + (o.h || 20)); ctx.lineTo(cx - 14, 322); ctx.moveTo(cx + 8, o.y + (o.h || 20)); ctx.lineTo(cx + 14, 322); ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = "rgba(124,77,255,0.55)"; ctx.beginPath(); ctx.ellipse(cx, 322, (o.w || 20) * 0.6, 5, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            }
+            // chieu cuoi
+            for (let ng of dkNguoi()) if (ng.dk && ng.dk.ult) dkVeUlt(ng, ng.dk.ult);
+        }
+        function dkVeUlt(ng, U){
+            let f = U.t;
+            ctx.save();
+            // pha 1: vet chem trang tim ca man + mat dat nut
+            if (f >= 14 && f < 44){
+                let a = 1 - Math.abs(f - 22) / 22;
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.strokeStyle = "rgba(235,225,255," + Math.max(0, a).toFixed(2) + ")"; ctx.lineWidth = 16; ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.ellipse(worldCX(), 250, canvas.width * 0.55, 60, 0, Math.PI * 1.05, Math.PI * 1.95, true); ctx.stroke();
+                ctx.strokeStyle = "rgba(179,136,255," + Math.max(0, a * 0.7).toFixed(2) + ")"; ctx.lineWidth = 34;
+                ctx.beginPath(); ctx.ellipse(worldCX(), 250, canvas.width * 0.55, 60, 0, Math.PI * 1.05, Math.PI * 1.95, true); ctx.stroke();
+                ctx.globalCompositeOperation = 'source-over';
+            }
+            if (f >= 20){
+                let a = f < 180 ? 1 : Math.max(0, 1 - (f - 180) / 20);
+                ctx.strokeStyle = "rgba(40,20,60," + (0.8 * a).toFixed(2) + ")"; ctx.lineWidth = 3;
+                for (const N of U.nut){
+                    ctx.beginPath(); ctx.moveTo(N.x, 320);
+                    ctx.lineTo(N.x + 8 - N.s * 16, 320 + N.l * 0.3); ctx.lineTo(N.x - 6 + N.s * 10, 320 + N.l * 0.6); ctx.lineTo(N.x + 4, 320 + N.l); ctx.stroke();
+                    ctx.strokeStyle = "rgba(179,136,255," + (0.5 * a).toFixed(2) + ")"; ctx.lineWidth = 1.2;
+                    ctx.beginPath(); ctx.moveTo(N.x, 320); ctx.lineTo(N.x + 8 - N.s * 16, 320 + N.l * 0.3); ctx.stroke();
+                    ctx.strokeStyle = "rgba(40,20,60," + (0.8 * a).toFixed(2) + ")"; ctx.lineWidth = 3;
+                }
+            }
+            // pha 2: kiem bay, set, hao quang tu, qua cau
+            if (f >= 36 && f < 168){
+                let mo = Math.min(1, (f - 36) / 30);
+                ctx.globalCompositeOperation = 'lighter';
+                let g = ctx.createRadialGradient(U.kx, U.ky, 4, U.kx, U.ky, 120);
+                g.addColorStop(0, "rgba(179,136,255," + (0.55 * mo).toFixed(2) + ")"); g.addColorStop(1, "rgba(124,77,255,0)");
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(U.kx, U.ky, 120, 0, Math.PI * 2); ctx.fill();
+                // vong tu truong
+                ctx.strokeStyle = "rgba(200,170,255," + (0.5 * mo).toFixed(2) + ")"; ctx.lineWidth = 2;
+                for (let k = 0; k < 3; k++){ ctx.beginPath(); ctx.ellipse(U.kx, U.ky + 40, 60 + k * 26 + Math.sin(f * 0.2 + k) * 6, 14 + k * 6, 0, 0, Math.PI * 2); ctx.stroke(); }
+                // set
+                if (f % 3 === 0 || f % 7 === 0){
+                    ctx.strokeStyle = "rgba(230,220,255,0.9)"; ctx.lineWidth = 2;
+                    for (let k = 0; k < 3; k++){
+                        let ax = U.kx, ay = U.ky, gx = U.kx + (Math.random() - 0.5) * 300, gy = U.ky + 40 + Math.random() * 160;
+                        ctx.beginPath(); ctx.moveTo(ax, ay);
+                        for (let s = 1; s <= 5; s++) ctx.lineTo(ax + (gx - ax) * s / 5 + (Math.random() - 0.5) * 18, ay + (gy - ay) * s / 5 + (Math.random() - 0.5) * 18);
+                        ctx.stroke();
+                    }
+                }
+                ctx.globalCompositeOperation = 'source-over';
+                // qua cau da + ke dich
+                if (f >= 70){
+                    let R = 26 + Math.min(40, (f - 70) * 0.5);
+                    let gq = ctx.createRadialGradient(U.kx - R * 0.3, U.qy - R * 0.3, 4, U.kx, U.qy, R);
+                    gq.addColorStop(0, "#8D6E63"); gq.addColorStop(0.7, "#4E342E"); gq.addColorStop(1, "#311B92");
+                    ctx.fillStyle = gq; ctx.beginPath(); ctx.arc(U.kx, U.qy, R, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = "rgba(179,136,255,0.8)"; ctx.lineWidth = 2; ctx.stroke();
+                }
+                ctx.fillStyle = "#6D4C41";
+                for (const r of U.da){ ctx.save(); ctx.translate(r.x, r.y); ctx.rotate(r.a); ctx.fillRect(-r.r, -r.r * 0.7, r.r * 2, r.r * 1.4); ctx.restore(); }
+                // kiem: mui chui xuong
+                ctx.save(); ctx.translate(U.kx, U.ky); ctx.rotate(Math.PI + (f < 70 ? (70 - f) * 0.18 : 0)); ctx.scale(1.5, 1.5);
+                dkVeKiem("#B388FF"); ctx.restore();
+            }
+            // vu no
+            if (U.no && U.no.t < 32){
+                let u = U.no.t / 32, R = 40 + 360 * dkEm(u, 'out');
+                ctx.globalCompositeOperation = 'lighter';
+                let g = ctx.createRadialGradient(U.no.x, U.no.y, 0, U.no.x, U.no.y, R);
+                g.addColorStop(0, "rgba(255,255,255," + (0.9 * (1 - u)).toFixed(2) + ")");
+                g.addColorStop(0.4, "rgba(179,136,255," + (0.7 * (1 - u)).toFixed(2) + ")");
+                g.addColorStop(1, "rgba(124,77,255,0)");
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(U.no.x, U.no.y, R, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = "rgba(224,210,255," + (1 - u).toFixed(2) + ")"; ctx.lineWidth = 6;
+                ctx.beginPath(); ctx.ellipse(U.no.x, 320, R * 1.3, 18, 0, 0, Math.PI * 2); ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        // ---- 3. METHOD / 4. DANG KY ----
+        vkDangKy(DK_DAN, {
+            ten: 'DAI KIEM',
+            mauUlt: '#B388FF',
+            theLuc: 3,
+            sacToiDa: 180,
+            slamTo: 1.4,
+            nhipHoi: 26,
+            // J: khong qua banJ — dkTick (moiKhung) tu bat canh len cua J vi kiem co hai trang thai
+            moiKhung(checkAmmo, fireKey, chargeKey, crouchKey){ dkTick(this, fireKey, chargeKey, crouchKey); },
+            nhaK(){ dkNhaK(this); },
+            channelRieng(chargeKey){
+                let dk = dkCua(this);
+                if (chargeKey && combatStance === 0 && this.aKeyHeldTime >= 180 && !dk.kenh && !dk.A && !dk.ult && !this.isOverheated){
+                    dkBatDau(this, 'kenh');
+                    dkChu(this.x - 26, this.y - 40, "ĐỊA CHẤN ẤN", "QUAKE SEAL");
+                }
+            },
+            // Lo Lung: bo xuong tu tren cao 9
+            hoverSac(half){
+                let dk = dkCua(this);
+                if (dk.A || dk.ult) return;
+                dk.trang = 'lung';
+                dkBatDau(this, 'roi', { dmg: 9 });
+            },
+            batUlt(){
+                if (dkUltBat(this)){
+                    ultCharge = 0;
+                    this.aKeyHeldTime = 0; this.chargeProgress = 0;
+                    shakeTimer = Math.max(shakeTimer, 20);
+                }
+            },
+            heSoChay(mv){
+                let dk = this.dk; if (!dk) return mv * DK_CHAY;
+                if (dkDungYen(dk)) return 0;
+                if (dk.A && dk.A.m.dmg > 0 && dk.A.t < dk.A.T) return mv * 0.4;
+                if (dk.trang === 'dat') return mv * (dk.buff > 0 ? 0.8 : DK_CHAY_DAT);
+                return mv * (dk.buff > 0 ? DK_CHAY_BUFF : DK_CHAY);
+            },
+            anDon(){
+                if (dkParry(this)){
+                    visualEffects.push(new Effect(this.x + (this.isFacingLeft ? 0 : this.w), this.y, 'parry', this.isFacingLeft));
+                    dkChu(this.x - 20, this.y - 34, "PARRY!", "PARRY!");
+                    this.invincible = true; this.invTimer = Math.max(this.invTimer || 0, 20);
+                    return true;
+                }
+                return false;
+            },
+            slamDuoi(ix, iy, to){
+                hitDat(ix, 320, 1, [179, 136, 255]);
+                shakeTimer = Math.max(shakeTimer, to ? 22 : 14);
+            },
+            veTrenNguoi(x, y, P){ dkVeTrenNguoi(this, x, y); },
+            veHudThem(){
+                let dk = this.dk; if (!dk) return;
+                ctx.font = "bold 12px Consolas, monospace";
+                ctx.fillStyle = dk.trang === 'dat' ? "#FFB74D" : "#B0BEC5";
+                ctx.fillText(dk.kenh ? LT("◆ CẮM KIẾM", "◆ PLANTED") : dk.trang === 'dat' ? LT("▼ KIẾM DƯỚI ĐẤT", "▼ BLADE DOWN") : LT("▲ KIẾM TRÊN LƯNG", "▲ ON BACK"), 140, 64);
+                if (dk.buff > 0){ ctx.fillStyle = "#FF5252"; ctx.fillText(LT("BÁT MÔN ", "8 GATES ") + Math.ceil(dk.buff / 60) + "s", 140, 80); }
+            }
+        });
+
         // @@VK-CUOI
     </script>
     <script>
@@ -67887,7 +68726,7 @@ class PulsarCloneBoss {
                    "To, tối màu, hào quang — 6 máu (người to hơn, dễ trúng đòn hơn). Nội tại: hào quang đốt quái thường đứng sát 1 sát thương mỗi giây (không tính boss).",
                    "Đỉnh cao, sừng + vảy — 6 máu (người to hơn). Nội tại: 25 giây không dính đòn thì mọc một lớp VẢY chặn trọn một đòn (tối đa 1)."];
             const ammos = AMMO_NAMES;
-            const ammoDesc = currentLang==="en" ? ["The Charge specialist. Hold longer and it keeps evolving — heavy round, piercing round, then a fission burst. Tap-firing is just filler.","The all-rounder. Almost everything splashes, so it clears packs and chews through bosses alike, and what it touches keeps burning.","Infinite ammo, but every shot starts wide. Keep the trigger down and the spread walks inward — thirty rounds in it is a purple laser firing twice as fast.","The strange one. Shards split, bounce and pierce, and the longer you stay on one target the harder it detonates. Learn it to use it.","Crowd king. Bolts leap from one enemy to the next, so the bigger the swarm the better. One-on-one with a boss it runs dry.","A close-range swordsman. There is a whole combo system hidden in your jump, dash and direction keys — go find it yourself.","You do not shoot enemies, you feed a star. It swallows every bullet near it and spits them back out in all directions, multiplied.","Throw it, then catch it yourself. A clean catch hurls it straight back into their face; a miss leaves you empty-handed.","Pure control. Every shot stacks frost; five stacks freeze. Then choose: leave them frozen, or shatter the ice for a burst.","Four rounds, no reload. The fourth is always the loudest — it executes on what they have already lost. Every hit leaves a mark for the rest of the kit.", "A melee weapon. J and K chain into each other like a Musou combo. Reach is 1.5x the sword but it has no ranged attack at all, so its answer to flying bosses is the air combo.", "A heavy melee weapon. Carrying it slows you to 85%; throwing it puts you at 120% but leaves you unable to attack. Every move has uncancellable recovery, and slams land where the hammer head hits.","J J J = right-left-right. Hold K to bank damage (lost health and parries add to it), release K to spend it all. HIDDEN INPUTS (Fwd = facing): Back Fwd J Hadoken · Down Fwd J Hashogeki · Back Down Fwd J Kamehameha (needs 50) · J then Jump Shoryuken · J Fwd J long jab · Down J ground punch · Dash J lunge · Down Down Denjin · In air: Down J Heaven Drop, Up Up Down J Stomp. Magnifier: numbers.","Mid-range melee. Web slows and binds to force an opening, then whip strings, spike bursts and a grab-slam pour everything into that opening.","The unfinished gun — the weakest in the roster, by design. Six rounds a second, and emptying its six-round magazine overheats it on the spot. Holding K banks rounds into a separate store that fires half again as fast and ignores heat.","A chainsaw swung like a sword — and swinging a chainsaw is a terrible way to use one, so the slashes are pathetic. Everything lives on the engine: release K (or Dash+J to pull-start) and the whole moveset changes tier by tier while fuel lasts; landing hits keeps it running. Down+J plows forward, holding J with the engine on grinds into the target.","Thin needles that pierce once. Every hit adds a PERMANENT bleed stack — the longer the fight, the harder it bleeds. K fans out needles (point-blank pins twice as deep); Down+J rips every needle out for instant damage. The Channel strings a net across the map, the ultimate is a storm of needles.","No ammo until you make it: hold K to forge swords on your back. Tap J throws one, HOLD J fuses 1–6 into one strike (up to a Heaven Sword), Dash+J fans them all, Down+J plants a sword wall. Swords block bullets on their own (and glow, adding damage to a fusion); six make a shield. Channel opens the Gate of Treasure, the ultimate drops ten thousand swords.","Death's scythe. Cuts land fast but recover SLOWLY, and every combo branches on RHYTHM: press straight on, or pause a beat (the blade flashes purple) and press. Holding it locks the Power to DEATH — hits build rage, I/O calls the Reaper to fight at your side."] : ["Vua của đòn Charge. Giữ càng lâu càng biến hoá: viên to, viên xuyên, rồi vỡ thành chùm mảnh. Bắn thường chỉ để cầm chừng.","Đa dụng nhất bảng. Gần như đòn nào cũng nổ lan nên vừa dọn bầy vừa gặm boss, và thứ gì dính lửa cũng cháy tiếp một lúc.","Vô hạn đạn, nhưng bắn phát nào cũng tản. Giữ liên tục thì đạn khép dần vào giữa — đủ ba mươi viên nó thành tia laser tím, nhịp bắn nhanh gấp đôi.","Loại lắt léo nhất. Đạn tách, nảy, xuyên, và càng bám riết một mục tiêu thì đòn nổ càng đau. Phải hiểu cơ chế mới xài được.","Ông vua dọn bầy. Sét tự nhảy từ con này sang con khác, càng đông càng lời. Nhưng tay đôi với boss thì hụt hơi.","Kiếm sĩ cận chiến. Có nguyên một hệ combo giấu trong nút nhảy, nút lướt và hướng bấm — tự tìm ra mới vui.","Bạn không bắn kẻ địch, bạn nuôi một ngôi sao. Sao hút mọi viên đạn quanh nó rồi bắn trả gấp bội ra khắp hướng.","Ném đi rồi phải tự bắt. Bắt gọn thì lưỡi bay ngược vào mặt kẻ địch, hụt thì trắng tay ngồi chờ. Càng liều càng lãi.","Thuần khống chế. Mỗi phát cộng một tầng băng, đủ 5 tầng thì đóng băng. Rồi tự chọn: để yên mà khống, hay đập vỡ lấy sát thương.","Bốn viên, không nạp lại. Viên thứ tư luôn là viên to nhất — nó ăn theo lượng máu đối thủ đã mất. Mỗi phát trúng để lại một dấu ấn cho các đòn sau.", "Vũ khí cận chiến. J và K nối nhau thành combo kiểu Musou. Tầm đánh gấp rưỡi Kiếm nhưng hoàn toàn không có đòn tầm xa, nên cách với tới boss bay là combo trên không.", "Vũ khí cận chiến hạng nặng. Cầm búa thì chạy nhảy còn 85%, ném búa đi thì lên 120% nhưng không đánh được gì. Mọi đòn đều có khung khựng không huỷ, và cú nện nổ ngay chỗ đầu búa chạm đất.","J J J đấm phải-trái-phải. Giữ K tích sát thương (mất máu, đỡ đòn cũng cộng), nhả K xả hết. LỆNH ẨN (Tiến = hướng mặt): Lùi Tiến J Hadoken · Xuống Tiến J Hashogeki · Lùi Xuống Tiến J Kamehameha (cần 50) · J rồi Nhảy Shoryuken · J Tiến J đấm vói · Xuống J nện đất · Lướt J lao đấm · Xuống Xuống Denjin · Trên không: Xuống J Thiên Truy, Lên Lên Xuống J Nhảy Đạp. Kính lúp: số liệu.","Cận chiến tầm trung. Tơ làm chậm rồi trói để mở khoảng trống, sau đó chuỗi quất, gai bung và cú tóm-đạp dồn hết vào khoảng trống đó.","Khẩu chưa xong — yếu nhất bảng, và đó là chủ ý. 6 viên mỗi giây, cạn băng 6 viên là quá nhiệt ngay. Giữ K trữ đạn vào một kho riêng; xả kho thì bắn nhanh gấp rưỡi và không sợ nóng.","Cưa máy vung như kiếm — mà vung cưa thì phế thật, nên nhát chém chỉ 1 sát thương. Tất cả nằm ở động cơ: nhả K (hoặc Lướt+J giật dây đề) là nổ máy, cả bộ đòn đổi nấc theo thời gian giữ, chạy chừng nào còn xăng — cưa trúng thì máy chạy lâu hơn. Xuống+J cày đất lao tới, giữ J khi nổ máy là nghiến vào mục tiêu.","Kim mảnh xuyên một lần. Mỗi mũi trúng cộng một vết CHẢY MÁU VĨNH VIỄN — trận càng dài máu chảy càng nhiều. K phóng quạt kim (sát mặt thì ghim sâu gấp đôi); Xuống+J rút hết kim lấy sát thương ngay. Channel giăng lưới dây kín map, chiêu cuối là cơn mưa kim.","Không có đạn cho tới khi tự rèn: giữ K sinh kiếm sau lưng. Chạm J ném một thanh, GIỮ J gộp 1–6 thanh thành một đòn (tới Thiên Kiếm), Lướt+J xoè quạt cả lưng, Xuống+J cắm tường kiếm. Kiếm tự chặn đạn (và phát sáng, cộng sát thương khi gộp); đủ sáu thanh thành khiên. Channel mở Vương Khố, chiêu cuối là Vạn Kiếm Quy Tông.","Lưỡi hái của thần chết. Chém ra rất nhanh nhưng THU HỒI CHẬM, và combo nào cũng rẽ nhánh theo NHỊP: bấm liền, hay dừng một nhịp (lưỡi loé tím) rồi bấm. Cầm nó thì Power khoá sang DEATH — đánh trúng tích nộ, I/O gọi thần chết ra đánh cùng."];
+            const ammoDesc = currentLang==="en" ? ["The Charge specialist. Hold longer and it keeps evolving — heavy round, piercing round, then a fission burst. Tap-firing is just filler.","The all-rounder. Almost everything splashes, so it clears packs and chews through bosses alike, and what it touches keeps burning.","Infinite ammo, but every shot starts wide. Keep the trigger down and the spread walks inward — thirty rounds in it is a purple laser firing twice as fast.","The strange one. Shards split, bounce and pierce, and the longer you stay on one target the harder it detonates. Learn it to use it.","Crowd king. Bolts leap from one enemy to the next, so the bigger the swarm the better. One-on-one with a boss it runs dry.","A close-range swordsman. There is a whole combo system hidden in your jump, dash and direction keys — go find it yourself.","You do not shoot enemies, you feed a star. It swallows every bullet near it and spits them back out in all directions, multiplied.","Throw it, then catch it yourself. A clean catch hurls it straight back into their face; a miss leaves you empty-handed.","Pure control. Every shot stacks frost; five stacks freeze. Then choose: leave them frozen, or shatter the ice for a burst.","Four rounds, no reload. The fourth is always the loudest — it executes on what they have already lost. Every hit leaves a mark for the rest of the kit.", "A melee weapon. J and K chain into each other like a Musou combo. Reach is 1.5x the sword but it has no ranged attack at all, so its answer to flying bosses is the air combo.", "A heavy melee weapon. Carrying it slows you to 85%; throwing it puts you at 120% but leaves you unable to attack. Every move has uncancellable recovery, and slams land where the hammer head hits.","J J J = right-left-right. Hold K to bank damage (lost health and parries add to it), release K to spend it all. HIDDEN INPUTS (Fwd = facing): Back Fwd J Hadoken · Down Fwd J Hashogeki · Back Down Fwd J Kamehameha (needs 50) · J then Jump Shoryuken · J Fwd J long jab · Down J ground punch · Dash J lunge · Down Down Denjin · In air: Down J Heaven Drop, Up Up Down J Stomp. Magnifier: numbers.","Mid-range melee. Web slows and binds to force an opening, then whip strings, spike bursts and a grab-slam pour everything into that opening.","The unfinished gun — the weakest in the roster, by design. Six rounds a second, and emptying its six-round magazine overheats it on the spot. Holding K banks rounds into a separate store that fires half again as fast and ignores heat.","A chainsaw swung like a sword — and swinging a chainsaw is a terrible way to use one, so the slashes are pathetic. Everything lives on the engine: release K (or Dash+J to pull-start) and the whole moveset changes tier by tier while fuel lasts; landing hits keeps it running. Down+J plows forward, holding J with the engine on grinds into the target.","Thin needles that pierce once. Every hit adds a PERMANENT bleed stack — the longer the fight, the harder it bleeds. K fans out needles (point-blank pins twice as deep); Down+J rips every needle out for instant damage. The Channel strings a net across the map, the ultimate is a storm of needles.","No ammo until you make it: hold K to forge swords on your back. Tap J throws one, HOLD J fuses 1–6 into one strike (up to a Heaven Sword), Dash+J fans them all, Down+J plants a sword wall. Swords block bullets on their own (and glow, adding damage to a fusion); six make a shield. Channel opens the Gate of Treasure, the ultimate drops ten thousand swords.","Death's scythe. Cuts land fast but recover SLOWLY, and every combo branches on RHYTHM: press straight on, or pause a beat (the blade flashes purple) and press. Holding it locks the Power to DEATH — hits build rage, I/O calls the Reaper to fight at your side.","A huge two-handed greatsword, 3 stamina. Swings start slow then crash down; after a chop the blade STAYS IN THE GROUND until you heave it back up (that lift is a cut too). Long reach, heavy feet. Charge it to plant the sword and drag every flyer out of the sky."] : ["Vua của đòn Charge. Giữ càng lâu càng biến hoá: viên to, viên xuyên, rồi vỡ thành chùm mảnh. Bắn thường chỉ để cầm chừng.","Đa dụng nhất bảng. Gần như đòn nào cũng nổ lan nên vừa dọn bầy vừa gặm boss, và thứ gì dính lửa cũng cháy tiếp một lúc.","Vô hạn đạn, nhưng bắn phát nào cũng tản. Giữ liên tục thì đạn khép dần vào giữa — đủ ba mươi viên nó thành tia laser tím, nhịp bắn nhanh gấp đôi.","Loại lắt léo nhất. Đạn tách, nảy, xuyên, và càng bám riết một mục tiêu thì đòn nổ càng đau. Phải hiểu cơ chế mới xài được.","Ông vua dọn bầy. Sét tự nhảy từ con này sang con khác, càng đông càng lời. Nhưng tay đôi với boss thì hụt hơi.","Kiếm sĩ cận chiến. Có nguyên một hệ combo giấu trong nút nhảy, nút lướt và hướng bấm — tự tìm ra mới vui.","Bạn không bắn kẻ địch, bạn nuôi một ngôi sao. Sao hút mọi viên đạn quanh nó rồi bắn trả gấp bội ra khắp hướng.","Ném đi rồi phải tự bắt. Bắt gọn thì lưỡi bay ngược vào mặt kẻ địch, hụt thì trắng tay ngồi chờ. Càng liều càng lãi.","Thuần khống chế. Mỗi phát cộng một tầng băng, đủ 5 tầng thì đóng băng. Rồi tự chọn: để yên mà khống, hay đập vỡ lấy sát thương.","Bốn viên, không nạp lại. Viên thứ tư luôn là viên to nhất — nó ăn theo lượng máu đối thủ đã mất. Mỗi phát trúng để lại một dấu ấn cho các đòn sau.", "Vũ khí cận chiến. J và K nối nhau thành combo kiểu Musou. Tầm đánh gấp rưỡi Kiếm nhưng hoàn toàn không có đòn tầm xa, nên cách với tới boss bay là combo trên không.", "Vũ khí cận chiến hạng nặng. Cầm búa thì chạy nhảy còn 85%, ném búa đi thì lên 120% nhưng không đánh được gì. Mọi đòn đều có khung khựng không huỷ, và cú nện nổ ngay chỗ đầu búa chạm đất.","J J J đấm phải-trái-phải. Giữ K tích sát thương (mất máu, đỡ đòn cũng cộng), nhả K xả hết. LỆNH ẨN (Tiến = hướng mặt): Lùi Tiến J Hadoken · Xuống Tiến J Hashogeki · Lùi Xuống Tiến J Kamehameha (cần 50) · J rồi Nhảy Shoryuken · J Tiến J đấm vói · Xuống J nện đất · Lướt J lao đấm · Xuống Xuống Denjin · Trên không: Xuống J Thiên Truy, Lên Lên Xuống J Nhảy Đạp. Kính lúp: số liệu.","Cận chiến tầm trung. Tơ làm chậm rồi trói để mở khoảng trống, sau đó chuỗi quất, gai bung và cú tóm-đạp dồn hết vào khoảng trống đó.","Khẩu chưa xong — yếu nhất bảng, và đó là chủ ý. 6 viên mỗi giây, cạn băng 6 viên là quá nhiệt ngay. Giữ K trữ đạn vào một kho riêng; xả kho thì bắn nhanh gấp rưỡi và không sợ nóng.","Cưa máy vung như kiếm — mà vung cưa thì phế thật, nên nhát chém chỉ 1 sát thương. Tất cả nằm ở động cơ: nhả K (hoặc Lướt+J giật dây đề) là nổ máy, cả bộ đòn đổi nấc theo thời gian giữ, chạy chừng nào còn xăng — cưa trúng thì máy chạy lâu hơn. Xuống+J cày đất lao tới, giữ J khi nổ máy là nghiến vào mục tiêu.","Kim mảnh xuyên một lần. Mỗi mũi trúng cộng một vết CHẢY MÁU VĨNH VIỄN — trận càng dài máu chảy càng nhiều. K phóng quạt kim (sát mặt thì ghim sâu gấp đôi); Xuống+J rút hết kim lấy sát thương ngay. Channel giăng lưới dây kín map, chiêu cuối là cơn mưa kim.","Không có đạn cho tới khi tự rèn: giữ K sinh kiếm sau lưng. Chạm J ném một thanh, GIỮ J gộp 1–6 thanh thành một đòn (tới Thiên Kiếm), Lướt+J xoè quạt cả lưng, Xuống+J cắm tường kiếm. Kiếm tự chặn đạn (và phát sáng, cộng sát thương khi gộp); đủ sáu thanh thành khiên. Channel mở Vương Khố, chiêu cuối là Vạn Kiếm Quy Tông.","Lưỡi hái của thần chết. Chém ra rất nhanh nhưng THU HỒI CHẬM, và combo nào cũng rẽ nhánh theo NHỊP: bấm liền, hay dừng một nhịp (lưỡi loé tím) rồi bấm. Cầm nó thì Power khoá sang DEATH — đánh trúng tích nộ, I/O gọi thần chết ra đánh cùng.","Đại kiếm hai tay, 3 thể lực. Vung chậm lúc đầu rồi giáng xuống cực nhanh; chém xong kiếm NẰM DƯỚI ĐẤT tới khi nhấc lên (nhát nhấc cũng là một đòn chém). Tầm xa, chân nặng. Charge để cắm kiếm kéo mọi kẻ đang bay rơi xuống đất."];
             const SHIELDS = currentLang==="en" ? ["PARRY","ACTIVE SHIELD"] : ["ĐỠ ĐÒN", "KHIÊN CHỦ ĐỘNG"];
             const shieldDesc = currentLang==="en" ? ["Time it right: block 1 hit + parry counter.","Hold up to 1.5s, 4s cooldown. Trade-off: no parry."] : ["Bấm đúng lúc: chặn 1 đòn + phản đòn (parry).", "Giữ tối đa 1,5s, sạc 4s. Đổi lại: mất phản đòn."];
 
@@ -68212,6 +69051,7 @@ class PulsarCloneBoss {
         function hitMau(){
             let a = (typeof currentAmmoType !== 'undefined') ? currentAmmoType : 0, r = (id) => typeof hasRune === 'function' && hasRune(id);
             if (a === LH_DAN) return [186, 104, 200];
+            if (typeof DK_DAN !== 'undefined' && a === DK_DAN) return [196, 206, 230];
             if (a === 11) return [255, 238, 88];
             if (a === 10) return r('trident') ? [77, 208, 225] : r('wukong') ? [255, 202, 40] : [255, 213, 79];
             if (a === 5)  return r('katana') ? [64, 196, 255] : [144, 202, 249];
@@ -68302,7 +69142,7 @@ class PulsarCloneBoss {
         //   Vi du: lướt + J phai canh goc giua cu luot nen KHONG bi ha dam; con nhat J dau
         //   chuoi thi ai cung bam duoc nen thap nhat.
         // MOI DON TON DUNG 1 DIEM THE LUC. Han che den tu thanh 6 diem, khong tu gia tung don.
-        const AMMO_NAMES = ["PULSE", "INFERNO", "RAPIDFIRE", "PRISM", "VOLT", "DINOSWORD", "PULSAR", "BOOMERANG", "CRYO", "WHISPER", "SPEAR", "MJÖLNIR", "MIDAS", "VENOM", "CUSTOM", "DINOSAW", "PHI TIÊU", "KIẾM VŨ", "LƯỠI HÁI"];
+        const AMMO_NAMES = ["PULSE", "INFERNO", "RAPIDFIRE", "PRISM", "VOLT", "DINOSWORD", "PULSAR", "BOOMERANG", "CRYO", "WHISPER", "SPEAR", "MJÖLNIR", "MIDAS", "VENOM", "CUSTOM", "DINOSAW", "PHI TIÊU", "KIẾM VŨ", "LƯỠI HÁI", "ĐẠI KIẾM"];
         // ============================ @@HE-RUNE-UNITY ============================
         // RUNE UNITY (2 o) — mang theo BA loai dan, doi bang Q / E giua tran.
         // DANH DOI: KHOA CHANNEL va KHOA ULT. Hinh dang nguoi choi doi sang mau UNITY theo tung loai dan.
@@ -68362,7 +69202,8 @@ class PulsarCloneBoss {
             { c:'#FF7043', d:'#BF360C' },   // 15 DINOSAW
             { c:'#FF8A80', d:'#B71C1C' },   // 16 PHI TIEU  — kim bac, vet mau
             { c:'#80DEEA', d:'#006064' },   // 17 KIEM VU   — kiem xanh ngoc
-            { c:'#BA68C8', d:'#311B3F' }    // 18 LUOI HAI  — tim than chet
+            { c:'#BA68C8', d:'#311B3F' },   // 18 LUOI HAI  — tim than chet
+            { c:'#B0BEC5', d:'#4527A0' }    // 19 DAI KIEM  — thep xam, an tim
         ];
         function unityPal(a){
             let s = UNITY_PAL_SRC[a] || UNITY_PAL_SRC[0];
@@ -69840,7 +70681,7 @@ class PulsarCloneBoss {
            loi choi One Shot co luat rieng @@HE-STY-DACBIET) ra cung mot tong Style voi cung bot danh tron. Bang cu lay dps giu J nen vu khi nao
            sat thuong nam o charge / combo (Mjolnir 7.2 -> 10.6, Pulsar 0.9 -> 9.5) bi lech: Mjolnir,
            Prism, Venom, DinoSword ra Style thap nhat, Pulsar thi gap doi cac khau khac. */
-        const STY_DPS = [4.0, 7.7, 9.8, 11.4, 4.9, 4.0, 9.5, 15.9, 3.0, 8.4, 11.1, 7.5, 3.0, 5.0, 2.8, 6.7, 7.0, 6.0, 5.5];   // 18 LUOI HAI: do luc con la rune   // 16/17: uoc tu so do module cu
+        const STY_DPS = [4.0, 7.7, 9.8, 11.4, 4.9, 4.0, 9.5, 15.9, 3.0, 8.4, 11.1, 7.5, 3.0, 5.0, 2.8, 6.7, 7.0, 6.0, 5.5, 6.0];   // 19 DAI KIEM: uoc (7-10 moi nhat, nhip cham)   // 18 LUOI HAI: do luc con la rune   // 16/17: uoc tu so do module cu
         const STY_MOI_DAY = 30;                     // 30 diem cua cung mot loai don la moi han
         const STY_SAN = 0.35, STY_HOI = 0.25 / 60;  // san he so · toc hoi moi moi khung
         const STY_CHARGE_DAI = 90;                  // 1.5 giay
@@ -71283,8 +72124,13 @@ class PulsarCloneBoss {
                     { let _rs = runeSlots.slice(), _gs = gameState, _bp = bossProjectiles.slice(), _bo = bosses.slice(), loi = '';
                       try {
                         if (gameState === 'pvp') gameState = 'test_boss';
-                        let thieu = [11, 12, 13, 14, 15, 16, 17, 18].filter(a => !vkMoc(a, 'hoverSac'));
-                        T(!thieu.length, 'Lo Lung: 8 loai dan moi deu co don rieng khi nha K tren khong', thieu.join(','));
+                        let thieu = [11, 12, 13, 14, 15, 16, 17, 18, 19].filter(a => !vkMoc(a, 'hoverSac'));
+                        T(!thieu.length, 'Lo Lung: 9 loai dan moi deu co don rieng khi nha K tren khong', thieu.join(','));
+                        // @@VK-DAIKIEM
+                        T(ammoToiDa(DK_DAN) === 3 && giaoLaCanChien(DK_DAN) && chargeTiersCua(DK_DAN).length === 5
+                          && DK_M.chem.dmg === 7 && DK_M.nhac.dmg === 7 && DK_M.nhacN.dmg === 9 && DK_M.dam2.dmg === 5
+                          && DK_M.ngang.dmg === 10 && DK_M.ngang.ton === 3 && DK_M.dam.dmg === 8 && DK_M.cheo.dmg === 10 && DK_M.quet.dmg === 10,
+                          'Dai kiem: 3 the luc, can chien, 5 moc K; J 7 / nhac 7 / nhay 9 / dam 5 / luot J 10 (3) / K 8-10-10');
                         bosses.length = 0; bossProjectiles.length = 0;
                         runeSlots = ['bulletclash', null];
                         let v = new BossProjectile(510, 210, 0, 0); bossProjectiles.push(v);
@@ -73507,7 +74353,7 @@ class PulsarCloneBoss {
              3) van khong duoc thi giu nguyen va ghi vao window.__chuaDich de lan quet sau bo sung.
            measureText cung dich y het, de chu canh giua / canh phai do dung be rong chu tieng Anh.
            Cac bang da song ngu san (tenEn, moEn, LT(...)) KHONG di qua day vi luc ve da la tieng Anh. */
-        const DICH_EN = { "DI CHUYỂN: A / D — SHIFT ĐỂ LƯỚT!": "MOVE: A / D — SHIFT TO DASH!", "NHẢY!": "JUMP!", "THIÊN THẠCH!": "METEOR!", "XOAY ĐUÔI!": "TAIL SPIN!", "ĐẠI BÀNG SẤM": "THUNDER EAGLE", "BƯỚM ĐÊM ĐỘC": "TOXIC MOTH", "NHỆN KHỔNG LỒ": "GIANT SPIDER", "TITAN RỪNG": "FOREST TITAN", "ROI QUÉT CẢ SÀN →": "FLOOR-SWEEPING WHIP →", "← ROI QUÉT CẢ SÀN": "← FLOOR-SWEEPING WHIP", "ĐỪNG CHẠM ĐẤT!": "DON'T TOUCH THE GROUND!", "SẮP PHỦ GAI — LÊN LÁ!": "SPIKES INCOMING — GET ON A LEAF!", "RỄ BÒ TỪ # MÉP — LÊN CAO!": "ROOTS CREEPING FROM # EDGES — GET UP HIGH!", "ROI SỐNG!": "LIVING WHIP!", "GAI PHỦ SÀN!": "SPIKES COVER THE FLOOR!", "RỄ SIẾT!": "ROOTS TIGHTEN!", "ĐỔI ĐẠN:": "AMMO SWAP:", "LAZER QUÉT #°": "LASER SWEEP #°", "HỎA VŨ — AURA LỬA": "FIRE DANCE — FLAME AURA", "NGŨ LIÊN XẠ": "FIVEFOLD VOLLEY", "ĐOẠN VỰC TRẢM": "ABYSS CLEAVE", "NHẢY CHUYỂN BỆ!": "PLATFORM SHIFT JUMP!", "PHẢN CÔNG!": "COUNTERATTACK!", "HỎA VŨ": "FIRE DANCE", "HỎA VŨ #″": "FIRE DANCE #″", "LƯỠI HÁI": "REAPER SCYTHE", "ĐỠ — LƯỚT XUYÊN QUA!": "PARRY — DASH THROUGH!", "TỤ LAZER": "CHARGING LASER", "BẮN VỠ KIẾM!": "SHOOT THE SWORDS!", "NHẢY QUA!": "JUMP OVER!", "XUỐNG THẤP!": "GET LOW!", "YAMATO GUARD — ĐỪNG ĐÁNH!": "YAMATO GUARD — DON'T ATTACK!", "Nào, tới đi!": "Come on, bring it!", "Chán quá...": "How boring...", "Chỉ có thế thôi à?": "Is that all?", "Cho cậu một nhịp đấy.": "I'll give you a beat.", "Nhảy đi chứ!": "Jump, will you!", "Xem này.": "Watch this.", "VỠ THẾ!": "GUARD BROKEN!", "NÉ THEO VÒNG CUNG!": "DODGE ALONG THE ARC!", "ROYAL GUARD — LƯỚT XUYÊN QUA!": "ROYAL GUARD — DASH THROUGH!", "GIÓ NỔI LÊN!": "THE WIND RISES!", "LƯỠI GIÓ!": "WIND BLADE!", "NHỊP!": "RHYTHM!", "HẤT TUNG!": "LAUNCH!", "TƯỜNG GIÓ": "WIND WALL", "LỐC XOÁY": "TORNADO", "TỬ THẦN CHI TỤC": "DEATH'S REQUIEM", "NHỊP — ĐANG CHẶN": "RHYTHM — BLOCKING", "NHỊP": "RHYTHM", "BÁO CHÚA REX": "TYRANT REX", "BÁO CHÚA REX — CUỒNG NỘ": "TYRANT REX — ENRAGED", "CUỒNG NỘ!": "ENRAGED!", "GẦM": "ROAR", "GIẪM": "STOMP", "QUÉT ĐUÔI": "TAIL SWEEP", "HÚC": "RAM", "CHOÁNG!": "STUNNED!", "CUỒNG BẠO": "BERSERK", "TAY GÃY!": "ARM BROKEN!", "CHẶN ĐƯỢC!": "BLOCKED!", "BỊ KÉO!": "PULLED IN!", "KHIÊN VỠ!": "SHIELD BROKEN!", "TÓM!": "GRAB!", "LÊN BỆ CAO!": "GET ON HIGH GROUND!", "CHẶN!": "BLOCK!", "TRÈO TƯỜNG": "WALL CLIMB", "PHÁN XỬ": "JUDGMENT", "TỬ THẦN GIÁNG": "DEATH DESCENDS", "PHÂN TÁCH LINH HỒN": "SOUL SPLIT", "CỔNG TƯƠNG LAI": "GATE OF THE FUTURE", "DEATH — KẺ TRỞ VỀ": "DEATH — THE RETURNED", "CỔNG THỜI GIAN MỞ RA": "THE TIME GATE OPENS", "ĐƯỢC HỒI ĐẦY MÁU": "FULLY HEALED", "MÓC HỒN!": "SOUL HOOK!", "HỤT!": "MISS!", "KÉO LẠI!": "PULL BACK!", "PHẢN ĐÒN!": "COUNTER!", "TỬ THẦN PHÁN QUYẾT": "DEATH'S VERDICT", "AEGIS — LƯỚT XUYÊN QUA!": "AEGIS — DASH THROUGH!", "ĐI VỀ TƯƠNG LAI": "INTO THE FUTURE", "TRÊN TƯỜNG — ĐẠN THẲNG KHÔNG TỚI": "ON THE WALL — STRAIGHT SHOTS CAN'T REACH", "KẺ TRỞ VỀ": "THE RETURNED", "KHÔNG ĐƯỢC ĐÂU": "NOT HAPPENING", "BẮN GẤP ĐỂ NGẮT!": "SHOOT FAST TO INTERRUPT!", "BỊ NGẮT! CHOÁNG": "INTERRUPTED! STUNNED", "SỨC MẠNH VỰC THẲM": "ABYSSAL POWER", "VÒNG VỰC THẲM": "ABYSS RING", "DẤU VỰC THẲM": "ABYSS MARK", "VỰC THẲM": "ABYSS", "NGẮT:": "BREAK:", "NGẮT: #%": "BREAK: #%", "CHOÁNG — ĐÁNH ĐI!": "STUNNED — ATTACK!", "ARTORIAS — SỨC MẠNH VỰC THẲM": "ARTORIAS — ABYSSAL POWER", "GAEL — MÁU CỦA HỒN TỐI": "GAEL — BLOOD OF THE DARK SOUL", "HỒN TỐI TRỖI DẬY": "THE DARK SOUL RISES", "GAEL — BÃO CỦA HỒN TỐI": "GAEL — STORM OF THE DARK SOUL", "MÁU CỦA HỒN TỐI SÔI LÊN": "THE DARK SOUL'S BLOOD BOILS", "OAN HỒN TRỖI DẬY": "VENGEFUL SPIRITS RISE", "MƯA SÉT MÁU": "BLOOD LIGHTNING RAIN", "CHẠY RA XA!": "GET AWAY!", "KIẾM THẲNG": "STRAIGHT SWORD", "KIẾM CONG · HOẢ THUẬT": "CURVED SWORD · PYROMANCY", "ĐẠI BÚA": "GREAT HAMMER", "GẬY PHÉP": "SORCERY STAFF", "CORRUPTION — HỦ HOÁ TOÀN PHẦN": "CORRUPTION — TOTAL DECAY", "QUỲ GỐI": "KNEEL", "HỖN MANG BÙNG PHÁT": "CHAOS ERUPTS", "HỖN MANG PHÌNH TO": "CHAOS SWELLS", "HỦ HOÁ TOÀN PHẦN": "TOTAL DECAY", "HỖN MANG!": "CHAOS!", "CHẶN! CHOÁNG": "BLOCKED! STUNNED", "BỊ TRÓI!": "BOUND!", "THOÁT!": "ESCAPED!", "BỊ TÓM!": "GRABBED!", "BẠCH TUỘC VỰC THẲM": "ABYSSAL OCTOPUS", "BẠCH TUỘC VỰC THẲM — TỪ VỰC SÂU": "ABYSSAL OCTOPUS — FROM THE DEEP", "PHUN MỰC!": "INK SPRAY!", "BỊ BẮT!": "CAUGHT!", "TỪ VỰC SÂU!": "FROM THE DEEP!", "CHẠY ĐI!": "RUN!", "KỲ DỊ": "ODDITY", "TRÁNH RA!": "GET CLEAR!", "PHẢN CÔNG TỬ THẦN — HẠ GỤC NGAY!": "DEATH COUNTER — KILL IT NOW!", "s — hoặc dùng khiên!": "s left — or use your shield!", "Còn #s — hoặc dùng khiên!": "#s left — or use your shield!", "ĐỠ ĐƯỢC!": "PARRIED!", "BẮN ĐỂ ĐẨY LÙI!": "SHOOT TO KNOCK IT BACK!", "Chạy sang phía kia!": "Run to the other side!", "THIÊN THẠCH! CHẠY RA MÉP MÀN HÌNH!": "METEOR! RUN TO THE SCREEN EDGE!", "PHUN TRÀO SAU": "ERUPTION IN", "s — HẠ GỤC NGAY!": "s — KILL IT NOW!", "Không hạ kịp = CHẾT": "Too slow = DEATH", "BỐC CHÁY!": "ABLAZE!", "DUNG NHAM TRÀO! LÊN BỤC!": "LAVA RISING! GET ON A PLATFORM!", "ĐẨY BẬT! NỔ -#": "BOUNCED! BLAST -#", "VỠ KHIÊN!": "SHIELD BROKEN!", "PHÁN QUYẾT!": "JUDGMENT!", "LAO KHIÊN — TRÁNH!": "SHIELD CHARGE — DODGE!", "PHÁN QUYẾT TẬN THẾ — RA RÌA MÀN HÌNH!": "DOOMSDAY JUDGMENT — GET TO THE SCREEN EDGE!", "BẤT KHẢ XÂM PHẠM": "INVIOLABLE", "VỠ KHIÊN — ĐÁNH ĐI!": "SHIELD BROKEN — ATTACK!", "KHIÊN HỒI!": "SHIELD RESTORED!", "ĐỠ!": "PARRY!", "TRIỆU HỒI!": "SUMMON!", "ĐỨNG YÊN LÂU QUÁ!": "STOOD STILL TOO LONG!", "TRẢI BÀI TOÀN MÀN!": "CARDS ACROSS THE SCREEN!", "CHẶN ĐƯỜNG!": "BLOCKING THE PATH!", "NỔ KHU!": "ZONE BLAST!", "PHÁ TOTEM!": "BREAK THE TOTEM!", "AN TOÀN!": "SAFE!", "AN TOÀN": "SAFE", "SƠ HỞ — TẤN CÔNG!": "OPENING — ATTACK!", "BẤT KHẢ XÂM PHẠM — PHÁ PHIẾN ĐÁ": "INVIOLABLE — BREAK THE STONE TABLET", "BẠCH TUỘC VỰC THẲM   # / #": "ABYSSAL OCTOPUS   # / #", "HELICOPRION — HÀM CƯA XOẮN   # / #": "HELICOPRION — SPIRAL SAW JAW   # / #", "BÁO CHÚA REX   # / #": "TYRANT REX   # / #", "THALASSA — NỮ HẢI THẦN   # / #": "THALASSA — SEA GODDESS   # / #", "BẠCH TUỘC VỰC THẲM — TỪ VỰC SÂU   # / #": "ABYSSAL OCTOPUS — FROM THE DEEP   # / #", "HELICOPRION — HÀM NUNG ĐỎ   # / #": "HELICOPRION — RED-HOT JAW   # / #", "BÁO CHÚA REX — CUỒNG NỘ   # / #": "TYRANT REX — ENRAGED   # / #", "GAEL — MÁU CỦA HỒN TỐI   # / #": "GAEL — BLOOD OF THE DARK SOUL   # / #", "PONTIFF SULYVAHN — HOÀN ẢNH   # / #": "PONTIFF SULYVAHN — PHANTOM   # / #", "ĐẤU TRƯỜNG ĐỒNG BỘ — ĐẠN CỦA BẠN BẮN VỠ ĐƯỢC ĐẠN CỦA NÓ": "SYNC ARENA — YOUR SHOTS CAN BREAK ITS SHOTS", "ĐANG NHẮM...": "AIMING...", "KHOÁ MỤC TIÊU!": "TARGET LOCKED!", "SẮP ĐÓNG BĂNG!": "FREEZE INCOMING!", "LUỒNG BĂNG QUÉT MẶT ĐẤT — LÊN CAO!": "ICE STREAM SWEEPS THE GROUND — GET UP HIGH!", "SÀN ĐANG CHẾT!": "THE FLOOR IS DYING!", "ĐẬP CẢ BẢN ĐỒ - NHẢY LÊN!": "MAP-WIDE SLAM - JUMP!", "PHUN LỬA QUÉT SÀN — LÊN CAO!": "FLAMES SWEEP THE FLOOR — GET UP HIGH!", "HÚT VÀO — CHẠY RA XA!": "PULLING IN — RUN AWAY!", "ĐẬP GIỮA!": "CENTER SLAM!", "VÒNG VÂY LỬA — VÀO GIỮA!": "RING OF FIRE — GET TO THE MIDDLE!", "QUÁ CAO!": "TOO HIGH!", "QUẠT CÁNH — GIÓ ĐẨY DẠT + LÔNG VŨ!": "WING GUST — WIND PUSH + FEATHERS!", "PHUN TRÀO — NÉ RA HAI BÊN!": "ERUPTION — DODGE TO EITHER SIDE!", "PHUN TRÀO — CHẠY SANG TRÁI!": "ERUPTION — RUN LEFT!", "PHUN TRÀO — CHẠY SANG PHẢI!": "ERUPTION — RUN RIGHT!", "MỎM ĐÁ HOÁ GAI — XUỐNG ĐẤT!": "LEDGES TURN TO SPIKES — GET DOWN!", "SẮP MỌC GAI!": "SPIKES INCOMING!", "ĐÁ RẠN NỨT —": "STONE CRACKING —", "ĐÁ SẮP RẠN!": "STONE ABOUT TO CRACK!", "ĐÁ RẠN NỨT — #s": "STONE CRACKING — #s", "HAI BÀN TAY ĐẬP XUỐNG!": "TWO HANDS SLAM DOWN!", "BÀN TAY ĐẬP XUỐNG!": "HAND SLAM!", "HÚT ĐẤT ĐÁ — HOÁ THÂN!": "ABSORBING ROCK — TRANSFORMING!", "GIÁP VỠ! DỒN SỨC CUỐI — # GIÂY!": "ARMOR BROKEN! LAST STAND — # SECONDS!", "LAZER QUÉT — CHẠY THEO TIA!": "LASER SWEEP — RUN WITH THE BEAM!", "ĐẠN!": "SHOTS!", "BUNG # ĐẠN!": "BURST OF # SHOTS!", "TỰ HUỶ! -# MÁU": "SELF-DESTRUCT! -# HP", "GIÁP VỠ — DỒN SỨC CUỐI!": "ARMOR BROKEN — LAST STAND!", "TỰ HUỶ TOÀN MÀN:": "SCREEN-WIDE SELF-DESTRUCT:", "PHA # — LÕI": "PHASE # — CORE", "CUỘN NGƯỜI — LĂN CẢ MÀN!": "CURL UP — ROLLING ACROSS THE SCREEN!", "MỞ LÕI — LAZER QUÉT!": "CORE OPEN — LASER SWEEP!", "ĐẬP LIÊN HOÀN x": "SLAM COMBO x", "MẠCH NHAM — # CỘT LẦN LƯỢT!": "MAGMA VEINS — # PILLARS IN TURN!", "GIẬM CHÂN — NHẢY LÊN!": "STOMP — JUMP!", "CHÉM": "SLASH", "ĐẠN": "AMMO", "CHONG CHÓNG — ĐẠN VÔ DỤNG, NHẢY QUA!": "PROPELLER — SHOTS ARE USELESS, JUMP OVER!", "MÚA THƯƠNG": "SPEAR DANCE", "MÚA THƯƠNG  #/#": "SPEAR DANCE  #/#", "LAO ĐÂM XUYÊN!": "PIERCING LUNGE!", "QUÉT THƯƠNG!": "SPEAR SWEEP!", "BỔ THƯƠNG!": "SPEAR CLEAVE!", "SÓNG CAO — PHẢI NHẢY ĐÔI!": "HIGH WAVE — DOUBLE JUMP!", "LIÊN ĐÂM x": "RAPID THRUST x", "LIÊN ĐÂM x#": "RAPID THRUST x#", "PHÓNG THƯƠNG!": "SPEAR THROW!", "PONTIFF SULYVAHN — HOÀN ẢNH": "PONTIFF SULYVAHN — PHANTOM", "HOÀN ẢNH": "PHANTOM", "PHA # — HAI THANH KIẾM": "PHASE # — TWIN BLADES", "PHA # — HOÀN ẢNH": "PHASE # — PHANTOM", "NGUYỆT TRẢM — LƯỠI ĐAO CHÉO!": "MOON SLASH — DIAGONAL BLADE!", "VỒ CẮN x": "POUNCE x", "VỒ CẮN x#": "POUNCE x#", "XÉ x": "REND x", "XÉ x#": "REND x#", "NHẢY NỔ CẢ KHU!": "EXPLOSIVE LEAP!", "LỘN NGƯỢC — CÀO!": "FLIP — CLAW!", "CHƯỞNG HOẢ CẦU!": "FIREBALL PALM!", "ĐANG ÁP SÁT...": "CLOSING IN...", "GẦM — TỰ ĐỐT!": "ROAR — SELF-IGNITE!", "CUỒNG NỘ — ĐÒN CÓ NỔ LAN": "ENRAGED — ATTACKS NOW SPLASH", "HÚC ĐẦU GỐI — NGỒI XUỐNG (S)!": "KNEE STRIKE — CROUCH (S)!", "SÓNG LỬA MẶT ĐẤT — NHẢY!": "GROUND FIRE WAVE — JUMP!", "ĐANG ĐỌC BÀI — NHẢY LÀ ĂN THĂNG LONG!": "READING YOU — JUMP AND EAT A RISING DRAGON!", "CHƯỞNG LỬA!": "FIRE PALM!", "🔥 CUỒNG NỘ": "🔥 ENRAGED", "MAGMA DRAGOON  🔥 CUỒNG NỘ": "MAGMA DRAGOON  🔥 ENRAGED", "RÚT KIẾM — ĐỠ (L) HOẶC LƯỚT (SHIFT)!": "DRAWING BLADE — PARRY (L) OR DASH (SHIFT)!", "CAO → NGỒI (S),  RỒI THẤP → NHẢY!": "HIGH → CROUCH (S), THEN LOW → JUMP!", "THẾ PHẢN ĐÒN — ĐỪNG BẮN!": "COUNTER STANCE — DON'T SHOOT!", "PHÂN THÂN — CHỈ BÓNG SÁNG LÀ THẬT!": "CLONES — ONLY THE BRIGHT SHADOW IS REAL!", "TAM LIÊN TRẢM": "TRIPLE SLASH", "/# — NHÁT CUỐI ĐỌC BÀI!": "/# — THE LAST CUT READS YOU!", "TAM LIÊN TRẢM #/# — NHÁT CUỐI ĐỌC BÀI!": "TRIPLE SLASH #/# — THE LAST CUT READS YOU!", "⚔ CUỒNG NỘ": "⚔ ENRAGED", "IAI RAPTOR  ⚔ CUỒNG NỘ": "IAI RAPTOR  ⚔ ENRAGED", "HÚC VAI — ĐỠ (L) HOẶC LƯỚT (SHIFT)!": "SHOULDER CHARGE — PARRY (L) OR DASH (SHIFT)!", "SÓNG CHẤN ĐỘNG — NHẢY!": "SHOCKWAVE — JUMP!", "LAZER TẦM ĐỨNG — NGỒI XUỐNG (S)!": "STANDING-HEIGHT LASER — CROUCH (S)!", "ĐANG HÚT — LƯỚT (SHIFT) ĐỂ THOÁT!": "PULLING IN — DASH (SHIFT) TO ESCAPE!", "QUÁ NHIỆT — ĐÁNH MẠNH VÀO LÕI!": "OVERHEATED — HIT THE CORE HARD!", "● SƠ HỞ": "● OPENING", "⚙ CUỒNG NỘ": "⚙ ENRAGED", "SIEGE GOLIATH  ● SƠ HỞ": "SIEGE GOLIATH  ● OPENING", "SIEGE GOLIATH  ⚙ CUỒNG NỘ": "SIEGE GOLIATH  ⚙ ENRAGED", "Ụ CÁT ĐANG ĐUỔI — CHẠY / NHẢY!": "SAND MOUND CHASING — RUN / JUMP!", "QUÉT ĐUÔI — NGỒI XUỐNG (S)!": "TAIL SWEEP — CROUCH (S)!", "KẸP CÀNG — ĐỠ (L) HOẶC LƯỚT (SHIFT)!": "PINCER GRAB — PARRY (L) OR DASH (SHIFT)!", "BÃO CÁT — CỌC CÁT SẼ TRỒI LÊN!": "SANDSTORM — SAND SPIKES WILL RISE!", "✕ DƯỚI CÁT": "✕ UNDER THE SAND", "☠ CUỒNG NỘ": "☠ ENRAGED", "SCARAB LORD  ✕ DƯỚI CÁT": "SCARAB LORD  ✕ UNDER THE SAND", "SCARAB LORD  ☠ CUỒNG NỘ": "SCARAB LORD  ☠ ENRAGED", "MỐC": "ANCHOR", "PHÁ MỐC! CHOÁNG!": "ANCHOR BROKEN! STUNNED!", "TUA LAI! PHÁ MỐC!": "REWINDING! BREAK THE ANCHORS!", "TUA LẠI THÀNH CÔNG +#": "REWIND SUCCESSFUL +#", "ĐÒN LẶP: KIM TẦM ĐỨNG — NGỒI (S)!": "ECHO: STANDING-HEIGHT NEEDLES — CROUCH (S)!", "ĐÒN LẶP: KIM SÁT ĐẤT — NHẢY!": "ECHO: GROUND NEEDLES — JUMP!", "ĐÒN LẶP: ĐẠN THỜI GIAN": "ECHO: TIME BULLETS", "ĐÒN LẶP: VÙNG CHẬM": "ECHO: SLOW ZONE", "CHẬM": "SLOW", "BỊ GHIM CHẬM — LƯỚT (SHIFT) ĐỂ THOÁT!": "PINNED BY SLOW — DASH (SHIFT) TO ESCAPE!", "KIM DIỆT — RA KHỎI VÙNG CHẬM!": "KILL NEEDLES — GET OUT OF THE SLOW ZONE!", "/# — BẮN VỠ!": "/# — SHOOT IT!", "MỐC #/# — BẮN VỠ!": "ANCHOR #/# — SHOOT IT!", "ĐANG TUA LẠI — PHÁ MỐC ĐỂ CHẶN!": "REWINDING — BREAK THE ANCHORS TO STOP IT!", "NẠP": "LOADED", "ĐẠN THỜI GIAN!": "TIME BULLETS!", "NẠP # ĐẠN THỜI GIAN!": "LOADED # TIME BULLETS!", "KIM TẦM ĐỨNG — NGỒI (S)!  … RỒI ĐỔI TẦNG!": "STANDING-HEIGHT NEEDLES — CROUCH (S)!  … THEN SWITCH LANES!", "KIM SÁT ĐẤT — NHẢY!  … RỒI ĐỔI TẦNG!": "GROUND NEEDLES — JUMP!  … THEN SWITCH LANES!", "⏱ ĐÒN LẶP LẠI SAU #s": "⏱ ECHO REPEATS IN #s", "· CUỒNG NỘ": "· ENRAGED", "CHRONO REX  ⏱ ĐÒN LẶP LẠI SAU #s": "CHRONO REX  ⏱ ECHO REPEATS IN #s", "CHRONO REX  ⏱ ĐÒN LẶP LẠI SAU #s  · CUỒNG NỘ": "CHRONO REX  ⏱ ECHO REPEATS IN #s  · ENRAGED", "HELICOPRION — HÀM CƯA XOẮN": "HELICOPRION — SPIRAL SAW JAW", "HELICOPRION — HÀM NUNG ĐỎ": "HELICOPRION — RED-HOT JAW", "MEGALODON — MÁU LOANG": "MEGALODON — BLOOD IN THE WATER", "THALASSA — NỮ HẢI THẦN": "THALASSA — SEA GODDESS", "DÒNG PHUN!": "JET STREAM!", "CỘT NƯỚC!": "WATER PILLAR!", "LỐC XOÁY!": "WHIRLWIND!", "THALASSA — HẢI THẦN HÓA THÂN": "THALASSA — SEA GODDESS INCARNATE", "XOÁY NƯỚC!": "WHIRLPOOL!", "BÙNG CHÁY... TÀN!": "BLAZING... BURNT OUT!", "CHÁY LẠI!": "REIGNITED!", "TÀN — SƠ HỞ! x# DMG": "BURNT OUT — OPENING! x# DMG", "LÁ RỤNG!": "FALLING LEAVES!", "BĂNG ĐÃ NẠP": "MAGAZINE LOADED", "HẾT XĂNG!": "OUT OF FUEL!", "CHƯA ĐỦ # GIÂY": "NOT # SECOND YET", "GAI MỌC!": "SPIKES RISE!", "XÉ!": "REND!", "BÙNG GAI": "SPIKE BURST", "THẾ TẤN": "STANCE", "NÉM · GỌI VỀ": "THROW · RECALL", "BẮT!": "CATCH!", "BÚA VỀ TAY!": "HAMMER RETURNS!", "LAO XUYÊN!": "PIERCING DASH!", "LƯỢT VỀ!": "RETURN PASS!", "QUÁ NHIỆT!": "OVERHEATED!", "HẠ RÈM!": "CURTAIN FALLS!", "NẠP BĂNG": "RELOAD", "CHẾT MÁY!": "ENGINE STALLED!", "ĐỀ MÁY!": "ENGINE STARTED!", "CƯA VÀNG!": "GOLDEN SAW!", "XỊT": "FIZZLE", "LĂNG KÍNH TỤ!": "PRISM FOCUS!", "MƯA HỎA": "FIRE RAIN", "MIỄN": "IMMUNE", "LÁ CHẮN!": "BARRIER!", "LẬP CÔN": "STAFF STANCE", "KÍCH CÔN!": "STAFF STRIKE!", "LỐC CÔN!": "STAFF CYCLONE!", "TAM XOA GIÁNG!": "TRIDENT DESCENT!", "TRẢM ĐỊA!": "EARTH CLEAVE!", "KHỐNG CHẾ!": "CONTROLLED!", "ĐÓNG BĂNG!": "FROZEN!", "VỠ BĂNG!": "ICE SHATTERED!", "TIM MÁU!": "HEART!", "SIÊU TẢI!": "SUPERCHARGE!", "NÉ!": "DODGE!", "⚠️ LƯU Ý: COMBO HỢP KÍCH! ⚠️": "⚠️ WARNING: JOINT COMBO! ⚠️", "NÉ LAZER!": "LASER DODGED!", "SSS! +#% CHIÊU": "SSS! +#% ULT", "NHẢY QUA! +#": "JUMPED OVER! +#", "NẤC #": "TIER #", "PHÂN HẠCH #%": "FISSION #%", "SENTRY # VIÊN": "SENTRY # ROUNDS", "TƯỜNG BĂNG #": "ICE WALL #", "CÚI NÉ! +#": "DUCKED! +#", "CƯA TỬ THẦN!": "DEATH SAW!", "KHO # VIÊN": "BANK # ROUNDS", "TÍCH # TIA": "# BEAMS STORED", "TOẢ #": "SPREAD #", "CHÉM # ĐẠN": "SLASHED # SHOTS", "ĐỔI ĐẠN: RAPIDFIRE": "AMMO SWAP: RAPIDFIRE", "SIÊU CHÍ MẠNG! ×#": "SUPER CRIT! ×#", "NẤC MUSOU #": "MUSOU TIER #", "SIÊU CHÍ MẠNG! ×": "SUPER CRIT! ×", "LỬA XANH!": "BLUE FLAME!", "SẮP VÀO CHANNEL": "CHANNEL INCOMING", "KHOÁ — CẦN HẠNG S": "LOCKED — NEEDS RANK S", "CHIÊU CUỐI BỊ KHOÁ": "ULTIMATE LOCKED", "MÀN CUỐI!": "FINAL ACT!", "TUYỆT ĐỐI LÃNH VỰC!": "ABSOLUTE DOMAIN!", "CẦN CÓ BÚA": "NEEDS THE HAMMER", "LINH HỒN NGỌN GIÁO!": "SOUL OF THE SPEAR!", "NHƯ Ý KIM CÔ BỔNG!": "RUYI JINGU BANG!", "THIÊN LONG THƯƠNG!": "HEAVENLY DRAGON SPEAR!", "XE TĂNG! J = PHÁO · GIÁP #": "TANK! J = CANNON · ARMOR #", "KIẾM VỆ!": "SWORD GUARD!", "KIẾM CHẤN": "SWORD QUAKE", "THƯƠNG CHẤN": "SPEAR QUAKE", "LÔI CHÙY": "THUNDER MACE", "LƠ LỬNG · CHẠM K": "HOVERING · TAP K", "THOÁT CHANNEL": "CHANNEL EXITED", "KIẾM VÒNG": "SWORD RING", "DRONE ĐẠN!": "AMMO DRONE!", "QUÁ TẢI # — SIÊU TẢI": "OVERLOAD # — SUPERCHARGE", "QUÁ TẢI": "OVERLOAD", "ĐỘC TẤU!": "SOLO!", "BÃO TUYẾT!": "BLIZZARD!", "MÚA CƯA!": "SAW DANCE!", "GAI LƯNG": "BACK SPIKES", "TÍCH": "STORED", "TOẢ": "SPREAD", "VIÊN": "ROUNDS", "HẤT": "LAUNCH", "LAO XUỐNG": "DIVE", "TRÓI!": "BIND!", "ĐU": "SWING", "ĐẠP!": "STOMP!", "# · TƠ": "# · WEB", "# · XÉ": "# · REND", "# · TOẢ GAI": "# · SPIKE BURST", "# · TÓM": "# · GRAB", "GIỮ K...": "HOLD K...", "XỬ TỬ!": "EXECUTE!", "NÉM BÚA": "HAMMER THROW", "SẤM GIÁNG!": "THUNDER STRIKE!", "SẤM SÉT!": "THUNDERBOLT!", "THIÊN LONG VIÊM THƯƠNG!": "HEAVENLY DRAGON FLAME SPEAR!", "THIÊN LONG XOAY!": "HEAVENLY DRAGON SPIN!", "THIÊN LÔI QUÁN ĐỊA!": "HEAVENLY THUNDER STRIKE!", "HẾT THỂ LỰC": "OUT OF STAMINA", "BỔ ĐỊA": "GROUND CLEAVE", "LÔI PHONG": "THUNDER GALE", "LIỆT PHONG": "RENDING GALE", "BẮN NHANH!": "RAPID FIRE!", "TƯỜNG BĂNG": "ICE WALL", "CHÉM KHÍ!": "SWORD WAVE!", "QUỶ CƯA!": "DEMON SAW!", "MÁU": "HP", "CƯA XANH!": "BLUE SAW!", "ĐÂM XUYÊN!": "RUN THROUGH!", "ĐẠI PHÁO!": "GREAT CANNON!", "PHÁO!": "CANNON!", "HẾT ĐẠN": "OUT OF AMMO", "HẾT SÚNG MÁY — CÒN": "MACHINE GUN EMPTY — CANNON LEFT:", "PHÁO": "CANNON", "XE TĂNG NỔ!": "TANK DESTROYED!", "GIÁP": "ARMOR", "DRONE HẾT ĐẠN": "DRONE OUT OF AMMO", "LĂNG KÍNH MAX!": "PRISM MAX!", "LƯỠI KÉP · NGẮM": "TWIN BLADE · AIM", "PHÂN HẠCH": "FISSION", "HỎA ẤN": "FIRE MARK", "NGẮT!": "INTERRUPT!", "ĐỨT MẠCH!": "CIRCUIT BROKEN!", "◆ COLOSSAL — NHẮM ĐẦU": "◆ COLOSSAL — AIM FOR THE HEAD", "SA MẠC": "DESERT", "RỪNG": "FOREST", "ĐỈNH NÚI": "SUMMIT", "THỬ THÁCH BẢN SAO": "CLONE GAUNTLET", "KHU BIỂN": "SEA ZONE", "MÁY —": "CPU —", "∞ BẤT TỬ · THỬ NGHIỆM": "∞ IMMORTAL · TESTING", "ĐÃ TRÚNG": "HITS TAKEN", "ĐÃ TRÚNG #": "HITS TAKEN #", "QUÁ NHIỆT": "OVERHEAT", "QUÁ NHIỆT #s": "OVERHEAT #s", "CHẾT MÁY": "STALLED", "CHẾT MÁY #s": "STALLED #s", "QUỶ CƯA": "DEMON SAW", "MÚA CƯA · CHÉM KHÍ": "SAW DANCE · SWORD WAVE", "MÚA CƯA": "SAW DANCE", "MÁY TẮT": "ENGINE OFF", "CƯA TỬ THẦN": "DEATH SAW", "KIẾM": "SWORDS", "KIẾM #/#": "SWORDS #/#", "◈ KHIÊN": "◈ SHIELD", "· TRẦN": "· CAP", "· LƯỚT": "· DASH", "⚡ ×# · LƯỚT #": "⚡ ×# · DASH #", "TOẢ ×": "SPREAD ×", "TOẢ ×#": "SPREAD ×#", "PHÁO #/#": "CANNON #/#", "XĂNG": "FUEL", "XĂNG #s": "FUEL #s", "● XANH — BẤM J": "● BLUE — PRESS J", "● VÀNG — BẤM J": "● GOLD — PRESS J", "XUYÊN": "PIERCE", "VÀNG #s": "GOLD #s", "VÀNG": "GOLD", "QUICKSILVER — KẾT": "QUICKSILVER — FINISH", "VẾT ·": "MARKS ·", "KHOÁ": "LOCKED", "MIỄN PHÍ": "FREE", "LÁ CHẮN": "BARRIER", "HÚT MÁU": "LIFESTEAL", "TÀN ẢNH": "AFTERIMAGE", "ĐANG CÓ": "ACTIVE", "CHIÊU CUỐI ĐANG CHẠY": "ULTIMATE RUNNING", "CHIÊU CUỐI SẴN SÀNG — U": "ULTIMATE READY — U", "CHIÊU CUỐI": "ULTIMATE", "VÀO TRẬN": "START MATCH", "CHƠI QUA LAN": "PLAY OVER LAN", "PHÒNG PVP": "PVP ROOM", "ĐẤU PVP": "PVP DUEL", "BẢN": "BUILD", "BẢN PVP-#-#": "BUILD PVP-#-#", "Bạn là CHỦ PHÒNG — bạn đặt luật cho cả phòng": "You are the HOST — you set the rules for the room", "Hai người một máy — P# bên trái, P# bên phải": "Two players, one machine — P# on the left, P# on the right", "Bạn là KHÁCH — chọn nhân vật của mình, luật do chủ phòng đặt": "You are the GUEST — pick your character, the host sets the rules", "TỈ SỐ": "SCORE", "(BẠN)": "(YOU)", "NGƯỜI CHƠI #  (BẠN)": "PLAYER #  (YOU)", "✓ SẴN SÀNG": "✓ READY", "chưa sẵn sàng": "not ready", "THẾ": "STANCE", "cố định cho đấu đối kháng": "locked for versus mode", "ĐẠN NÀY BỊ KHOÁ": "THIS AMMO IS LOCKED", "NGƯỜI CHƠI #": "PLAYER #", "P#: MÁY": "P#: CPU", "P#: NGƯỜI": "P#: HUMAN", "ĐỘ KHÓ:": "DIFFICULTY:", "LUẬT PHÒNG": "ROOM RULES", "(chủ phòng đặt)": "(set by host)", "HIỆP": "ROUNDS", "THẮNG #": "WIN #", "THẮNG": "WINS", "CHIÊU CUỐI: BẬT": "ULTIMATE: ON", "CHIÊU CUỐI: TẮT": "ULTIMATE: OFF", "ĐẠN BỊ KHOÁ:": "LOCKED AMMO:", "TẤT CẢ # LOẠI ĐẠN ĐỀU MỞ": "ALL # AMMO TYPES UNLOCKED", "ĐẠN BỊ KHOÁ: PHI TIÊU": "LOCKED AMMO: NEEDLES", "ĐẠN BỊ KHOÁ: KIẾM VŨ": "LOCKED AMMO: SWORD DANCE", "HUỶ SẴN SÀNG": "CANCEL READY", "SẴN SÀNG": "READY", "(chỉ dùng khi chơi qua mạng)": "(only used when playing online)", "P#: WASD · J/K/L · Shift        P#: máy thứ hai": "P#: WASD · J/K/L · Shift        P#: second machine", "CHỜ CHỦ PHÒNG BẮT ĐẦU": "WAITING FOR THE HOST TO START", "CHỜ NGƯỜI CHƠI #": "WAITING FOR PLAYER #", "PHÒNG: CHỦ": "ROOM: HOST", "PHÒNG: KHÁCH": "ROOM: GUEST", "→ Bấm SẴN SÀNG": "→ Press READY", "Đang chờ người kia bấm SẴN SÀNG...": "Waiting for the other player to press READY...", "Cả hai đã sẵn sàng — chờ chủ phòng bấm VÀO TRẬN": "Both ready — waiting for the host to press START MATCH", "Cả hai đã sẵn sàng — bấm VÀO TRẬN": "Both ready — press START MATCH", "— trống": "— empty", "TƠ": "WEB", "TRỤY CÔN!": "PLUNGING STAFF!", "THÂN NGOẠI THÂN!": "BODY BEYOND BODY!", "TOÀN CÔN!": "FULL STAFF!", "CÂN ĐẨU VÂN!": "SOMERSAULT CLOUD!", "ĐANG BẬN GẬY!": "STAFF IS BUSY!", "XOAY CÔN!": "STAFF SPIN!", "PHÓNG CÔN +": "STAFF THROW +", "VÒNG CHỐNG YÊU": "DEMON-WARDING CIRCLE", "CÂN ĐẨU VÂN GỌI SÉT": "SOMERSAULT CLOUD CALLS LIGHTNING", "THÂN NGOẠI HOÁ THÂN!": "BODY BEYOND BODY — INCARNATE!", "HÀO QUANG": "AURA", "GÕ!": "KNOCK!", "ĐẬP TƯỜNG +#": "WALL SLAM +#", "LIÊN HOÀN THƯƠNG!": "CHAIN SPEAR!", "CỘT NƯỚC · SÓNG!": "WATER PILLARS · WAVE!", "TAM XOA · THỦY CẦU!": "TRIDENT · WATER ORB!", "THỦY LAO!": "WATER PRISON!", "CƯỠI SÓNG!": "WAVE RIDER!", "CHƯA ĐỦ NẤC": "NOT ENOUGH TIERS", "MUSOU TỐI ĐA": "MUSOU MAXED", "HẾT MUSOU": "MUSOU ENDED", "NẤC MUSOU": "MUSOU TIER", "HỒI XUYÊN!": "RETURN PIERCE!", "XUYÊN TÂM!": "HEART PIERCE!", "HẤT BAY!": "SENT FLYING!", "HẢI THẦN PHÓNG THƯƠNG!": "SEA GOD'S SPEAR THROW!", "MỒI": "BAIT", "CHẶN": "BLOCK", "PHI TIÊU": "NEEDLES", "KIẾM VŨ": "SWORD DANCE", "HỢP NHẤT ĐÃ LÊN NÒNG — BẮN J / K": "FUSION LOADED — FIRE J / K", "HỢP NHẤT SẴN SÀNG — Y": "FUSION READY — Y", "HỢP NHẤT": "FUSION", "% — HẾT HẠN MỨC, ĐỔI ĐẠN [Q/E]": "% — LIMIT REACHED, SWAP AMMO [Q/E]", "HỢP NHẤT!": "FUSION!", "MÀN HẠ!": "CURTAIN DOWN!", "MỘT PHÁT CUỐI": "ONE LAST SHOT", "J / K ĐỂ PHÓNG": "J / K TO LAUNCH", "KHOÁ!": "LOCK!", "CHIÊU CUỐI #%": "ULTIMATE #%", "HỢP NHẤT #%": "FUSION #%", "HỢP NHẤT #% — HẾT HẠN MỨC, ĐỔI ĐẠN [Q/E]": "FUSION #% — LIMIT REACHED, SWAP AMMO [Q/E]", "ô rune": "rune slots", "PHONG CÁCH": "STYLE", "NÉ HOÀN HẢO!": "PERFECT DODGE!", "TẠM DỪNG": "PAUSED", "TIẾP TỤC": "RESUME", "CHƠI LẠI": "RESTART", "MENU CHÍNH": "MAIN MENU", "ĐỈNH": "PEAK", "ĐỈNH #": "PEAK #", "TỔNG": "TOTAL", "TỔNG #": "TOTAL #", "PTERO XÁM": "GREY PTERO", "PTERO ĐỎ": "RED PTERO", "PTERO VÀNG": "GOLD PTERO", "BẮN RỪNG": "FOREST SHOOTER", "DƠI NÚI": "MOUNTAIN BAT", "TIM MÁU": "HEART", "XOÁ SẠCH": "CLEAR ALL", "ĐẦM LẦY": "SWAMP", "ĐỒNG CỎ": "GRASSLAND", "HANG NHỆN": "SPIDER CAVE", "HỐC TỐI": "DARK HOLLOW", "HỐC NẤM": "MUSHROOM HOLLOW", "NÚI LỬA": "VOLCANO", "ĐIỆN THỜ": "TEMPLE", "BIỂN": "SEA", "CAO NGUYÊN": "HIGHLANDS", "LÒ RÈN": "FORGE", "ĐỤN CÁT": "SAND DUNES", "THỜI GIAN": "TIME", "lượt — đóng bảng để thả theo đúng nhịp bạn bấm": "waves — close the panel to release them in the rhythm you pressed", "🇻🇳 Tiếng Việt": "🇻🇳 Tiếng Việt", "— KHU SA MẠC —": "— DESERT ZONE —", "— KHU RỪNG —": "— FOREST ZONE —", "#. ĐẠI BÀNG": "#. THUNDER EAGLE", "#. BƯỚM ĐÊM": "#. TOXIC MOTH", "#. NHỆN": "#. SPIDER", "#. CỰ VIÊN": "#. GIANT APE", "#. TITAN RỪNG": "#. FOREST TITAN", "#. HỎA XÀ": "#. FIRE SERPENT", "#. HOẢ LANG": "#. FIRE WOLF", "#. THẠCH TRỤ REX": "#. PILLAR REX", "#. DIÊM THƯƠNG": "#. HELLSPEAR", "#. HOẢ TÂM": "#. FIRE HEART", "#. HỎA LONG": "#. FIRE DRAGON", "#. HẮC LONG VƯƠNG": "#. BLACK DRAGON KING", "— KHU ĐỈNH NÚI —": "— SUMMIT ZONE —", "#. THẠCH ƯNG": "#. STONE HAWK", "#. BĂNG NHA": "#. ICE FANG", "#. CỰ THẠCH": "#. COLOSSUS", "#. PHONG XÀ": "#. WIND SERPENT", "#. SƠN THẦN": "#. MOUNTAIN GOD", "— THỬ THÁCH BẢN SAO —": "— CLONE GAUNTLET —", "— ĐÔI (SA MẠC) —": "— DUO (DESERT) —", "— KHU BIỂN —": "— SEA ZONE —", "#. BẠCH TUỘC": "#. OCTOPUS", "— SIÊU KHỦNG LONG —": "— SUPER DINOSAURS —", "— ĐẶC BIỆT —": "— SPECIAL —", "# KHỦNG LONG": "# DINOSAURS", "— THẦN THOẠI —": "— MYTHOLOGY —", "🔧 TỰ KIỂM": "🔧 SELF-TEST", "DỄ": "EASY", "KHÁ DỄ": "FAIRLY EASY", "BÌNH THƯỜNG": "NORMAL", "KHÓ": "HARD", "ĐẠI BÀNG": "THUNDER EAGLE", "NHỆN": "SPIDER", "BƯỚM ĐÊM": "TOXIC MOTH", "CỰ VIÊN": "GIANT APE", "THẠCH ƯNG": "STONE HAWK", "BĂNG NHA": "ICE FANG", "CỰ THẠCH": "COLOSSUS", "PHONG XÀ": "WIND SERPENT", "SƠN THẦN": "MOUNTAIN GOD", "HỎA XÀ": "FIRE SERPENT", "HOẢ LANG": "FIRE WOLF", "THẠCH TRỤ REX": "PILLAR REX", "DIÊM THƯƠNG": "HELLSPEAR", "HOẢ TÂM": "FIRE HEART", "HỎA LONG": "FIRE DRAGON", "HẮC LONG VƯƠNG": "BLACK DRAGON KING", "TB THẤP": "BELOW AVERAGE", "CỰC KHÓ": "EXTREME", "NÂNG CẤP CUSTOM": "CUSTOM UPGRADE", "TRẠM NGHỈ EX": "REST STOP EX", "BẠCH TUỘC": "OCTOPUS", "MÀN MỞ ĐẦU": "OPENING STAGE", "KHÁCH": "GUEST", "MƯỢN ·": "BORROWED ·", "ĐẶC BIỆT": "SPECIAL", "CHỌN BOSS": "SELECT BOSS", "— KHU SA MẠC —   # / #": "— DESERT ZONE —   # / #", "BOSS RUSH — CHỌN MAP": "BOSS RUSH — SELECT MAP", "CÙNG ĐƯỜNG!": "CORNERED!", "HỒI SINH!": "REVIVED!", "KHỦNG LONG PIXEL v#": "PIXEL DINO v#", "--- Chơi đơn ---": "--- Single player ---", "CHƠI CHIẾN DỊCH": "PLAY CAMPAIGN", "QUAY LẠI": "BACK", "CHIẾN THẮNG!": "VICTORY!", "ĐANG NẠP...": "RELOADING...", "KHIÊN:": "SHIELD:", "ĐẠN:": "AMMO:", "MÁU:": "HP:", "LƯỚT [Shift]": "DASH [Shift]", "SẴN": "READY", "BẤM U!": "PRESS U!", "SẠC x": "CHARGE x", "NGOÀI KHUNG": "OUT OF FRAME", "HẠ XUỐNG — ĐÁNH!": "IT'S DOWN — ATTACK!", "+# MÁU": "+# HP", "Máu gốc # → #": "Base HP # → #", "DIỆT BOSS +# MÁU": "BOSS KILL +# HP", "HỒI ĐẦY KHI HẠ BOSS": "FULL HEAL ON BOSS KILL", "LÁ CHẮN TÁI TẠO": "REGEN BARRIER", "HỒI SINH • C#": "REVIVE • L#", "CHIÊU CUỐI TỨC THÌ • C#": "INSTANT ULTIMATE • L#", "KHIÊN KHI CHANNEL • C#": "CHANNEL SHIELD • L#", "VA CHẠM ĐẠN": "BULLET CLASH", "BẤT TỬ • THỬ NGHIỆM": "IMMORTAL • TESTING", "LƠ LỬNG": "HOVER", "NHẢY BA": "TRIPLE JUMP", "ĐÒN ĐẦU TIÊN": "FIRST STRIKE", "💥 CHÍ MẠNG": "💥 CRITICAL", "💥 CHÍ MẠNG • C#": "💥 CRITICAL • L#", "SIÊU TỐC": "HYPERSPEED", "HÚC ĐẦU": "HEADBUTT", "ĐỆ CHIM • C#": "BIRD BUDDY • L#", "ĐỆ NỔ • C#": "BOMB BUDDY • L#", "ĐỆ KHIÊN • C#": "SHIELD BUDDY • L#", "ĐỆ HỒI MÁU • C#": "HEALER BUDDY • L#", "ĐỆ LƯỚT CHÉM • C#": "DASH-SLASH BUDDY • L#", "ĐỆ SAO XOAY • C#": "STAR-SPIN BUDDY • L#", "ĐỆ CHIM": "BIRD BUDDY", "ĐỆ NỔ": "BOMB BUDDY", "ĐỆ KHIÊN": "SHIELD BUDDY", "ĐỆ HỒI MÁU": "HEALER BUDDY", "ĐỆ LƯỚT CHÉM": "DASH-SLASH BUDDY", "ĐỆ SAO XOAY": "STAR-SPIN BUDDY", "HỒI SINH": "REVIVE", "CHIÊU CUỐI TỨC THÌ": "INSTANT ULTIMATE", "KHIÊN KHI CHANNEL": "CHANNEL SHIELD", "CHÍ MẠNG": "CRITICAL", "Ụ SÚNG KHAI HOẢ —": "TURRET FIRING —", "CẮM Ụ SÚNG": "PLANT TURRET", "DRONE KHIÊN — # GIÂY": "SHIELD DRONE — # SECONDS", "XE TĂNG — PHÁO": "TANK — CANNON", "KHIÊN": "SHIELD", "hồi": "cooldown", "TAM LUÂN": "TRIPLE WHEEL", "LƯỚT SÉT": "LIGHTNING DASH", "HƯ VÔ BỘ PHÁP": "VOID STEP", "CHÂN LONG": "DRAGON STEP", "Ô THỨ BA": "THIRD SLOT", "SHIN GUARD! NẠP LẠI": "SHIN GUARD! RECHARGED", "ĐỠ TRÚNG! NẠP LẠI": "PARRIED! RECHARGED", "THỬ NGHIỆM — KHÔNG TÍNH ĐIỂM": "TESTING — NO SCORE", "SINH TỒN": "SURVIVAL", "CHIẾN ĐẤU": "COMBAT", "TỰ ĐỘNG": "AUTO", "ĐỘC QUYỀN — CẦN ĐÚNG ĐẠN / THẾ / POWER": "EXCLUSIVE — NEEDS THE RIGHT AMMO / STANCE / POWER", "THỨC TỈNH — # Ô": "AWAKENED — # SLOTS", "CẬN CHIẾN": "MELEE", "TẦM XA · ĐƠN MỤC TIÊU": "RANGED · SINGLE TARGET", "TẦM XA · DIỆN RỘNG": "RANGED · AREA", "BĂNG ĐẠN": "MAGAZINE", "TÁCH TIA": "SPLIT SHOT", "TẦM XA": "LONG SHOT", "TỎA": "SPREAD", "XOẮN SÓNG ĐÔI": "TWIN HELIX", "QUỸ ĐẠO": "ORBIT", "KHÚC XẠ": "REFRACTION", "NỔ": "DETONATE", "BĂNG": "FROST", "TIẾP TRỢ": "SUPPLY DROP", "ĐỐT": "BURN", "PHÁ THẾ": "SHATTER", "TÂM NHÃN": "MIND'S EYE", "VÔ CỰC KIẾM": "INFINITY BLADE", "MÀN CUỐI": "FINAL ACT", "KHÍ CÔNG PHÁO": "AIR CANNON", "NỔ MÁY": "ENGINE ON", "CƯA VÀNG": "GOLDEN SAW", "CƯA XANH": "BLUE SAW", "KHO ĐẠN": "AMMO DUMP", "TÊN LỬA": "MISSILES", "BOM NGUYÊN TỬ": "NUKE", "MƯA TÊN": "ARROW RAIN", "Ô": "SLOTS", "HỒI MÁU": "HEAL", "CƠ BẢN": "BASIC", "CHÂN THÂN!": "TRUE FORM!", "CHÂN LONG!": "TRUE DRAGON!", "HẾT DRAGON": "DRAGON ENDED", "XOÈ CÁNH": "WING SPREAD", "DẬM ĐẤT": "GROUND STOMP", "LONG THĂNG": "DRAGON RISE", "LONG GIÁNG": "DRAGON FALL", "PHI LONG TẠI THIÊN": "FLYING DRAGON IN THE SKY", "LONG VIÊM…": "DRAGON FLAME…", "LONG VIÊM PHÁ ĐỊA": "DRAGON FLAME EARTHBREAKER", "— I/O LÊN SHIN +": "— I/O TO SHIN +", "XUYÊN QUA!": "PIERCED THROUGH!", "HƯ VÔ ×": "VOID ×", "HƯ VÔ NGUỘI — ×#": "VOID COOLING — ×#", "HƯ VÔ TẮT": "VOID OFF", "CẮT!": "CUT!", "KIẾM PHÓNG": "SWORDS LAUNCHED", "SÁT THƯƠNG": "DAMAGE", "PHÒNG THỦ": "DEFENSE", "TỐC ĐỘ": "SPEED", "TÀN ẢNH PARRY!": "AFTERIMAGE PARRY!", "KHÁN GIẢ — bạn bất tử, bắn ai cũng được": "SPECTATOR — you're immortal, shoot anyone you like", "bấm ESC để về menu": "press ESC to return to the menu", "HỎA ẤN · DÂY CHUYỀN": "FIRE MARK · CHAIN", "XUYÊN!": "PIERCE!", "▲ NHẢY": "▲ JUMP", "▼ NGỒI": "▼ CROUCH", "giữ ▲ = nhảy # bậc · hết cỡ ngang = LƯỚT": "hold ▲ = jump # steps · full sideways = DASH", "chạm nhẹ = bắn · quẹt ngang = đổi đạn / đổi thế": "light tap = shoot · swipe sideways = swap ammo / stance", "-#% TỐC": "-#% SPEED", "KHOÁ #s": "LOCKED #s", "BẤT ĐỘNG": "IMMOBILIZED", "THIÊN LA ĐỊA VÕNG": "HEAVEN AND EARTH NET", "BẠO VŨ LÊ HOA CHÂM": "STORM OF PEAR-BLOSSOM NEEDLES", "VẠN KIẾM QUY TÔNG": "TEN THOUSAND SWORDS", "VƯƠNG KHỐ": "GATE OF TREASURE", "MÁY ĐANG NỔ — TỰ ĐỔ XĂNG": "ENGINE RUNNING — AUTO REFUEL", "CÚI # LẦN ĐỂ ĐỀ MÁY": "CROUCH # TIMES TO START THE ENGINE", "TIẾP TRỢ! HẾT NÓNG": "SUPPLY DROP! HEAT CLEARED", "TIẾP TRỢ!": "SUPPLY DROP!", "UFO: +# MÁU": "UFO: +# HP", "UFO: ĐÃ ĐẦY MÁU": "UFO: HP FULL", "ĐẾM NGƯỢC #...": "COUNTDOWN #...", "BOM NGUYÊN TỬ!": "NUKE!", "GIẢI NHIỆT!": "COOLED DOWN!", "NGẮT CHANNEL!": "CHANNEL INTERRUPTED!", "KHO ĐẠN! +": "AMMO DUMP! +", "TÊN LỬA!": "MISSILES!", "DRONE SÚNG MÁY!": "MACHINE-GUN DRONE!", "ICE thất bại — mạng hai bên có thể chặn, cần TURN": "ICE failed — either network may be blocking it, TURN is needed", "Kết nối đã đóng": "Connection closed", "Máy bên kia đã thoát": "The other machine has left", "XONG — đã nối, đóng bảng này rồi bấm VÀO TRẬN": "DONE — connected, close this panel then press START MATCH", "BƯỚC #/# — đã nhận mã trả lời, đang chờ nối xong...": "STEP #/# — answer code received, waiting for the connection...", "BƯỚC #/# — đang tạo mã mời...": "STEP #/# — creating invite code...", "BƯỚC #/# — đang tạo mã trả lời...": "STEP #/# — creating answer code...", "chưa mở kết nối": "connection not opened yet", "nội bộ": "local", "công cộng": "public", "trung chuyển": "relay", "địa chỉ": "addresses", "· kênh": "· channel", "chưa có": "none yet", "LỖI:": "ERROR:", "ĐÃ NỐI — bạn là": "CONNECTED — you are", "NGƯỜI CHƠI # (chủ phòng)": "PLAYER # (host)", "NGƯỜI CHƠI # (khách)": "PLAYER # (guest)", "Mã của máy này sẽ hiện ở đây": "This machine's code will appear here", "MẠNG: QUA INTERNET": "NETWORK: OVER THE INTERNET", "MẠNG: CÙNG WIFI (LAN)": "NETWORK: SAME WIFI (LAN)", "LUẬT PHÒNG —": "ROOM RULES —", "loại đạn (chủ phòng đặt)": "ammo types (set by host)", "LOẠI ĐẠN ĐƯỢC XÀI — bấm để tắt, còn": "ALLOWED AMMO — click to disable, remaining", "Đang gom địa chỉ mạng...": "Gathering network addresses...", "không nén được mã": "could not compress the code", "Tạo phòng hỏng:": "Creating the room failed:", "Chưa tạo phòng — bấm TẠO PHÒNG trước": "No room yet — press CREATE ROOM first", "Đã nhận mã trả lời rồi (": "Answer code already received (", "Đây là mã MỜI, không phải mã TRẢ LỜI": "This is an INVITE code, not an ANSWER code", "Mã trả lời không đọc được": "Could not read the answer code", "Đang nối...": "Connecting...", "Nhận mã hỏng:": "Receiving the code failed:", "Đây là mã TRẢ LỜI, không phải mã MỜI": "This is an ANSWER code, not an INVITE code", "Mã mời không đọc được": "Could not read the invite code", "không nén được mã trả lời": "could not compress the answer code", "Vào phòng hỏng:": "Joining the room failed:", "THƯỜNG": "NORMAL", "QUỶ": "DEMON", "CẦN": "NEEDS", "→ CHƯỞNG!": "→ PALM STRIKE!", "NẤC": "TIER", "BÁCH": "HUNDRED", "HUYỀN": "ARCANE", "TỐI THƯỢNG": "SUPREME", "CHỐNG KHÔNG!": "ANTI-AIR!", "TẬN CÙNG": "ULTIMATE END", "BẮN": "SHOOT", "HOÀN THÀNH TOÀN BỘ!": "ALL STAGES COMPLETE!", "THẮNG MÀN": "STAGE CLEARED", "— đã phá cứ điểm địch": "— enemy stronghold destroyed", "MÀN HÌNH CHÍNH": "MAIN SCREEN", "(HẾT MÀN)": "(NO MORE STAGES)", "MÀN TIẾP THEO": "NEXT STAGE", "bấm chuột để chọn": "click to choose", "BÙNG NỔ NGUYÊN TỬ!": "ATOMIC BLAST!", "LAO XOÁY!": "SPIN DASH!", "TRIỆU BẦY!": "SUMMON THE SWARM!", "THÚC QUÂN!": "RALLY THE TROOPS!", "THIẾU TÀI NGUYÊN": "NOT ENOUGH RESOURCES", "MÀN": "STAGE", "— TÀI NGUYÊN ĐỊCH": "— ENEMY RESOURCES", "MÀN # · SA MẠC — TÀI NGUYÊN ĐỊCH #": "STAGE # · DESERT — ENEMY RESOURCES #", "TÀI NGUYÊN": "RESOURCES", "TÀI NGUYÊN #": "RESOURCES #", "[#] CHẶN #": "[#] BLOCK #", "[#] BẮN #": "[#] SHOOT #", "[#] PTERO ĐỎ #": "[#] RED PTERO #", "BOSS ĐÃ RA — HẠ NÓ ĐỂ QUA MÀN": "THE BOSS HAS APPEARED — DEFEAT IT TO CLEAR THE STAGE", "SIÊU TẢI": "SUPERCHARGE", "CỨ ĐIỂM CỦA BẠN": "YOUR STRONGHOLDS", "CỨ ĐIỂM CỦA BẠN #/#     ĐỊCH #/#": "YOUR STRONGHOLDS #/#     ENEMY #/#", "ĐỊCH": "ENEMY", "PHẢN! +": "COUNTER! +", "VỠ!": "BREAK!", "MÁU TỐI ĐA!": "MAX HP!", "HỒI ĐẦY MÁU!": "FULLY HEALED!", "NGƯỜI CHƠI # THẮNG CHUNG CUỘC": "PLAYER # WINS THE MATCH", "HOÀ": "DRAW", "NGƯỜI CHƠI # THẮNG HIỆP": "PLAYER # WINS THE ROUND", "HIỆP HOÀ": "ROUND DRAWN", "thắng": "win", "hiệp là vô địch": "rounds to be champion", "thắng # hiệp là vô địch": "win # rounds to be champion", "Chờ chủ phòng…": "Waiting for the host…", "SPACE — đánh hiệp tiếp": "SPACE — next round", "SPACE — về sảnh chờ": "SPACE — back to the lobby", "NÉ DẬM ĐẤT!": "STOMP DODGED!", "CHẶN LAZER!": "LASER BLOCKED!", "NHẢY QUA! +": "JUMPED OVER! +", "CÚI NÉ! +": "DUCKED! +", "CẠN SỨC QUỶ": "DEMON POWER DRAINED", "TRỞ VỀ DẠNG NGƯỜI": "BACK TO HUMAN FORM", "GIƠ KHIÊN HOẶC LƯỚT NÉ": "RAISE YOUR SHIELD OR DASH AWAY", "KIỆT SỨC": "EXHAUSTED", "# địa chỉ": "# addresses", "kênh": "channel", "gom": "gathering", "SONG NHAM - LEN COT CAO!": "MAGMA WAVE - GET ON A HIGH PILLAR!", "XOAY HUT!": "SUCTION SPIN!", "HOA XA  (DANG LAN)": "FIRE SERPENT  (DIVING)", "HOA XA  (TROI - DANH DI!)": "FIRE SERPENT  (SURFACED - ATTACK!)", "GON SONG - NO O DAY": "RIPPLES - IT'S RIGHT HERE", "SAP TROI LEN!": "ABOUT TO SURFACE!", "TROI LEN!": "SURFACING!", "BAN DUT TO #/#": "SHOOT THE THREADS #/#", "NE DI!": "DODGE!", "CHUP!": "SNAP!", "CHOANG #s - DANH DI!": "STUNNED #s - ATTACK!", "CHAN DIA #": "GROUND QUAKE #", "TRANH RA!": "GET CLEAR!", "PHONG LONG": "WIND DRAGON", "SAP TROI LEN #s": "SURFACING IN #s", "LUA DOC": "VERTICAL FIRE", "BAN CHAN #/#": "SHOOT THE LEGS #/#", "THACH TRU REX  #/#": "PILLAR REX  #/#", "BANG #  RUNG #s": "ICE #  FALLS IN #s", "TANG AN TOAN": "SAFE LEVEL", "BAO BANG! TU TRAI": "ICE STORM! FROM THE LEFT", "BANG NHA  #/#": "ICE FANG  #/#", "SONG XUNG KICH! NHAY LEN BE DA!": "SHOCKWAVE! JUMP ONTO THE ROCK!", "TAN ANH #": "AFTERIMAGE #", "NHAT #/#": "STRIKE #/#", "KIM CANG REX  #/#": "DIAMOND REX  #/#", "LAO PHUN LUA - DOI TANG!": "FIRE DASH - SWITCH LEVELS!", "DA KHOA!": "ROCK LOCKED!", "PHI LONG TAI THIEN": "FLYING DRAGON IN THE SKY", "HOA LONG  #/#": "FIRE DRAGON  #/#", "CAO VUNG RONG - LUI RA XA!": "WIDE CLAW - BACK AWAY!", "SONG LUA - NHAY DOI QUA!": "FIRE WAVE - DOUBLE JUMP OVER!", "HAC LONG VUONG  #/#": "BLACK DRAGON KING  #/#", "SAP #s - BAN CANH!": "COLLAPSE IN #s - SHOOT THE WINGS!", "THACH UNG  #/#": "STONE HAWK  #/#", "HAI TAY CHOP - RA KHOI!": "TWIN-HAND GRAB - GET OUT!", "DA RUNG! COI CHUNG TREN DAU": "FALLING ROCKS! WATCH ABOVE YOU", "DAM XUYEN - DOI TANG!": "PIERCING CHARGE - SWITCH LEVELS!", "QUET TU TREN XUONG!": "TOP-DOWN SWEEP!", "BAN KHOP TAY #/#": "SHOOT THE WRIST #/#", "CU THACH  #/#": "COLOSSUS  #/#", "SIET TAY - RA KHOI!": "CRUSHING GRIP - GET OUT!", "THIEN TRU SON THAN  #/#": "HEAVEN-PILLAR MOUNTAIN GOD  #/#", "THIEN TRU SON THAN  #/#  [DUNG DAY]": "HEAVEN-PILLAR MOUNTAIN GOD  #/#  [STANDING UP]", "DA KHOA - LAO XUONG!": "ROCK LOCKED - DIVING DOWN!", "DANG NGAM...": "AIMING...", "BAM CAY #/# DE NO ROT": "HIT THE TREE #/# TO KNOCK IT DOWN", "CHOANG - DANH DI!": "STUNNED - ATTACK!", "LA RUNG HET: #s": "LEAVES GONE: #s", "CU VIEN  #/#": "GIANT APE  #/#", "BOI NGUOC LAI!": "SWIMMING BACK!", "PHA # — GOLEM": "PHASE # — GOLEM", "EP GIO — NHAY KHONG LEN": "WIND PRESSURE — CAN'T JUMP", "CHAY NGANG!": "SIDE DASH!", "HAI LUONG — VAO KHE GIUA!": "TWIN STREAMS — GET IN THE GAP!", "LUONG CAT — DOI CAO DO!": "SAND STREAM — CHANGE HEIGHT!", "LUONG DANG LEN!": "STREAM RISING!", "PHONG XA  #/#": "WIND SERPENT  #/#", "# KIM": "# NEEDLES", "# TIA!": "# BEAMS!", "BAM CAY #/#": "HIT THE TREE #/#", "BANG NHA!": "ICE FANG!", "BAO TU #/#": "SPORES #/#", "BAT LUOI x#": "WEB CATCH x#", "CANH #/#": "WINGS #/#", "CHIM DUNG NHAM!": "LAVA BIRD!", "CHOANG! DANH DI!": "STUNNED! ATTACK!", "CU THACH!": "COLOSSUS!", "DAM!": "STAB!", "DOI BEN VACH!": "SWITCH SIDES!", "DONG BANG! RA KHOI DO / BAN VO!": "FROZEN! GET OUT OF THERE / SHOOT IT OPEN!", "DUT TO #/#": "THREADS CUT #/#", "HAC LONG VUONG!": "BLACK DRAGON KING!", "HOA LONG!": "FIRE DRAGON!", "HOA XA!": "FIRE SERPENT!", "HUT LUOI!": "WEB SNATCH!", "IM LANG": "SILENCED", "KHUC XA x#  -#": "REFRACTION x#  -#", "KIM CANG REX!": "DIAMOND REX!", "LAN XUONG!": "ROLL DOWN!", "LEN CAY! TREO LEN LA MA BAN!": "UP THE TREE! HANG ON THE LEAF AND SHOOT!", "NAM NO!": "MUSHROOM BURST!", "PHAN DON x#  -#": "COUNTER x#  -#", "PHAN DON!": "COUNTER!", "PHONG LONG!": "WIND DRAGON!", "PHONG XA!": "WIND SERPENT!", "QUA NHIET!": "OVERHEATED!", "ROI! CHOANG!": "FELL! STUNNED!", "ROT XUONG!": "FALLING!", "RUNG CAY! LA RUNG # GIAY": "TREE SHAKEN! LEAVES FALL FOR # SECONDS", "TE BAO AN MON!": "CELLS EATING AWAY!", "THACH TRU REX!": "PILLAR REX!", "THACH UNG!": "STONE HAWK!", "THIEN TRU SON THAN!": "HEAVEN-PILLAR MOUNTAIN GOD!", "CHON MAP - CAMPAIGN": "SELECT MAP - CAMPAIGN", "LO TRINH": "ROUTE", "— TRONG —": "— INSIDE —", "# man · re nhanh lien tuc · chang EX": "# stages · many branches · EX stops", "# map chay tu dong": "# maps played automatically", "Thu thanh, map rong # man": "Tower defense, map spans # stages", "danh cho che do sau nay": "reserved for a future mode", "Bao ve cu diem # mau": "Defend the stronghold # HP", "Sa mac · Rung · Dung nham": "Desert · Forest · Lava", "Thuong sau moi man · mau giu nguyen": "Reward after each stage · HP carries over", "TIA #/#": "BEAMS #/#", "KIM #/#": "NEEDLES #/#", "🩸 #/s · #/# kim": "🩸 #/s · #/# needles", "KHO #/#": "BANK #/#", "DUNG NHAM": "LAVA", "DUNG NHAM #": "LAVA #", "TRIO VANG  ·  #:#": "GOLD TRIO  ·  #:#", "TRIO XANH  ·  #:#": "BLUE TRIO  ·  #:#", "Trang # / #": "Page # / #", "# chang": "# stops", "DINH NUI": "SUMMIT", "RUNG": "FOREST", "SA MAC": "DESERT", "DO CHUONG! BAN VAO TIA!": "BELL TOLLS! SHOOT THE BEAM!", "KHE AN TOAN": "SAFE GAP", "PHAN NO HAT NHAN!": "NUCLEAR COUNTER!", "SAO VO!": "STAR BROKEN!", "CHEM VO TIA!": "BEAM CUT!", "XUYEN!": "PIERCE!", "XUYEN": "PIERCE", "HOA XA": "FIRE SERPENT", "COT SAP!": "PILLAR COLLAPSING!", "(TROI - DANH DI!)": "(SURFACED - ATTACK!)", "BAN DUT TO": "SHOOT THE THREADS", "CHOANG": "STUNNED", "s - DANH DI!": "s - ATTACK!", "BAO LA - TIM KHE!": "LEAF STORM - FIND THE GAP!", "QUAT NGANG - DOI DO CAO!": "SIDE FAN - CHANGE HEIGHT!", "RUNG GIA THUC TINH!": "THE ELDER FOREST AWAKENS!", "CHAN DUOC! CHOANG!  (": "BLOCKED! STUNNED!  (", "NHAM TOI CHIEU CAO THAY VI NGANG": "AIMS AT HEAD HEIGHT INSTEAD OF LEVEL", "SAU DO LUOT VAO CHEM": "THEN DASHES IN TO SLASH", "KHONG CON KHIEN - DANH DI!": "NO SHIELD LEFT - ATTACK!", "KHIEN HOA KIEM!": "SHIELD BECOMES A SWORD!", "VO KIEM KHI!": "SWORD WAVE BROKEN!", "NEM KHIEN!": "SHIELD THROW!", "CHAN DIA": "GROUND QUAKE", "KIEM KHI": "SWORD WAVE", "KIEM KHI! BAN VO NO!": "SWORD WAVE! SHOOT IT DOWN!", "SAP TROI LEN": "ABOUT TO SURFACE", "LOI VO!": "CORE BROKEN!", "SAP LAO TOI! TRANH RA!": "ABOUT TO CHARGE! GET CLEAR!", "THACH TRU REX": "PILLAR REX", "CHAN COT": "PILLAR BASE", "HUY DON!": "MOVE CANCELLED!", "SAP TRU!": "PILLAR SINKING!", "LUA NGANG": "HORIZONTAL FIRE", "BAN CHAN": "SHOOT THE LEGS", "HO! DANH DI!": "EXPOSED! ATTACK!", "BANG NHA": "ICE FANG", "VO BANG!": "ICE BROKEN!", "CHOANG!": "STUNNED!", "BAO BANG!": "ICE STORM!", "TU TRAI": "FROM THE LEFT", "TU PHAI": "FROM THE RIGHT", "KIM CANG REX": "DIAMOND REX", "TAN ANH!": "AFTERIMAGE!", "HOAN HAO! CHOANG!": "PERFECT! STUNNED!", "TAN ANH": "AFTERIMAGE", "NHAT": "STRIKE", "HAC LONG VUONG": "BLACK DRAGON KING", "CHAY VE PHIA RONG!": "RUN TOWARD THE OPENING!", "GIO DAY! CHAY VE PHIA RONG!": "WIND BLOWING! RUN TOWARD THE OPENING!", "THACH UNG": "STONE HAWK", "CANH": "WINGS", "DUOI DUOC!": "DODGED!", "BI QUAP! BAN DE THOAT!": "SNATCHED! SHOOT TO ESCAPE!", "THOAT": "ESCAPE", "THOAT!": "ESCAPED!", "BI THA!": "DROPPED!", "s - BAN CANH!": "s - SHOOT THE WINGS!", "BAN DE THOAT": "SHOOT TO ESCAPE", "CU THACH": "COLOSSUS", "KHOP": "JOINT", "LAM ROI! DUOC BE MOI!": "MADE IT! A LEDGE APPEARS!", "BAN KHOP TAY": "SHOOT THE WRIST", "THIEN TRU SON THAN": "HEAVEN-PILLAR MOUNTAIN GOD", "NUI DUNG DAY! LEO LEN!": "THE MOUNTAIN RISES! CLIMB UP!", "NGHIENG PHAI - TRUOT!": "TILTING RIGHT - SLIDING!", "NGHIENG TRAI - TRUOT!": "TILTING LEFT - SLIDING!", "CU VIEN": "GIANT APE", "BAM CAY": "HIT THE TREE", "/# DE NO ROT": "/# TO KNOCK IT DOWN", "LA RUNG HET:": "LEAVES GONE:", "DIEN TIET!": "ENRAGED!", "KET TRONG BEO — BAN DI!": "STUCK IN THE WEEDS — SHOOT!", "HOA TAM": "FIRE HEART", "NHAM THACH GOLEM": "MAGMA GOLEM", "HOA TAM — TAN LUC": "FIRE HEART — SPENT", "DIEM THUONG": "HELLSPEAR", "HOA LANG": "FIRE WOLF", "PHONG XA": "WIND SERPENT", "BAO NOI LEN!": "STORM RISING!", "LAO LEN!": "RISE UP!", "BI GHIM!": "PINNED!", "BI NGHE THAY!": "HEARD YOU!", "CHAN DUOC!": "BLOCKED!", "BACH TUOC": "OCTOPUS", "BAO TU": "SPORES", "GO BAO TU (": "CLEAR SPORES (", "HOI DAY MAU": "FULL HEAL", "NHAY DE TREO LEN!": "JUMP TO HANG ON!", "KHIEN LUOI!": "WEB SHIELD!", "BU LUOI": "WEB REFILL", "MAT HET LUOI!": "OUT OF WEBS!", "TIA": "BEAMS", "KIM": "NEEDLES", "KHO": "BANK", "TIA!": "BEAMS!", "GAI": "SPIKES", "GHIM!": "PINNED!", "LUOI KEP!": "TWIN BLADES!", "DAO": "KNIVES", "— KHU DUNG NHAM —": "— LAVA ZONE —", "#. KIM CANG REX": "#. DIAMOND REX", "KHO # VIEN": "BANK # ROUNDS", "BAO CHUA REX   # / #": "TYRANT REX   # / #", "SANG MAP:": "GO TO MAP:", "XE": "TANK", "DOC QUYEN GIAO.": "SPEAR EXCLUSIVE.", "KHONG TINH DIEM": "NO SCORE", "LEN LUOI!": "WEB UP!", "CAM XUONG! (": "PLUNGE! (", "TAN...": "SPENT...", "CAM LUOI! -#": "WEB STAB! -#", "PHAN DON x": "COUNTER x", "BAT LUOI x": "WEB CATCH x", "KHUC XA x#": "REFRACTION x#", "KHUC XA x": "REFRACTION x", "TRUNG": "HIT", "HOI DAY MAU!": "FULL HEAL!", "CHAN DUOC! CHOANG!  (DAY BAT)": "BLOCKED! STUNNED!  (KNOCKED BACK)", "DAY LUI!": "PUSHED BACK!", "SONG #": "WAVE #", "DAY BAT": "KNOCKED BACK", "MÁY": "CPU", "NỔ MÁY!": "ENGINE ON!", "◆ LAZER QUÉT #° ◆": "◆ LASER SWEEP #° ◆", "NGAT CHANNEL!": "CHANNEL INTERRUPTED!", "CO VAN DO: man # / #": "RUN IN PROGRESS: stage # / #", "BAT ON!": "UNSTABLE!", "DO THUA!": "CLASH LOST!", "DO THANG!": "CLASH WON!", "ĐẬP LIÊN HOÀN x#": "SLAM COMBO x#", "ĐẬP LIÊN HOÀN": "SLAM COMBO" };
+        const DICH_EN = { "DI CHUYỂN: A / D — SHIFT ĐỂ LƯỚT!": "MOVE: A / D — SHIFT TO DASH!", "NHẢY!": "JUMP!", "THIÊN THẠCH!": "METEOR!", "XOAY ĐUÔI!": "TAIL SPIN!", "ĐẠI BÀNG SẤM": "THUNDER EAGLE", "BƯỚM ĐÊM ĐỘC": "TOXIC MOTH", "NHỆN KHỔNG LỒ": "GIANT SPIDER", "TITAN RỪNG": "FOREST TITAN", "ROI QUÉT CẢ SÀN →": "FLOOR-SWEEPING WHIP →", "← ROI QUÉT CẢ SÀN": "← FLOOR-SWEEPING WHIP", "ĐỪNG CHẠM ĐẤT!": "DON'T TOUCH THE GROUND!", "SẮP PHỦ GAI — LÊN LÁ!": "SPIKES INCOMING — GET ON A LEAF!", "RỄ BÒ TỪ # MÉP — LÊN CAO!": "ROOTS CREEPING FROM # EDGES — GET UP HIGH!", "ROI SỐNG!": "LIVING WHIP!", "GAI PHỦ SÀN!": "SPIKES COVER THE FLOOR!", "RỄ SIẾT!": "ROOTS TIGHTEN!", "ĐỔI ĐẠN:": "AMMO SWAP:", "LAZER QUÉT #°": "LASER SWEEP #°", "HỎA VŨ — AURA LỬA": "FIRE DANCE — FLAME AURA", "NGŨ LIÊN XẠ": "FIVEFOLD VOLLEY", "ĐOẠN VỰC TRẢM": "ABYSS CLEAVE", "NHẢY CHUYỂN BỆ!": "PLATFORM SHIFT JUMP!", "PHẢN CÔNG!": "COUNTERATTACK!", "HỎA VŨ": "FIRE DANCE", "HỎA VŨ #″": "FIRE DANCE #″", "LƯỠI HÁI": "REAPER SCYTHE", "ĐẠI KIẾM": "GREATSWORD", "ĐỠ — LƯỚT XUYÊN QUA!": "PARRY — DASH THROUGH!", "TỤ LAZER": "CHARGING LASER", "BẮN VỠ KIẾM!": "SHOOT THE SWORDS!", "NHẢY QUA!": "JUMP OVER!", "XUỐNG THẤP!": "GET LOW!", "YAMATO GUARD — ĐỪNG ĐÁNH!": "YAMATO GUARD — DON'T ATTACK!", "Nào, tới đi!": "Come on, bring it!", "Chán quá...": "How boring...", "Chỉ có thế thôi à?": "Is that all?", "Cho cậu một nhịp đấy.": "I'll give you a beat.", "Nhảy đi chứ!": "Jump, will you!", "Xem này.": "Watch this.", "VỠ THẾ!": "GUARD BROKEN!", "NÉ THEO VÒNG CUNG!": "DODGE ALONG THE ARC!", "ROYAL GUARD — LƯỚT XUYÊN QUA!": "ROYAL GUARD — DASH THROUGH!", "GIÓ NỔI LÊN!": "THE WIND RISES!", "LƯỠI GIÓ!": "WIND BLADE!", "NHỊP!": "RHYTHM!", "HẤT TUNG!": "LAUNCH!", "TƯỜNG GIÓ": "WIND WALL", "LỐC XOÁY": "TORNADO", "TỬ THẦN CHI TỤC": "DEATH'S REQUIEM", "NHỊP — ĐANG CHẶN": "RHYTHM — BLOCKING", "NHỊP": "RHYTHM", "BÁO CHÚA REX": "TYRANT REX", "BÁO CHÚA REX — CUỒNG NỘ": "TYRANT REX — ENRAGED", "CUỒNG NỘ!": "ENRAGED!", "GẦM": "ROAR", "GIẪM": "STOMP", "QUÉT ĐUÔI": "TAIL SWEEP", "HÚC": "RAM", "CHOÁNG!": "STUNNED!", "CUỒNG BẠO": "BERSERK", "TAY GÃY!": "ARM BROKEN!", "CHẶN ĐƯỢC!": "BLOCKED!", "BỊ KÉO!": "PULLED IN!", "KHIÊN VỠ!": "SHIELD BROKEN!", "TÓM!": "GRAB!", "LÊN BỆ CAO!": "GET ON HIGH GROUND!", "CHẶN!": "BLOCK!", "TRÈO TƯỜNG": "WALL CLIMB", "PHÁN XỬ": "JUDGMENT", "TỬ THẦN GIÁNG": "DEATH DESCENDS", "PHÂN TÁCH LINH HỒN": "SOUL SPLIT", "CỔNG TƯƠNG LAI": "GATE OF THE FUTURE", "DEATH — KẺ TRỞ VỀ": "DEATH — THE RETURNED", "CỔNG THỜI GIAN MỞ RA": "THE TIME GATE OPENS", "ĐƯỢC HỒI ĐẦY MÁU": "FULLY HEALED", "MÓC HỒN!": "SOUL HOOK!", "HỤT!": "MISS!", "KÉO LẠI!": "PULL BACK!", "PHẢN ĐÒN!": "COUNTER!", "TỬ THẦN PHÁN QUYẾT": "DEATH'S VERDICT", "AEGIS — LƯỚT XUYÊN QUA!": "AEGIS — DASH THROUGH!", "ĐI VỀ TƯƠNG LAI": "INTO THE FUTURE", "TRÊN TƯỜNG — ĐẠN THẲNG KHÔNG TỚI": "ON THE WALL — STRAIGHT SHOTS CAN'T REACH", "KẺ TRỞ VỀ": "THE RETURNED", "KHÔNG ĐƯỢC ĐÂU": "NOT HAPPENING", "BẮN GẤP ĐỂ NGẮT!": "SHOOT FAST TO INTERRUPT!", "BỊ NGẮT! CHOÁNG": "INTERRUPTED! STUNNED", "SỨC MẠNH VỰC THẲM": "ABYSSAL POWER", "VÒNG VỰC THẲM": "ABYSS RING", "DẤU VỰC THẲM": "ABYSS MARK", "VỰC THẲM": "ABYSS", "NGẮT:": "BREAK:", "NGẮT: #%": "BREAK: #%", "CHOÁNG — ĐÁNH ĐI!": "STUNNED — ATTACK!", "ARTORIAS — SỨC MẠNH VỰC THẲM": "ARTORIAS — ABYSSAL POWER", "GAEL — MÁU CỦA HỒN TỐI": "GAEL — BLOOD OF THE DARK SOUL", "HỒN TỐI TRỖI DẬY": "THE DARK SOUL RISES", "GAEL — BÃO CỦA HỒN TỐI": "GAEL — STORM OF THE DARK SOUL", "MÁU CỦA HỒN TỐI SÔI LÊN": "THE DARK SOUL'S BLOOD BOILS", "OAN HỒN TRỖI DẬY": "VENGEFUL SPIRITS RISE", "MƯA SÉT MÁU": "BLOOD LIGHTNING RAIN", "CHẠY RA XA!": "GET AWAY!", "KIẾM THẲNG": "STRAIGHT SWORD", "KIẾM CONG · HOẢ THUẬT": "CURVED SWORD · PYROMANCY", "ĐẠI BÚA": "GREAT HAMMER", "GẬY PHÉP": "SORCERY STAFF", "CORRUPTION — HỦ HOÁ TOÀN PHẦN": "CORRUPTION — TOTAL DECAY", "QUỲ GỐI": "KNEEL", "HỖN MANG BÙNG PHÁT": "CHAOS ERUPTS", "HỖN MANG PHÌNH TO": "CHAOS SWELLS", "HỦ HOÁ TOÀN PHẦN": "TOTAL DECAY", "HỖN MANG!": "CHAOS!", "CHẶN! CHOÁNG": "BLOCKED! STUNNED", "BỊ TRÓI!": "BOUND!", "THOÁT!": "ESCAPED!", "BỊ TÓM!": "GRABBED!", "BẠCH TUỘC VỰC THẲM": "ABYSSAL OCTOPUS", "BẠCH TUỘC VỰC THẲM — TỪ VỰC SÂU": "ABYSSAL OCTOPUS — FROM THE DEEP", "PHUN MỰC!": "INK SPRAY!", "BỊ BẮT!": "CAUGHT!", "TỪ VỰC SÂU!": "FROM THE DEEP!", "CHẠY ĐI!": "RUN!", "KỲ DỊ": "ODDITY", "TRÁNH RA!": "GET CLEAR!", "PHẢN CÔNG TỬ THẦN — HẠ GỤC NGAY!": "DEATH COUNTER — KILL IT NOW!", "s — hoặc dùng khiên!": "s left — or use your shield!", "Còn #s — hoặc dùng khiên!": "#s left — or use your shield!", "ĐỠ ĐƯỢC!": "PARRIED!", "BẮN ĐỂ ĐẨY LÙI!": "SHOOT TO KNOCK IT BACK!", "Chạy sang phía kia!": "Run to the other side!", "THIÊN THẠCH! CHẠY RA MÉP MÀN HÌNH!": "METEOR! RUN TO THE SCREEN EDGE!", "PHUN TRÀO SAU": "ERUPTION IN", "s — HẠ GỤC NGAY!": "s — KILL IT NOW!", "Không hạ kịp = CHẾT": "Too slow = DEATH", "BỐC CHÁY!": "ABLAZE!", "DUNG NHAM TRÀO! LÊN BỤC!": "LAVA RISING! GET ON A PLATFORM!", "ĐẨY BẬT! NỔ -#": "BOUNCED! BLAST -#", "VỠ KHIÊN!": "SHIELD BROKEN!", "PHÁN QUYẾT!": "JUDGMENT!", "LAO KHIÊN — TRÁNH!": "SHIELD CHARGE — DODGE!", "PHÁN QUYẾT TẬN THẾ — RA RÌA MÀN HÌNH!": "DOOMSDAY JUDGMENT — GET TO THE SCREEN EDGE!", "BẤT KHẢ XÂM PHẠM": "INVIOLABLE", "VỠ KHIÊN — ĐÁNH ĐI!": "SHIELD BROKEN — ATTACK!", "KHIÊN HỒI!": "SHIELD RESTORED!", "ĐỠ!": "PARRY!", "TRIỆU HỒI!": "SUMMON!", "ĐỨNG YÊN LÂU QUÁ!": "STOOD STILL TOO LONG!", "TRẢI BÀI TOÀN MÀN!": "CARDS ACROSS THE SCREEN!", "CHẶN ĐƯỜNG!": "BLOCKING THE PATH!", "NỔ KHU!": "ZONE BLAST!", "PHÁ TOTEM!": "BREAK THE TOTEM!", "AN TOÀN!": "SAFE!", "AN TOÀN": "SAFE", "SƠ HỞ — TẤN CÔNG!": "OPENING — ATTACK!", "BẤT KHẢ XÂM PHẠM — PHÁ PHIẾN ĐÁ": "INVIOLABLE — BREAK THE STONE TABLET", "BẠCH TUỘC VỰC THẲM   # / #": "ABYSSAL OCTOPUS   # / #", "HELICOPRION — HÀM CƯA XOẮN   # / #": "HELICOPRION — SPIRAL SAW JAW   # / #", "BÁO CHÚA REX   # / #": "TYRANT REX   # / #", "THALASSA — NỮ HẢI THẦN   # / #": "THALASSA — SEA GODDESS   # / #", "BẠCH TUỘC VỰC THẲM — TỪ VỰC SÂU   # / #": "ABYSSAL OCTOPUS — FROM THE DEEP   # / #", "HELICOPRION — HÀM NUNG ĐỎ   # / #": "HELICOPRION — RED-HOT JAW   # / #", "BÁO CHÚA REX — CUỒNG NỘ   # / #": "TYRANT REX — ENRAGED   # / #", "GAEL — MÁU CỦA HỒN TỐI   # / #": "GAEL — BLOOD OF THE DARK SOUL   # / #", "PONTIFF SULYVAHN — HOÀN ẢNH   # / #": "PONTIFF SULYVAHN — PHANTOM   # / #", "ĐẤU TRƯỜNG ĐỒNG BỘ — ĐẠN CỦA BẠN BẮN VỠ ĐƯỢC ĐẠN CỦA NÓ": "SYNC ARENA — YOUR SHOTS CAN BREAK ITS SHOTS", "ĐANG NHẮM...": "AIMING...", "KHOÁ MỤC TIÊU!": "TARGET LOCKED!", "SẮP ĐÓNG BĂNG!": "FREEZE INCOMING!", "LUỒNG BĂNG QUÉT MẶT ĐẤT — LÊN CAO!": "ICE STREAM SWEEPS THE GROUND — GET UP HIGH!", "SÀN ĐANG CHẾT!": "THE FLOOR IS DYING!", "ĐẬP CẢ BẢN ĐỒ - NHẢY LÊN!": "MAP-WIDE SLAM - JUMP!", "PHUN LỬA QUÉT SÀN — LÊN CAO!": "FLAMES SWEEP THE FLOOR — GET UP HIGH!", "HÚT VÀO — CHẠY RA XA!": "PULLING IN — RUN AWAY!", "ĐẬP GIỮA!": "CENTER SLAM!", "VÒNG VÂY LỬA — VÀO GIỮA!": "RING OF FIRE — GET TO THE MIDDLE!", "QUÁ CAO!": "TOO HIGH!", "QUẠT CÁNH — GIÓ ĐẨY DẠT + LÔNG VŨ!": "WING GUST — WIND PUSH + FEATHERS!", "PHUN TRÀO — NÉ RA HAI BÊN!": "ERUPTION — DODGE TO EITHER SIDE!", "PHUN TRÀO — CHẠY SANG TRÁI!": "ERUPTION — RUN LEFT!", "PHUN TRÀO — CHẠY SANG PHẢI!": "ERUPTION — RUN RIGHT!", "MỎM ĐÁ HOÁ GAI — XUỐNG ĐẤT!": "LEDGES TURN TO SPIKES — GET DOWN!", "SẮP MỌC GAI!": "SPIKES INCOMING!", "ĐÁ RẠN NỨT —": "STONE CRACKING —", "ĐÁ SẮP RẠN!": "STONE ABOUT TO CRACK!", "ĐÁ RẠN NỨT — #s": "STONE CRACKING — #s", "HAI BÀN TAY ĐẬP XUỐNG!": "TWO HANDS SLAM DOWN!", "BÀN TAY ĐẬP XUỐNG!": "HAND SLAM!", "HÚT ĐẤT ĐÁ — HOÁ THÂN!": "ABSORBING ROCK — TRANSFORMING!", "GIÁP VỠ! DỒN SỨC CUỐI — # GIÂY!": "ARMOR BROKEN! LAST STAND — # SECONDS!", "LAZER QUÉT — CHẠY THEO TIA!": "LASER SWEEP — RUN WITH THE BEAM!", "ĐẠN!": "SHOTS!", "BUNG # ĐẠN!": "BURST OF # SHOTS!", "TỰ HUỶ! -# MÁU": "SELF-DESTRUCT! -# HP", "GIÁP VỠ — DỒN SỨC CUỐI!": "ARMOR BROKEN — LAST STAND!", "TỰ HUỶ TOÀN MÀN:": "SCREEN-WIDE SELF-DESTRUCT:", "PHA # — LÕI": "PHASE # — CORE", "CUỘN NGƯỜI — LĂN CẢ MÀN!": "CURL UP — ROLLING ACROSS THE SCREEN!", "MỞ LÕI — LAZER QUÉT!": "CORE OPEN — LASER SWEEP!", "ĐẬP LIÊN HOÀN x": "SLAM COMBO x", "MẠCH NHAM — # CỘT LẦN LƯỢT!": "MAGMA VEINS — # PILLARS IN TURN!", "GIẬM CHÂN — NHẢY LÊN!": "STOMP — JUMP!", "CHÉM": "SLASH", "ĐẠN": "AMMO", "CHONG CHÓNG — ĐẠN VÔ DỤNG, NHẢY QUA!": "PROPELLER — SHOTS ARE USELESS, JUMP OVER!", "MÚA THƯƠNG": "SPEAR DANCE", "MÚA THƯƠNG  #/#": "SPEAR DANCE  #/#", "LAO ĐÂM XUYÊN!": "PIERCING LUNGE!", "QUÉT THƯƠNG!": "SPEAR SWEEP!", "BỔ THƯƠNG!": "SPEAR CLEAVE!", "SÓNG CAO — PHẢI NHẢY ĐÔI!": "HIGH WAVE — DOUBLE JUMP!", "LIÊN ĐÂM x": "RAPID THRUST x", "LIÊN ĐÂM x#": "RAPID THRUST x#", "PHÓNG THƯƠNG!": "SPEAR THROW!", "PONTIFF SULYVAHN — HOÀN ẢNH": "PONTIFF SULYVAHN — PHANTOM", "HOÀN ẢNH": "PHANTOM", "PHA # — HAI THANH KIẾM": "PHASE # — TWIN BLADES", "PHA # — HOÀN ẢNH": "PHASE # — PHANTOM", "NGUYỆT TRẢM — LƯỠI ĐAO CHÉO!": "MOON SLASH — DIAGONAL BLADE!", "VỒ CẮN x": "POUNCE x", "VỒ CẮN x#": "POUNCE x#", "XÉ x": "REND x", "XÉ x#": "REND x#", "NHẢY NỔ CẢ KHU!": "EXPLOSIVE LEAP!", "LỘN NGƯỢC — CÀO!": "FLIP — CLAW!", "CHƯỞNG HOẢ CẦU!": "FIREBALL PALM!", "ĐANG ÁP SÁT...": "CLOSING IN...", "GẦM — TỰ ĐỐT!": "ROAR — SELF-IGNITE!", "CUỒNG NỘ — ĐÒN CÓ NỔ LAN": "ENRAGED — ATTACKS NOW SPLASH", "HÚC ĐẦU GỐI — NGỒI XUỐNG (S)!": "KNEE STRIKE — CROUCH (S)!", "SÓNG LỬA MẶT ĐẤT — NHẢY!": "GROUND FIRE WAVE — JUMP!", "ĐANG ĐỌC BÀI — NHẢY LÀ ĂN THĂNG LONG!": "READING YOU — JUMP AND EAT A RISING DRAGON!", "CHƯỞNG LỬA!": "FIRE PALM!", "🔥 CUỒNG NỘ": "🔥 ENRAGED", "MAGMA DRAGOON  🔥 CUỒNG NỘ": "MAGMA DRAGOON  🔥 ENRAGED", "RÚT KIẾM — ĐỠ (L) HOẶC LƯỚT (SHIFT)!": "DRAWING BLADE — PARRY (L) OR DASH (SHIFT)!", "CAO → NGỒI (S),  RỒI THẤP → NHẢY!": "HIGH → CROUCH (S), THEN LOW → JUMP!", "THẾ PHẢN ĐÒN — ĐỪNG BẮN!": "COUNTER STANCE — DON'T SHOOT!", "PHÂN THÂN — CHỈ BÓNG SÁNG LÀ THẬT!": "CLONES — ONLY THE BRIGHT SHADOW IS REAL!", "TAM LIÊN TRẢM": "TRIPLE SLASH", "/# — NHÁT CUỐI ĐỌC BÀI!": "/# — THE LAST CUT READS YOU!", "TAM LIÊN TRẢM #/# — NHÁT CUỐI ĐỌC BÀI!": "TRIPLE SLASH #/# — THE LAST CUT READS YOU!", "⚔ CUỒNG NỘ": "⚔ ENRAGED", "IAI RAPTOR  ⚔ CUỒNG NỘ": "IAI RAPTOR  ⚔ ENRAGED", "HÚC VAI — ĐỠ (L) HOẶC LƯỚT (SHIFT)!": "SHOULDER CHARGE — PARRY (L) OR DASH (SHIFT)!", "SÓNG CHẤN ĐỘNG — NHẢY!": "SHOCKWAVE — JUMP!", "LAZER TẦM ĐỨNG — NGỒI XUỐNG (S)!": "STANDING-HEIGHT LASER — CROUCH (S)!", "ĐANG HÚT — LƯỚT (SHIFT) ĐỂ THOÁT!": "PULLING IN — DASH (SHIFT) TO ESCAPE!", "QUÁ NHIỆT — ĐÁNH MẠNH VÀO LÕI!": "OVERHEATED — HIT THE CORE HARD!", "● SƠ HỞ": "● OPENING", "⚙ CUỒNG NỘ": "⚙ ENRAGED", "SIEGE GOLIATH  ● SƠ HỞ": "SIEGE GOLIATH  ● OPENING", "SIEGE GOLIATH  ⚙ CUỒNG NỘ": "SIEGE GOLIATH  ⚙ ENRAGED", "Ụ CÁT ĐANG ĐUỔI — CHẠY / NHẢY!": "SAND MOUND CHASING — RUN / JUMP!", "QUÉT ĐUÔI — NGỒI XUỐNG (S)!": "TAIL SWEEP — CROUCH (S)!", "KẸP CÀNG — ĐỠ (L) HOẶC LƯỚT (SHIFT)!": "PINCER GRAB — PARRY (L) OR DASH (SHIFT)!", "BÃO CÁT — CỌC CÁT SẼ TRỒI LÊN!": "SANDSTORM — SAND SPIKES WILL RISE!", "✕ DƯỚI CÁT": "✕ UNDER THE SAND", "☠ CUỒNG NỘ": "☠ ENRAGED", "SCARAB LORD  ✕ DƯỚI CÁT": "SCARAB LORD  ✕ UNDER THE SAND", "SCARAB LORD  ☠ CUỒNG NỘ": "SCARAB LORD  ☠ ENRAGED", "MỐC": "ANCHOR", "PHÁ MỐC! CHOÁNG!": "ANCHOR BROKEN! STUNNED!", "TUA LAI! PHÁ MỐC!": "REWINDING! BREAK THE ANCHORS!", "TUA LẠI THÀNH CÔNG +#": "REWIND SUCCESSFUL +#", "ĐÒN LẶP: KIM TẦM ĐỨNG — NGỒI (S)!": "ECHO: STANDING-HEIGHT NEEDLES — CROUCH (S)!", "ĐÒN LẶP: KIM SÁT ĐẤT — NHẢY!": "ECHO: GROUND NEEDLES — JUMP!", "ĐÒN LẶP: ĐẠN THỜI GIAN": "ECHO: TIME BULLETS", "ĐÒN LẶP: VÙNG CHẬM": "ECHO: SLOW ZONE", "CHẬM": "SLOW", "BỊ GHIM CHẬM — LƯỚT (SHIFT) ĐỂ THOÁT!": "PINNED BY SLOW — DASH (SHIFT) TO ESCAPE!", "KIM DIỆT — RA KHỎI VÙNG CHẬM!": "KILL NEEDLES — GET OUT OF THE SLOW ZONE!", "/# — BẮN VỠ!": "/# — SHOOT IT!", "MỐC #/# — BẮN VỠ!": "ANCHOR #/# — SHOOT IT!", "ĐANG TUA LẠI — PHÁ MỐC ĐỂ CHẶN!": "REWINDING — BREAK THE ANCHORS TO STOP IT!", "NẠP": "LOADED", "ĐẠN THỜI GIAN!": "TIME BULLETS!", "NẠP # ĐẠN THỜI GIAN!": "LOADED # TIME BULLETS!", "KIM TẦM ĐỨNG — NGỒI (S)!  … RỒI ĐỔI TẦNG!": "STANDING-HEIGHT NEEDLES — CROUCH (S)!  … THEN SWITCH LANES!", "KIM SÁT ĐẤT — NHẢY!  … RỒI ĐỔI TẦNG!": "GROUND NEEDLES — JUMP!  … THEN SWITCH LANES!", "⏱ ĐÒN LẶP LẠI SAU #s": "⏱ ECHO REPEATS IN #s", "· CUỒNG NỘ": "· ENRAGED", "CHRONO REX  ⏱ ĐÒN LẶP LẠI SAU #s": "CHRONO REX  ⏱ ECHO REPEATS IN #s", "CHRONO REX  ⏱ ĐÒN LẶP LẠI SAU #s  · CUỒNG NỘ": "CHRONO REX  ⏱ ECHO REPEATS IN #s  · ENRAGED", "HELICOPRION — HÀM CƯA XOẮN": "HELICOPRION — SPIRAL SAW JAW", "HELICOPRION — HÀM NUNG ĐỎ": "HELICOPRION — RED-HOT JAW", "MEGALODON — MÁU LOANG": "MEGALODON — BLOOD IN THE WATER", "THALASSA — NỮ HẢI THẦN": "THALASSA — SEA GODDESS", "DÒNG PHUN!": "JET STREAM!", "CỘT NƯỚC!": "WATER PILLAR!", "LỐC XOÁY!": "WHIRLWIND!", "THALASSA — HẢI THẦN HÓA THÂN": "THALASSA — SEA GODDESS INCARNATE", "XOÁY NƯỚC!": "WHIRLPOOL!", "BÙNG CHÁY... TÀN!": "BLAZING... BURNT OUT!", "CHÁY LẠI!": "REIGNITED!", "TÀN — SƠ HỞ! x# DMG": "BURNT OUT — OPENING! x# DMG", "LÁ RỤNG!": "FALLING LEAVES!", "BĂNG ĐÃ NẠP": "MAGAZINE LOADED", "HẾT XĂNG!": "OUT OF FUEL!", "CHƯA ĐỦ # GIÂY": "NOT # SECOND YET", "GAI MỌC!": "SPIKES RISE!", "XÉ!": "REND!", "BÙNG GAI": "SPIKE BURST", "THẾ TẤN": "STANCE", "NÉM · GỌI VỀ": "THROW · RECALL", "BẮT!": "CATCH!", "BÚA VỀ TAY!": "HAMMER RETURNS!", "LAO XUYÊN!": "PIERCING DASH!", "LƯỢT VỀ!": "RETURN PASS!", "QUÁ NHIỆT!": "OVERHEATED!", "HẠ RÈM!": "CURTAIN FALLS!", "NẠP BĂNG": "RELOAD", "CHẾT MÁY!": "ENGINE STALLED!", "ĐỀ MÁY!": "ENGINE STARTED!", "CƯA VÀNG!": "GOLDEN SAW!", "XỊT": "FIZZLE", "LĂNG KÍNH TỤ!": "PRISM FOCUS!", "MƯA HỎA": "FIRE RAIN", "MIỄN": "IMMUNE", "LÁ CHẮN!": "BARRIER!", "LẬP CÔN": "STAFF STANCE", "KÍCH CÔN!": "STAFF STRIKE!", "LỐC CÔN!": "STAFF CYCLONE!", "TAM XOA GIÁNG!": "TRIDENT DESCENT!", "TRẢM ĐỊA!": "EARTH CLEAVE!", "KHỐNG CHẾ!": "CONTROLLED!", "ĐÓNG BĂNG!": "FROZEN!", "VỠ BĂNG!": "ICE SHATTERED!", "TIM MÁU!": "HEART!", "SIÊU TẢI!": "SUPERCHARGE!", "NÉ!": "DODGE!", "⚠️ LƯU Ý: COMBO HỢP KÍCH! ⚠️": "⚠️ WARNING: JOINT COMBO! ⚠️", "NÉ LAZER!": "LASER DODGED!", "SSS! +#% CHIÊU": "SSS! +#% ULT", "NHẢY QUA! +#": "JUMPED OVER! +#", "NẤC #": "TIER #", "PHÂN HẠCH #%": "FISSION #%", "SENTRY # VIÊN": "SENTRY # ROUNDS", "TƯỜNG BĂNG #": "ICE WALL #", "CÚI NÉ! +#": "DUCKED! +#", "CƯA TỬ THẦN!": "DEATH SAW!", "KHO # VIÊN": "BANK # ROUNDS", "TÍCH # TIA": "# BEAMS STORED", "TOẢ #": "SPREAD #", "CHÉM # ĐẠN": "SLASHED # SHOTS", "ĐỔI ĐẠN: RAPIDFIRE": "AMMO SWAP: RAPIDFIRE", "SIÊU CHÍ MẠNG! ×#": "SUPER CRIT! ×#", "NẤC MUSOU #": "MUSOU TIER #", "SIÊU CHÍ MẠNG! ×": "SUPER CRIT! ×", "LỬA XANH!": "BLUE FLAME!", "SẮP VÀO CHANNEL": "CHANNEL INCOMING", "KHOÁ — CẦN HẠNG S": "LOCKED — NEEDS RANK S", "CHIÊU CUỐI BỊ KHOÁ": "ULTIMATE LOCKED", "MÀN CUỐI!": "FINAL ACT!", "TUYỆT ĐỐI LÃNH VỰC!": "ABSOLUTE DOMAIN!", "CẦN CÓ BÚA": "NEEDS THE HAMMER", "LINH HỒN NGỌN GIÁO!": "SOUL OF THE SPEAR!", "NHƯ Ý KIM CÔ BỔNG!": "RUYI JINGU BANG!", "THIÊN LONG THƯƠNG!": "HEAVENLY DRAGON SPEAR!", "XE TĂNG! J = PHÁO · GIÁP #": "TANK! J = CANNON · ARMOR #", "KIẾM VỆ!": "SWORD GUARD!", "KIẾM CHẤN": "SWORD QUAKE", "THƯƠNG CHẤN": "SPEAR QUAKE", "LÔI CHÙY": "THUNDER MACE", "LƠ LỬNG · CHẠM K": "HOVERING · TAP K", "THOÁT CHANNEL": "CHANNEL EXITED", "KIẾM VÒNG": "SWORD RING", "DRONE ĐẠN!": "AMMO DRONE!", "QUÁ TẢI # — SIÊU TẢI": "OVERLOAD # — SUPERCHARGE", "QUÁ TẢI": "OVERLOAD", "ĐỘC TẤU!": "SOLO!", "BÃO TUYẾT!": "BLIZZARD!", "MÚA CƯA!": "SAW DANCE!", "GAI LƯNG": "BACK SPIKES", "TÍCH": "STORED", "TOẢ": "SPREAD", "VIÊN": "ROUNDS", "HẤT": "LAUNCH", "LAO XUỐNG": "DIVE", "TRÓI!": "BIND!", "ĐU": "SWING", "ĐẠP!": "STOMP!", "# · TƠ": "# · WEB", "# · XÉ": "# · REND", "# · TOẢ GAI": "# · SPIKE BURST", "# · TÓM": "# · GRAB", "GIỮ K...": "HOLD K...", "XỬ TỬ!": "EXECUTE!", "NÉM BÚA": "HAMMER THROW", "SẤM GIÁNG!": "THUNDER STRIKE!", "SẤM SÉT!": "THUNDERBOLT!", "THIÊN LONG VIÊM THƯƠNG!": "HEAVENLY DRAGON FLAME SPEAR!", "THIÊN LONG XOAY!": "HEAVENLY DRAGON SPIN!", "THIÊN LÔI QUÁN ĐỊA!": "HEAVENLY THUNDER STRIKE!", "HẾT THỂ LỰC": "OUT OF STAMINA", "BỔ ĐỊA": "GROUND CLEAVE", "LÔI PHONG": "THUNDER GALE", "LIỆT PHONG": "RENDING GALE", "BẮN NHANH!": "RAPID FIRE!", "TƯỜNG BĂNG": "ICE WALL", "CHÉM KHÍ!": "SWORD WAVE!", "QUỶ CƯA!": "DEMON SAW!", "MÁU": "HP", "CƯA XANH!": "BLUE SAW!", "ĐÂM XUYÊN!": "RUN THROUGH!", "ĐẠI PHÁO!": "GREAT CANNON!", "PHÁO!": "CANNON!", "HẾT ĐẠN": "OUT OF AMMO", "HẾT SÚNG MÁY — CÒN": "MACHINE GUN EMPTY — CANNON LEFT:", "PHÁO": "CANNON", "XE TĂNG NỔ!": "TANK DESTROYED!", "GIÁP": "ARMOR", "DRONE HẾT ĐẠN": "DRONE OUT OF AMMO", "LĂNG KÍNH MAX!": "PRISM MAX!", "LƯỠI KÉP · NGẮM": "TWIN BLADE · AIM", "PHÂN HẠCH": "FISSION", "HỎA ẤN": "FIRE MARK", "NGẮT!": "INTERRUPT!", "ĐỨT MẠCH!": "CIRCUIT BROKEN!", "◆ COLOSSAL — NHẮM ĐẦU": "◆ COLOSSAL — AIM FOR THE HEAD", "SA MẠC": "DESERT", "RỪNG": "FOREST", "ĐỈNH NÚI": "SUMMIT", "THỬ THÁCH BẢN SAO": "CLONE GAUNTLET", "KHU BIỂN": "SEA ZONE", "MÁY —": "CPU —", "∞ BẤT TỬ · THỬ NGHIỆM": "∞ IMMORTAL · TESTING", "ĐÃ TRÚNG": "HITS TAKEN", "ĐÃ TRÚNG #": "HITS TAKEN #", "QUÁ NHIỆT": "OVERHEAT", "QUÁ NHIỆT #s": "OVERHEAT #s", "CHẾT MÁY": "STALLED", "CHẾT MÁY #s": "STALLED #s", "QUỶ CƯA": "DEMON SAW", "MÚA CƯA · CHÉM KHÍ": "SAW DANCE · SWORD WAVE", "MÚA CƯA": "SAW DANCE", "MÁY TẮT": "ENGINE OFF", "CƯA TỬ THẦN": "DEATH SAW", "KIẾM": "SWORDS", "KIẾM #/#": "SWORDS #/#", "◈ KHIÊN": "◈ SHIELD", "· TRẦN": "· CAP", "· LƯỚT": "· DASH", "⚡ ×# · LƯỚT #": "⚡ ×# · DASH #", "TOẢ ×": "SPREAD ×", "TOẢ ×#": "SPREAD ×#", "PHÁO #/#": "CANNON #/#", "XĂNG": "FUEL", "XĂNG #s": "FUEL #s", "● XANH — BẤM J": "● BLUE — PRESS J", "● VÀNG — BẤM J": "● GOLD — PRESS J", "XUYÊN": "PIERCE", "VÀNG #s": "GOLD #s", "VÀNG": "GOLD", "QUICKSILVER — KẾT": "QUICKSILVER — FINISH", "VẾT ·": "MARKS ·", "KHOÁ": "LOCKED", "MIỄN PHÍ": "FREE", "LÁ CHẮN": "BARRIER", "HÚT MÁU": "LIFESTEAL", "TÀN ẢNH": "AFTERIMAGE", "ĐANG CÓ": "ACTIVE", "CHIÊU CUỐI ĐANG CHẠY": "ULTIMATE RUNNING", "CHIÊU CUỐI SẴN SÀNG — U": "ULTIMATE READY — U", "CHIÊU CUỐI": "ULTIMATE", "VÀO TRẬN": "START MATCH", "CHƠI QUA LAN": "PLAY OVER LAN", "PHÒNG PVP": "PVP ROOM", "ĐẤU PVP": "PVP DUEL", "BẢN": "BUILD", "BẢN PVP-#-#": "BUILD PVP-#-#", "Bạn là CHỦ PHÒNG — bạn đặt luật cho cả phòng": "You are the HOST — you set the rules for the room", "Hai người một máy — P# bên trái, P# bên phải": "Two players, one machine — P# on the left, P# on the right", "Bạn là KHÁCH — chọn nhân vật của mình, luật do chủ phòng đặt": "You are the GUEST — pick your character, the host sets the rules", "TỈ SỐ": "SCORE", "(BẠN)": "(YOU)", "NGƯỜI CHƠI #  (BẠN)": "PLAYER #  (YOU)", "✓ SẴN SÀNG": "✓ READY", "chưa sẵn sàng": "not ready", "THẾ": "STANCE", "cố định cho đấu đối kháng": "locked for versus mode", "ĐẠN NÀY BỊ KHOÁ": "THIS AMMO IS LOCKED", "NGƯỜI CHƠI #": "PLAYER #", "P#: MÁY": "P#: CPU", "P#: NGƯỜI": "P#: HUMAN", "ĐỘ KHÓ:": "DIFFICULTY:", "LUẬT PHÒNG": "ROOM RULES", "(chủ phòng đặt)": "(set by host)", "HIỆP": "ROUNDS", "THẮNG #": "WIN #", "THẮNG": "WINS", "CHIÊU CUỐI: BẬT": "ULTIMATE: ON", "CHIÊU CUỐI: TẮT": "ULTIMATE: OFF", "ĐẠN BỊ KHOÁ:": "LOCKED AMMO:", "TẤT CẢ # LOẠI ĐẠN ĐỀU MỞ": "ALL # AMMO TYPES UNLOCKED", "ĐẠN BỊ KHOÁ: PHI TIÊU": "LOCKED AMMO: NEEDLES", "ĐẠN BỊ KHOÁ: KIẾM VŨ": "LOCKED AMMO: SWORD DANCE", "HUỶ SẴN SÀNG": "CANCEL READY", "SẴN SÀNG": "READY", "(chỉ dùng khi chơi qua mạng)": "(only used when playing online)", "P#: WASD · J/K/L · Shift        P#: máy thứ hai": "P#: WASD · J/K/L · Shift        P#: second machine", "CHỜ CHỦ PHÒNG BẮT ĐẦU": "WAITING FOR THE HOST TO START", "CHỜ NGƯỜI CHƠI #": "WAITING FOR PLAYER #", "PHÒNG: CHỦ": "ROOM: HOST", "PHÒNG: KHÁCH": "ROOM: GUEST", "→ Bấm SẴN SÀNG": "→ Press READY", "Đang chờ người kia bấm SẴN SÀNG...": "Waiting for the other player to press READY...", "Cả hai đã sẵn sàng — chờ chủ phòng bấm VÀO TRẬN": "Both ready — waiting for the host to press START MATCH", "Cả hai đã sẵn sàng — bấm VÀO TRẬN": "Both ready — press START MATCH", "— trống": "— empty", "TƠ": "WEB", "TRỤY CÔN!": "PLUNGING STAFF!", "THÂN NGOẠI THÂN!": "BODY BEYOND BODY!", "TOÀN CÔN!": "FULL STAFF!", "CÂN ĐẨU VÂN!": "SOMERSAULT CLOUD!", "ĐANG BẬN GẬY!": "STAFF IS BUSY!", "XOAY CÔN!": "STAFF SPIN!", "PHÓNG CÔN +": "STAFF THROW +", "VÒNG CHỐNG YÊU": "DEMON-WARDING CIRCLE", "CÂN ĐẨU VÂN GỌI SÉT": "SOMERSAULT CLOUD CALLS LIGHTNING", "THÂN NGOẠI HOÁ THÂN!": "BODY BEYOND BODY — INCARNATE!", "HÀO QUANG": "AURA", "GÕ!": "KNOCK!", "ĐẬP TƯỜNG +#": "WALL SLAM +#", "LIÊN HOÀN THƯƠNG!": "CHAIN SPEAR!", "CỘT NƯỚC · SÓNG!": "WATER PILLARS · WAVE!", "TAM XOA · THỦY CẦU!": "TRIDENT · WATER ORB!", "THỦY LAO!": "WATER PRISON!", "CƯỠI SÓNG!": "WAVE RIDER!", "CHƯA ĐỦ NẤC": "NOT ENOUGH TIERS", "MUSOU TỐI ĐA": "MUSOU MAXED", "HẾT MUSOU": "MUSOU ENDED", "NẤC MUSOU": "MUSOU TIER", "HỒI XUYÊN!": "RETURN PIERCE!", "XUYÊN TÂM!": "HEART PIERCE!", "HẤT BAY!": "SENT FLYING!", "HẢI THẦN PHÓNG THƯƠNG!": "SEA GOD'S SPEAR THROW!", "MỒI": "BAIT", "CHẶN": "BLOCK", "PHI TIÊU": "NEEDLES", "KIẾM VŨ": "SWORD DANCE", "HỢP NHẤT ĐÃ LÊN NÒNG — BẮN J / K": "FUSION LOADED — FIRE J / K", "HỢP NHẤT SẴN SÀNG — Y": "FUSION READY — Y", "HỢP NHẤT": "FUSION", "% — HẾT HẠN MỨC, ĐỔI ĐẠN [Q/E]": "% — LIMIT REACHED, SWAP AMMO [Q/E]", "HỢP NHẤT!": "FUSION!", "MÀN HẠ!": "CURTAIN DOWN!", "MỘT PHÁT CUỐI": "ONE LAST SHOT", "J / K ĐỂ PHÓNG": "J / K TO LAUNCH", "KHOÁ!": "LOCK!", "CHIÊU CUỐI #%": "ULTIMATE #%", "HỢP NHẤT #%": "FUSION #%", "HỢP NHẤT #% — HẾT HẠN MỨC, ĐỔI ĐẠN [Q/E]": "FUSION #% — LIMIT REACHED, SWAP AMMO [Q/E]", "ô rune": "rune slots", "PHONG CÁCH": "STYLE", "NÉ HOÀN HẢO!": "PERFECT DODGE!", "TẠM DỪNG": "PAUSED", "TIẾP TỤC": "RESUME", "CHƠI LẠI": "RESTART", "MENU CHÍNH": "MAIN MENU", "ĐỈNH": "PEAK", "ĐỈNH #": "PEAK #", "TỔNG": "TOTAL", "TỔNG #": "TOTAL #", "PTERO XÁM": "GREY PTERO", "PTERO ĐỎ": "RED PTERO", "PTERO VÀNG": "GOLD PTERO", "BẮN RỪNG": "FOREST SHOOTER", "DƠI NÚI": "MOUNTAIN BAT", "TIM MÁU": "HEART", "XOÁ SẠCH": "CLEAR ALL", "ĐẦM LẦY": "SWAMP", "ĐỒNG CỎ": "GRASSLAND", "HANG NHỆN": "SPIDER CAVE", "HỐC TỐI": "DARK HOLLOW", "HỐC NẤM": "MUSHROOM HOLLOW", "NÚI LỬA": "VOLCANO", "ĐIỆN THỜ": "TEMPLE", "BIỂN": "SEA", "CAO NGUYÊN": "HIGHLANDS", "LÒ RÈN": "FORGE", "ĐỤN CÁT": "SAND DUNES", "THỜI GIAN": "TIME", "lượt — đóng bảng để thả theo đúng nhịp bạn bấm": "waves — close the panel to release them in the rhythm you pressed", "🇻🇳 Tiếng Việt": "🇻🇳 Tiếng Việt", "— KHU SA MẠC —": "— DESERT ZONE —", "— KHU RỪNG —": "— FOREST ZONE —", "#. ĐẠI BÀNG": "#. THUNDER EAGLE", "#. BƯỚM ĐÊM": "#. TOXIC MOTH", "#. NHỆN": "#. SPIDER", "#. CỰ VIÊN": "#. GIANT APE", "#. TITAN RỪNG": "#. FOREST TITAN", "#. HỎA XÀ": "#. FIRE SERPENT", "#. HOẢ LANG": "#. FIRE WOLF", "#. THẠCH TRỤ REX": "#. PILLAR REX", "#. DIÊM THƯƠNG": "#. HELLSPEAR", "#. HOẢ TÂM": "#. FIRE HEART", "#. HỎA LONG": "#. FIRE DRAGON", "#. HẮC LONG VƯƠNG": "#. BLACK DRAGON KING", "— KHU ĐỈNH NÚI —": "— SUMMIT ZONE —", "#. THẠCH ƯNG": "#. STONE HAWK", "#. BĂNG NHA": "#. ICE FANG", "#. CỰ THẠCH": "#. COLOSSUS", "#. PHONG XÀ": "#. WIND SERPENT", "#. SƠN THẦN": "#. MOUNTAIN GOD", "— THỬ THÁCH BẢN SAO —": "— CLONE GAUNTLET —", "— ĐÔI (SA MẠC) —": "— DUO (DESERT) —", "— KHU BIỂN —": "— SEA ZONE —", "#. BẠCH TUỘC": "#. OCTOPUS", "— SIÊU KHỦNG LONG —": "— SUPER DINOSAURS —", "— ĐẶC BIỆT —": "— SPECIAL —", "# KHỦNG LONG": "# DINOSAURS", "— THẦN THOẠI —": "— MYTHOLOGY —", "🔧 TỰ KIỂM": "🔧 SELF-TEST", "DỄ": "EASY", "KHÁ DỄ": "FAIRLY EASY", "BÌNH THƯỜNG": "NORMAL", "KHÓ": "HARD", "ĐẠI BÀNG": "THUNDER EAGLE", "NHỆN": "SPIDER", "BƯỚM ĐÊM": "TOXIC MOTH", "CỰ VIÊN": "GIANT APE", "THẠCH ƯNG": "STONE HAWK", "BĂNG NHA": "ICE FANG", "CỰ THẠCH": "COLOSSUS", "PHONG XÀ": "WIND SERPENT", "SƠN THẦN": "MOUNTAIN GOD", "HỎA XÀ": "FIRE SERPENT", "HOẢ LANG": "FIRE WOLF", "THẠCH TRỤ REX": "PILLAR REX", "DIÊM THƯƠNG": "HELLSPEAR", "HOẢ TÂM": "FIRE HEART", "HỎA LONG": "FIRE DRAGON", "HẮC LONG VƯƠNG": "BLACK DRAGON KING", "TB THẤP": "BELOW AVERAGE", "CỰC KHÓ": "EXTREME", "NÂNG CẤP CUSTOM": "CUSTOM UPGRADE", "TRẠM NGHỈ EX": "REST STOP EX", "BẠCH TUỘC": "OCTOPUS", "MÀN MỞ ĐẦU": "OPENING STAGE", "KHÁCH": "GUEST", "MƯỢN ·": "BORROWED ·", "ĐẶC BIỆT": "SPECIAL", "CHỌN BOSS": "SELECT BOSS", "— KHU SA MẠC —   # / #": "— DESERT ZONE —   # / #", "BOSS RUSH — CHỌN MAP": "BOSS RUSH — SELECT MAP", "CÙNG ĐƯỜNG!": "CORNERED!", "HỒI SINH!": "REVIVED!", "KHỦNG LONG PIXEL v#": "PIXEL DINO v#", "--- Chơi đơn ---": "--- Single player ---", "CHƠI CHIẾN DỊCH": "PLAY CAMPAIGN", "QUAY LẠI": "BACK", "CHIẾN THẮNG!": "VICTORY!", "ĐANG NẠP...": "RELOADING...", "KHIÊN:": "SHIELD:", "ĐẠN:": "AMMO:", "MÁU:": "HP:", "LƯỚT [Shift]": "DASH [Shift]", "SẴN": "READY", "BẤM U!": "PRESS U!", "SẠC x": "CHARGE x", "NGOÀI KHUNG": "OUT OF FRAME", "HẠ XUỐNG — ĐÁNH!": "IT'S DOWN — ATTACK!", "+# MÁU": "+# HP", "Máu gốc # → #": "Base HP # → #", "DIỆT BOSS +# MÁU": "BOSS KILL +# HP", "HỒI ĐẦY KHI HẠ BOSS": "FULL HEAL ON BOSS KILL", "LÁ CHẮN TÁI TẠO": "REGEN BARRIER", "HỒI SINH • C#": "REVIVE • L#", "CHIÊU CUỐI TỨC THÌ • C#": "INSTANT ULTIMATE • L#", "KHIÊN KHI CHANNEL • C#": "CHANNEL SHIELD • L#", "VA CHẠM ĐẠN": "BULLET CLASH", "BẤT TỬ • THỬ NGHIỆM": "IMMORTAL • TESTING", "LƠ LỬNG": "HOVER", "NHẢY BA": "TRIPLE JUMP", "ĐÒN ĐẦU TIÊN": "FIRST STRIKE", "💥 CHÍ MẠNG": "💥 CRITICAL", "💥 CHÍ MẠNG • C#": "💥 CRITICAL • L#", "SIÊU TỐC": "HYPERSPEED", "HÚC ĐẦU": "HEADBUTT", "ĐỆ CHIM • C#": "BIRD BUDDY • L#", "ĐỆ NỔ • C#": "BOMB BUDDY • L#", "ĐỆ KHIÊN • C#": "SHIELD BUDDY • L#", "ĐỆ HỒI MÁU • C#": "HEALER BUDDY • L#", "ĐỆ LƯỚT CHÉM • C#": "DASH-SLASH BUDDY • L#", "ĐỆ SAO XOAY • C#": "STAR-SPIN BUDDY • L#", "ĐỆ CHIM": "BIRD BUDDY", "ĐỆ NỔ": "BOMB BUDDY", "ĐỆ KHIÊN": "SHIELD BUDDY", "ĐỆ HỒI MÁU": "HEALER BUDDY", "ĐỆ LƯỚT CHÉM": "DASH-SLASH BUDDY", "ĐỆ SAO XOAY": "STAR-SPIN BUDDY", "HỒI SINH": "REVIVE", "CHIÊU CUỐI TỨC THÌ": "INSTANT ULTIMATE", "KHIÊN KHI CHANNEL": "CHANNEL SHIELD", "CHÍ MẠNG": "CRITICAL", "Ụ SÚNG KHAI HOẢ —": "TURRET FIRING —", "CẮM Ụ SÚNG": "PLANT TURRET", "DRONE KHIÊN — # GIÂY": "SHIELD DRONE — # SECONDS", "XE TĂNG — PHÁO": "TANK — CANNON", "KHIÊN": "SHIELD", "hồi": "cooldown", "TAM LUÂN": "TRIPLE WHEEL", "LƯỚT SÉT": "LIGHTNING DASH", "HƯ VÔ BỘ PHÁP": "VOID STEP", "CHÂN LONG": "DRAGON STEP", "Ô THỨ BA": "THIRD SLOT", "SHIN GUARD! NẠP LẠI": "SHIN GUARD! RECHARGED", "ĐỠ TRÚNG! NẠP LẠI": "PARRIED! RECHARGED", "THỬ NGHIỆM — KHÔNG TÍNH ĐIỂM": "TESTING — NO SCORE", "SINH TỒN": "SURVIVAL", "CHIẾN ĐẤU": "COMBAT", "TỰ ĐỘNG": "AUTO", "ĐỘC QUYỀN — CẦN ĐÚNG ĐẠN / THẾ / POWER": "EXCLUSIVE — NEEDS THE RIGHT AMMO / STANCE / POWER", "THỨC TỈNH — # Ô": "AWAKENED — # SLOTS", "CẬN CHIẾN": "MELEE", "TẦM XA · ĐƠN MỤC TIÊU": "RANGED · SINGLE TARGET", "TẦM XA · DIỆN RỘNG": "RANGED · AREA", "BĂNG ĐẠN": "MAGAZINE", "TÁCH TIA": "SPLIT SHOT", "TẦM XA": "LONG SHOT", "TỎA": "SPREAD", "XOẮN SÓNG ĐÔI": "TWIN HELIX", "QUỸ ĐẠO": "ORBIT", "KHÚC XẠ": "REFRACTION", "NỔ": "DETONATE", "BĂNG": "FROST", "TIẾP TRỢ": "SUPPLY DROP", "ĐỐT": "BURN", "PHÁ THẾ": "SHATTER", "TÂM NHÃN": "MIND'S EYE", "VÔ CỰC KIẾM": "INFINITY BLADE", "MÀN CUỐI": "FINAL ACT", "KHÍ CÔNG PHÁO": "AIR CANNON", "NỔ MÁY": "ENGINE ON", "CƯA VÀNG": "GOLDEN SAW", "CƯA XANH": "BLUE SAW", "KHO ĐẠN": "AMMO DUMP", "TÊN LỬA": "MISSILES", "BOM NGUYÊN TỬ": "NUKE", "MƯA TÊN": "ARROW RAIN", "Ô": "SLOTS", "HỒI MÁU": "HEAL", "CƠ BẢN": "BASIC", "CHÂN THÂN!": "TRUE FORM!", "CHÂN LONG!": "TRUE DRAGON!", "HẾT DRAGON": "DRAGON ENDED", "XOÈ CÁNH": "WING SPREAD", "DẬM ĐẤT": "GROUND STOMP", "LONG THĂNG": "DRAGON RISE", "LONG GIÁNG": "DRAGON FALL", "PHI LONG TẠI THIÊN": "FLYING DRAGON IN THE SKY", "LONG VIÊM…": "DRAGON FLAME…", "LONG VIÊM PHÁ ĐỊA": "DRAGON FLAME EARTHBREAKER", "— I/O LÊN SHIN +": "— I/O TO SHIN +", "XUYÊN QUA!": "PIERCED THROUGH!", "HƯ VÔ ×": "VOID ×", "HƯ VÔ NGUỘI — ×#": "VOID COOLING — ×#", "HƯ VÔ TẮT": "VOID OFF", "CẮT!": "CUT!", "KIẾM PHÓNG": "SWORDS LAUNCHED", "SÁT THƯƠNG": "DAMAGE", "PHÒNG THỦ": "DEFENSE", "TỐC ĐỘ": "SPEED", "TÀN ẢNH PARRY!": "AFTERIMAGE PARRY!", "KHÁN GIẢ — bạn bất tử, bắn ai cũng được": "SPECTATOR — you're immortal, shoot anyone you like", "bấm ESC để về menu": "press ESC to return to the menu", "HỎA ẤN · DÂY CHUYỀN": "FIRE MARK · CHAIN", "XUYÊN!": "PIERCE!", "▲ NHẢY": "▲ JUMP", "▼ NGỒI": "▼ CROUCH", "giữ ▲ = nhảy # bậc · hết cỡ ngang = LƯỚT": "hold ▲ = jump # steps · full sideways = DASH", "chạm nhẹ = bắn · quẹt ngang = đổi đạn / đổi thế": "light tap = shoot · swipe sideways = swap ammo / stance", "-#% TỐC": "-#% SPEED", "KHOÁ #s": "LOCKED #s", "BẤT ĐỘNG": "IMMOBILIZED", "THIÊN LA ĐỊA VÕNG": "HEAVEN AND EARTH NET", "BẠO VŨ LÊ HOA CHÂM": "STORM OF PEAR-BLOSSOM NEEDLES", "VẠN KIẾM QUY TÔNG": "TEN THOUSAND SWORDS", "VƯƠNG KHỐ": "GATE OF TREASURE", "MÁY ĐANG NỔ — TỰ ĐỔ XĂNG": "ENGINE RUNNING — AUTO REFUEL", "CÚI # LẦN ĐỂ ĐỀ MÁY": "CROUCH # TIMES TO START THE ENGINE", "TIẾP TRỢ! HẾT NÓNG": "SUPPLY DROP! HEAT CLEARED", "TIẾP TRỢ!": "SUPPLY DROP!", "UFO: +# MÁU": "UFO: +# HP", "UFO: ĐÃ ĐẦY MÁU": "UFO: HP FULL", "ĐẾM NGƯỢC #...": "COUNTDOWN #...", "BOM NGUYÊN TỬ!": "NUKE!", "GIẢI NHIỆT!": "COOLED DOWN!", "NGẮT CHANNEL!": "CHANNEL INTERRUPTED!", "KHO ĐẠN! +": "AMMO DUMP! +", "TÊN LỬA!": "MISSILES!", "DRONE SÚNG MÁY!": "MACHINE-GUN DRONE!", "ICE thất bại — mạng hai bên có thể chặn, cần TURN": "ICE failed — either network may be blocking it, TURN is needed", "Kết nối đã đóng": "Connection closed", "Máy bên kia đã thoát": "The other machine has left", "XONG — đã nối, đóng bảng này rồi bấm VÀO TRẬN": "DONE — connected, close this panel then press START MATCH", "BƯỚC #/# — đã nhận mã trả lời, đang chờ nối xong...": "STEP #/# — answer code received, waiting for the connection...", "BƯỚC #/# — đang tạo mã mời...": "STEP #/# — creating invite code...", "BƯỚC #/# — đang tạo mã trả lời...": "STEP #/# — creating answer code...", "chưa mở kết nối": "connection not opened yet", "nội bộ": "local", "công cộng": "public", "trung chuyển": "relay", "địa chỉ": "addresses", "· kênh": "· channel", "chưa có": "none yet", "LỖI:": "ERROR:", "ĐÃ NỐI — bạn là": "CONNECTED — you are", "NGƯỜI CHƠI # (chủ phòng)": "PLAYER # (host)", "NGƯỜI CHƠI # (khách)": "PLAYER # (guest)", "Mã của máy này sẽ hiện ở đây": "This machine's code will appear here", "MẠNG: QUA INTERNET": "NETWORK: OVER THE INTERNET", "MẠNG: CÙNG WIFI (LAN)": "NETWORK: SAME WIFI (LAN)", "LUẬT PHÒNG —": "ROOM RULES —", "loại đạn (chủ phòng đặt)": "ammo types (set by host)", "LOẠI ĐẠN ĐƯỢC XÀI — bấm để tắt, còn": "ALLOWED AMMO — click to disable, remaining", "Đang gom địa chỉ mạng...": "Gathering network addresses...", "không nén được mã": "could not compress the code", "Tạo phòng hỏng:": "Creating the room failed:", "Chưa tạo phòng — bấm TẠO PHÒNG trước": "No room yet — press CREATE ROOM first", "Đã nhận mã trả lời rồi (": "Answer code already received (", "Đây là mã MỜI, không phải mã TRẢ LỜI": "This is an INVITE code, not an ANSWER code", "Mã trả lời không đọc được": "Could not read the answer code", "Đang nối...": "Connecting...", "Nhận mã hỏng:": "Receiving the code failed:", "Đây là mã TRẢ LỜI, không phải mã MỜI": "This is an ANSWER code, not an INVITE code", "Mã mời không đọc được": "Could not read the invite code", "không nén được mã trả lời": "could not compress the answer code", "Vào phòng hỏng:": "Joining the room failed:", "THƯỜNG": "NORMAL", "QUỶ": "DEMON", "CẦN": "NEEDS", "→ CHƯỞNG!": "→ PALM STRIKE!", "NẤC": "TIER", "BÁCH": "HUNDRED", "HUYỀN": "ARCANE", "TỐI THƯỢNG": "SUPREME", "CHỐNG KHÔNG!": "ANTI-AIR!", "TẬN CÙNG": "ULTIMATE END", "BẮN": "SHOOT", "HOÀN THÀNH TOÀN BỘ!": "ALL STAGES COMPLETE!", "THẮNG MÀN": "STAGE CLEARED", "— đã phá cứ điểm địch": "— enemy stronghold destroyed", "MÀN HÌNH CHÍNH": "MAIN SCREEN", "(HẾT MÀN)": "(NO MORE STAGES)", "MÀN TIẾP THEO": "NEXT STAGE", "bấm chuột để chọn": "click to choose", "BÙNG NỔ NGUYÊN TỬ!": "ATOMIC BLAST!", "LAO XOÁY!": "SPIN DASH!", "TRIỆU BẦY!": "SUMMON THE SWARM!", "THÚC QUÂN!": "RALLY THE TROOPS!", "THIẾU TÀI NGUYÊN": "NOT ENOUGH RESOURCES", "MÀN": "STAGE", "— TÀI NGUYÊN ĐỊCH": "— ENEMY RESOURCES", "MÀN # · SA MẠC — TÀI NGUYÊN ĐỊCH #": "STAGE # · DESERT — ENEMY RESOURCES #", "TÀI NGUYÊN": "RESOURCES", "TÀI NGUYÊN #": "RESOURCES #", "[#] CHẶN #": "[#] BLOCK #", "[#] BẮN #": "[#] SHOOT #", "[#] PTERO ĐỎ #": "[#] RED PTERO #", "BOSS ĐÃ RA — HẠ NÓ ĐỂ QUA MÀN": "THE BOSS HAS APPEARED — DEFEAT IT TO CLEAR THE STAGE", "SIÊU TẢI": "SUPERCHARGE", "CỨ ĐIỂM CỦA BẠN": "YOUR STRONGHOLDS", "CỨ ĐIỂM CỦA BẠN #/#     ĐỊCH #/#": "YOUR STRONGHOLDS #/#     ENEMY #/#", "ĐỊCH": "ENEMY", "PHẢN! +": "COUNTER! +", "VỠ!": "BREAK!", "MÁU TỐI ĐA!": "MAX HP!", "HỒI ĐẦY MÁU!": "FULLY HEALED!", "NGƯỜI CHƠI # THẮNG CHUNG CUỘC": "PLAYER # WINS THE MATCH", "HOÀ": "DRAW", "NGƯỜI CHƠI # THẮNG HIỆP": "PLAYER # WINS THE ROUND", "HIỆP HOÀ": "ROUND DRAWN", "thắng": "win", "hiệp là vô địch": "rounds to be champion", "thắng # hiệp là vô địch": "win # rounds to be champion", "Chờ chủ phòng…": "Waiting for the host…", "SPACE — đánh hiệp tiếp": "SPACE — next round", "SPACE — về sảnh chờ": "SPACE — back to the lobby", "NÉ DẬM ĐẤT!": "STOMP DODGED!", "CHẶN LAZER!": "LASER BLOCKED!", "NHẢY QUA! +": "JUMPED OVER! +", "CÚI NÉ! +": "DUCKED! +", "CẠN SỨC QUỶ": "DEMON POWER DRAINED", "TRỞ VỀ DẠNG NGƯỜI": "BACK TO HUMAN FORM", "GIƠ KHIÊN HOẶC LƯỚT NÉ": "RAISE YOUR SHIELD OR DASH AWAY", "KIỆT SỨC": "EXHAUSTED", "# địa chỉ": "# addresses", "kênh": "channel", "gom": "gathering", "SONG NHAM - LEN COT CAO!": "MAGMA WAVE - GET ON A HIGH PILLAR!", "XOAY HUT!": "SUCTION SPIN!", "HOA XA  (DANG LAN)": "FIRE SERPENT  (DIVING)", "HOA XA  (TROI - DANH DI!)": "FIRE SERPENT  (SURFACED - ATTACK!)", "GON SONG - NO O DAY": "RIPPLES - IT'S RIGHT HERE", "SAP TROI LEN!": "ABOUT TO SURFACE!", "TROI LEN!": "SURFACING!", "BAN DUT TO #/#": "SHOOT THE THREADS #/#", "NE DI!": "DODGE!", "CHUP!": "SNAP!", "CHOANG #s - DANH DI!": "STUNNED #s - ATTACK!", "CHAN DIA #": "GROUND QUAKE #", "TRANH RA!": "GET CLEAR!", "PHONG LONG": "WIND DRAGON", "SAP TROI LEN #s": "SURFACING IN #s", "LUA DOC": "VERTICAL FIRE", "BAN CHAN #/#": "SHOOT THE LEGS #/#", "THACH TRU REX  #/#": "PILLAR REX  #/#", "BANG #  RUNG #s": "ICE #  FALLS IN #s", "TANG AN TOAN": "SAFE LEVEL", "BAO BANG! TU TRAI": "ICE STORM! FROM THE LEFT", "BANG NHA  #/#": "ICE FANG  #/#", "SONG XUNG KICH! NHAY LEN BE DA!": "SHOCKWAVE! JUMP ONTO THE ROCK!", "TAN ANH #": "AFTERIMAGE #", "NHAT #/#": "STRIKE #/#", "KIM CANG REX  #/#": "DIAMOND REX  #/#", "LAO PHUN LUA - DOI TANG!": "FIRE DASH - SWITCH LEVELS!", "DA KHOA!": "ROCK LOCKED!", "PHI LONG TAI THIEN": "FLYING DRAGON IN THE SKY", "HOA LONG  #/#": "FIRE DRAGON  #/#", "CAO VUNG RONG - LUI RA XA!": "WIDE CLAW - BACK AWAY!", "SONG LUA - NHAY DOI QUA!": "FIRE WAVE - DOUBLE JUMP OVER!", "HAC LONG VUONG  #/#": "BLACK DRAGON KING  #/#", "SAP #s - BAN CANH!": "COLLAPSE IN #s - SHOOT THE WINGS!", "THACH UNG  #/#": "STONE HAWK  #/#", "HAI TAY CHOP - RA KHOI!": "TWIN-HAND GRAB - GET OUT!", "DA RUNG! COI CHUNG TREN DAU": "FALLING ROCKS! WATCH ABOVE YOU", "DAM XUYEN - DOI TANG!": "PIERCING CHARGE - SWITCH LEVELS!", "QUET TU TREN XUONG!": "TOP-DOWN SWEEP!", "BAN KHOP TAY #/#": "SHOOT THE WRIST #/#", "CU THACH  #/#": "COLOSSUS  #/#", "SIET TAY - RA KHOI!": "CRUSHING GRIP - GET OUT!", "THIEN TRU SON THAN  #/#": "HEAVEN-PILLAR MOUNTAIN GOD  #/#", "THIEN TRU SON THAN  #/#  [DUNG DAY]": "HEAVEN-PILLAR MOUNTAIN GOD  #/#  [STANDING UP]", "DA KHOA - LAO XUONG!": "ROCK LOCKED - DIVING DOWN!", "DANG NGAM...": "AIMING...", "BAM CAY #/# DE NO ROT": "HIT THE TREE #/# TO KNOCK IT DOWN", "CHOANG - DANH DI!": "STUNNED - ATTACK!", "LA RUNG HET: #s": "LEAVES GONE: #s", "CU VIEN  #/#": "GIANT APE  #/#", "BOI NGUOC LAI!": "SWIMMING BACK!", "PHA # — GOLEM": "PHASE # — GOLEM", "EP GIO — NHAY KHONG LEN": "WIND PRESSURE — CAN'T JUMP", "CHAY NGANG!": "SIDE DASH!", "HAI LUONG — VAO KHE GIUA!": "TWIN STREAMS — GET IN THE GAP!", "LUONG CAT — DOI CAO DO!": "SAND STREAM — CHANGE HEIGHT!", "LUONG DANG LEN!": "STREAM RISING!", "PHONG XA  #/#": "WIND SERPENT  #/#", "# KIM": "# NEEDLES", "# TIA!": "# BEAMS!", "BAM CAY #/#": "HIT THE TREE #/#", "BANG NHA!": "ICE FANG!", "BAO TU #/#": "SPORES #/#", "BAT LUOI x#": "WEB CATCH x#", "CANH #/#": "WINGS #/#", "CHIM DUNG NHAM!": "LAVA BIRD!", "CHOANG! DANH DI!": "STUNNED! ATTACK!", "CU THACH!": "COLOSSUS!", "DAM!": "STAB!", "DOI BEN VACH!": "SWITCH SIDES!", "DONG BANG! RA KHOI DO / BAN VO!": "FROZEN! GET OUT OF THERE / SHOOT IT OPEN!", "DUT TO #/#": "THREADS CUT #/#", "HAC LONG VUONG!": "BLACK DRAGON KING!", "HOA LONG!": "FIRE DRAGON!", "HOA XA!": "FIRE SERPENT!", "HUT LUOI!": "WEB SNATCH!", "IM LANG": "SILENCED", "KHUC XA x#  -#": "REFRACTION x#  -#", "KIM CANG REX!": "DIAMOND REX!", "LAN XUONG!": "ROLL DOWN!", "LEN CAY! TREO LEN LA MA BAN!": "UP THE TREE! HANG ON THE LEAF AND SHOOT!", "NAM NO!": "MUSHROOM BURST!", "PHAN DON x#  -#": "COUNTER x#  -#", "PHAN DON!": "COUNTER!", "PHONG LONG!": "WIND DRAGON!", "PHONG XA!": "WIND SERPENT!", "QUA NHIET!": "OVERHEATED!", "ROI! CHOANG!": "FELL! STUNNED!", "ROT XUONG!": "FALLING!", "RUNG CAY! LA RUNG # GIAY": "TREE SHAKEN! LEAVES FALL FOR # SECONDS", "TE BAO AN MON!": "CELLS EATING AWAY!", "THACH TRU REX!": "PILLAR REX!", "THACH UNG!": "STONE HAWK!", "THIEN TRU SON THAN!": "HEAVEN-PILLAR MOUNTAIN GOD!", "CHON MAP - CAMPAIGN": "SELECT MAP - CAMPAIGN", "LO TRINH": "ROUTE", "— TRONG —": "— INSIDE —", "# man · re nhanh lien tuc · chang EX": "# stages · many branches · EX stops", "# map chay tu dong": "# maps played automatically", "Thu thanh, map rong # man": "Tower defense, map spans # stages", "danh cho che do sau nay": "reserved for a future mode", "Bao ve cu diem # mau": "Defend the stronghold # HP", "Sa mac · Rung · Dung nham": "Desert · Forest · Lava", "Thuong sau moi man · mau giu nguyen": "Reward after each stage · HP carries over", "TIA #/#": "BEAMS #/#", "KIM #/#": "NEEDLES #/#", "🩸 #/s · #/# kim": "🩸 #/s · #/# needles", "KHO #/#": "BANK #/#", "DUNG NHAM": "LAVA", "DUNG NHAM #": "LAVA #", "TRIO VANG  ·  #:#": "GOLD TRIO  ·  #:#", "TRIO XANH  ·  #:#": "BLUE TRIO  ·  #:#", "Trang # / #": "Page # / #", "# chang": "# stops", "DINH NUI": "SUMMIT", "RUNG": "FOREST", "SA MAC": "DESERT", "DO CHUONG! BAN VAO TIA!": "BELL TOLLS! SHOOT THE BEAM!", "KHE AN TOAN": "SAFE GAP", "PHAN NO HAT NHAN!": "NUCLEAR COUNTER!", "SAO VO!": "STAR BROKEN!", "CHEM VO TIA!": "BEAM CUT!", "XUYEN!": "PIERCE!", "XUYEN": "PIERCE", "HOA XA": "FIRE SERPENT", "COT SAP!": "PILLAR COLLAPSING!", "(TROI - DANH DI!)": "(SURFACED - ATTACK!)", "BAN DUT TO": "SHOOT THE THREADS", "CHOANG": "STUNNED", "s - DANH DI!": "s - ATTACK!", "BAO LA - TIM KHE!": "LEAF STORM - FIND THE GAP!", "QUAT NGANG - DOI DO CAO!": "SIDE FAN - CHANGE HEIGHT!", "RUNG GIA THUC TINH!": "THE ELDER FOREST AWAKENS!", "CHAN DUOC! CHOANG!  (": "BLOCKED! STUNNED!  (", "NHAM TOI CHIEU CAO THAY VI NGANG": "AIMS AT HEAD HEIGHT INSTEAD OF LEVEL", "SAU DO LUOT VAO CHEM": "THEN DASHES IN TO SLASH", "KHONG CON KHIEN - DANH DI!": "NO SHIELD LEFT - ATTACK!", "KHIEN HOA KIEM!": "SHIELD BECOMES A SWORD!", "VO KIEM KHI!": "SWORD WAVE BROKEN!", "NEM KHIEN!": "SHIELD THROW!", "CHAN DIA": "GROUND QUAKE", "KIEM KHI": "SWORD WAVE", "KIEM KHI! BAN VO NO!": "SWORD WAVE! SHOOT IT DOWN!", "SAP TROI LEN": "ABOUT TO SURFACE", "LOI VO!": "CORE BROKEN!", "SAP LAO TOI! TRANH RA!": "ABOUT TO CHARGE! GET CLEAR!", "THACH TRU REX": "PILLAR REX", "CHAN COT": "PILLAR BASE", "HUY DON!": "MOVE CANCELLED!", "SAP TRU!": "PILLAR SINKING!", "LUA NGANG": "HORIZONTAL FIRE", "BAN CHAN": "SHOOT THE LEGS", "HO! DANH DI!": "EXPOSED! ATTACK!", "BANG NHA": "ICE FANG", "VO BANG!": "ICE BROKEN!", "CHOANG!": "STUNNED!", "BAO BANG!": "ICE STORM!", "TU TRAI": "FROM THE LEFT", "TU PHAI": "FROM THE RIGHT", "KIM CANG REX": "DIAMOND REX", "TAN ANH!": "AFTERIMAGE!", "HOAN HAO! CHOANG!": "PERFECT! STUNNED!", "TAN ANH": "AFTERIMAGE", "NHAT": "STRIKE", "HAC LONG VUONG": "BLACK DRAGON KING", "CHAY VE PHIA RONG!": "RUN TOWARD THE OPENING!", "GIO DAY! CHAY VE PHIA RONG!": "WIND BLOWING! RUN TOWARD THE OPENING!", "THACH UNG": "STONE HAWK", "CANH": "WINGS", "DUOI DUOC!": "DODGED!", "BI QUAP! BAN DE THOAT!": "SNATCHED! SHOOT TO ESCAPE!", "THOAT": "ESCAPE", "THOAT!": "ESCAPED!", "BI THA!": "DROPPED!", "s - BAN CANH!": "s - SHOOT THE WINGS!", "BAN DE THOAT": "SHOOT TO ESCAPE", "CU THACH": "COLOSSUS", "KHOP": "JOINT", "LAM ROI! DUOC BE MOI!": "MADE IT! A LEDGE APPEARS!", "BAN KHOP TAY": "SHOOT THE WRIST", "THIEN TRU SON THAN": "HEAVEN-PILLAR MOUNTAIN GOD", "NUI DUNG DAY! LEO LEN!": "THE MOUNTAIN RISES! CLIMB UP!", "NGHIENG PHAI - TRUOT!": "TILTING RIGHT - SLIDING!", "NGHIENG TRAI - TRUOT!": "TILTING LEFT - SLIDING!", "CU VIEN": "GIANT APE", "BAM CAY": "HIT THE TREE", "/# DE NO ROT": "/# TO KNOCK IT DOWN", "LA RUNG HET:": "LEAVES GONE:", "DIEN TIET!": "ENRAGED!", "KET TRONG BEO — BAN DI!": "STUCK IN THE WEEDS — SHOOT!", "HOA TAM": "FIRE HEART", "NHAM THACH GOLEM": "MAGMA GOLEM", "HOA TAM — TAN LUC": "FIRE HEART — SPENT", "DIEM THUONG": "HELLSPEAR", "HOA LANG": "FIRE WOLF", "PHONG XA": "WIND SERPENT", "BAO NOI LEN!": "STORM RISING!", "LAO LEN!": "RISE UP!", "BI GHIM!": "PINNED!", "BI NGHE THAY!": "HEARD YOU!", "CHAN DUOC!": "BLOCKED!", "BACH TUOC": "OCTOPUS", "BAO TU": "SPORES", "GO BAO TU (": "CLEAR SPORES (", "HOI DAY MAU": "FULL HEAL", "NHAY DE TREO LEN!": "JUMP TO HANG ON!", "KHIEN LUOI!": "WEB SHIELD!", "BU LUOI": "WEB REFILL", "MAT HET LUOI!": "OUT OF WEBS!", "TIA": "BEAMS", "KIM": "NEEDLES", "KHO": "BANK", "TIA!": "BEAMS!", "GAI": "SPIKES", "GHIM!": "PINNED!", "LUOI KEP!": "TWIN BLADES!", "DAO": "KNIVES", "— KHU DUNG NHAM —": "— LAVA ZONE —", "#. KIM CANG REX": "#. DIAMOND REX", "KHO # VIEN": "BANK # ROUNDS", "BAO CHUA REX   # / #": "TYRANT REX   # / #", "SANG MAP:": "GO TO MAP:", "XE": "TANK", "DOC QUYEN GIAO.": "SPEAR EXCLUSIVE.", "KHONG TINH DIEM": "NO SCORE", "LEN LUOI!": "WEB UP!", "CAM XUONG! (": "PLUNGE! (", "TAN...": "SPENT...", "CAM LUOI! -#": "WEB STAB! -#", "PHAN DON x": "COUNTER x", "BAT LUOI x": "WEB CATCH x", "KHUC XA x#": "REFRACTION x#", "KHUC XA x": "REFRACTION x", "TRUNG": "HIT", "HOI DAY MAU!": "FULL HEAL!", "CHAN DUOC! CHOANG!  (DAY BAT)": "BLOCKED! STUNNED!  (KNOCKED BACK)", "DAY LUI!": "PUSHED BACK!", "SONG #": "WAVE #", "DAY BAT": "KNOCKED BACK", "MÁY": "CPU", "NỔ MÁY!": "ENGINE ON!", "◆ LAZER QUÉT #° ◆": "◆ LASER SWEEP #° ◆", "NGAT CHANNEL!": "CHANNEL INTERRUPTED!", "CO VAN DO: man # / #": "RUN IN PROGRESS: stage # / #", "BAT ON!": "UNSTABLE!", "DO THUA!": "CLASH LOST!", "DO THANG!": "CLASH WON!", "ĐẬP LIÊN HOÀN x#": "SLAM COMBO x#", "ĐẬP LIÊN HOÀN": "SLAM COMBO" };
         const DICH_VI = /[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ]/i;
         const DICH_NOI = /(\s*[—·:→]\s*|\s{2,}|\s+-\s+)/;
         const _dichNho = new Map();
@@ -74505,7 +75351,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
            tuc la khong hien ra o Customize, ma Customize moi la cho nguoi ta thuc su dung.
            Cac bang phai noi them khi co dan moi: AMMO_NAMES · ammoColors · ammoDesc (ca hai
            ngon ngu) · AMMO_NHOM · PVP_HS · PVP_SAN · AI_HOSO. */
-        const AMMO_NHOM = [1, 2, 1, 2, 2, 0, 2, 1, 2, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0];   // 18 LUOI HAI = can chien   // 16 PHI TIEU, 17 KIEM VU = tam xa don muc tieu   // MIDAS, VENOM = can chien | 14 CUSTOM = tam xa don muc tieu | 15 DINOSAW = can chien
+        const AMMO_NHOM = [1, 2, 1, 2, 2, 0, 2, 1, 2, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0];   // 19 DAI KIEM = can chien   // 18 LUOI HAI = can chien   // 16 PHI TIEU, 17 KIEM VU = tam xa don muc tieu   // MIDAS, VENOM = can chien | 14 CUSTOM = tam xa don muc tieu | 15 DINOSAW = can chien
         const AMMO_NHOM_TEN = [
             ['CẬN CHIẾN', 'MELEE'],
             ['TẦM XA · ĐƠN MỤC TIÊU', 'RANGED · SINGLE TARGET'],
@@ -75111,6 +75957,32 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '-Cấp 2 (đang cấp 1, hạng S trở lên): THẦN CHẾT GIÁNG THẾ — hình dạng đổi thành thần chết, mọi đòn +1, tầm ×1.3, KHÔNG TỐN THỂ LỰC. Hết dạng thì hồi 1 máu.',
                 '#CHIÊU CUỐI [U] — SỔ SINH TỬ',
                 '-Mọi thứ ngưng đọng 2.5 giây, thần chết ghi tên từng kẻ địch. Kẻ bị ghi tên mất 8 máu mỗi giây tới chết.'
+            ],
+            [
+                '#THỂ LỰC',
+                '-3 thể lực. Hồi 1 mỗi ~0.43s khi không đánh.',
+                '#NỘI TẠI',
+                '-Kiếm có HAI TRẠNG THÁI: TRÊN LƯNG và DƯỚI ĐẤT (HUD có ghi). Chém xong kiếm nằm dưới đất ~2.5 giây rồi tự nhấc lên chậm.',
+                '-Vung chậm lúc đầu rồi giáng xuống rất nhanh. Tầm xa. Đi lại và nhảy chậm như Búa (85%), kiếm dưới đất còn chậm hơn.',
+                '-MA PHÁP TRỌNG LỰC: mọi nhát chém (và sóng) trúng kẻ đang bay đều ghim nó rơi xuống đất 0.75 giây — đứa nào bay thì đứa đó chết.',
+                '#ĐÒN J',
+                '-J (trên lưng): CHÉM XUỐNG. 7 sát thương, tốn 1. Kiếm cắm lại dưới đất.',
+                '-J (dưới đất): NHẤC KIẾM bằng lực — đẩy kiếm nhích lên trước (mặt đất nứt), khựng lại rồi mới giật lên: chém hất lên 7 sát thương, không tốn thể lực, hồi khá chậm trước nhát kế.',
+                '-Lướt khi kiếm dưới đất: ĐÂM bằng mũi kiếm, 5 sát thương.',
+                '-NHẢY khi kiếm dưới đất: BẠT SƠN — nhấc mạnh kiếm lên theo đà nhảy, 11 sát thương, tốn 2.',
+                '-Nhảy J (kiếm dưới đất, đã ở trên không): HỒI KIẾM — nhấc kiếm về lưng trên không, 9 sát thương. Nhảy J (trên lưng): bổ xuống 7.',
+                '-Lướt J: HOÀNH TẢO — lao tới chém ngang cực mạnh, 10 sát thương, đẩy lùi, PHÁ đòn lao của địch (chặn luôn đòn chạm). Tốn 3.',
+                '#TÍCH LỰC [K] — tối đa 3s (180f)',
+                '>0.5s (30f) — ĐỘT KÍCH — thu kiếm ra sau một chút rồi ĐÂM XUYÊN, lao xa gấp rưỡi một cú lướt (có khung bất tử ngắn), trúng mọi kẻ trên đường lao. 8 sát thương, đẩy lùi nhẹ, tốn 1.',
+                '>1s (60f) — VUNG TRẢM — lấy đà chậm rồi vung chém NGANG hơi chếch lên thật nhanh. 10 sát thương, đẩy lùi + PARRY. Đứng yên khi ra đòn. Tốn 1.',
+                '>1.5s (90f) — LIỆT ĐỊA TRẢM — hạ thẳng kiếm từ trên lưng xuống đất SAU LƯNG rồi vung từ dưới vòng lên ngược chiều kim đồng hồ như Lưỡi hái chém hất (chậm → nhanh), mũi kiếm miết nứt đất: chém 10 + SÓNG XUNG KÍCH 10 bay dọc mặt đất. Đứng yên. Tốn 2.',
+                '>2s (120f) — TRỌNG ẤN — cắm kiếm, kiếm sáng tím, vòng tím co lại vào kiếm: MỌI kẻ đang bay bị kéo xuống đất 4 giây, không bay được. 2-3 sát thương tuỳ cỡ boss. Trong 1 giây đầu MỌI kẻ địch bị PHONG ẤN: chiêu đang tung bị huỷ, không tung được chiêu mới. Tốn 2.',
+                '>2.5s (150f) — BÁT MÔN — hào quang đỏ 4.5 giây: VÔ HẠN THỂ LỰC, vung nhanh hơn ~25%, hồi nhanh hơn, đi lại thoải mái hơn.',
+                '#CHANNEL — ĐỊA CHẤN ẤN (giữ K từ 3s)',
+                '-Cắm kiếm, đứng yên. Mỗi 2 giây một đợt địa chấn: mọi kẻ địch chịu 10 sát thương và bị làm chậm 1 giây. Kẻ đang bay còn bị kéo xuống, chạm đất thì ăn thêm một đợt (quái nhỏ 1, boss 2-3). Khác Trọng Ấn: hết đợt chúng bay lại được, nhưng vẫn dính nhịp sau.',
+                '#CHIÊU CUỐI [U] — THIÊN ĐỊA NHẤT TRẢM · THIÊN THẠCH KIẾM',
+                '-Pha 1: chém quét cả màn hình, 30 sát thương. Mặt đất nứt, MỌI kẻ địch trên màn (cả con xuất hiện giữa chừng) mất trọng lực lơ lửng.',
+                '-Pha 2: kiếm bay lên đỉnh trời giữa sấm sét và hào quang từ tím, hút đá và kẻ địch thành một quả cầu rồi đập xuống nổ 120 sát thương. Bất tử suốt chiêu.'
             ]
         ];
         const AMMO_CHITIET_EN = [
@@ -75586,6 +76458,32 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '-Tier 2 (from tier 1 at rank S+): DEATH INCARNATE — you take the Reaper\'s shape, every hit +1, reach x1.3, NO STAMINA COST. You heal 1 HP when it ends.',
                 '#ULTIMATE [U] — LEDGER OF THE DEAD',
                 '-Time stops for 2.5s while the Reaper writes down every enemy\'s name. Marked foes lose 8 HP a second until they die.'
+            ],
+            [
+                '#STAMINA',
+                '-3 stamina. Regains 1 every ~0.43s while not attacking.',
+                '#PASSIVE',
+                '-The blade has TWO STATES: ON YOUR BACK and IN THE GROUND (shown on the HUD). After a chop it stays in the ground ~2.5s, then is slowly lifted on its own.',
+                '-Swings start slow then crash down fast. Long reach. Walks and jumps slowly like the Hammer (85%), slower still with the blade down.',
+                '-GRAVITY MAGIC: every cut (and wave) that hits a flying enemy pins it to the ground for 0.75s — whoever flies, dies.',
+                '#J ATTACKS',
+                '-J (on back): DOWNWARD CHOP. 7 damage, costs 1. The blade stays in the ground.',
+                '-J (blade down): HEAVE — pry the blade up a little first (the ground cracks), a beat, then rip it up: 7-damage rising cut, free, but slow to recover.',
+                '-Dash with the blade down: STAB with the tip, 5 damage.',
+                '-JUMP with the blade down: UPHEAVAL — rip the sword up with the jump, 11 damage, costs 2.',
+                '-Jump J (blade down, already airborne): RECOVER — heave it back onto your back in mid-air, 9 damage. Jump J (on back): falling chop 7.',
+                '-Dash J: CLEAVE — lunge into a brutal horizontal swing, 10 damage, knockback, BREAKS enemy rushes (and blocks contact hits). Costs 3.',
+                '#CHARGE [K] — max 3s (180f)',
+                '>0.5s (30f) — PIERCING LUNGE — draw the sword back, then thrust through everything, lunging 1.5x as far as a normal dash (brief i-frames). 8 damage, light knockback, costs 1.',
+                '>1s (60f) — WIDE CLEAVE — slow wind-up, then a fast horizontal swing angled just slightly upward. 10 damage, knockback + PARRY. You stand still. Costs 1.',
+                '>1.5s (90f) — EARTH-RENDER — lower the blade straight from your back to the ground BEHIND you, then swing it up from below counter-clockwise like the Scythe\'s rising cut (slow → fast), the tip scraping and cracking the ground: 10 slash + a 10-damage SHOCKWAVE along the ground. Stand still. Costs 2.',
+                '>2s (120f) — GRAVITY SEAL — plant the sword; it glows purple and a purple ring collapses into it: EVERY flying enemy is dragged to the ground for 4s and cannot fly. 2-3 damage by boss size. For the first second EVERY enemy is SEALED: the move in progress is cancelled and no new move can start. Costs 2.',
+                '>2.5s (150f) — EIGHT GATES — red aura for 4.5s: INFINITE STAMINA, ~25% faster swings, quicker recovery, freer movement.',
+                '#CHANNEL — QUAKE SEAL (hold K from 3s)',
+                '-Plant the sword and stand still. Every 2s a quake: every enemy takes 10 damage and is slowed for 1s. Flyers are also dragged down and take another hit when they land (small mobs 1, bosses 2-3). Unlike Gravity Seal they fly again afterwards, but the next pulse catches them.',
+                '#ULTIMATE [U] — WORLD SPLITTER · METEOR BLADE',
+                '-Phase 1: a screen-wide sweep, 30 damage. The ground cracks and EVERY enemy on screen (even ones arriving mid-move) loses gravity and floats.',
+                '-Phase 2: the sword soars to the top of the sky amid lightning and a purple magnetic aura, pulls rocks and enemies into a ball, then slams it down for a 120-damage explosion. Invincible throughout.'
             ]
         ];
         function ADESC(i){ return (currentLang === 'en' ? AMMO_CHITIET_EN : AMMO_CHITIET_VI)[i] || []; }
@@ -78893,7 +79791,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
         // Trickster". Cho P2 mot bien rieng, va tra lai quyen chon cho ca hai o sanh.
         let p2Stance = 0;
 
-        let ammoColors = ["#00BCD4", "#FF5722", "#76FF03", "#FFEB3B", "#E0F7FA", "#FFFFFF", "#FFD700", "#80DEEA", "#4FC3F7", "#EC407A", "#B0BEC5", "#FFD54F", "#FFC107", "#7E57C2", "#90A4AE", "#FF7043", "#FF8A80", "#80DEEA", "#BA68C8"]; 
+        let ammoColors = ["#00BCD4", "#FF5722", "#76FF03", "#FFEB3B", "#E0F7FA", "#FFFFFF", "#FFD700", "#80DEEA", "#4FC3F7", "#EC407A", "#B0BEC5", "#FFD54F", "#FFC107", "#7E57C2", "#90A4AE", "#FF7043", "#FF8A80", "#80DEEA", "#BA68C8", "#B0BEC5"]; 
 
         // --- PREVIEW VARIABLES (he thong xem truoc trong menu Customize) ---
         let previewEnemies = [];
@@ -82726,7 +83624,8 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             /* 15 DINOSAW   */ { dai:[ 30,  80], ep:true,  sac:0.9, moc:[18] },
             /* 16 PHI TIEU  */ { dai:[240, 420], ep:false, sac:1.2, moc:[90] },
             /* 17 KIEM VU   */ { dai:[260, 460], ep:false, sac:2.5, moc:[120, 160] },
-            /* 18 LUOI HAI  */ { dai:[ 40, 100], ep:true,  sac:1.0, moc:[15] }
+            /* 18 LUOI HAI  */ { dai:[ 40, 100], ep:true,  sac:1.0, moc:[15] },
+            /* 19 DAI KIEM  */ { dai:[ 60, 130], ep:true,  sac:1.0, moc:[60] }
         ];
         function aiHoSo(a){ return AI_HOSO[a] || { dai:[200, 340], ep:false, sac:1, xa:false }; }
         let AI_KV_NAP = [150, 240, 330], AI_KV_GAN = 6, AI_KV_GIU = 0;   // @@HE-PVPCUS: nhip nap / ban cua AI Kiem Vu
@@ -83997,7 +84896,9 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             // 17 KIEM VU : moi 0.5 giay sinh mot thanh kiem; 3 giay la Channel VUONG KHO
             [[30,"#B2EBF2"],[60,"#80DEEA"],[90,"#4DD0E1"],[120,"#26C6DA"],[150,"#00BCD4"],[180,"#FFFFFF"]],
             // 18 LUOI HAI: moc / chu thap / luot lui / khien xoay / cua dia nguc (Channel tu 3 giay)
-            LH_TIERS
+            LH_TIERS,
+            // 19 DAI KIEM: dam | chem cheo len | quet song | cam kiem (keo xuong dat) | bat mon (Channel tu 3 giay)
+            DK_TIERS
         ];
         // (VENOM da nam san trong bang tren — khong con phai va rieng o duoi nua.)
         // ============================================================================
@@ -86171,7 +87072,8 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             1,   // 15 DINOSAW    — @@HE-CANPVP3: 2 -> 1 (combo 1/1/5 bi san 2 day len, thang 74%)
             0,   // 16 PHI TIEU   — nhu Custom (chung duong code)
             0,   // 17 KIEM VU
-            2    // 18 LUOI HAI   — can chien nhu Bua (@@HE-P2KHOA: gio ca P1 lan P2 deu dung that)
+            2,   // 18 LUOI HAI   — can chien nhu Bua (@@HE-P2KHOA: gio ca P1 lan P2 deu dung that)
+            2    // 19 DAI KIEM   — can chien, nhip cham
         ];
         /* @@HE-CANPVP — CAN THEO BA TRUC: TAM XA · TOC DANH · DO DE TRUNG.
            Cang danh day, cang de trung, tam cang xa thi he so cang thap. Vu khi phai
@@ -86231,7 +87133,8 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                    //    no may manh). Lay he so gan DINOSWORD (0.90), se do lai khi du bo don.
             0.58,  // 16 PHI TIEU   — @@HE-PVPCUS: 0.92 -> 0.58. Kim gio nap ult + Bao Vu / Thien La cat that (co no chay mau) trong PvP: thang 86% o 0.92
             0.33,  // 17 KIEM VU    — @@HE-PVPCUS: 0.93 -> 0.33. Kiem bay TU TIM muc tieu nen gan nhu trung het; AI moi biet giu K nap kiem: thang 88% o 0.93
-            1.00   // 18 LUOI HAI   — tam, chua do PvP
+            1.00,  // 18 LUOI HAI   — tam, chua do PvP
+            0.75   // 19 DAI KIEM   — tam: don to (7-10) nhung cham, chua do PvP
         ];
         /* LOI DA SUA — SAN "toi thieu 1" LAM PHANG HET MOI DON.
            Truoc day ham nay lam tron tung nhip va ep toi thieu 1. Voi he so < 1 thi MOI
@@ -87584,6 +88487,7 @@ function checkPvPCollisions() {
             if (typeof wkgDongBo === 'function'){ wkgDongBo(); wkgTick(); wkgVe(); }             // @@HE-WUKONG
             if (typeof trdDongBo === 'function'){ trdDongBo(); trdTick(); trdVe(); }             // @@HE-TRIDENT
             if (typeof lhDongBo === 'function'){ lhDongBo(); lhTick(); lhVe(); }                 // @@HE-LUOIHAI
+            if (typeof dkChung === 'function') dkChung();                                         // @@VK-DAIKIEM
             if (typeof dino !== 'undefined' && dino && (currentAmmoType === 5 || currentAmmoType === 10 || currentAmmoType === 11) && !dino.ultActive){   // @@HE-THELUC
                 let _mx = ammoToiDa(currentAmmoType);
                 if (dino.maxAmmo !== _mx){ dino.maxAmmo = _mx; if (dino.ammo > _mx) dino.ammo = _mx; }
