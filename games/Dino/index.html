@@ -45961,6 +45961,10 @@ class PulsarCloneBoss {
             if (tier === 3){
                 // ===== KATANA THAT — mot canh, CONG (sori) ve phia song, ban luoi deu tu habaki toi mui,
                 // mui KISSAKI vat goc co duong yokote, tsuba tron nho, chuoi dai quan day kieu hishigami =====
+                /* @@HE-KATNGUOC — Hans: "Katana bi nguoc". Luoi quay THEO CHIEU KIM DONG HO khi chem (goc tang),
+                   nen phia DAN DAU la x+ cua he toa do luoi. Ban truoc canh cat nam o x- (phia sau) va song o x+
+                   (phia truoc): chem bang song kiem, con luc gac vai thi canh cat ty len vai. Lat guong lai. */
+                ctx.scale(-1, 1);
                 const L = 72, W = 3.6, SORI = 5.2, B0 = -8;          // chieu dai luoi, be ngang, do cong, goc luoi
                 const cong = (u) => SORI * u * u;                     // do lech ve phia SONG (x+) theo chieu dai
                 // tsuka dai (hai tay cam) quan day cheo + samegawa
@@ -46197,7 +46201,7 @@ class PulsarCloneBoss {
             ctx.shadowBlur = 10; ctx.shadowColor = mau;
             ctx.beginPath(); ctx.arc(cx, cy, R, -Math.PI/2, -Math.PI/2 + Math.PI*2*k); ctx.stroke();
             ctx.shadowBlur = 0;
-            for (const m of [KAT_J1, KAT_J2, KAT_J3, KAT_J_TRAN]){
+            for (const m of [KAT_J1, KAT_J2, KAT_J_TRAN]){   // @@HE-MOCCHARGE2: vach 105 khong doi don nao -> bo
                 let ang = -Math.PI/2 + Math.PI*2*(m / KAT_J_TRAN), qua = p.katJ >= m;
                 ctx.strokeStyle = qua ? '#FFFFFF' : 'rgba(0,0,0,0.7)'; ctx.lineWidth = qua ? 3 : 2;
                 ctx.beginPath();
@@ -47087,6 +47091,10 @@ class PulsarCloneBoss {
                 this.ammo--;
                 let sScale = this.getFormScale();
                 let dir = this.isFacingLeft ? -1 : 1;
+                if (this._cuiNoiF && frames - this._cuiNoiF <= 40){          // @@HE-CUINOI: dung day noi tu cu cui -> mo dau combo J J J
+                    this._cuiNoiF = 0; this.clawCombo = 0; this.clawComboWindow = 46;
+                    floatingTexts.push(new FloatingText(this.x - 14, this.y - 30, LT("NỐI!", "LINK!")));
+                }
 
                 if ((this.clawComboWindow || 0) <= 0) this.clawCombo = 0;   // qua cua so -> ve nhat dau
                 let step = this.clawCombo || 0;
@@ -47115,6 +47123,7 @@ class PulsarCloneBoss {
                 if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(560, 0.06, 'square', 0.12, 1000);
                 this.clawCombo = 0; this.clawComboWindow = 0; this.clawRiseWindow = 0;
                 this.attackCooldown = 32;                                    // khong noi combo, khong spam
+                this._cuiNoiF = frames;                                      // @@HE-CUINOI: dung day chem thi ra nhanh
                 if (this.ammo <= 0) { this.isOverheated = true; this.overheatTimer = 150; }
             },
             // ===== KUUENZAN — chem xoay vong tren khong =====
@@ -47701,7 +47710,13 @@ class PulsarCloneBoss {
             /* Cua so Dash J -> J cua Katana cung phai vuot qua hang rao hoi don: cu
                Rapid Slash dat cooldown 10, nen bam J thu hai trong 10 khung do bi
                nuot va don hat tung khong bao gio ra. */
-            jQuaHoi(){ return katBat(5) && (this.katRapidCS || 0) > 0; },
+            jQuaHoi(){
+                if (katBat(5)) return (this.katRapidCS || 0) > 0;
+                /* @@HE-CUINOI — CUI + J tu no hoi cham (32 khung), nhung DUNG DAY chem ngay sau do thi nhat
+                   moi ra NHANH (tu khung 8 toi 40 sau cu cui) — chem sat dat roi dung len noi thang vao combo. */
+                let d = frames - (this._cuiNoiF || -999);
+                return this.grounded && d >= 8 && d <= 40 && !(keys['KeyS'] || keys['ArrowDown']);
+            },
             // cay kiem ve tren tay khung long (drawDinoSwordArt o muc 1-2)
             veTrenNguoi(x, y, P){
                 if (typeof drawDinoSwordArt === 'function')
@@ -51749,7 +51764,7 @@ class PulsarCloneBoss {
            CHIEU CUOI: LINH HON NGON GIAO — Poseidon hien ra, cam dinh ba, ne, phong: cam ke dich
                        toi cuoi map, 100 sat thuong + choang 2 giay. */
         const TRD_CM = 43.4;
-        const TRD_TIERS = [[30, "#80DEEA"], [60, "#26C6DA"], [105, "#00ACC1"], [150, "#E0F7FA"]];
+        const TRD_TIERS = [[30, "#80DEEA"], [60, "#26C6DA"], [90, "#4DD0E1"], [105, "#00ACC1"], [135, "#B2EBF2"], [150, "#E0F7FA"]];   // 90: +song · 135: +thuy cau
         const TRD_I_CD = 90, TRD_HAO_T = 600, TRD_NAC_DMG = 20, TRD_NAC_MAX = 3;
         let trd = null, trdPowerCu = -1;
         function trdMoi(){
@@ -53706,6 +53721,15 @@ class PulsarCloneBoss {
         const BUA_PARRY_TOC = 0.34;          // toc xoay toi thieu de Channel parry duoc
         const BUA_CHAN_MAX = 0.62;           // toc xoay toi da cua Channel
         const BUA_SET_CHOANG = 30;           // 0.5 giay choang
+        /* @@HE-BUA2 — Hans: "bua luc nem di thi Charge lau moi xa, ngan thi bay gan hon. Mat bua thi nem
+           1-3 tia set kieu Zeus (moc chua charge khong co, 1 va 2 theo moc dang charge, 3 o Channel), 4 dmg
+           moi tia. J Dash thi bua XOAY luc luot. Xuong + J nen dat (dia chan)."
+           Nem: 30f -> 280px / 4 dmg · 60f -> 520px / 7 dmg + sam set · 120f -> bay het man / 12 dmg + goi ve.
+           Tam ngan thi bua VE TAY SOM — mat bua it hon nen sat thuong thap hon. */
+        const BUA_NEM_TAM = [280, 520];
+        const BUA_ZEUS_DMG = 4, BUA_ZEUS_TOC = 20, BUA_ZEUS_MOC = [30, 90];
+        const BUA_TIERS_TAY = [[30, "#FFF59D"], [90, "#FFEE58"]];   // vach charge luc MAT BUA
+        const BUA_DIA_DMG = 5, BUA_DIA_SONG = 3;
         // (da xoa: code chet, khong con duong nao chay toi)
         function buaMat(){ return currentAmmoType === 11 && (typeof dino !== 'undefined') && dino && !!dino.buaBay; }
         function buaHeSo(){ if (typeof lhBat === 'function' && lhBat()) return 1; return buaMat() ? BUA_NHANH : (currentAmmoType === 11 ? BUA_CHAM : 1); }
@@ -53760,6 +53784,15 @@ class PulsarCloneBoss {
                 // phai nhanh den muc phi ly.
                 if (this.grounded && (this._buaLuotDu || 0) > 0){ this.buaLaoNhay(); return; }
                 if (!this.grounded){ this.buaNhay(); return; }
+                // @@HE-BUA2 — XUONG + J: DIA CHAN
+                if (keys['KeyS'] || keys['ArrowDown']){
+                    this._buaDanh(BUA_DIA_DMG, 14, BUA_TAM[0], 10, 40, 30, 'nen');
+                    this.buaKhung = BUA_KHUNG + 4; this.buaBuoc = 0; this.buaCS = 0;
+                    this._buaDiaCho = 11;                       // song chay ra dung luc dau bua cham dat
+                    floatingTexts.push(new FloatingText(this.x - 26, this.y - 34, LT("ĐỊA CHẤN!", "QUAKE!")));
+                    this.buaCho = BUA_LAI;
+                    return;
+                }
                 if ((this.buaCS || 0) <= 0) this.buaBuoc = 0;
                 let b = this.buaBuoc || 0;
                 if (b === 0){
@@ -53816,14 +53849,14 @@ class PulsarCloneBoss {
                 shakeTimer = Math.max(shakeTimer, 14 + Math.round(8 * (k || 1)));
             },
             // ===== NEM BUA =====
-            buaNem(dmg, veLai){
+            buaNem(dmg, veLai, tam){
                 if (this.buaBay) return;
                 // Ba moc nem 5 / 8 / 12 la so ban dat, nhung he so PvP cua Bua la 0.53 nen
                 // ra man hinh chi con 3 / 4 / 6. Chia nguoc he so de con so hien ra dung
                 // bang so thiet ke; sam set di kem van giu nguyen nhu cu.
                 if (gameState === 'pvp') dmg = dmg / (PVP_HS[11] || 1) + 1e-6;
                 let dir = this.isFacingLeft ? -1 : 1;
-                this.buaBay = { x: this.x + this.w/2 + dir * 26, y: this.y + this.h * 0.42,
+                this.buaBay = { x: this.x + this.w/2 + dir * 26, y: this.y + this.h * 0.42, x0: this.x + this.w/2, tam: tam || 0,
                                 vx: dir * BUA_NEM_TOC, vy: 0, dmg,
                                 pha: 'di', t: 0, hit: new Set(), veLai: !!veLai, set: 0,
                                 goc: dir > 0 ? 0 : Math.PI };
@@ -53844,6 +53877,84 @@ class PulsarCloneBoss {
             // chu ky nay khi cho hai AI cam Bua danh nhau. Chan bang mot co: dang o trong
             // mot day chuyen set thi khong mo them day moi. Set goi ROI RAC trong cung mot
             // khung van chay binh thuong vi co duoc go o finally.
+            // ===== @@HE-BUA2 — DIA CHAN: hai lan song chan chay doc mat dat =====
+            buaDiaSong(){
+                let d0 = this.buaDau(), sc = this.getFormScale(), cx = d0.x, songT = 30;
+                for (const d of [-1, 1]){
+                    giaoSong.push({ chu: this, chuId: this.id, x: cx, y: this.y + this.h * 0.72, dir: d,
+                                    t: songT, t0: songT, r: Math.round(64 * sc), dmg: BUA_DIA_SONG, xuyen: 1, kiem: 0,
+                                    x0: cx, giam: 1, mau: '#FFEE58', hit: new Set() });
+                }
+                if (typeof this.giaoDatDap === 'function') this.giaoDatDap(cx, this.y + this.h, 1.4);
+                shakeTimer = Math.max(shakeTimer, 18);
+                if (typeof SFX !== 'undefined' && SFX.tone){ SFX.tone(70, 0.35, 'sawtooth', 0.28, 35); SFX.tone(1800, 0.08, 'square', 0.12, 500); }
+            },
+            // ===== @@HE-BUA2 — NEM SET KIEU ZEUS (luc mat bua) =====
+            buaZeusNem(n){
+                if (!this.buaZeus) this.buaZeus = [];
+                let cx = this.x + this.w / 2, cy = this.y - 18, dir = this.isFacingLeft ? -1 : 1;
+                let ds = (gameState === 'pvp') ? [((typeof pvpDich === 'function') ? pvpDich(this) : null)].filter(Boolean)
+                                               : ((typeof allTargets === 'function') ? allTargets() : []);
+                ds = ds.filter(o => o && o !== this && o.hp > 0 && !o.invulnAll && (typeof obstacles === 'undefined' || obstacles.indexOf(o) < 0));
+                ds.sort((a, b) => Math.abs(a.x - cx) - Math.abs(b.x - cx));
+                for (let i = 0; i < n; i++){
+                    let m = ds.length ? ds[i % ds.length] : null;
+                    let tx = m ? m.x + (m.w||20) / 2 : cx + dir * 400, ty = m ? m.y + (m.h||20) / 2 : 300;
+                    let g = Math.atan2(ty - cy, tx - cx) + (i - (n - 1) / 2) * 0.09;
+                    this.buaZeus.push({ x: cx - dir * 6, y: cy - i * 6, vx: Math.cos(g) * BUA_ZEUS_TOC, vy: Math.sin(g) * BUA_ZEUS_TOC,
+                                        t: 0, tre: i * 6, muc: m, xong: 0 });
+                }
+                this.ammo = Math.max(0, this.ammo - 1);
+                if (this.ammo <= 0){ this.isOverheated = true; this.overheatTimer = 75; }
+                this.attackCooldown = 18;
+                this._buaZeusTay = 14;                          // gio tay len cao
+                floatingTexts.push(new FloatingText(this.x - 20, this.y - 40, "ZEUS ×" + n));
+                if (typeof SFX !== 'undefined' && SFX.tone){ SFX.tone(2600, 0.10, 'square', 0.16, 900); SFX.tone(140, 0.25, 'sawtooth', 0.18, 60); }
+            },
+            buaZeusTick(){
+                if (this._buaZeusTay > 0) this._buaZeusTay--;
+                for (let i = this.buaZeus.length - 1; i >= 0; i--){
+                    let Z = this.buaZeus[i]; Z.t++;
+                    if (Z.xong){ if (++Z.xong > 12) this.buaZeus.splice(i, 1); continue; }
+                    if (Z.t <= Z.tre){ Z.x = this.x + this.w / 2 - (this.isFacingLeft ? -6 : 6); Z.y = this.y - 18 - i * 6; continue; }
+                    // hoi be lai ve muc tieu
+                    if (Z.muc && Z.muc.hp > 0){
+                        let mx = Z.muc.x + (Z.muc.w||20) / 2, my = Z.muc.y + (Z.muc.h||20) / 2;
+                        let a = Math.atan2(my - Z.y, mx - Z.x), v = Math.hypot(Z.vx, Z.vy), a0 = Math.atan2(Z.vy, Z.vx);
+                        let da = ((a - a0 + Math.PI * 3) % (Math.PI * 2)) - Math.PI; a0 += Math.max(-0.12, Math.min(0.12, da));
+                        Z.vx = Math.cos(a0) * v; Z.vy = Math.sin(a0) * v;
+                    }
+                    let x0 = Z.x, y0 = Z.y; Z.x += Z.vx; Z.y += Z.vy;
+                    let hop = { x: Math.min(x0, Z.x) - 8, y: Math.min(y0, Z.y) - 8, w: Math.abs(Z.x - x0) + 16, h: Math.abs(Z.y - y0) + 16 };
+                    let ds = (gameState === 'pvp') ? [((typeof pvpDich === 'function') ? pvpDich(this) : null)] : ((typeof allTargets === 'function') ? allTargets() : []);
+                    for (let o of ds){
+                        if (!o || o === this || o.invulnAll || o.hp === undefined || o.hp <= 0) continue;
+                        if (!checkAABB(hop, o)) continue;
+                        if (gameState === 'pvp' && typeof pvpVoBoc === 'function') pvpVoBoc(o).takeDamage(BUA_ZEUS_DMG);
+                        else if (typeof dealDamage === 'function') dealDamage(o, BUA_ZEUS_DMG, 'ammo'); else o.hp -= BUA_ZEUS_DMG;
+                        visualEffects.push(new Effect(Z.x, Z.y, 'lightning_shock', true, 30));
+                        this.buaTia = { x: Z.x, y: Z.y, R: 50, t: 12 };
+                        shakeTimer = Math.max(shakeTimer, 8);
+                        Z.xong = 1; break;
+                    }
+                    if (!Z.xong && (Z.y > 330 || Z.t > 80 || Z.x < worldL() - 60 || Z.x > worldR() + 60)){
+                        Z.xong = 1; visualEffects.push(new Effect(Z.x, Math.min(Z.y, 320), 'lightning_shock', true, 20));
+                    }
+                }
+            },
+            buaZeusVe(){
+                if (!this.buaZeus || !this.buaZeus.length) return;
+                ctx.save(); ctx.lineCap = 'round';
+                for (let Z of this.buaZeus){
+                    if (Z.xong) continue;
+                    let v = Math.hypot(Z.vx, Z.vy) || 1, ux = Z.vx / v, uy = Z.vy / v, L = 46;
+                    ctx.globalAlpha = 0.35; ctx.strokeStyle = '#FFF59D'; ctx.lineWidth = 9;
+                    ctx.beginPath(); ctx.moveTo(Z.x - ux * L, Z.y - uy * L); ctx.lineTo(Z.x, Z.y); ctx.stroke();
+                    ctx.globalAlpha = 1;
+                    this.buaVeTia(Z.x - ux * L, Z.y - uy * L, Z.x + ux * 6, Z.y + uy * 6, 2.6, frames * 0.3 + Z.tre);
+                }
+                ctx.restore();
+            },
             buaSet(x, y, R, dmg){
                 if (Player._buaSetDangChay) return;
                 Player._buaSetDangChay = true;
@@ -54066,7 +54177,13 @@ class PulsarCloneBoss {
                         if ((this.grounded && Z.t > 8) || Z.t > 70) this.buaLaoDap(Z.dir);
                     } else {
                         if (!this.buaVK) this.buaVK = { ang: 0.9, ext: -10, veti: [] };
-                        this._buaAnim = null;   // giu the vac, khong xoay bua trong luc lao
+                        this._buaAnim = null;
+                        // @@HE-BUA2 — J roi DASH: bua XOAY vong trong suot cu lao, quet trung ai o canh
+                        this.buaVK.ang += Z.dir * 0.62; this.buaVK.ext += (6 - this.buaVK.ext) * 0.3;
+                        if (Z.t % 5 === 0){
+                            let sc = this.getFormScale(), cx = this.x + this.w / 2, cy = this.y + this.h / 2, R = 62 * sc;
+                            if (this.meleeStrike({ x: cx - R, y: cy - R, w: R * 2, h: R * 2 }, 1)) shakeTimer = Math.max(shakeTimer, 4);
+                        }
                         // LUOT SET khong buff toc do hay tam luot — no la HIEU UNG SAC BUA
                         // truoc cu dap. Tia set day dan tren dau bua trong suot cu lao.
                         if (typeof hasRune === 'function' && (hasRune('voltdash') || hasRune('explshot'))){
@@ -54096,7 +54213,9 @@ class PulsarCloneBoss {
                 }
                 // ---- CHANNEL: xoay nhanh dan ----
                 // MAT BUA thi khong tich luc duoc — khong co bua thi sac cai gi.
-                if (this.buaBay){ this.aKeyHeldTime = 0; this.chargeProgress = 0; }
+                // @@HE-BUA2: MAT BUA van tich duoc — de nem set kieu Zeus
+                if (this.buaZeus && this.buaZeus.length) this.buaZeusTick();
+                if (this._buaDiaCho > 0 && --this._buaDiaCho === 0) this.buaDiaSong();
                 if (this.buaChan){
                     let C = this.buaChan; C.t++;
                     if (C.nghi > 0) C.nghi--;
@@ -54138,7 +54257,8 @@ class PulsarCloneBoss {
                         if (B.set && B.t % 7 === 0) this.buaSet(B.x, B.y, 74, 2);
                         let _mL = (typeof camX === 'number' ? camX : 0) - 60;
                         let _mR = (typeof camX === 'number' ? camX : 0) + canvas.width + 60;
-                        if (B.x < _mL || B.x > _mR){
+                        if (B.tam && Math.abs(B.x - B.x0) >= B.tam){ B.pha = 've'; B.hit = new Set(); }   // @@HE-BUA2: tam ngan -> quay ve som
+                        else if (B.x < _mL || B.x > _mR){
                             // BAY HAN RA NGOAI 2 GIAY roi moi quay ve — trang thai mat bua phai
                             // that su thay duoc, khong phai nhay ra roi ve ngay.
                             B.pha = 'ngoai'; B.ngoai = 120;
@@ -54180,6 +54300,7 @@ class PulsarCloneBoss {
                     }
                 }
                 this.buaVe();
+                this.buaZeusVe();   // @@HE-BUA2
                 this.buaVeUlt();
                 this.giaoVeDap();   // Impact dung chung he voi Giao — PHAI goi o day moi thay
             },
@@ -54210,7 +54331,7 @@ class PulsarCloneBoss {
                     // KHUNG KHUNG dong bang CA hoat anh — dung y nghia hitstop, thay vi de cay
                     // bua chay het roi treo lo lung giua khong trong luc nguoi choi bi dinh chan.
                     if ((this.buaKhung || 0) > 0 && u >= 0.72) A.t--;
-                } else if (!this.buaChan && !this.buaXoay && !this.buaTien){
+                } else if (!this.buaChan && !this.buaXoay && !this.buaTien && !(this.buaLao && this.buaLao.pha === 'toi')){
                     // TU THE VAC VAI: dau bua gac ra sau vai, san sang bo tu tren xuong.
                     // Luon di theo duong NGAN NHAT ve tu the vac vai
                     let _d = -2.55 - V.ang;
@@ -54220,7 +54341,7 @@ class PulsarCloneBoss {
                 }
                 // VET VUNG — dai ruy bang bam theo DAU BUA qua 12 khung gan nhat
                 if (!V.veti) V.veti = [];
-                if ((A && A.kieu !== 'nem') || this.buaChan || this.buaXoay || this.buaTien){
+                if ((A && A.kieu !== 'nem') || this.buaChan || this.buaXoay || this.buaTien || (this.buaLao && this.buaLao.pha === 'toi')){
                     let d0 = this.buaDau();
                     let sc0 = this.getFormScale();
                     let px0 = this.x + this.w/2 + dir * (10 + V.ext * sc0), py0 = this.y + this.h * 0.5;
@@ -54612,17 +54733,25 @@ class PulsarCloneBoss {
                 // Truoc day no ket sau chot attackCooldown nen phai bam J K K moi ra.
                 else if (_hb < 15 && (this.buaCS || 0) > 0 && !this.isOverheated && this.ammo > 0
                          && this.buaCoBua() && !this.buaLao){ this.buaKet(); }
-                else if (!this.buaCoBua()){ /* dang khong co bua: khong lam gi */ }
-                // Ba moc nem cua BUA: truoc day 8 / 10 / 12 — sat nhau qua trong khi
-                // moc cao doi hoi giu gap bon lan. Gian ra: 5 / 8 / 12.
+                else if (!this.buaCoBua()){
+                    // @@HE-BUA2 — MAT BUA: nem set kieu Zeus. Duoi moc dau thi khong co gi.
+                    if (!this.isOverheated && this.ammo > 0 && _hb >= BUA_ZEUS_MOC[0])
+                        this.buaZeusNem(_hb >= BUA_ZEUS_MOC[1] ? 2 : 1);
+                }
+                // @@HE-BUA2: tam bay theo moc — 280 / 520 / het man; sat thuong 4 / 7 / 12
                 else if (_hb >= 120 && _ob){ this.buaNem(12, true); if (this.buaBay) this.buaBay.set = 1; this.buaNoNem(1.6); }
-                else if (_hb >= 60  && _ob){ this.buaNem(8, false); if (this.buaBay) this.buaBay.set = 1; this.buaNoNem(1.4); }
-                else if (_hb >= 30  && _ob){ this.buaNem(5, false); }
+                else if (_hb >= 60  && _ob){ this.buaNem(7, false, BUA_NEM_TAM[1]); if (this.buaBay) this.buaBay.set = 1; this.buaNoNem(1.4); }
+                else if (_hb >= 30  && _ob){ this.buaNem(4, false, BUA_NEM_TAM[0]); }
                 else if (_hb >= 15  && _ob){ this.buaNen(7, BUA_TAM[1], 1.5); this.buaKhung = 8; }
                 else if (_ob){ this.buaKet(); }        // CHAM K = don xoay tien toi (du phong)
             },
             channelRieng(chargeKey){
                 if (chargeKey && combatStance === 0 && this.aKeyHeldTime >= 180) {
+                    if (!this.buaCoBua()){                       // @@HE-BUA2: mat bua -> Channel = 3 tia set
+                        if (!this.isOverheated && this.ammo > 0) this.buaZeusNem(3);
+                        this.aKeyHeldTime = 0; this.chargeProgress = 0;
+                        return;
+                    }
                     if (!this.buaChan) this.buaBatChannel();
                 }
             },
@@ -65437,6 +65566,15 @@ class PulsarCloneBoss {
                 return;
             }
             lh.khong = 0;
+            // @@HE-LHTHU — J ngay sau khi BAT luoi hai: chem XUONG, than chet hien ra chem LEN tao song xung kich
+            if (lh.thuF && frames - lh.thuF <= LH_THU_CUA && !crouch){
+                lh.thuF = 0;
+                lh.chuoi = '3';                                   // ket chuoi: J sau do bat dau chuoi moi
+                lhVung(ng, LH_M.j1);
+                lhHienBat(ng, 'lenSong', LH_THU_DMG);
+                lhChu(ng.x - 30, ng.y - 40, "TỬ THẦN THĂNG!", "REAPER RISE!");
+                return;
+            }
             // CUI J: mot vong ngang dai; dang hien than thi than chet chem them (ton 2)
             if (crouch){
                 lh.chuoi = 'c';
@@ -65500,6 +65638,7 @@ class PulsarCloneBoss {
            cho luoi hai va KHONG CHE (dung hinh) suot luc xoay. Bam J them lan nua khi dang xoay = THU LUOI HAI
            SOM — con da bi moc van giu khong che toi het thoi gian cu, chi la khong an them nhat nao. */
         const LH_NEM_TOC = 24, LH_NEM_KEO = 10;
+        const LH_THU_HOI = 2, LH_THU_CUA = 50, LH_THU_DMG = 4, LH_THU_SONG = 4;   // @@HE-LHTHU
         function lhNemBat(ng){
             let d = lhDir(ng), x0 = ng.x + ng.w / 2 + d * 20;
             lh.nem = { x: x0, y: ng.y + ng.h * 0.4, x1: ng.x + ng.w / 2 + d * 5 * LH_CM, t: 0, T: 60, pha: 'di', goc: 0,
@@ -65561,7 +65700,17 @@ class PulsarCloneBoss {
                 if (N.t >= N.T){ N.pha = 've'; N.moc.clear(); }
             } else {
                 let tx = ng.x + ng.w / 2, ty = ng.y + ng.h * 0.4, dx = tx - N.x, dy = ty - N.y, l = Math.hypot(dx, dy);
-                if (l < 22){ lh.nem = null; lhChu(ng.x - 10, ng.y - 26, "BẮT!", "CATCH!"); return; }
+                if (l < 22){
+                    lh.nem = null;
+                    // @@HE-LHTHU — Hans: "J-JJ thu luoi hai ve se hoi 2 dan. Don J trong thoi gian ngan tiep theo se chem
+                    // luoi hai xuong va than chet hien ra chem luoi hai len tao song xung kich."
+                    let _mx = ng.maxAmmo || 5;
+                    ng.ammo = Math.min(_mx, (ng.ammo || 0) + LH_THU_HOI);
+                    if (ng.ammo > 0 && ng.isOverheated){ ng.isOverheated = false; ng.overheatTimer = 0; }
+                    lh.thuF = frames;
+                    lhChu(ng.x - 22, ng.y - 26, "BẮT! +" + LH_THU_HOI, "CATCH! +" + LH_THU_HOI);
+                    return;
+                }
                 N.x += dx / l * 16; N.y += dy / l * 16;
             }
         }
@@ -65577,6 +65726,7 @@ class PulsarCloneBoss {
             if (kieu === 'doc'){ H.T = 26; H.hitAt = [14]; H.x = cx - d * 34; }
             if (kieu === 'jjj'){ H.T = 46; H.hitAt = [12, 24, 36]; H.x = cx; H.dx = d * 3.6; }
             if (kieu === 'hat'){ H.T = 30; H.hitAt = [11]; H.x = cx + d * 6; H.y = ng.y + ng.h + 34; }
+            if (kieu === 'lenSong'){ H.T = 36; H.hitAt = [18]; H.x = cx + d * 10; }   // @@HE-LHTHU: doi nhat chem xuong cua nguoi choi xong roi moi vut len
             /* @@HE-LUOIHAI4 — Hans: "Combo J J - J cua Liem dang phe qua. Khi dung Combo do Than chet xoay ngang, xoay vong
                chem xuong va xoay vong nguoc lai chem len tao ra mot dot song nang luong manh hon so voi nguoi choi. Don do gay
                them 1 va 2 dmg so voi don chem ngang va song nang luong gay 4 dmg ra xa gan ca man hinh."
@@ -65614,6 +65764,13 @@ class PulsarCloneBoss {
                     else if (H.kieu === 'bo') lhHop(cx + d * 20, H.y - 150 * k, cx + d * 260 * k, H.y + 10, H.dmg, H.hit);
                     else if (H.kieu === 'doc') lhHop(cx + d * 10, H.y - 130 * k, cx + d * 170 * k, H.y + 8, H.dmg, H.hit);
                     else if (H.kieu === 'jjj') lhHop(cx - d * 20, H.y - 90 * k, cx + d * 140 * k, H.y + 6, H.dmg, H.hit);
+                    else if (H.kieu === 'lenSong'){                    // @@HE-LHTHU
+                        lhHop(cx - d * 30, H.y - 190 * k, cx + d * 200 * k, H.y + 10, H.dmg, H.hit,
+                              o => { if (typeof wkgHatTung === 'function' && !o.invulnAll) wkgHatTung(o, 80); });
+                        let W = (typeof canvas !== 'undefined' && canvas.width) ? canvas.width : 1000;
+                        lhSongTao(cx + d * 40, H.y, d, W * 0.7, LH_THU_SONG, 1.3, 14);
+                        shakeTimer = Math.max(shakeTimer || 0, 16);
+                    }
                     else if (H.kieu === 'hat') lhHop(cx - d * 20, H.y - 180 * k, cx + d * 170 * k, H.y + 10, H.dmg, H.hit,
                                                      o => { if (typeof wkgHatTung === 'function' && !o.invulnAll) wkgHatTung(o, 100); });
                     shakeTimer = Math.max(shakeTimer || 0, H.kieu === 'bo' ? 14 : 8);
@@ -66729,9 +66886,9 @@ class PulsarCloneBoss {
                 let k = 0; for (let i = 0; i < H.hitAt.length; i++) if (H.t >= H.hitAt[i] - 8) k = i;
                 let hh = H.hitAt[k], p = Math.min(1, Math.max(0, (H.t - (hh - 8)) / 8));
                 armR = (k % 2 === 0) ? (-0.4 + 2.4 * p) : (2.0 - 2.4 * p);
-            } else if (H.kieu === 'hat'){
+            } else if (H.kieu === 'hat' || H.kieu === 'lenSong'){
                 // chem HAT LEN: luoi tu thap phia truoc quet vut len tren dau
-                luoi = 'dai';
+                luoi = 'dai'; if (H.kieu === 'lenSong') nguoc = true;   // @@HE-LHTHU: phan luoi xuc dat moi ra song
                 armR = H.t < h0 - 5 ? 2.2 : Math.max(-1.1, 2.2 - 3.3 * ((H.t - (h0 - 5)) / 6));
             } else {
                 // bo / doc: gio len (nga ra sau) roi bo xuong dung khung hit
@@ -74738,16 +74895,21 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '>nhát 2 — NHẤC BÚA LÊN — 4 sát thương, tầm 150px, khựng 10 khung.',
                 '>nhát 3 — XOAY RỒI NỆN — xoay 15 khung rồi giáng, 8 sát thương, tầm 178px, Impact lớn, chỉ khựng 4 khung sau đòn.',
                 '-Bấm J một lần rồi thôi thì phải chờ 15 khung mới đánh lại từ đầu.',
+                '>Xuống + J — ĐỊA CHẤN — nện búa xuống đất 5 sát thương, hai làn sóng chấn chạy dọc mặt đất hai bên (3 mỗi làn).',
+                '>J rồi Lướt — BÚA XOAY — búa xoay vòng suốt cú lướt, quét 1 sát thương mỗi nhịp, rồi nện xuống. (Lướt rồi J là nhảy lên nện.)',
                 '#TRÊN KHÔNG [J]',
                 '-Đập rồi GIỮ NGUYÊN TƯ THẾ cho tới khi chạm đất, kiểu Jump Attack của Dark Souls. 9 sát thương, tốn 2 thể lực, kèm 22 khung miễn thương lúc bổ. Bấm là cắm chắc rơi thẳng xuống, không bẻ hướng và không huỷ được.',
                 '#ĐÒN KẾT [K] sau một nhát J',
                 '-Xoay một vòng, TIẾN TỚI 2cm rồi nện, 6 sát thương. Bấm K thêm hai lần nữa để lặp, mỗi lần lại tiến thêm 2cm.',
                 '#TÍCH LỰC — GIỮ K, tối đa 3s (180f)',
                 '>0.25s (15f) — NỆN MẠNH — 7 sát thương, chỉ khựng 8 khung.',
-                '>0.5s (30f) — NÉM BÚA — 5 sát thương. Mất búa: không đánh được gì nhưng chạy nhảy lên 120%.',
-                '>1s (60f) — NÉM KÈM SẤM SÉT — 8 sát thương, búa toả sét dọc đường bay, choáng 0.5 giây.',
-                '>2s (120f) — NÉM CÓ GỌI VỀ — 12 sát thương, búa tự bay về tay. Từ mốc này mở được PARRY.',
-                '-Ba mốc ném TĂNG DẦN 5 → 8 → 12: sạc càng lâu, cú ném càng nặng. Mốc 30f là cú ném vội, mốc 120f mới là cú ném thật.',
+                '>0.5s (30f) — NÉM GẦN — 4 sát thương, bay 280px rồi quay về. Mất búa: chạy nhảy lên 120%.',
+                '>1s (60f) — NÉM KÈM SẤM SÉT — 7 sát thương, bay 520px, toả sét dọc đường bay, choáng 0.5 giây.',
+                '>2s (120f) — NÉM CÓ GỌI VỀ — 12 sát thương, bay hết màn hình rồi tự bay về tay. Từ mốc này mở được PARRY.',
+                '-Sạc càng lâu búa bay càng XA và càng nặng; ném gần thì búa về tay sớm nên sát thương thấp hơn.',
+                '#MẤT BÚA — SÉT KIỂU ZEUS [giữ K]',
+                '>chưa tới 0.5s — không có gì.',
+                '>0.5s (30f) — 1 tia sét · 1.5s (90f) — 2 tia · Channel (3s) — 3 tia. Mỗi tia 4 sát thương, tự bẻ về kẻ địch gần nhất.',
                 '#PARRY',
                 '-Cần ĐỦ TỐC. Giữ K từ mốc 2 giây trở đi là chặn được một đòn — nhưng parry xong thì tích lực tắt sạch về 0.',
                 '-Channel parry được khi vòng xoay đủ nhanh. Parry không tắt Channel nhưng tốc xoay tụt về đáy, phải giữ lại khoảng 3 giây mới đủ parry lần nữa.',
@@ -74929,6 +75091,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '#CHÉM [J]',
                 '>J J J — chém xuống 3 · chém ngang ngược 3 · bổ 6.',
                 '>J . J J — chém 3 · xoay chém 4 · NÉM lưỡi hái bay ra 5cm, MÓC mọi kẻ địch trên đường bay kéo về chỗ nó rồi xoay 1 giây giữ khống chế (2 mỗi 0.25s). Bấm J lần nữa để thu lưỡi hái sớm — kẻ địch vẫn bị khống chế tới hết thời gian.',
+                '>Bắt lưỡi hái về — hồi 2 thể lực. Bấm J ngay sau đó (0.8s): TỬ THẦN THĂNG — bạn chém xuống, thần chết hiện ra vút lưỡi hái lên 4, hất kẻ địch và phóng SÓNG xung kích 4.',
                 '>J J . J — chém 3 · 3 · thần chết hiện ra sau lưng xoay ngang 5, xoay vòng chém xuống 6, xoay ngược chém lên 7 và phóng một đợt SÓNG lớn 4 bay gần hết màn hình.',
                 '>J rồi NHẢY — nhảy lên chém hất 3. Trên không J J J: hất 3 · ngang 3 · chém xuống 6. Trên không J J . J: thần chết chém hất kẻ địch 4 và bạn bật lên nối combo. Bấm K trong combo trên không: ĐẬP XUỐNG 5.',
                 '>Lướt J J J — chém ngang DÀI (lưỡi hái vươn dài ra) 4 mỗi nhát. J rồi Lướt — SÓNG CHẤN ĐỘNG tím 5.',
@@ -75210,16 +75373,21 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '>hit 2 — RISING LIFT — 4 damage, 150px, 10 frames of hitstop.',
                 '>hit 3 — SPIN THEN SLAM — spins for 15 frames then lands for 8 damage at 178px, big impact, only 4 frames of recovery.',
                 '-Press J once and stop, and you wait 15 frames before you can start again.',
+                '>Down + J — QUAKE — slam the ground for 5, two shockwaves race along the floor both ways (3 each).',
+                '>J then Dash — HAMMER SPIN — the hammer spins through the whole dash, 1 damage per beat, then slams. (Dash then J is the leaping slam.)',
                 '#AIRBORNE [J]',
                 '-Smash and HOLD THE POSE until you land, Dark Souls jump attack style. 9 damage, costs 2 stamina, with 22 frames of invulnerability on the way down. Once pressed you drop straight and cannot steer or cancel.',
                 '#FINISHER [K] after a J',
                 '-Spin, ADVANCE 2cm, then slam for 6 damage. Press K twice more to repeat, advancing another 2cm each time.',
                 '#CHARGE — HOLD K, max 3s (180f)',
                 '>0.25s (15f) — HEAVY SLAM — 7 damage, only 8 frames of hitstop.',
-                '>0.5s (30f) — THROW — 5 damage. Without the hammer you cannot attack, but you run and jump at 120%.',
-                '>1s (60f) — THROW WITH THUNDER — 8 damage, lightning along its flight, half second stun.',
-                '>2s (120f) — THROW AND RECALL — 12 damage, the hammer flies back to your hand. PARRY unlocks from this tier.',
-                '-The three throws CLIMB 5 to 8 to 12: the longer you charge, the heavier the throw. 30f is a rushed toss, 120f is the real one.',
+                '>0.5s (30f) — SHORT THROW — 4 damage, flies 280px and comes back. Empty handed you run and jump at 120%.',
+                '>1s (60f) — THROW WITH THUNDER — 7 damage, flies 520px, lightning along its flight, half second stun.',
+                '>2s (120f) — THROW AND RECALL — 12 damage, crosses the whole screen then flies back. PARRY unlocks from this tier.',
+                '-The longer you charge, the FURTHER and heavier the throw; a short throw returns sooner, so it hits softer.',
+                '#EMPTY HANDED — ZEUS BOLTS [hold K]',
+                '>under 0.5s — nothing.',
+                '>0.5s (30f) — 1 bolt · 1.5s (90f) — 2 bolts · Channel (3s) — 3 bolts. 4 damage each, homing on the nearest enemy.',
                 '#PARRY',
                 '-It needs SPEED. Holding K past the 2 second mark blocks one hit, but parrying wipes your charge back to zero.',
                 '-The channel parries once its spin is fast enough. Parrying does not end the channel, but the spin drops to the floor and you must hold roughly 3 more seconds to parry again.',
@@ -75398,6 +75566,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '#CUTS [J]',
                 '>J J J — down-cut 3 · reverse sweep 3 · cleave 6.',
                 '>J . J J — cut 3 · spin cut 4 · THROW the scythe 5cm out: it HOOKS every enemy along its flight, drags them to where it spins and holds them for 1s (2 every 0.25s). Press J again to recall it early — they stay controlled until the time runs out.',
+                '>Catching the scythe back restores 2 stamina. Press J right after (0.8s): REAPER RISE — you cut down, the Reaper appears and sweeps upward for 4, launching the enemy and loosing a SHOCKWAVE for 4.',
                 '>J J . J — cut 3 · 3 · the Reaper appears behind you: spinning sweep 5, full-circle down-cut 6, reverse rising cut 7 that unleashes a huge WAVE for 4 across almost the whole screen.',
                 '>J then JUMP — leap into a rising cut 3. Air J J J: rise 3 · sweep 3 · down-cut 6. Air J J . J: the Reaper launches the enemy for 4 and you hop up to keep going. K during an air combo: SLAM down for 5.',
                 '>Dash J J J — LONG sweeps (the blade reaches much further) of 4. J then Dash — a purple SHOCKWAVE for 5.',
@@ -83867,7 +84036,18 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             if (t <= 0.01) o._mocTruoc = 0;
         }
 
-        function chargeTiersCua(ammo){ return (ammo === 10 && typeof trdBat === 'function' && trdBat()) ? TRD_TIERS : CHARGE_TIERS[ammo]; }   // @@HE-TRIDENT
+        /* @@HE-MOCCHARGE2 — Hans: "nhieu moc Charge J lan K khong chuan: cham toi vach thi phai chuyen luon".
+           Do lai tung loai: KATANA va SON WUKONG van dung bo vach cua Kiem / Giao goc nen co vach o 15 khung ma
+           khong co don nao doi (Katana bat dau doi o 30), con TRIDENT doi them o 90 va 135 ma khong co vach. */
+        const KAT_TIERS = [[30, "#80D8FF"], [60, "#40C4FF"], [90, "#00B0FF"], [120, "#FFFFFF"]];   // Drive | Round Trip | Deep Stinger | JCE
+        const WKG_TIERS = [[30, "#FFE082"], [60, "#FFCA28"], [90, "#FFB300"], [120, "#FFFFFF"]];   // Vong Chong Yeu | May 3s | May 4s | Loc Con
+        function chargeTiersCua(ammo){
+            if (ammo === 10 && typeof trdBat === 'function' && trdBat()) return TRD_TIERS;   // @@HE-TRIDENT
+            if (ammo === 10 && typeof wkgBat === 'function' && wkgBat()) return WKG_TIERS;
+            if (ammo === 5 && typeof katBat === 'function' && katBat(5)) return KAT_TIERS;
+            if (ammo === 11 && typeof dino !== 'undefined' && dino && dino.buaBay && typeof BUA_TIERS_TAY !== 'undefined') return BUA_TIERS_TAY;   // @@HE-BUA2: mat bua -> moc nem set
+            return CHARGE_TIERS[ammo];
+        }
         function chargeVongMax(ammo){ return ammo === 13 ? 185 : 180; }
         function chargeRingColor(ammo, held) {
             let T = chargeTiersCua(ammo) || CHARGE_TIERS[0], col = "#00E5FF";
