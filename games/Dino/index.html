@@ -42189,6 +42189,8 @@ class PulsarCloneBoss {
                 ctx.quadraticCurveTo(bx+39, by+24+cs*8, bx+31, by+31+cs*6);
                 ctx.quadraticCurveTo(bx+16, by+35+cs*5, bx+8, by+28+cs*8); ctx.closePath(); ctx.fill(); ctx.stroke();
                 ctx.fillStyle = P.lt; ctx.beginPath(); ctx.ellipse(bx+18, by+27+cs*7, 10, 4, -0.05, 0, Math.PI*2); ctx.fill();
+                // PHU KIEN BOC THAN (giap): ve ngay tren than, DUOI gai lung va DUOI canh tay
+                if (this.id === 1 && typeof vePhuKienThan === 'function') vePhuKienThan(bx, by, cs, br);
                 // GAI LUNG neo tren song lung
                 if (P.crest) {
                     let P0=[bx+6,by+16+cs*11+br], C=[bx+18,by+8+cs*13+br], P1=[bx+33,by+15+cs*11+br], n=P.crest;
@@ -57767,29 +57769,25 @@ class PulsarCloneBoss {
            thang cap 3. Khi dung Route that thi co doi co nay ve false va doc `cusCap`. */
         let cusThuNghiem = true;
         function cusOBa(){ return typeof hasRune === 'function' && hasRune('cus3o'); }
-        /* @@HE-SONGHE — rune SONG HE: hai o NANG LUC + hai o HIEU UNG.
-           Hai hieu ung luon chay cung luc (va mo duoc cac COMBO cung loai: BANG + NO...).
-           Hai nang luc: neu ca hai deu chi CHINH VIEN DAN THUONG (Bang Dan / Tach Tia / Tam Xa)
-           thi chay chung luon — vd Tach Tia + Tam Xa = ba vien xuyen lon dan. Con lai moi nang
-           luc khac deu THAY HAN cach ban (Railgun, Laser, Cua, Cung...), hai cai do khong the
-           cung nam tren mot nong sung — nen chi MOT LOI chay mot luc va Q / E doi loi. */
-        const CUS_SH_BOTRO = { bangdan: 1, tachtia: 1, tamxa: 1 };
-        let cusSHChon = 0, cusSHCd = 0;          // 0 = loi 1 (o nl) dang chay, 1 = loi 2 (o nl2)
+        /* @@HE-SONGHE — rune SONG HE: hai o NANG LUC + hai o HIEU UNG, va hai nang luc GOP vao
+           MOT phat ban (Hans: "mot nhat ban co ca 2 hieu ung, vd vua tach tia vua toa").
+           Nhom DAN (chinh vien dan thuong) gop voi nhau tu do; nhom VU KHI (thay han cach ban)
+           chi gop duoc voi nhung nhanh dan co nghia tren vu khi do — cap nao khong co nghia thi
+           bang nang cap khong cho lap, thay vi lap vao roi mot nua nam im. */
+        const CUS_SH_DAN = { bangdan: 1, tachtia: 1, tamxa: 1, toa: 1, helix: 1, quydao: 1, mancuoi: 1 };
+        const CUS_SH_VK  = { railgun: ['tachtia', 'toa'], laser: ['tachtia', 'toa'], cung: ['tachtia', 'toa'] };
         function cusSH(){ return typeof hasRune === 'function' && hasRune('cussh'); }
-        function cusSHHaiLoi(){ return cusSH() && !!cusLap.nl && !!cusLap.nl2 && !(CUS_SH_BOTRO[cusLap.nl] && CUS_SH_BOTRO[cusLap.nl2]); }
-        function cusSHNghi(){ return cusSHHaiLoi() ? (cusSHChon ? cusLap.nl : cusLap.nl2) : null; }
-        function cusSHDoi(ng){
-            if (!cusSHHaiLoi() || cusSHCd > 0 || !ng) return false;
-            if (ng.cwKhoa || ng.cusRgGiu || ng.jcState || ng.ultActive) return false;     // dang giua mot don thi khong rut loi
-            cusSHChon = cusSHChon ? 0 : 1; cusSHCd = 30;
-            ng.cusRgGiu = false; ng.cusRgT = 0; ng.cwGiu = 0; ng.cwRo = 0; ng.chargeProgress = 0; ng.aKeyHeldTime = 0;
-            ng.isOverheated = false; ng.overheatTimer = 0;
-            let id = cusSHChon ? cusLap.nl2 : cusLap.nl, it = cusNCTim(id);
-            floatingTexts.push(new FloatingText(ng.x - 30, ng.y - 34, LT("LÕI: ", "CORE: ") + (it ? cusTen(it) : '?')));
-            visualEffects.push(new Effect(ng.x + ng.w / 2, ng.y + ng.h / 2, 'parry', false));
-            if (typeof SFX !== 'undefined' && SFX.tone){ SFX.tone(660, 0.07, 'square', 0.12, 990); SFX.tone(990, 0.09, 'triangle', 0.10, 1320); }
-            return true;
+        function cusSHHop(a, b){
+            if (!a || !b || a === b) return true;
+            if (CUS_SH_DAN[a] && CUS_SH_DAN[b]) return true;
+            if (CUS_SH_VK[a]) return CUS_SH_VK[a].indexOf(b) >= 0;
+            if (CUS_SH_VK[b]) return CUS_SH_VK[b].indexOf(a) >= 0;
+            return false;
         }
+        // dang gop hai nang luc vao mot phat?
+        function cusSHGop(){ return cusSH() && !!cusLap.nl && !!cusLap.nl2; }
+        function cusSHHaiLoi(){ return false; }   // (giu ten cu cho cac cho goi; khong con doi loi)
+        function cusSHNghi(){ return null; }
         /* @@HE-TACHDAN — bo lap AO cua hai loai dan moi. Custom khong con Phi Tieu / Kiem Vu. */
         const CUS_LAP_PT = { nl: 'phitieu', he: 'phitieu', x: null, ch: null };
         const CUS_LAP_KV = { nl: 'kiemvu', he: 'kiemvu', x: null, ch: null };
@@ -57809,7 +57807,6 @@ class PulsarCloneBoss {
             let co = (cusLap.nl === id) || (cusLap.he === id) || (cusLap.x === id && cusOBa())
                   || ((cusLap.nl2 === id || cusLap.he2 === id) && cusSH());          // @@HE-SONGHE
             if (!co) return 0;
-            if (id === cusSHNghi()) return 0;                                        // @@HE-SONGHE: loi dang nghi
             return Math.min(cusCapToiDa(id), cusThuNghiem ? 3 : Math.max(0, Math.min(3, cusCap[id] || 0)));
         }
         // @@HE-NO2: module co `capMax` (vd NO chi toi cap 2)
@@ -57818,6 +57815,7 @@ class PulsarCloneBoss {
             return cusCapToiDa.m[id] || 3;
         }
         let cusNCPicker = null;      // null = dong bang chon nang cap
+        let cusSHLoi = null;         // @@HE-SONGHE: bao "khong gop duoc" trong bang nang cap
         let _cusNCBtn = null, _cusNCO = [];
         function cusTen(o){ return (currentLang === 'en' && o && o.tenEn) ? o.tenEn : (o ? o.ten : '—'); }
         function cusMo(o, cap){ let m = (currentLang === 'en' && o && o.moEn) ? o.moEn : (o ? o.mo : null);
@@ -57834,7 +57832,7 @@ class PulsarCloneBoss {
                                           he: (b && (b.loai === 'he' || b.ca) && b.xong) ? v.he : null,
                                           x:  (c && c.xong) ? v.x : null,
                                           ch: (d && d.xong) ? v.ch : null,
-                                          nl2: (cusNCTim(v.nl2) && cusNCTim(v.nl2).loai === 'nl' && !cusNCTim(v.nl2).ca && cusNCTim(v.nl2).xong && v.nl2 !== v.nl) ? v.nl2 : null,
+                                          nl2: (cusNCTim(v.nl2) && cusNCTim(v.nl2).loai === 'nl' && !cusNCTim(v.nl2).ca && cusNCTim(v.nl2).xong && v.nl2 !== v.nl && cusSHHop(v.nl, v.nl2)) ? v.nl2 : null,
                                           he2: (cusNCTim(v.he2) && cusNCTim(v.he2).loai === 'he' && !cusNCTim(v.he2).ca && cusNCTim(v.he2).xong && v.he2 !== v.he) ? v.he2 : null };
                            } } catch(e){} }
         // ---- Cac chi so doi theo nhanh BANG DAN ----
@@ -58452,7 +58450,7 @@ class PulsarCloneBoss {
             ctx.textAlign = "right"; ctx.font = "bold 11px Consolas, monospace";
             if (cusSH()){
                 ctx.fillStyle = "#FFD54F";
-                let _l = cusSHHaiLoi() ? LT("hai lõi — Q / E đổi", "two cores — Q / E swaps") : LT("2 năng lực + 2 hiệu ứng", "2 abilities + 2 effects");
+                let _l = LT("2 năng lực gộp một phát + 2 hiệu ứng", "2 abilities in one shot + 2 effects");
                 ctx.fillText(LT("◆ SONG HỆ: ", "◆ DUAL CORE: ") + _l, L.PX + L.PW - 44, L.PY + 28);
             } else if (cusOBa()){
                 ctx.fillStyle = "#FFD54F";
@@ -58530,7 +58528,15 @@ class PulsarCloneBoss {
             ctx.strokeStyle = "rgba(255,255,255,0.14)"; ctx.lineWidth = 1;
             ctx.strokeRect(T.x + 0.5, T.y + 0.5, T.w - 1, T.h - 1);
             ctx.save(); ctx.beginPath(); ctx.rect(T.x + 8, T.y + 3, T.w - 16, T.h - 6); ctx.clip();
-            if (ro){
+            if (typeof cusSHLoi !== 'undefined' && cusSHLoi && cusSHLoi.t > 0 && !ro){
+                cusSHLoi.t--;
+                ctx.fillStyle = "#FF8A80"; ctx.font = "bold 12px Consolas, monospace";
+                let _ta = cusNCTim(cusSHLoi.a), _tb = cusNCTim(cusSHLoi.b);
+                wrapText(LT("SONG HỆ: ", "DUAL CORE: ") + (_ta ? cusTen(_ta) : '?') + " + " + (_tb ? cusTen(_tb) : '?')
+                         + LT(" không gộp được vào một phát. Vũ khí (Railgun / Laser / Cung) chỉ gộp với TÁCH TIA hoặc TỎA; Cưa Máy và Khí Công Pháo không gộp được; các nhánh đạn thường gộp với nhau tự do.",
+                              " cannot share one shot. Weapons (Railgun / Laser / Bow) only combine with SPLIT SHOT or BURST; Chainsaw and Ki Cannon combine with nothing; plain-round branches combine freely."),
+                         T.x + 10, T.y + 18, T.w - 20, 14);
+            } else if (ro){
                 let lap = cusModLap(ro.hang, ro.it), cap = cusModCap(ro.hang, ro.it);
                 ctx.fillStyle = ro.box.mau; ctx.font = "bold 12px Consolas, monospace";
                 ctx.fillText(cusModTen(ro.it) + (lap ? (LT("  ·  CẤP ","  ·  LV ") + cap) : ""), T.x + 10, T.y + 16);
@@ -58548,7 +58554,6 @@ class PulsarCloneBoss {
                     ds.push(h.ten.split(" —")[0] + ": " + ten);
                 }
                 if (cusOBa() && cusLap.x) ds.push(LT("Ô BA: ","SLOT 3: ") + cusTen(cusNCTim(cusLap.x)));
-                if (cusSHHaiLoi()) ds.push(LT("LÕI ĐANG CHẠY: ","ACTIVE CORE: ") + cusTen(cusNCTim(cusSHChon ? cusLap.nl2 : cusLap.nl)));
                 wrapText(LT("Đang lắp — ","Equipped — ") + ds.join("   ·   "), T.x + 10, T.y + 18, T.w - 20, 14);
             }
             ctx.restore();
@@ -58602,9 +58607,18 @@ class PulsarCloneBoss {
             // @@HE-SONGHE — o thu hai cung loai
             let _o2 = (loai === 'nl' || loai === 'he') ? loai + '2' : null;
             if (_o2 && cusLap[_o2] === it.id && cusSH()){ cusLap[_o2] = null; return false; }
-            if (cusLap[loai] === it.id){ cusLap[loai] = null; if (_o2 && cusSH() && cusLap[_o2]){ cusLap[loai] = cusLap[_o2]; cusLap[_o2] = null; } cusSHChon = 0; return false; }
+            if (cusLap[loai] === it.id){ cusLap[loai] = null; if (_o2 && cusSH() && cusLap[_o2]){ cusLap[loai] = cusLap[_o2]; cusLap[_o2] = null; } return false; }
             if (!cusLap[loai]){ cusLap[loai] = it.id; return true; }
-            if (_o2 && cusSH() && !cusLap[_o2]){ cusLap[_o2] = it.id; cusSHChon = 0; return true; }
+            if (_o2 && cusSH() && !cusLap[_o2]){
+                // @@HE-SONGHE: hai nang luc phai GOP duoc vao mot phat
+                if (loai === 'nl' && !cusSHHop(cusLap.nl, it.id)){
+                    if (typeof dino !== 'undefined' && dino) floatingTexts.push(new FloatingText(dino.x - 60, dino.y - 40, LT("KHÔNG GỘP ĐƯỢC", "CAN'T COMBINE")));
+                    cusSHLoi = { a: cusLap.nl, b: it.id, t: 150 };
+                    if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(150, 0.12, 'square', 0.16, 90);
+                    return false;
+                }
+                cusLap[_o2] = it.id; return true;
+            }
             if (cusOBa() && !cusLap.x){ cusLap.x = it.id; return true; }
             cusLap[loai] = it.id; return true;
         }
@@ -58682,6 +58696,7 @@ class PulsarCloneBoss {
                cong don thi sai so troi dan va sau vai giay hai vien khong con doi xung. */
             if (p && p._cusHx){
                 p._cusHxT = (p._cusHxT || 0) + 1;
+                if (p._cusHxVy) p._cusHxY0 += p._cusHxVy;    // @@HE-SONGHE: truc xoan nghieng theo tach tia
                 let _hc = cusCapCua('helix') || 1;
                 let _hs = Math.sin(p._cusHxT * CUS_HX_TAN[_hc] + p._cusHxPha);
                 p.y = p._cusHxY0 + _hs * CUS_HX_BIEN;
@@ -58691,7 +58706,8 @@ class PulsarCloneBoss {
                 p.w = p._cusHxW0 * _to; p.h = p._cusHxH0 * _to;
                 // Cap 3 — DIEM HOI TU: cham dung luc dang o nut thi xuyen thang qua than do
                 if (_nut && _hc >= 3) p.pierceCount = Math.max(p.pierceCount || 0, 1);
-                return;
+                if (!p._cusXa) return;
+                p._cusW0 = p.w; p._cusH0 = p.h;               // @@HE-SONGHE: XOAN + TAM XA — lon dan tren nen kich thuoc cua nut
             }
             if (p && p._cusToaCon){
                 p._cusToaDi = (p._cusToaDi || 0) + Math.hypot(p.speed || 0, p.vy || 0);
@@ -58989,7 +59005,9 @@ class PulsarCloneBoss {
             let cao = CUS_LZ_CAO * ((typeof ng.getFormScale === 'function') ? ng.getFormScale() : 1);
             let khung = { x: Math.min(pos.x, bien), y: pos.y - cao / 2,
                           w: Math.abs(bien - pos.x), h: cao };
-            ng.cusLzTia = { x1: pos.x, x2: bien, y: pos.y, cao: cao, t: 0, tong: 16 };
+            let _tt = cusCapCua('tachtia'), _toa = cusCapCua('toa') > 0;   // @@HE-SONGHE
+            let _phu = _tt > 0 ? [-(cao * 1.9), cao * 1.9] : [];
+            ng.cusLzTia = { x1: pos.x, x2: bien, y: pos.y, cao: cao, t: 0, tong: 16, phu: _phu };
             if (ng.id === 1 && typeof doChieuThu === 'function') doChieuThu(khung, khung, base);   // @@HE-DOCHIEU
             ng.cusLot = (ng.cusLot || 0) + 1;
             if (gameState === 'pvp'){
@@ -59012,7 +59030,21 @@ class PulsarCloneBoss {
                        hieu ung gi. Phai tu dat vu no o cho tia cham. */
                     if (typeof cusCapCua === 'function' && cusCapCua('no') > 0 && typeof cusNoDat === 'function')
                         cusNoDat(o.x + (o.w||20)/2, o.y + (o.h||20)/2);
+                    // LASER + TOA: moi muc tieu tia cat qua bung mot chum toa phia sau no
+                    if (_toa && typeof cusToaNo === 'function')
+                        cusToaNo({ cusToaSo: CUS_TOA_SO, dmg: 1, cusLot: ng.cusLot, owner: ng.id }, o.x + (o.w||20)/2 + huong * ((o.w||20)/2 + 30), pos.y);
                     visualEffects.push(new Effect(o.x + (o.w||20)/2, o.y + (o.h||20)/2, 'explosion', true, 20));
+                }
+                // LASER + TACH TIA: hai tia phu tren / duoi, nua sat thuong
+                for (let off of _phu){
+                    let k2 = { x: khung.x, y: khung.y + off, w: khung.w, h: khung.h };
+                    for (let o of allTargets()){
+                        if (!o || o.invulnAll || o.hp === undefined || o.hp <= 0) continue;
+                        if (!checkAABB(k2, o)) continue;
+                        let d2 = Math.max(1, Math.round(cusTangPT(o, base) / 2));
+                        if (typeof dealDamage === 'function') dealDamage(o, d2, 'ammo'); else o.hp -= d2;
+                        visualEffects.push(new Effect(o.x + (o.w||20)/2, o.y + (o.h||20)/2, 'explosion', true, 14));
+                    }
                 }
                 for (let i = obstacles.length - 1; i >= 0; i--)
                     if (checkAABB(khung, obstacles[i])) obstacles[i].hp -= base;
@@ -59094,9 +59126,18 @@ class PulsarCloneBoss {
             let pos = ng.getShootPos(), dir = pos.dir < 0 ? -1 : 1;
             let sc = (typeof ng.getFormScale === 'function') ? ng.getFormScale() : 1;
             ng.cusLot = (ng.cusLot || 0) + 1;
+            let _toa = cusCapCua('toa') > 0, _tt = cusCapCua('tachtia');   // @@HE-SONGHE: chi co khi deo Song He
             cusRgDan.push({ ng: ng, x0: pos.x, x: pos.x, y: pos.y, dir: dir, n: n, v: cusRgToc(n),
                             h: cusRgCao(n) * sc, dmg: cusRgDmg(n), trung: new Set(), t: 0, het: 0, lot: ng.cusLot,
-                            bien: dir > 0 ? worldR() + 200 : worldL() - 200 });
+                            bien: dir > 0 ? worldR() + 200 : worldL() - 200, toa: _toa });
+            // RAILGUN + TACH TIA: hai cot dan phu tren / duoi, nua sat thuong
+            if (_tt > 0){
+                let lech = cusRgCao(n) * sc * 0.5 + 26 * sc;
+                for (let sg of (_tt === 1 ? [-1, 1] : [-1, 1]))
+                    cusRgDan.push({ ng: ng, x0: pos.x, x: pos.x, y: pos.y + sg * lech, dir: dir, n: n, v: cusRgToc(n),
+                                    h: cusRgCao(n) * sc * 0.6, dmg: Math.max(1, Math.round(cusRgDmg(n) / 2)), trung: new Set(), t: 0, het: 0, lot: ng.cusLot,
+                                    bien: dir > 0 ? worldR() + 200 : worldL() - 200, toa: _toa, phu: 1 });
+            }
             shakeTimer = Math.max(shakeTimer, Math.min(50, 8 + 5 * n));
             // giat lui
             if (typeof ng.x === 'number') ng.x -= dir * Math.min(36, 3 + 3 * n);
@@ -59117,6 +59158,11 @@ class PulsarCloneBoss {
             }
             d = cusTangPT(o, d);
             if (o._cusLot !== D.lot){ o._cusLot = D.lot; d += (typeof cusHieuUng === 'function') ? cusHieuUng(o, D.dmg) : 0; }
+            // RAILGUN + TOA: muc tieu DAU TIEN cot dan xuyen qua bung ra mot chum toa (moi vien = so nac)
+            if (D.toa && !D.toaXong && typeof cusToaNo === 'function'){
+                D.toaXong = 1;
+                cusToaNo({ cusToaSo: CUS_TOA_SO, dmg: Math.max(1, D.n), cusLot: D.lot, owner: ng.id }, o.x + (o.w||20)/2 + D.dir * ((o.w||20)/2 + 30), D.y);
+            }
             cusStandThu(o, d, 'rail', ng.id);
             if (typeof dealDamage === 'function') dealDamage(o, d, 'ammo'); else o.hp -= d;
             if (typeof novaCo === 'function' && novaCo(ng) && o.hp > 0){   // @@HE-NOVA2: TE LIET 0.5 giay
@@ -59515,10 +59561,13 @@ class PulsarCloneBoss {
             let n = Math.max(1, Math.min(cusCgMax(), ng.cusCgTen || 1)), dmg = cusCgDmg(t), xuyen = t >= CUS_CG_XUYEN;
             let u = Math.min(1, t / CUS_CG_FULL), v = 11 + 15 * u + (xuyen ? 5 : 0), b = cusCgGoc();
             ng.cusLot = (ng.cusLot || 0) + 1;
-            for (let i = 0; i < n; i++){
-                let a = (dir > 0 ? 0 : Math.PI) + (i - (n - 1) / 2) * b * dir;
+            // @@HE-SONGHE — CUNG + TACH TIA: moi mui tach thanh 2 / 3 mui; CUNG + TOA: mui ten trung la toa chum
+            let _tt = cusCapCua('tachtia'), _toa = cusCapCua('toa') > 0;
+            let _lech = _tt <= 0 ? [0] : (_tt === 1 ? [-CUS_TACH_GOC * 1.4, CUS_TACH_GOC * 1.4] : [-CUS_TACH_GOC * 1.4, 0, CUS_TACH_GOC * 1.4]);
+            for (let i = 0; i < n; i++) for (let l of _lech){
+                let a = (dir > 0 ? 0 : Math.PI) + ((i - (n - 1) / 2) * b + l) * dir;
                 cusCgDan.push({ ng, x: pos.x, y: pos.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, dmg, xuyen, tam: cusCgTam(t),
-                                di: 0, roi: 0, cam: 0, trung: new Set(), lot: ng.cusLot, t: 0, muc: dmg });
+                                di: 0, roi: 0, cam: 0, trung: new Set(), lot: ng.cusLot, t: 0, muc: dmg, toa: _toa });
             }
             if (typeof SFX !== 'undefined' && SFX.tone){
                 SFX.tone(260 + 60 * dmg, 0.08, 'triangle', 0.16, 120);
@@ -59530,6 +59579,11 @@ class PulsarCloneBoss {
             if (gameState === 'pvp'){ cusPvpDanh(D.ng, o, D.dmg); return; }
             let d = cusTangPT(o, D.dmg);
             if (o._cusLot !== D.lot){ o._cusLot = D.lot; d += (typeof cusHieuUng === 'function') ? cusHieuUng(o, D.dmg) : 0; }
+            if (D.toa && !D.toaXong && typeof cusToaNo === 'function'){   // @@HE-SONGHE: CUNG + TOA
+                D.toaXong = 1;
+                let tv = Math.hypot(D.vx, D.vy) || 1;
+                cusToaNo({ cusToaSo: CUS_TOA_SO, dmg: Math.max(1, Math.round(D.dmg / 2)), cusLot: D.lot, owner: D.ng.id }, D.x + D.vx / tv * 50, D.y + D.vy / tv * 50);
+            }
             cusStandThu(o, d, 'cung', D.ng.id);
             if (typeof dealDamage === 'function') dealDamage(o, d, 'ammo'); else o.hp -= d;
             if (typeof novaCo === 'function' && novaCo(D.ng)) novaMuiCam(o, D.x, D.y, Math.atan2(D.vy, D.vx), D.muc, D.xuyen);   // @@HE-NOVA2
@@ -60725,6 +60779,12 @@ class PulsarCloneBoss {
                 ctx.fillRect(Math.min(T.x1, T.x2), T.y - h, Math.abs(T.x2 - T.x1), h * 2);
                 ctx.fillStyle = "rgba(255,255,255,0.95)";
                 ctx.fillRect(Math.min(T.x1, T.x2), T.y - h * 0.16, Math.abs(T.x2 - T.x1), h * 0.32);
+                for (let off of (T.phu || [])){      // @@HE-SONGHE: tia phu cua TACH TIA
+                    let y2 = T.y + off, h2 = h * 0.6;
+                    let g2 = ctx.createLinearGradient(0, y2 - h2, 0, y2 + h2);
+                    g2.addColorStop(0, "rgba(255,193,7,0)"); g2.addColorStop(0.5, "rgba(255,245,200,0.9)"); g2.addColorStop(1, "rgba(255,193,7,0)");
+                    ctx.fillStyle = g2; ctx.fillRect(Math.min(T.x1, T.x2), y2 - h2, Math.abs(T.x2 - T.x1), h2 * 2);
+                }
                 ctx.restore();
             }
         }
@@ -63065,6 +63125,7 @@ class PulsarCloneBoss {
             cusBan(kho){
                 // @@HE-CUSULT — dang con luot TEN LUA thi phat nay ra ten lua thay vi dan.
                 if ((this.cusTL || 0) > 0){ this.cusBanTenLua(kho); return; }
+                if (typeof cusSHGop === 'function' && cusSHGop()){ this.cusBanGhep(kho); return; }   // @@HE-SONGHE: hai nang luc mot phat
                 if (cusToaBat()){ this.cusBanToa(kho, CUS_TOA_SO); return; }   // @@HE-CUSTOA
                 if (cusHelixBat()){ this.cusBanHelix(kho); return; }            // @@HE-CUSHX
                 if (cusQdBat()){ this.cusBanQuyDao(kho); return; }              // @@HE-CUSQD
@@ -63129,6 +63190,78 @@ class PulsarCloneBoss {
                     }
                 }
                 this.attackCooldown = 2;                  // chi de hoat anh/SFX, khong phai nhip ban
+            },
+            /* @@HE-SONGHE — MOT PHAT mang CA HAI nang luc nhom dan.
+               Thu tu gop: TACH TIA quyet dinh so HUONG; moi huong la mot vien (hoac mot CAP
+               vien xoan neu co XOAN SONG DOI); moi vien mang them TOA (xuyen roi toa chum),
+               TAM XA (lon dan theo quang duong), MAN CUOI (vien thu 4). Co QUY DAO thi tat ca
+               nhung vien do khong bay di ma vao vong quy dao. */
+            cusBanGhep(kho){
+                let pos = this.getShootPos();
+                let _d = (pos.dir < 0 ? -1 : 1);
+                let _sc = (typeof this.getFormScale === 'function') ? this.getFormScale() : 1;
+                let _tt = cusCapCua('tachtia'), _xa = cusCapCua('tamxa');
+                let _toa = cusToaBat(), _hx = cusHelixBat(), _qd = cusQdBat();
+                let _gan = 1e9;
+                if (_tt >= 3 && !_qd && typeof allTargets === 'function')
+                    for (let o of allTargets()){
+                        if (!o || o.hp === undefined || o.hp <= 0 || o.invulnAll) continue;
+                        let _dx = ((o.x + (o.w||20)/2) - pos.x) * _d;
+                        if (_dx < -((o.w||20)/2)) continue;
+                        _gan = Math.min(_gan, Math.max(0, _dx));
+                    }
+                let _chum = (_tt >= 3 && _gan < canvas.width / 3);
+                let _goc = (_tt <= 0 || _chum) ? [0] : (_tt === 1 ? [-CUS_TACH_GOC, CUS_TACH_GOC] : [-CUS_TACH_GOC, 0, CUS_TACH_GOC]);
+                let _cap = _hx ? 2 : 1;
+                this.cusLot = (this.cusLot || 0) + 1;
+                if (_qd){
+                    // QUY DAO + nhanh khac: moi huong / moi vien xoan la them mot ngoi sao vao vong
+                    if (!this.cusQd) this.cusQd = [];
+                    let R = cusQdR(), n = _goc.length * _cap;
+                    for (let i = 0; i < n; i++){
+                        let g = (this.cusQdGoc || 0) + i * (Math.PI * 2 / n);
+                        this.cusQd.push({ goc: g, r: R, lao: null, vet: [], x: this.x + this.w/2 + Math.cos(g) * R, y: this.y + this.h/2 + Math.sin(g) * R,
+                                          t: 0, quay: Math.random() * 6.28, cui: 0, khoa: 0 });
+                    }
+                    if (kho){ this.cusKho = Math.max(0, (this.cusKho || 0) - 1); this.cusCd = 60 / ((typeof cusXaToc === 'function') ? cusXaToc() : CUS_XA_TOC); }
+                    else { this.ammo = Math.max(0, this.ammo - 1); this.cusCd = 60 / CUS_QD_TOCBAN; }
+                    this.attackCooldown = 2;
+                    if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(880, 0.05, 'triangle', 0.10, 1320);
+                    return;
+                }
+                let _mc = (!kho && cusMcBat()) ? { thu: Math.max(1, Math.min(CUS_MC_BANG, CUS_MC_BANG - this.ammo + 1)), sac: !!this.cusMcSac } : null;
+                let _dmg = _chum ? this.bulletDmg * 3 : this.bulletDmg;
+                let _xu = _toa ? (CUS_TOA_XUYEN[cusCapCua('toa')] || 1) : 1;
+                for (let g of _goc) for (let k = 0; k < _cap; k++){
+                    let p = new Projectile(pos.x, pos.y - 2, _dmg, 5, 0, 0, pos.dir, this.id);
+                    p.speed = _d * CUS_TOCDO; p.vy = CUS_TOCDO * Math.tan(g);
+                    p.cus = 1; p.cusLot = this.cusLot;
+                    p.w = CUS_VIEN_W * _sc * (_hx ? 0.82 : 1); p.h = CUS_VIEN_H * _sc;
+                    if (_chum){ p.w *= 1.6; p.h *= 1.6; p._cusChum = 1; }
+                    if (_hx){
+                        p._cusHx = 1; p._cusHxPha = k * Math.PI; p._cusHxT = 0; p._cusHxY0 = p.y;
+                        p._cusHxVy = p.vy; p.vy = 0;                 // xoan quanh mot truc NGHIENG theo huong tach tia
+                        p._cusHxW0 = p.w; p._cusHxH0 = p.h;
+                    }
+                    if (_toa){ p.cusToa = 1; p.cusToaSo = CUS_TOA_SO; p._cusToaChinh = 1; p.pierceCount = Math.max(p.pierceCount || 0, _xu - 1); }
+                    if (_mc){ p.cusMc = _mc; let km = _mc.thu >= 4 ? (_mc.sac ? 2.1 : 1.8) : (_mc.sac ? 1.3 : 1);
+                        let cx = p.x + p.w / 2, cy = p.y + p.h / 2; p.w *= km; p.h *= km; p.x = cx - p.w / 2; p.y = cy - p.h / 2;
+                        if (_hx){ p._cusHxW0 = p.w; p._cusHxH0 = p.h; p._cusHxY0 = p.y; } }
+                    if (_xa > 0){ p.pierceCount = Math.max(p.pierceCount || 0, 2); p._cusXa = 1; p._cusDi = 0; p._cusW0 = p.w; p._cusH0 = p.h; }
+                    projectiles.push(p);
+                }
+                if (kho){
+                    this.cusKho = Math.max(0, (this.cusKho || 0) - 1);
+                    this.cusCd = 60 / ((typeof cusXaToc === 'function') ? cusXaToc() : CUS_XA_TOC);
+                } else {
+                    this.ammo--;
+                    this.cusCd = 60 / CUS_TOC;
+                    if (this.ammo <= 0){
+                        this.ammo = 0; this.isOverheated = true; this.overheatTimer = _mc ? CUS_MC_NAP : CUS_NONG;
+                        if (_mc) floatingTexts.push(new FloatingText(this.x - 20, this.y - 30, _mc.sac ? "HẠ RÈM!" : "NẠP BĂNG"));
+                    }
+                }
+                this.attackCooldown = 2;
             },
             /* @@HE-LOLUNG2 — Lo Lung + Custom: MOT vien TO, sat thuong = 150% sat thuong goc cua mot vien. Tinh tren
                vien CHINH: nhanh Toa / Tach Tia / Xoan Song / Quy Dao... cung chi ra mot vien to nay. Hieu ung Custom
@@ -63733,7 +63866,6 @@ class PulsarCloneBoss {
                     if (this.ammo > _cmx) this.ammo = _cmx;
                 }
                 if (this.cusCd > 0) this.cusCd--;
-                if (this.id === 1 && cusSHCd > 0) cusSHCd--;   // @@HE-SONGHE
                 if (cusQdBat()) this.cusQdNapDan();          // @@HE-CUSQD — khong qua nhiet
                 let _cOk = (fireKey && (this.aKeyHeldTime === 0 || jkKep(checkAmmo)) && this.laserActiveTimer <= 0 && !this.jcState);   // @@HE-JKKEP
                 /* @@HE-CUSCW — CHAINSAW nuot han nhip ban: khong co vien nao ra ca, va no
@@ -63787,14 +63919,6 @@ class PulsarCloneBoss {
                gi thay doi tren HUD thi nguoi choi khong biet minh vua duoc cai gi. */
             veHudThem(){
                 ctx.font = "bold 12px Consolas, monospace";
-                // @@HE-SONGHE — loi dang chay
-                if (typeof cusSHHaiLoi === 'function' && cusSHHaiLoi()){
-                    let _a = cusNCTim(cusSHChon ? cusLap.nl2 : cusLap.nl), _b = cusNCTim(cusSHChon ? cusLap.nl : cusLap.nl2);
-                    ctx.fillStyle = "#FFD54F"; ctx.fillText("⧉ " + (_a ? cusTen(_a) : '?'), 200, 48);
-                    ctx.fillStyle = "#78909C"; ctx.font = "10px Consolas, monospace";
-                    ctx.fillText("Q/E → " + (_b ? cusTen(_b) : '?') + (cusSHCd > 0 ? " …" : ""), 200 + ctx.measureText("⧉ " + (_a ? cusTen(_a) : '?')).width * 1.2 + 10, 48);
-                    ctx.font = "bold 12px Consolas, monospace";
-                }
                 if (cusLaserBat()){
                     // @@HE-CUSLZ — kho tru khong con nghia gi voi LASER; cho hien so TIA tich san
                     let _t = dino.cusLzKho || 0;
@@ -70251,22 +70375,29 @@ class PulsarCloneBoss {
                           'STAND: ti le 5% (1) -> 60% (200)', cusStandTiLe(100).toFixed(3) + ' o 100');
                     } finally { cusLap = _lap; cusThuNghiem = _tn; }
                 }
-                // @@HE-SONGHE — rune hai loi
+                // @@HE-SONGHE — rune hai nang luc GOP mot phat
                 if (typeof cusSH === 'function'){
                     G('RUNE SONG HE');
-                    let _rs = runeSlots.slice(), _lap = cusLap, _ch = cusSHChon, _ca = currentAmmoType, _tn = cusThuNghiem;
+                    let _rs = runeSlots.slice(), _lap = cusLap, _ca = currentAmmoType, _tn = cusThuNghiem;
                     try {
                         currentAmmoType = CUS_DAN; runeSlots[0] = 'cussh'; runeSlots[1] = null; cusThuNghiem = true;
-                        cusLap = { nl: 'railgun', he: 'bang', x: null, ch: null, nl2: 'chainsaw', he2: 'no' }; cusSHChon = 0;
-                        T(cusCapCua('bang') > 0 && cusCapCua('no') > 0, 'hai HIEU UNG chay cung luc');
-                        T(cusCapCua('railgun') > 0 && cusCapCua('chainsaw') === 0, 'hai loi thay cach ban: chi loi dang chon chay');
-                        cusSHChon = 1;
-                        T(cusCapCua('railgun') === 0 && cusCapCua('chainsaw') > 0, 'Q / E doi loi');
-                        cusLap = { nl: 'tachtia', he: null, x: null, ch: null, nl2: 'tamxa', he2: null };
-                        T(cusCapCua('tachtia') > 0 && cusCapCua('tamxa') > 0, 'hai nang luc chi chinh vien dan thi chay chung');
+                        cusLap = { nl: 'tachtia', he: 'bang', x: null, ch: null, nl2: 'toa', he2: 'no' };
+                        T(cusCapCua('tachtia') > 0 && cusCapCua('toa') > 0 && cusCapCua('bang') > 0 && cusCapCua('no') > 0, 'hai nang luc + hai hieu ung cung chay');
+                        let _g = { x: 400, y: 200, w: 40, h: 40, isFacingLeft: false, bulletDmg: 1, ammo: 6, cusKho: 0, id: 1,
+                                   getShootPos(){ return { x: 440, y: 220, dir: 1 }; }, getFormScale(){ return 1; } };
+                        let _n0 = projectiles.length;
+                        dino.cusBanGhep.call(_g, false);
+                        let _moi = projectiles.slice(_n0); projectiles.length = _n0;
+                        T(_moi.length === 3 && _moi.every(q => q.cusToa) && new Set(_moi.map(q => Math.round(q.vy * 100))).size === 3,
+                          'TACH TIA + TOA: mot phat ra ba huong, vien nao cung toa', _moi.length + ' vien');
+                        T(cusSHHop('railgun', 'tachtia') && cusSHHop('toa', 'cung') && !cusSHHop('railgun', 'laser') && !cusSHHop('chainsaw', 'tachtia'),
+                          'vu khi chi gop voi tach tia / toa; hai vu khi khong gop');
+                        cusLap = { nl: 'railgun', he: null, x: null, ch: null, nl2: null, he2: null };
+                        T(cusLapBam(cusNCTim('laser'), 'nl') === false && cusLap.nl2 === null, 'bang nang cap tu choi cap khong gop duoc');
                         runeSlots[0] = null;
-                        T(cusCapCua('tamxa') === 0, 'thao rune thi o thu hai tat');
-                    } finally { runeSlots[0] = _rs[0]; runeSlots[1] = _rs[1]; cusLap = _lap; cusSHChon = _ch; currentAmmoType = _ca; cusThuNghiem = _tn; }
+                        cusLap = { nl: 'tachtia', he: null, x: null, ch: null, nl2: 'toa', he2: null };
+                        T(cusCapCua('toa') === 0, 'thao rune thi o thu hai tat');
+                    } finally { runeSlots[0] = _rs[0]; runeSlots[1] = _rs[1]; cusLap = _lap; currentAmmoType = _ca; cusThuNghiem = _tn; cusSHLoi = null; }
                 }
                 // @@HE-LUU — lua chon Custom nap lai duoc sau khi tat game
                 if (typeof cusNapLuu === 'function'){
@@ -73203,34 +73334,6 @@ class PulsarCloneBoss {
                 ctx.quadraticCurveTo(bx + 55, hy - 9, bx + 44, hy - 4); ctx.closePath(); ctx.fill(); ctx.stroke();
                 ctx.fillStyle = '#FFC400'; ctx.beginPath(); ctx.arc(bx + 44, hy - 3.5, 2.8, 0, 6.28); ctx.fill(); ctx.stroke();
                 ctx.fillStyle = '#B71C1C'; ctx.beginPath(); ctx.arc(bx + 44, hy - 3.5, 1.2, 0, 6.28); ctx.fill();
-            } else if (K.id === 'giap'){
-                // GIAP NGUC: tam nguc thep lon nhieu lop, vai giap tron, vien vang va huy hieu giua
-                let gy = hy + 9 - cs * 1;
-                let g = ctx.createLinearGradient(bx + 10, gy, bx + 40, gy + 24);
-                g.addColorStop(0, '#F5F7F8'); g.addColorStop(0.45, '#9EAFB8'); g.addColorStop(1, '#455A64');
-                ctx.fillStyle = g; ctx.strokeStyle = '#1C262B'; ctx.lineWidth = 1.1;
-                ctx.beginPath(); ctx.moveTo(bx + 12, gy + 5); ctx.quadraticCurveTo(bx + 26, gy - 3, bx + 39, gy + 4);
-                ctx.lineTo(bx + 38, gy + 20); ctx.quadraticCurveTo(bx + 26, gy + 27, bx + 13, gy + 20); ctx.closePath(); ctx.fill(); ctx.stroke();
-                // cac lop van ngang
-                ctx.strokeStyle = 'rgba(28,38,43,0.55)'; ctx.lineWidth = 0.9;
-                for (let r = 1; r <= 3; r++){ let yy = gy + 4 + r * 4.5; ctx.beginPath(); ctx.moveTo(bx + 13, yy); ctx.quadraticCurveTo(bx + 26, yy + 3, bx + 38, yy); ctx.stroke(); }
-                // vien vang
-                ctx.strokeStyle = '#FFC400'; ctx.lineWidth = 1.3;
-                ctx.beginPath(); ctx.moveTo(bx + 12, gy + 5); ctx.quadraticCurveTo(bx + 26, gy - 3, bx + 39, gy + 4); ctx.stroke();
-                // huy hieu
-                ctx.fillStyle = '#FFC400'; ctx.strokeStyle = '#6D4C00'; ctx.lineWidth = 0.8;
-                ctx.beginPath(); ctx.moveTo(bx + 26, gy + 5); ctx.lineTo(bx + 30, gy + 8); ctx.lineTo(bx + 29, gy + 13); ctx.lineTo(bx + 26, gy + 15); ctx.lineTo(bx + 23, gy + 13); ctx.lineTo(bx + 22, gy + 8); ctx.closePath(); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#E53935'; ctx.beginPath(); ctx.arc(bx + 26, gy + 10, 1.6, 0, 6.28); ctx.fill();
-                // vai giap 2 tang
-                let vg = ctx.createRadialGradient(bx + 17, gy - 1, 1, bx + 18, gy + 2, 10);
-                vg.addColorStop(0, '#FFFFFF'); vg.addColorStop(0.5, '#B0BEC5'); vg.addColorStop(1, '#455A64');
-                ctx.fillStyle = vg; ctx.strokeStyle = '#1C262B'; ctx.lineWidth = 1;
-                ctx.beginPath(); ctx.ellipse(bx + 18, gy + 3, 9, 6.5, -0.2, Math.PI, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
-                ctx.beginPath(); ctx.ellipse(bx + 18, gy + 6, 8, 4.5, -0.2, Math.PI * 0.95, Math.PI * 0.05, true); ctx.stroke();
-                ctx.strokeStyle = '#FFC400'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(bx + 18, gy + 3, 9, 6.5, -0.2, Math.PI, 0); ctx.stroke();
-                ctx.fillStyle = '#FFF';
-                for (const [rx, ry] of [[15, 9], [37, 8], [15, 18], [37, 18], [13, 0], [22, -1.5]]) { ctx.beginPath(); ctx.arc(bx + rx, gy + ry, 1, 0, 6.28); ctx.fill(); }
-                if (frames % 90 < 8){ ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillRect(bx + 16 + (frames % 90) * 2.4, gy + 3, 1.5, 15); }
             } else if (K.id === 'khan'){
                 // KHAN QUANG to: vong quan day quanh co, hai duoi dai co soc trang va tua o mut
                 let toc = Math.min(1, (Math.abs((typeof dashVx !== 'undefined') ? dashVx : 0) + ((keys['KeyA'] || keys['KeyD'] || keys['ArrowLeft'] || keys['ArrowRight']) ? 4 : 0)) / 10);
@@ -73279,6 +73382,67 @@ class PulsarCloneBoss {
                 ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(4.6, -5.4, 0.8, 0, 6.28); ctx.fill();
                 ctx.fillStyle = '#FFF'; ctx.fillRect(4.8, -5.9, 0.4, 0.4);
                 ctx.fillStyle = 'rgba(255,138,128,0.6)'; ctx.beginPath(); ctx.arc(4.4, -3.4, 0.8, 0, 6.28); ctx.fill();   // ma hong
+                ctx.restore();
+            }
+            ctx.restore();
+        }
+        /* GIAP NGUC — boc theo DUNG duong cong than khung long: tam lung chay doc song lung
+           (nhieu lop van nhu giap la), om xuong nguc, chua phan bung. Ve TRUOC gai lung (gai
+           xuyen qua khe giap) va TRUOC canh tay (tay nam ngoai giap). Toa do lay tu chinh
+           duong ve THAN trong drawDinoBody nen bien dang theo cui / nhay van khop. */
+        function vePhuKienThan(bx, by, cs, br){
+            let K = PHU_KIEN[phuKien]; if (!K || K.id !== 'giap') return;
+            const Y = (v, k, b2) => by + v + cs * k + (b2 ? br : 0);
+            const q = (a, c, b2, t) => [(1-t)*(1-t)*a[0] + 2*(1-t)*t*c[0] + t*t*b2[0], (1-t)*(1-t)*a[1] + 2*(1-t)*t*c[1] + t*t*b2[1]];
+            // song lung (y het duong THAN) noi ra 1.5px
+            let L0 = [bx + 7, Y(14.5, 11, 1)], LC = [bx + 18, Y(6.5, 13, 1)], L1 = [bx + 34, Y(13.5, 11, 1)];
+            ctx.save(); ctx.lineJoin = 'round';
+            // ---- than giap ----
+            let g = ctx.createLinearGradient(bx + 10, Y(8, 13, 1), bx + 26, Y(30, 7));
+            g.addColorStop(0, '#F5F7F8'); g.addColorStop(0.35, '#B8C4CB'); g.addColorStop(0.75, '#78909C'); g.addColorStop(1, '#455A64');
+            ctx.fillStyle = g; ctx.strokeStyle = '#1C262B'; ctx.lineWidth = 1.3;
+            ctx.beginPath(); ctx.moveTo(L0[0], L0[1]);
+            ctx.quadraticCurveTo(LC[0], LC[1], L1[0], L1[1]);                                // tam lung
+            ctx.quadraticCurveTo(bx + 40, Y(21, 9), bx + 36, Y(28, 7));                       // om nguc
+            ctx.quadraticCurveTo(bx + 22, Y(27, 8), bx + 9, Y(24, 9));                        // mep duoi (de lo bung)
+            ctx.quadraticCurveTo(bx + 5, Y(20, 10), L0[0], L0[1]); ctx.closePath(); ctx.fill(); ctx.stroke();
+            // ---- cac lop giap la chay song song song lung ----
+            ctx.strokeStyle = 'rgba(28,38,43,0.6)'; ctx.lineWidth = 0.9;
+            for (let k = 1; k <= 3; k++){
+                let d = k * 3.6;
+                ctx.beginPath();
+                for (let i = 0; i <= 10; i++){
+                    let t = 0.06 + i * 0.088, pt = q(L0, LC, L1, t);
+                    let x = pt[0], y = pt[1] + d + (k === 3 ? Math.sin(t * Math.PI) * 0.8 : 0);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+            // anh kim tren lung
+            ctx.strokeStyle = 'rgba(255,255,255,0.75)'; ctx.lineWidth = 1.4;
+            ctx.beginPath();
+            for (let i = 0; i <= 8; i++){ let pt = q(L0, LC, L1, 0.15 + i * 0.07); if (!i) ctx.moveTo(pt[0], pt[1] + 1.6); else ctx.lineTo(pt[0], pt[1] + 1.6); }
+            ctx.stroke();
+            // ---- vien vang doc song lung va mep duoi ----
+            ctx.strokeStyle = '#FFC400'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(L0[0], L0[1]); ctx.quadraticCurveTo(LC[0], LC[1], L1[0], L1[1]); ctx.stroke();
+            ctx.strokeStyle = '#C79100'; ctx.lineWidth = 1.2;
+            ctx.beginPath(); ctx.moveTo(bx + 36, Y(28, 7)); ctx.quadraticCurveTo(bx + 22, Y(27, 8), bx + 9, Y(24, 9)); ctx.stroke();
+            // ---- dinh tan doc mep duoi ----
+            ctx.fillStyle = '#FFF8E1';
+            for (let i = 1; i <= 4; i++){ let pt = q([bx + 36, Y(28, 7)], [bx + 22, Y(27, 8)], [bx + 9, Y(24, 9)], i / 5); ctx.beginPath(); ctx.arc(pt[0], pt[1] - 1.6, 0.9, 0, 6.28); ctx.fill(); }
+            // ---- huy hieu o suon (khong bi tay che) ----
+            let hx = bx + 18, hy2 = Y(19, 10, 1);
+            ctx.fillStyle = '#FFC400'; ctx.strokeStyle = '#6D4C00'; ctx.lineWidth = 0.8;
+            ctx.beginPath(); ctx.moveTo(hx, hy2 - 3.5); ctx.lineTo(hx + 3, hy2 - 1); ctx.lineTo(hx + 2.2, hy2 + 3); ctx.lineTo(hx, hy2 + 4.5);
+            ctx.lineTo(hx - 2.2, hy2 + 3); ctx.lineTo(hx - 3, hy2 - 1); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#E53935'; ctx.beginPath(); ctx.arc(hx, hy2 + 0.6, 1.3, 0, 6.28); ctx.fill();
+            // loe sang chay qua tam giap thinh thoang
+            let f = frames % 120;
+            if (f < 14){
+                ctx.save(); ctx.beginPath(); ctx.moveTo(L0[0], L0[1]); ctx.quadraticCurveTo(LC[0], LC[1], L1[0], L1[1]);
+                ctx.quadraticCurveTo(bx + 40, Y(21, 9), bx + 36, Y(28, 7)); ctx.quadraticCurveTo(bx + 22, Y(27, 8), bx + 9, Y(24, 9)); ctx.closePath(); ctx.clip();
+                ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.fillRect(bx + 4 + f * 2.6, Y(4, 13, 1), 3, 30);
                 ctx.restore();
             }
             ctx.restore();
@@ -73473,8 +73637,8 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
            (nen hai rune khong bao gio di chung). O Thu Ba cho MOT o tu do; Song He cho HAI o nhung
            moi o chi nhan dung loai cua no. */
         RUNES.push({ id:'cussh', name:'SONG HỆ', nameEn:'DUAL CORE', icon:'⧉', cost:2, ammoRune:true, onlyAmmo:CUS_DAN,
-              desc:'Tốn 2 ô. CHỈ DÙNG ĐƯỢC VỚI CUSTOM. Mở thêm MỘT ô NĂNG LỰC và MỘT ô HIỆU ỨNG — lắp được 2 năng lực + 2 hiệu ứng.\n\nHai HIỆU ỨNG luôn chạy cùng lúc, và mở được các COMBO cùng loại (BĂNG + NỔ: vụ nổ đập vỡ băng).\n\nHai NĂNG LỰC: nếu cả hai đều chỉ chỉnh viên đạn thường (BĂNG ĐẠN / TÁCH TIA / TẦM XA) thì chạy chung — Tách Tia + Tầm Xa là ba viên xuyên lớn dần. Còn lại mỗi năng lực khác đều THAY HẲN cách bắn, nên mỗi lúc chỉ một LÕI chạy: bấm Q / E để rút lõi kia ra (0.5 giây hồi, không đổi được giữa một đòn). Railgun tích nấc rồi rút Cưa Máy khi địch áp sát — đó là trò chơi của rune này.\n\nGiá vẫn là toàn bộ hàng phòng thủ: hai ô rune.',
-              descEn:'Costs 2 slots. CUSTOM ONLY. Adds one more ABILITY slot and one more EFFECT slot — equip 2 abilities + 2 effects.\n\nBoth EFFECTS always run together, unlocking same-type COMBOS (FROST + DETONATE: the blast shatters ice).\n\nTwo ABILITIES: if both only tune the plain round (MAGAZINE / SPLIT SHOT / LONG SHOT) they run together — Split Shot + Long Shot is three growing piercing rounds. Every other ability REPLACES how the gun fires, so only one CORE runs at a time: press Q / E to swap to the other (0.5s cooldown, not mid-move). Charge a Railgun, then pull the Chainsaw when they close in — that is what this rune is for.\n\nThe price is still your whole defensive line: two rune slots.' });
+              desc:'Tốn 2 ô. CHỈ DÙNG ĐƯỢC VỚI CUSTOM. Mở thêm MỘT ô NĂNG LỰC và MỘT ô HIỆU ỨNG — lắp được 2 năng lực + 2 hiệu ứng.\n\nHai NĂNG LỰC GỘP VÀO MỘT PHÁT BẮN. TÁCH TIA + TỎA: mỗi phát ra ba viên, viên nào xuyên qua địch cũng tỏa chùm. XOẮN SÓNG ĐÔI + TÁCH TIA: ba cặp viên xoắn. QUỸ ĐẠO + nhánh khác: mỗi phát thả nhiều sao vào vòng. Các nhánh đạn thường (Băng Đạn, Tách Tia, Tầm Xa, Tỏa, Xoắn Sóng Đôi, Quỹ Đạo, Màn Cuối) gộp với nhau tự do.\n\nVũ khí RAILGUN / LASER / CUNG gộp được với TÁCH TIA (thêm hai cột đạn / hai tia / mỗi mũi tách ra) hoặc TỎA (trúng là tỏa chùm). Cưa Máy và Khí Công Pháo không gộp với gì — bảng nâng cấp sẽ báo.\n\nHai HIỆU ỨNG luôn chạy cùng lúc và mở các COMBO cùng loại (BĂNG + NỔ: vụ nổ đập vỡ băng).\n\nGiá vẫn là toàn bộ hàng phòng thủ: hai ô rune.',
+              descEn:'Costs 2 slots. CUSTOM ONLY. Adds one more ABILITY slot and one more EFFECT slot — equip 2 abilities + 2 effects.\n\nBoth ABILITIES MERGE INTO ONE SHOT. SPLIT SHOT + BURST: three rounds per shot, and each one that pierces bursts. HELIX + SPLIT SHOT: three twisting pairs. ORBIT + anything: each shot drops several stars into the ring. Plain-round branches (Magazine, Split Shot, Long Shot, Burst, Helix, Orbit, Final Curtain) merge freely.\n\nThe RAILGUN / LASER / BOW weapons merge with SPLIT SHOT (two extra rails / two extra beams / every arrow splits) or BURST (a hit bursts). Chainsaw and Ki Cannon merge with nothing — the upgrade panel will say so.\n\nBoth EFFECTS always run together and unlock same-type COMBOS (FROST + DETONATE: the blast shatters ice).\n\nThe price is still your whole defensive line: two rune slots.' });
         /* @@HE-KHOAPOWER — hai rune duoi day song bang viec DOI THE, ma VOID va DRAGON
            TRIGGER deu ghim the o Gunslinger. Danh dau de picker khoa luon. */
         { let _r;
@@ -79720,10 +79884,6 @@ function infernoMaxChain(x, y, source){
             if ((e.code === 'KeyJ' || e.code === 'KeyK') && !e.repeat && uniArmed > 0 &&
                 (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss'
                  || gameState === 'pvp')) unityFire();
-            // @@HE-SONGHE — Q / E doi LOI khi deo Song He (Unity cung gia 2 o nen khong bao gio trung)
-            if ((e.code === 'KeyQ' || e.code === 'KeyE') && !e.repeat && typeof cusSH === 'function' && cusSH()
-                && typeof dino !== 'undefined' && dino && dino.ammoType === CUS_DAN
-                && (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss')){ cusSHDoi(dino); return; }
             if ((e.code === 'KeyQ' || e.code === 'KeyE') && !e.repeat &&
                 (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss'
                  || gameState === 'pvp')) unitySwap(e.code === 'KeyE' ? 1 : -1);
