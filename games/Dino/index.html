@@ -65446,6 +65446,10 @@ class PulsarCloneBoss {
            de lai vet ELIP det. `nguoc: 1` = luoi lat ngua len tren (don chem nguoc / tu duoi len).
            `sty` = loai don cho he Stylish (xem lhStyLoai). */
         const LH_NGANG_TOI = [2.7, -0.9], LH_NGANG_LUI = [-2.7, 0.9];
+        /* @@HE-LHLUOTDAI — Hans: "chem ngang sau khi luot: hoat anh luoi hai keo dai cho du tam danh that". Hop chem cua
+           Luot J J J vuon toi 236 truoc mat, nhung can ve chi dai 66 x 1.6 = 106 -> trung ke dich o xa ma luoi hai khong
+           cham toi. Can gio dai dung bang tam hop (236 / (66 x 0.98)); luoi giu co vua phai (x1.4) chu khong phong theo can. */
+        const LH_LUOT_TAM = 236, LH_LUOT_DAI = LH_LUOT_TAM / (66 * 0.98);
         const LH_M = {
             // duoi dat
             j1:  { T: 12, hit: 5,  hoi: LH_HOI, ton: 1, a0: -2.3, a1: 1.05, am: 190, sty: 'j',
@@ -65478,10 +65482,10 @@ class PulsarCloneBoss {
                    bat: (ng) => { ng.dy = Math.min(ng.dy || 0, -8.5); },
                    fn: (ng) => lhHienBat(ng, 'hat', 4) },
             // luot J J J: chem NGANG lien tuc, doi chieu moi nhat — luoi hai VUON DAI (dai 1.6) nen nhat chem dai han nhat thuong
-            l1:  { T: 9, hit: 4, hoi: 6, ton: 1, ngang: LH_NGANG_TOI, dai: 1.6, am: 280, sty: 'luot',
-                   fn: (ng, D) => lhHopNguoi(ng, -90, 236, 44, 8, 4, D.hitSet) },
-            l2:  { T: 9, hit: 4, hoi: 6, ton: 1, ngang: LH_NGANG_LUI, dai: 1.6, nguoc: 1, am: 300, sty: 'luot',
-                   fn: (ng, D) => lhHopNguoi(ng, -90, 236, 44, 8, 4, D.hitSet) },
+            l1:  { T: 9, hit: 4, hoi: 6, ton: 1, ngang: LH_NGANG_TOI, dai: LH_LUOT_DAI, luoiK: 1.4, am: 280, sty: 'luot',
+                   fn: (ng, D) => lhHopNguoi(ng, -90, LH_LUOT_TAM, 44, 8, 4, D.hitSet) },
+            l2:  { T: 9, hit: 4, hoi: 6, ton: 1, ngang: LH_NGANG_LUI, dai: LH_LUOT_DAI, luoiK: 1.4, nguoc: 1, am: 300, sty: 'luot',
+                   fn: (ng, D) => lhHopNguoi(ng, -90, LH_LUOT_TAM, 44, 8, 4, D.hitSet) },
             // J roi LUOT: chem tu duoi len (nguoc) phong song chan dong
             songluot:{ T: 14, hit: 7, hoi: 14, ton: 1, a0: 1.4, a1: -2.4, nguoc: 1, am: 140, ket: true, sty: 'luot',
                    fn: (ng) => lhSongBat(ng, 260, 5) },
@@ -66767,7 +66771,8 @@ class PulsarCloneBoss {
         /* VUNG NGANG 2.5D: luoi hai quay quanh truc dung o ngang hong. Nhin nghieng thi can co lai theo cos(phi),
            luoi nam ngang nen chi con mot la cong mong, muc luoi huong theo chieu quay; NGUOC thi mep luoi ngua len.
            Vet chem la mot DAI ELIP det quanh nguoi (nhu cach ve vong quet ngang cua Than Chet). */
-        function lhVeNgang(ng, d, N, L){
+        function lhVeNgang(ng, d, N, L, LL){
+            LL = LL || L;                                        // co luoi (mac dinh theo chieu dai can)
             let cx = ng.x + ng.w / 2, cy = ng.y + ng.h * (N.thap ? 0.82 : 0.56), R = L * 0.98, ry = 11;
             let P = t => ({ x: cx + d * Math.cos(t) * R, y: cy + Math.sin(t) * ry });
             let Q = t => ({ x: cx + d * Math.cos(t) * R * 0.66, y: cy + Math.sin(t) * ry * 0.66 });
@@ -66790,8 +66795,8 @@ class PulsarCloneBoss {
             ctx.beginPath(); ctx.moveTo(B.x, B.y); ctx.lineTo(E.x, E.y); ctx.stroke();
             ctx.strokeStyle = "#4A3A57"; ctx.lineWidth = 1.4; ctx.stroke();
             let chieu = N.xuoi ? 1 : -1;                                // muc luoi di truoc theo chieu quay
-            let lx = d * Math.sin(N.phi) * 46 * chieu * (L / 66), up = N.nguoc ? -1 : 1;
-            let tip = { x: E.x + lx, y: E.y + 6 * up }, dayB = 9 * (L / 66);
+            let lx = d * Math.sin(N.phi) * 46 * chieu * (LL / 66), up = N.nguoc ? -1 : 1;
+            let tip = { x: E.x + lx, y: E.y + 6 * up }, dayB = 9 * (LL / 66);
             let g = ctx.createLinearGradient(E.x, E.y, tip.x, tip.y);
             g.addColorStop(0, "#3D3847"); g.addColorStop(0.55, "#C9C3D6"); g.addColorStop(1, "#7E758F");
             ctx.fillStyle = g;
@@ -66813,7 +66818,7 @@ class PulsarCloneBoss {
                 ngang = { phi: p0 + (p1 - p0) * e, phi0: p0, nguoc: D.m.nguoc, thap: D.m.thap, xuoi: p1 < p0 };
                 lh.ang = 0.15;                                   // xong nhat ngang thi thu hoi ve tu the nghi tu day
             }
-            if (ngang){ lh.vetGoc.length = 0; lhVeNgang(ng, d, ngang, L * ((D && D.m.dai) || 1)); }
+            if (ngang){ lh.vetGoc.length = 0; lhVeNgang(ng, d, ngang, L * ((D && D.m.dai) || 1), L * ((D && (D.m.luoiK || D.m.dai)) || 1)); }
             else {
                 let a = lhGocNguoi(), nguoc = !!(D && D.m.nguoc);
                 let keo = 0;
