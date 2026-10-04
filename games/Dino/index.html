@@ -67228,10 +67228,30 @@ class PulsarCloneBoss {
                                    luotDu: 0, luotCu: false, kenh: false }; }
         function dkCua(ng){ if (!ng.dk) ng.dk = dkMoi(); return ng.dk; }
         function dkDir(ng){ return ng.isFacingLeft ? -1 : 1; }
-        function dkDs(){ return (typeof lhDs === 'function') ? lhDs() : trdDs(); }
+        function dkDs(){
+            let ds = (typeof lhDs === 'function') ? lhDs() : trdDs();
+            // vat can (xuong rong...) cung chem duoc
+            if (gameState !== 'pvp' && typeof obstacles !== 'undefined') for (const o of obstacles) if (o && o.hp > 0) ds.push(o);
+            return ds;
+        }
+        function dkLaVatCan(o){ return typeof obstacles !== 'undefined' && obstacles.indexOf(o) >= 0; }
         function dkLaQuai(o){ return (typeof bosses !== 'undefined' && bosses.indexOf(o) >= 0) || (typeof enemies !== 'undefined' && enemies.indexOf(o) >= 0); }
         function dkLaBoss(o){ return typeof bosses !== 'undefined' && bosses.indexOf(o) >= 0; }
-        function dkDangBay(o){ return (o.y + (o.h || 20)) < 320 - 12; }
+        // mat dat THAT cua ban do (Tetris: day ho o tetris.groundY, khong phai 320)
+        function dkNenY(){ return (mapTheme === 'tetris' && typeof tetris !== 'undefined' && tetris) ? tetris.groundY : 320; }
+        // be mat gan nhat ngay DUOI diem (x, chan): mat Platform neu co, khong thi mat dat
+        function dkMatDuoi(x, chan){
+            let best = dkNenY();
+            if (typeof platforms !== 'undefined') for (const pf of platforms){
+                if (pf.wall || pf.top === undefined || (pf.isLeaf && !pf.solid)) continue;
+                if (x < pf.x || x > pf.x + pf.w) continue;
+                if (pf.top >= chan - 4 && pf.top < best) best = pf.top;
+            }
+            return best;
+        }
+        // mat dat duoi chan nguoi choi: dung tren Platform thi la mat Platform
+        function dkChan(ng){ return ng.grounded ? ng.y + ng.h : dkMatDuoi(ng.x + ng.w / 2, ng.y + ng.h); }
+        function dkDangBay(o){ let c = o.y + (o.h || 20); return c < dkMatDuoi(o.x + (o.w || 20) / 2, c) - 12; }
         function dkSfx(f, d, k, v, f2){ if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(f, d, k, v, f2); }
         function dkChu(x, y, vi, en){ floatingTexts.push(new FloatingText(x, y, LT(vi, en))); }
         // toa do than nguoi choi (he ve veTrenNguoi, luon quay phai) -> the gioi
@@ -67241,6 +67261,7 @@ class PulsarCloneBoss {
         }
         function dkDanh(o, dmg){
             if (!o || o.hp === undefined || o.hp <= 0) return;
+            if (dkLaVatCan(o)){ o.hp -= dmg; if (o.hp <= 0 && typeof score !== 'undefined') score += 1; return; }   // nhu meleeStrike
             if (typeof dealDamage === 'function') dealDamage(o, dmg, 'ammo'); else o.hp -= dmg;
         }
         function dkDay(o, d, px){
@@ -67292,7 +67313,7 @@ class PulsarCloneBoss {
             nhac:  { T: 38, hit: 20, ton: 0, dmg: 7, het: 'lung', cho: 22, nut: 7, keys: [[0.2, 1.63, 33, 15, 'out'], [0.4, 1.6, 33, 14], [0.56, -0.5, 28, 12, 'in'], [1, -1.85, 16, 4, 'io']],
                      hop: [-10, 162, 100, 6], am: 260 },
             // NHAY khi kiem dang duoi dat: NHAC MANH len theo da nhay — 11, ton 2
-            nhacJ: { T: 24, hit: 6, ton: 2, dmg: 11, het: 'lung', cho: 14, keys: [[0.3, -0.5, 28, 12, 'out'], [1, -1.85, 16, 4, 'io']],
+            nhacJ: { T: 24, hit: 6, ton: 2, tonDu: 1, dmg: 11, het: 'lung', cho: 14, keys: [[0.3, -0.5, 28, 12, 'out'], [1, -1.85, 16, 4, 'io']],
                      hop: [-20, 168, 116, 40], day: 16, am: 200 },
             nhacN: { T: 24, hit: 6, ton: 0, dmg: 9, het: 'lung', cho: 16, keys: [[0.3, -0.5, 28, 12, 'out'], [1, -1.85, 16, 4, 'io']],
                      hop: [-20, 164, 110, 40], am: 280 },
@@ -67363,12 +67384,12 @@ class PulsarCloneBoss {
         function dkDungYen(dk){ return !!((dk.A && dk.A.m.dung) || dk.kenh || dk.ult); }
         function dkBatDau(ng, kieu, them){
             let dk = dkCua(ng), m = DK_M[kieu];
-            if (m.ton && ng.ammo < m.ton){ dkChu(ng.x - 20, ng.y - 30, "HẾT THỂ LỰC", "NO STAMINA"); return false; }
+            if (m.ton && !m.tonDu && ng.ammo < m.ton){ dkChu(ng.x - 20, ng.y - 30, "HẾT THỂ LỰC", "NO STAMINA"); return false; }
             let p = dkPose(ng) || { ang: DK_LUNG[0], px: DK_LUNG[1], py: DK_LUNG[2] };
             let nhanh = dk.buff > 0 ? 0.75 : 1;
             let T = Math.max(6, Math.round(m.T * nhanh)), hit = Math.min(T - 1, Math.round(m.hit * nhanh));
             dk.A = { kieu, m, t: 0, T, hit, k0: [p.ang, p.px, p.py], set: new Set(), dir: dkDir(ng), them: them || {} };
-            if (m.ton) dkTon(ng, m.ton);
+            if (m.ton) dkTon(ng, m.tonDu ? Math.min(m.ton, ng.ammo) : m.ton);
             ng._hoiCho = 45;
 
             if (m.am) dkSfx(m.am, 0.16, 'sawtooth', 0.18, m.am * 0.45);
@@ -67377,7 +67398,7 @@ class PulsarCloneBoss {
         function dkHopDon(ng, A){
             let m = A.m, d = dkDir(ng), dmg = (A.them.dmg || m.dmg);
             if (m.hop){
-                let h = m.hop, duoi = m.xuong ? Math.max(h[3], 326 - (ng.y + ng.h)) : h[3];
+                let h = m.hop, duoi = m.xuong ? Math.max(h[3], dkChan(ng) + 6 - (ng.y + ng.h)) : h[3];
                 dkHop(ng, h[0], h[1], h[2], duoi, dmg, A.set, o => {
                     if (m.day) dkDay(o, d, m.day);
                     if (m.pha) dkPhaDon(o, ng);
@@ -67390,18 +67411,18 @@ class PulsarCloneBoss {
             dkHopDon(ng, A);
             if (m.dat || (m.xuong && ng.grounded)){
                 let t = dkTG(ng, 31 + 118, 44);
-                hitDat(t.x, 320, 1, DK_MAU);
+                hitDat(t.x, dkChan(ng), 1, DK_MAU);
                 shakeTimer = Math.max(shakeTimer || 0, 12);
             }
             if (m.song){
                 let s = ng.getFormScale(), cx = ng.x + ng.w / 2;
-                dkSong.push({ x: cx + d * 40 * s, d, t: 0, T: 62, v: 10.5, cao: 120, rong: 60, dmg: 10, hit: new Set(), ng });
+                dkSong.push({ x: cx + d * 40 * s, y: dkChan(ng), d, t: 0, T: 62, v: 10.5, cao: 120, rong: 60, dmg: 10, hit: new Set(), ng });
                 shakeTimer = Math.max(shakeTimer || 0, 14);
                 dkChu(ng.x - 30, ng.y - 44, "LIỆT ĐỊA TRẢM!", "EARTH-RENDER!");
             }
-            if (A.kieu === 'cam'){ shakeTimer = Math.max(shakeTimer || 0, 16); let t = dkTG(ng, 48, 44); hitDat(t.x, 320, 1, [179, 136, 255]);
-                                   dkVong.push({ ng, x: t.x, y: 300, t: 0, T: A.T - A.hit, R: 260 }); }
-            if (A.kieu === 'kenh'){ shakeTimer = Math.max(shakeTimer || 0, 14); let t = dkTG(ng, 48, 44); hitDat(t.x, 320, 1, [179, 136, 255]); }
+            if (A.kieu === 'cam'){ shakeTimer = Math.max(shakeTimer || 0, 16); let t = dkTG(ng, 48, 44); hitDat(t.x, dkChan(ng), 1, [179, 136, 255]);
+                                   dkVong.push({ ng, x: t.x, y: dkChan(ng) - 20, t: 0, T: A.T - A.hit, R: 260 }); }
+            if (A.kieu === 'kenh'){ shakeTimer = Math.max(shakeTimer || 0, 14); let t = dkTG(ng, 48, 44); hitDat(t.x, dkChan(ng), 1, [179, 136, 255]); }
             if (A.kieu === 'buff'){
                 ng.dk.buff = DK_BUFF_T;
                 dkChu(ng.x - 34, ng.y - 46, "BÁT MÔN ĐỘN GIÁP!", "EIGHT GATES!");
@@ -67441,7 +67462,7 @@ class PulsarCloneBoss {
                 return;
             }
             if ((o._dkGhim || 0) > 0){
-                let nen = 320 - (o.h || 20);
+                let nen = dkMatDuoi(o.x + (o.w || 20) / 2, o.y + (o.h || 20)) - (o.h || 20);
                 o._dkKeoK = Math.min(1, (o._dkKeoK || 0) + 0.2);      // 5 khung dau: bi GIAT xuong, sau do dinh chat mat dat
                 if (o.y < nen) o.y += (nen - o.y) * o._dkKeoK;
                 if (o.dy !== undefined && o.dy < 0) o.dy = 0;
@@ -67501,7 +67522,7 @@ class PulsarCloneBoss {
         // CHANNEL: mot dot dia chan
         function dkDiaChan(ng){
             let t = dkTG(ng, 48, 44);
-            dkSongTron.push({ x: t.x, t: 0, T: 40, R: 520 });
+            dkSongTron.push({ x: t.x, y: dkChan(ng), t: 0, T: 40, R: 520 });
             for (let o of dkDs()){
                 if (!dkLaQuai(o) && gameState !== 'pvp') continue;
                 if (dkLaQuai(o) && dkDangBay(o)){
@@ -67513,7 +67534,7 @@ class PulsarCloneBoss {
                 } else {
                     if (Math.abs((o.x + (o.w || 20) / 2) - t.x) > 520) continue;
                     dkDanh(o, 10); o._wsCham = Math.max(o._wsCham || 0, 60);
-                    hitDat(o.x + (o.w || 20) / 2, 320, 0, [179, 136, 255]);
+                    hitDat(o.x + (o.w || 20) / 2, o.y + (o.h || 20), 0, [179, 136, 255]);
                 }
             }
             shakeTimer = Math.max(shakeTimer || 0, 18);
@@ -67551,9 +67572,9 @@ class PulsarCloneBoss {
             }
             // kiem nam duoi dat: tu nhac len khi het gio
             if (!dk.A && dk.trang === 'dat' && !ng.grounded && (ng.dy || 0) < -2 && dk.datDat){
-                // vua nhay len khi kiem con duoi dat: nhac manh (het the luc thi chi nhac len, khong ra don)
-                if (ng.ammo >= 2 && !ng.isOverheated){ dkBatDau(ng, 'nhacJ'); dkChu(ng.x - 26, ng.y - 40, "BẠT SƠN!", "UPHEAVAL!"); }
-                else dkBatDau(ng, 'nho');
+                // vua nhay len khi kiem con duoi dat: nhac manh
+                // con 1 the luc (hay dang qua nhiet) van nhac manh ra don — ton toi da 2, con bao nhieu tru bay nhieu
+                dkBatDau(ng, 'nhacJ'); dkChu(ng.x - 26, ng.y - 40, "BẠT SƠN!", "UPHEAVAL!");
             }
             dk.datDat = !!ng.grounded;
             if (!dk.A && dk.trang === 'dat'){
@@ -67635,6 +67656,7 @@ class PulsarCloneBoss {
                     dkDanh(o, 30);
                     hitCat(o.x + (o.w || 20) / 2, o.y + (o.h || 20) / 2, 0, true, DK_MAU);
                 }
+                U.nenY = dkNenY();
                 for (let i = 0; i < 9; i++) U.nut.push({ x: camX + 40 + i * (canvas.width - 80) / 8 + (Math.random() - 0.5) * 40, l: 30 + Math.random() * 40, s: Math.random() });
                 shakeTimer = Math.max(shakeTimer || 0, 26);
                 dkChu(ng.x - 40, ng.y - 50, "THIÊN ĐỊA NHẤT TRẢM!", "WORLD SPLITTER!");
@@ -67652,14 +67674,14 @@ class PulsarCloneBoss {
                 U.qy = qua.y;
                 if (U.t % 4 === 0 && U.da.length < 26){
                     let bx = camX + Math.random() * canvas.width;
-                    U.da.push({ x: bx, y: 318, r: 4 + Math.random() * 7, a: Math.random() * 6 });
+                    U.da.push({ x: bx, y: dkNenY() - 2, r: 4 + Math.random() * 7, a: Math.random() * 6 });
                 }
                 for (let r of U.da){ r.x += (qua.x - r.x) * 0.07; r.y += (qua.y - r.y) * 0.07; r.a += 0.2; }
                 for (let o of U.ds) if (o._dkNoi) o._dkNoi.keo = qua;
                 if (U.t % 10 === 0) dkSfx(900 + Math.random() * 600, 0.08, 'square', 0.1, 300);
             } else if (U.t >= 150 && U.t < 168){
                 let u = dkEm((U.t - 150) / 18, 'in');
-                U.kx = dinh.x; U.ky = dinh.y + (300 - 96 - dinh.y) * u;
+                U.kx = dinh.x; U.ky = dinh.y + (dkNenY() - 20 - 96 - dinh.y) * u;
                 U.qy = U.ky + 96;
                 let qua = { x: dinh.x, y: U.qy };
                 for (let r of U.da){ r.x += (qua.x - r.x) * 0.3; r.y += (qua.y - r.y) * 0.3; }
@@ -67669,7 +67691,7 @@ class PulsarCloneBoss {
                     if (o.hp !== undefined && o.hp > 0) dkDanh(o, 120);
                     if (o._dkNoi){ o.x = o._dkNoi.x0; o.y = o._dkNoi.y0; o._dkNoi = null; if (!(o._dkGhim > 0)) dkGoBoc(o); }
                 }
-                U.no = { x: dinh.x, y: 300, t: 0 };
+                U.no = { x: dinh.x, y: dkNenY() - 20, t: 0 };
                 U.da = [];
                 shakeTimer = Math.max(shakeTimer || 0, 40);
                 dkChu(dinh.x - 50, 200, "THIÊN THẠCH KIẾM!", "METEOR BLADE!");
@@ -67688,8 +67710,9 @@ class PulsarCloneBoss {
         function dkNutDat(ng, lx){
             let t = dkTG(ng, lx === undefined ? 31 + 116 : lx, 44), d = dkDir(ng);
             let tia = []; for (let k = 0; k < 6; k++) tia.push({ a: -Math.PI / 2 + (k - 2.5) * 0.5 + (Math.random() - 0.5) * 0.3, l: 14 + Math.random() * 18 });
-            dkNut.push({ x: t.x, t: 0, T: 46, tia, d });
-            hitDat(t.x, 320, 0, [161, 136, 127]);
+            let y = dkChan(ng);
+            dkNut.push({ x: t.x, y, t: 0, T: 46, tia, d });
+            hitDat(t.x, y, 0, [161, 136, 127]);
             shakeTimer = Math.max(shakeTimer || 0, 7);
             dkSfx(70, 0.22, 'sawtooth', 0.22, 40);
         }
@@ -67712,10 +67735,10 @@ class PulsarCloneBoss {
             // song xung kich
             for (let i = dkSong.length - 1; i >= 0; i--){
                 let S = dkSong[i]; S.t++; S.x += S.d * S.v;
-                let x0 = S.x - S.rong / 2, x1 = S.x + S.rong / 2, y0 = 320 - S.cao;
+                let x0 = S.x - S.rong / 2, x1 = S.x + S.rong / 2, y0 = S.y - S.cao;
                 for (let o of dkDs()){
                     if (S.hit.has(o)) continue;
-                    if (o.x + (o.w || 20) < x0 || o.x > x1 || o.y + (o.h || 20) < y0 || o.y > 330) continue;
+                    if (o.x + (o.w || 20) < x0 || o.x > x1 || o.y + (o.h || 20) < y0 || o.y > S.y + 10) continue;
                     S.hit.add(o); dkDanh(o, S.dmg); dkDay(o, S.d, 16);
                     if (dkLaQuai(o) && dkDangBay(o)) dkGhim(o, DK_TRONG);
                     hitCat(o.x + (o.w || 20) / 2, o.y + (o.h || 20) / 2, -S.d * 0.8, true, [179, 136, 255]);
@@ -67727,7 +67750,7 @@ class PulsarCloneBoss {
             for (let i = dkSongTron.length - 1; i >= 0; i--) if (++dkSongTron[i].t >= dkSongTron[i].T) dkSongTron.splice(i, 1);
             for (let i = dkNut.length - 1; i >= 0; i--) if (++dkNut[i].t >= dkNut[i].T) dkNut.splice(i, 1);
             // channel: ke bay bi keo xuong, CHAM DAT thi them mot dot sat thuong
-            for (let i = dkHen.length - 1; i >= 0; i--){ let H = dkHen[i]; if (--H.t <= 0){ if (H.o.hp > 0){ dkDanh(H.o, H.dmg); hitDat(H.o.x + (H.o.w || 20) / 2, 320, 1, [179, 136, 255]); } dkHen.splice(i, 1); } }
+            for (let i = dkHen.length - 1; i >= 0; i--){ let H = dkHen[i]; if (--H.t <= 0){ if (H.o.hp > 0){ dkDanh(H.o, H.dmg); hitDat(H.o.x + (H.o.w || 20) / 2, H.o.y + (H.o.h || 20), 1, [179, 136, 255]); } dkHen.splice(i, 1); } }
             // ghim: dem nguoc + ap vi tri (con bi khoa _uFreeze khong goi update)
             if (typeof bosses !== 'undefined') for (let o of bosses.concat(enemies)){
                 dkPhongAnTick(o);
@@ -67834,7 +67857,7 @@ class PulsarCloneBoss {
                     ctx.save(); ctx.globalCompositeOperation = 'lighter';
                     ctx.strokeStyle = "rgba(179,136,255,0.5)"; ctx.lineWidth = 3;
                     let u = ((f % 30) / 30);
-                    ctx.beginPath(); ctx.ellipse(t.x, 320, 30 + u * 40, 6 + u * 6, 0, 0, Math.PI * 2); ctx.stroke();
+                    ctx.beginPath(); ctx.ellipse(t.x, dkChan(ng), 30 + u * 40, 6 + u * 6, 0, 0, Math.PI * 2); ctx.stroke();
                     ctx.restore();
                 }
             }
@@ -67850,7 +67873,7 @@ class PulsarCloneBoss {
             // song xung kich: nua vang trang tim dung tren mat dat
             for (const S of dkSong){
                 let a = 1 - S.t / S.T;
-                ctx.save(); ctx.translate(S.x, 320); ctx.scale(S.d, 1);
+                ctx.save(); ctx.translate(S.x, S.y); ctx.scale(S.d, 1);
                 let g = ctx.createLinearGradient(-S.rong, 0, S.rong * 0.6, 0);
                 g.addColorStop(0, "rgba(179,136,255,0)"); g.addColorStop(1, "rgba(224,210,255," + (0.85 * a).toFixed(2) + ")");
                 ctx.fillStyle = g;
@@ -67865,32 +67888,32 @@ class PulsarCloneBoss {
                 let a = 1 - N.t / N.T;
                 ctx.strokeStyle = "rgba(62,39,35," + (0.85 * a).toFixed(2) + ")"; ctx.lineWidth = 2.2;
                 for (const r of N.tia){
-                    ctx.beginPath(); ctx.moveTo(N.x, 321);
-                    let x = N.x, y = 321;
-                    for (let s = 1; s <= 3; s++){ x += Math.cos(r.a) * r.l / 3 * 1.6 + (s % 2 ? 2 : -2); y = 321 + Math.abs(Math.sin(r.a)) * r.l * 0.18 * s; ctx.lineTo(x, y); }
+                    ctx.beginPath(); ctx.moveTo(N.x, N.y + 1);
+                    let x = N.x, y = N.y + 1;
+                    for (let s = 1; s <= 3; s++){ x += Math.cos(r.a) * r.l / 3 * 1.6 + (s % 2 ? 2 : -2); y = N.y + 1 + Math.abs(Math.sin(r.a)) * r.l * 0.18 * s; ctx.lineTo(x, y); }
                     ctx.stroke();
                 }
                 ctx.fillStyle = "rgba(141,110,99," + (0.7 * a).toFixed(2) + ")";
-                for (let k = 0; k < 5; k++){ let u = N.t / N.T; ctx.fillRect(N.x + (k - 2) * 7 * (1 + u * 2), 316 - 18 * u * (1 + (k % 2)), 4, 4); }
+                for (let k = 0; k < 5; k++){ let u = N.t / N.T; ctx.fillRect(N.x + (k - 2) * 7 * (1 + u * 2), N.y - 4 - 18 * u * (1 + (k % 2)), 4, 4); }
             }
             ctx.globalCompositeOperation = 'lighter';
             // dia chan (channel)
             for (const Q of dkSongTron){
                 let u = Q.t / Q.T, R = Q.R * dkEm(u, 'out'), a = 1 - u;
                 ctx.strokeStyle = "rgba(179,136,255," + (0.8 * a).toFixed(2) + ")"; ctx.lineWidth = 5;
-                ctx.beginPath(); ctx.ellipse(Q.x, 320, R, 10 + R * 0.04, 0, 0, Math.PI * 2); ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(Q.x, Q.y, R, 10 + R * 0.04, 0, 0, Math.PI * 2); ctx.stroke();
                 ctx.fillStyle = "rgba(141,110,99," + (0.6 * a).toFixed(2) + ")";
-                for (let k = -4; k <= 4; k++){ if (!k) continue; let xx = Q.x + k * R / 4.5; ctx.fillRect(xx - 3, 312 - 10 * a, 6, 8); }
+                for (let k = -4; k <= 4; k++){ if (!k) continue; let xx = Q.x + k * R / 4.5; ctx.fillRect(xx - 3, Q.y - 8 - 10 * a, 6, 8); }
             }
             ctx.restore();
             // ke bi ghim: xich tim keo xuong dat
             if (typeof bosses !== 'undefined') for (let o of bosses.concat(enemies)){
                 if (!((o._dkGhim || 0) > 0)) continue;
-                let cx = o.x + (o.w || 20) / 2;
+                let cx = o.x + (o.w || 20) / 2, gy = dkMatDuoi(cx, o.y + (o.h || 20)) + 2;
                 ctx.save(); ctx.strokeStyle = "rgba(179,136,255,0.75)"; ctx.lineWidth = 2; ctx.setLineDash([5, 4]);
-                ctx.beginPath(); ctx.moveTo(cx - 8, o.y + (o.h || 20)); ctx.lineTo(cx - 14, 322); ctx.moveTo(cx + 8, o.y + (o.h || 20)); ctx.lineTo(cx + 14, 322); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx - 8, o.y + (o.h || 20)); ctx.lineTo(cx - 14, gy); ctx.moveTo(cx + 8, o.y + (o.h || 20)); ctx.lineTo(cx + 14, gy); ctx.stroke();
                 ctx.setLineDash([]);
-                ctx.fillStyle = "rgba(124,77,255,0.55)"; ctx.beginPath(); ctx.ellipse(cx, 322, (o.w || 20) * 0.6, 5, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = "rgba(124,77,255,0.55)"; ctx.beginPath(); ctx.ellipse(cx, gy, (o.w || 20) * 0.6, 5, 0, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
             }
             // chieu cuoi
@@ -67913,10 +67936,11 @@ class PulsarCloneBoss {
                 let a = f < 180 ? 1 : Math.max(0, 1 - (f - 180) / 20);
                 ctx.strokeStyle = "rgba(40,20,60," + (0.8 * a).toFixed(2) + ")"; ctx.lineWidth = 3;
                 for (const N of U.nut){
-                    ctx.beginPath(); ctx.moveTo(N.x, 320);
-                    ctx.lineTo(N.x + 8 - N.s * 16, 320 + N.l * 0.3); ctx.lineTo(N.x - 6 + N.s * 10, 320 + N.l * 0.6); ctx.lineTo(N.x + 4, 320 + N.l); ctx.stroke();
+                    let G = U.nenY || 320;
+                    ctx.beginPath(); ctx.moveTo(N.x, G);
+                    ctx.lineTo(N.x + 8 - N.s * 16, G + N.l * 0.3); ctx.lineTo(N.x - 6 + N.s * 10, G + N.l * 0.6); ctx.lineTo(N.x + 4, G + N.l); ctx.stroke();
                     ctx.strokeStyle = "rgba(179,136,255," + (0.5 * a).toFixed(2) + ")"; ctx.lineWidth = 1.2;
-                    ctx.beginPath(); ctx.moveTo(N.x, 320); ctx.lineTo(N.x + 8 - N.s * 16, 320 + N.l * 0.3); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(N.x, G); ctx.lineTo(N.x + 8 - N.s * 16, G + N.l * 0.3); ctx.stroke();
                     ctx.strokeStyle = "rgba(40,20,60," + (0.8 * a).toFixed(2) + ")"; ctx.lineWidth = 3;
                 }
             }
@@ -67965,7 +67989,7 @@ class PulsarCloneBoss {
                 g.addColorStop(1, "rgba(124,77,255,0)");
                 ctx.fillStyle = g; ctx.beginPath(); ctx.arc(U.no.x, U.no.y, R, 0, Math.PI * 2); ctx.fill();
                 ctx.strokeStyle = "rgba(224,210,255," + (1 - u).toFixed(2) + ")"; ctx.lineWidth = 6;
-                ctx.beginPath(); ctx.ellipse(U.no.x, 320, R * 1.3, 18, 0, 0, Math.PI * 2); ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(U.no.x, U.no.y + 20, R * 1.3, 18, 0, 0, Math.PI * 2); ctx.stroke();
             }
             ctx.restore();
         }
@@ -68019,7 +68043,7 @@ class PulsarCloneBoss {
                 return false;
             },
             slamDuoi(ix, iy, to){
-                hitDat(ix, 320, 1, [179, 136, 255]);
+                hitDat(ix, iy, 1, [179, 136, 255]);
                 shakeTimer = Math.max(shakeTimer, to ? 22 : 14);
             },
             veTrenNguoi(x, y, P){ dkVeTrenNguoi(this, x, y); },
@@ -75969,7 +75993,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '-J (trên lưng): CHÉM XUỐNG. 7 sát thương, tốn 1. Kiếm cắm lại dưới đất.',
                 '-J (dưới đất): NHẤC KIẾM bằng lực — đẩy kiếm nhích lên trước (mặt đất nứt), khựng lại rồi mới giật lên: chém hất lên 7 sát thương, không tốn thể lực, hồi khá chậm trước nhát kế.',
                 '-Lướt khi kiếm dưới đất: ĐÂM bằng mũi kiếm, 5 sát thương.',
-                '-NHẢY khi kiếm dưới đất: BẠT SƠN — nhấc mạnh kiếm lên theo đà nhảy, 11 sát thương, tốn 2.',
+                '-NHẢY khi kiếm dưới đất: BẠT SƠN — nhấc mạnh kiếm lên theo đà nhảy, 11 sát thương, tốn 2 (còn 1 thể lực vẫn ra đòn).',
                 '-Nhảy J (kiếm dưới đất, đã ở trên không): HỒI KIẾM — nhấc kiếm về lưng trên không, 9 sát thương. Nhảy J (trên lưng): bổ xuống 7.',
                 '-Lướt J: HOÀNH TẢO — lao tới chém ngang cực mạnh, 10 sát thương, đẩy lùi, PHÁ đòn lao của địch (chặn luôn đòn chạm). Tốn 3.',
                 '#TÍCH LỰC [K] — tối đa 3s (180f)',
@@ -76470,7 +76494,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '-J (on back): DOWNWARD CHOP. 7 damage, costs 1. The blade stays in the ground.',
                 '-J (blade down): HEAVE — pry the blade up a little first (the ground cracks), a beat, then rip it up: 7-damage rising cut, free, but slow to recover.',
                 '-Dash with the blade down: STAB with the tip, 5 damage.',
-                '-JUMP with the blade down: UPHEAVAL — rip the sword up with the jump, 11 damage, costs 2.',
+                '-JUMP with the blade down: UPHEAVAL — rip the sword up with the jump, 11 damage, costs 2 (still works on 1 stamina).',
                 '-Jump J (blade down, already airborne): RECOVER — heave it back onto your back in mid-air, 9 damage. Jump J (on back): falling chop 7.',
                 '-Dash J: CLEAVE — lunge into a brutal horizontal swing, 10 damage, knockback, BREAKS enemy rushes (and blocks contact hits). Costs 3.',
                 '#CHARGE [K] — max 3s (180f)',
@@ -85485,6 +85509,10 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         let _bucCache = { n: -1, co: false };
         function coBuc(){
             if (mapTheme === 'ocean') return true;   // @@HE-BIEN: bien luon dung vat ly nen/be (co khi khong co be nao tren man)
+            /* Tetris: day ho nam o tetris.groundY (400) va moi khoi deu thap hon 318 luc dau. Truoc day nhanh duoi coi
+               "khong co be nao cao hon 318" la ban do phang -> nguoi choi bi ghim o y 320, LO LUNG giua khong trung tren
+               day ho va khong dung len duoc khoi nao cho toi khi chong khoi cao qua 318. */
+            if (mapTheme === 'tetris') return true;
             if (_bucCache.n !== platforms.length){
                 _bucCache.n = platforms.length;
                 _bucCache.co = platforms.some(pf => pf.top < 318 && !pf.wall);
