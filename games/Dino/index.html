@@ -40337,7 +40337,7 @@ class PulsarCloneBoss {
             tetris:'#05080D', zerospace:'#080B14', slashcave:'#090B0F', nero:'#071012',
             death:'#0C1018', dragoon:'#241110', plateau:'#2b4257', forge:'#1b212a',
             dune:'#6b4a52', trio:'#1a2440', vergil:'#0A0E1C', artorias:'#0A0E1C', gael:'#140D0E',
-            unity:'#0B1020', dante:'#12060B', war:'#1A0A06', chrono:'#0A1018', cinder:'#07070B', pontiff:'#070A14', corrupt:'#07040C', reef:'#04182A',
+            unity:'#0B1020', dante:'#12060B', war:'#1A0A06', chrono:'#0A1018', cinder:'#07070B', pontiff:'#070A14', hogac:'#10060A', corrupt:'#07040C', reef:'#04182A',
             shrine:'#101826', ocean:'#062033', baibien:'#9ad6f0', dinhnui:'#0E1420',
             desert:'#FFF9C4', forest:'#12301C', volcano:'#1A0806', defense:'#101010'
         };
@@ -40392,6 +40392,7 @@ class PulsarCloneBoss {
             if (mapTheme === 'gael') { drawGaelEnv(); return; }
             if (mapTheme === 'cinder') { drawCinderEnv(); return; }
             if (mapTheme === 'pontiff') { drawPontiffEnv(); return; }   // @@HE-PONTIFF
+            if (mapTheme === 'hogac') { drawHoGacEnv(); return; }       // @@HE-HOGAC
             if (mapTheme === 'corrupt') { drawCorruptEnv(); return; }   // @@HE-COR
             if (mapTheme === 'plateau') { drawPlateauEnv(); return; }
             if (mapTheme === 'forge') { drawForgeEnv(); return; }
@@ -42135,6 +42136,7 @@ class PulsarCloneBoss {
                     let cs = crouch ? 1 : 0, br = Math.sin(frames * 0.09) * 0.5;
                     if (this.id === 1 && typeof vePhuKienThan === 'function') vePhuKienThan(bx, by, cs, br);
                     if (this.id === 1 && typeof veBzGiapThan === 'function') veBzGiapThan(bx, by, cs, br, true);
+                    if (this.id === 1 && typeof bzVeGiap === 'function') bzVeGiap(bx, by, cs, br, true);
                     if (this.id === 1 && typeof vePhuKien === 'function') vePhuKien(bx, by + cs * 12 + br, cs, airborne);
                     let _sa = (this.id === 1) ? ((typeof currentAmmoType !== 'undefined') ? currentAmmoType : -1) : (this.ammoType != null ? this.ammoType : -1);
                     { let _vkN = vkMoc(_sa, 'veTrenNguoi'); if (_vkN) _vkN.call(this, bx, by + cs * 12 + br, { out: '#0D1114', rim: '#80DEEA', lt: '#B0BEC5' }); }
@@ -42176,6 +42178,15 @@ class PulsarCloneBoss {
                     ctx.strokeStyle = P.rim; ctx.lineWidth = 1; ctx.globalAlpha = 0.7;
                     ctx.beginPath(); ctx.moveTo(hipX+6,hipY-2); ctx.quadraticCurveTo(kneeX+5,kneeY-2,kneeX+4,kneeY+2); ctx.stroke();
                     ctx.globalAlpha = 1;
+                    if (this.id === 1 && typeof bzBat === 'function' && bzBat(dino)){
+                        ctx.fillStyle = '#141414'; ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 0.8;
+                        ctx.beginPath();
+                        ctx.moveTo(kneeX - 5.5, kneeY - 1);
+                        ctx.lineTo(kneeX + 5.5, kneeY - 2);
+                        ctx.lineTo(ankX + 4.5, ankY);
+                        ctx.lineTo(ankX - 4.5, ankY + 2);
+                        ctx.closePath(); ctx.fill(); ctx.stroke();
+                    }
                 };
 
                 if (P.aura) { ctx.fillStyle = P.aura; ctx.beginPath(); ctx.arc(bx+22, by+22+cs*8, 29+Math.sin(frames*0.1)*3, 0, Math.PI*2); ctx.fill(); }
@@ -42233,7 +42244,13 @@ class PulsarCloneBoss {
                 if (!crouch) leg(13, stance, P.bd);
                 else { ctx.fillStyle=P.dk; ctx.strokeStyle=P.out; ctx.lineWidth=1.4;
                     for (let k=0;k<2;k++){ let lx=bx+13+k*9;
-                        ctx.beginPath(); ctx.moveTo(lx-4,by+34); ctx.lineTo(lx+4,by+34); ctx.lineTo(lx+6,by+44); ctx.lineTo(lx-2,by+44); ctx.closePath(); ctx.fill(); ctx.stroke(); } }
+                        ctx.beginPath(); ctx.moveTo(lx-4,by+34); ctx.lineTo(lx+4,by+34); ctx.lineTo(lx+6,by+44); ctx.lineTo(lx-2,by+44); ctx.closePath(); ctx.fill(); ctx.stroke();
+                        if (this.id === 1 && typeof bzBat === 'function' && bzBat(dino)){
+                            ctx.fillStyle = '#141414'; ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 0.8;
+                            ctx.beginPath(); ctx.moveTo(lx-3.5,by+35); ctx.lineTo(lx+5,by+35); ctx.lineTo(lx+6,by+44); ctx.lineTo(lx-2,by+44); ctx.closePath(); ctx.fill(); ctx.stroke();
+                            ctx.fillStyle = P.dk; ctx.strokeStyle = P.out; ctx.lineWidth = 1.4;
+                        }
+                    } }
 
                 // CO + DAU
                 ctx.fillStyle=P.hd; ctx.strokeStyle=P.out; ctx.lineWidth=1.8;
@@ -42268,6 +42285,7 @@ class PulsarCloneBoss {
                 } else { ctx.fillStyle=P.eye; ctx.fillRect(bx+42,by+5+cs*12+br,6,5);
                     ctx.fillStyle=P.pup; ctx.fillRect(bx+44,by+6+cs*12+br,3,3); }
                 ctx.fillStyle=P.out; ctx.fillRect(bx+50,by+8+cs*12+br,2,2);
+                if (this.id === 1 && typeof bzVeGiap === 'function') bzVeGiap(bx, by, cs, br, false);
                 // ---- PHU KIEN (chi nguoi choi 1 — ca ban xem truoc trong Customize) ----
                 if (this.id === 1 && typeof vePhuKien === 'function') vePhuKien(bx, by + cs * 12 + br, cs, airborne);
 
@@ -42302,10 +42320,12 @@ class PulsarCloneBoss {
                 if (this._bzAn) return;
                 if (this._giaoAn) return;   // @@HE-GIAO ult: tat than nguoi choi, thay bang vet luot
                 if (this._cusNkAn) return;  // @@HE-CUSNK: dang o trong may khoan duoi long dat
+                if (this._cusBomAn) return; // @@HE-CUSBOM: da bien mat, chi con vung tha bom
                 // @@HE-CHANLONG: chan than duoc ghim `invincible` vinh vien de khong bao gio
                 // chet — neu de no di qua nhanh nhap nhay o duoi thi no bien mat nua thoi gian.
-                if (this.invincible && !(this.dk && this.dk.ult && this.dk.ult.bz) && !this._clNhan && !this._hakiGong && frames % 10 < 5 && !deathCineActive) return;   // @@HE-HAKI: dang gong thi khong nhap nhay
+                if (this.invincible && !this._cusBom && !(this.dk && this.dk.ult && this.dk.ult.bz) && !this._clNhan && !this._hakiGong && frames % 10 < 5 && !deathCineActive) return;   // @@HE-HAKI: dang gong thi khong nhap nhay
                 ctx.save();
+                if (this._cusBom && this._cusBomMo < 1) ctx.globalAlpha *= this._cusBomMo;
                 
                 let sScale = this.getFormScale();
                 let pos = this.getShootPos();
@@ -42396,11 +42416,12 @@ class PulsarCloneBoss {
                     this.chgBurst--;
                 }
                 let _caR0 = this.id === 1 ? currentAmmoType : p2AmmoType;
-                if (this.chargeProgress > 0 && this.aKeyHeldTime < chargeVongMax(_caR0) && this.laserActiveTimer <= 0
+                let _bzJNap = typeof bzBat === 'function' && bzBat(this) && this.dk && this.dk.jHold && (this.dk.jT || 0) > 0;
+                if ((this.chargeProgress > 0 || _bzJNap) && (_bzJNap || this.aKeyHeldTime < chargeVongMax(_caR0)) && this.laserActiveTimer <= 0
                     && !(VK[_caR0] && VK[_caR0].anVongSac && VK[_caR0].anVongSac.call(this))) {
-                    let caRing = _caR0, _vMax = chargeVongMax(caRing);
-                    chargeTick(this, caRing);
-                    let _held = this.aKeyHeldTime;
+                    let caRing = _caR0, _vMax = _bzJNap ? 150 : chargeVongMax(caRing);
+                    if (!_bzJNap) chargeTick(this, caRing);
+                    let _held = _bzJNap ? this.dk.jT : this.aKeyHeldTime;
                     let _ringT = Math.max(0, Math.min(1, _held / _vMax));
                     let _rCol = chargeRingColor(caRing, _held);
                     { let _vkR = vkMoc(caRing, 'veVongSac'); if (_vkR) _vkR.call(this, _ringT, _rCol); else {   // @@KHOI-VK — vong sac rieng (Kiem: tia chop quanh than)
@@ -42421,7 +42442,7 @@ class PulsarCloneBoss {
                     ctx.fillStyle = "#000"; ctx.fillRect(pos.x + Math.cos(_hA)*_R - 7, pos.y + Math.sin(_hA)*_R - 7, 14, 14);
                     ctx.fillStyle = "#FFFFFF"; ctx.fillRect(pos.x + Math.cos(_hA)*_R - 5, pos.y + Math.sin(_hA)*_R - 5, 10, 10);
                     // VACH MOC: moi nac charge mot vach, day len khi da qua
-                    for (let _m of chargeMoc(caRing)){
+                    for (let _m of (_bzJNap ? [0.2, 0.4, 0.6, 0.8, 1] : chargeMoc(caRing))){
                         let _a = -Math.PI/2 + Math.PI*2*_m, qua = _ringT >= _m;
                         ctx.strokeStyle = qua ? '#FFFFFF' : 'rgba(0,0,0,0.75)';
                         ctx.lineWidth = qua ? 4 : 3;
@@ -42443,7 +42464,7 @@ class PulsarCloneBoss {
                     }
                     ctx.restore();
                     // canh bao sap roi vao Channel
-                    if (_held > _vMax - 15 && frames % 6 < 3) {
+                    if (!_bzJNap && _held > _vMax - 15 && frames % 6 < 3) {
                         ctx.fillStyle = "#FF5252"; ctx.font = "bold 11px Consolas, monospace"; ctx.textAlign = "center";
                         ctx.fillText("SẮP VÀO CHANNEL", pos.x, pos.y - 60); ctx.textAlign = "left";
                     }
@@ -42904,7 +42925,8 @@ class PulsarCloneBoss {
                    charge tu khung sau va khi NHA K lai ban them don cham K cua vu khi (Luoi hai ra ca MOC -> "HỤT!").
                    Nuot cu bam do: khong dem charge cho toi khi nha K. */
                 if (this._hoverNuot){ if (!chargeKey) this._hoverNuot = false; this.aKeyHeldTime = 0; this.chargeProgress = 0; }
-                if (chargeKey && _canCharge && !this._hoverNuot && (_boQuaNhiet || !this.isOverheated) && this.laserActiveTimer <= 0 && this.fireBreathTimer <= 0) {
+                let _bzDangJ = typeof bzBat === 'function' && bzBat(this) && !!(this.dk && (fireKey || this.dk.jHold));
+                if (chargeKey && _canCharge && !_bzDangJ && !this._hoverNuot && (_boQuaNhiet || !this.isOverheated) && this.laserActiveTimer <= 0 && this.fireBreathTimer <= 0) {
                     this.aKeyHeldTime++; this.chargeProgress = Math.min(100, (this.aKeyHeldTime / maxChargeFrames) * 100);
                     if (this.chargeProgress >= 100) { let oc = this.aKeyHeldTime - maxChargeFrames; this.ultFillMult = oc >= 300 ? 3 : 2; }
                 }
@@ -42926,7 +42948,7 @@ class PulsarCloneBoss {
                     if (this._kChoT <= 45) _kCho = true;
                 } else this._kChoT = 0;
                 // K nha ra = ban don CHARGE theo muc
-                if (!chargeKey && this.aKeyHeldTime > 0 && !_kCho && !(typeof bzBat === 'function' && bzBat(this) && fireKey)) {
+                if (!chargeKey && this.aKeyHeldTime > 0 && !_kCho && !_bzDangJ) {
                     // @@HE-HOVER-DAN — CHAM K trong luc dang lo lung = thi trien don rieng cua
                     // loai dan do, mot lan moi lan lo lung. GIU K van la charge binh thuong.
                     if (vkMoc(checkAmmo, 'nhaKTruoc')) { vkMoc(checkAmmo, 'nhaKTruoc').call(this); }   // @@KHOI-VK — nha K xu ly TRUOC Kiem Tran (DinoSaw, Custom)
@@ -50828,15 +50850,16 @@ class PulsarCloneBoss {
            truoc luc bi hat.
            Nhuong quyen lai cho boss ngay khi boss TU nhac minh len cao hon vi tri ta vua dat
            (tuc no dang co mot chieu bay that), va khi no dang trong chuoi chong khong. */
-        function wkgHatTung(o, cao){
+        function wkgHatTung(o, cao, treo, g){
             if (!o) return;
             let nen = (o.baseY !== undefined) ? o.baseY : o.y;
             o.y = Math.max(-CAM_TROI + 20, o.y - cao);
             /* KHONG dat o.dy = -8 nua. Voi may con CO trong luc (Death) thi dy am lam chung
                bay len them vai khung, va cai do bi chinh cai bay-that ben duoi doc nham ->
-               tha quyen -> treo o -74 suot gan 300 khung. Cu vung roi tu lo lay. */
+               tha quyen -> treo o -74 suot gan 300 khung. Cu vung roi tu lo lay.
+               treo / g: tuy chon. Mac dinh 0 / 0.9 — moi cho goi cu giu nguyen. */
             if (isFinite(o.y) && isFinite(nen) && o.y < nen - 1)
-                o._wkgHat = { nen: nen, v: 0, t: 0, yCu: o.y, len: 0 };
+                o._wkgHat = { nen: nen, v: 0, t: 0, yCu: o.y, len: 0, treo: treo || 0, g: g || 0 };
         }
         function wkgTickHat(){
             let ds = [];
@@ -50847,6 +50870,12 @@ class PulsarCloneBoss {
                 H.t++;
                 if (o.hp === undefined || o.hp <= 0 || o.dying || o._wkgCuon
                     || o.aaSeq || o.aaCombo || H.t > 300){ o._wkgHat = null; continue; }
+                if ((H.treo || 0) > 0){
+                    H.treo--;
+                    o.y = H.yCu;
+                    if (o.dy !== undefined) o.dy = 0;
+                    continue;
+                }
                 /* Chi keo nhung con KHONG co vat ly cua rieng no. Phan biet bang cach nhin
                    chinh con boss: `d` la doan no TU di chuyen ke tu lan ta chinh truoc.
                    d > 0  -> no dang tu roi (co trong luc that, nhu Helios/Magma/Death) -> tra
@@ -50863,7 +50892,7 @@ class PulsarCloneBoss {
                     if (o.grounded !== undefined) o.grounded = true;
                     o._wkgHat = null; continue;
                 }
-                H.v = Math.min(17, H.v + 0.9);
+                H.v = Math.min(17, H.v + (H.g || 0.9));
                 o.y = Math.min(H.nen, o.y + H.v);
                 H.yCu = o.y;
             }
@@ -58395,7 +58424,18 @@ class PulsarCloneBoss {
               moEn:['Your next 4 shots become homing missiles, 10 damage each plus a blast.',
                     '15 damage.', '20 damage.'],
               tom:'Bề sâu. Bay chậm, phóng lên rồi bẻ vào mục tiêu; một phát bằng cả băng đạn.',
-              tomEn:'Depth. Slow, it climbs then curves into the target; one is worth a magazine.' }
+              tomEn:'Depth. Slow, it climbs then curves into the target; one is worth a magazine.' },
+            /* @@HE-CUSBOM — Hans: mờ rồi biến mất, A/D chọn vùng, J thả. 3 quả.
+               3 cấp: tâm 25/30/33, bán kính 4/5/6cm, mỗi 1cm trừ 3. Bom to dần, rơi từ trên màn hình. */
+            { id:'bom', ten:'THẢ BOM', tenEn:'BOMB DROP',
+              mo:['Mờ dần rồi biến mất. A và D đưa vùng thả, J thả một quả. Được 3 quả, rơi từ trên cao. Tâm 25, mỗi 1cm trừ 3, bán kính 4cm. Mé còn 13.',
+                  'Mờ dần rồi biến mất. A và D đưa vùng thả, J thả một quả. Được 3 quả, rơi từ trên cao. Tâm 30, mỗi 1cm trừ 3, bán kính 5cm. Mé còn 15. Bom to hơn cấp 1.',
+                  'Mờ dần rồi biến mất. A và D đưa vùng thả, J thả một quả. Được 3 quả, rơi từ trên cao. Tâm 33, mỗi 1cm trừ 3, bán kính 6cm. Mé còn 15. Bom to nhất.'],
+              moEn:['You fade out. A and D move the drop zone, J drops one bomb. 3 bombs fall from above the screen. 25 at the center, minus 3 per 1cm, 4cm radius. The edge still deals 13.',
+                    'You fade out. A and D move the drop zone, J drops one bomb. 3 bombs fall from above the screen. 30 at the center, minus 3 per 1cm, 5cm radius. The edge still deals 15. The bomb is larger.',
+                    'You fade out. A and D move the drop zone, J drops one bomb. 3 bombs fall from above the screen. 33 at the center, minus 3 per 1cm, 6cm radius. The edge still deals 15. The bomb is the largest.'],
+              tom:'3 cấp: tâm 25/30/33, bán kính 4/5/6cm. Mỗi 1cm trừ 3 nên mé còn 13/15/15. Bom to dần theo cấp và rơi từ trên màn hình.',
+              tomEn:'3 levels: center 25/30/33, radius 4/5/6cm. Minus 3 per 1cm, so the edge still deals 13/15/15. The bomb grows with the level and falls from above the screen.' }
         ];
         function cusUltTim(id){ return CUS_ULT.find(x => x.id === id) || null; }
 
@@ -63445,6 +63485,7 @@ class PulsarCloneBoss {
             return d;
         }
         function cusUltTick(){
+            if (typeof cusBomTick === 'function') cusBomTick();   // @@HE-CUSBOM
             if (typeof dino === 'undefined' || !dino || dino.hp <= 0) return;
             if (currentAmmoType !== CUS_DAN || gameState === 'pvp') return;
             if (cusUltChon !== 'drone' || cusUltCap() < 1) return;
@@ -63493,6 +63534,9 @@ class PulsarCloneBoss {
                 ng.cusTL = CUS_TL_SO;
                 floatingTexts.push(new FloatingText(ng.x - 52, ng.y - 34, "TÊN LỬA! " + CUS_TL_SO + " × " + CUS_TL_DMG[cap]));
                 if (typeof SFX !== 'undefined' && SFX.tone){ SFX.tone(160, 0.30, 'sawtooth', 0.28, 70); SFX.tone(1100, 0.14, 'square', 0.14, 1700); }
+            } else if (cusUltChon === 'bom'){
+                if (cusBom) return false;
+                cusBomBat(ng, cap);
             } else {
                 let n = CUS_ULT_DRONE[cap];
                 cusDroneTao(ng, 'dan', n);
@@ -63503,6 +63547,171 @@ class PulsarCloneBoss {
             ng.aKeyHeldTime = 0; ng.chargeProgress = 0;
             shakeTimer = Math.max(shakeTimer, 20);
             return true;
+        }
+
+        /* @@HE-CUSBOM — THẢ BOM. 3 cấp.
+           Tâm 25/30/33. Mỗi 1cm (floor) trừ 3. Bán kính 4/5/6cm. Mép còn 13/15/15.
+           Bom sinh phía trên mép camera, rơi 4 px/khung. Cấp cao thì quả to hơn. */
+        const CUS_BOM_MO = 24, CUS_BOM_SO = 3, CUS_BOM_BUOC = 3;
+        const CUS_BOM_DMG = [0, 25, 30, 33];
+        const CUS_BOM_RCM = [0, 4, 5, 6];
+        const CUS_BOM_SC  = [0, 1.15, 1.4, 1.7];
+        const CUS_BOM_VY = 4, CUS_BOM_TOC = 8, CUS_BOM_HAN = 480, CUS_BOM_EP = 16;
+        let cusBom = null;
+        function cusBomCm(){ return (typeof CM === 'number') ? CM : (canvas.width / 23); }
+        function cusBomDat(){ return 320; }
+        function cusBomCap(S){ return Math.max(1, Math.min(3, (S && S.cap) || 1)); }
+        function cusBomTren(){
+            let top = (typeof camY === 'number' ? camY : -160) - 80;
+            return Math.min(top, cusBomDat() - 420);
+        }
+        function cusBomKhoang(o, x, y){
+            let x0 = o.x, y0 = o.y, x1 = o.x + (o.w || 20), y1 = o.y + (o.h || 20);
+            let px = Math.max(x0, Math.min(x, x1)), py = Math.max(y0, Math.min(y, y1));
+            return Math.hypot(px - x, py - y);
+        }
+        function cusBomBat(ng, cap){
+            cusBom = { ng: ng, pha: 'mo', t: 0, x: ng.x + ng.w / 2, con: CUS_BOM_SO, roi: [], no: [],
+                       jCu: true, khoaJ: true, ep: 0, tha: 0, cap: Math.max(1, Math.min(3, cap || 1)) };
+            ng._cusBom = 1; ng._cusBomAn = 0; ng._cusBomMo = 1;
+            ng.cusCh = 0;
+            floatingTexts.push(new FloatingText(ng.x - 36, ng.y - 40, LT("THẢ BOM", "BOMB DROP")));
+            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(180, 0.22, 'sawtooth', 0.18, 90);
+        }
+        function cusBomTha(S){
+            if (!S || S.con <= 0) return;
+            let y0 = cusBomTren();
+            S.roi.push({ x: S.x, y: y0, y0: y0, dat: cusBomDat(), sc: CUS_BOM_SC[cusBomCap(S)] });
+            S.con--;
+            if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(240, 0.08, 'square', 0.12, 180);
+            if (S.con <= 0 && S.pha === 'ngam'){ S.pha = 've'; S.t = 0; }
+        }
+        function cusBomNo(S, x, y){
+            let cm = cusBomCm(), cap = cusBomCap(S);
+            let Rcm = CUS_BOM_RCM[cap], R = Rcm * cm, tam = CUS_BOM_DMG[cap];
+            let ds = [];
+            if (gameState === 'pvp' && typeof pvpMucCua === 'function') ds = pvpMucCua(S.ng);
+            else if (typeof allTargets === 'function') ds = allTargets();
+            for (let o of ds){
+                if (!o || o.invulnAll || o.hp === undefined || o.hp <= 0) continue;
+                let d = cusBomKhoang(o, x, y);
+                if (d > R) continue;
+                let buoc = Math.min(Rcm, Math.floor(d / cm + 1e-4));
+                let dmg = tam - CUS_BOM_BUOC * buoc;
+                if (dmg <= 0) continue;
+                if (typeof dealDamage === 'function') dealDamage(o, dmg, 'flat'); else o.hp -= dmg;
+                floatingTexts.push(new FloatingText(o.x, o.y - 18, String(dmg)));
+            }
+            S.no.push({ x: x, y: y, t: 0, R: R });
+            shakeTimer = Math.max(shakeTimer || 0, 14);
+            if (typeof SFX !== 'undefined' && SFX.tone){ SFX.tone(70, 0.28, 'sawtooth', 0.3, 40); SFX.tone(140, 0.16, 'square', 0.16, 80); }
+        }
+        function cusBomNha(ng){
+            if (!ng) return;
+            ng._cusBom = 0; ng._cusBomAn = 0; ng._cusBomMo = 1;
+            ng._uFreeze = 0;
+            ng.invTimer = Math.max(ng.invTimer || 0, 24);
+            ng.invincible = true;
+        }
+        function cusBomTick(){
+            let S = cusBom; if (!S) return;
+            let ng = S.ng;
+            if (!ng || ng.hp === undefined || ng.hp <= 0){ if (ng) cusBomNha(ng); cusBom = null; return; }
+            S.t++;
+            ng._cusBom = 1;
+            ng.invincible = true; ng.invTimer = Math.max(ng.invTimer || 0, 8);
+            if (!S.tha) ng._uFreeze = 2;
+            if (typeof dashVx !== 'undefined' && ng.id === 1) dashVx = 0;
+            if (S.pha === 'mo'){
+                ng._cusBomAn = 0;
+                ng._cusBomMo = Math.max(0, 1 - S.t / CUS_BOM_MO);
+                if (S.t >= CUS_BOM_MO){ S.pha = 'ngam'; S.t = 0; ng._cusBomAn = 1; ng._cusBomMo = 0; S.khoaJ = !!keys['KeyJ']; }
+            } else if (S.pha === 'ngam'){
+                ng._cusBomAn = 1; ng._cusBomMo = 0;
+                let trai = !!(keys['KeyA'] || keys['ArrowLeft']), phai = !!(keys['KeyD'] || keys['ArrowRight']);
+                if (trai !== phai) S.x += (phai ? 1 : -1) * CUS_BOM_TOC;
+                let viewL = (typeof camX === 'number' ? camX : 0) + 28;
+                let viewR = (typeof camX === 'number' ? camX : 0) + canvas.width - 28;
+                let mapL = (typeof worldL === 'function' ? worldL() : 0) + 16;
+                let mapR = (typeof worldR === 'function' ? worldR() : canvas.width) - 16;
+                S.x = Math.max(Math.max(viewL, mapL), Math.min(Math.min(viewR, mapR), S.x));
+                let j = !!keys['KeyJ'];
+                if (S.khoaJ){ if (!j) S.khoaJ = false; }
+                else if (j && !S.jCu && S.ep <= 0) cusBomTha(S);
+                S.jCu = j;
+                if (S.t >= CUS_BOM_HAN && S.con > 0){
+                    if (S.ep <= 0){ cusBomTha(S); S.ep = CUS_BOM_EP; }
+                    else S.ep--;
+                }
+            } else if (S.pha === 've'){
+                ng._cusBomAn = 0;
+                ng._cusBomMo = Math.min(1, S.t / CUS_BOM_MO);
+                if (S.t >= CUS_BOM_MO){ cusBomNha(ng); S.tha = 1; }
+            }
+            for (let i = S.roi.length - 1; i >= 0; i--){
+                let b = S.roi[i];
+                b.y += CUS_BOM_VY;
+                if (b.y >= b.dat){ cusBomNo(S, b.x, b.dat); S.roi.splice(i, 1); }
+            }
+            for (let i = S.no.length - 1; i >= 0; i--) if (++S.no[i].t > 18) S.no.splice(i, 1);
+            if (S.tha && S.roi.length === 0 && S.no.length === 0) cusBom = null;
+            cusBomVe(S);
+        }
+        function cusBomVeQua(x, y, sc){
+            ctx.save();
+            ctx.translate(x, y); ctx.scale(sc, sc);
+            ctx.fillStyle = "#37474F";
+            ctx.beginPath(); ctx.moveTo(-14, -6); ctx.lineTo(-26, -22); ctx.lineTo(-6, -12); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(14, -6); ctx.lineTo(26, -22); ctx.lineTo(6, -12); ctx.fill();
+            ctx.fillStyle = "#263238";
+            ctx.beginPath(); ctx.ellipse(0, 4, 16, 24, 0, 0, 6.28); ctx.fill();
+            ctx.fillStyle = "#FF6D00";
+            ctx.fillRect(-16, 0, 32, 9);
+            ctx.fillStyle = "#546E7A";
+            ctx.beginPath(); ctx.moveTo(-10, 22); ctx.lineTo(0, 40); ctx.lineTo(10, 22); ctx.fill();
+            ctx.strokeStyle = "#FFAB40"; ctx.lineWidth = 2.4;
+            ctx.beginPath(); ctx.moveTo(2, -16); ctx.quadraticCurveTo(14, -30, 6, -40); ctx.stroke();
+            ctx.fillStyle = "#FFD54F";
+            ctx.beginPath(); ctx.arc(6, -40, 4, 0, 6.28); ctx.fill();
+            ctx.restore();
+        }
+        function cusBomVe(S){
+            if (!S) return;
+            let cm = cusBomCm(), cap = cusBomCap(S), R = CUS_BOM_RCM[cap] * cm, y = cusBomDat();
+            if (S.pha === 'ngam'){
+                ctx.save();
+                ctx.strokeStyle = "rgba(255,145,40,0.85)"; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(S.x, y, R, 0, 6.28); ctx.stroke();
+                ctx.strokeStyle = "rgba(255,145,40,0.22)";
+                for (let i = 1; i < CUS_BOM_RCM[cap]; i++){ ctx.beginPath(); ctx.arc(S.x, y, i * cm, 0, 6.28); ctx.stroke(); }
+                ctx.fillStyle = "rgba(255,80,20,0.2)";
+                ctx.beginPath(); ctx.arc(S.x, y, cm, 0, 6.28); ctx.fill();
+                ctx.fillStyle = "#FFCC80"; ctx.font = "bold 13px Consolas, monospace";
+                ctx.fillText("BOM " + S.con, S.x - 22, y - R - 8);
+                ctx.restore();
+            }
+            for (let b of S.roi){
+                let cao = Math.max(1, b.dat - b.y0);
+                let u = Math.max(0, Math.min(1, 1 - (b.dat - b.y) / cao));
+                let sc = b.sc || 1;
+                ctx.save();
+                ctx.fillStyle = "rgba(0,0,0," + (0.15 + 0.35 * u).toFixed(2) + ")";
+                ctx.beginPath(); ctx.ellipse(b.x, b.dat - 2, (14 + 18 * u) * sc, (5 + 3 * u) * sc, 0, 0, 6.28); ctx.fill();
+                ctx.strokeStyle = "rgba(255,180,70,0.45)"; ctx.setLineDash([4, 6]);
+                ctx.beginPath(); ctx.moveTo(b.x, b.y + 20 * sc); ctx.lineTo(b.x, b.dat); ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.restore();
+                cusBomVeQua(b.x, b.y, sc);
+            }
+            for (let n of S.no){
+                let p = n.t / 18;
+                ctx.save(); ctx.globalAlpha = Math.max(0, 1 - p);
+                ctx.strokeStyle = "#FF6D00"; ctx.lineWidth = 6;
+                ctx.beginPath(); ctx.arc(n.x, n.y, n.R * (0.3 + 0.7 * p), 0, 6.28); ctx.stroke();
+                ctx.fillStyle = "rgba(255,87,34,0.22)";
+                ctx.beginPath(); ctx.arc(n.x, n.y, n.R * (0.15 + 0.45 * p), 0, 6.28); ctx.fill();
+                ctx.restore();
+            }
         }
 
         function cusNoVe(){
@@ -65518,7 +65727,7 @@ class PulsarCloneBoss {
                    fn: (ng) => lhHienBat(ng, 'xoay3', 5) },
             // NHAY LEN chem hat len (nguoc): nguoi choi bat len cung muc tieu
             len: { T: 14, hit: 5,  hoi: 8, ton: 1, a0: 1.4, a1: -2.6, nguoc: 1, am: 260, sty: 'khong', treo: 1,
-                   fn: (ng, D) => lhHopNguoi(ng, -14, 108, 100, 8, 3, D.hitSet, o => { if (typeof wkgHatTung === 'function' && !o.invulnAll) wkgHatTung(o, 110); }) },
+                   fn: (ng, D) => lhHopNguoi(ng, -14, 108, 100, 8, 3, D.hitSet, o => { if (typeof wkgHatTung === 'function' && !o.invulnAll) wkgHatTung(o, 155, 12, 0.28); }) },
             // tu tren khong CHEM MANH DAP XUONG
             dap: { T: 18, hit: 9, hoi: 20, ton: 1, a0: -2.8, a1: 1.45, am: 100, ket: true, sty: 'khong',
                    bat: (ng) => { ng.dy = Math.max(ng.dy || 0, 12); if (typeof slamLaoBat === 'function') slamLaoBat(ng); },   // @@HE-SLAMLAO
@@ -65669,10 +65878,10 @@ class PulsarCloneBoss {
             else lh.bufLen = true;
             return true;
         }
-        // Hans: "J lên J la NHAY LEN chem hat len" — nguoi choi bat len cung cu chem, ke dich bi hat theo
+        // Hans: "J lên J la NHAY LEN chem hat len". @@HE-LHNHAY: 1.08× (−13.5, đỉnh ~134px; trước 0.92× / ~96px).
         function lhLenBat(ng){
             lh.chuoi = 'u'; lh.khong = 1;                        // dem la nhat tren khong dau tien
-            ng.dy = (ng.jumpPower || -12.5) * 0.92; ng.grounded = false; ng.canDoubleJump = true; ng.jumpCount = 1;
+            ng.dy = (ng.jumpPower || -12.5) * 1.08; ng.grounded = false; ng.canDoubleJump = true; ng.jumpCount = 1;
             lhVung(ng, LH_M.len);
         }
         // LUOT: J roi luot -> song chan dong; con lai mo cua so "luot J J J"
@@ -66722,12 +66931,10 @@ class PulsarCloneBoss {
                 lh.hoi--; if (lh.hoi === 0) lh.rh = 0;
             } else lh.rh = Math.min(999, lh.rh + 1);
             if (ng.grounded && !(lh.dang && /^k/.test(lh.chuoi))) lh.khong = 0;
-            // @@HE-LUOIHAI3: dang combo tren khong thi ROI CHAM trong luc thu hoi va cua so "dung mot nhip",
-            // de J J . J tren troi co du thoi gian (khong thi cham dat truoc khi kip dung nhip)
-            /* @@HE-LHDAN — Hans: "nguoi choi chi lo lung tren khong khi bat dau chem thuong thay vi mac dinh".
-               Truoc day nhay chem hat (J len, chuoi 'u') cung treo nguoi lai toi 45 khung — tuc la cu nhay
-               len la lo lung. Gio chi treo khi DA vung it nhat mot nhat chem thuong tren khong (chuoi 'k...'). */
-            if (!ng.grounded && !lh.dang && /^k/.test(lh.chuoi) && (lh.hoi > 0 || lh.rh <= LH_NGAT) && !bamXuongKhong(ng)) ng.dy = Math.min(ng.dy || 0, 0.3);
+            // @@HE-LHNHAY — Hans: J-jump hat cao hon mot chut, o tren khong roi cham hon de combo ra hinh.
+            // Chuoi 'u' (vua nhay chem) truoc day roi tu do. Gio tran dy 0.35 trong cua so nhip (~1px/khung sau trong luc).
+            // Chuoi 'k...' giu tran 0.3 nhu cu. Giu xuong van roi nhanh.
+            if (!ng.grounded && !lh.dang && (lh.chuoi === 'u' || /^k/.test(lh.chuoi)) && (lh.hoi > 0 || lh.rh <= LH_NGAT) && !bamXuongKhong(ng)) ng.dy = Math.min(ng.dy || 0, lh.chuoi === 'u' ? 0.35 : 0.3);
             // cua so luot J J J
             if (typeof dashVx !== 'undefined' && Math.abs(dashVx) > 2 && lh.luotDu > 0) lh.luotDu = 30;
             else if (lh.luotDu > 0) lh.luotDu--;
@@ -67298,7 +67505,18 @@ class PulsarCloneBoss {
         const DK_JC_HUT = [3, 6, 9];
         // @@HE-BZ — BERSERKER: nhip nhu Luoi hai. <= BZ_LIEN la bam lien, BZ_LIEN..BZ_NGAT la dung mot nhip.
         const BZ_LIEN = 12, BZ_NGAT = 40, BZ_GIU = 20;
-        const BZ_CHAT = [12, 15, 18], BZ_TAM = [3, 5, 7], BZ_HOI = [600, 540, 480];
+        const BZ_CHAT = [12, 15, 18], BZ_TAM = [3, 5, 7], BZ_HOI = [600, 510, 420, 330, 240];
+        function bzBeRong(tier){
+            let map = 1000;
+            if (typeof worldR === 'function' && typeof worldL === 'function') map = Math.max(480, worldR() - worldL());
+            let dau = 106, cuoi = map * 0.5;
+            let t = Math.max(1, Math.min(5, tier || 1));
+            return dau + (cuoi - dau) * (t - 1) / 4;
+        }
+        function bzBeMo(ng, tier, x){
+            let gy = dkChan(ng);
+            dkBeMau.push({ x: x == null ? ng.x + ng.w / 2 : x, w: bzBeRong(tier), y: gy, t: 0, T: 1200, tier: tier || 1, hoi: 0 });
+        }
         const BZ_TAM_THEM = 50, BZ_TAM_T = 300;
         function bzBat(ng){
             if (!ng || !dkBat(ng)) return false;
@@ -68119,8 +68337,11 @@ class PulsarCloneBoss {
             }
             for (let o of dkDs()) if (dkLaQuai(o) && dkDangBay(o)) dkGhim(o, 50);
             let gy = dkChan(ng);
-            dkBeMau.push({ x: (x0 + x1) / 2, w: 70 + tier * 36, y: gy, t: 0, T: 1200, tier, hoi: 0 });
-            bzTuThuong(ng);
+            let giua = (x0 + x1) / 2;
+            if (A.them && A.them.be){
+                bzBeMo(ng, tier, giua);
+                bzTuThuong(ng);
+            }
             hitDat((x0 + x1) / 2, gy, 1, [183, 28, 28]);
             shakeTimer = Math.max(shakeTimer || 0, 18);
         }
@@ -68129,13 +68350,18 @@ class PulsarCloneBoss {
                 let B = dkBeMau[i]; B.t++;
                 if (B.t >= B.T){ dkBeMau.splice(i, 1); continue; }
                 let hx = ng.x + ng.w / 2, chan = ng.y + ng.h;
-                let tren = bzBat(ng) && ng.grounded && Math.abs(hx - B.x) < B.w / 2 && Math.abs(chan - B.y) < 28;
+                let trongX = Math.abs(hx - B.x) < B.w / 2 + ng.w * 0.25;
+                let trongY = Math.abs(chan - B.y) < 80 || (!!ng.grounded && Math.abs(chan - B.y) < 160);
+                let tren = bzBat(ng) && trongX && trongY && ng.hp > 0;
                 if (tren){
                     B.hoi++;
-                    if (B.hoi >= BZ_HOI[(B.tier || 1) - 1]){
+                    let moc = BZ_HOI[Math.max(0, Math.min(BZ_HOI.length - 1, (B.tier || 1) - 1))] || 600;
+                    if (B.hoi >= moc){
                         B.hoi = 0;
-                        if (!(ng._bzHoiF && frames - ng._bzHoiF < 30) && ng.hp > 0 && ng.hp < ng.maxHp){
-                            ng._bzHoiF = frames; ng.hp++; dkChu(ng.x - 8, ng.y - 30, "+1", "+1");
+                        if (ng.hp < ng.maxHp){
+                            ng.hp++;
+                            dkChu(ng.x - 8, ng.y - 30, "+1", "+1");
+                            if (typeof SFX !== 'undefined' && SFX.heal) SFX.heal();
                         }
                     }
                 }
@@ -68154,11 +68380,12 @@ class PulsarCloneBoss {
         function bzVeBe(){
             for (const B of dkBeMau){
                 let a = B.t > B.T - 40 ? (B.T - B.t) / 40 : 1;
+                let rx = B.w / 2, ry = B.w <= 120 ? 8 : Math.min(26, 8 + (B.w - 106) / 48);
                 ctx.save();
                 ctx.fillStyle = "rgba(120,8,12," + (0.55 * a).toFixed(2) + ")";
-                ctx.beginPath(); ctx.ellipse(B.x, B.y - 2, B.w / 2, 8, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(B.x, B.y - 2, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
                 ctx.fillStyle = "rgba(198,40,40," + (0.35 * a).toFixed(2) + ")";
-                ctx.beginPath(); ctx.ellipse(B.x, B.y - 3, B.w / 2 - 8, 4, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(B.x, B.y - 3, Math.max(8, rx - 8), Math.max(3, ry * 0.45), 0, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
             }
         }
@@ -68237,7 +68464,12 @@ class PulsarCloneBoss {
             dk._hetPose = giu;
         }
         function bzNapRa(ng, tier){
-            if (tier === 1){ bzChatRa(ng, 12, 3, 1, "CHÉM XA!", "FAR SLASH!"); return; }
+            if (tier === 1){
+                bzNgatGiua(ng);
+                if (!bzBatDau(ng, 'quet')) return;
+                dkChu(ng.x - 44, ng.y - 48, "KIẾM KHÍ!", "SWORD QI!");
+                return;
+            }
             if (tier === 2){ bzVongRa(ng); return; }
             if (tier === 3){ bzNoLuc(ng); return; }
             if (tier === 4){ bzRutRa(ng); return; }
@@ -68248,6 +68480,14 @@ class PulsarCloneBoss {
             let them = { dmg: dmg, reach: cm * DK_CM, tier: poolTier, jc: poolTier };
             if (!bzBatDau(ng, 'bzChat', them)) return;
             dkChu(ng.x - 34, ng.y - 52, tenVi, tenEn);
+        }
+        const BZ_J_DMG = [12, 14, 16, 18, 20], BZ_J_CM = [3, 6, 10, 15, 22];
+        function bzChemJ(ng, tier){
+            let t = Math.max(1, Math.min(5, tier || 1));
+            bzNgatGiua(ng);
+            let them = { dmg: BZ_J_DMG[t - 1], reach: BZ_J_CM[t - 1] * DK_CM, tier: t, be: 1 };
+            if (!bzBatDau(ng, 'bzChat', them)) return;
+            dkChu(ng.x - 40, ng.y - 52, t >= 5 ? "CHÉM MẠNH!" : "CHẶT MÁU!", t >= 5 ? "HEAVY SLASH!" : "BLOOD SLASH!");
         }
         function bzVongRa(ng){
             bzNgatGiua(ng);
@@ -68290,8 +68530,8 @@ class PulsarCloneBoss {
             dkTon(ng, 1);
             return true;
         }
-        const BZ_NAP = ["", "MÁU", "XOAY", "BÙNG", "ĐÂM", "LOẠN"];
-        const BZ_NAP_EN = ["", "BLOOD", "SPIN", "BURST", "THRUST", "FRENZY"];
+        const BZ_NAP = ["", "KHÍ", "XOAY", "BÙNG", "ĐÂM", "LOẠN"];
+        const BZ_NAP_EN = ["", "QI", "SPIN", "BURST", "THRUST", "FRENZY"];
         function bzHoanh(ng, kieu){
             let dk = ng.dk;
             if (kieu === 'ngang' && ng.ammo < (DK_M.ngang.ton || 3) && !((dk.voHan || 0) > 0)){
@@ -68370,18 +68610,16 @@ class PulsarCloneBoss {
                 if (tier > dk.jTier){
                     dk.jTier = tier;
                     dkSfx(160 + tier * 55, 0.1, 'sawtooth', 0.15, 80 + tier * 30);
-                    dkChu(ng.x - 22, ng.y - 34, BZ_NAP[tier], BZ_NAP_EN[tier]);
+                    dkChu(ng.x - 22, ng.y - 34, "CHÉM " + tier, "SLASH " + tier);
                 }
                 dk._bzSac = tier;
-                ng.aKeyHeldTime = dk.jT;
-                ng.chargeProgress = Math.min(100, (dk.jT / 180) * 100);
             } else if (dk.jHold){
                 let tier = dk.jT >= 150 ? 5 : dk.jT >= 120 ? 4 : dk.jT >= 90 ? 3 : dk.jT >= 60 ? 2 : dk.jT >= 30 ? 1 : 0;
                 let nhip = dk._bzNhip || 'moi', luot = dk._bzLuot;
                 dk.jHold = false; dk.jT = 0; dk.jTier = 0; dk._bzSac = 0; dk._bzLuot = 0;
                 ng.aKeyHeldTime = 0; ng.chargeProgress = 0;
                 if (tier === 0 && luot){ bzHoanh(ng, 'ngang'); return; }
-                if (tier > 0){ bzNapRa(ng, tier); return; }
+                if (tier > 0){ bzChemJ(ng, tier); return; }
                 if (dk.A || dk.cho > 0) dk._bzCho = nhip;
                 else bzThuc(ng, nhip);
             }
@@ -68600,55 +68838,93 @@ class PulsarCloneBoss {
             ctx.save(); ctx.lineJoin = 'round';
             if (may){
                 let dy = cs ? 8 : 0;
-                let g = ctx.createLinearGradient(bx + 12, by + 12 + dy, bx + 30, by + 28 + dy);
+                let g = ctx.createLinearGradient(bx + 12, by + 12 + dy, bx + 34, by + 28 + dy);
                 g.addColorStop(0, '#3a3a3a'); g.addColorStop(0.5, '#141414'); g.addColorStop(1, '#070707');
                 ctx.fillStyle = g; ctx.strokeStyle = '#000'; ctx.lineWidth = 1.15;
                 ctx.beginPath();
-                ctx.moveTo(bx + 13, by + 14 + dy); ctx.lineTo(bx + 33, by + 14 + dy);
-                ctx.lineTo(bx + 35, by + 25 + dy); ctx.lineTo(bx + 14, by + 26 + dy);
+                ctx.moveTo(bx + 12, by + 12 + dy); ctx.lineTo(bx + 35, by + 12 + dy);
+                ctx.lineTo(bx + 37, by + 26); ctx.lineTo(bx + 13, by + 27);
                 ctx.closePath(); ctx.fill(); ctx.stroke();
-                ctx.strokeStyle = '#6b1c22'; ctx.lineWidth = 0.9;
-                ctx.beginPath(); ctx.moveTo(bx + 16, by + 18 + dy); ctx.lineTo(bx + 30, by + 18 + dy); ctx.stroke();
-                ctx.fillStyle = '#ff1744';
-                ctx.beginPath(); ctx.moveTo(bx + 23, by + 19.2 + dy); ctx.lineTo(bx + 24.6, by + 21.2 + dy);
-                ctx.lineTo(bx + 23, by + 23.2 + dy); ctx.lineTo(bx + 21.4, by + 21.2 + dy); ctx.closePath(); ctx.fill();
+                ctx.strokeStyle = '#b71c1c'; ctx.lineWidth = 1.1;
+                ctx.beginPath(); ctx.moveTo(bx + 15, by + 17 + dy); ctx.lineTo(bx + 32, by + 17 + dy); ctx.stroke();
                 ctx.restore(); return;
             }
-            const Y = (v, k, b) => by + v + cs * k + (b ? br : 0);
-            let g = ctx.createLinearGradient(bx + 12, Y(14, 11, 1), bx + 26, Y(30, 6));
+            const Y = (v, k) => by + v + cs * k + br;
+            ctx.beginPath();
+            ctx.moveTo(bx + 7, Y(16, 11));
+            ctx.quadraticCurveTo(bx + 18, Y(8.5, 13), bx + 33, Y(15, 11));
+            ctx.quadraticCurveTo(bx + 38, Y(23, 8), bx + 31, Y(30, 6));
+            ctx.quadraticCurveTo(bx + 17, Y(33, 5), bx + 9, Y(27, 8));
+            ctx.quadraticCurveTo(bx + 5, Y(20, 10), bx + 7, Y(16, 11));
+            ctx.closePath();
+            let g = ctx.createLinearGradient(bx + 8, Y(9, 13), bx + 30, Y(32, 6));
             g.addColorStop(0, '#4a4a4a'); g.addColorStop(0.45, '#1a1a1a'); g.addColorStop(1, '#080808');
             ctx.fillStyle = g; ctx.strokeStyle = '#000'; ctx.lineWidth = 1.15;
+            ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 1.15;
             ctx.beginPath();
-            ctx.moveTo(bx + 9, Y(18, 10, 1));
-            ctx.quadraticCurveTo(bx + 18, Y(13, 12, 1), bx + 31, Y(17, 10, 1));
-            ctx.quadraticCurveTo(bx + 36, Y(23, 8), bx + 29, Y(28, 6));
-            ctx.quadraticCurveTo(bx + 18, Y(31, 6), bx + 11, Y(25, 8));
-            ctx.closePath(); ctx.fill(); ctx.stroke();
-            ctx.strokeStyle = '#5c2024'; ctx.lineWidth = 0.85;
-            for (let i = 0; i < 3; i++){
-                ctx.beginPath();
-                ctx.moveTo(bx + 13, Y(20.2 + i * 2.1, 9, 1));
-                ctx.quadraticCurveTo(bx + 20, Y(17.4 + i * 2.1, 10, 1), bx + 28, Y(20.2 + i * 2.1, 9, 1));
-                ctx.stroke();
-            }
-            ctx.fillStyle = '#141414';
-            ctx.beginPath();
-            ctx.moveTo(bx + 26, Y(15.5, 10, 1));
-            ctx.quadraticCurveTo(bx + 34, Y(12.5, 11, 1), bx + 36, Y(18.5, 9, 1));
-            ctx.lineTo(bx + 30, Y(20.2, 9, 1));
-            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.moveTo(bx + 10, Y(17, 11));
+            ctx.quadraticCurveTo(bx + 19, Y(13, 12), bx + 30, Y(16.5, 11));
+            ctx.stroke();
             ctx.fillStyle = '#ff1744';
             ctx.beginPath();
-            ctx.moveTo(bx + 20, Y(21.2, 9, 1));
-            ctx.lineTo(bx + 22.1, Y(23.3, 8.4, 1));
-            ctx.lineTo(bx + 20, Y(25.4, 8, 1));
-            ctx.lineTo(bx + 17.9, Y(23.3, 8.4, 1));
+            ctx.moveTo(bx + 20, Y(19, 9));
+            ctx.lineTo(bx + 22.4, Y(22, 8.5));
+            ctx.lineTo(bx + 20, Y(25, 8));
+            ctx.lineTo(bx + 17.6, Y(22, 8.5));
             ctx.closePath(); ctx.fill();
-            ctx.fillStyle = '#ff8a80';
-            ctx.fillRect(bx + 19.5, Y(22.4, 8.6, 1), 0.7, 0.7);
             ctx.restore();
         }
-        function bzVeGiap(){}
+        function bzVeGiap(bx, by, cs, br, may){
+            if (typeof bzBat !== 'function' || !bzBat(dino)) return;
+            ctx.save(); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+            if (may){
+                let dy = cs ? 8 : 0;
+                ctx.fillStyle = '#161616'; ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 1.1;
+                ctx.beginPath(); ctx.arc(bx + 33, by + 13 + dy, 7.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(bx + 40, by + 6 + dy);
+                ctx.quadraticCurveTo(bx + 50, by + 4 + dy, bx + 58, by + 8 + dy);
+                ctx.lineTo(bx + 56, by + 14 + dy);
+                ctx.quadraticCurveTo(bx + 48, by + 12 + dy, bx + 40, by + 14 + dy);
+                ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.restore(); return;
+            }
+            let yb = cs * 12 + br, yt = cs * 13 + br;
+            ctx.fillStyle = '#161616'; ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 1.05;
+            ctx.beginPath();
+            ctx.moveTo(bx + 32, by + 4 + yt);
+            ctx.quadraticCurveTo(bx + 44, by + 0 + yt, bx + 53, by + 7 + yb);
+            ctx.lineTo(bx + 50, by + 10 + yb);
+            ctx.quadraticCurveTo(bx + 42, by + 5 + yt, bx + 33, by + 8 + yt);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(bx + 35, by + 13 + yb);
+            ctx.quadraticCurveTo(bx + 46, by + 17 + yb, bx + 53, by + 12 + yb);
+            ctx.lineTo(bx + 51, by + 16 + yb);
+            ctx.quadraticCurveTo(bx + 44, by + 20 + yb, bx + 34, by + 16 + yb);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            let sX = bx + 27, sY = by + 19 + cs * 9;
+            ctx.fillStyle = '#1c1c1c'; ctx.strokeStyle = '#424242'; ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.ellipse(sX + 1, sY, 8, 6.5, -0.35, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#ff1744';
+            ctx.beginPath();
+            ctx.moveTo(sX + 1, sY - 6.5);
+            ctx.lineTo(sX + 4, sY - 1);
+            ctx.lineTo(sX - 2, sY - 1);
+            ctx.closePath(); ctx.fill();
+            let eX = bx + 30, eY = by + 26 + cs * 8, wX = bx + 37, wY = by + 28 + cs * 8;
+            ctx.fillStyle = '#121212'; ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(eX - 4, eY - 3);
+            ctx.lineTo(eX + 4, eY - 2);
+            ctx.lineTo(wX + 3, wY + 1);
+            ctx.lineTo(wX - 3, wY + 5);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.restore();
+        }
 
         /* ---------- TICK NGUOI CHOI (goi tu moc moiKhung) ---------- */
         function dkTick(ng, fireKey, chargeKey, crouchKey){
@@ -68815,10 +69091,9 @@ class PulsarCloneBoss {
         }
         function dkNhaK(ng){
             if (bzBat(ng)){
-                // Vòng nạp (giữ K) trước đây bị nuốt: thả ra không ra đòn nào.
-                // Cùng 5 mốc với giữ J. Phép cũ (quét / cắm / đập / đá / bát môn) vẫn khóa.
-                // Đang giữ J thì đồng hồ J làm chủ — không thả kép.
-                // Giữ tới 3 giây thì Channel đã nhận, không thả thêm đòn loạn.
+                // Giữ K: 5 đòn riêng (chém / xoay / bùng / đâm / loạn). Không bể máu.
+                // Bể máu chỉ có ở giữ J. Đang giữ J thì không thả kép.
+                // Giữ tới 3 giây thì Channel đã nhận, không thả thêm đòn.
                 let dk = dkCua(ng);
                 if (dk.jHold || dk.bzCh || dk.ult) return;
                 let h = ng.aKeyHeldTime || 0;
@@ -69202,6 +69477,10 @@ class PulsarCloneBoss {
                         if (S.hit.has(o)) continue;
                         if (o.x + (o.w || 20) < x0 || o.x > x1 || o.y + (o.h || 20) < y0 || o.y > S.y + 10) continue;
                         S.hit.add(o); dkDanh(o, S.dmg); dkDay(o, S.d, 16);
+                        if (dkLaQuai(o) && !S.mau){
+                            if (o.stunTimer !== undefined) o.stunTimer = Math.max(o.stunTimer || 0, 18);
+                            if (typeof venKhoa === 'function') venKhoa(o, 18);
+                        }
                         if (dkLaQuai(o) && dkDangBay(o) && !S.mau) dkGhim(o, DK_TRONG);
                         hitCat(o.x + (o.w || 20) / 2, o.y + (o.h || 20) / 2, -S.d * 0.8, true, [179, 136, 255]);
                     }
@@ -69385,7 +69664,7 @@ class PulsarCloneBoss {
                 let Ad = dk.A;
                 if ((dk.tamThem || 0) > 0) dkVeSuongDo(BZ_TAM_THEM, false);
                 else if (Ad && Ad.kieu === 'bzChat') dkVeSuongDo((Ad.them && Ad.them.reach) || 30, true);
-                else if (dk.jHold && (dk.jTier || 0) >= 1 && !Ad) dkVeSuongDo(Math.min(24, (dk.jT || 0) * 0.4), false);
+                else if (dk.jHold && (dk.jTier || 0) >= 1 && !Ad) dkVeSuongDo(BZ_J_CM[(dk.jTier || 1) - 1] * DK_CM, true);
             }
             ctx.restore();
             // vet chem
@@ -69926,7 +70205,7 @@ class PulsarCloneBoss {
                     ctx.fillStyle = dk._bzNgat ? "#FF8A80" : "#FF1744";
                     let buoc = dk.bzNhanh ? (dk.bzNhanh + " " + (dk.bzBuoc || 0)) : ((dk.bz || 0) ? ("J" + dk.bz) : "");
                     if (dk._bzNgat) buoc = "NGẮT";
-                    else if (dk.jHold) buoc = (dk.jTier > 0 ? (BZ_NAP[dk.jTier] + " ") : "NẠP ") + (dk.jT / 60).toFixed(1) + "s";
+                    else if (dk.jHold) buoc = "CHÉM " + (dk.jTier || 0) + " " + (dk.jT / 60).toFixed(1) + "s";
                     else if (dk.bzCh) buoc = "KÊNH";
                     else if ((this.aKeyHeldTime || 0) >= 30 && !dk.A){
                         let h = this.aKeyHeldTime;
@@ -73106,7 +73385,8 @@ class PulsarCloneBoss {
                     ["ARTORIAS", 56, "#546E7A", "#141A26", "#ECEFF1", "#B388FF"],
                     ["GAEL", 68, "#6D4C41", "#190F0E", "#FFCCBC", "#FF5252"],
                     ["SOUL OF CINDER", 69, "#8D6E1E", "#0B0A0C", "#FFF9C4", "#FFAB40"],
-                    ["PONTIFF", 73, "#4527A0", "#0B0A14", "#EDE7F6", "#FF7043"] ] },
+                    ["PONTIFF", 73, "#4527A0", "#0B0A14", "#EDE7F6", "#FF7043"],
+                    ["KẺ GÁC HỐ", 80, "#B71C1C", "#1A0A0C", "#FFCDD2", "#FF6D00"] ] },
                 { title: "— DARKSIDERS —", tc: "#FF7043", items: [
                     null, null, null, null,
                     ["WAR", 53, "#B71C1C", "#3E1008", "#FFCDD2", "#FF1744"],
@@ -73179,6 +73459,16 @@ class PulsarCloneBoss {
                         ghi = 'cx=' + b.cx();
                     } catch(e){ ghi = e.message; }
                     T(ok, n, ghi);
+                }
+
+                G('KE GAC HO');
+                {
+                    let b = new HoGacBoss(1);
+                    T(b.phase === 1 && b.phu !== true && typeof b.startPhase2 === 'function', 'chinh la pha 1, co cua doi pha');
+                    b.startPhase2();
+                    T(b.phase === 2 && b.hp === 130 && b.maxHp === 130 && b.invulnAll === true, 'dung day: 130 mau, bat tu luc vua day');
+                    let a = new HoGacBoss(1, true, 'phan');
+                    T(a.phu === true && a.phase === 2 && a.hp === 36 && a.phan === 'phan', 'ke phu 36 mau, chet that, khong tu doi pha');
                 }
 
                 G('MOT CUA GAY SAT THUONG');
@@ -77150,8 +77440,8 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
             desc:'Tốn 2 ô. ĐỘC QUYỀN DINOSWORD. Bản nâng cấp toàn diện cho bộ kiếm — tầm chém, phòng thủ khi lướt, và cả một người thứ hai đánh cùng bạn. Không kể ra hết ở đây: cầm thử một ván là hiểu tại sao DinoSword cần nó.',
             descEn:'Costs 2 slots. DINOSWORD ONLY. A complete overhaul of the sword kit — longer reach, defence while dashing, and a second fighter at your side. Not spelling it all out here: run one stage with it and you will see why DinoSword wants it.' });
         RUNES.push({ id:'berserk', name:'BERSERKER', nameEn:'BERSERKER', icon:'☠', cost:2, ammoRune:true, onlyAmmo:19,
-            desc:'Tốn 2 ô. ĐỘC QUYỀN ĐẠI KIẾM. Giáp thú thay bộ J, thể lực lên 6, đi lại hết chậm. Phép K cũ vẫn khóa. Giữ K tới 3 giây vào Channel kiếm khí. Chiêu cuối riêng là Trăng Đen.\n\nBấm liền là chuỗi 5 nhát: chém xuống 5, hất 5, xoay 6, đâm 6, lùi rồi đâm xuyên 8 và có khung bất tử. Dừng một nhịp (kiếm loé đỏ) rồi bấm để rẽ.\n\nJ, dừng, J J J — đâm 6, hất nhảy 6 (địch hất nhẹ), bổ xuống 8.\nJ J, dừng, J J — cắm kiếm, ma pháp 3 mọi kẻ địch kể cả không trúng chém và kể cả đang đứng đất. J nữa cắm sâu, ma pháp 6, cùng luật. Nhát kiếm gần vẫn cộng thêm 4 rồi 10.\nJ J J, dừng, J — hất lên phóng kiếm khí máu cực to, sóng 8. Chém xong nghỉ một nhịp, không nối được.\nJ rồi Dash rồi J — lướt hất. Bấm J thường là bổ xuống 8, địch rơi theo và ăn thêm 2 khi chạm đất. Giữ J khoảng một phần ba giây thì mới xoay cưa tới khi chạm đất, kết bằng bổ 8.\nDash rồi J J — hai nhát chém ngang Hoành Tảo như kiếm gốc: 10 rồi 11. Nhát đầu tốn 3 thể lực.\n\nGiữ J hoặc K (vòng nạp) để nạp, thả là đòn riêng không nối combo. Phép K cũ vẫn khóa. Giữ K tới 3 giây thì vào Channel, không thả ra đòn loạn.\n0.5 giây: nhát chém tầm xa của đại kiếm gốc, lưỡi kiếm khí đỏ kéo dài, 12 sát thương, tầm +3cm. Cắt đạn, choáng, kéo kẻ bay xuống, bể máu 20 giây (đứng trên hồi 1 máu mỗi 10 giây, địch mất 1 mỗi giây). Tự mất 1 máu.\n1 giây: xoay ngang 3 phát, tầm ngắn, cắt đạn. Hai phát đầu lệch lên và lệch xuống, mỗi phát 2. Phát cuối xoay ngang hẳn, rộng hơn, 5.\n1.5 giây: bùng nổ. 5 giây sau không tốn thể lực. Hết 5 giây thì mất 1 máu.\n2 giây: thu kiếm, để ngang, đâm 14 rồi rút thêm 4. Sau đó 5 giây cả lưỡi có sương đỏ, dài thêm 5cm, nhát cắt chuyển đỏ máu.\n2.5 giây: chém loạn. Hai nhát tới rồi một nhát lùi, mỗi nhát 6, có iframe đúng lúc vung và lao theo nhát. Khoảng dừng giữa các nhát không có iframe. Rồi nhảy cao găm xuống: găm 10, đâm trúng thì sâu thêm 6. Đáp đúng giữa tâm thì hút 1 máu. Trên không bấm A D để chọn chỗ đáp.\n\nCHANNEL — giữ K đủ 3 giây: chém ngang 3 nhát như mốc 1 giây rồi lặp đến khi thả K. Mỗi nhát cận chiến 3, 3 rồi 5 và bắn kiếm khí. Khí nhát 1 và 2 gây 2, càng xa mỗi 2cm giảm 1. Nhát 3 khí to hơn, gây 4, mỗi 3cm giảm 1. Vào channel tốn 1 thể lực, mỗi nhát sau không tốn.\n\nCHIÊU CUỐI — màn hình đen, mặt trăng và cột tím. Ẩn hiện 7 nhát: lao tới, ra sau lưng, ra trước, rồi lặp. Mỗi nhát 10. Mọi kẻ địch bị khóa chân. Rồi người chơi xuất hiện sát mép sàn và bắn Getsuga quét cả sàn, 100 một lần.',
-            descEn:'Costs 2 slots. GREATSWORD ONLY. The beast armor replaces the J string (stamina 6, full move speed). K magic stays locked. Hold K for 3 seconds to enter a sword-qi Channel. The ultimate is now Black Moon.\n\nMash J for five hits: down 5, up 5, spin 6, thrust 6, step back and pierce 8 with iframes. Pause a beat (the sword flashes red) to branch.\n\nJ, pause, JJJ — thrust 6, rising cut 6, slam 8.\nJJ, pause, JJ — plant: gravity deals 3 to every enemy, even off the blade and even on the ground. The deeper plant deals 6 the same way. The close slash still adds 4 then 10.\nJJJ, pause, J — an upward cut that fires a huge blood wave for 8. After it, one beat of rest: you cannot chain.\nJ, Dash, J — a launching dash. A normal J press slams for 8; launched enemies are thrown down and take 2 more on impact. Hold J for about a third of a second to saw until you land, then slam for 8.\nDash, then J J — two horizontal cleaves, the old ones: 10 then 11. The first costs 3 stamina.\n\nHold J or K (the charge ring) to charge. Release is its own move, not a combo. Old K magic stays locked. Hold K for 3 seconds to enter Channel instead of releasing Frenzy.\n0.5s: the original far slash with a long red energy blade, 12 damage, +3cm. Cuts bullets, stuns, pulls airborne enemies down, leaves a 20s blood pool (stand in it to heal 1 every 10s, enemies take 1 per second). Costs 1 HP.\n1s: three horizontal spins, short range, cuts bullets. The first two sit a little high and a little low, 2 damage each. The last is dead horizontal, wider, and deals 5.\n1.5s: power burst. No stamina cost for the next 5 seconds. When those 5 seconds end, lose 1 HP.\n2s: pull the blade back, hold it flat, thrust for 14, then withdraw for 4. For the next 5 seconds the whole blade wears red mist, reaches 5cm farther, and cut trails turn blood red.\n2.5s: frenzy. Two forward lunges then one back lunge, 6 each, iframes only during the swing, and you lunge with the blade. The short pauses have no iframes. Then a high jump and a downward plant: 10, plus 6 more if the stab connects. Landing on the center of an enemy drains 1 HP. Steer the landing with A and D.\n\nCHANNEL — hold K for 3 seconds: three horizontal slashes like the 1 second charge, looping until K is released. Slashes deal 3, then 3, then 5, and each fires sword qi. Qi 1 and 2 deal 2 and lose 1 per 2cm. The third qi is larger and deals 4, losing 1 per 3cm. Entering costs 1 stamina. Later slashes cost 0.\n\nULTIMATE — the screen goes black, then a moon and a purple column. The player flickers through 7 slashes: lunge in, appear behind, appear in front, then repeat. Each slash deals 10. Every enemy is locked in place. Then the player appears at the far edge and fires a Getsuga that sweeps the whole arena for 100 once.' });
+            desc:'Tốn 2 ô. ĐỘC QUYỀN ĐẠI KIẾM. Giáp thú thay bộ J, thể lực lên 6, đi lại hết chậm. Phép K cũ vẫn khóa. Giữ K tới 3 giây vào Channel kiếm khí. Chiêu cuối riêng là Trăng Đen.\n\nBấm liền là chuỗi 5 nhát: chém xuống 5, hất 5, xoay 6, đâm 6, lùi rồi đâm xuyên 8 và có khung bất tử. Dừng một nhịp (kiếm loé đỏ) rồi bấm để rẽ.\n\nJ, dừng, J J J — đâm 6, hất nhảy 6 (địch hất nhẹ), bổ xuống 8.\nJ J, dừng, J J — cắm kiếm, ma pháp 3 mọi kẻ địch kể cả không trúng chém và kể cả đang đứng đất. J nữa cắm sâu, ma pháp 6, cùng luật. Nhát kiếm gần vẫn cộng thêm 4 rồi 10.\nJ J J, dừng, J — hất lên phóng kiếm khí máu cực to, sóng 8. Chém xong nghỉ một nhịp, không nối được.\nJ rồi Dash rồi J — lướt hất. Bấm J thường là bổ xuống 8, địch rơi theo và ăn thêm 2 khi chạm đất. Giữ J khoảng một phần ba giây thì mới xoay cưa tới khi chạm đất, kết bằng bổ 8.\nDash rồi J J — hai nhát chém ngang Hoành Tảo như kiếm gốc: 10 rồi 11. Nhát đầu tốn 3 thể lực.\n\nGiữ J và giữ K là hai thứ khác nhau.\n\nGIỮ J — giơ kiếm nạp, thả ra một nhát duy nhất. Bấm nhanh vẫn là chuỗi thường. Năm nấc 0.5 / 1 / 1.5 / 2 / 2.5 giây: sát thương 12 / 14 / 16 / 18 / 20, tầm thêm 3 / 6 / 10 / 15 / 22cm. Cắt đạn, choáng, kéo kẻ bay xuống. Bể máu 20 giây, nấc đầu nhỏ như cũ, nấc cuối gần nửa map. Đứng trên hồi 1 máu mỗi 10 / 8.5 / 7 / 5.5 / 4 giây. Địch trong bể mất 1 mỗi giây. Mỗi nhát tốn 1 máu. Không ra đòn của K.\n\nGIỮ K — bộ skill riêng, không bể máu. Phép K cũ vẫn khóa. Giữ tới 3 giây thì vào Channel, không thả ra đòn loạn.\n0.5 giây: nhát kiếm khí của đại kiếm gốc. Chém 8 và bắn lưỡi kiếm khí 8, choáng nhẹ. Không tốn máu, không bể máu.\n1 giây: xoay ngang 3 phát, tầm ngắn, cắt đạn. Hai phát đầu lệch lên và lệch xuống, mỗi phát 2. Phát cuối xoay ngang hẳn, rộng hơn, 5.\n1.5 giây: bùng nổ. 5 giây sau không tốn thể lực. Hết 5 giây thì mất 1 máu.\n2 giây: thu kiếm, để ngang, đâm 14 rồi rút thêm 4. Sau đó 5 giây cả lưỡi có sương đỏ, dài thêm 5cm, nhát cắt chuyển đỏ máu.\n2.5 giây: chém loạn. Hai nhát tới rồi một nhát lùi, mỗi nhát 6, có iframe đúng lúc vung và lao theo nhát. Khoảng dừng giữa các nhát không có iframe. Rồi nhảy cao găm xuống: găm 10, đâm trúng thì sâu thêm 6. Đáp đúng giữa tâm thì hút 1 máu. Trên không bấm A D để chọn chỗ đáp.\n\nCHANNEL — giữ K đủ 3 giây: chém ngang 3 nhát như mốc 1 giây rồi lặp đến khi thả K. Mỗi nhát cận chiến 3, 3 rồi 5 và bắn kiếm khí. Khí nhát 1 và 2 gây 2, càng xa mỗi 2cm giảm 1. Nhát 3 khí to hơn, gây 4, mỗi 3cm giảm 1. Vào channel tốn 1 thể lực, mỗi nhát sau không tốn.\n\nCHIÊU CUỐI — màn hình đen, mặt trăng và cột tím. Ẩn hiện 7 nhát: lao tới, ra sau lưng, ra trước, rồi lặp. Mỗi nhát 10. Mọi kẻ địch bị khóa chân. Rồi người chơi xuất hiện sát mép sàn và bắn Getsuga quét cả sàn, 100 một lần.',
+            descEn:'Costs 2 slots. GREATSWORD ONLY. The beast armor replaces the J string (stamina 6, full move speed). K magic stays locked. Hold K for 3 seconds to enter a sword-qi Channel. The ultimate is now Black Moon.\n\nMash J for five hits: down 5, up 5, spin 6, thrust 6, step back and pierce 8 with iframes. Pause a beat (the sword flashes red) to branch.\n\nJ, pause, JJJ — thrust 6, rising cut 6, slam 8.\nJJ, pause, JJ — plant: gravity deals 3 to every enemy, even off the blade and even on the ground. The deeper plant deals 6 the same way. The close slash still adds 4 then 10.\nJJJ, pause, J — an upward cut that fires a huge blood wave for 8. After it, one beat of rest: you cannot chain.\nJ, Dash, J — a launching dash. A normal J press slams for 8; launched enemies are thrown down and take 2 more on impact. Hold J for about a third of a second to saw until you land, then slam for 8.\nDash, then J J — two horizontal cleaves, the old ones: 10 then 11. The first costs 3 stamina.\n\nHold J and hold K are separate.\n\nHOLD J — raise the sword, charge, release one slash. A tap is still the normal chain. Five tiers at 0.5 / 1 / 1.5 / 2 / 2.5s: damage 12 / 14 / 16 / 18 / 20, extra reach 3 / 6 / 10 / 15 / 22cm. Cuts bullets, stuns, pulls airborne enemies down. Blood pool lasts 20s, small at tier 1, nearly half the map at tier 5. Standing in it heals 1 every 10 / 8.5 / 7 / 5.5 / 4s. Enemies in it take 1 per second. Each slash costs 1 HP. It does not use the K moves.\n\nHOLD K — its own skill set, no blood pool. Old K magic stays locked. Hold for 3 seconds to enter Channel instead of releasing a move.\n0.5s: the greatsword sword-qi slash. An 8-damage cut plus an 8-damage energy blade, with a short stun. No HP cost, no pool.\n1s: three horizontal spins, short range, cuts bullets. The first two sit a little high and a little low, 2 damage each. The last is dead horizontal, wider, and deals 5.\n1.5s: power burst. No stamina cost for the next 5 seconds. When those 5 seconds end, lose 1 HP.\n2s: pull the blade back, hold it flat, thrust for 14, then withdraw for 4. For the next 5 seconds the whole blade wears red mist, reaches 5cm farther, and cut trails turn blood red.\n2.5s: frenzy. Two forward lunges then one back lunge, 6 each, iframes only during the swing, and you lunge with the blade. The short pauses have no iframes. Then a high jump and a downward plant: 10, plus 6 more if the stab connects. Landing on the center of an enemy drains 1 HP. Steer the landing with A and D.\n\nCHANNEL — hold K for 3 seconds: three horizontal slashes like the 1 second charge, looping until K is released. Slashes deal 3, then 3, then 5, and each fires sword qi. Qi 1 and 2 deal 2 and lose 1 per 2cm. The third qi is larger and deals 4, losing 1 per 3cm. Entering costs 1 stamina. Later slashes cost 0.\n\nULTIMATE — the screen goes black, then a moon and a purple column. The player flickers through 7 slashes: lunge in, appear behind, appear in front, then repeat. Each slash deals 10. Every enemy is locked in place. Then the player appears at the far edge and fires a Getsuga that sweeps the whole arena for 100 once.' });
         // id rune -> chi so loai dan bat buoc
         RUNES.push({ id:'voltdash', name:'LƯỚT SÉT', nameEn:'LIGHTNING DASH', icon:'⚡', cost:1,
             desc:'Tốn 1 ô. MỌI loại đạn: cú lướt đi xa hơn hẳn (36 thay vì 22) và gây 3 sát thương cho kẻ địch bạn lướt xuyên qua. CẦM VOLT thì lướt còn phóng thêm một TIA SÉT từ sau lưng ra trước, xuyên mọi mục tiêu, 3 sát thương nữa. Ghép SIÊU TỐC thì cả hai lên 5. Trong Lightning Form của Volt cả hai lên 6. Với MJÖLNIR thì nó mở hàng sấm 7cm: hai combo Dash+J và J→Dash giáng 10 cột sét trước mặt, mỗi cột 1 sát thương kèm choáng — rune không tăng tốc hay tầm lướt của Búa, nó là hiệu ứng sạc búa trước cú đập.\n\nVỚI VŨ KHÍ CẬN CHIẾN: rune không sinh thêm tia sét rời nào. Nó chỉ làm hai việc — cộng sát thương, và nhuộm chính nhát chém sang tông điện khiến nhát đó nở to ra 28%. KIẾM — cả hai nhát của chuỗi Lướt Chém đều +2, lưỡi kiếm khí của nhát hai bay 340 thay vì 260. GIÁO — Lướt Đâm và nhát bồi đều +2 và sâu thêm 28%, có một tia chạy dọc thân giáo; Mũi Tên Khí bay lâu hơn, rộng hơn, +2. BÚA — vốn đã có sấm sét, không đụng vào.',
@@ -87208,7 +87498,8 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             73:'EX',   // @@HE-PONTIFF — Hans: "~EX hoac thap hon chi 1 chut": 12 chieu hai pha, it hon Gael/Cinder
             /* ---- A — KHO ----  Hans: "do kho thi nghien cuu o muc KHO la duoc." */
             70:'A', 71:'A', 72:'A', 78:'A',   // 78 = MEGALODON (@@HE-MEG)
-            79:'S'    // 79 = THALASSA, nu hai than (@@HE-CORALIE)
+            79:'S',    // 79 = THALASSA, nu hai than (@@HE-CORALIE)
+            80:'S'     // @@HE-HOGAC — Ke Gac Ho. Bac S, hai pha, pha 1 toi da 3 nguoi.
         };
         const TIER_TEN = { 'D':'BÁCH', 'C':'TRUNG', 'B':'CAO', 'A':'HUYỀN', 'S':'TỐI THƯỢNG', 'EX':'CỰC KHÓ' };
         const TIER_MAU = { 'D':'#9E9E9E', 'C':'#8BC34A', 'B':'#42A5F5', 'A':'#FF9800', 'S':'#EF5350', 'EX':'#E040FB' };
@@ -89483,6 +89774,7 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
                 else if (testBossSelection === 78) { setupMegArena(); bosses.push(new MegalodonBoss(1)); }   // @@HE-MEG
                 else if (testBossSelection === 79) { setupBeachArena(); bosses.push(new ThalassaBoss(1)); }   // @@HE-CORALIE
                 else if (testBossSelection === 73) { setupPontiffArena(); bosses.push(new PontiffBoss(1)); }    // @@HE-PONTIFF
+                else if (testBossSelection === 80) { setupHoGacArena(); bosses.push(new HoGacBoss(1)); }       // @@HE-HOGAC
                 // Chon tran dau ma CHUA qua bang chinh thong so -> mo bang chinh truoc.
                 else if ((testBossSelection === 57 || testBossSelection === 55) && duelChon !== testBossSelection) {
                     duelChon = testBossSelection;
@@ -90305,7 +90597,13 @@ function checkPvPCollisions() {
         }
 
         function processBossDefeat(index) {
-            let deadBoss = bosses[index]; 
+            let deadBoss = bosses[index];
+            /* @@HE-HOGAC — ke phu chet khong tinh la ha boss (khong +ult, khong +style,
+               khong qua man). Chi khi khong con ai song thi roi xuong duong ha boss thuong. */
+            if (deadBoss && deadBoss.phu && bosses.some(function(b, i){ return i !== index && b && !b.dying && b.hp > 0; })){
+                bosses.splice(index, 1);
+                return;
+            }
             if (typeof ttBossChet === 'function') ttBossChet(deadBoss);   // @@HE-KYLUC
             if (typeof dino !== 'undefined' && dino && !dino.ultActive) ultCharge = Math.min(100, ultCharge + 10);
             addStyle(40, 'boss');
@@ -91880,6 +92178,581 @@ function checkPvPCollisions() {
             }
         })();
 
+        /* ===================== @@HE-HOGAC — KẺ GÁC HỐ =====================
+           Hai pha. Pha 1: toi da 3 nguoi (ke chinh + toi da 2 ke phu).
+           Mot ke phu la PHAN BOI: no danh dong bon, dong bon danh lai no.
+           Het mau ke chinh thi ke phu bien mat, ke chinh dung day mot minh (pha 2).
+           Moi don vao nguoi choi la 1. Don giua cac ke gac la 8, kieu flat.
+           Mau: chinh 110 roi 130, ke phu 36. Dai kiem: nhip vung dut khoat, hoi giua don cham. */
+        const HG_W = 74, HG_H = 96, HG_P1 = 110, HG_P2 = 130, HG_PHU = 36, HG_DOI = 8, HG_VE = 2.35;
+        class HoGacBoss {
+            constructor(level, phu, phan){
+                this.phu = !!phu;
+                this.phan = phan || 'ta';
+                this.w = HG_W; this.h = HG_H;
+                this.baseY = 320 - this.h;
+                this.x = this.phu ? 70 : (canvas.width - 180);
+                this.y = this.baseY;
+                this.facingLeft = !this.phu;
+                this.grounded = true;
+                this.state = this.phu ? 'idle' : 'entering';
+                this.sub = 0;
+                this.actionTimer = this.phu ? 24 : 8;
+                /* Ke phu de phase = 2 de vong lap chet KHONG goi startPhase2.
+                   Chi ke chinh o phase 1 moi dung day. */
+                this.phase = this.phu ? 2 : 1;
+                this.hp = this.phu ? HG_PHU : HG_P1;
+                this.maxHp = this.hp;
+                this.name = this.phu ? (this.phan === 'phan' ? "PHẢN BỘI" : "ĐỒNG BỌN") : "KẺ GÁC HỐ";
+                this.invulnAll = false;
+                this.kiem = 0.55;
+                this.lua = [];
+                this.luaNhom = 0;
+                this.vx = 0; this.dy = 0; this.bay = 0; this.bayY = 0; this.vuaDat = false;
+                this.bao = null; this.huong = -1;
+                this.sinh = 150;
+                this.aiRieng = true;
+                this.daNguoi = false;
+                this.daAi = [];
+                this.nhip = 0;
+                this.retState = 'return';
+                this.lastMeleeHit = -1;
+                this.song = null;
+                this._lui = 0;
+            }
+            p2(){ return this.phase === 2 && !this.phu; }
+            toc(){ return this.p2() ? 6.4 : 4.8; }
+            tam(){ return this.p2() ? 210 : 168; }
+            mt(){
+                let gan = this.keGan(this.phan === 'phan' ? null : 'phan');
+                if (gan) return gan;
+                return (typeof dino !== 'undefined') ? dino : null;
+            }
+            keGan(phan){
+                if (typeof bosses === 'undefined') return null;
+                let best = null, bd = 1e9;
+                for (let b of bosses){
+                    if (b === this || !(b instanceof HoGacBoss) || b.dying || !(b.hp > 0) || b.invulnAll) continue;
+                    if (phan && b.phan !== phan) continue;
+                    let d = Math.abs(b.cx() - this.cx());
+                    if (d < bd){ bd = d; best = b; }
+                }
+                return best;
+            }
+            hoi(){ return this.p2() ? 34 : 48; }
+            face(t){
+                if (!t) return;
+                let tx = t.x + (t.w || 20) / 2;
+                this.facingLeft = tx < this.cx();
+            }
+            gapTo(t){
+                if (!t) return 0;
+                return (t.x + (t.w || 20) / 2) - this.cx();
+            }
+            hop(r){
+                let y = 246, h = 74;
+                return this.facingLeft
+                    ? { x: this.x - r, y: y, w: r + 14, h: h }
+                    : { x: this.x + this.w - 8, y: y, w: r + 14, h: h };
+            }
+            nghi(t){
+                if (this._biParry && (this.state === 'return' || this.state === 'returning')) return;
+                this.state = 'idle'; this.sub = 0; this.vx = 0;
+                this.actionTimer = t; this.kiem = 0.85; this.bao = null;
+                this.daNguoi = false; this.daAi = [];
+                this._lui = 0;
+            }
+            moDon(){ this.daNguoi = false; this.daAi = []; this.face(this.mt()); }
+            hurtP(n){
+                if (typeof dino !== 'undefined' && dino && dino.isShielding()){
+                    if (typeof parry === 'function') parry();
+                    let st = this.state;
+                    if (st !== 'idle' && st !== 'return' && st !== 'returning' && st !== 'dung' && st !== 'entering'){
+                        this.state = 'return'; this._biParry = 1;
+                    }
+                    return;
+                }
+                if (typeof dino !== 'undefined' && dino) dino.takeDamage(n);
+            }
+            chem(box){
+                if (!box) box = this.hop(this.tam());
+                this.bao = box;
+                if (!this.daNguoi && typeof dino !== 'undefined' && dino && typeof checkAABB === 'function' && checkAABB(dino, box)){
+                    this.daNguoi = true; this.hurtP(1);
+                }
+                if (typeof bosses === 'undefined') return;
+                for (let b of bosses){
+                    if (b === this || !(b instanceof HoGacBoss) || b.dying || !(b.hp > 0) || b.invulnAll) continue;
+                    if (this.phan !== 'phan' && b.phan !== 'phan') continue;
+                    if (this.daAi.indexOf(b) >= 0) continue;
+                    if (typeof checkAABB === 'function' && checkAABB(b, box)){
+                        this.daAi.push(b);
+                        if (typeof dealDamage === 'function') dealDamage(b, HG_DOI, 'flat');
+                    }
+                }
+            }
+            demSong(){
+                let n = 0, phan = false;
+                if (typeof bosses === 'undefined') return { n: 1, phan: false };
+                for (let b of bosses){
+                    if (!(b instanceof HoGacBoss) || b.dying || !(b.hp > 0)) continue;
+                    n++; if (b.phan === 'phan') phan = true;
+                }
+                return { n: n, phan: phan };
+            }
+            sinhThem(){
+                if (this.phu || this.phase !== 1 || this.state === 'entering') return;
+                this.sinh--;
+                if (this.sinh > 0) return;
+                this.sinh = 220;
+                let d = this.demSong();
+                if (d.n >= 3) return;
+                let phan = (!d.phan && d.n >= 2) ? 'phan' : 'ta';
+                let a = new HoGacBoss(1, true, phan);
+                a.x = (Math.random() < 0.5) ? 36 : (canvas.width - HG_W - 36);
+                a.y = a.baseY;
+                a.facingLeft = a.x > canvas.width / 2;
+                bosses.push(a);
+                floatingTexts.push(new FloatingText(a.x - 20, a.y - 28, LT(phan === 'phan' ? "PHẢN BỘI" : "THÊM MỘT KẺ", phan === 'phan' ? "TRAITOR" : "ANOTHER")));
+                if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(phan === 'phan' ? 180 : 240, 0.12, 'square', 0.14, 90);
+            }
+            tickLua(){
+                for (let i = this.lua.length - 1; i >= 0; i--){
+                    let f = this.lua[i];
+                    f.t--;
+                    if (!f.hit && f.t < 30 && typeof dino !== 'undefined' && dino && typeof checkAABB === 'function'){
+                        if (checkAABB(dino, { x: f.x, y: 286, w: 48, h: 36 })){
+                            let nh = f.nhom;
+                            for (let q of this.lua) if (q.nhom === nh) q.hit = true;
+                            this.hurtP(1);
+                        }
+                    }
+                    if (f.t <= 0) this.lua.splice(i, 1);
+                }
+            }
+            tickSong(){
+                let s = this.song; if (!s) return;
+                s.x += s.dir * 6.2; s.t++;
+                if (!s.hit && typeof dino !== 'undefined' && dino && typeof checkAABB === 'function' && checkAABB(dino, { x: s.x, y: 284, w: 44, h: 36 })){
+                    s.hit = true; this.hurtP(1);
+                }
+                if (s.t > 48 || s.x < -50 || s.x > (canvas.width || 1000) + 50) this.song = null;
+            }
+            buoc(){
+                this.nhip++;
+                this.x += this.vx; this.vx *= 0.84;
+                if (Math.abs(this.vx) < 0.35) this.vx = 0;
+                this.vuaDat = false;
+                if (this.bay){
+                    this.dy = (this.dy || 0) + 0.78;
+                    this.bayY = (this.bayY || 0) + this.dy;
+                    if (this.bayY >= 0){ this.bayY = 0; this.dy = 0; this.bay = 0; this.vuaDat = true; }
+                }
+                let L = (typeof worldL === 'function') ? worldL() : 0;
+                let R = (typeof worldR === 'function') ? worldR() : canvas.width;
+                this.x = Math.max(L + 8, Math.min(R - this.w - 8, this.x));
+                this.y = this.baseY + (this.bayY || 0); this.grounded = !this.bay;
+            }
+            startPhase2(){
+                if (this.phu || this.phase !== 1) return;
+                this.phase = 2;
+                this.maxHp = HG_P2; this.hp = HG_P2;
+                this.state = 'dung'; this.sub = 0; this.vx = 0;
+                this.invulnAll = true; this.kiem = -0.3; this.lua = [];
+                this.name = "KẺ GÁC HỐ";
+                if (typeof bosses !== 'undefined'){
+                    for (let i = bosses.length - 1; i >= 0; i--){
+                        let o = bosses[i];
+                        if (o !== this && o instanceof HoGacBoss){
+                            if (typeof visualEffects !== 'undefined') visualEffects.push(new Effect(o.cx(), o.cy(), 'explosion', true, 26));
+                            bosses.splice(i, 1);
+                        }
+                    }
+                }
+                floatingTexts.push(new FloatingText(this.cx() - 70, 118, LT("HẮN ĐỨNG DẬY", "HE STANDS")));
+                shakeTimer = Math.max(shakeTimer || 0, 28);
+                if (typeof SFX !== 'undefined' && SFX.bossEntry) SFX.bossEntry();
+            }
+            update(){
+                if (this.dying) return;
+                this.buoc(); this.tickLua(); this.tickSong();
+                if (this.state === 'entering'){
+                    this.facingLeft = true; this.x -= 3.2; this.kiem = 0.4;
+                    if (this.x < canvas.width - 240) this.nghi(28);
+                    return;
+                }
+                this.sinhThem();
+                if (this.state === 'dung'){
+                    this.sub++; this.kiem = -0.4 + Math.min(1, this.sub / 70) * 0.9;
+                    if (this.sub >= 70){ this.invulnAll = false; this.nghi(18); }
+                    return;
+                }
+                if (this.state === 'return' || this.state === 'returning'){
+                    if (!this._lui){
+                        this._lui = 1; this._biParry = 0; this.sub = 0; this.bao = null;
+                        this.bay = 0; this.dy = 0; this.bayY = 0; this.y = this.baseY;
+                        let g = (typeof dino !== 'undefined' && dino) ? this.gapTo(dino) : (this.facingLeft ? -1 : 1);
+                        let lui = -Math.sign(g || 1);
+                        this.facingLeft = lui < 0;
+                        this.vx = lui * 6.5;
+                        this.x += lui * 10;
+                        this.kiem = 2.35;
+                    }
+                    this.sub++;
+                    this.kiem = 2.15 - this.sub * 0.03;
+                    if (this.sub > 36) this.nghi(this.p2() ? 30 : 42);
+                    return;
+                }
+                if (this.state === 'idle'){
+                    let t = this.mt(); this.face(t);
+                    let g = this.gapTo(t), ad = Math.abs(g);
+                    if (ad > this.tam() * 0.55) this.x += Math.sign(g) * this.toc();
+                    else if (ad < 28 && ad > 0) this.x -= Math.sign(g) * 1.4;
+                    let dong = 0;
+                    if (typeof bosses !== 'undefined'){
+                        for (let b of bosses){
+                            if (b !== this && b instanceof HoGacBoss && !b.dying && b.hp > 0 && b.state !== 'idle' && b.state !== 'entering' && b.state !== 'dung' && b.state !== 'return' && b.state !== 'returning') dong++;
+                        }
+                    }
+                    if (dong >= 2 && ad < 280) this.actionTimer = Math.max(this.actionTimer, 6);
+                    else {
+                        this.actionTimer--;
+                        if (this.actionTimer <= 0) this.chon(ad);
+                    }
+                    this.kiem = 0.85;
+                    return;
+                }
+                this.chay();
+            }
+            chon(ad){
+                this.sub = 0; this.moDon(); this.bao = null;
+                let t = this.mt();
+                let tren = t && (t.y + (t.h || 20)) < this.baseY - 18;
+                if (tren && Math.random() < 0.7){ this.state = 'vot'; return; }
+                let xa = ad > 280, gan = ad < 110;
+                let pool = this.p2()
+                    ? (xa ? ['lao','lat','song','nhay'] : gan ? ['chuoi','chem','dao','xoay','dam','xien','truot'] : ['chuoi','chem','lao','lat','xien','song','dam','truot','keo','nhay'])
+                    : (xa ? ['lao','nhay','truot'] : gan ? ['chuoi','chem','dao','xoay','dam','xien','vot'] : ['chuoi','chem','lao','nhay','xien','dam','truot','lui']);
+                this.state = pool[Math.floor(Math.random() * pool.length)];
+            }
+            datLua(d, so, buoc){
+                this.luaNhom++;
+                for (let k = 0; k < so; k++) this.lua.push({ x: this.cx() + d * (30 + k * buoc) - 22, t: 50, hit: false, nhom: this.luaNhom });
+            }
+            chay(){
+                let st = this.state; this.sub++;
+                let t = this.mt();
+                let dir = this.facingLeft ? -1 : 1;
+                if (st === 'chem'){
+                    /* 2 nhip dai kiem. Pha 2 them nhip 3 roi mot nhip dao ngan.
+                       Giua hai nhip co khoang ~20 khung giu tu the, khong quat lien. */
+                    let nhip = this.p2() ? [1, 34, 66, 96] : [1, 40];
+                    let danh = this.p2() ? [12, 46, 78, 106] : [16, 56];
+                    for (let k = 0; k < nhip.length; k++){
+                        let dao = this.p2() && k === nhip.length - 1;
+                        let r = dao ? 72 : this.tam() + (k === (this.p2() ? 2 : 1) ? 36 : 0);
+                        if (this.sub === nhip[k]){ this.moDon(); this.face(t); this.kiem = dao ? -0.6 : -2.15; this.bao = this.hop(r); }
+                        if (this.sub === danh[k]){
+                            this.kiem = dao ? 0.35 : 1.35;
+                            let g = this.gapTo(t);
+                            if (!dao && Math.abs(g) > 48) this.vx = Math.sign(g) * 4.2;
+                            this.chem(this.hop(r));
+                            if (this.p2() && !dao) this.datLua(this.facingLeft ? -1 : 1, 3, 26);
+                        }
+                    }
+                    if (this.sub > (this.p2() ? 128 : 86)) this.nghi(this.hoi());
+                    return;
+                }
+                if (st === 'lao'){
+                    if (this.sub === 1){
+                        this.face(t); this.kiem = -1.7;
+                        let ad = Math.abs(this.gapTo(t));
+                        this.laoN = Math.max(10, Math.min(20, 6 + Math.floor(ad / 22)));
+                        this.bao = this.hop(this.tam());
+                    }
+                    if (this.sub >= 8 && this.sub < 8 + (this.laoN || 12)){
+                        this.vx = dir * (this.p2() ? 14 : 12);
+                        this.kiem = -1.45;
+                    }
+                    if (this.sub === 8 + (this.laoN || 12)){
+                        this.moDon(); this.kiem = 1.25;
+                        this.chem(this.hop(this.tam() + 24));
+                        if (this.p2()) this.datLua(dir, 4, 30);
+                    }
+                    if (this.sub > 30 + (this.laoN || 12)) this.nghi(this.hoi());
+                    return;
+                }
+                if (st === 'nhay'){
+                    if (this.sub === 1){ this.face(t); this.kiem = -2.4; this.huong = dir; }
+                    if (this.sub < 16) this.kiem = -2.35;
+                    if (this.sub === 16){
+                        this.bay = 1; this.dy = this.p2() ? -14.5 : -13; this.bayY = 0;
+                        this.huong = Math.sign(this.gapTo(t) || dir);
+                    }
+                    if (this.bay){ this.vx = (this.huong || dir) * (this.p2() ? 9 : 7.4); this.kiem += 0.28; }
+                    if (this.vuaDat){
+                        this.moDon(); this.kiem = 1.75;
+                        let R = this.p2() ? 150 : 124;
+                        this.chem({ x: this.cx() - R, y: 250, w: R * 2, h: 72 });
+                        if (this.p2()) this.datLua(this.huong || dir, 7, 36);
+                        shakeTimer = Math.max(shakeTimer || 0, 16);
+                        this.nghi(this.p2() ? 40 : 52);
+                    } else if (this.sub > 90) this.nghi(this.hoi());
+                    return;
+                }
+                if (st === 'xoay'){
+                    if (this.sub === 1){ this.face(t); this.kiem = -1.8; }
+                    if (this.sub < 18) this.kiem = -1.7;
+                    if (this.sub >= 18 && this.sub <= 32) this.kiem += 0.55;
+                    if (this.sub === 24){
+                        this.moDon();
+                        let R = this.p2() ? 160 : 140;
+                        this.chem({ x: this.cx() - R, y: 246, w: R * 2, h: 74 });
+                        if (this.p2()) this.datLua(dir, 3, 24);
+                    }
+                    if (this.sub > 58) this.nghi(this.hoi());
+                    return;
+                }
+                if (st === 'dam'){
+                    if (this.sub === 1){ this.face(t); this.bao = this.hop(this.tam() + 50); }
+                    if (this.sub < 26){
+                        this.kiem = -0.35;
+                        let g = this.gapTo(t);
+                        if (Math.abs(g) > 70) this.vx = Math.sign(g) * 2.2;
+                    }
+                    if (this.sub === 26){
+                        this.moDon(); this.kiem = 1.7;
+                        this.chem(this.hop(this.tam() + 56));
+                        if (this.p2()) this.datLua(dir, 4, 28);
+                        shakeTimer = Math.max(shakeTimer || 0, 12);
+                    }
+                    if (this.sub > 52) this.nghi(this.hoi());
+                    return;
+                }
+                if (st === 'xien'){
+                    if (this.sub === 1){ this.face(t); this.kiem = -0.15; this.bao = this.hop(this.tam() + 48); }
+                    if (this.sub < 18) this.kiem = -0.1;
+                    if (this.sub === 18){
+                        this.moDon(); this.vx = dir * 15; this.kiem = 1.55;
+                        this.chem(this.hop(this.tam() + 64));
+                        if (this.p2()) this.datLua(dir, 3, 34);
+                    }
+                    if (this.sub > 18 && this.sub < 26) this.vx = dir * 6;
+                    if (this.sub > 48) this.nghi(this.hoi());
+                    return;
+                }
+                if (st === 'keo'){
+                    if (this.sub === 1){ this.face(t); this.kiem = 1.15; this.moDon(); }
+                    if (this.sub <= 16){
+                        this.vx = dir * 6.5; this.kiem = 1.25;
+                        if (this.sub === 6) this.chem(this.hop(this.tam()));
+                        if (this.sub === 4) this.datLua(dir, 6, 32);
+                    }
+                    if (this.sub > 44) this.nghi(this.hoi());
+                    return;
+                }
+                if (st === 'chuoi'){
+                    let nhip = this.p2() ? [1, 32, 64, 92] : [1, 36, 72];
+                    let danh = this.p2() ? [14, 46, 78, 102] : [16, 52, 88];
+                    for (let k = 0; k < nhip.length; k++){
+                        let dao = this.p2() && k === 3;
+                        let dam = !dao && k === nhip.length - (this.p2() ? 2 : 1);
+                        let r = dao ? 64 : this.tam() + (dam ? 52 : 0);
+                        if (this.sub === nhip[k]){ this.moDon(); this.face(t); this.kiem = dao ? -0.5 : (dam ? -0.2 : -2.15); this.bao = this.hop(r); }
+                        if (this.sub === danh[k]){
+                            this.kiem = dao ? 0.4 : (dam ? 1.55 : 1.3);
+                            if (dam) this.vx = dir * 8;
+                            this.chem(this.hop(r));
+                            if (this.p2() && dam) this.datLua(dir, 4, 28);
+                        }
+                    }
+                    if (this.sub > (this.p2() ? 124 : 112)) this.nghi(this.hoi());
+                    return;
+                }
+                if (st === 'truot'){
+                    if (this.sub === 1){ this.face(t); this.kiem = 1.7; }
+                    if (this.sub < 12) this.bao = { x: this.facingLeft ? this.x - this.tam() : this.x, y: 294, w: this.tam() + this.w, h: 26 };
+                    if (this.sub >= 12 && this.sub <= 26){
+                        this.vx = dir * (this.p2() ? 13 : 11);
+                        this.kiem = 1.55;
+                        if (this.sub === 16){
+                            this.moDon();
+                            this.chem({ x: this.facingLeft ? this.x - this.tam() : this.x, y: 294, w: this.tam() + this.w, h: 26 });
+                            if (this.p2()) this.datLua(dir, 3, 24);
+                        }
+                    }
+                    if (this.sub > 48) this.nghi(this.hoi());
+                    return;
+                }
+                if (st === 'vot'){
+                    if (this.sub === 1){ this.face(t); this.kiem = 1.9; }
+                    if (this.sub < 16) this.kiem = 1.8;
+                    if (this.sub === 16){
+                        this.moDon(); this.kiem = -1.2;
+                        let r = this.p2() ? 150 : 124;
+                        let box = this.facingLeft
+                            ? { x: this.cx() - r, y: 150, w: r, h: 120 }
+                            : { x: this.cx(), y: 150, w: r, h: 120 };
+                        this.chem(box);
+                    }
+                    if (this.sub > 42) this.nghi(this.hoi());
+                    return;
+                }
+                if (st === 'dao'){
+                    if (this.sub === 1){ this.face(t); this.kiem = 0.9; this.bao = this.hop(68); }
+                    if (this.sub === 8){ this.moDon(); this.kiem = 0.35; this.chem(this.hop(68)); }
+                    if (this.sub > 20) this.nghi(this.hoi() + 10);
+                    return;
+                }
+                if (st === 'lui'){
+                    if (this.sub === 1){ this.face(t); this.kiem = -1.8; }
+                    if (this.sub <= 12) this.vx = -dir * 5.5;
+                    if (this.sub === 18){ this.face(this.mt()); dir = this.facingLeft ? -1 : 1; this.kiem = -0.3; this.bao = this.hop(this.tam() + 40); }
+                    if (this.sub >= 24 && this.sub <= 32) this.vx = dir * 12;
+                    if (this.sub === 28){ this.moDon(); this.kiem = 1.45; this.chem(this.hop(this.tam() + 28)); }
+                    if (this.sub > 52) this.nghi(this.hoi());
+                    return;
+                }
+                if (st === 'song'){
+                    if (this.sub === 1){ this.face(t); this.kiem = -0.4; }
+                    if (this.sub < 18){
+                        this.bao = { x: this.facingLeft ? this.cx() - 280 : this.cx(), y: 284, w: 280, h: 36 };
+                    }
+                    if (this.sub === 18){
+                        this.kiem = 1.2;
+                        this.song = { x: this.cx() + dir * 16, dir: dir, t: 0, hit: false };
+                        if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(110, 0.14, 'sawtooth', 0.14, 70);
+                    }
+                    if (this.sub > 36) this.nghi(this.hoi());
+                    return;
+                }
+                if (st === 'lat'){
+                    if (this.sub === 1){ this.face(t); this.kiem = -2.5; this.huong = dir; }
+                    if (this.sub === 14){
+                        this.bay = 1; this.dy = -12.5; this.bayY = 0;
+                        this.huong = Math.sign(this.gapTo(t) || dir);
+                    }
+                    if (this.bay){ this.vx = (this.huong || dir) * 12; this.kiem += 0.34; }
+                    if (this.vuaDat){
+                        this.moDon(); this.kiem = 1.8;
+                        let R = 156;
+                        this.chem({ x: this.cx() - R, y: 246, w: R * 2, h: 74 });
+                        this.datLua(this.huong || dir, 8, 34);
+                        shakeTimer = Math.max(shakeTimer || 0, 16);
+                        this.nghi(44);
+                    } else if (this.sub > 96) this.nghi(this.hoi());
+                }
+            }
+            veQua(){
+                let p2 = this.p2(), phan = this.phan === 'phan';
+                let st = this.state;
+                let dao = st === 'dao' || ((st === 'chem' || st === 'chuoi') && p2 && this.sub > 90 && this.sub < 116);
+                let vung = st !== 'idle' && st !== 'return' && st !== 'returning' && st !== 'entering' && st !== 'dung' && this.kiem > 0.5;
+                let luoi = vung ? 116 : 58;
+                ctx.save();
+                ctx.translate(this.cx(), this.y + this.h);
+                ctx.scale((this.facingLeft ? -1 : 1) * HG_VE, HG_VE);
+                ctx.fillStyle = p2 ? "#3E1810" : (phan ? "#4A1018" : "#241910");
+                ctx.beginPath();
+                ctx.moveTo(-3, -32);
+                ctx.lineTo(-16, -6 + Math.sin(this.nhip / 8) * 2);
+                ctx.lineTo(-8, 1);
+                ctx.lineTo(2, -24);
+                ctx.fill();
+                if (p2){ ctx.fillStyle = "#FF6D00"; ctx.fillRect(-14, -2, 8, 2); }
+                ctx.fillStyle = p2 ? "#5D4037" : "#3A4450";
+                ctx.fillRect(-7, -30, 14, 14);
+                ctx.fillStyle = "#1C1814";
+                ctx.fillRect(-5, -18, 10, 8);
+                ctx.fillStyle = "#2E261E";
+                ctx.fillRect(-6, -10, 4, 10);
+                ctx.fillRect(2, -10, 4, 10);
+                ctx.fillStyle = "#2A241C";
+                ctx.fillRect(-6, -40, 12, 5);
+                ctx.fillStyle = "#C8B8A4";
+                ctx.fillRect(-4, -38, 8, 6);
+                ctx.fillStyle = phan ? "#FF1744" : (p2 ? "#FF6D00" : "#ECEFF1");
+                ctx.fillRect(-3, -36, 2, 2);
+                ctx.fillRect(2, -36, 2, 2);
+                if (phan){ ctx.fillStyle = "#B71C1C"; ctx.fillRect(-6, -33, 12, 2); }
+                ctx.save();
+                ctx.translate(dao ? 10 : -8, dao ? -24 : -16);
+                ctx.rotate(dao ? 0.5 : 1.1);
+                ctx.fillStyle = "#6D4C41";
+                ctx.fillRect(-1, -8, 2, 10);
+                ctx.fillStyle = "#B0BEC5";
+                ctx.fillRect(-1, -16, 2, 8);
+                ctx.restore();
+                ctx.translate(2, -22);
+                ctx.rotate(this.kiem);
+                ctx.fillStyle = "#4E342E";
+                ctx.fillRect(-3, -6, 6, 8);
+                ctx.fillStyle = p2 ? "#FF8A50" : "#E0E4E8";
+                ctx.fillRect(-3, -luoi, 5, luoi - 4);
+                ctx.fillStyle = p2 ? "#FFE082" : "#90A4AE";
+                ctx.fillRect(-1, -luoi + 4, 2, luoi - 14);
+                ctx.fillStyle = "#5D4037";
+                ctx.fillRect(-6, -8, 12, 3);
+                ctx.restore();
+            }
+            draw(){
+                if (this.song){
+                    let s = this.song;
+                    ctx.save();
+                    ctx.globalAlpha = 0.8;
+                    ctx.fillStyle = "#FF6D00";
+                    ctx.fillRect(s.x, 286, 46, 28);
+                    ctx.fillStyle = "#FFE082";
+                    ctx.fillRect(s.x + 8, 276, 20, 16);
+                    ctx.restore();
+                }
+                for (let f of this.lua){
+                    let u = Math.max(0, f.t / 48);
+                    ctx.save();
+                    ctx.globalAlpha = 0.35 + 0.55 * u;
+                    ctx.fillStyle = "#FF6D00";
+                    ctx.fillRect(f.x, 300, 48, 20);
+                    ctx.fillStyle = "#FFD54F";
+                    ctx.fillRect(f.x + 8, 292, 22, 14);
+                    ctx.restore();
+                }
+                if (this.bao){
+                    ctx.save(); ctx.globalAlpha = 0.28; ctx.strokeStyle = this.p2() ? "#FF6D00" : "#ECEFF1"; ctx.lineWidth = 2;
+                    ctx.strokeRect(this.bao.x, this.bao.y, this.bao.w, this.bao.h);
+                    ctx.restore();
+                }
+                this.veQua();
+                if (!this.dying && this.hp > 0 && typeof drawTopBossBar === 'function'){
+                    let ten = this.p2() ? "GÁC HỐ — DẬY" : (this.phan === 'phan' ? "PHẢN BỘI" : (this.phu ? "ĐỒNG BỌN" : "GÁC HỐ"));
+                    let col = this.phan === 'phan' ? "#E53935" : (this.p2() ? "#FF6D00" : "#90A4AE");
+                    drawTopBossBar(this, col, ten);
+                }
+            }
+        }
+        function setupHoGacArena(){
+            mapTheme = 'hogac';
+            platforms.length = 0; enemies.length = 0; obstacles.length = 0; bossProjectiles.length = 0;
+            lavaGeysers.length = 0; visualEffects.length = 0; lavaFlood = 0;
+            if (typeof camReset === 'function') camReset();
+            platforms.push({ x: -60, w: canvas.width + 160, top: 320, h: 80 });
+            if (typeof dino !== 'undefined' && dino){
+                dino.x = 140; dino.y = 320 - dino.h; dino.dy = 0; dino.grounded = true; dino.isFacingLeft = false;
+            }
+        }
+        function drawHoGacEnv(){
+            let g = ctx.createLinearGradient(0, -160, 0, 340);
+            g.addColorStop(0, "#14080C"); g.addColorStop(0.55, "#1C1014"); g.addColorStop(1, "#2A1618");
+            ctx.fillStyle = g; ctx.fillRect(-40, -180, canvas.width + 80, 560);
+            ctx.fillStyle = "#3E2723";
+            for (let i = 0; i < 6; i++){
+                let x = 70 + i * 160;
+                ctx.fillRect(x, 150, 18, 170);
+                ctx.fillRect(x - 8, 142, 34, 12);
+            }
+            ctx.fillStyle = "#4E342E"; ctx.fillRect(-40, 320, canvas.width + 80, 80);
+            ctx.fillStyle = "#6D4C41"; ctx.fillRect(-40, 320, canvas.width + 80, 6);
+        }
+
         const BOSS_CHUNG = {
             cx(){ return this.x + this.w / 2; },
             cy(){ return this.y + this.h / 2; },
@@ -91898,7 +92771,7 @@ function checkPvPCollisions() {
             GreatSerpentBoss, StormEagleBoss, PoisonMothBoss, IndominusBoss,
             GiantSpiderBoss, ForestTitanBoss, UnityCloneBoss, VergilBoss,
             DanteBoss, NeroBoss, WarBoss, DeathBoss,
-            ArtoriasBoss, ClawCloneBoss, FireCloneBoss, AegisRexBoss,
+            ArtoriasBoss, HoGacBoss, ClawCloneBoss, FireCloneBoss, AegisRexBoss,
             SummitDragonBoss, ArcanaRexBoss, TetrisBoss, VoltCloneBoss,
             TriDino, MosaBoss, FlameCoreBoss, FlameLancerBoss,
             EmberWolfBoss, MagmaDragoonBoss, IaiRaptorBoss, SiegeGoliathBoss,
