@@ -42436,8 +42436,7 @@ class PulsarCloneBoss {
                     veDinoMay(bx, by, crouch, airborne, airborne && this.dy < 1.2 || (this.mayBay || 0) > 0);
                     let cs = crouch ? 1 : 0, br = Math.sin(frames * 0.09) * 0.5;
                     if (this.id === 1 && typeof vePhuKienThan === 'function') vePhuKienThan(bx, by, cs, br);
-                    if (this.id === 1 && typeof veBzGiapThan === 'function') veBzGiapThan(bx, by, cs, br, true);
-                    if (this.id === 1 && typeof bzVeGiap === 'function') bzVeGiap(bx, by, cs, br, true);
+                    if (this.id === 1 && typeof bzVeGiapMay === 'function') bzVeGiapMay(bx, by, cs, br, crouch, airborne);   // GIAP BERSERKER rieng cho dang may moc
                     if (this.id === 1 && typeof vePhuKien === 'function') vePhuKien(bx, by + cs * 12 + br, cs, airborne);
                     let _sa = (this.id === 1) ? ((typeof currentAmmoType !== 'undefined') ? currentAmmoType : -1) : (this.ammoType != null ? this.ammoType : -1);
                     { let _vkN = vkMoc(_sa, 'veTrenNguoi'); if (_vkN) _vkN.call(this, bx, by + cs * 12 + br, { out: '#0D1114', rim: '#80DEEA', lt: '#B0BEC5' }); }
@@ -42479,15 +42478,7 @@ class PulsarCloneBoss {
                     ctx.strokeStyle = P.rim; ctx.lineWidth = 1; ctx.globalAlpha = 0.7;
                     ctx.beginPath(); ctx.moveTo(hipX+6,hipY-2); ctx.quadraticCurveTo(kneeX+5,kneeY-2,kneeX+4,kneeY+2); ctx.stroke();
                     ctx.globalAlpha = 1;
-                    if (this.id === 1 && typeof bzBat === 'function' && bzBat(dino)){
-                        ctx.fillStyle = '#141414'; ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 0.8;
-                        ctx.beginPath();
-                        ctx.moveTo(kneeX - 5.5, kneeY - 1);
-                        ctx.lineTo(kneeX + 5.5, kneeY - 2);
-                        ctx.lineTo(ankX + 4.5, ankY);
-                        ctx.lineTo(ankX - 4.5, ankY + 2);
-                        ctx.closePath(); ctx.fill(); ctx.stroke();
-                    }
+                    if (this.id === 1 && typeof bzVeChan === 'function') bzVeChan(hipX, hipY, kneeX, kneeY, ankX, ankY, toeX, toeY);   // GIAP CHAN BERSERKER
                 };
 
                 if (P.aura) { ctx.fillStyle = P.aura; ctx.beginPath(); ctx.arc(bx+22, by+22+cs*8, 29+Math.sin(frames*0.1)*3, 0, Math.PI*2); ctx.fill(); }
@@ -42546,11 +42537,7 @@ class PulsarCloneBoss {
                 else { ctx.fillStyle=P.dk; ctx.strokeStyle=P.out; ctx.lineWidth=1.4;
                     for (let k=0;k<2;k++){ let lx=bx+13+k*9;
                         ctx.beginPath(); ctx.moveTo(lx-4,by+34); ctx.lineTo(lx+4,by+34); ctx.lineTo(lx+6,by+44); ctx.lineTo(lx-2,by+44); ctx.closePath(); ctx.fill(); ctx.stroke();
-                        if (this.id === 1 && typeof bzBat === 'function' && bzBat(dino)){
-                            ctx.fillStyle = '#141414'; ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 0.8;
-                            ctx.beginPath(); ctx.moveTo(lx-3.5,by+35); ctx.lineTo(lx+5,by+35); ctx.lineTo(lx+6,by+44); ctx.lineTo(lx-2,by+44); ctx.closePath(); ctx.fill(); ctx.stroke();
-                            ctx.fillStyle = P.dk; ctx.strokeStyle = P.out; ctx.lineWidth = 1.4;
-                        }
+                        if (this.id === 1 && typeof bzVeChanNgoi === 'function'){ bzVeChanNgoi(lx, by); ctx.fillStyle = P.dk; ctx.strokeStyle = P.out; ctx.lineWidth = 1.4; }
                     } }
 
                 // CO + DAU
@@ -68179,7 +68166,24 @@ class PulsarCloneBoss {
             // Channel: 3 nhat ngang lap lai. bzSau ban kiem khi. Khong tu het — tha K moi dung.
             bzKen:  { T: 900, hit: 899, ton: 0, dmg: 0, het: 'lung', cho: 10, khongGhim: 1, ken: 1, am: 90 },
             // Charge 2.5s: loan chem. bzSau dieu khien pha. ton 1 luc bat dau, khong ton tung nhat.
-            bzLoan: { T: 360, hit: 999, ton: 1, dmg: 0, het: 'lung', cho: 14, khongGhim: 1, loan: 1, am: 110 }
+            bzLoan: { T: 360, hit: 999, ton: 1, dmg: 0, het: 'lung', cho: 14, khongGhim: 1, loan: 1, am: 110 },
+            // CHARGE 2.5s — CHEM LIEN HOAN (55 sat thuong): chem xuong 8 · chem len 8 (moi don tien len mot chut) · chem ngang 9 roi lui ngan
+            //                 · dam toi 10 · gom luc tao Aura roi MUI KHOAN lon lao xuyen 20. Tu noi tiep, khong nhan phim J giua chuoi.
+            //                 BAT TU (iframe) SUOT CA CHUOI vi nguoi choi bi ep danh het chuoi.
+            bzLH1: { T: 22, hit: 10, ton: 2, dmg: 8, het: 'lung', cho: 0, khongGhim: 1, tien: 22,
+                     keys: [[0.08, -0.5, 24, -4, 'out'], [0.455, 1.95, 34, 22], [1, 1.95, 34, 22]],
+                     hop: [-8, 160, 64, 6], am: 150 },
+            bzLH2: { T: 22, hit: 10, ton: 0, dmg: 8, het: 'lung', cho: 0, khongGhim: 1, tien: 16,
+                     keys: [[0.455, -0.35, 26, -8], [1, -0.5, 22, -4]],
+                     hop: [-16, 158, 96, 10], day: 10, am: 170 },
+            bzLH3: { T: 26, hit: 12, ton: 0, dmg: 9, het: 'lung', cho: 0, khongGhim: 1, tien: 10, luiSau: 8,
+                     ngang: [0.06, 0.46, 1.05, -0.12], hop: [-90, 170, 48, 8], day: 14, am: 130 },
+            bzLH4: { T: 22, hit: 10, ton: 0, dmg: 10, het: 'lung', cho: 0, khongGhim: 1, tien: 8, buoc: 12,
+                     keys: [[0.08, 1.15, 22, 10, 'out'], [0.455, 1.58, 52, 18], [1, 1.55, 48, 16]],
+                     hop: [0, 190, 12, 0], am: 200 },
+            bzLH5: { T: 40, hit: 24, ton: 0, dmg: 20, het: 'lung', cho: 14, khongGhim: 1, khoan: 1, keoDai: 12,
+                     keys: [[0.12, 1.2, 14, 12, 'out'], [0.42, 1.5, 40, 14], [0.6, 1.6, 54, 16], [1, 1.58, 50, 16]],
+                     hop: [-10, 250, 38, 18], am: 90 }
         };
         function dkEm(u, em){
             if (em === 'in') return u * u * u;
@@ -68651,7 +68655,7 @@ class PulsarCloneBoss {
             return { bzXuong: 'CHÉM!', bzLen: 'HẤT!', bzXoay: 'XOAY!', bzDam: 'ĐÂM!', bzXuyen: 'XUYÊN!',
                      bzDamN: 'ĐÂM!', bzLenN: 'HẤT NHẢY!', bzBo: 'BỔ!', bzCam: 'CẮM!', bzDe: 'CẮM SÂU!',
                      bzKhi: 'KIẾM KHÍ!', bzHat: 'HẤT LƯỚT!', bzRot: 'BỔ!', bzCua: 'CƯA!', bzChat: 'CHẶT MÁU!',
-                     bzRut: 'ĐÂM!', bzVong: 'XOAY!', bzLoan: 'LOẠN!', bzKen: 'KIẾM KHÍ!' }[kieu] || '';
+                     bzRut: 'ĐÂM!', bzVong: 'XOAY!', bzLoan: 'LOẠN!', bzKen: 'KIẾM KHÍ!', bzLH1: 'CHÉM XUỐNG!', bzLH2: 'CHÉM LÊN!', bzLH3: 'CHÉM NGANG!', bzLH4: 'ĐÂM TỚI!', bzLH5: 'KHOAN!' }[kieu] || '';
         }
         function bzBatDau(ng, kieu, them){
             let dk = dkCua(ng);
@@ -68910,11 +68914,24 @@ class PulsarCloneBoss {
             if (!bzBatDau(ng, 'bzVong')) return;
             ng.dk.A._ang = 0.2;
         }
+        // ---- CHARGE 2.5s: CHEM LIEN HOAN. dk._lh = { i (don ke tiep), t (khung), hp }. Het mot don thi tu bat don ke; mat mau / chiêu cuoi / kenh thi huy chuoi.
+        const BZ_LH_SEQ = ['bzLH1', 'bzLH2', 'bzLH3', 'bzLH4', 'bzLH5'];
+        function bzLienHoanTiep(ng){
+            let dk = ng.dk, L = dk._lh;
+            if (!L) return;
+            L.t++;
+            if (!(ng.hp > 0)){ dk._lh = null; return; }                     // chet thi thoi (mat mau do rut mau dinh ky KHONG ngat chuoi)
+            if (L.t > 420 || L.i >= BZ_LH_SEQ.length){                      // het chuoi: them chut bat tu de thoat don an toan
+                dk._lh = null; ng.invincible = true; ng.invTimer = Math.max(ng.invTimer || 0, 10); return;
+            }
+            if (dk.A || (dk.cho || 0) > 0) return;
+            if (!bzBatDau(ng, BZ_LH_SEQ[L.i++])) dk._lh = null;
+        }
         function bzLoanRa(ng){
             bzNgatGiua(ng);
-            if (!bzBatDau(ng, 'bzLoan')) return;
-            let A = ng.dk.A;
-            A.ph = 0; A.pt = 0; A._dir = dkDir(ng);
+            ng.dk._lh = { i: 0, t: 0, hp: ng.hp };
+            bzLienHoanTiep(ng);
+            if (!ng.dk.A) ng.dk._lh = null;                                 // khong du the luc -> khong ra don
         }
         function bzNoLuc(ng){
             let dk = ng.dk;
@@ -68946,8 +68963,8 @@ class PulsarCloneBoss {
             dkTon(ng, 1);
             return true;
         }
-        const BZ_NAP = ["", "KHÍ", "XOAY", "BÙNG", "ĐÂM", "LOẠN"];
-        const BZ_NAP_EN = ["", "QI", "SPIN", "BURST", "THRUST", "FRENZY"];
+        const BZ_NAP = ["", "KHÍ", "XOAY", "BÙNG", "ĐÂM", "LIÊN HOÀN"];
+        const BZ_NAP_EN = ["", "QI", "SPIN", "BURST", "THRUST", "FLURRY"];
         function bzHoanh(ng, kieu){
             let dk = ng.dk;
             if (kieu === 'ngang' && ng.ammo < (DK_M.ngang.ton || 3) && !((dk.voHan || 0) > 0)){
@@ -69049,6 +69066,26 @@ class PulsarCloneBoss {
             let dk = ng.dk, A = dk.A;
             if (!A) return;
             let d = dkDir(ng);
+            if (A.m.tien && A.t >= 1 && A.t < A.hit - 1){                      // CHEM LIEN HOAN: di toi mot chut roi moi chem
+                ng.x += d * A.m.tien / Math.max(1, A.hit - 2);
+                ng.x = Math.max(worldL(), Math.min(worldR() - ng.w, ng.x));
+            }
+            if (A.m.luiSau && A.t === A.hit + 2){                              // chem ngang xong LUI NGAN
+                if (typeof dashVx !== 'undefined') dashVx = -d * A.m.luiSau;
+                ng.invincible = true; ng.invTimer = Math.max(ng.invTimer || 0, 8);
+                dk._khongLuot = frames + 50; dk.luotDu = 0;
+            }
+            if (A.m.khoan){                                                    // don cuoi: gom luc (lui nhe) -> MUI KHOAN lao xuyen
+                if (A.t === 2) ng.x -= d * 8;
+                if (A.t === A.hit){
+                    ng.invincible = true; ng.invTimer = Math.max(ng.invTimer || 0, 26);
+                    if (typeof dashVx !== 'undefined') dashVx = d * 24;
+                    dk._khongLuot = frames + 70; dk.luotDu = 0;
+                    shakeTimer = Math.max(shakeTimer || 0, 14);
+                    dkSfx(70, 0.35, 'sawtooth', 0.28, 360);
+                }
+                if (A.t < A.hit && A.t % 5 === 0) dkSfx(180 + A.t * 9, 0.06, 'sine', 0.08, 40);
+            }
             if (A.m.xuyen){
                 if (A.t === 2) ng.x -= d * 16;
                 if (A.t === A.hit){
@@ -69133,9 +69170,17 @@ class PulsarCloneBoss {
             if (A.m.rut && !A._rut && A.t === 36){
                 A._rut = 1;
                 dkHop(ng, -12, 140, 16, 4, 4, new Set(), null);
-                dk.tamThem = BZ_TAM_T;
-                dkChu(ng.x - 34, ng.y - 46, "RÚT! TẦM +5", "DRAW! REACH +5");
-                dkSfx(190, 0.12, 'square', 0.14, 80);
+                // BUFF chi co khi mui DAM (khung 20) da trung it nhat 1 ke dich. Dam hut thi rut kiem ve khong buff.
+                let trung = false;
+                if (A.set) for (const o of A.set){ if (dkLaQuai(o)){ trung = true; break; } }
+                if (trung){
+                    dk.tamThem = BZ_TAM_T;
+                    dkChu(ng.x - 34, ng.y - 46, "RÚT! TẦM +5", "DRAW! REACH +5");
+                    dkSfx(190, 0.12, 'square', 0.14, 80);
+                } else {
+                    dkChu(ng.x - 34, ng.y - 46, "ĐÂM TRƯỢT! KHÔNG BUFF", "MISSED! NO BUFF");
+                    dkSfx(110, 0.1, 'square', 0.1, 50);
+                }
             }
             if (A.m.vong){
                 const NHIP = 18;
@@ -69249,7 +69294,267 @@ class PulsarCloneBoss {
                 }
             }
         }
+        /* ---------- GIAP BERSERKER MOI: BO GIAP DEN TO, NHIEU GAI ----------
+           Giap NHO RA NGOAI hinh khung long: gai lung cao, giap vai nhieu lop co gai, mu sung co sung, giap tay, giap chan, duoi co luoi dao.
+           Ve o he toa do than (bx, by). cs = ngoi, br = nhip tho. Dang may (form 4) giu bo giap cu. */
+        function bzGaiVe(x, y, tx, ty, hw, cong, fill, ve){
+            let dx = tx - x, dy = ty - y, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L;
+            let mx = (x + tx) / 2 + nx * cong, my = (y + ty) / 2 + ny * cong;
+            ctx.beginPath();
+            ctx.moveTo(x + nx * hw, y + ny * hw);
+            ctx.quadraticCurveTo(mx + nx * hw * 0.35, my + ny * hw * 0.35, tx, ty);
+            ctx.quadraticCurveTo(mx - nx * hw * 0.35, my - ny * hw * 0.35, x - nx * hw, y - ny * hw);
+            ctx.closePath();
+            ctx.fillStyle = fill || '#17171c'; ctx.fill(); ctx.stroke();
+            if (ve){                                                           // soc do phat sang chay doc gai
+                ctx.save(); ctx.strokeStyle = 'rgba(255,40,70,' + ve.toFixed(2) + ')'; ctx.lineWidth = 0.8;
+                ctx.beginPath(); ctx.moveTo(x + dx * 0.12, y + dy * 0.12); ctx.quadraticCurveTo(mx, my, x + dx * 0.78, y + dy * 0.78); ctx.stroke();
+                ctx.restore();
+            }
+        }
+        function bzGiapSang(){
+            let dk = (typeof dino !== 'undefined' && dino && dino.dk) ? dino.dk : {};
+            let pul = 0.65 + 0.35 * Math.sin((typeof frames !== 'undefined' ? frames : 0) * 0.12);
+            return ((dk.voHan || 0) > 0 ? 1 : ((dk.tamThem || 0) > 0 ? 0.85 : 0.55)) * pul;
+        }
+        const BZ_G = { den: '#101013', nua: '#1c1c22', sang: '#2f2f38', vien: '#000', do: '#ff1744', domau: '#9b1c1c' };
+        /* ---------- GIAP BERSERKER CHO DANG MAY MOC (form 4) ----------
+           Cung bo gai den nhung theo than hop cua robot: duoi nhieu doan co luoi dao, gai lung tren nap than, khung nguc den
+           boc loi (loi doi tu xanh sang do), giap vai nhieu lop, mu sung co sung va mat do, giap dui / goi / chan co gai.
+           Ve DE LEN veDinoMay (goi sau no). crouch = ngoi, airborne = tren khong (chan nhay theo nhip chay y nhu veDinoMay). */
+        function bzVeGiapMay(bx, by, cs, br, crouch, airborne){
+            if (typeof bzBat !== 'function' || !bzBat(dino)) return;
+            const G = bzGiapSang(), dy = crouch ? 8 : 0, ph = airborne ? 0 : Math.sin(frames * 0.26);
+            const rd = (a) => 'rgba(255,23,68,' + a.toFixed(2) + ')';
+            ctx.save(); ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 1.1;
+            // ---- DUOI: 3 doan boc giap + gai + luoi dao
+            for (let i = 0; i < 3; i++){
+                let x = bx + 4 - i * 8, y = by + 19 + dy + i, w = 10 - i * 0.6;
+                ctx.fillStyle = i % 2 ? '#17171c' : '#101013'; ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 1.1;
+                ctx.beginPath(); ctx.moveTo(x - 1.5, y - 1.5); ctx.lineTo(x + w + 1.5, y - 1.5); ctx.lineTo(x + w + 0.5, y + 9.5); ctx.lineTo(x - 0.5, y + 9.5); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.strokeStyle = rd(0.55 + 0.3 * G); ctx.lineWidth = 0.9; ctx.beginPath(); ctx.moveTo(x, y + 6); ctx.lineTo(x + w, y + 6); ctx.stroke();
+                ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 1;
+                bzGaiVe(x + w * 0.55, y - 1, x + w * 0.55 - 4, y - 10 + i * 1.5, 2.8 - i * 0.3, -1.2, '#1d1d22', 0.6 * G);
+            }
+            bzGaiVe(bx - 15, by + 26 + dy, bx - 37, by + 22 + dy, 3.8, 2, '#1d1d22', 0.7 * G);         // luoi dao o mut duoi
+            bzGaiVe(bx - 16, by + 28 + dy, bx - 30, by + 36 + dy, 2.6, -1.5, null, 0.5 * G);
+            // ---- GAI LUNG tren nap than
+            const H = [9, 14, 17, 15, 12, 8];
+            for (let i = 0; i < 6; i++){
+                let t = i / 5, x = bx + 11 + t * 25, y = by + 11.5 + dy - t * 0.6;
+                bzGaiVe(x - 2.5, y + 1, x - 6 - (t > 0.5 ? 0 : 1), y - H[i], 3.4 - i * 0.1, -2, i % 2 ? '#1d1d22' : '#141418', 0.7 * G);
+            }
+            // ---- KHUNG NGUC DEN boc loi (loi doi sang do)
+            let gt = ctx.createLinearGradient(bx + 8, by + 10 + dy, bx + 40, by + 34);
+            gt.addColorStop(0, '#34343e'); gt.addColorStop(0.45, '#14141a'); gt.addColorStop(1, '#050507');
+            ctx.beginPath();
+            ctx.moveTo(bx + 8.5, by + 12.5 + dy); ctx.lineTo(bx + 37.5, by + 10.5 + dy); ctx.lineTo(bx + 42, by + 25); ctx.lineTo(bx + 40, by + 31);
+            ctx.lineTo(bx + 23, by + 35); ctx.lineTo(bx + 9, by + 31); ctx.closePath();
+            ctx.fillStyle = gt; ctx.fill(); ctx.stroke();
+            ctx.lineWidth = 0.95;
+            for (const v of [18, 24.5, 30]){                                                           // duong noi tam giap
+                ctx.strokeStyle = '#3d3d48'; ctx.beginPath(); ctx.moveTo(bx + 9.5, by + v + dy * 0.7); ctx.lineTo(bx + 41, by + v - 1.5 + dy * 0.7); ctx.stroke();
+                ctx.strokeStyle = rd(0.45 + 0.3 * G); ctx.beginPath(); ctx.moveTo(bx + 9.5, by + v + 1.2 + dy * 0.7); ctx.lineTo(bx + 40.5, by + v - 0.3 + dy * 0.7); ctx.stroke();
+            }
+            let cyc = by + 22 + dy * 0.2;                                                              // loi nang luong do
+            ctx.fillStyle = '#16050a'; ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 1.1;
+            ctx.beginPath(); ctx.arc(bx + 22, cyc, 5.6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.save(); ctx.shadowBlur = 9 * G + 2; ctx.shadowColor = '#ff1744'; ctx.fillStyle = rd(0.6 + 0.4 * G);
+            ctx.beginPath(); ctx.arc(bx + 22, cyc, 3.2, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+            ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 1;
+            bzGaiVe(bx + 41, by + 22 + dy * 0.3, bx + 51, by + 29, 3.2, -2, '#1d1d22', 0.6 * G);        // gai o hong truoc
+            bzGaiVe(bx + 39, by + 29, bx + 46, by + 38, 2.8, -1.5, '#17171c', 0.5 * G);
+            // ---- GIAP CHAN: dui + goi gai + ong chan + mui chan (theo dung nhip chan cua veDinoMay)
+            const greave = (hx, st) => {
+                let nen = crouch ? 7 : (airborne ? -1 : Math.max(0, st) * 5);
+                let y0 = by + 20 + nen * 0.15, h0 = Math.max(3.2, 8 - nen * 0.45), h1 = Math.max(3.2, 7 - nen * 0.45), h2 = Math.max(3.2, 6 - nen * 0.45);
+                let y1 = y0 + h0 - 1, y2 = y1 + h1 - 1, y3 = y2 + h2 - 1;
+                let gl = ctx.createLinearGradient(hx - 8, y0, hx + 8, y3);
+                gl.addColorStop(0, '#34343e'); gl.addColorStop(1, '#09090c');
+                ctx.fillStyle = gl; ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 0.9;
+                ctx.beginPath(); ctx.moveTo(hx - 9.5, y0 - 0.5); ctx.lineTo(hx + 9.5, y0 - 0.5); ctx.lineTo(hx + 8.5, y1 + 1.5); ctx.lineTo(hx - 8.5, y1 + 1.5); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(hx - 8, y1 + 1); ctx.lineTo(hx + 8, y1 + 1); ctx.lineTo(hx + 6.5, y3 + 0.6); ctx.lineTo(hx - 6.5, y3 + 0.6); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.strokeStyle = rd(0.5 + 0.3 * G); ctx.lineWidth = 0.9; ctx.beginPath(); ctx.moveTo(hx + 0.5, y1 + 2.5); ctx.lineTo(hx + 0.5, y3 - 0.5); ctx.stroke();
+                ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 0.9;
+                bzGaiVe(hx + 6.5, y1 + 0.5, hx + 17, y1 - 6, 3.4, -1.8, '#1d1d22', 0.7 * G);            // gai dau goi
+                bzGaiVe(hx + 7.5, y3 + 2.4, hx + 17, y3 + 4, 2.3, 0.8, '#1d1d22', 0.5 * G);             // gai mui chan
+            };
+            if (!crouch){ greave(bx + 16, -ph); greave(bx + 30, ph); } else { greave(bx + 16, 1); greave(bx + 30, 1); }
+            // ---- GIAP VAI nhieu lop + 3 gai (khop vai cua robot o bx+33)
+            for (let i = 2; i >= 0; i--){
+                let cx0 = bx + 31 - i * 1.3, cy0 = by + 16 + dy + i * 3.4, rx = 12.5 - i * 1.5, ry = 6.2 - i * 0.4;
+                let g = ctx.createLinearGradient(cx0 - rx, cy0 - ry, cx0 + rx, cy0 + 2);
+                g.addColorStop(0, '#3a3a46'); g.addColorStop(0.5, '#16161c'); g.addColorStop(1, '#07070a');
+                ctx.beginPath(); ctx.ellipse(cx0, cy0, rx, ry, -0.2, Math.PI, 0); ctx.quadraticCurveTo(cx0 + rx * 0.2, cy0 + 3.6, cx0 - rx, cy0 + 0.6); ctx.closePath();
+                ctx.fillStyle = g; ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 1.1; ctx.fill(); ctx.stroke();
+                ctx.save(); ctx.strokeStyle = rd(0.5 + 0.35 * G); ctx.lineWidth = 0.9;
+                ctx.beginPath(); ctx.ellipse(cx0, cy0 + 0.6, rx - 1.2, ry - 0.7, -0.2, Math.PI * 1.08, Math.PI * 1.92); ctx.stroke(); ctx.restore();
+            }
+            let sx = bx + 31, sy = by + 16 + dy;
+            ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 1.1;
+            bzGaiVe(sx + 7, sy - 4.5, sx + 15, sy - 13, 3.6, -3, '#1d1d22', 0.8 * G);
+            bzGaiVe(sx + 1, sy - 6, sx - 0.5, sy - 18, 3.9, 2.2, '#222229', 0.8 * G);
+            bzGaiVe(sx - 7, sy - 4, sx - 15, sy - 11, 3.4, 3, '#1d1d22', 0.8 * G);
+            // ---- MU SUNG: tam che dau, 2 sung + gai dinh, mat do (che mat xanh cu)
+            let gh = ctx.createLinearGradient(bx + 38, by + 3 + dy, bx + 60, by + 14 + dy);
+            gh.addColorStop(0, '#3a3a46'); gh.addColorStop(0.5, '#15151b'); gh.addColorStop(1, '#060608');
+            ctx.beginPath();
+            ctx.moveTo(bx + 37, by + 7 + dy); ctx.lineTo(bx + 41, by + 2.5 + dy); ctx.lineTo(bx + 57, by + 4.5 + dy); ctx.lineTo(bx + 61, by + 13 + dy);
+            ctx.lineTo(bx + 56, by + 13.5 + dy); ctx.lineTo(bx + 41, by + 12 + dy); ctx.closePath();
+            ctx.fillStyle = gh; ctx.fill(); ctx.stroke();
+            ctx.save(); ctx.strokeStyle = rd(0.55 + 0.3 * G); ctx.lineWidth = 0.9;
+            ctx.beginPath(); ctx.moveTo(bx + 40, by + 4.5 + dy); ctx.lineTo(bx + 58, by + 6.2 + dy); ctx.stroke(); ctx.restore();
+            ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 1.1;
+            bzGaiVe(bx + 40.5, by + 4 + dy, bx + 24, by - 10 + dy, 3.6, -4.5, '#222229', 0.8 * G);          // sung lon cong ra sau
+            bzGaiVe(bx + 45, by + 3.2 + dy, bx + 34, by - 8 + dy, 2.8, -3.2, '#1d1d22', 0.8 * G);           // sung nho
+            bzGaiVe(bx + 51, by + 3.6 + dy, bx + 55, by - 5 + dy, 2.4, 1.2, '#1d1d22', 0.8 * G);            // gai dinh dau
+            ctx.fillStyle = '#05080a';                                                                      // che mat xanh cu
+            ctx.beginPath(); ctx.arc(bx + 50, by + 11 + dy, 3.9, 0, Math.PI * 2); ctx.fill();
+            ctx.save(); ctx.shadowBlur = 7 * G + 2; ctx.shadowColor = '#ff1744'; ctx.fillStyle = BZ_G.do;
+            ctx.beginPath(); ctx.moveTo(bx + 45.5, by + 9.4 + dy); ctx.lineTo(bx + 55, by + 10.2 + dy); ctx.lineTo(bx + 53, by + 12 + dy); ctx.lineTo(bx + 46.8, by + 11.6 + dy); ctx.closePath(); ctx.fill();
+            ctx.restore();
+            bzGaiVe(bx + 43, by + 22 + dy, bx + 40, by + 30 + dy, 2.4, 1, '#1d1d22', 0.6 * G);             // gai ham
+            ctx.restore();
+        }
         function veBzGiapThan(bx, by, cs, br, may){
+            if (typeof bzBat !== 'function' || !bzBat(dino)) return;
+            if (may) return veBzGiapThanCu(bx, by, cs, br, true);
+            const Y = (v, k) => by + v + cs * k + br, G = bzGiapSang();
+            const qp = (p0, c, p1, t) => { let u = 1 - t; return [u*u*p0[0]+2*u*t*c[0]+t*t*p1[0], u*u*p0[1]+2*u*t*c[1]+t*t*p1[1]]; };
+            const tg = (p0, c, p1, t) => { let a = qp(p0, c, p1, Math.max(0, t - 0.02)), b = qp(p0, c, p1, Math.min(1, t + 0.02)), dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+                let nx = dy / L, ny = -dx / L; if (ny > 0){ nx = -nx; ny = -ny; } return { tx: dx / L, ty: dy / L, nx, ny }; };
+            ctx.save(); ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 1.1;
+            // ---- DUOI: bang giap doan + gai + luoi dao o mut duoi
+            let T0 = [bx + 7, by + 18 + cs * 10 + br], TC = [bx - 11, by + 15 + cs * 12], T1 = [bx - 21, by + 6 + cs * 12];
+            for (const t of [0.16, 0.38, 0.6, 0.8]){
+                let r = qp(T0, TC, T1, t), n = tg(T0, TC, T1, t), w = 6.2 - t * 4;
+                ctx.beginPath(); ctx.moveTo(r[0] + n.nx * w, r[1] + n.ny * w); ctx.lineTo(r[0] - n.nx * w, r[1] - n.ny * w);
+                ctx.lineWidth = 4.6; ctx.strokeStyle = '#000'; ctx.stroke();
+                ctx.lineWidth = 3; ctx.strokeStyle = BZ_G.nua; ctx.stroke();
+                ctx.lineWidth = 1; ctx.strokeStyle = BZ_G.vien;
+                bzGaiVe(r[0] + n.nx * (w - 1), r[1] + n.ny * (w - 1), r[0] + n.nx * (w + 7 - t * 4) - n.tx * 3, r[1] + n.ny * (w + 7 - t * 4) - n.ty * 3, 2.4 - t, 0.8, null, 0.5 * G);
+            }
+            bzGaiVe(T1[0] + 3, T1[1] + 1.5, T1[0] - 13, T1[1] - 6, 3.4, 2, '#1d1d22', 0.7 * G);   // luoi dao cuoi duoi
+            bzGaiVe(T1[0] + 2, T1[1] + 2, T1[0] - 8, T1[1] + 8, 2.4, -1.5, null, 0.5 * G);
+            // ---- GAI LUNG: hang gai cong cao, nga ve sau
+            let B0 = [bx + 6, Y(16, 11)], BC = [bx + 18, Y(8, 13)], B1 = [bx + 33, Y(15, 11)];
+            const H = [9, 14, 17, 16, 13, 9];
+            for (let i = 0; i < 6; i++){
+                let t = 0.1 + i * 0.165, r = qp(B0, BC, B1, t), n = tg(B0, BC, B1, t), h = H[i];
+                bzGaiVe(r[0] - n.tx * 3.5, r[1] - n.ty * 3.5 + 1, r[0] + n.nx * h - n.tx * 5.5, r[1] + n.ny * h - n.ty * 5.5, 3.6 - i * 0.12, -2.2, i % 2 ? '#1d1d22' : '#141418', 0.7 * G);
+            }
+            // ---- GIAP NGUC: to hon than ~3px, cac tam xep lop
+            let g = ctx.createLinearGradient(bx + 6, Y(6, 13), bx + 38, Y(38, 5));
+            g.addColorStop(0, '#34343e'); g.addColorStop(0.45, '#14141a'); g.addColorStop(1, '#050507');
+            ctx.beginPath();
+            ctx.moveTo(bx + 3.2, Y(16, 11));
+            ctx.quadraticCurveTo(bx + 18, Y(4.8, 13), bx + 35.5, Y(13.5, 11));
+            ctx.quadraticCurveTo(bx + 43, Y(24, 8), bx + 33.5, Y(33.5, 6));
+            ctx.quadraticCurveTo(bx + 16, Y(39, 5), bx + 5.5, Y(29.5, 8));
+            ctx.quadraticCurveTo(bx + 1.5, Y(22, 10), bx + 3.2, Y(16, 11));
+            ctx.closePath(); ctx.fillStyle = g; ctx.fill(); ctx.stroke();
+            ctx.lineWidth = 0.95;
+            for (const [v0, v1, ky] of [[20.5, 17.5, 9.5], [26, 22.5, 8.5], [31, 28.5, 7]]){   // duong noi tam giap
+                ctx.strokeStyle = '#3d3d48';
+                ctx.beginPath(); ctx.moveTo(bx + 5, Y(v0 + 2, ky)); ctx.quadraticCurveTo(bx + 21, Y(v1 - 2.5, ky + 1), bx + 40.5, Y(v0 + 1, ky - 1)); ctx.stroke();
+                ctx.strokeStyle = 'rgba(155,28,28,' + (0.55 + 0.3 * G).toFixed(2) + ')';
+                ctx.beginPath(); ctx.moveTo(bx + 5.5, Y(v0 + 3.2, ky)); ctx.quadraticCurveTo(bx + 21, Y(v1 - 1.2, ky + 1), bx + 40, Y(v0 + 2.2, ky - 1)); ctx.stroke();
+            }
+            ctx.save(); ctx.shadowBlur = 8 * G + 2; ctx.shadowColor = '#ff1744';                       // loi nang luong o nguc
+            ctx.fillStyle = 'rgba(255,23,68,' + (0.55 + 0.4 * G).toFixed(2) + ')'; ctx.strokeStyle = '#7a0f1e'; ctx.lineWidth = 0.8;
+            ctx.beginPath(); ctx.moveTo(bx + 22.5, Y(16.5, 10)); ctx.lineTo(bx + 26.2, Y(23, 9)); ctx.lineTo(bx + 22.5, Y(29.5, 8)); ctx.lineTo(bx + 18.8, Y(23, 9)); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.restore();
+            ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 1.1;
+            bzGaiVe(bx + 35, Y(15, 11), bx + 46, Y(5, 12), 3.4, -2.5, '#1d1d22', 0.7 * G);              // 2 gai nguc huong truoc
+            bzGaiVe(bx + 38, Y(20, 10), bx + 48.5, Y(14.5, 10), 2.8, -2, '#17171c', 0.6 * G);
+            ctx.restore();
+        }
+        // giap chan: dui · goi co gai · ong chan co soc do · bao mui chan
+        function bzVeChan(hx, hy, kx, ky, ax, ay, tx, ty){
+            if (typeof bzBat !== 'function' || !bzBat(dino)) return;
+            const G = bzGiapSang();
+            ctx.save(); ctx.lineJoin = 'round'; ctx.strokeStyle = '#000'; ctx.lineWidth = 0.9;
+            let g = ctx.createLinearGradient(kx - 6, ky - 4, kx + 6, ay + 3);
+            g.addColorStop(0, '#34343e'); g.addColorStop(1, '#09090c'); ctx.fillStyle = g;
+            ctx.beginPath(); ctx.moveTo(hx - 7, hy - 4); ctx.lineTo(hx + 7.5, hy - 3); ctx.lineTo(kx + 6.5, ky + 1.2); ctx.lineTo(kx - 6.5, ky + 1.8); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(kx - 6, ky + 1); ctx.lineTo(kx + 6, ky); ctx.lineTo(ax + 6, ay); ctx.lineTo(ax - 5, ay + 2.4); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = 'rgba(255,23,68,' + (0.5 + 0.3 * G).toFixed(2) + ')'; ctx.lineWidth = 0.9;
+            ctx.beginPath(); ctx.moveTo(kx + 0.5, ky + 3); ctx.lineTo(ax + 0.5, ay - 0.5); ctx.stroke();
+            ctx.strokeStyle = '#000'; ctx.lineWidth = 0.9;
+            bzGaiVe(kx + 2.5, ky - 0.5, kx + 13, ky - 7, 3.4, -1.8, '#1d1d22', 0.7 * G);              // gai dau goi
+            ctx.fillStyle = '#121216';
+            ctx.beginPath(); ctx.moveTo(ax - 5, ay - 2.5); ctx.lineTo(tx + 1.5, ty - 4); ctx.lineTo(tx + 3.5, ty + 0.5); ctx.lineTo(ax - 5.5, ay + 3.8); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.restore();
+        }
+        function bzVeChanNgoi(lx, by){
+            if (typeof bzBat !== 'function' || !bzBat(dino)) return;
+            const G = bzGiapSang();
+            ctx.save(); ctx.lineJoin = 'round'; ctx.strokeStyle = '#000'; ctx.lineWidth = 0.9; ctx.fillStyle = '#131318';
+            ctx.beginPath(); ctx.moveTo(lx - 5, by + 33); ctx.lineTo(lx + 5.5, by + 33); ctx.lineTo(lx + 7, by + 44); ctx.lineTo(lx - 3, by + 44); ctx.closePath(); ctx.fill(); ctx.stroke();
+            bzGaiVe(lx + 4.5, by + 36, lx + 13.5, by + 30.5, 3.2, -1.6, '#1d1d22', 0.7 * G);
+            ctx.restore();
+        }
+        function bzVeGiap(bx, by, cs, br, may){
+            if (typeof bzBat !== 'function' || !bzBat(dino)) return;
+            if (may) return bzVeGiapCu(bx, by, cs, br, true);
+            const Y = (v, k) => by + v + cs * k + br, G = bzGiapSang();
+            const Hh = (v) => by + v + cs * 13 + br, E = (v) => by + v + cs * 12 + br;
+            ctx.save(); ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 1.1;
+            // ---- VONG CO + gai
+            ctx.fillStyle = BZ_G.nua;
+            ctx.beginPath(); ctx.ellipse(bx + 33.5, Y(13.5, 11.5), 7.6, 3.4, 0.95, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = 'rgba(255,23,68,' + (0.55 + 0.3 * G).toFixed(2) + ')'; ctx.lineWidth = 0.9;
+            ctx.beginPath(); ctx.ellipse(bx + 33.5, Y(13.5, 11.5), 6, 2.4, 0.95, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+            ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 1;
+            bzGaiVe(bx + 31, Y(10, 12), bx + 24, Y(1, 12), 3, 1.8, '#1d1d22', 0.6 * G);
+            // ---- GIAP VAI nhieu lop, 3 gai
+            for (let i = 2; i >= 0; i--){
+                let cx0 = bx + 25 - i * 1.3, cy0 = Y(16 + i * 3.6, 11.5), rx = 12.5 - i * 1.5, ry = 6.4 - i * 0.4;
+                let g = ctx.createLinearGradient(cx0 - rx, cy0 - ry, cx0 + rx, cy0 + 2);
+                g.addColorStop(0, '#3a3a46'); g.addColorStop(0.5, '#16161c'); g.addColorStop(1, '#07070a');
+                ctx.beginPath(); ctx.ellipse(cx0, cy0, rx, ry, -0.2, Math.PI, 0); ctx.quadraticCurveTo(cx0 + rx * 0.2, cy0 + 3.6, cx0 - rx, cy0 + 0.6); ctx.closePath();
+                ctx.fillStyle = g; ctx.fill(); ctx.stroke();
+                ctx.save(); ctx.strokeStyle = 'rgba(255,40,70,' + (0.5 + 0.35 * G).toFixed(2) + ')'; ctx.lineWidth = 0.9;
+                ctx.beginPath(); ctx.ellipse(cx0, cy0 + 0.6, rx - 1.2, ry - 0.7, -0.2, Math.PI * 1.08, Math.PI * 1.92); ctx.stroke(); ctx.restore();
+            }
+            let sx = bx + 25, sy = Y(16, 11.5);
+            bzGaiVe(sx + 7, sy - 4.5, sx + 15, sy - 13, 3.6, -3, '#1d1d22', 0.8 * G);
+            bzGaiVe(sx + 1, sy - 6, sx - 0.5, sy - 18, 3.9, 2.2, '#222229', 0.8 * G);
+            bzGaiVe(sx - 7, sy - 4, sx - 15, sy - 11, 3.4, 3, '#1d1d22', 0.8 * G);
+            // ---- GIAP TAY: bao tay + gai cui chi
+            let eX = bx + 30, eY = by + 26 + cs * 8, wX = bx + 37, wY = by + 28 + cs * 8;
+            ctx.beginPath(); ctx.moveTo(eX - 4, eY - 2.4); ctx.lineTo(eX + 4, eY - 2.6); ctx.lineTo(wX + 3, wY - 1.4); ctx.lineTo(wX - 3, wY + 3.6); ctx.closePath();
+            ctx.fillStyle = '#15151a'; ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = 'rgba(255,23,68,' + (0.5 + 0.3 * G).toFixed(2) + ')'; ctx.lineWidth = 0.9;
+            ctx.beginPath(); ctx.moveTo(eX - 1, eY - 0.5); ctx.lineTo(wX - 0.5, wY + 1.2); ctx.stroke();
+            ctx.strokeStyle = BZ_G.vien; ctx.lineWidth = 1;
+            bzGaiVe(eX - 2, eY - 1, eX - 11, eY - 5, 3, 1.5, '#1d1d22', 0.7 * G);
+            // ---- MU SUNG co sung + mat do (che lai mat cu)
+            ctx.beginPath();
+            ctx.moveTo(bx + 30, Hh(8));
+            ctx.quadraticCurveTo(bx + 34, Hh(-2), bx + 44, Hh(-2.3));
+            ctx.quadraticCurveTo(bx + 51.5, Hh(-0.8), bx + 54.2, E(8.2));
+            ctx.lineTo(bx + 51.4, E(9.6)); ctx.lineTo(bx + 47, E(8.4));
+            ctx.quadraticCurveTo(bx + 40, E(5), bx + 33.4, Hh(10.5));
+            ctx.closePath();
+            let gh = ctx.createLinearGradient(bx + 30, Hh(-2), bx + 52, E(10));
+            gh.addColorStop(0, '#3a3a46'); gh.addColorStop(0.5, '#15151b'); gh.addColorStop(1, '#060608');
+            ctx.fillStyle = gh; ctx.fill(); ctx.stroke();
+            ctx.save(); ctx.strokeStyle = 'rgba(255,40,70,' + (0.55 + 0.3 * G).toFixed(2) + ')'; ctx.lineWidth = 0.9;
+            ctx.beginPath(); ctx.moveTo(bx + 32.5, Hh(4)); ctx.quadraticCurveTo(bx + 42, Hh(-0.2), bx + 52, E(7.4)); ctx.stroke(); ctx.restore();
+            bzGaiVe(bx + 35.5, Hh(2.5), bx + 21, Hh(-11), 3.5, -4.5, '#222229', 0.8 * G);                // sung lon cong ra sau
+            bzGaiVe(bx + 39.5, Hh(0.5), bx + 29.5, Hh(-9.5), 2.7, -3.2, '#1d1d22', 0.8 * G);              // sung nho
+            bzGaiVe(bx + 44.5, Hh(-1.5), bx + 48.5, Hh(-9), 2.3, 1.2, '#1d1d22', 0.8 * G);                // gai dinh
+            ctx.beginPath(); ctx.moveTo(bx + 39, E(3)); ctx.lineTo(bx + 51.5, E(5)); ctx.lineTo(bx + 49, E(8)); ctx.lineTo(bx + 40.5, E(6.4)); ctx.closePath();
+            ctx.fillStyle = '#0d0d10'; ctx.fill(); ctx.stroke();
+            ctx.save(); ctx.shadowBlur = 7 * G + 2; ctx.shadowColor = '#ff1744';
+            ctx.fillStyle = BZ_G.do;
+            ctx.beginPath(); ctx.moveTo(bx + 42.2, E(6.3)); ctx.lineTo(bx + 49.4, E(6.9)); ctx.lineTo(bx + 47.8, E(8.2)); ctx.lineTo(bx + 43.2, E(7.8)); ctx.closePath(); ctx.fill();
+            ctx.restore();
+            bzGaiVe(bx + 38.5, E(15.5), bx + 35.5, E(22.5), 2.4, 1, '#1d1d22', 0.6 * G);                   // gai ham
+            ctx.restore();
+        }
+        function veBzGiapThanCu(bx, by, cs, br, may){
             if (typeof bzBat !== 'function' || !bzBat(dino)) return;
             ctx.save(); ctx.lineJoin = 'round';
             if (may){
@@ -69291,7 +69596,7 @@ class PulsarCloneBoss {
             ctx.closePath(); ctx.fill();
             ctx.restore();
         }
-        function bzVeGiap(bx, by, cs, br, may){
+        function bzVeGiapCu(bx, by, cs, br, may){
             if (typeof bzBat !== 'function' || !bzBat(dino)) return;
             ctx.save(); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
             if (may){
@@ -69376,7 +69681,7 @@ class PulsarCloneBoss {
             ng._dkNhay = true;
             if (dkDungYen(dk) && typeof dashVx !== 'undefined') dashVx = 0;   // PvP: vong cua P2 da doi dashVx sang cua P2
             // luot
-            let luot = (ng.id === 1 || gameState === 'pvp') && typeof dangLuotHoacChop === 'function' && dangLuotHoacChop();
+            let luot = (ng.id === 1 || gameState === 'pvp') && typeof dangLuotHoacChop === 'function' && dangLuotHoacChop() && !((dk._khongLuot || 0) > frames);
             if (luot) dk.luotDu = 14; else if (dk.luotDu > 0) dk.luotDu--;
             let luotMoi = luot && !dk.luotCu; dk.luotCu = luot;
             // hoat anh
@@ -69401,6 +69706,14 @@ class PulsarCloneBoss {
                 if (dk.A && A.t >= A.T) dkXong(ng, A);
             }
             if (bzBat(ng)){
+                if (dk._lh){                                                   // dang chay CHEM LIEN HOAN: tu noi don, khong nhan J
+                    if (dk.ult || dk.kenh) dk._lh = null;
+                    else {
+                        ng.invincible = true; ng.invTimer = Math.max(ng.invTimer || 0, 4);          // BAT TU SUOT CA CHUOI (ke ca luc nghi giua cac don): da bi ep danh thi khong the bi dam
+                        if (!dk.A) bzLienHoanTiep(ng);
+                        dk.datDat = !!ng.grounded; return;
+                    }
+                }
                 if (dk.bzCh){
                     if (!chargeKey){
                         dk.bzCh = false;
@@ -70118,6 +70431,7 @@ class PulsarCloneBoss {
                 ctx.restore();
             }
             if (A && A.kieu === 'quet') dkVeQuetBanNguyet(ng, A, x, y, p);      // CHARGE MOC 1: vet ban nguyet quet tu duoi len
+            if (A && A.kieu === 'bzLH5') dkVeKhoan(ng, A, x, y, p);             // CHARGE 2.5s: aura + mui khoan
             let bzVet = A && A.kieu && A.kieu.indexOf('bz') === 0;
             let mauCat = bzBat(ng) && ((dk.tamThem || 0) > 0 || (A && A.kieu === 'bzRut'));
             if (A && A.t >= A.hit - (bzVet ? 8 : 4) && A.t <= A.hit + (bzVet ? 6 : 5) && A.m.dmg > 0){
@@ -70329,6 +70643,63 @@ class PulsarCloneBoss {
         const DK_QUET_PHI = 5.0832;       // tong goc quet cua kiem (rad): tu -1.9 den -0.7 - 2PI
         function dkMauBN(hong){
             return hong ? { c: [255, 70, 70], w: [255, 225, 225] } : { c: [190, 160, 255], w: [240, 245, 255] };
+        }
+        // MUI KHOAN (don cuoi cua CHEM LIEN HOAN): aura nhe quanh luoi luc gom luc, roi mui khoan lon hinh non xoay boc quanh luoi huong ve phia dam
+        function dkVeKhoan(ng, A, x, y, p){
+            if (!p || !A) return;
+            let t = A.t, hit = A.hit, kd = A.m.keoDai || 12, f = (typeof frames !== 'undefined' ? frames : 0);
+            let pre = Math.min(1, t / hit);
+            let grow = t >= hit ? Math.min(1, (t - hit + 1) / 3) : 0;
+            let fade = t > hit + kd ? Math.max(0, 1 - (t - hit - kd) / 8) : 1;
+            if (fade <= 0) return;
+            const LB = 118, BASE = -26;
+            ctx.save();
+            ctx.translate(x + p.px, y + p.py); ctx.rotate(p.ang);
+            ctx.globalCompositeOperation = 'lighter';
+            ctx.save(); ctx.translate(0, -(LB * 0.5 + 8)); ctx.scale(0.42, 1);                // AURA NHE: elip keo doc theo luoi
+            let ar = (LB * 0.62) * (0.7 + 0.3 * pre), al = (0.25 + 0.35 * pre) * fade * (1 - 0.35 * grow);
+            let ga = ctx.createRadialGradient(0, 0, 4, 0, 0, ar);
+            ga.addColorStop(0, 'rgba(255,120,120,' + (0.5 * al).toFixed(2) + ')');
+            ga.addColorStop(0.55, 'rgba(230,30,55,' + (0.55 * al).toFixed(2) + ')');
+            ga.addColorStop(1, 'rgba(120,0,20,0)');
+            ctx.fillStyle = ga; ctx.beginPath(); ctx.arc(0, 0, ar, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+            if (t < hit){                                                                      // hat nang luong hoi tu vao luoi
+                ctx.fillStyle = 'rgba(255,200,200,' + (0.8 * fade).toFixed(2) + ')';
+                for (let i = 0; i < 9; i++){
+                    let ph = ((f * 0.07) + i / 9) % 1, ang = i * 2.4 + f * 0.05, r = (1 - ph) * 34;
+                    ctx.fillRect(Math.cos(ang) * r - 1.5, -LB * (0.25 + 0.7 * ph) - 1.5, 3, 3);
+                }
+            }
+            if (grow > 0){                                                                     // MUI KHOAN
+                let tip = LB + 12 + 62 * grow, Wb = 27 * (0.6 + 0.4 * grow);
+                let gx = ctx.createLinearGradient(-Wb, 0, Wb, 0);
+                gx.addColorStop(0, 'rgba(24,2,6,' + (0.95 * fade).toFixed(2) + ')');
+                gx.addColorStop(0.5, 'rgba(190,24,40,' + (0.97 * fade).toFixed(2) + ')');
+                gx.addColorStop(1, 'rgba(18,2,5,' + (0.95 * fade).toFixed(2) + ')');
+                ctx.globalCompositeOperation = 'source-over';                                  // than khoan ve mau thuong (do sam) de khong chay trang tren nen sang
+                ctx.shadowBlur = 18; ctx.shadowColor = 'rgba(255,40,60,0.9)';
+                ctx.fillStyle = gx;
+                ctx.beginPath(); ctx.moveTo(-Wb, BASE); ctx.quadraticCurveTo(-Wb * 0.55, -tip * 0.55, 0, -tip); ctx.quadraticCurveTo(Wb * 0.55, -tip * 0.55, Wb, BASE); ctx.closePath(); ctx.fill();
+                ctx.shadowBlur = 0; ctx.lineCap = 'round';
+                ctx.globalCompositeOperation = 'lighter';
+                for (let i = 0; i < 7; i++){                                                   // van xoan oc cuon doc than khoan
+                    let s = ((i / 7) + f * 0.09) % 1, yy = BASE - s * (tip - BASE), w = Wb * Math.pow(1 - s, 0.85);
+                    ctx.strokeStyle = 'rgba(255,235,235,' + ((0.85 - 0.5 * s) * fade).toFixed(2) + ')'; ctx.lineWidth = 2.4 - s * 1.2;
+                    ctx.beginPath(); ctx.moveTo(-w, yy); ctx.quadraticCurveTo(0, yy - 9 * (1 - s * 0.6), w, yy); ctx.stroke();
+                }
+                ctx.strokeStyle = 'rgba(255,255,255,' + (0.7 * fade).toFixed(2) + ')'; ctx.lineWidth = 1.6;
+                ctx.beginPath(); ctx.moveTo(-Wb, BASE); ctx.quadraticCurveTo(-Wb * 0.55, -tip * 0.55, 0, -tip); ctx.quadraticCurveTo(Wb * 0.55, -tip * 0.55, Wb, BASE); ctx.stroke();
+                let gt = ctx.createRadialGradient(0, -tip, 0, 0, -tip, 16);
+                gt.addColorStop(0, 'rgba(255,255,255,' + (0.95 * fade).toFixed(2) + ')'); gt.addColorStop(1, 'rgba(255,60,80,0)');
+                ctx.fillStyle = gt; ctx.beginPath(); ctx.arc(0, -tip, 16, 0, Math.PI * 2); ctx.fill();
+                for (let i = 0; i < 5; i++){                                                   // vet toc do phia sau
+                    let yy = 14 + i * 12, w = 10 + i * 5;
+                    ctx.strokeStyle = 'rgba(255,90,100,' + ((0.45 - i * 0.08) * fade).toFixed(2) + ')'; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(-w, yy); ctx.lineTo(-w * 0.2, yy + 10); ctx.moveTo(w, yy); ctx.lineTo(w * 0.2, yy + 10); ctx.stroke();
+                }
+            }
+            ctx.restore();
         }
         function dkVeQuetBanNguyet(ng, A, x, y, p){
             if (!p || !A) return;
@@ -70781,7 +71152,7 @@ class PulsarCloneBoss {
                     }
                     else if (dk.A && dk.A.kieu === 'bzCua') buoc = "CƯA";
                     else if (dk.A && (dk.A.kieu === 'bzVong' || dk.A.kieu === 'bzKen')) buoc = dk.A.kieu === 'bzKen' ? "KÊNH" : "XOAY";
-                    else if (dk.A && dk.A.kieu === 'bzLoan') buoc = "LOẠN";
+                    else if (dk.A && (dk.A.kieu === 'bzLoan' || (dk.A.kieu || '').indexOf('bzLH') === 0)) buoc = "LIÊN HOÀN";
                     else if ((dk.voHan || 0) > 0) buoc = "BÙNG " + Math.ceil(dk.voHan / 60) + "s";
                     ctx.fillText("BERSERK" + (buoc ? " · " + buoc : ""), 140, hy); hy += 16;
                 }
@@ -78042,8 +78413,8 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
             desc:'Tốn 2 ô. ĐỘC QUYỀN DINOSWORD. Bản nâng cấp toàn diện cho bộ kiếm — tầm chém, phòng thủ khi lướt, và cả một người thứ hai đánh cùng bạn. Không kể ra hết ở đây: cầm thử một ván là hiểu tại sao DinoSword cần nó.',
             descEn:'Costs 2 slots. DINOSWORD ONLY. A complete overhaul of the sword kit — longer reach, defence while dashing, and a second fighter at your side. Not spelling it all out here: run one stage with it and you will see why DinoSword wants it.' });
         RUNES.push({ id:'berserk', name:'BERSERKER', nameEn:'BERSERKER', icon:'☠', cost:2, ammoRune:true, onlyAmmo:19,
-            desc:'Tốn 2 ô. ĐỘC QUYỀN ĐẠI KIẾM. Giáp thú thay bộ J, thể lực lên 6, đi lại hết chậm. Phép K cũ vẫn khóa. Giữ K tới 3 giây vào Channel kiếm khí. Chiêu cuối riêng là Trăng Đen.\n\nBấm liền là chuỗi 5 nhát: chém xuống 5, hất 5, xoay 6, đâm 6, lùi rồi đâm xuyên 8 và có khung bất tử. Dừng một nhịp (kiếm loé đỏ) rồi bấm để rẽ.\n\nJ, dừng, J J J — đâm 6, hất nhảy 6 (địch hất nhẹ), bổ xuống 8.\nJ J, dừng, J J — cắm kiếm, ma pháp 3 mọi kẻ địch kể cả không trúng chém và kể cả đang đứng đất. J nữa cắm sâu, ma pháp 6, cùng luật. Nhát kiếm gần vẫn cộng thêm 4 rồi 10.\nJ J J, dừng, J — hất lên phóng kiếm khí máu cực to, sóng 8. Chém xong nghỉ một nhịp, không nối được.\nJ rồi Dash rồi J — lướt hất. Bấm J thường là bổ xuống 8, địch rơi theo và ăn thêm 2 khi chạm đất. Giữ J khoảng một phần ba giây thì mới xoay cưa tới khi chạm đất, kết bằng bổ 8.\nDash rồi J J — hai nhát chém ngang Hoành Tảo như kiếm gốc: 10 rồi 11. Nhát đầu tốn 3 thể lực.\n\nGiữ J và giữ K là hai thứ khác nhau.\n\nGIỮ J — giơ kiếm nạp, thả ra một nhát duy nhất. Bấm nhanh vẫn là chuỗi thường. Năm nấc 0.5 / 1 / 1.5 / 2 / 2.5 giây: sát thương 12 / 14 / 16 / 18 / 20, tầm thêm 3 / 6 / 10 / 15 / 22cm. Cắt đạn, choáng, kéo kẻ bay xuống. Bể máu 20 giây, nấc đầu nhỏ như cũ, nấc cuối gần nửa map. Đứng trên hồi 1 máu mỗi 10 / 8.5 / 7 / 5.5 / 4 giây. Địch trong bể mất 1 mỗi giây. Mỗi nhát tốn 1 máu. Không ra đòn của K.\n\nGIỮ K — bộ skill riêng, không bể máu. Phép K cũ vẫn khóa. Giữ tới 3 giây thì vào Channel, không thả ra đòn loạn.\n0.5 giây: nhát kiếm khí của đại kiếm gốc. Chém 8 và bắn lưỡi kiếm khí 8, choáng nhẹ. Không tốn máu, không bể máu.\n1 giây: xoay ngang 3 phát, tầm ngắn, cắt đạn. Hai phát đầu lệch lên và lệch xuống, mỗi phát 2. Phát cuối xoay ngang hẳn, rộng hơn, 5.\n1.5 giây: bùng nổ. 5 giây sau không tốn thể lực. Hết 5 giây thì mất 1 máu.\n2 giây: thu kiếm, để ngang, đâm 14 rồi rút thêm 4. Sau đó 5 giây cả lưỡi có sương đỏ, dài thêm 5cm, nhát cắt chuyển đỏ máu.\n2.5 giây: chém loạn. Hai nhát tới rồi một nhát lùi, mỗi nhát 6, có iframe đúng lúc vung và lao theo nhát. Khoảng dừng giữa các nhát không có iframe. Rồi nhảy cao găm xuống: găm 10, đâm trúng thì sâu thêm 6. Đáp đúng giữa tâm thì hút 1 máu. Trên không bấm A D để chọn chỗ đáp.\n\nCHANNEL — giữ K đủ 3 giây: chém ngang 3 nhát như mốc 1 giây rồi lặp đến khi thả K. Mỗi nhát cận chiến 3, 3 rồi 5 và bắn kiếm khí. Khí nhát 1 và 2 gây 2, càng xa mỗi 2cm giảm 1. Nhát 3 khí to hơn, gây 4, mỗi 3cm giảm 1. Vào channel tốn 1 thể lực, mỗi nhát sau không tốn.\n\nCHIÊU CUỐI — màn hình đen, mặt trăng và cột tím. Ẩn hiện 7 nhát: lao tới, ra sau lưng, ra trước, rồi lặp. Mỗi nhát 10. Mọi kẻ địch bị khóa chân. Rồi người chơi xuất hiện sát mép sàn và bắn Getsuga quét cả sàn, 100 một lần.',
-            descEn:'Costs 2 slots. GREATSWORD ONLY. The beast armor replaces the J string (stamina 6, full move speed). K magic stays locked. Hold K for 3 seconds to enter a sword-qi Channel. The ultimate is now Black Moon.\n\nMash J for five hits: down 5, up 5, spin 6, thrust 6, step back and pierce 8 with iframes. Pause a beat (the sword flashes red) to branch.\n\nJ, pause, JJJ — thrust 6, rising cut 6, slam 8.\nJJ, pause, JJ — plant: gravity deals 3 to every enemy, even off the blade and even on the ground. The deeper plant deals 6 the same way. The close slash still adds 4 then 10.\nJJJ, pause, J — an upward cut that fires a huge blood wave for 8. After it, one beat of rest: you cannot chain.\nJ, Dash, J — a launching dash. A normal J press slams for 8; launched enemies are thrown down and take 2 more on impact. Hold J for about a third of a second to saw until you land, then slam for 8.\nDash, then J J — two horizontal cleaves, the old ones: 10 then 11. The first costs 3 stamina.\n\nHold J and hold K are separate.\n\nHOLD J — raise the sword, charge, release one slash. A tap is still the normal chain. Five tiers at 0.5 / 1 / 1.5 / 2 / 2.5s: damage 12 / 14 / 16 / 18 / 20, extra reach 3 / 6 / 10 / 15 / 22cm. Cuts bullets, stuns, pulls airborne enemies down. Blood pool lasts 20s, small at tier 1, nearly half the map at tier 5. Standing in it heals 1 every 10 / 8.5 / 7 / 5.5 / 4s. Enemies in it take 1 per second. Each slash costs 1 HP. It does not use the K moves.\n\nHOLD K — its own skill set, no blood pool. Old K magic stays locked. Hold for 3 seconds to enter Channel instead of releasing a move.\n0.5s: the greatsword sword-qi slash. An 8-damage cut plus an 8-damage energy blade, with a short stun. No HP cost, no pool.\n1s: three horizontal spins, short range, cuts bullets. The first two sit a little high and a little low, 2 damage each. The last is dead horizontal, wider, and deals 5.\n1.5s: power burst. No stamina cost for the next 5 seconds. When those 5 seconds end, lose 1 HP.\n2s: pull the blade back, hold it flat, thrust for 14, then withdraw for 4. For the next 5 seconds the whole blade wears red mist, reaches 5cm farther, and cut trails turn blood red.\n2.5s: frenzy. Two forward lunges then one back lunge, 6 each, iframes only during the swing, and you lunge with the blade. The short pauses have no iframes. Then a high jump and a downward plant: 10, plus 6 more if the stab connects. Landing on the center of an enemy drains 1 HP. Steer the landing with A and D.\n\nCHANNEL — hold K for 3 seconds: three horizontal slashes like the 1 second charge, looping until K is released. Slashes deal 3, then 3, then 5, and each fires sword qi. Qi 1 and 2 deal 2 and lose 1 per 2cm. The third qi is larger and deals 4, losing 1 per 3cm. Entering costs 1 stamina. Later slashes cost 0.\n\nULTIMATE — the screen goes black, then a moon and a purple column. The player flickers through 7 slashes: lunge in, appear behind, appear in front, then repeat. Each slash deals 10. Every enemy is locked in place. Then the player appears at the far edge and fires a Getsuga that sweeps the whole arena for 100 once.' });
+            desc:'Tốn 2 ô. ĐỘC QUYỀN ĐẠI KIẾM. Giáp thú thay bộ J, thể lực lên 6, đi lại hết chậm. Phép K cũ vẫn khóa. Giữ K tới 3 giây vào Channel kiếm khí. Chiêu cuối riêng là Trăng Đen.\n\nBấm liền là chuỗi 5 nhát: chém xuống 5, hất 5, xoay 6, đâm 6, lùi rồi đâm xuyên 8 và có khung bất tử. Dừng một nhịp (kiếm loé đỏ) rồi bấm để rẽ.\n\nJ, dừng, J J J — đâm 6, hất nhảy 6 (địch hất nhẹ), bổ xuống 8.\nJ J, dừng, J J — cắm kiếm, ma pháp 3 mọi kẻ địch kể cả không trúng chém và kể cả đang đứng đất. J nữa cắm sâu, ma pháp 6, cùng luật. Nhát kiếm gần vẫn cộng thêm 4 rồi 10.\nJ J J, dừng, J — hất lên phóng kiếm khí máu cực to, sóng 8. Chém xong nghỉ một nhịp, không nối được.\nJ rồi Dash rồi J — lướt hất. Bấm J thường là bổ xuống 8, địch rơi theo và ăn thêm 2 khi chạm đất. Giữ J khoảng một phần ba giây thì mới xoay cưa tới khi chạm đất, kết bằng bổ 8.\nDash rồi J J — hai nhát chém ngang Hoành Tảo như kiếm gốc: 10 rồi 11. Nhát đầu tốn 3 thể lực.\n\nGiữ J và giữ K là hai thứ khác nhau.\n\nGIỮ J — giơ kiếm nạp, thả ra một nhát duy nhất. Bấm nhanh vẫn là chuỗi thường. Năm nấc 0.5 / 1 / 1.5 / 2 / 2.5 giây: sát thương 12 / 14 / 16 / 18 / 20, tầm thêm 3 / 6 / 10 / 15 / 22cm. Cắt đạn, choáng, kéo kẻ bay xuống. Bể máu 20 giây, nấc đầu nhỏ như cũ, nấc cuối gần nửa map. Đứng trên hồi 1 máu mỗi 10 / 8.5 / 7 / 5.5 / 4 giây. Địch trong bể mất 1 mỗi giây. Mỗi nhát tốn 1 máu. Không ra đòn của K.\n\nGIỮ K — bộ skill riêng, không bể máu. Phép K cũ vẫn khóa. Giữ tới 3 giây thì vào Channel, không thả ra đòn loạn.\n0.5 giây: nhát kiếm khí của đại kiếm gốc. Chém 8 và bắn lưỡi kiếm khí 8, choáng nhẹ. Không tốn máu, không bể máu.\n1 giây: xoay ngang 3 phát, tầm ngắn, cắt đạn. Hai phát đầu lệch lên và lệch xuống, mỗi phát 2. Phát cuối xoay ngang hẳn, rộng hơn, 5.\n1.5 giây: bùng nổ. 5 giây sau không tốn thể lực. Hết 5 giây thì mất 1 máu.\n2 giây: thu kiếm, để ngang, đâm 14 rồi rút thêm 4. CHỈ KHI mũi đâm TRÚNG kẻ địch: 5 giây sau cả lưỡi có sương đỏ, dài thêm 5cm, nhát cắt chuyển đỏ máu.\n2.5 giây: chém liên hoàn 5 đòn tự nối (tổng 55, tốn 2 thể lực): chém xuống 8 rồi chém lên 8, mỗi đòn tiến lên một chút; chém ngang 9 rồi lùi ngắn; đâm tới 10; cuối cùng gom lực tạo Aura nhẹ rồi hóa mũi khoan lớn từ kiếm lao xuyên mọi kẻ địch trên đường, 20. Bất tử suốt cả chuỗi.\n\nCHANNEL — giữ K đủ 3 giây: chém ngang 3 nhát như mốc 1 giây rồi lặp đến khi thả K. Mỗi nhát cận chiến 3, 3 rồi 5 và bắn kiếm khí. Khí nhát 1 và 2 gây 2, càng xa mỗi 2cm giảm 1. Nhát 3 khí to hơn, gây 4, mỗi 3cm giảm 1. Vào channel tốn 1 thể lực, mỗi nhát sau không tốn.\n\nCHIÊU CUỐI — màn hình đen, mặt trăng và cột tím. Ẩn hiện 7 nhát: lao tới, ra sau lưng, ra trước, rồi lặp. Mỗi nhát 10. Mọi kẻ địch bị khóa chân. Rồi người chơi xuất hiện sát mép sàn và bắn Getsuga quét cả sàn, 100 một lần.',
+            descEn:'Costs 2 slots. GREATSWORD ONLY. The beast armor replaces the J string (stamina 6, full move speed). K magic stays locked. Hold K for 3 seconds to enter a sword-qi Channel. The ultimate is now Black Moon.\n\nMash J for five hits: down 5, up 5, spin 6, thrust 6, step back and pierce 8 with iframes. Pause a beat (the sword flashes red) to branch.\n\nJ, pause, JJJ — thrust 6, rising cut 6, slam 8.\nJJ, pause, JJ — plant: gravity deals 3 to every enemy, even off the blade and even on the ground. The deeper plant deals 6 the same way. The close slash still adds 4 then 10.\nJJJ, pause, J — an upward cut that fires a huge blood wave for 8. After it, one beat of rest: you cannot chain.\nJ, Dash, J — a launching dash. A normal J press slams for 8; launched enemies are thrown down and take 2 more on impact. Hold J for about a third of a second to saw until you land, then slam for 8.\nDash, then J J — two horizontal cleaves, the old ones: 10 then 11. The first costs 3 stamina.\n\nHold J and hold K are separate.\n\nHOLD J — raise the sword, charge, release one slash. A tap is still the normal chain. Five tiers at 0.5 / 1 / 1.5 / 2 / 2.5s: damage 12 / 14 / 16 / 18 / 20, extra reach 3 / 6 / 10 / 15 / 22cm. Cuts bullets, stuns, pulls airborne enemies down. Blood pool lasts 20s, small at tier 1, nearly half the map at tier 5. Standing in it heals 1 every 10 / 8.5 / 7 / 5.5 / 4s. Enemies in it take 1 per second. Each slash costs 1 HP. It does not use the K moves.\n\nHOLD K — its own skill set, no blood pool. Old K magic stays locked. Hold for 3 seconds to enter Channel instead of releasing a move.\n0.5s: the greatsword sword-qi slash. An 8-damage cut plus an 8-damage energy blade, with a short stun. No HP cost, no pool.\n1s: three horizontal spins, short range, cuts bullets. The first two sit a little high and a little low, 2 damage each. The last is dead horizontal, wider, and deals 5.\n1.5s: power burst. No stamina cost for the next 5 seconds. When those 5 seconds end, lose 1 HP.\n2s: pull the blade back, hold it flat, thrust for 14, then withdraw for 4. ONLY if the thrust HITS an enemy, for the next 5 seconds the whole blade wears red mist, reaches 5cm farther, and cut trails turn blood red.\n2.5s: a self-chaining five-hit flurry (55 total, costs 2 stamina): downward slash 8 then upward slash 8, each stepping forward a little; horizontal slash 9 then a short retreat; forward thrust 10; finally a short charge that builds a light aura, then the sword becomes a huge drill that lunges through every enemy in its path for 20. Invulnerable for the whole flurry.\n\nCHANNEL — hold K for 3 seconds: three horizontal slashes like the 1 second charge, looping until K is released. Slashes deal 3, then 3, then 5, and each fires sword qi. Qi 1 and 2 deal 2 and lose 1 per 2cm. The third qi is larger and deals 4, losing 1 per 3cm. Entering costs 1 stamina. Later slashes cost 0.\n\nULTIMATE — the screen goes black, then a moon and a purple column. The player flickers through 7 slashes: lunge in, appear behind, appear in front, then repeat. Each slash deals 10. Every enemy is locked in place. Then the player appears at the far edge and fires a Getsuga that sweeps the whole arena for 100 once.' });
         // id rune -> chi so loai dan bat buoc
         RUNES.push({ id:'voltdash', name:'LƯỚT SÉT', nameEn:'LIGHTNING DASH', icon:'⚡', cost:1,
             desc:'Tốn 1 ô. MỌI loại đạn: cú lướt đi xa hơn hẳn (36 thay vì 22) và gây 3 sát thương cho kẻ địch bạn lướt xuyên qua. CẦM VOLT thì lướt còn phóng thêm một TIA SÉT từ sau lưng ra trước, xuyên mọi mục tiêu, 3 sát thương nữa. Ghép SIÊU TỐC thì cả hai lên 5. Trong Lightning Form của Volt cả hai lên 6. Với MIDAS, cả J Dash lẫn Dash J đều bắn thêm một chưởng sét giống Volt. Với MJÖLNIR thì nó mở hàng sấm 7cm: hai combo Dash+J và J→Dash giáng 10 cột sét trước mặt, mỗi cột 1 sát thương kèm choáng — rune không tăng tốc hay tầm lướt của Búa, nó là hiệu ứng sạc búa trước cú đập.\n\nVỚI VŨ KHÍ CẬN CHIẾN: rune không sinh thêm tia sét rời nào. Nó chỉ làm hai việc — cộng sát thương, và nhuộm chính nhát chém sang tông điện khiến nhát đó nở to ra 28%. KIẾM — cả hai nhát của chuỗi Lướt Chém đều +2, lưỡi kiếm khí của nhát hai bay 340 thay vì 260. GIÁO — Lướt Đâm và nhát bồi đều +2 và sâu thêm 28%, có một tia chạy dọc thân giáo; Mũi Tên Khí bay lâu hơn, rộng hơn, +2. BÚA — vốn đã có sấm sét, không đụng vào.',
