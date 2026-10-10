@@ -67822,11 +67822,11 @@ class PulsarCloneBoss {
            DAI KIEM — kiem hai luoi to, dai, nang. 3 the luc. Tam xa, ra don CHAM DAU roi roi xuong RAT NHANH
            (trong luc keo), chem xong kiem NAM DUOI DAT mot luc — phai nhac len moi chem tiep. Chay / nhay cham
            nhu Bua. Hai trang thai: 'lung' (vac tren lung) va 'dat' (mui kiem cham dat truoc mat).
-             J (tren lung)      CHEM XUONG 7 -> kiem nam duoi dat
-             J (duoi dat)       NHAC KIEM bang luc = chem hat len 7, thu hoi kha cham
-             Luot (duoi dat)    DAM bang mui kiem 5
+             J (tren lung)      CHEM XUONG 13 -> kiem nam duoi dat
+             J (duoi dat)       NHAC KIEM bang luc = chem hat len 13, thu hoi kha cham
+             Luot (duoi dat)    DAM bang mui kiem 10
              Nhay J (duoi dat)  nhac kiem ve lung tren khong 9 · Nhay J (tren lung): bo xuong 7
-             Luot J             lao toi CHEM NGANG cuc manh 10, day lui, PHA don lao cua dich, ton 3
+             Luot J (JJ)        lao toi CHEM NGANG 9 + 9 = 18, day lui, PHA don lao cua dich (choang 0.1s), ton 3
              K 0.5s  (cu K 1.5s) ha kiem nhe xuong dat sau lung roi vung tu duoi vong len: chem 8 + chem khi 8.
                       Song kiem khi trong suot, to dan theo moc Charge J (moc 3 la luoi vuot rang). Dang cam Dai Cu Kiem da thi song thanh cot da chem cheo, huy luon kiem da, +10 sat thuong, hat ke dich len 1 than roi choang 1.5s khi cham dat.
              NOI TAI MA PHAP TRONG LUC: moi nhat trung ke dang bay ghim no xuong dat 0.75 giay · Bat mon = vo han the luc
@@ -67894,7 +67894,14 @@ class PulsarCloneBoss {
         // Nhat 5: chem +7, tam Impact rong hon tam da thuong, 4 manh kiem lon gay 4
         const DK_DA_VO_DMG = 7, DK_DA_VO_TAM = 150, DK_DA_VO_N = 4, DK_DA_VO_MANH = 4;
         // ---- K 1.5s TRONG LUC TRAM: sat thuong dap · vung trung (khung, ban kinh, luc keo moi khung) ----
-        const DK_DAP_DMG = 12, DK_TRUNG_T = 30, DK_TRUNG_R = 170, DK_TRUNG_KEO = 0.14;
+        // K 1.5s TRONG LUC TRAM: 16 sat thuong. Dang cam kiem da: PHA kiem da -> mui da nhon hat tung ke dich, DK_DAP_VO_DMG sat thuong (thay cho 16).
+        // To hop K 1.5s + kiem da + Charge J TOI DA da nap san (moc 3): DK_DAP_VO_MAX sat thuong (J moc 1 / 2 chi cong them +4 / +7 nhu moi don K).
+        // Charge J toi da khi danh rieng van la 20 nhu cu.
+        const DK_DAP_VO_DMG = 50, DK_DAP_VO_MAX = 65, DK_DAP_VO_R = 190, DK_DAP_VO_CAO = 120;
+        // DASH J (Hoanh Tao) + kiem da: nhat dau PHA kiem da (+DK_NGANG_VO_BONUS thay cho +5) va phong 4 mui da nhon chay choe ve phia truoc
+        // (2 cheo len, 2 cheo xuong), moi mui DK_MUI_BAY_DMG. Ke dich sat (<= DK_MUI_GAN = 4cm) dinh ca 4 mui, xa hon chi dinh 2 mui giua.
+        const DK_NGANG_VO_BONUS = 10, DK_MUI_BAY_DMG = 4, DK_MUI_GAN = 4 * DK_CM;
+        const DK_DAP_DMG = 16, DK_TRUNG_T = 30, DK_TRUNG_R = 170, DK_TRUNG_KEO = 0.14;
         function dkBat(ng){ return !!ng && (ng.id === 1 ? currentAmmoType : (ng.ammoType != null ? ng.ammoType : -1)) === DK_DAN; }
         function dkNovaOn(ng){
             if (typeof hasRune !== 'function' || !hasRune('explshot')) return false;
@@ -67958,7 +67965,7 @@ class PulsarCloneBoss {
                 if (o.dashVx !== undefined) o.dashVx = 0;
                 dkChu(o.x + (o.w || 40) / 2 - 30, o.y - 20, "PHÁ ĐÒN!", "BROKEN!");
             }
-            if (typeof venKhoa === 'function') venKhoa(o, 24);
+            if (typeof venKhoa === 'function') venKhoa(o, 6);          // CHOANG chi 0.1 giay (truoc 0.4s)
         }
         // hop danh theo nguoi choi (don vi than, nhan he so hinh dang)
         function dkHop(ng, sau, truoc, tren, duoi, dmg, hit, fn){
@@ -68076,24 +68083,24 @@ class PulsarCloneBoss {
 
         /* ---------- HOAT ANH: moi don la day khoa [u, goc, px, py, em] (em = 'in' / 'out' / 'io'), khoa dau = tu the hien tai ---------- */
         const DK_M = {
-            chem:  { T: 32, hit: 20, ton: 1, dmg: 7, het: 'dat', keys: [[0.45, -0.25, 26, 10, 'io'], [0.62, 1.77, 31, 20, 'in'], [1, 1.77, 31, 20]],
+            chem:  { T: 32, hit: 20, ton: 1, dmg: 13, het: 'dat', keys: [[0.45, -0.25, 26, 10, 'io'], [0.62, 1.77, 31, 20, 'in'], [1, 1.77, 31, 20]],
                      hop: [-10, 168, 74, 8], dat: 1, am: 120 },
             // NHAC: day kiem len mot chut (mat dat nut) — khung lai — roi moi giat len. Nang, manh.
-            nhac:  { T: 38, hit: 20, ton: 0, dmg: 7, het: 'lung', cho: 22, nut: 7, keys: [[0.2, 1.63, 33, 15, 'out'], [0.4, 1.6, 33, 14], [0.56, -0.5, 28, 12, 'in'], [1, -1.85, 16, 4, 'io']],
+            nhac:  { T: 38, hit: 20, ton: 0, dmg: 13, het: 'lung', cho: 22, nut: 7, keys: [[0.2, 1.63, 33, 15, 'out'], [0.4, 1.6, 33, 14], [0.56, -0.5, 28, 12, 'in'], [1, -1.85, 16, 4, 'io']],
                      hop: [-10, 162, 100, 6], am: 260 },
             // NHAY khi kiem dang duoi dat: NHAC MANH len theo da nhay — 11, ton 2
-            nhacJ: { T: 24, hit: 6, ton: 2, tonDu: 1, dmg: 11, het: 'lung', cho: 14, keys: [[0.3, -0.5, 28, 12, 'out'], [1, -1.85, 16, 4, 'io']],
+            nhacJ: { T: 24, hit: 6, ton: 2, tonDu: 1, dmg: 9, het: 'lung', cho: 14, keys: [[0.3, -0.5, 28, 12, 'out'], [1, -1.85, 16, 4, 'io']],
                      hop: [-20, 168, 116, 40], day: 16, am: 200 },
             nhacN: { T: 24, hit: 6, ton: 0, dmg: 9, het: 'lung', cho: 16, keys: [[0.3, -0.5, 28, 12, 'out'], [1, -1.85, 16, 4, 'io']],
                      hop: [-20, 164, 110, 40], am: 280 },
             roi:   { T: 22, hit: 12, ton: 1, dmg: 7, het: 'datNeu', keys: [[0.3, -0.4, 26, 10, 'out'], [0.55, 1.77, 31, 20, 'in'], [1, 1.77, 31, 20]],
                      hop: [-10, 158, 40, 0], xuong: 1, am: 110 },
-            dam2:  { T: 16, hit: 5, ton: 0, dmg: 5, het: 'dat', keys: [[0.3, 1.6, 42, 22, 'out'], [0.7, 1.6, 42, 22], [1, 1.77, 31, 20, 'io']],
+            dam2:  { T: 16, hit: 5, ton: 0, dmg: 10, het: 'dat', keys: [[0.3, 1.6, 42, 22, 'out'], [0.7, 1.6, 42, 22], [1, 1.77, 31, 20, 'io']],
                      hop: [0, 186, 8, 0], am: 420 },
             // ngang: [het lay da, het vung, bat dau thu, nghieng mat phang (am = chech len)]
-            ngang: { T: 30, hit: 13, ton: 3, dmg: 10, het: 'lung', cho: 14, ngang: [0.25, 0.5, 0.62, 0], lao: 15, hop: [-80, 212, 44, 6], day: 44, pha: 1, am: 90 },
+            ngang: { T: 30, hit: 13, ton: 3, dmg: 9, het: 'lung', cho: 14, ngang: [0.25, 0.5, 0.62, 0], lao: 15, hop: [-80, 212, 44, 6], day: 44, pha: 1, am: 90 },
             // Vong thu hai cua Hoanh Tao: rong hon, nam ngang hon, +1. Khong ton them the luc — nhat dau da tieu het 3.
-            ngang2:{ T: 20, hit: 7, ton: 0, dmg: 11, het: 'lung', cho: 10, ngang: [0.08, 0.36, 0.5, 0], lao: 6, hop: [-120, 280, 22, 4], day: 28, pha: 1, am: 74 },
+            ngang2:{ T: 20, hit: 7, ton: 0, dmg: 9, het: 'lung', cho: 10, ngang: [0.08, 0.36, 0.5, 0], lao: 6, hop: [-120, 280, 22, 4], day: 28, pha: 1, am: 74 },
             // K 0.5s: THU kiem ra sau mot chut roi DAM XUYEN, lao xa bang mot cu luot; hop di theo nguoi suot doan lao
             dam:   { T: 30, hit: 12, ton: 1, dmg: 8, het: 'lung', cho: 12, keys: [[0.33, 1.42, 2, 18, 'io'], [0.42, 1.6, 52, 22, 'in'], [0.72, 1.6, 50, 22], [1, -1.85, 16, 4, 'io']],
                      hop: [-20, 184, 10, 0], keoDai: 13, day: 12, laoLuc: 33, am: 360 },
@@ -68313,8 +68320,8 @@ class PulsarCloneBoss {
             dk.A.rEx = (them && them.reach) || 0; dk.A.bonus = 0;
             if (typeof bzBat === 'function' && bzBat(ng) && (dk.tamThem || 0) > 0 && kieu !== 'bzRut') dk.A.rEx += BZ_TAM_THEM;
             // Liet Dia Tram dang cam kiem da: huy CA thanh kiem, +10 thay vi an 1 luot da thuong.
-            if (m.song && dk.da > 0){
-                dk.A.daVo = true; dk.A.bonus = 10; dk.da = 0;
+            if ((m.song || kieu === 'nhayDap' || kieu === 'ngang') && dk.da > 0){
+                dk.A.daVo = true; dk.A.bonus = m.song ? 10 : (kieu === 'ngang' ? DK_NGANG_VO_BONUS : 0); dk.da = 0;   // 'quet', 'nhayDap', Dash J ('ngang') PHA kiem da (huy ca thanh kiem)
             } else if (m.dmg > 0 && dk.da > 0){
                 let luot = DK_DA_N - dk.da + 1;
                 dk.A.daLuot = luot;
@@ -68357,6 +68364,7 @@ class PulsarCloneBoss {
         function dkRaDon(ng, A){
             let m = A.m, d = dkDir(ng);
             dkHopDon(ng, A);
+            if (A.kieu === 'ngang' && A.daVo && !A._muiBay){ A._muiBay = 1; dkMuiDaPhong(ng, A); }     // Dash J + kiem da: phong mui da
             if (ng && ng.id === 1 && m.hop && (((A.them && A.them.dmg) || m.dmg || 0) > 0 || (A.bonus || 0) > 0)){
                 ng._dtDonSeq = (ng._dtDonSeq || 0) + 1;
                 ng._dtDon = { seq: ng._dtDonSeq, atk: {
@@ -68586,10 +68594,61 @@ class PulsarCloneBoss {
                 if (A.pt >= 22) dkXong(ng, A);
             }
         }
+        // PHA KIEM DA (K 1.5s khi dang cam Dai Cu Kiem Thach): kiem da vo, mui da nhon trong len tu mat dat, hat tung moi ke dich trong tam
+        // (dkHatLen: hat 1 than roi roi xuong choang) va gay DK_DAP_VO_DMG sat thuong (khong cong them 16 cua cu dap thuong).
+        let dkMuiDa = [];
+        let dkMuiBay = [];
+        function dkMuiDaPhong(ng, A){
+            let d = dkDir(ng), s = ng.getFormScale ? ng.getFormScale() : 1;
+            let x0 = ng.x + ng.w / 2 + d * 46 * s, y0 = ng.y + ng.h * 0.55, gan = new Set();
+            for (let o of dkDs()){                                            // ke dich SAT (<= 4cm tu diem phong): dinh ca 4 mui
+                if (!o || !(o.hp > 0) || dkLaVatCan(o) || o.invulnAll || !dkLaQuai(o)) continue;
+                let ow = o.w || 20, ex = d > 0 ? o.x - x0 : x0 - (o.x + ow);
+                let vy = Math.abs((o.y + (o.h || 20) / 2) - y0);
+                if (ex <= DK_MUI_GAN && ex > -ow - 12 && vy <= (o.h || 20) / 2 + 26) gan.add(o);
+            }
+            [[-0.26, 1], [-0.09, 0], [0.09, 0], [0.26, 1]].forEach(([ang, ngoai], idx) =>      // 2 cheo len (goc am), 2 cheo xuong; tua nhe, khong bay thang
+                dkMuiBay.push({ x: x0, y: y0, vx: Math.cos(ang) * 13 * d, vy: Math.sin(ang) * 13, ang, d, t: 0, T: 17, ngoai, idx, gan, hit: new Set(), ng }));
+            hitDat(x0, y0, d > 0 ? 1 : 0, [141, 134, 127]);
+            dkChu(ng.x - 22, ng.y - 44, "ĐÁ VỠ! MŨI ĐÁ!", "STONE BREAK!");
+            dkSfx(90, 0.4, 'sawtooth', 0.26, 40); dkSfx(260, 0.15, 'square', 0.16, 80);
+        }
+        function dkMuiBayHit(M){
+            for (let o of dkDs()){
+                if (!o || !(o.hp > 0) || M.hit.has(o) || dkLaVatCan(o) || o.invulnAll || !dkLaQuai(o)) continue;
+                let hit = false;
+                if (M.gan.has(o)) hit = M.t >= 1 + M.idx;                            // sat: ca 4 mui deu dinh (so le 1 khung)
+                else if (!M.ngoai){                                                   // xa: chi 2 mui giua, theo duong bay
+                    let ow = o.w || 20, oh = o.h || 20;
+                    hit = M.x > o.x - 14 && M.x < o.x + ow + 14 && M.y > o.y - 8 && M.y < o.y + oh + 8;
+                }
+                if (hit){ M.hit.add(o); dkDanh(o, DK_MUI_BAY_DMG); hitDat(o.x + (o.w || 20) / 2, M.y, M.d > 0 ? 1 : 0, [179, 136, 255]); }
+            }
+        }
+        function dkNhayDapVoDa(ng, A, cx, gy){
+            let R = DK_DAP_VO_R * (ng.getFormScale ? Math.max(1, ng.getFormScale() * 0.9) : 1);
+            let jc = (A.them && A.them.jc) || 0;
+            let dmgVo = jc >= DK_JC_DMG.length ? DK_DAP_VO_MAX : DK_DAP_VO_DMG + dkCong(A);          // J toi da: 65; khong thi 50 (+4 / +7 neu co J moc 1 / 2)
+            dkHop(ng, -R, R, 170, 18, dmgVo, A.set, o => {
+                if (dkLaVatCan(o) || o.invulnAll) return;
+                if (!dkLaQuai(o) && gameState !== 'pvp') return;
+                dkHatLen(o, (o.x + (o.w || 20) / 2 >= cx) ? 1 : -1, DK_DAP_VO_CAO, 8);
+                dkChu(o.x, o.y - 24, "MŨI ĐÁ!", "STONE SPIKE!");
+            });
+            for (let i = -5; i <= 5; i++){
+                dkMuiDa.push({ x: cx + i * (R / 5.2), y: gy, h: 74 + Math.random() * 36 - Math.abs(i) * 3, w: 24 + Math.random() * 8,
+                               lean: Math.sign(i) * 0.18, delay: Math.abs(i) * 2, t: 0, T: 50 });
+            }
+            hitDat(cx - 50, gy, 0, [141, 134, 127]); hitDat(cx + 50, gy, 1, [141, 134, 127]); hitDat(cx, gy, 1, [179, 136, 255]);
+            shakeTimer = Math.max(shakeTimer || 0, 40);
+            dkChu(cx - 40, gy - 118, "ĐÁ VỠ! MŨI ĐÁ!", "STONE BREAK!");
+            dkSfx(50, 0.7, 'sawtooth', 0.34, 22); dkSfx(180, 0.3, 'square', 0.2, 60);
+        }
         function dkNhayDapDap(ng, A){
             let cx = ng.x + ng.w / 2, gy = dkChan(ng), rEx = A.rEx || 0;
             let R = 130 + rEx, dmg = (A.them.dmg || DK_DAP_DMG) + (A.bonus || 0) + dkCong(A);
-            dkHop(ng, -R, R, 120, 14, dmg, A.set, o => {
+            if (A.daVo) dkNhayDapVoDa(ng, A, cx, gy);                          // dang cam kiem da: PHA kiem da -> mui da nhon hat tung
+            else dkHop(ng, -R, R, 120, 14, dmg, A.set, o => {
                 if (dkLaVatCan(o) || o.invulnAll) return;
                 if (!dkLaQuai(o) && gameState !== 'pvp') return;
                 o._uFreeze = Math.max(o._uFreeze || 0, 60);
@@ -70243,6 +70302,11 @@ class PulsarCloneBoss {
             for (let i = dkVong.length - 1; i >= 0; i--) if (++dkVong[i].t >= dkVong[i].T) dkVong.splice(i, 1);
             for (let i = dkSongTron.length - 1; i >= 0; i--) if (++dkSongTron[i].t >= dkSongTron[i].T) dkSongTron.splice(i, 1);
             for (let i = dkNut.length - 1; i >= 0; i--) if (++dkNut[i].t >= dkNut[i].T) dkNut.splice(i, 1);
+            for (let i = dkMuiDa.length - 1; i >= 0; i--) if (++dkMuiDa[i].t >= dkMuiDa[i].T) dkMuiDa.splice(i, 1);
+            for (let i = dkMuiBay.length - 1; i >= 0; i--){
+                let M = dkMuiBay[i]; M.t++; M.x += M.vx; M.y += M.vy; dkMuiBayHit(M);
+                if (M.t >= M.T) dkMuiBay.splice(i, 1);
+            }
             for (let i = dkVo.length - 1; i >= 0; i--) if (++dkVo[i].t >= dkVo[i].T) dkVo.splice(i, 1);
             // VUNG TRUNG TRONG LUC: 0.5 giay keo moi ke dich xung quanh vao tam (boss bi keo yeu hon)
             for (let i = dkTrong.length - 1; i >= 0; i--){
@@ -70885,6 +70949,44 @@ class PulsarCloneBoss {
         }
         function dkVeThem(){
             let f = (typeof frames !== 'undefined' ? frames : 0);
+            // MUI DA PHONG RA (Dash J + kiem da): 4 mui da nhon bay choe ve phia truoc, de lai vet mo
+            for (const M of dkMuiBay){
+                let a = Math.min(1, (M.T - M.t) / 5), dirA = M.d > 0 ? M.ang : Math.PI - M.ang;
+                for (let k = 3; k >= 0; k--){
+                    ctx.save();
+                    ctx.translate(M.x - M.vx * k * 0.9, M.y - M.vy * k * 0.9); ctx.rotate(dirA);
+                    ctx.globalAlpha = a * (k === 0 ? 1 : 0.28 / k);
+                    let g = ctx.createLinearGradient(0, -5, 0, 5); g.addColorStop(0, '#a39d94'); g.addColorStop(1, '#4a454c');
+                    ctx.fillStyle = g; ctx.strokeStyle = '#2a2230'; ctx.lineWidth = 1.2; ctx.lineJoin = 'round';
+                    ctx.beginPath(); ctx.moveTo(26, 0); ctx.lineTo(4, -5.5); ctx.lineTo(-10, -3.2); ctx.lineTo(-14, 0); ctx.lineTo(-10, 3.2); ctx.lineTo(4, 5.5); ctx.closePath(); ctx.fill(); ctx.stroke();
+                    if (k === 0){
+                        ctx.shadowBlur = 6; ctx.shadowColor = '#B388FF'; ctx.strokeStyle = 'rgba(179,136,255,0.95)'; ctx.lineWidth = 1.3;
+                        ctx.beginPath(); ctx.moveTo(-8, 0); ctx.lineTo(0, -1.5); ctx.lineTo(8, 0.5); ctx.stroke();
+                    }
+                    ctx.restore();
+                }
+            }
+            // MUI DA NHON (pha kiem da): trong len tu mat dat tu tam ra ngoai, dung 1 luc roi chim xuong
+            for (const M of dkMuiDa){
+                let t = M.t - M.delay; if (t < 0) continue;
+                let up = Math.min(1, t / 5), out = M.T - M.delay, fade = t > out - 12 ? Math.max(0, (out - t) / 12) : 1;
+                let H = M.h * (1 - Math.pow(1 - up, 3)), W = M.w;
+                if (H < 2) continue;
+                ctx.save(); ctx.translate(M.x, M.y); ctx.globalAlpha = fade;
+                ctx.fillStyle = 'rgba(120,112,104,' + (0.5 * fade).toFixed(2) + ')';                      // bui o chan mui da
+                ctx.beginPath(); ctx.ellipse(0, 1, W * 0.9, 4, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.transform(1, 0, -M.lean, 1, 0, 0);
+                let g = ctx.createLinearGradient(-W / 2, 0, W / 2, 0);
+                g.addColorStop(0, '#a39d94'); g.addColorStop(0.55, '#7a7570'); g.addColorStop(1, '#4a454c');
+                ctx.fillStyle = g; ctx.strokeStyle = '#2a2230'; ctx.lineWidth = 1.4; ctx.lineJoin = 'round';
+                ctx.beginPath(); ctx.moveTo(-W / 2, 2); ctx.lineTo(-W * 0.34, -H * 0.5); ctx.lineTo(-W * 0.12, -H * 0.58); ctx.lineTo(0, -H);
+                ctx.lineTo(W * 0.16, -H * 0.55); ctx.lineTo(W * 0.36, -H * 0.42); ctx.lineTo(W / 2, 2); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.save(); ctx.shadowBlur = 7; ctx.shadowColor = '#B388FF'; ctx.strokeStyle = 'rgba(179,136,255,' + (0.9 * fade).toFixed(2) + ')'; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.moveTo(-1, -2); ctx.lineTo(3, -H * 0.3); ctx.lineTo(-2, -H * 0.55); ctx.lineTo(1, -H * 0.8); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(3, -H * 0.3); ctx.lineTo(W * 0.25, -H * 0.4); ctx.stroke();
+                ctx.restore();
+                ctx.restore();
+            }
             // vong bao cho dap (TRONG LUC TRAM): di theo nguoi choi khi bam A / D
             for (let ng of dkNguoi()){
                 let dk = ng.dk, A = dk && dk.A;
@@ -75346,10 +75448,10 @@ class PulsarCloneBoss {
                         T(!thieu.length, 'Lo Lung: 9 loai dan moi deu co don rieng khi nha K tren khong', thieu.join(','));
                         // @@VK-DAIKIEM
                         T(ammoToiDa(DK_DAN) === (typeof hasRune === 'function' && hasRune('berserk') ? 6 : 3) && giaoLaCanChien(DK_DAN) && chargeTiersCua(DK_DAN).length === 5
-                          && DK_M.chem.dmg === 7 && DK_M.nhac.dmg === 7 && DK_M.nhacN.dmg === 9 && DK_M.dam2.dmg === 5
-                          && DK_M.ngang.dmg === 10 && DK_M.ngang.ton === 3 && DK_M.dam.dmg === 8 && DK_M.cheo.dmg === 10 && DK_M.quet.dmg === 10
-                          && DK_M.nhayDap.dmg === 12 && DK_M.da.dmg === 0 && DK_JC_DMG.join() === '12,16,20' && DK_JC_CM.join() === '3,5,7',
-                          'Dai kiem: 3 the luc, can chien, 5 moc K; J 7 / nhac 7 / nhay 9 / dam 5 / luot J 10 (3) / K 8-10-10');
+                          && DK_M.chem.dmg === 13 && DK_M.nhac.dmg === 13 && DK_M.nhacJ.dmg === 9 && DK_M.nhacN.dmg === 9 && DK_M.dam2.dmg === 10
+                          && DK_M.ngang.dmg === 9 && DK_M.ngang2.dmg === 9 && DK_M.ngang.ton === 3 && DK_M.dam.dmg === 8 && DK_M.cheo.dmg === 10 && DK_M.quet.dmg === 8
+                          && DK_M.nhayDap.dmg === 16 && DK_DAP_VO_DMG === 50 && DK_DAP_VO_MAX === 65 && DK_NGANG_VO_BONUS === 10 && DK_MUI_BAY_DMG === 4 && DK_M.da.dmg === 0 && DK_JC_DMG.join() === '12,16,20' && DK_JC_CM.join() === '3,5,7',
+                          'Dai kiem: 3 the luc, can chien, 5 moc K; J 13 / nhac 13 / nhay 9 / dam 10 / luot JJ 9+9 (3) / K 8-16 (da 50) / J max da 65');
                         bosses.length = 0; bossProjectiles.length = 0;
                         runeSlots = ['bulletclash', null];
                         let v = new BossProjectile(510, 210, 0, 0); bossProjectiles.push(v);
@@ -79491,17 +79593,17 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '-Vung chậm lúc đầu rồi giáng xuống rất nhanh. Tầm xa. Đi lại và nhảy chậm như Búa (85%), kiếm dưới đất còn chậm hơn.',
                 '-MA PHÁP TRỌNG LỰC: mọi nhát chém (và sóng) trúng kẻ đang bay đều ghim nó rơi xuống đất 0.75 giây — đứa nào bay thì đứa đó chết.',
                 '#ĐÒN J',
-                '-J (trên lưng): CHÉM XUỐNG. 7 sát thương, tốn 1. Kiếm cắm lại dưới đất.',
-                '-J (dưới đất): NHẤC KIẾM bằng lực — đẩy kiếm nhích lên trước (mặt đất nứt), khựng lại rồi mới giật lên: chém hất lên 7 sát thương, không tốn thể lực, hồi khá chậm trước nhát kế.',
-                '-Lướt khi kiếm dưới đất, hoặc lướt giữa nhát chém xuống khi kiếm đã vung: ĐÂM, 5 sát thương, ra gần như ngay.',
-                '-NHẢY khi kiếm dưới đất: BẠT SƠN — nhấc mạnh kiếm lên theo đà nhảy, 11 sát thương, tốn 2 (còn 1 thể lực vẫn ra đòn).',
+                '-J (trên lưng): CHÉM XUỐNG. 13 sát thương, tốn 1. Kiếm cắm lại dưới đất.',
+                '-J (dưới đất): NHẤC KIẾM bằng lực — đẩy kiếm nhích lên trước (mặt đất nứt), khựng lại rồi mới giật lên: chém hất lên 13 sát thương, không tốn thể lực, hồi khá chậm trước nhát kế.',
+                '-Lướt khi kiếm dưới đất, hoặc lướt giữa nhát chém xuống khi kiếm đã vung: ĐÂM, 10 sát thương, ra gần như ngay.',
+                '-NHẢY khi kiếm dưới đất: BẠT SƠN — nhấc mạnh kiếm lên theo đà nhảy, 9 sát thương, tốn 2 (còn 1 thể lực vẫn ra đòn).',
                 '-Nhảy J (kiếm dưới đất, đã ở trên không): HỒI KIẾM — nhấc kiếm về lưng trên không, 9 sát thương. Nhảy J (trên lưng): bổ xuống 7.',
-                '-Lướt J: HOÀNH TẢO — lao tới xoay một vòng, 10 sát thương, đẩy lùi, PHÁ đòn lao của địch. Tốn 3. Bấm J thêm một vòng nữa, nhưng hai nhát bị cách một nhịp ngắn: vòng sau rộng hơn, nằm ngang hơn, 11 sát thương, không tốn thêm.',
+                '-Lướt J: HOÀNH TẢO — lao tới xoay một vòng, 9 sát thương, đẩy lùi, PHÁ đòn lao của địch (chỉ choáng 0.1 giây). Đang cầm kiếm đá: nhát đầu PHÁ kiếm đá (+10 thay vì +5) và phóng 4 mũi đá nhọn chéo (2 lên, 2 xuống), mỗi mũi 4; địch sát dưới 4cm dính cả 4, xa hơn chỉ dính 2 mũi giữa. Tốn 3. Bấm J thêm một vòng nữa, nhưng hai nhát bị cách một nhịp ngắn: vòng sau rộng hơn, nằm ngang hơn, 9 sát thương (tổng 18), không tốn thêm.',
                 '-GIỮ J rồi THẢ = TÍCH LỰC KIẾM KHÍ: một thanh kiếm năng lượng khổng lồ bọc lấy thanh kiếm gốc ở mốc 0.5s / 1s / 1.5s, dài thêm 3 / 5 / 7 cm. Nhát chém tung ra gây 12 / 16 / 20 sát thương (áp dụng cho J, nhấc kiếm, bổ trên không và Lướt J; vẫn tốn thể lực như đòn thường). Chạm J nhanh thì đánh như thường.',
                 '#TÍCH LỰC [K] — tối đa 3s (180f)',
                 '>0.5s (30f) — LIỆT ĐỊA TRẢM — hạ thẳng kiếm từ trên lưng xuống đất SAU LƯNG rồi vung từ dưới vòng lên ngược chiều kim đồng hồ như Lưỡi hái chém hất (chậm → nhanh), mũi kiếm miết nứt đất: chém 8 + chém khí 8 bay dọc mặt đất. Sóng là lưỡi kiếm khí trong suốt; 3 mốc Charge J làm lưỡi hiện rõ dần, mốc cuối là lưỡi vuốt răng. Nếu đang có Đại Cự Kiếm đá, sóng thành các cột đá đâm chéo dính liền, HỦY luôn kiếm đá, cả vung lẫn sóng +10 sát thương, địch bị hất lên đúng một thân rồi choáng 1.5 giây khi chạm đất. Đứng yên. Tốn 2.',
                 '>1s (60f) — TRỌNG ẤN — cắm kiếm, kiếm sáng tím, vòng tím co lại vào kiếm: MỌI kẻ đang bay bị kéo xuống đất 4 giây, không bay được. 2-3 sát thương tuỳ cỡ boss. Trong 1 giây đầu MỌI kẻ địch bị PHONG ẤN: chiêu đang tung bị huỷ, không tung được chiêu mới. Tốn 2.',
-                '>1.5s (90f) — TRỌNG LỰC TRẢM — thu lực rồi NHẢY VỌT lên cao, khựng một nhịp giữa trời rồi giáng thẳng xuống. Trên không bấm A / D để CHỌN VÙNG ĐÁP (vòng ma thuật dưới chân báo trước chỗ rơi). Chạm đất: 12 sát thương quanh điểm đáp và CHOÁNG 1 giây, rồi mở VÙNG TRŨNG TRỌNG LỰC 0.5 giây kéo mọi kẻ địch xung quanh vào tâm. Kiếm cắm lại dưới đất. Tốn 2.',
+                '>1.5s (90f) — TRỌNG LỰC TRẢM — thu lực rồi NHẢY VỌT lên cao, khựng một nhịp giữa trời rồi giáng thẳng xuống. Trên không bấm A / D để CHỌN VÙNG ĐÁP (vòng ma thuật dưới chân báo trước chỗ rơi). Chạm đất: 16 sát thương quanh điểm đáp và CHOÁNG 1 giây (đang cầm kiếm đá thì PHÁ kiếm đá: các mũi đá nhọn trồi lên hất tung kẻ địch, 50 sát thương thay cho 16, còn 65 nếu đã nạp sẵn Charge J tối đa), rồi mở VÙNG TRŨNG TRỌNG LỰC 0.5 giây kéo mọi kẻ địch xung quanh vào tâm. Kiếm cắm lại dưới đất. Tốn 2.',
                 '>2s (120f) — ĐẠI CỰ KIẾM THẠCH — cắm kiếm xuống, dùng ma thuật trọng lực hút đất đá quanh người bọc thành một thanh ĐẠI CỰ KIẾM bằng đá nứt ánh tím. 5 đòn đánh kế tiếp: +5 sát thương và tầm đánh dài thêm (cả đòn J tích lực). HUD hiện số đòn còn lại. Đứng yên khi cắm. Tốn 2.',
                 '>2.5s (150f) — BÁT MÔN — hào quang đỏ 4.5 giây: VÔ HẠN THỂ LỰC, vung nhanh hơn ~25%, hồi nhanh hơn, đi lại thoải mái hơn.',
                 '#CHANNEL — ĐỊA CHẤN ẤN (giữ K từ 3s)',
@@ -79993,17 +80095,17 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '-Swings start slow then crash down fast. Long reach. Walks and jumps slowly like the Hammer (85%), slower still with the blade down.',
                 '-GRAVITY MAGIC: every cut (and wave) that hits a flying enemy pins it to the ground for 0.75s — whoever flies, dies.',
                 '#J ATTACKS',
-                '-J (on back): DOWNWARD CHOP. 7 damage, costs 1. The blade stays in the ground.',
-                '-J (blade down): HEAVE — pry the blade up a little first (the ground cracks), a beat, then rip it up: 7-damage rising cut, free, but slow to recover.',
-                '-Dash with the blade down: STAB with the tip, 5 damage.',
-                '-JUMP with the blade down: UPHEAVAL — rip the sword up with the jump, 11 damage, costs 2 (still works on 1 stamina).',
+                '-J (on back): DOWNWARD CHOP. 13 damage, costs 1. The blade stays in the ground.',
+                '-J (blade down): HEAVE — pry the blade up a little first (the ground cracks), a beat, then rip it up: 13-damage rising cut, free, but slow to recover.',
+                '-Dash with the blade down: STAB with the tip, 10 damage.',
+                '-JUMP with the blade down: UPHEAVAL — rip the sword up with the jump, 9 damage, costs 2 (still works on 1 stamina).',
                 '-Jump J (blade down, already airborne): RECOVER — heave it back onto your back in mid-air, 9 damage. Jump J (on back): falling chop 7.',
-                '-Dash J: CLEAVE — lunge into a brutal horizontal swing, 10 damage, knockback, BREAKS enemy rushes (and blocks contact hits). Costs 3.',
+                '-Dash J: CLEAVE — lunge into a brutal horizontal swing, 9 damage (second swing 9, total 18), knockback, only a 0.1s stun, BREAKS enemy rushes. With the stone sword active the first swing BREAKS it (+10 instead of +5) and fires 4 sharp stone spikes diagonally (2 up, 2 down), 4 damage each; enemies closer than 4cm take all 4, farther ones only the 2 middle spikes (and blocks contact hits). Costs 3.',
                 '-HOLD J then RELEASE = BLADE AURA: a huge energy sword wraps the original blade at 0.5s / 1s / 1.5s, 3 / 5 / 7 cm longer. The strike you release deals 12 / 16 / 20 damage (works for J, Heave, the aerial chop and Dash J; stamina cost unchanged). A quick tap J attacks as usual.',
                 '#CHARGE [K] — max 3s (180f)',
                 '>0.5s (30f) — EARTH-RENDER — lower the blade straight from your back to the ground BEHIND you, then swing it up from below counter-clockwise like the Scythe\'s rising cut (slow → fast), the tip scraping and cracking the ground: 8 slash + an 8-damage energy crescent along the ground. The crescent is a transparent energy blade; the 3 Charge J tiers make it manifest further, and the last tier is a toothed claw. With the stone colossus sword active, the wave becomes linked diagonal stone pillars, the stone sword is destroyed, both hits gain +10, and enemies are launched up one body then stunned 1.5s on landing. Stand still. Costs 2.',
                 '>1s (60f) — GRAVITY SEAL — plant the sword; it glows purple and a purple ring collapses into it: EVERY flying enemy is dragged to the ground for 4s and cannot fly. 2-3 damage by boss size. For the first second EVERY enemy is SEALED: the move in progress is cancelled and no new move can start. Costs 2.',
-                '>1.5s (90f) — GRAVITY CRASH — wind up, LEAP high, hang for a beat, then slam straight down. Press A / D in the air to CHOOSE YOUR LANDING (a magic ring under your feet shows where you will land). On impact: 12 damage around the landing point, then a GRAVITY WELL opens for 0.5s and drags every nearby enemy into its centre. The sword stays in the ground. Costs 2.',
+                '>1.5s (90f) — GRAVITY CRASH — wind up, LEAP high, hang for a beat, then slam straight down. Press A / D in the air to CHOOSE YOUR LANDING (a magic ring under your feet shows where you will land). On impact: 16 damage around the landing point (with the stone sword active it BREAKS the stone sword: sharp stone spikes erupt and launch enemies into the air, 50 damage instead of 16, or 65 if a max-tier J charge is stored), then a GRAVITY WELL opens for 0.5s and drags every nearby enemy into its centre. The sword stays in the ground. Costs 2.',
                 '>2s (120f) — STONE COLOSSUS — plant the sword and pull the surrounding earth in with gravity magic, wrapping the blade in a giant cracked stone sword with purple fissures. Your next 5 attacks deal +5 damage and reach further (charged J strikes included). The HUD shows attacks left. You stand still while planting. Costs 2.',
                 '>2.5s (150f) — EIGHT GATES — red aura for 4.5s: INFINITE STAMINA, ~25% faster swings, quicker recovery, freer movement.',
                 '#CHANNEL — QUAKE SEAL (hold K from 3s)',
