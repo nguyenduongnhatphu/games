@@ -68608,7 +68608,7 @@ class PulsarCloneBoss {
                 if (ex <= DK_MUI_GAN && ex > -ow - 12 && vy <= (o.h || 20) / 2 + 26) gan.add(o);
             }
             [[-0.26, 1], [-0.09, 0], [0.09, 0], [0.26, 1]].forEach(([ang, ngoai], idx) =>      // 2 cheo len (goc am), 2 cheo xuong; tua nhe, khong bay thang
-                dkMuiBay.push({ x: x0, y: y0, vx: Math.cos(ang) * 13 * d, vy: Math.sin(ang) * 13, ang, d, t: 0, T: 17, ngoai, idx, gan, hit: new Set(), ng }));
+                dkMuiBay.push({ x: x0, y: y0, vx: Math.cos(ang) * 13 * d, vy: Math.sin(ang) * 13, ang, d, t: 0, T: 220, ngoai, idx, gan, hit: new Set(), ng }));
             hitDat(x0, y0, d > 0 ? 1 : 0, [141, 134, 127]);
             dkChu(ng.x - 22, ng.y - 44, "ĐÁ VỠ! MŨI ĐÁ!", "STONE BREAK!");
             dkSfx(90, 0.4, 'sawtooth', 0.26, 40); dkSfx(260, 0.15, 'square', 0.16, 80);
@@ -70305,7 +70305,10 @@ class PulsarCloneBoss {
             for (let i = dkMuiDa.length - 1; i >= 0; i--) if (++dkMuiDa[i].t >= dkMuiDa[i].T) dkMuiDa.splice(i, 1);
             for (let i = dkMuiBay.length - 1; i >= 0; i--){
                 let M = dkMuiBay[i]; M.t++; M.x += M.vx; M.y += M.vy; dkMuiBayHit(M);
-                if (M.t >= M.T) dkMuiBay.splice(i, 1);
+                // bay thang ra khoi map roi moi bien mat (khong con gioi han tam)
+                let bR = (typeof worldR === 'function' ? Math.max(worldR(), canvas.width) : canvas.width) + 140;
+                let bL = (typeof worldL === 'function' ? Math.min(worldL(), 0) : 0) - 140;
+                if (M.t >= M.T || M.x < bL || M.x > bR || M.y < -260 || M.y > canvas.height + 160) dkMuiBay.splice(i, 1);
             }
             for (let i = dkVo.length - 1; i >= 0; i--) if (++dkVo[i].t >= dkVo[i].T) dkVo.splice(i, 1);
             // VUNG TRUNG TRONG LUC: 0.5 giay keo moi ke dich xung quanh vao tam (boss bi keo yeu hon)
@@ -79598,7 +79601,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '-Lướt khi kiếm dưới đất, hoặc lướt giữa nhát chém xuống khi kiếm đã vung: ĐÂM, 10 sát thương, ra gần như ngay.',
                 '-NHẢY khi kiếm dưới đất: BẠT SƠN — nhấc mạnh kiếm lên theo đà nhảy, 9 sát thương, tốn 2 (còn 1 thể lực vẫn ra đòn).',
                 '-Nhảy J (kiếm dưới đất, đã ở trên không): HỒI KIẾM — nhấc kiếm về lưng trên không, 9 sát thương. Nhảy J (trên lưng): bổ xuống 7.',
-                '-Lướt J: HOÀNH TẢO — lao tới xoay một vòng, 9 sát thương, đẩy lùi, PHÁ đòn lao của địch (chỉ choáng 0.1 giây). Đang cầm kiếm đá: nhát đầu PHÁ kiếm đá (+10 thay vì +5) và phóng 4 mũi đá nhọn chéo (2 lên, 2 xuống), mỗi mũi 4; địch sát dưới 4cm dính cả 4, xa hơn chỉ dính 2 mũi giữa. Tốn 3. Bấm J thêm một vòng nữa, nhưng hai nhát bị cách một nhịp ngắn: vòng sau rộng hơn, nằm ngang hơn, 9 sát thương (tổng 18), không tốn thêm.',
+                '-Lướt J: HOÀNH TẢO — lao tới xoay một vòng, 9 sát thương, đẩy lùi, PHÁ đòn lao của địch (chỉ choáng 0.1 giây). Đang cầm kiếm đá: nhát đầu PHÁ kiếm đá (+10 thay vì +5) và phóng 4 mũi đá nhọn chéo (2 lên, 2 xuống) bay thẳng ra khỏi map, mỗi mũi 4; địch sát dưới 4cm dính cả 4, xa hơn chỉ dính 2 mũi giữa. Tốn 3. Bấm J thêm một vòng nữa, nhưng hai nhát bị cách một nhịp ngắn: vòng sau rộng hơn, nằm ngang hơn, 9 sát thương (tổng 18), không tốn thêm.',
                 '-GIỮ J rồi THẢ = TÍCH LỰC KIẾM KHÍ: một thanh kiếm năng lượng khổng lồ bọc lấy thanh kiếm gốc ở mốc 0.5s / 1s / 1.5s, dài thêm 3 / 5 / 7 cm. Nhát chém tung ra gây 12 / 16 / 20 sát thương (áp dụng cho J, nhấc kiếm, bổ trên không và Lướt J; vẫn tốn thể lực như đòn thường). Chạm J nhanh thì đánh như thường.',
                 '#TÍCH LỰC [K] — tối đa 3s (180f)',
                 '>0.5s (30f) — LIỆT ĐỊA TRẢM — hạ thẳng kiếm từ trên lưng xuống đất SAU LƯNG rồi vung từ dưới vòng lên ngược chiều kim đồng hồ như Lưỡi hái chém hất (chậm → nhanh), mũi kiếm miết nứt đất: chém 8 + chém khí 8 bay dọc mặt đất. Sóng là lưỡi kiếm khí trong suốt; 3 mốc Charge J làm lưỡi hiện rõ dần, mốc cuối là lưỡi vuốt răng. Nếu đang có Đại Cự Kiếm đá, sóng thành các cột đá đâm chéo dính liền, HỦY luôn kiếm đá, cả vung lẫn sóng +10 sát thương, địch bị hất lên đúng một thân rồi choáng 1.5 giây khi chạm đất. Đứng yên. Tốn 2.',
@@ -80100,7 +80103,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 '-Dash with the blade down: STAB with the tip, 10 damage.',
                 '-JUMP with the blade down: UPHEAVAL — rip the sword up with the jump, 9 damage, costs 2 (still works on 1 stamina).',
                 '-Jump J (blade down, already airborne): RECOVER — heave it back onto your back in mid-air, 9 damage. Jump J (on back): falling chop 7.',
-                '-Dash J: CLEAVE — lunge into a brutal horizontal swing, 9 damage (second swing 9, total 18), knockback, only a 0.1s stun, BREAKS enemy rushes. With the stone sword active the first swing BREAKS it (+10 instead of +5) and fires 4 sharp stone spikes diagonally (2 up, 2 down), 4 damage each; enemies closer than 4cm take all 4, farther ones only the 2 middle spikes (and blocks contact hits). Costs 3.',
+                '-Dash J: CLEAVE — lunge into a brutal horizontal swing, 9 damage (second swing 9, total 18), knockback, only a 0.1s stun, BREAKS enemy rushes. With the stone sword active the first swing BREAKS it (+10 instead of +5) and fires 4 sharp stone spikes diagonally (2 up, 2 down) that fly off the map, 4 damage each; enemies closer than 4cm take all 4, farther ones only the 2 middle spikes (and blocks contact hits). Costs 3.',
                 '-HOLD J then RELEASE = BLADE AURA: a huge energy sword wraps the original blade at 0.5s / 1s / 1.5s, 3 / 5 / 7 cm longer. The strike you release deals 12 / 16 / 20 damage (works for J, Heave, the aerial chop and Dash J; stamina cost unchanged). A quick tap J attacks as usual.',
                 '#CHARGE [K] — max 3s (180f)',
                 '>0.5s (30f) — EARTH-RENDER — lower the blade straight from your back to the ground BEHIND you, then swing it up from below counter-clockwise like the Scythe\'s rising cut (slow → fast), the tip scraping and cracking the ground: 8 slash + an 8-damage energy crescent along the ground. The crescent is a transparent energy blade; the 3 Charge J tiers make it manifest further, and the last tier is a toothed claw. With the stone colossus sword active, the wave becomes linked diagonal stone pillars, the stone sword is destroyed, both hits gain +10, and enemies are launched up one body then stunned 1.5s on landing. Stand still. Costs 2.',
