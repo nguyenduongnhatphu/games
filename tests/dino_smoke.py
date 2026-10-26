@@ -123,9 +123,32 @@ with sync_playwright() as p:
  reset();dino.grounded=false;K();if(dino.dante.attack?.id!=='air')throw Error('air K');step(30);
  reset();doDash(1);K();if(dino.dante.attack?.id!=='dash')throw Error('dash K');step(30);
  reset();danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();if(dino.dante.attack?.id!=='meteor')throw Error('charged K');step(40);
- if(dino.dante.rounds.filter(q=>q.kind==='meteor').length!==3)throw Error('Red Hot Night must create 3 meteors');
+ if(faustState(dino.dante).meteors.length!==3)throw Error('Red Hot Night must create 3 meteors');
  reset();const meteorTarget=target(520,265);danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();step(95);
  if(meteorTarget.hp!==176)throw Error('meteors must actually hit '+meteorTarget.hp);
+ // Each growing meteor blast hits once; targets outside the radius remain safe.
+ reset();const epicentre=target(520,265),edge=target(610,275,10,10),outside=target(730,275);
+ danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();step(95);
+ if(epicentre.hp!==176||edge.hp!==190||outside.hp!==200)throw Error('meteor AoE radii / repeated damage '+[epicentre.hp,edge.hp,outside.hp]);
+ reset();const moving=target(520,265);danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();moving.x+=300;step(95);
+ if(moving.hp!==200)throw Error('meteor target position must stay locked');
+ // Red Shot is a finite, piercing, aimed ranged attack with three charge tiers.
+ for(const left of [false,true])for(const charge of [30,60,90]){
+  reset(left);const front=target(left?200:600,270),far=target(left?0:800,270),behind=target(left?550:290,270);
+  keys.KeyS=true;danteKey('KeyK',false);step(charge);keys.KeyK=false;danteRelease();keys.KeyS=false;
+  if(dino.dante.attack?.id!=='beam')throw Error('charged ranged branch');
+  step(42);const expected=3*(charge===90?8:charge===60?6:4);
+  if(front.hp!==200-expected||far.hp!==200-expected||behind.hp!==200)throw Error('piercing beam damage/direction '+[left,charge,front.hp,far.hp,behind.hp]);
+ }
+ reset();doDash(1);danteKey('KeyJ',false);if(dino.dante.attack?.id!=='beam')throw Error('dash J ranged');keys.KeyJ=false;step(42);
+ reset();danteKey('KeyJ',false);step(25);const orbTarget=target(630,270);doDash(1);
+ if(faustState(dino.dante).spears.length!==6||faustState(dino.dante).orbit)throw Error('orbit release');
+ keys.KeyJ=false;step(70);if(orbTarget.hp>=200||faustState(dino.dante).spears.length)throw Error('homing damage/expiry');
+ reset();K();step(24);const flight=faustState(dino.dante).hat; // Existing recall still works after new ranged moves.
+ if(!flight)throw Error('hat flight regression');
+ reset();danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();step(16);dino.invincible=false;dino.takeDamage(1);step(80);
+ if(faustState(dino.dante).meteors.length||faustState(dino.dante).lock)throw Error('cancelled meteor cleanup');
+ reset();keys.KeyS=true;K();step(10);if(!dino.dante.body._faustLegs||!faustState(dino.dante).swings.length)throw Error('melee motion/trail missing');
  reset();danteKey('KeyJ',false);step(25);danteKey('KeyE',false);
  if(dino.dante.arm!==0||faustState(dino.dante).orbit)throw Error('orbit not cleaned on switch');
  reset();danteKey('KeyJ',false);step(25);dino.invincible=false;dino.takeDamage(1);
@@ -135,7 +158,7 @@ with sync_playwright() as p:
  reset();paused=true;danteKey('KeyJ',false);if(dino.dante.attack)throw Error('paused Faust attack');
  reset();danteKey('KeyJ',false);step(25);gameOver=true;faustTick();if(faustState(dino.dante).orbit)throw Error('gameover orbit');
  reset();danteKey('KeyJ',false);step(25);paused=true;
- return 'tap/hold J, ring cadence, both hat passes, recall, 3-hit melee, air/dash, meteors, interruption and cleanup passed';
+ return 'gunfire/orbit, swept melee, 3 ranged charge tiers, homing release, meteor AoE/position lock and interruption passed';
  }"""))
  pg.evaluate("()=>{paused=false;gameState='custom_menu';drawCustomMenu();}")
  pg.screenshot(path='/tmp/faust-menu.png')
