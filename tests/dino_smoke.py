@@ -58,6 +58,43 @@ with sync_playwright() as p:
  for(let i=0;i<5;i++)danteTick();danteKey('KeyE',false);
  if(p.arm!==5||p.attack)throw Error('weapon cancel');return true;
  }"""))
+ # Actual press/dash sequences, with player physics and bounded escape windows.
+ print('dash combos',pg.evaluate("""()=>{
+ const results=[];
+ function reset(left=false){
+  for(const k of Object.keys(keys))delete keys[k];startGame('normal');paused=false;
+  dino.x=400;dino.y=260;dino.grounded=true;dino.isFacingLeft=left;dino.dante.arm=4;
+  const target={x:left?270:510,y:260,w:36,h:60,hp:100,maxHp:100,dy:0,takeDamage(d){this.hp-=d;}};
+  enemies.push(target);return target;
+ }
+ function step(count){for(let i=0;i<count;i++){frames++;dino.update();danteTick();}}
+ for(const left of [false,true]){
+  const dir=left?-1:1;let t=reset(left);doDash(dir);danteKey('KeyJ',false);
+  if(dino.dante.attack?.id!=='stinger')throw Error('dash J');keys.KeyJ=false;step(32);
+  if(t.hp>=100)throw Error('Gun Stinger missed nearby target');results.push(['stinger',left,t.hp]);
+  t=reset(left);danteKey('KeyJ',false);step(1);keys.KeyJ=false;doDash(dir);danteKey('KeyJ',false);keys.KeyJ=false;
+  if(dino.dante.attack?.id!=='slide')throw Error('J dash J');step(40);
+  if((dino.x+dino.w/2-t.x-t.w/2)*dir<=0||t.hp>=98||dino.isFacingLeft===left)throw Error('slide must cross, turn and hit');
+  if(dino.invincible)throw Error('slide grants permanent invulnerability');results.push(['slide',left,t.hp]);
+  reset(left);doDash(dir);danteKey('KeyK',false);
+  if(dino.dante.attack?.id!=='fireworks')throw Error('dash K');keys.KeyK=false;step(34);
+  reset(left);danteKey('KeyK',false);step(5);doDash(dir);
+  if(dino.dante.attack?.id!=='vault'||dino.dante.k!==null)throw Error('K dash');
+  keys.KeyK=false;danteRelease();
+  let sent=false;for(let i=0;i<30;i++){step(1);if(dino.dante.attack?.sent){sent=true;break;}}
+  const fan=dino.dante.rounds.filter(q=>q.kind==='bullet');
+  if(!sent||fan.length!==12||!fan.every(q=>Number.isFinite(q.vx)&&Number.isFinite(q.vy)))throw Error('vault fan');
+  step(48);results.push(['vault',left]);
+ }
+ reset();enemies.length=0;danteKey('KeyK',false);doDash(1);keys.KeyK=false;step(48);
+ if(dino.dante.attack||!Number.isFinite(dino.y))throw Error('no-target vault');
+ reset();dashCd=20;danteKey('KeyK',false);doDash(1);
+ if(dino.dante.attack?.id==='vault'||dino.dante.k===null)throw Error('failed dash consumed charge');
+ reset();doDash(1);frames+=25;dashVx=0;danteKey('KeyJ',false);
+ if(dino.dante.attack?.id!=='shot')throw Error('expired dash input');
+ reset();doDash(1);paused=true;danteKey('KeyJ',false);
+ if(dino.dante.attack)throw Error('paused combo');return results;
+ }"""))
  # Old Devil Arms still start and draw their own attacks.
  for arm in [0,1,2,3,5]:
   pg.evaluate(f"()=>{{startGame('normal');paused=true;dino.dante.arm={arm};danteKey('KeyJ',false);for(let i=0;i<35;i++){{danteTick();danteDraw(dino);}}}}")
@@ -67,4 +104,4 @@ with sync_playwright() as p:
  pg.evaluate("startGame('pvp')");assert pg.evaluate('!danteOn()&&!dino.dante')
  pg.evaluate("()=>{xDatForm(0);startGame('normal');}");assert pg.evaluate('!dino.dante')
  assert not errors,errors
- print('PASS syntax, reload/start, 7 pistol branches, real damage, 10 form menus, live input, restart modes and PvP exclusion');b.close()
+ print('PASS syntax, reload/start, 7 pistol branches, directional dash combos, real damage, 10 form menus, live input, restart modes and PvP exclusion');b.close()
