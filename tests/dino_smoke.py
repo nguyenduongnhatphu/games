@@ -28,7 +28,7 @@ with sync_playwright() as p:
  pg.wait_for_timeout(500);assert pg.evaluate('_loiKhung.size===0')
  # Test each contextual branch without RAF advancing between assertions.
  result=pg.evaluate('''()=>{
- paused=true;const results=[];const reset=()=>{for(const k of Object.keys(keys))delete keys[k];dino.dante.attack=null;dino.dante.cd=0;dino.dante.rounds=[];dino.dante.arm=4;dino.grounded=true;dino.dante.style=1;combatStance=0;};
+ paused=true;const results=[];const reset=()=>{for(const k of Object.keys(keys))delete keys[k];dino.dante.attack=null;dino.dante.swapReady=0;dino.dante.nextSwap=0;dino.dante.cd=0;dino.dante.rounds=[];dino.dante.arm=4;dino.grounded=true;dino.dante.style=1;combatStance=0;};
  function run(special,charge,expected){eiCommand(special,charge);const a=dino.dante.attack;if(!a||a.id!==expected)throw Error('expected '+expected);for(let i=0;i<EI_MOVES[expected].T;i++)eiTick();const q=dino.dante.rounds;if(!q.length)throw Error('no shots');results.push([expected,q.length,q.every(r=>Number.isFinite(r.vx)&&Number.isFinite(r.vy))]);return q;}
  reset();run(false,0,'shot');reset();let q=run(true,0,'twosome');if(!(q.some(r=>r.vx>0)&&q.some(r=>r.vx<0)))throw Error('both directions');
  reset();keys.KeyS=true;run(true,0,'honeycomb');reset();dino.grounded=false;dino.dante.ebony.rainUsed=false;q=run(true,0,'rain');if(!q.every(r=>r.vy>0))throw Error('rain must shoot down');
@@ -105,31 +105,31 @@ with sync_playwright() as p:
  function K(){danteKey('KeyK',false);keys.KeyK=false;danteRelease();}
  for(const left of [false,true]){
   reset(left);const t=target(left?300:490,270);danteKey('KeyJ',false);keys.KeyJ=false;step(12);
-  if(t.hp!==198)throw Error('Faust tap must shoot one 2-damage bullet');
+  if(Math.abs(t.hp-198.4)>1e-6)throw Error('Faust tap must shoot one 2-damage bullet');
   reset(left);const ringTarget=target(415,345,10,10);danteKey('KeyJ',false);step(120);
   const f=faustState(dino.dante),damage=200-ringTarget.hp;
   if(!f.orbit||damage<=0||damage>20)throw Error('orbit damage/cadence '+damage);
   keys.KeyJ=false;step(1);if(f.orbit)throw Error('release J did not stop orbit');
   const hp=ringTarget.hp;step(36);if(ringTarget.hp!==hp)throw Error('orbit damages after release');
   reset(left);const hatTarget=target(left?300:500,265);K();if(dino.dante.attack?.id!=='throw')throw Error('K throw');step(90);
-  if(faustState(dino.dante).hat||hatTarget.hp!==190)throw Error('hat must hit once per pass and return '+hatTarget.hp);
+  if(faustState(dino.dante).hat||Math.abs(hatTarget.hp-192)>1e-6)throw Error('hat must hit once per pass and return '+hatTarget.hp);
  }
- reset();K();step(24);if(!faustState(dino.dante).hat)throw Error('missing thrown hat');
+ reset();K();step(FAUST_MOVES.throw.T);if(!faustState(dino.dante).hat)throw Error('missing thrown hat');
  const h=faustState(dino.dante).hat,burstTarget=target(h.x-8,h.y-8);K();if(dino.dante.attack?.id!=='trick')throw Error('hat recall');step(6);
  if(burstTarget.hp>=200||!faustState(dino.dante).hat?.returning)throw Error('Hat Trick burst');step(100);if(faustState(dino.dante).hat)throw Error('hat stuck');
  reset();const melee=target(450,270);keys.KeyS=true;
  for(const id of ['slash','slash','upper']){K();if(dino.dante.attack?.id!==id)throw Error('down K combo');step(FAUST_MOVES[id].T);}
- if(melee.hp!==183||melee.dy!==-9)throw Error('melee cadence / launch '+melee.hp);
+ if(Math.abs(melee.hp-186.4)>1e-6||!melee._dswControl?.air)throw Error('melee cadence / launch '+melee.hp);
  reset();dino.grounded=false;K();if(dino.dante.attack?.id!=='air')throw Error('air K');step(30);
  reset();doDash(1);K();if(dino.dante.attack?.id!=='dash')throw Error('dash K');step(30);
  reset();danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();if(dino.dante.attack?.id!=='meteor')throw Error('charged K');step(40);
  if(faustState(dino.dante).meteors.length!==3)throw Error('Red Hot Night must create 3 meteors');
  reset();const meteorTarget=target(520,265);danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();step(95);
- if(meteorTarget.hp!==156)throw Error('meteors must actually hit '+meteorTarget.hp);
+ if(Math.abs(meteorTarget.hp-164.8)>1e-6)throw Error('meteors must actually hit '+meteorTarget.hp);
  // Each growing meteor blast hits once; targets outside the radius remain safe.
  reset();const epicentre=target(520,265),edge=target(610,275,10,10),outside=target(730,275);
  danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();step(95);
- if(epicentre.hp!==156||edge.hp!==174||outside.hp!==200)throw Error('meteor AoE radii / repeated damage '+[epicentre.hp,edge.hp,outside.hp]);
+ if(Math.abs(epicentre.hp-164.8)>1e-6||Math.abs(edge.hp-179.2)>1e-6||outside.hp!==200)throw Error('meteor AoE radii / repeated damage '+[epicentre.hp,edge.hp,outside.hp]);
  reset();const moving=target(520,265);danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();moving.x+=300;step(95);
  if(moving.hp!==200)throw Error('meteor target position must stay locked');
  // Red Shot is a finite, piercing, aimed ranged attack with three charge tiers.
@@ -137,8 +137,8 @@ with sync_playwright() as p:
   reset(left);const front=target(left?200:600,270),far=target(left?0:800,270),behind=target(left?550:290,270);
   keys.KeyS=true;danteKey('KeyK',false);step(charge);keys.KeyK=false;danteRelease();keys.KeyS=false;
   if(dino.dante.attack?.id!=='beam')throw Error('charged ranged branch');
-  step(42);const expected=3*(charge===90?10:charge===60?8:5);
-  if(front.hp!==200-expected||far.hp!==200-expected||behind.hp!==200)throw Error('piercing beam damage/direction '+[left,charge,front.hp,far.hp,behind.hp]);
+  step(42);const expected=.8*3*(charge===90?10:charge===60?8:5);
+  if(Math.abs(front.hp-(200-expected))>1e-6||Math.abs(far.hp-(200-expected))>1e-6||behind.hp!==200)throw Error('piercing beam damage/direction '+[left,charge,front.hp,far.hp,behind.hp]);
  }
  reset();doDash(1);danteKey('KeyJ',false);if(dino.dante.attack?.id!=='beam')throw Error('dash J ranged');keys.KeyJ=false;step(42);
  reset();danteKey('KeyJ',false);step(25);const orbTarget=target(630,270);doDash(1);
@@ -153,7 +153,7 @@ with sync_playwright() as p:
  if(dino.dante.arm!==0||faustState(dino.dante).orbit)throw Error('orbit not cleaned on switch');
  reset();danteKey('KeyJ',false);step(25);dino.invincible=false;dino.takeDamage(1);
  if(dino.hp!==9||faustState(dino.dante).orbit)throw Error('damage must interrupt orbit');
- reset();dino.dante.dt=120;const dtTarget=target(490,270);danteKey('KeyJ',false);keys.KeyJ=false;step(12);if(dtTarget.hp!==196)throw Error('Faust DT bonus');
+ reset();dino.dante.dt=120;const dtTarget=target(490,270);danteKey('KeyJ',false);keys.KeyJ=false;step(12);if(Math.abs(dtTarget.hp-196.8)>1e-6)throw Error('Faust DT bonus');
  reset();K();step(17);danteKey('KeyE',false);if(faustState(dino.dante).hat)throw Error('hat persists after switching');
  reset();paused=true;danteKey('KeyJ',false);if(dino.dante.attack)throw Error('paused Faust attack');
  reset();danteKey('KeyJ',false);step(25);gameOver=true;faustTick();if(faustState(dino.dante).orbit)throw Error('gameover orbit');
