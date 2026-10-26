@@ -28,12 +28,12 @@ with sync_playwright() as p:
  pg.wait_for_timeout(500);assert pg.evaluate('_loiKhung.size===0')
  # Test each contextual branch without RAF advancing between assertions.
  result=pg.evaluate('''()=>{
- paused=true;const results=[];const reset=()=>{for(const k of Object.keys(keys))delete keys[k];dino.dante.attack=null;dino.dante.cd=0;dino.dante.rounds=[];dino.dante.arm=4;dino.grounded=true;combatStance=0;};
+ paused=true;const results=[];const reset=()=>{for(const k of Object.keys(keys))delete keys[k];dino.dante.attack=null;dino.dante.cd=0;dino.dante.rounds=[];dino.dante.arm=4;dino.grounded=true;dino.dante.style=1;combatStance=0;};
  function run(special,charge,expected){eiCommand(special,charge);const a=dino.dante.attack;if(!a||a.id!==expected)throw Error('expected '+expected);for(let i=0;i<EI_MOVES[expected].T;i++)eiTick();const q=dino.dante.rounds;if(!q.length)throw Error('no shots');results.push([expected,q.length,q.every(r=>Number.isFinite(r.vx)&&Number.isFinite(r.vy))]);return q;}
  reset();run(false,0,'shot');reset();let q=run(true,0,'twosome');if(!(q.some(r=>r.vx>0)&&q.some(r=>r.vx<0)))throw Error('both directions');
  reset();keys.KeyS=true;run(true,0,'honeycomb');reset();dino.grounded=false;dino.dante.ebony.rainUsed=false;q=run(true,0,'rain');if(!q.every(r=>r.vy>0))throw Error('rain must shoot down');
  dino.dante.cd=0;dino.dante.attack=null;eiCommand(true,0);if(dino.dante.attack.id==='rain')throw Error('infinite hover');
- reset();q=run(true,45,'charge');if(!q.every(r=>r.damage===6&&r.kind==='ei-charge'))throw Error('charge damage');reset();combatStance=1;run(true,0,'twin');
+ reset();q=run(true,45,'charge');if(!q.every(r=>r.damage===8&&r.kind==='ei-charge'))throw Error('charge damage');reset();danteSetStyle(2);run(true,0,'twin');
  reset();dino.isFacingLeft=true;q=run(false,0,'shot');if(!q.every(r=>r.vx<0))throw Error('left facing');dino.isFacingLeft=false;
  return results;
 }''');print('E&I contextual moves:',result)
@@ -108,11 +108,11 @@ with sync_playwright() as p:
   if(t.hp!==198)throw Error('Faust tap must shoot one 2-damage bullet');
   reset(left);const ringTarget=target(415,345,10,10);danteKey('KeyJ',false);step(120);
   const f=faustState(dino.dante),damage=200-ringTarget.hp;
-  if(!f.orbit||damage<=0||damage>10)throw Error('orbit damage/cadence '+damage);
+  if(!f.orbit||damage<=0||damage>20)throw Error('orbit damage/cadence '+damage);
   keys.KeyJ=false;step(1);if(f.orbit)throw Error('release J did not stop orbit');
   const hp=ringTarget.hp;step(36);if(ringTarget.hp!==hp)throw Error('orbit damages after release');
   reset(left);const hatTarget=target(left?300:500,265);K();if(dino.dante.attack?.id!=='throw')throw Error('K throw');step(90);
-  if(faustState(dino.dante).hat||hatTarget.hp!==192)throw Error('hat must hit once per pass and return '+hatTarget.hp);
+  if(faustState(dino.dante).hat||hatTarget.hp!==190)throw Error('hat must hit once per pass and return '+hatTarget.hp);
  }
  reset();K();step(24);if(!faustState(dino.dante).hat)throw Error('missing thrown hat');
  const h=faustState(dino.dante).hat,burstTarget=target(h.x-8,h.y-8);K();if(dino.dante.attack?.id!=='trick')throw Error('hat recall');step(6);
@@ -125,11 +125,11 @@ with sync_playwright() as p:
  reset();danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();if(dino.dante.attack?.id!=='meteor')throw Error('charged K');step(40);
  if(faustState(dino.dante).meteors.length!==3)throw Error('Red Hot Night must create 3 meteors');
  reset();const meteorTarget=target(520,265);danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();step(95);
- if(meteorTarget.hp!==176)throw Error('meteors must actually hit '+meteorTarget.hp);
+ if(meteorTarget.hp!==156)throw Error('meteors must actually hit '+meteorTarget.hp);
  // Each growing meteor blast hits once; targets outside the radius remain safe.
  reset();const epicentre=target(520,265),edge=target(610,275,10,10),outside=target(730,275);
  danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();step(95);
- if(epicentre.hp!==176||edge.hp!==190||outside.hp!==200)throw Error('meteor AoE radii / repeated damage '+[epicentre.hp,edge.hp,outside.hp]);
+ if(epicentre.hp!==156||edge.hp!==174||outside.hp!==200)throw Error('meteor AoE radii / repeated damage '+[epicentre.hp,edge.hp,outside.hp]);
  reset();const moving=target(520,265);danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();moving.x+=300;step(95);
  if(moving.hp!==200)throw Error('meteor target position must stay locked');
  // Red Shot is a finite, piercing, aimed ranged attack with three charge tiers.
@@ -137,7 +137,7 @@ with sync_playwright() as p:
   reset(left);const front=target(left?200:600,270),far=target(left?0:800,270),behind=target(left?550:290,270);
   keys.KeyS=true;danteKey('KeyK',false);step(charge);keys.KeyK=false;danteRelease();keys.KeyS=false;
   if(dino.dante.attack?.id!=='beam')throw Error('charged ranged branch');
-  step(42);const expected=3*(charge===90?8:charge===60?6:4);
+  step(42);const expected=3*(charge===90?10:charge===60?8:5);
   if(front.hp!==200-expected||far.hp!==200-expected||behind.hp!==200)throw Error('piercing beam damage/direction '+[left,charge,front.hp,far.hp,behind.hp]);
  }
  reset();doDash(1);danteKey('KeyJ',false);if(dino.dante.attack?.id!=='beam')throw Error('dash J ranged');keys.KeyJ=false;step(42);
@@ -164,6 +164,78 @@ with sync_playwright() as p:
  pg.screenshot(path='/tmp/faust-menu.png')
  pg.evaluate("()=>{startGame('normal');dino.dante.arm=5;}")
  pg.keyboard.down('j');pg.wait_for_timeout(600);assert pg.evaluate('faustState(dino.dante).orbit===1');pg.screenshot(path='/tmp/faust-orbit.png');pg.keyboard.up('j');pg.wait_for_timeout(60);assert pg.evaluate('faustState(dino.dante).orbit===0')
+ # Four Dante styles: fixed phantom damage, output rounds, actual guard collision routes,
+ # movement thresholds/solids, and preservation of the original Dino controller.
+ print('Dante styles',pg.evaluate("""()=>{
+ function reset(style=1){for(const k of Object.keys(keys))delete keys[k];xDatForm(9);startGame('normal');paused=false;dino.x=300;dino.y=260;dino.grounded=true;dino.isFacingLeft=false;dino.dante.arm=4;danteSetStyle(style);}
+ function enemy(x=450,y=260){const o={x,y,w:40,h:60,hp:1000,maxHp:1000,dy:0,grounded:true,facingLeft:true,state:'idle',lastMeleeHit:-1,name:'TEST',takeDamage(d){this.hp-=d;}};enemies.push(o);return o;}
+ function tick(count){for(let i=0;i<count;i++){frames++;danteTick();}}
+ const result=[];
+ for(const [rank,count] of [[0,1],[1,1],[2,2],[3,2],[4,3],[5,3],[6,4]]){
+  reset(0);styleRankIdx=rank;dino.dante.dt=60;const o=enemy();danteHit(dino.dante,o,2);
+  if(o.hp!==998-count||danteStyleState(dino.dante).swords.length!==count)throw Error('Swordmaster rank '+rank+': '+o.hp);
+ }
+ result.push('phantom ranks / exact 1 damage / no DT recursion');
+ for(const style of [0,1,2,3]){
+  reset(style);eiCommand(false,0);eiTick();const q=dino.dante.rounds[0];
+  if(q.damage!==(style===1?2:1)||q.color!==danteBulletColor(dino.dante))throw Error('E&I base/GS output');
+  reset(style);dino.dante.arm=5;faustCommand(false,0);faustTick();const r=dino.dante.rounds[0];
+  if(r.damage!==(style===1?2:1)||r.color!==danteBulletColor(dino.dante))throw Error('Faust base/GS output');
+ }
+ for(const style of [1,2]){
+  reset(style);dino.dante.arm=5;faustCommand(true,60);tick(49);
+  if(faustState(dino.dante).meteors.length!==(style===1?4:3))throw Error('Gunslinger extra meteor');
+ }
+ result.push('ranged base 1 / red GS 2 / extra meteor');
+ reset(2);const boss=enemy(344);enemies.length=0;bosses.push(boss);boss.state='charging';danteKey('KeyL',false);
+ checkCollisions();const s=danteStyleState(dino.dante),stored=Math.max(1,Math.round(parryDamage(boss,true)*.5));
+ if(s.bank!==stored||dino.shieldCd!==0||dino.hp!==10)throw Error('perfect melee rush guard '+s.bank);
+ frames++;checkCollisions();if(s.bank!==stored)throw Error('same rush credited twice');
+ keys.KeyL=false;danteKey('KeyL',false);
+ const shot={x:dino.x+dino.w+3,y:dino.y+15,w:6,h:6,dmg:3,vx:-5,vy:0};bossProjectiles.push(shot);checkCollisions();
+ if(bossProjectiles.includes(shot)||s.bank!==stored*2||dino.hp!==10||dino.shieldCd!==0)throw Error('perfect projectile guard');
+ tick(8);const old=s.bank;bossProjectiles.push({x:dino.x+dino.w+3,y:dino.y+15,w:6,h:6,dmg:3});checkCollisions();
+ if(s.bank!==old)throw Error('late block must not store');
+ tick(30);dino.invincible=false;dino.takeDamage(1);if(dino.hp!==9)throw Error('guard never expired');
+ reset(2);enemy();danteKey('KeyL',false);tick(8);const state=danteStyleState(dino.dante);dino.takeDamage(2);
+ if(state.bank!==0||state.guardReady===frames)throw Error('normal block reset cooldown');
+ reset(2);const customBoss=enemy();danteKey('KeyL',false);parry();const customBank=danteStyleState(dino.dante).bank;frames++;parry();
+ if(customBank<=0||danteStyleState(dino.dante).bank!==customBank)throw Error('shared boss parry / sustained contact');
+ reset(2);enemy();danteKey('KeyL',false);bossProjectiles.push({x:dino.x+10,y:dino.y+15,w:8,h:8,dmg:2,isPiercing:true});checkCollisions();
+ if(dino.hp!==10||danteStyleState(dino.dante).bank<=0)throw Error('perfect piercing guard');
+ reset(2);enemy();danteKey('KeyL',false);tick(8);dino.invincible=false;bossProjectiles.push({x:dino.x+10,y:dino.y+15,w:8,h:8,dmg:2,isPiercing:true});checkCollisions();
+ if(dino.hp!==8||danteStyleState(dino.dante).bank!==0)throw Error('late piercing block should fail');
+ // Dash L releases the stored amount once to one enemy; switching cannot leave a stuck action.
+ reset(2);const target=enemy(365),other=enemy(380);danteStyleState(dino.dante).bank=40;doDash(1);danteKey('KeyL',false);tick(22);
+ if(target.hp!==960||other.hp!==1000||danteStyleState(dino.dante).bank!==0)throw Error('Royal Release exact damage / one target');
+ danteStyleState(dino.dante).bank=20;dashCd=0;doDash(1);danteKey('KeyL',false);danteKey('KeyO',false);
+ if(dino.dante.attack?.royal||dino.isShielding())throw Error('release/guard leaked after switching');
+ result.push('perfect melee/projectile, no duplicate, cooldown/expiry, exact release');
+ reset(3);const t=enemy(440);const start=dino.x;doDash(1);
+ if(dashVx<30||afterimages.length)throw Error('Trickster dash range / Dino decoy leak');
+ dino.x=355;tick(1);if(dino.x<=t.x+t.w||!dino.isFacingLeft||danteStyleState(dino.dante).ghosts.length<2)throw Error('dash cross-behind');
+ reset(3);enemy(500);keys.KeyS=true;danteKey('Space',false);
+ if(dino.x>=500||dino.x<=400||!dino.invincible||dino.invTimer<8)throw Error('down jump front teleport');
+ const x=dino.x;danteKey('Space',false);if(dino.x!==x)throw Error('teleport cooldown');
+ reset(3);const wallTarget=enemy(500);platforms.push({x:435,w:50,top:200,h:150,pillar:true});keys.KeyS=true;danteKey('Space',false);
+ if(dino.x!==300)throw Error('teleport into solid');
+ reset(3);const near=enemy(500);doDash(1);dino.x=near.x-dino.w-2*CM;tick(1);if(dino.x!==near.x-dino.w-2*CM)throw Error('2cm threshold must be strict');
+ reset(0);doDash(1);if(dashVx>23)throw Error('Trickster range leaked to Swordmaster');
+ result.push('Trickster ghosts, 2cm threshold, front/back teleports, i-frames and solids');
+ reset(1);for(let i=0;i<4;i++){danteKey('KeyO',false);}if(danteStyle()!==1)throw Error('four-style cycle');
+ danteKey('KeyI',false);if(danteStyle()!==0)throw Error('reverse style cycle');
+ reset(1);dino.dante.arm=5;danteKey('KeyK',false);keys.KeyK=false;danteRelease();spawnTimerCactus=spawnTimerEnemy=99999;
+ const bp={x:dino.x+dino.w+5,y:dino.y+15,w:4,h:4,vx:3,vy:0,dmg:1,update(){this.x+=this.vx;},draw(){}};bossProjectiles.push(bp);
+ const before=stylePoints;loop();if(stylePoints<=before||hitstopTimer!==0)throw Error('Faust near-miss hitch regression '+[stylePoints,before,hitstopTimer]);
+ result.push('Faust graze reward retained without global freeze');
+ const saved=combatStance;gameState='menu';xDatForm(0);if(danteOn())throw Error('exit Dante');
+ currentShieldType=0;startGame('normal');dino.meleeTimer=10;if(!dino.isShielding())throw Error('Dino guard was replaced');
+ return result;
+ }"""))
+ for style in range(4):
+  pg.evaluate(f"()=>{{xDatForm(9);startGame('normal');danteSetStyle({style});}}")
+  pg.wait_for_timeout(80)
+  assert pg.evaluate('_loiKhung.size===0')
  # Old Devil Arms still start and draw their own attacks.
  for arm in [0,1,2,3,5]:
   pg.evaluate(f"()=>{{startGame('normal');paused=true;dino.dante.arm={arm};danteKey('KeyJ',false);for(let i=0;i<35;i++){{danteTick();danteDraw(dino);}}}}")

@@ -86131,6 +86131,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
         const KL_NO_DMG = 2, KL_NO_R = 96;
         let khienLuotHit = new Set(), khienManh = [];
         function khienLuotDmg(){
+            if(typeof danteOn==='function'&&danteOn())return 0;
             let d = 0;
             if (dino.isShielding && dino.isShielding()) d = (combatStance === 2) ? 2 : 1;
             if ((dino.petShieldTimer || 0) > 0) d = Math.max(d, 3);
@@ -87509,6 +87510,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
         //                 rieng TRICKSTER thi phan than thanh loai DAC BIET — 3 mau, 3 giay,
         //                 biet BAN va PARRY duoc mot lan.
         function spawnAfterimage(){
+            if(typeof danteOn==='function'&&danteOn())return;
             let rune = hasRune('afterimg'), trick = (combatStance === 1);
             if (!rune && !trick) return;
             if (afterimgCd > 0 || afterimages.length > 0) return;      // chi 1 phan than cung luc
@@ -95041,6 +95043,7 @@ function checkPvPCollisions() {
                         let _st = b.state || '';
                         let isDashing = _st.includes('dash') || _st.includes('charging') || _st.includes('charge_go') || _st.includes('lunge') || _st.includes('rush') || _st.includes('roll_go') || _st.includes('pounce') || _st.includes('dive_go') || _st.includes('ram') || _st.includes('tackle') || _st === 'swooping' || _st === 'slam_down' || _st === 'slam_fall' || _st.includes('clone_dash');   // MOI don LAO deu parry an dmg
                         let parryDmg = isDashing ? Math.round((parryDamage(b, false) + (dino.bulletDmg||0)) * parryBoost) : 0;
+                        if(typeof danteRoyalShield==='function'&&danteRoyalShield()){if(isDashing)danteGuardContact(b.dmg||b.damage||1,b);b.lastMeleeHit=dino.meleeID;continue;}
                         if (isDashing) parryGainUlt(false);   // chan don lao -> +5% chieu cuoi
 
                         if (b.name === "SPINOSAURUS" && (b.state === 'spin_dash_1' || b.state === 'spin_dash_2')) {
@@ -95132,6 +95135,7 @@ function checkPvPCollisions() {
                     if (typeof voidPhanRa === 'function') voidPhanRa(bx, by, bpV);
                     continue;
                 }
+                if(typeof danteRoyalShield==='function'&&danteRoyalShield()&&checkAABB(shieldHitbox,bpV)&&(!bpV.isPiercing||dantePerfectGuard())){danteGuardContact(bpV.dmg||1,bpV);bossProjectiles.splice(i,1);continue;}
                 if (isShieldActive && checkAABB(shieldHitbox, bpV) && (!bpV.isPiercing || _isPerfect)) {
                     if (_isPerfect) {
                         let tgt = null, bd = 1e9;
@@ -95147,6 +95151,7 @@ function checkPvPCollisions() {
                     } else { visualEffects.push(new Effect(sX, bpV.y, 'parry')); addStyle(6, 'block'); }
                     bossProjectiles.splice(i, 1);
                 } else if (checkAABB(bpV, dino)) {
+                    if(typeof danteRoyalShield==='function'&&danteRoyalShield()&&bpV.isPiercing&&!dantePerfectGuard()){const sg=danteStyleState(dino.dante),until=sg.guardUntil;sg.guardUntil=-100;try{dino.takeDamage(bpV.dmg||1);}finally{sg.guardUntil=until;}bossProjectiles.splice(i,1);continue;}
                     if (bpV.web) { dino.takeDamage(1); dino.webTimer = 45; } else dino.takeDamage(bpV.dmg); bossProjectiles.splice(i, 1);
                 }
             }
@@ -96126,7 +96131,7 @@ function checkPvPCollisions() {
                     if (checkAABB(gb, bp) && !checkAABB(dino, bp)) {
                         let rx = (bp.x + bp.w / 2) - dcx, ry = (bp.y + bp.h / 2) - dcy;
                         if (rx * bp.vx + ry * bp.vy > 0) {
-                            hitstopTimer = 7; grazeFlashTimer = 15; flashKind = 0; grazeX = dcx; grazeY = dcy; dodgeCd = 40;
+                            hitstopTimer = (typeof danteOn==='function'&&danteOn()&&dino.dante?.arm===5)?0:7; grazeFlashTimer = 15; flashKind = 0; grazeX = dcx; grazeY = dcy; dodgeCd = 40;
                             if (!dino.ultActive && ultCharge < 100) ultCharge = Math.min(100, ultCharge + 4);
                             floatingTexts.push(new FloatingText(dino.x - 4, dino.y - 18, "NÉ!")); addStyle(18, 'graze');
                             if (typeof tdNeSatSuon === 'function') tdNeSatSuon();   // @@HE-TUDIA3: ne sat suon = kich Tu Dia
@@ -103344,6 +103349,7 @@ class DantePlayerRig {
             let sway = Math.sin(frames * 0.065) * 2.2 + (b.dashV ? -Math.abs(b.dashV) * 0.45 : 0);
 
             ctx.save();
+            ctx.globalAlpha*=1-(b._trickPhase||0)*.7;
             ctx.translate(cxb, y + 32);
             ctx.scale(dr * (b._swordTurn === undefined ? 1 : b._swordTurn), 1);
             ctx.rotate((b._swordLean || 0)+(b._gunRoll || 0));
@@ -103737,7 +103743,7 @@ function danteTick(){
  if(p.k!==null){if(keys.KeyK)p.k=Math.min(120,p.k+1);else danteRelease();}
  if(p.arm!==0&&p.arm!==1&&p.arm!==2&&p.arm!==3&&p.arm!==5&&keys.KeyJ&&!keys.KeyK&&!p.attack&&p.cd<=0)danteAttack(false,0);
  if(p.dt>0){p.dt--;ultCharge=0;if(++p.regen>=120){p.regen=0;n.hp=Math.min(n.maxHp,n.hp+1);}}
- if(p.attack&&!p.attack.sword&&!p.attack.balrog&&!p.attack.cavaliere&&!p.attack.cerberus&&!p.attack.ebony&&!p.attack.faust){const a=p.attack;a.age++;
+ if(p.attack&&!p.attack.sword&&!p.attack.balrog&&!p.attack.cavaliere&&!p.attack.cerberus&&!p.attack.ebony&&!p.attack.faust&&!p.attack.royal){const a=p.attack;a.age++;
   if(a.kind==='slam'&&!n.grounded){a.age=Math.min(a.age,a.wind);n.dy=Math.max(n.dy,9);}
   if(a.age>=a.wind+1&&(a.age-a.wind-1)%a.interval===0&&a.pulses>0){dantePulse(n,p,a);a.pulses--;}
   if(a.kind==='slam'&&!n.grounded)n.dy=Math.max(n.dy,9);
@@ -103766,7 +103772,7 @@ const danteDamageBase=Player.prototype.takeDamage;Player.prototype.takeDamage=fu
 const danteBusyBase=dojoUltBusy;dojoUltBusy=function(n){return !!(n&&n.dante&&n.dante.dt>0)||danteBusyBase(n);};
 const danteMenuBase=drawCustomMenu;
 drawCustomMenu=function(){danteMenuBase();if(!danteOn())return;ctx.save();ctx.fillStyle='#190e14';ctx.fillRect(24,76,276,452);ctx.fillRect(702,80,272,436);ctx.textAlign='left';ctx.fillStyle='#ff6878';ctx.font='bold 22px Consolas';ctx.fillText('DANTE · 10 HP',38,108);ctx.fillText('DEVIL HUNTER',716,111);ctx.font='12px Consolas';ctx.fillStyle='#eee0df';apexWrap(LT('POWER / RUNE / PHỤ KIỆN: KHÓA\n\nJ: combo · Kiếm: bấm nối nhịp\nK: Drive / giữ K: Overdrive\nCúi K: Round Trip (ném kiếm)\nQ / E: đổi 6 vũ khí\nI / O: Gunslinger / Trickster / RG\nL: khiên · Shift: lướt\nSpace / W: nhảy đôi\nU: Devil Trigger 10 giây\n\nDT: mỗi hit +2 sát thương,\nhồi 1 HP mỗi 2 giây.','POWER / RUNES / ACCESSORIES: LOCKED\n\nJ: combo · Sword: tap to chain\nK: Drive / hold K: Overdrive\nDown K: Round Trip (throw sword)\nQ / E: cycle six weapons\nI / O: Gunslinger / Trickster / RG\nL: shield · Shift: dash\nSpace / W: double jump\nU: Devil Trigger for 10 seconds\n\nDT: +2 damage per hit,\nheal 1 HP every 2 seconds.'),38,145,246,19);apexWrap(LT('KIẾM DEVIL SWORD DANTE\nJJJ: xuống → lên → xoay ngang\nJKKK: xoay 2 → đâm → đâm mạnh\nJ → Nhảy: HIGH TIME\nTrên không JJJJ: 3 chém → bổ\nTrên không K: HELM BREAKER\nDash J: STINGER\nJ Dash: MILLION STAB\nThêm J ×4: 6 / 8 / 10 / 12 / 14\nCúi J: PROP → J ×3 SHREDDER\nK: DRIVE (3 dmg)\nGiữ K 0.75s: OVERDRIVE (3×3)\nCúi K: ROUND TRIP (1 dmg / 15f)\nDash → K liên tục: DANCE MACABRE\nChém thường 3 · đòn mạnh 5\nMillion Stab: 1 dmg mỗi nhát', 'DEVIL SWORD DANTE\nJJJ: down → up → spin\nJKKK: double spin → stabs → thrust\nJ → Jump: HIGH TIME\nAir JJJJ: 3 slashes → slam\nAir K: HELM BREAKER\nDash J: STINGER\nJ Dash: MILLION STAB\nExtra J ×4: 6 / 8 / 10 / 12 / 14\nDown J: PROP → J ×3 SHREDDER\nK: DRIVE (3 dmg)\nHold K 0.75s: OVERDRIVE (3×3)\nDown K: ROUND TRIP (1 dmg / 15f)\nDash → repeat K: DANCE MACABRE\nNormal slash 3 · heavy 5\nMillion Stab: 1 damage per stab'),716,145,248,20);ctx.restore();};
-const danteUIBase=drawUI;drawUI=function(){danteUIBase();if(!danteOn()||!dino||!dino.dante)return;const p=dino.dante;ctx.save();if(dojoMode)ctx.translate(0,15);ctx.fillStyle='#1c1119';ctx.fillRect(10,45,282,144);ctx.textAlign='left';ctx.font='bold 13px Consolas';ctx.fillStyle=DT_ARMS[p.arm].c;ctx.fillText('DANTE · '+DT_ARMS[p.arm].n,20,65);ctx.font='11px Consolas';ctx.fillStyle='#f3dddd';ctx.fillText('Q/E: WEAPON · I/O: '+['GUNSLINGER','TRICKSTER','ROYAL GUARD'][combatStance],20,85);ctx.fillText(p.k!==null?'OVERDRIVE CHARGE: '+Math.min(100,Math.floor(p.k/45*100))+'%':p.attack?p.attack.name:'J: COMBO · K: DRIVE · S+K: ROUND TRIP',20,105);ctx.fillStyle='#55313b';ctx.fillRect(20,133,250,8);ctx.fillStyle='#ff5166';ctx.fillRect(20,133,250*(p.dt?p.dt/600:Math.min(100,ultCharge)/100),8);ctx.fillStyle='#fff';ctx.fillText(p.dt?'DEVIL TRIGGER '+(p.dt/60).toFixed(1)+'s':'U: DEVIL TRIGGER '+Math.floor(ultCharge)+'%',20,125);ctx.fillText('HP '+Math.ceil(dino.hp)+' / '+dino.maxHp+' · '+LT('KHIÊN ','SHIELD ')+(dino.shieldCd>0?(dino.shieldCd/60).toFixed(1)+'s':LT('SẴN SÀNG','READY')),20,163);ctx.restore();};
+const danteUIBase=drawUI;drawUI=function(){danteUIBase();if(!danteOn()||!dino||!dino.dante)return;const p=dino.dante;ctx.save();if(dojoMode)ctx.translate(0,15);ctx.fillStyle='#1c1119';ctx.fillRect(10,45,282,144);ctx.textAlign='left';ctx.font='bold 13px Consolas';ctx.fillStyle=DT_ARMS[p.arm].c;ctx.fillText('DANTE · '+DT_ARMS[p.arm].n,20,65);ctx.font='11px Consolas';ctx.fillStyle='#f3dddd';ctx.fillText('Q/E: WEAPON · I/O: '+DANTE_STYLES[danteStyle(p)],20,85);ctx.fillText(p.k!==null?'OVERDRIVE CHARGE: '+Math.min(100,Math.floor(p.k/45*100))+'%':p.attack?p.attack.name:'J: COMBO · K: DRIVE · S+K: ROUND TRIP',20,105);ctx.fillStyle='#55313b';ctx.fillRect(20,133,250,8);ctx.fillStyle='#ff5166';ctx.fillRect(20,133,250*(p.dt?p.dt/600:Math.min(100,ultCharge)/100),8);ctx.fillStyle='#fff';ctx.fillText(p.dt?'DEVIL TRIGGER '+(p.dt/60).toFixed(1)+'s':'U: DEVIL TRIGGER '+Math.floor(ultCharge)+'%',20,125);ctx.fillText('HP '+Math.ceil(dino.hp)+' / '+dino.maxHp+' · '+LT('KHIÊN ','SHIELD ')+(dino.shieldCd>0?(dino.shieldCd/60).toFixed(1)+'s':LT('SẴN SÀNG','READY')),20,163);ctx.restore();};
 
 
 // =============================================================================
@@ -107038,8 +107044,8 @@ danteDraw = function(n){
 // EBONY & IVORY: accurate alternating fire and contextual Gunslinger techniques.
 // Timings use the same fixed 60 Hz clock as the other Devil Arms.
 const EI_MOVES={
- shot:{name:'EBONY & IVORY',T:8,shots:[1],damage:2},
- twin:{name:'TWINS',T:16,shots:[1,4],damage:2},
+ shot:{name:'EBONY & IVORY',T:8,shots:[1],damage:1},
+ twin:{name:'TWINS',T:16,shots:[1,4],damage:1},
  charge:{name:'CHARGED SHOT',T:24,shots:[4,8],damage:6},
  twosome:{name:'TWOSOME TIME',T:32,shots:[2,10,18,26],damage:2},
  honeycomb:{name:'HONEYCOMB FIRE',T:44,shots:[4,8,12,16,20,24,28,32,36],damage:1},
@@ -107057,7 +107063,7 @@ function eiCommand(special,charge){
  let id='shot';
  if(special){
   if(charge>=45)id='charge';
-  else if(combatStance===0){
+  else if(danteStyle(p)===1){
    if(!n.grounded&&!e.rainUsed)id='rain';
    else id=down?'honeycomb':'twosome';
   }else id='twin';
@@ -107070,7 +107076,7 @@ function eiCommand(special,charge){
 function eiShoot(n,p,a,angle,hand,damage,charged=false){
  const e=eiState(p),x=n.x+n.w/2+Math.cos(angle)*34+(hand?-9:9),y=n.y+22+Math.sin(angle)*18+(hand?3:-3);
  const speed=charged?21:18;
- p.rounds.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:charged?5:2.5,kind:charged?'ei-charge':'bullet',damage:damage+(p.dt?2:0),life:50,age:0,hit:new Set(),dir:a.dir});
+ p.rounds.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:charged?5:2.5,kind:charged?'ei-charge':'bullet',color:danteBulletColor(p),damage:danteRangedBase(p,charged?damage:1,charged)+(p.dt?2:0),life:50,age:0,hit:new Set(),dir:a.dir});
  e.flash.push({x,y,angle,hand,t:4});
 }
 // Sequences are recorded on real presses and successful dashes, never on auto-fire.
@@ -107129,7 +107135,7 @@ function eiCoyote(n,p,a,angle,damage){
   const dx=o.x+o.w/2-x,dy=o.y+o.h/2-y,d=Math.hypot(dx,dy);
   const spread=Math.atan2(Math.sin(Math.atan2(dy,dx)-angle),Math.cos(Math.atan2(dy,dx)-angle));
   if(d<30||(d<range+o.w/2&&Math.abs(spread)<.48+Math.atan2(o.h/2,Math.max(1,d)))){
-   if(danteHit(p,o,(d<90?damage:Math.ceil(damage*.65))+(p.dt?2:0))>0&&Number.isFinite(o.dy))o.dy=Math.min(o.dy,-3);
+   if(danteHit(p,o,danteRangedBase(p,(d<90?damage:Math.ceil(damage*.65)),true)+(p.dt?2:0))>0&&Number.isFinite(o.dy))o.dy=Math.min(o.dy,-3);
   }
  }
  const e=eiState(p);e.flash.push({x:x+Math.cos(angle)*48,y:y+Math.sin(angle)*48,angle,hand:0,t:6,coyote:true});
@@ -107312,11 +107318,11 @@ function faustCommand(special,charge=0){
  }
  p.attack={faust:true,id,name:FAUST_MOVES[id].name,duration:FAUST_MOVES[id].T,age:0,dir:n.isFacingLeft?-1:1,hit:new Set(),combo:f.combo,charge};p.cd=p.attack.duration;
  if(id==='beam'){const a=p.attack;a.angle=faustAim(n,a.dir);a.power=charge>=90?8:charge>=60?6:4;}
- if(id==='meteor'){const point=faustLock(n,p.attack.dir);f.lock={...point,t:90};p.attack.lock={...point};}
+ if(id==='meteor'){p.attack.gunslinger=danteStyle(p)===1;const point=faustLock(n,p.attack.dir);f.lock={...point,t:90};p.attack.lock={...point};}
  if(special)danteLabel(p.attack.name);
 }
 function faustRound(n,p,angle,damage){
- p.rounds.push({x:n.x+n.w/2+Math.cos(angle)*27,y:n.y+23,vx:Math.cos(angle)*16,vy:Math.sin(angle)*16,r:4,kind:'bullet',color:'#ff556f',damage:damage+(p.dt?2:0),life:65,age:0,hit:new Set()});
+ p.rounds.push({x:n.x+n.w/2+Math.cos(angle)*27,y:n.y+23,vx:Math.cos(angle)*16,vy:Math.sin(angle)*16,r:4,kind:'bullet',color:danteBulletColor(p),damage:danteRangedBase(p,1)+(p.dt?2:0),life:65,age:0,hit:new Set()});
  faustState(p).flash=5;if(SFX.tone)SFX.tone(480,.04,'triangle',.045,150);
 }
 function faustHatShape(x,y,rotation=0,scale=1){
@@ -107369,7 +107375,7 @@ function faustBeam(n,p,a){
  const f=faustState(p),x=n.x+n.w/2,y=n.y+23,length=780,tx=x+Math.cos(a.angle)*length,ty=y+Math.sin(a.angle)*length;
  // Each pulse pierces, but damages each target at most once.
  for(const o of sgTargets(n))if(sgSegmentBox(x,y,tx,ty,o,9)!==null){
-  if(danteHit(p,o,a.power+(p.dt?2:0))>0)faustParticles(f,o.x+o.w/2,o.y+o.h/2,8);
+  if(danteHit(p,o,danteRangedBase(p,a.power,true)+(p.dt?2:0))>0)faustParticles(f,o.x+o.w/2,o.y+o.h/2,8);
  }
  f.beam={x,y,tx,ty,t:7,max:7,power:a.power};faustParticles(f,x,y,12,'#ffd1df');
  dashVx=-a.dir*3;shakeTimer=Math.max(shakeTimer,4);if(SFX.tone)SFX.tone(240,.1,'sawtooth',.07,80);
@@ -107384,8 +107390,8 @@ function faustMeteorTick(n,p,f){
    const x=Math.max(o.x,Math.min(m.tx,o.x+o.w)),y=Math.max(o.y,Math.min(m.ty,o.y+o.h));
    if(Math.hypot(x-m.tx,y-m.ty)<=radius)danteHit(p,o,m.damage+(p.dt?2:0));
   }
-  f.impacts.push({x:m.tx,y:m.ty,t:36,max:36,r:radius,meteor:true});faustParticles(f,m.tx,m.ty,m.index===2?38:22,'#ffad77');
-  shakeTimer=Math.max(shakeTimer,m.index===2?13:7);if(SFX.tone)SFX.tone(m.index===2?65:95,.18,'sawtooth',.1,25);
+  f.impacts.push({x:m.tx,y:m.ty,t:36,max:36,r:radius,meteor:true});faustParticles(f,m.tx,m.ty,m.index>=2?38:22,'#ffad77');
+  shakeTimer=Math.max(shakeTimer,m.index>=2?13:7);if(SFX.tone)SFX.tone(m.index>=2?65:95,.18,'sawtooth',.1,25);
  }
  f.meteors=f.meteors.filter(m=>m.age<36);
 }
@@ -107394,7 +107400,7 @@ function faustSpears(n,p,f){
   q.life--;const oldX=q.x,oldY=q.y;
   if(q.target&&q.target.hp>0){const desired=Math.atan2(q.target.y+q.target.h/2-q.y,q.target.x+q.target.w/2-q.x),diff=Math.atan2(Math.sin(desired-q.angle),Math.cos(desired-q.angle));q.angle+=Math.max(-.12,Math.min(.12,diff));}
   q.x+=Math.cos(q.angle)*16;q.y+=Math.sin(q.angle)*16;
-  for(const o of sgTargets(n))if(sgSegmentBox(oldX,oldY,q.x,q.y,o,5)!==null){danteHit(p,o,3+(p.dt?2:0));faustParticles(f,q.x,q.y,6);q.life=0;break;}
+  for(const o of sgTargets(n))if(sgSegmentBox(oldX,oldY,q.x,q.y,o,5)!==null){danteHit(p,o,danteRangedBase(p,3,true)+(p.dt?2:0));faustParticles(f,q.x,q.y,6);q.life=0;break;}
  }
  f.spears=f.spears.filter(q=>q.life>0);
 }
@@ -107409,7 +107415,7 @@ function faustOrbit(n,p,f){
    const root=o.__goc||o;
    if(f.ringHits.has(root))continue;
    if(sgSegmentBox(cx+Math.cos(b)*radius,cy+Math.sin(b)*radius,x,y,o,5)!==null){
-    f.ringHits.set(root,frames+12);danteHit(p,o,1+(p.dt?2:0));
+    f.ringHits.set(root,frames+12);danteHit(p,o,danteRangedBase(p,1)+(p.dt?2:0));
    }
   }
  }
@@ -107423,7 +107429,7 @@ function faustHatTick(n,p,f){
  const hits=h.returning?h.back:h.out;
  for(const o of sgTargets(n)){
   const root=o.__goc||o;if(hits.has(root))continue;
-  if(sgSegmentBox(oldX,oldY,h.x,h.y,o,16)!==null){hits.add(root);danteHit(p,o,4+(p.dt?2:0));}
+  if(sgSegmentBox(oldX,oldY,h.x,h.y,o,16)!==null){hits.add(root);danteHit(p,o,h.damage+(p.dt?2:0));}
  }
  f.trail.push({x:h.x,y:h.y,t:10});
 }
@@ -107452,10 +107458,10 @@ function faustTick(){
  if(a?.faust){
   a.age++;
   if(a.id==='shot'&&a.age===1)faustRound(n,p,eiAim(n,a.dir),2);
-  if(a.id==='throw'&&a.age===6&&!f.hat)f.hat={x:n.x+n.w/2,y:n.y+18,vx:a.dir*11,vy:0,age:0,returning:false,out:new Set(),back:new Set()};
+  if(a.id==='throw'&&a.age===6&&!f.hat)f.hat={x:n.x+n.w/2,y:n.y+18,vx:a.dir*11,vy:0,age:0,damage:danteRangedBase(p,4,true),returning:false,out:new Set(),back:new Set()};
   if(a.id==='trick'&&a.age===5&&f.hat){
    const h=f.hat;
-   for(const o of sgTargets(n))if(Math.hypot(o.x+o.w/2-h.x,o.y+o.h/2-h.y)<65)danteHit(p,o,6+(p.dt?2:0));
+   for(const o of sgTargets(n))if(Math.hypot(o.x+o.w/2-h.x,o.y+o.h/2-h.y)<65)danteHit(p,o,danteRangedBase(p,6,true)+(p.dt?2:0));
    p.fx.push({x:h.x,y:h.y,dir:1,r:65,kind:'fire',t:14,max:14,col:'#ff6799'});h.returning=true;
   }
   if(['slash','upper','air','dash'].includes(a.id)){
@@ -107464,9 +107470,9 @@ function faustTick(){
    if(a.age>=6&&a.age<=15)faustStrike(n,p,a);
   }
   if(a.id==='beam'&&[12,19,26].includes(a.age))faustBeam(n,p,a);
-  if(a.id==='meteor'&&[18,28,38].includes(a.age)){
+  if(a.id==='meteor'&&(a.gunslinger?[18,28,38,48]:[18,28,38]).includes(a.age)){
    const index=(a.age-18)/10,point=a.lock;
-   f.meteors.push({sx:point.x-a.dir*(150-index*40),sy:Math.min(n.y-310,(typeof camY==='number'?camY:0)-90),x:point.x-a.dir*150,y:n.y-310,tx:point.x,ty:point.y,age:0,index,r:14+index*7,radius:50+index*20,damage:6+index*2});
+   f.meteors.push({sx:point.x-a.dir*(150-index*40),sy:Math.min(n.y-310,(typeof camY==='number'?camY:0)-90),x:point.x-a.dir*150,y:n.y-310,tx:point.x,ty:point.y,age:0,index,r:14+index*7,radius:50+index*20,damage:danteRangedBase(p,6+Math.min(index,2)*2,true,a.gunslinger)});
   }
   if(a.age>=a.duration)p.attack=null;
  }
@@ -107519,7 +107525,7 @@ function faustDraw(n){
  if(f.flash){ctx.fillStyle='#ff628d';ctx.shadowColor='#ff466c';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(50,23,6,0,Math.PI*2);ctx.fill();}ctx.restore();
  faustDrawEffects(n,p,f,a);
  if(f.orbit){ctx.save();ctx.strokeStyle='rgba(255,70,120,.25)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,64,0,Math.PI*2);ctx.stroke();
- for(let i=0;i<6;i++){const angle=f.angle+i*Math.PI/3;ctx.save();ctx.translate(cx+Math.cos(angle)*64,cy+Math.sin(angle)*64);ctx.rotate(angle+Math.PI/2);ctx.fillStyle='#ff537f';ctx.shadowColor='#ff4064';ctx.shadowBlur=12;ctx.beginPath();ctx.moveTo(0,-9);ctx.lineTo(5,0);ctx.lineTo(0,9);ctx.lineTo(-5,0);ctx.closePath();ctx.fill();ctx.restore();}ctx.restore();}
+ for(let i=0;i<6;i++){const angle=f.angle+i*Math.PI/3;ctx.save();ctx.translate(cx+Math.cos(angle)*64,cy+Math.sin(angle)*64);ctx.rotate(angle+Math.PI/2);ctx.fillStyle=danteBulletColor(p);ctx.shadowColor=danteBulletColor(p);ctx.shadowBlur=12;ctx.beginPath();ctx.moveTo(0,-9);ctx.lineTo(5,0);ctx.lineTo(0,9);ctx.lineTo(-5,0);ctx.closePath();ctx.fill();ctx.restore();}ctx.restore();}
  for(const t of f.trail){ctx.save();ctx.globalAlpha=t.t/30;faustHatShape(t.x,t.y,frames*.3,.8);ctx.restore();}
  if(f.hat)faustHatShape(f.hat.x,f.hat.y,f.hat.age*.32);
  if(f.swings.length>1){
@@ -107553,7 +107559,7 @@ function faustDrawEffects(n,p,f,a){
  if(f.beam){const b=f.beam;ctx.save();ctx.globalAlpha=b.t/b.max;ctx.lineCap='round';ctx.shadowColor='#ff3463';ctx.shadowBlur=20;
   for(const [width,col] of [[26,'rgba(255,40,90,.2)'],[12,'#ff3769'],[4,'#fff0dc']]){ctx.strokeStyle=col;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(b.x,b.y);ctx.lineTo(b.tx,b.ty);ctx.stroke();}ctx.restore();
  }
- for(const q of f.spears){ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.angle);ctx.strokeStyle='rgba(255,55,100,.5)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-26,0);ctx.lineTo(0,0);ctx.stroke();ctx.fillStyle='#ffabc3';ctx.shadowColor='#ff245f';ctx.shadowBlur=12;ctx.beginPath();ctx.moveTo(10,0);ctx.lineTo(-4,-5);ctx.lineTo(-10,0);ctx.lineTo(-4,5);ctx.closePath();ctx.fill();ctx.restore();}
+ for(const q of f.spears){ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.angle);ctx.strokeStyle='rgba(255,55,100,.5)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-26,0);ctx.lineTo(0,0);ctx.stroke();ctx.fillStyle=danteBulletColor(p);ctx.shadowColor=danteBulletColor(p);ctx.shadowBlur=12;ctx.beginPath();ctx.moveTo(10,0);ctx.lineTo(-4,-5);ctx.lineTo(-10,0);ctx.lineTo(-4,5);ctx.closePath();ctx.fill();ctx.restore();}
  for(const h of f.impacts){const t=1-h.t/h.max,r=Math.max(1,h.r*t);ctx.save();ctx.globalAlpha=1-t;
   if(h.meteor){
    const blast=Math.max(1,h.r*(.4+t*.8)),g=ctx.createRadialGradient(h.x,h.y,0,h.x,h.y,blast);
@@ -107571,7 +107577,189 @@ danteDraw=function(n){faustDrawBase(n);if(danteOn()&&n.dante?.arm===5)faustDraw(
 const faustUIBase=drawUI;
 drawUI=function(){faustUIBase();if(!danteOn()||dino?.dante?.arm!==5)return;const p=dino.dante,f=faustState(p);ctx.save();if(dojoMode)ctx.translate(0,15);ctx.fillStyle='#1c1119';ctx.fillRect(15,92,275,20);ctx.font='11px Consolas,monospace';ctx.fillStyle='#ffb4cd';ctx.textAlign='left';ctx.fillText(p.k!==null?(keys.KeyS||keys.ArrowDown?'RED SHOT: '+Math.min(3,Math.floor(p.k/30))+'/3':'RED HOT NIGHT: '+Math.min(100,Math.floor(p.k/60*100))+'%'):f.orbit?'MAN HAT · ORBIT':p.attack?p.attack.name:'J: FIRE / HOLD: ORBIT · K: HAT',20,105);ctx.restore();};
 const faustMenuBase=drawCustomMenu;
-drawCustomMenu=function(){faustMenuBase();if(!danteOn()||dino?.dante?.arm!==5||runePicker!==null||ammoPicker||ammoXem!==null)return;ctx.save();ctx.fillStyle='#190e14';ctx.fillRect(708,135,262,380);ctx.font='bold 14px Consolas,monospace';ctx.fillStyle='#ff85ab';ctx.textAlign='left';ctx.fillText('DR. FAUST · Q/E',716,157);ctx.font='11px Consolas,monospace';ctx.fillStyle='#eee0df';apexWrap(LT('J: bắn · Giữ J: vòng đạn\nĐang có vòng đạn → Dash:\nphóng 6 mũi truy kích mục tiêu\nDash J: RED SHOT xuyên xa\n\nK: ném mũ · K tiếp: gọi về nổ\nCúi K ×3: chém → quất → hất\nAir K: xoay người chém mũ\nDash K: lướt cắt vành mũ\n\nCúi + giữ K 0.5–1.5s:\nRED SHOT — 3 tia, lực tăng dần\nGiữ K 1s (không cúi):\nRED HOT NIGHT — khóa vị trí\n3 thiên thạch, nổ lan tăng dần', 'J: fire · Hold J: orbit\nOrbit → Dash: launch 6\nhoming crystal spears\nDash J: long piercing RED SHOT\n\nK: throw · K again: recall burst\nDown K x3: slash, backhand, lift\nAir K: spinning brim slash\nDash K: sliding hat cut\n\nDown + hold K 0.5–1.5s:\nRED SHOT — 3 piercing pulses\nHold K 1s (no crouch):\nRED HOT NIGHT — lock position\n3 meteors, growing blast radius'),716,181,248,22);ctx.restore();};
+drawCustomMenu=function(){faustMenuBase();if(!danteOn()||dino?.dante?.arm!==5||runePicker!==null||ammoPicker||ammoXem!==null)return;ctx.save();ctx.fillStyle='#190e14';ctx.fillRect(708,135,262,380);ctx.font='bold 14px Consolas,monospace';ctx.fillStyle='#ff85ab';ctx.textAlign='left';ctx.fillText('DR. FAUST · Q/E',716,157);ctx.font='11px Consolas,monospace';ctx.fillStyle='#eee0df';apexWrap(LT('J: bắn · Giữ J: vòng đạn\nĐang có vòng đạn → Dash:\nphóng 6 mũi truy kích mục tiêu\nDash J: RED SHOT xuyên xa\n\nK: ném mũ · K tiếp: gọi về nổ\nCúi K ×3: chém → quất → hất\nAir K: xoay người chém mũ\nDash K: lướt cắt vành mũ\n\nCúi + giữ K 0.5–1.5s:\nRED SHOT — 3 tia, lực tăng dần\nGiữ K 1s (không cúi):\nRED HOT NIGHT — khóa vị trí\n3 thiên thạch / Gunslinger: 4', 'J: fire · Hold J: orbit\nOrbit → Dash: launch 6\nhoming crystal spears\nDash J: long piercing RED SHOT\n\nK: throw · K again: recall burst\nDown K x3: slash, backhand, lift\nAir K: spinning brim slash\nDash K: sliding hat cut\n\nDown + hold K 0.5–1.5s:\nRED SHOT — 3 piercing pulses\nHold K 1s (no crouch):\nRED HOT NIGHT — lock position\n3 meteors / 4 in Gunslinger'),716,181,248,22);ctx.restore();};
+</script>
+<script>
+// Playable Dante owns four styles. combatStance is only a compatibility selector;
+// Trickster and Swordmaster use neutral 3 so Dino's stance passives cannot leak in.
+const DANTE_STYLES=['SWORDMASTER','GUNSLINGER','ROYAL GUARD','TRICKSTER'];
+function danteStyle(p=dino?.dante){return p?.style??1;}
+function danteStyleState(p){return p.styles||(p.styles={guardUntil:-100,perfectUntil:-100,guardReady:0,bank:0,contacts:new WeakMap(),unknown:-100,lastDash:-100,dashDir:1,crossed:true,teleReady:0,phaseUntil:-100,ghosts:[],swords:[],swordReady:-100,release:null});}
+function danteStyleLive(){return danteActive(dino)&&!!dino.dante&&!gameOver&&!gameVictory;}
+function danteSetStyle(index){
+ if(!dino?.dante)return;
+ const p=dino.dante,s=danteStyleState(p);p.style=(index+4)%4;
+ combatStance=p.style===1?0:p.style===2?2:3;
+ s.guardUntil=s.perfectUntil=-100;s.crossed=true;s.release=null;if(p.attack?.royal){p.attack=null;p.cd=0;}
+ dino.meleeTimer=dino.parryWindow=dino.dashShieldTimer=0;
+ danteLabel(DANTE_STYLES[p.style]);
+}
+function danteRangedBase(p,damage,heavy=false,guns=danteStyle(p)===1){return damage+(guns?(heavy?Math.max(1,Math.round(damage*.25)):1):0);}
+function danteBulletColor(p){return danteStyle(p)===1?'#ff4a67':'#d9e8ff';}
+const styleInitBase=danteInit;
+danteInit=function(n){styleInitBase(n);n.dante.style=1;danteStyleState(n.dante);combatStance=0;};
+function danteRoyalShield(){return danteStyleLive()&&danteStyle()===2&&frames<danteStyleState(dino.dante).guardUntil;}
+function dantePerfectGuard(){return danteRoyalShield()&&frames<danteStyleState(dino.dante).perfectUntil;}
+function danteGuardSource(){return sgTargets(dino).sort((a,b)=>Math.hypot(a.x-dino.x,a.y-dino.y)-Math.hypot(b.x-dino.x,b.y-dino.y))[0]||null;}
+function danteGuardContact(amount=1,source=null){
+ if(!danteRoyalShield())return false;
+ const n=dino,p=n.dante,s=danteStyleState(p),perfect=dantePerfectGuard();
+ source=source||danteGuardSource();
+ // A sustained rush/contact is one event until it leaves contact or changes action.
+ if(source&&typeof source==='object'){
+  const last=s.contacts.get(source),state=source.state||'';
+  s.contacts.set(source,{at:frames,state});
+  if(last&&last.at>=frames-2&&last.state===state)return true;
+ }else{if(s.unknown===frames)return true;s.unknown=frames;}
+ if(perfect){
+  const target=source&&Number.isFinite(source.maxHp)?source:danteGuardSource();
+  const stored=target?Math.max(1,Math.round(parryDamage(target,true)*.5)):Math.max(1,amount);
+  s.bank+=stored;s.guardReady=frames;n.shieldCd=perfectParryCd=0;
+  parryGainUlt(true);addStyle(28,'parry');
+  floatingTexts.push(new FloatingText(n.x-25,n.y-35,'PERFECT · +'+stored));
+ }else floatingTexts.push(new FloatingText(n.x-20,n.y-30,'GUARD'));
+ n.shinFlash=12;playerHexImpact(n,n.x+n.w/2,n.y+20);
+ if(SFX.tone)SFX.tone(perfect?1200:300,.05,'triangle',.08,300);
+ return true;
+}
+const styleGuardResetBase=shinGuardReset;
+shinGuardReset=function(perfect){if(danteStyleLive()){if(danteRoyalShield())danteGuardContact(1,danteGuardSource());return;}return styleGuardResetBase(perfect);};
+const styleParryBase=parry;
+parry=function(y){if(danteRoyalShield()){danteGuardContact(1,danteGuardSource());return;}return styleParryBase(y);};
+const styleShieldBase=Player.prototype.isShielding;
+Player.prototype.isShielding=function(){if(danteStyleLive()&&this===dino)return frames<danteStyleState(this.dante).guardUntil;return styleShieldBase.call(this);};
+const styleDamageBase=Player.prototype.takeDamage;
+Player.prototype.takeDamage=function(amount=1,...args){if(this===dino&&danteRoyalShield()){danteGuardContact(amount);return;}return styleDamageBase.call(this,amount,...args);};
+function danteGuardPress(){
+ const n=dino,p=n.dante,s=danteStyleState(p);
+ if(danteStyle()===2&&frames-s.lastDash<=24&&s.bank>0){
+  p.k=null;p.attack={royal:true,name:'ROYAL RELEASE',age:0,duration:22,dir:s.dashDir};p.cd=22;
+  s.guardUntil=s.perfectUntil=-100;s.release={age:0,dir:s.dashDir,hit:false};s.lastDash=-100;danteLabel('ROYAL RELEASE');return;
+ }
+ if(frames<s.guardReady)return;
+ p.k=null;if(p.attack){p.attack=null;p.cd=0;}
+ s.guardUntil=frames+30;s.perfectUntil=frames+6;s.guardReady=frames+(danteStyle()===2?75:90);
+ n.shieldCd=s.guardReady-frames;n.meleeTimer=30;n.parryWindow=6;n.meleeID++;
+}
+function danteGhost(n){
+ const s=danteStyleState(n.dante);s.ghosts.push({x:n.x,y:n.y,w:n.w,h:n.h,body:{...n.dante.body,facingLeft:n.isFacingLeft},t:14});
+ if(s.ghosts.length>16)s.ghosts.shift();
+}
+function danteTeleport(target,behind){
+ const n=dino,p=n.dante,s=danteStyleState(p);
+ if(!target||![target.x,target.y,target.w,target.h].every(Number.isFinite))return false;
+ const side=target.isFacingLeft??target.facingLeft??(target.x>n.x);
+ let x=behind?(side?target.x+target.w+18:target.x-n.w-18):(side?target.x-n.w-18:target.x+target.w+18);
+ const y=Math.max(-CAM_TROI+10,target.y+target.h-n.h),before={x:n.x,y:n.y};
+ x=Math.max(worldL(),Math.min(worldR()-n.w,x));
+ const proposed={x,y,w:n.w,h:n.h};
+ // No teleport into a solid pillar or a Tetris cell. Keep the old position on failure.
+ for(const pf of platforms)if((pf.pillar||pf.wall)&&checkAABB(proposed,{x:pf.x,y:pf.top??pf.y,w:pf.w,h:pf.h||40}))return false;
+ if(mapTheme==='tetris'&&typeof tetris!=='undefined'&&tetris){
+  const T=tetris,c0=Math.floor((x-T.fx)/T.cell),c1=Math.floor((x+n.w-T.fx)/T.cell),r0=Math.floor((y-T.worldTop)/T.cell),r1=Math.floor((y+n.h-1-T.worldTop)/T.cell);
+  for(let r=r0;r<=r1;r++)for(let c=c0;c<=c1;c++)if(r>=0&&r<T.rows&&c>=0&&c<T.cols&&T.grid[r][c])return false;
+ }
+ if(checkAABB(proposed,target)||Math.abs(x-before.x)<2)return false;
+ danteGhost(n);n.x=x;n.y=y;n.dy=0;dashVx=0;n.isFacingLeft=target.x+target.w/2<x+n.w/2;n.grounded=!!target.grounded&&Math.abs(n.y+n.h-dkNenY())<8;
+ n.invincible=true;n.invTimer=Math.max(n.invTimer,8);p.body.facingLeft=n.isFacingLeft;
+ danteGhost(n);s.crossed=true;s.teleReady=frames+30;s.phaseUntil=frames+8;return true;
+}
+const styleKeyBase=danteKey;
+danteKey=function(code,repeat){
+ if(danteStyleLive()){
+  const p=dino.dante,s=danteStyleState(p);
+  if(['KeyI','KeyO','KeyL'].includes(code)){
+   keys[code]=true;if(paused||repeat)return true;
+   if(code==='KeyL')danteGuardPress();else danteSetStyle(danteStyle()+(code==='KeyO'?1:-1));return true;
+  }
+  if(!paused&&!repeat&&danteStyle()===3&&['Space','KeyW'].includes(code)&&(keys.KeyS||keys.ArrowDown)&&frames>=s.teleReady){
+   const target=sgTargets(dino).filter(o=>Math.hypot(o.x-dino.x,o.y-dino.y)<600).sort((a,b)=>Math.hypot(a.x-dino.x,a.y-dino.y)-Math.hypot(b.x-dino.x,b.y-dino.y))[0];
+   if(target&&danteTeleport(target,false)){keys[code]=true;danteLabel('AIR TRICK');return true;}
+  }
+ }
+ return styleKeyBase(code,repeat);
+};
+const styleDashBase=doDash;
+doDash=function(...args){
+ const active=danteStyleLive()&&!paused,before=dashCd;
+ styleDashBase(...args);
+ if(!active||dashCd<=before)return;
+ const n=dino,s=danteStyleState(n.dante);s.lastDash=frames;s.dashDir=n.dashDir;s.crossed=false;
+ if(danteStyle()===3){dashVx*=1.45;danteGhost(n);}
+};
+const styleHitBase=danteHit;
+danteHit=function(p,o,damage){
+ const dealt=styleHitBase(p,o,damage);
+ if(dealt>0&&danteStyle(p)===0&&danteStyleLive()){
+  const s=danteStyleState(p);
+  if(frames>=s.swordReady){
+   s.swordReady=frames+6;
+   const count=styleRankIdx>=6?4:styleRankIdx>=4?3:styleRankIdx>=2?2:1;
+   for(let i=0;i<count;i++){if(o.hp>0)sgDamage(dino,o,1,'phantom');s.swords.push({x:o.x+o.w/2,y:o.y+o.h/2,i,count,t:14});}
+   if(s.swords.length>24)s.swords.splice(0,s.swords.length-24);
+  }
+ }
+ return dealt;
+};
+function danteStylesTick(){
+ if(!danteStyleLive()||paused)return;
+ const n=dino,p=n.dante,s=danteStyleState(p);
+ s.ghosts=s.ghosts.filter(g=>--g.t>0);s.swords=s.swords.filter(g=>--g.t>0);p.body._trickPhase=Math.max(0,(s.phaseUntil-frames)/8);
+ n.meleeTimer=Math.max(0,Math.min(n.meleeTimer,s.guardUntil-frames));n.parryWindow=Math.max(0,s.perfectUntil-frames);
+ if(danteStyle()===3&&!s.crossed&&frames-s.lastDash<14){
+  if(frames%2===0)danteGhost(n);
+  if(frames>=s.teleReady){
+   const target=sgTargets(n).filter(o=>{const gap=s.dashDir>0?o.x-(n.x+n.w):n.x-(o.x+o.w);return gap>=0&&gap<2*CM&&n.y<o.y+o.h&&n.y+n.h>o.y;}).sort((a,b)=>Math.abs(a.x-n.x)-Math.abs(b.x-n.x))[0];
+   if(target)danteTeleport(target,true);
+  }
+ }
+ if(s.release&&p.attack?.royal){
+  const a=p.attack;a.age++;s.release.age=a.age;
+  if(a.age===6){
+   const box={x:a.dir>0?n.x+n.w:n.x-100,y:n.y-10,w:100,h:n.h+20};
+   const target=sgTargets(n).filter(o=>checkAABB(box,o)).sort((a,b)=>Math.abs(a.x-n.x)-Math.abs(b.x-n.x))[0];
+   if(target&&s.bank>0){const damage=s.bank;sgDamage(n,target,damage,'royal');s.bank=0;s.release.hit=true;visualEffects.push(new Effect(target.x+target.w/2,target.y+target.h/2,'explosion',true,40));}
+  }
+  if(a.age>=a.duration){p.attack=null;s.release=null;}
+ }else if(s.release)s.release=null;
+}
+const styleTickBase=danteTick;
+danteTick=function(){styleTickBase();danteStylesTick();};
+// Dark silhouette geometry avoids per-primitive canvas filters on a full character rig.
+function danteDrawShadow(g){
+ const b=g.body,dir=b.facingLeft?-1:1,flap=Math.sin(frames*.065)*2.2;
+ ctx.save();ctx.globalAlpha=g.t/50;ctx.translate(g.x+g.w/2,g.y+g.h*.53);ctx.scale(dir*g.w/40,g.h/60);ctx.rotate(b._swordLean||0);ctx.translate(-20,-32);ctx.fillStyle='#080916';
+ ctx.beginPath();ctx.moveTo(8,16);ctx.lineTo(31,16);ctx.lineTo(36,40);ctx.lineTo(19,58);ctx.lineTo(-10+flap,60);ctx.quadraticCurveTo(0,38,8,16);ctx.fill();
+ ctx.beginPath();ctx.moveTo(9,12);ctx.lineTo(8,2);ctx.lineTo(15,-5);ctx.lineTo(20,-2);ctx.lineTo(24,-6);ctx.lineTo(31,2);ctx.lineTo(31,13);ctx.closePath();ctx.fill();
+ ctx.fillRect(10,37,9,23);ctx.fillRect(24,37,9,23);ctx.strokeStyle='#080916';ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(30,20);ctx.lineTo(35,34);ctx.lineTo(43,33);ctx.stroke();ctx.restore();
+}
+const styleDrawBase=danteDraw;
+danteDraw=function(n){
+ const p=n.dante,s=p?danteStyleState(p):null;
+ if(s){
+  for(const g of s.ghosts)danteDrawShadow(g);
+ }
+ styleDrawBase(n);
+ if(!s)return;
+ for(const sword of s.swords){
+  const t=1-sword.t/14,angle=-1.3+sword.i*.7+t*1.4,x=sword.x+(sword.i-(sword.count-1)/2)*15;
+  ctx.save();ctx.globalAlpha=sword.t/14;ctx.translate(x,sword.y);ctx.rotate(angle);ctx.shadowColor='#8dccff';ctx.shadowBlur=8;ctx.fillStyle='#ccecff';ctx.beginPath();ctx.moveTo(-3,-38);ctx.lineTo(3,-38);ctx.lineTo(5,16);ctx.lineTo(0,32);ctx.lineTo(-5,16);ctx.closePath();ctx.fill();ctx.fillStyle='#5d89c9';ctx.fillRect(-11,-28,22,4);ctx.restore();
+ }
+ if(s.release){ctx.save();ctx.translate(n.x+n.w/2,n.y+n.h/2);ctx.scale(s.release.dir,1);ctx.strokeStyle='#ffcc69';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.min(100,s.release.age*16),0);ctx.stroke();ctx.beginPath();ctx.arc(Math.min(100,s.release.age*16),0,12,0,Math.PI*2);ctx.stroke();ctx.restore();}
+};
+const styleUIBase=drawUI;
+drawUI=function(){
+ styleUIBase();if(!danteOn()||!dino?.dante)return;
+ const p=dino.dante,s=danteStyleState(p);ctx.save();if(dojoMode)ctx.translate(0,15);ctx.fillStyle='#1c1119';ctx.fillRect(15,72,275,18);ctx.fillRect(15,151,275,22);ctx.textAlign='left';ctx.font='11px Consolas,monospace';ctx.fillStyle='#e6e5ff';ctx.fillText('I/O: '+DANTE_STYLES[danteStyle()],20,85);
+ const info=danteStyle()===2?'RG '+s.bank+' · Dash L: RELEASE':danteStyle()===3?'TRICKSTER · Down + Jump: TELEPORT':danteStyle()===0?'PHANTOM SWORDS: '+(styleRankIdx>=6?4:styleRankIdx>=4?3:styleRankIdx>=2?2:1):'RED BULLETS · STRONG SHOTS +';
+ ctx.fillText(info,20,165);ctx.restore();
+};
+const styleMenuBase=drawCustomMenu;
+drawCustomMenu=function(){
+ styleMenuBase();if(!danteOn()||!dino?.dante)return;
+ ctx.save();ctx.fillStyle='#190e14';ctx.fillRect(28,117,266,405);ctx.textAlign='left';ctx.font='11px Consolas,monospace';ctx.fillStyle='#eee0df';
+ apexWrap(LT('I/O: đổi 4 STANCE riêng\n\nSWORDMASTER\nKiếm ảo gây 1 dmg mỗi kiếm\nD/C: 1 · B/A: 2 · S/SS: 3\nSSS: 4 kiếm cùng lúc\n\nGUNSLINGER\nĐạn thường: 1 → 2, chuyển đỏ\nĐòn mạnh tăng lực; thêm meteor\n\nROYAL GUARD\nPerfect L: hồi đỡ ngay, tích kho\nDash L: trả kho vào 1 mục tiêu\n\nTRICKSTER\nDash xa, bóng đen mờ\nGần <2cm: ra sau lưng mục tiêu\nCúi + Nhảy: dịch đến trước mặt\n\nQ/E: vũ khí · U: Devil Trigger', 'I/O: cycle 4 DANTE STYLES\n\nSWORDMASTER\nPhantom swords: 1 damage each\nD/C: 1 · B/A: 2 · S/SS: 3\nSSS: 4 simultaneous swords\n\nGUNSLINGER\nNormal rounds: 1 → 2, turn red\nStronger specials, extra meteor\n\nROYAL GUARD\nPerfect L: guard reset, store\nDash L: release bank at 1 enemy\n\nTRICKSTER\nLong dash, dark afterimages\nWithin <2cm: cross behind foe\nDown + Jump: teleport in front\n\nQ/E: weapons · U: Devil Trigger'),38,139,246,17);ctx.restore();
+};
 </script>
 </body>
 </html>
