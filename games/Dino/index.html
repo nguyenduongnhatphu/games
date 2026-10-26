@@ -97550,7 +97550,8 @@ function checkPvPCollisions() {
 
         // Khoi dong: goi rafDriver chu KHONG goi loop() — loop() gio chi la mot buoc
         // logic, khong tu hen gio nua, goi thang no thi game chay dung 1 khung roi dung.
-        rafDriver();
+        // Start only after every character/weapon module has been installed.
+        window.addEventListener('DOMContentLoaded', () => rafDriver(), {once:true});
     </script>
 <script>
 /* @@VK-SONGSUNG (20) — self-contained dual-pistol prototype.
@@ -103464,7 +103465,7 @@ class DantePlayerRig {
             // 6. TAY TRAI (Tay sau — Tạo thế cân bằng khi vung kiếm)
             let ar = b.armR || 0, al = b.armL || (b._swordBackArm || 0.25);
             if (b.stab > 0) ar = -1.55 + (Math.random() - 0.5) * 0.25;
-            if(![1,2,3].includes(arm)){
+            if(![1,2,3,4].includes(arm)){
             ctx.save(); ctx.translate(cxb - 13, y + 19); ctx.rotate(al);
             ctx.fillStyle = "#8E1B1B"; ctx.fillRect(-3.5, 0, 7, 13);
             ctx.fillStyle = "#263238"; ctx.fillRect(-4, 11, 8, 3);
@@ -103649,6 +103650,8 @@ class DantePlayerRig {
 // Playable Dante: player physics and defenses, independent friendly combat controller.
 let danteForm=false,danteLoadout=null;
 try{danteForm=localStorage.getItem('dino_dante_form')==='1';}catch(e){}
+// A saved Dante selection must not inherit X/Apex physics or their renderer.
+if(danteForm){xForm=false;currentForm=0;}
 function danteOn(){return danteForm&&gameState!=='pvp';}
 function danteActive(n){return danteOn()&&['normal','boss_rush','test_boss'].includes(gameState)&&n===dino&&n.hp>0;}
 function danteSync(){
@@ -103661,7 +103664,8 @@ const danteFormBase=xDatForm;
 xDatForm=function(i){const choose=((i%X_N_DANG)+X_N_DANG)%X_N_DANG;danteForm=false;danteSync();danteFormBase(choose);if(choose===9){danteForm=true;xForm=false;currentForm=0;}danteSync();try{localStorage.setItem('dino_dante_form',danteForm?'1':'0');localStorage.setItem('dino_current_form',currentForm);}catch(e){}};
 const danteSyncBase=xDongBo;xDongBo=function(){danteSyncBase();danteSync();};
 function danteInit(n){
- n.form=0;n.ammoType=0;n.maxHp=n.hp=10;n.w=DT_W;n.h=DT_H;n.y-=Math.max(0,DT_H-44);
+ const feet=n.y+n.h;
+ n.form=0;n.ammoType=0;n.maxHp=n.hp=10;n.w=DT_W;n.h=DT_H;n.y=feet-n.h;
  n.dante={body:new DantePlayerRig(1),arm:0,combo:0,lastJ:-100,cd:0,k:null,attack:null,rounds:[],fx:[],dt:0,regen:0};
  n.dante.body.state='idle';n.dante.body.facingLeft=false;ultCharge=dojoMode?100:0;
 }
@@ -103682,6 +103686,7 @@ function danteKey(code,repeat){
 function danteRelease(){if(!danteActive(dino)||!dino.dante)return;const p=dino.dante;if(p.k!==null){const charge=p.k;p.k=null;danteAttack(true,charge);}}
 function danteAttack(special,charge){
  if(dino.dante&&dino.dante.arm===0){dswCommand({key:special?'K':'J',charge,down:!!(keys.KeyS||keys.ArrowDown),air:!dino.grounded,dash:frames-dswState(dino.dante).lastDash<=24});return;}
+ if(dino.dante&&dino.dante.arm===4){eiCommand(special,charge);return;}
  const n=dino,p=n.dante;if(!p||p.cd>0||p.attack||n.isShielding()||n.hp<=0)return;
  const arm=p.arm,dir=n.isFacingLeft?-1:1,air=!n.grounded,down=keys.KeyS||keys.ArrowDown,dash=Math.abs(dashVx)>1;
  if(frames-p.lastJ>40)p.combo=0;const combo=p.combo++%3;p.lastJ=frames;
@@ -103727,12 +103732,13 @@ function dantePulse(n,p,a){
  if(SFX.tone)SFX.tone(a.kind==='gun'?700:220,.04,'triangle',.05,100);
 }
 function danteTick(){
- if(!danteActive(dino)||!dino.dante)return;
+ if(!danteActive(dino))return;
+ if(!dino.dante)danteInit(dino);
  const n=dino,p=n.dante;if(p.cd>0)p.cd--;
  if(p.k!==null){if(keys.KeyK)p.k=Math.min(120,p.k+1);else danteRelease();}
  if(p.arm!==0&&p.arm!==1&&p.arm!==2&&p.arm!==3&&keys.KeyJ&&!keys.KeyK&&!p.attack&&p.cd<=0)danteAttack(false,0);
  if(p.dt>0){p.dt--;ultCharge=0;if(++p.regen>=120){p.regen=0;n.hp=Math.min(n.maxHp,n.hp+1);}}
- if(p.attack&&!p.attack.sword&&!p.attack.balrog&&!p.attack.cavaliere&&!p.attack.cerberus){const a=p.attack;a.age++;
+ if(p.attack&&!p.attack.sword&&!p.attack.balrog&&!p.attack.cavaliere&&!p.attack.cerberus&&!p.attack.ebony){const a=p.attack;a.age++;
   if(a.kind==='slam'&&!n.grounded){a.age=Math.min(a.age,a.wind);n.dy=Math.max(n.dy,9);}
   if(a.age>=a.wind+1&&(a.age-a.wind-1)%a.interval===0&&a.pulses>0){dantePulse(n,p,a);a.pulses--;}
   if(a.kind==='slam'&&!n.grounded)n.dy=Math.max(n.dy,9);
@@ -103743,7 +103749,7 @@ function danteTick(){
   if(q.kind==='hat'&&q.age>25){const angle=Math.atan2(n.y+n.h/2-q.y,n.x+n.w/2-q.x);q.vx=Math.cos(angle)*12;q.vy=Math.sin(angle)*12;if(Math.hypot(n.x+n.w/2-q.x,n.y+n.h/2-q.y)<18)q.life=0;}
   q.x+=q.vx;q.y+=q.vy;
   const box={x:Math.min(oldX,q.x)-q.r,y:Math.min(oldY,q.y)-q.r,w:Math.abs(q.x-oldX)+q.r*2,h:Math.abs(q.y-oldY)+q.r*2};
-  for(const o of sgTargets(n)){const id=o.__goc||o;if(!q.hit.has(id)&&checkAABB(box,o)){q.hit.add(id);danteHit(p,o,q.damage);if(q.kind==='bullet'||q.kind==='meteor')q.life=0;}}
+  for(const o of sgTargets(n)){const id=o.__goc||o;if(!q.hit.has(id)&&checkAABB(box,o)){q.hit.add(id);danteHit(p,o,q.damage);if(q.kind==='bullet'||q.kind==='meteor'){q.life=0;break;}}}
   if(q.kind==='meteor'&&q.life===0)p.fx.push({x:q.x,y:q.y,dir:1,r:50,kind:'fire',t:12,max:12,col:'#ff5533'});
  }
  p.rounds=p.rounds.filter(q=>q.life>0);p.fx=p.fx.filter(f=>--f.t>0);
@@ -103751,7 +103757,7 @@ function danteTick(){
  b.armR=p.attack?Math.sin(p.attack.age/p.attack.duration*Math.PI*2)*1.4-.6:0;b.armL=p.arm===4&&p.attack?-1.3:0;
 }
 function danteDraw(n){const p=n.dante;if(!p)return;const b=p.body;ctx.save();if(n.invincible&&frames%6<3)ctx.globalAlpha=.5;ctx.translate(n.x,n.y);ctx.scale(n.w/DT_W,n.h/DT_H);drawDantePlayerBody(b,0,0);if(p.dt)drawDantePlayerDtOverlay(b,0,0);ctx.restore();
- for(const q of p.rounds){ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.kind==='hat'?q.age*.35:Math.atan2(q.vy,q.vx));ctx.fillStyle=q.kind==='bullet'?'#ffe6a0':'#ff5264';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=12;ctx.beginPath();ctx.ellipse(0,0,q.r,q.kind==='hat'?6:q.r,0,0,Math.PI*2);ctx.fill();if(q.kind==='drive'){ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(-10,0,25,-1.2,1.2);ctx.stroke();}ctx.restore();}
+ for(const q of p.rounds){ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.kind==='hat'?q.age*.35:Math.atan2(q.vy,q.vx));ctx.fillStyle=q.kind==='bullet'?'#ffe6a0':q.kind==='ei-charge'?'#a4dfff':'#ff5264';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=12;ctx.beginPath();ctx.ellipse(0,0,q.r,q.kind==='hat'?6:q.r,0,0,Math.PI*2);ctx.fill();if(q.kind==='drive'){ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(-10,0,25,-1.2,1.2);ctx.stroke();}ctx.restore();}
  for(const f of p.fx){ctx.save();ctx.translate(f.x,f.y);ctx.scale(f.dir,1);ctx.globalAlpha=f.t/f.max;ctx.strokeStyle=f.col;ctx.shadowColor=f.col;ctx.shadowBlur=14;ctx.lineWidth=6;ctx.beginPath();if(['ice','fire','wheel'].includes(f.kind))ctx.arc(0,0,f.r*(1-f.t/f.max*.25),0,Math.PI*2);else ctx.ellipse(0,0,f.r,f.r*.65,-.6,-1.3,1.2);ctx.stroke();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.restore();}
  if(p.k!==null){ctx.save();ctx.strokeStyle=p.k>=45?'#fff1b0':'#ff5566';ctx.lineWidth=3;ctx.beginPath();ctx.arc(n.x+n.w/2,n.y+n.h/2,25,0,Math.PI*2*Math.min(1,p.k/45));ctx.stroke();ctx.restore();}
  if(n.isShielding()){ctx.save();ctx.strokeStyle=combatStance===2?'#ffb341':'#79dfff';ctx.fillStyle='rgba(100,180,255,.12)';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(n.x+n.w/2,n.y+n.h/2,n.w*.9,n.h*.65,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();}
@@ -104711,7 +104717,7 @@ function dswDraw(n){
 const dswDrawBase=danteDraw;
 danteDraw=function(n){
  const p=n.dante;
- if(p){p.body._swordCustom=p.arm===0||p.arm===1||p.arm===2||p.arm===3;if(p.arm===0)p.body.drawn=true;}
+ if(p){p.body._swordCustom=p.arm===0||p.arm===1||p.arm===2||p.arm===3||p.arm===4;if(p.arm===0)p.body.drawn=true;}
  dswDrawBase(n);
  if(p&&(p.arm===0||p.sword))dswDraw(n);
 };
@@ -107027,6 +107033,140 @@ danteDraw = function(n){
 };
 
 
+</script>
+
+<script>
+// EBONY & IVORY: accurate alternating fire and contextual Gunslinger techniques.
+// Timings use the same fixed 60 Hz clock as the other Devil Arms.
+const EI_MOVES={
+ shot:{name:'EBONY & IVORY',T:8,shots:[1],damage:2},
+ twin:{name:'TWINS',T:16,shots:[1,4],damage:2},
+ charge:{name:'CHARGED SHOT',T:24,shots:[4,8],damage:6},
+ twosome:{name:'TWOSOME TIME',T:32,shots:[2,10,18,26],damage:2},
+ honeycomb:{name:'HONEYCOMB FIRE',T:44,shots:[4,8,12,16,20,24,28,32,36],damage:1},
+ rain:{name:'RAIN STORM',T:36,shots:[3,9,15,21,27],damage:2}
+};
+function eiState(p){return p.ebony||(p.ebony={hand:0,flash:[],rainUsed:false});}
+function eiCommand(special,charge){
+ const n=dino,p=n.dante;
+ if(!p||p.cd>0||p.attack||n.isShielding()||n.hp<=0)return;
+ const e=eiState(p),down=keys.KeyS||keys.ArrowDown;
+ let id='shot';
+ if(special){
+  if(charge>=45)id='charge';
+  else if(combatStance===0){
+   if(!n.grounded&&!e.rainUsed)id='rain';
+   else id=down?'honeycomb':'twosome';
+  }else id='twin';
+ }
+ const m=EI_MOVES[id];
+ p.attack={ebony:true,id,name:m.name,age:0,duration:m.T,dir:n.isFacingLeft?-1:1};p.cd=m.T;
+ if(id==='rain')e.rainUsed=true;
+ if(special)danteLabel(m.name);
+}
+function eiShoot(n,p,a,angle,hand,damage,charged=false){
+ const e=eiState(p),x=n.x+n.w/2+Math.cos(angle)*34+(hand?-9:9),y=n.y+22+Math.sin(angle)*18+(hand?3:-3);
+ const speed=charged?21:18;
+ p.rounds.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:charged?5:2.5,kind:charged?'ei-charge':'bullet',damage:damage+(p.dt?2:0),life:50,age:0,hit:new Set(),dir:a.dir});
+ e.flash.push({x,y,angle,hand,t:4});
+}
+// Gun recovery can be cancelled into a different Devil Arm after the shot.
+const eiKeyBase=danteKey;
+danteKey=function(code,repeat){
+ if(danteActive(dino)&&dino.dante?.arm===4&&!repeat&&!paused&&!gameOver&&!gameVictory){
+  const p=dino.dante,a=p.attack;
+  if((code==='KeyQ'||code==='KeyE')&&a?.ebony&&a.age>=4){p.attack=null;p.cd=0;}
+ }
+ return eiKeyBase(code,repeat);
+};
+function eiAim(n,dir){
+ const cx=n.x+n.w/2,cy=n.y+22;
+ const targets=sgTargets(n).filter(o=>(o.x+o.w/2-cx)*dir>0&&Math.abs(o.y+o.h/2-cy)<180);
+ targets.sort((a,b)=>Math.hypot(a.x-cx,a.y-cy)-Math.hypot(b.x-cx,b.y-cy));
+ const t=targets[0],pitch=t?Math.max(-.35,Math.min(.35,Math.atan2(t.y+t.h/2-cy,Math.abs(t.x+t.w/2-cx)))):0;
+ return dir>0?pitch:Math.PI-pitch;
+}
+function eiTick(){
+ if(!danteActive(dino)||!dino.dante)return;
+ const n=dino,p=n.dante,e=eiState(p),a=p.attack;
+ e.flash=e.flash.filter(f=>--f.t>0);
+ if(n.grounded)e.rainUsed=false;
+ if(!a||!a.ebony)return;
+ const m=EI_MOVES[a.id];a.age++;
+ if(m.shots.includes(a.age)){
+  const aim=eiAim(n,a.dir),hand=e.hand++%2;
+  if(a.id==='twosome'){
+   eiShoot(n,p,a,aim,0,m.damage);eiShoot(n,p,a,eiAim(n,-a.dir),1,m.damage);
+  }else if(a.id==='rain'){
+   const spread=Math.sin(a.age*.7)*.65;
+   eiShoot(n,p,a,Math.PI/2+spread,0,m.damage);eiShoot(n,p,a,Math.PI/2-spread,1,m.damage);
+  }else if(a.id==='honeycomb'){
+   const spread=Math.sin(a.age*.9)*.22;
+   eiShoot(n,p,a,aim+spread,hand,m.damage);
+  }else eiShoot(n,p,a,aim,hand,m.damage,a.id==='charge');
+  if(SFX.tone)SFX.tone(hand?920:720,.035,'triangle',.045,180);
+ }
+ // One short suspension per jump; no infinite airborne firing stall.
+ if(a.id==='rain'&&!n.grounded)n.dy=Math.min(n.dy,.6);
+ if(a.age>=m.T)p.attack=null;
+}
+const eiTickBase=danteTick;
+danteTick=function(){eiTickBase();eiTick();};
+function eiDraw(n){
+ const p=n.dante,e=eiState(p),a=p.attack,dir=n.isFacingLeft?-1:1;
+ ctx.save();ctx.translate(n.x+n.w/2,n.y+20);ctx.scale(dir,1);
+ for(let hand=0;hand<2;hand++){
+  let angle=a&&a.ebony?(a.id==='twosome'&&hand?Math.PI:a.id==='rain'?Math.PI/2+(hand?-.65:.65)*Math.sin(a.age*.4):(dir>0?eiAim(n,dir):Math.PI-eiAim(n,dir))):1.1;
+  const recoil=e.flash.some(f=>f.hand===hand)?-3:0;
+  ctx.save();ctx.translate(hand?-9:9,hand?3:0);ctx.rotate(angle);
+  ctx.strokeStyle=hand?'#751c25':'#b02c32';ctx.lineWidth=6;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(8+recoil,3);ctx.lineTo(17+recoil,0);ctx.stroke();
+  ctx.fillStyle='#e2bc9b';ctx.fillRect(14+recoil,-3,5,5);
+  ctx.fillStyle=hand?'#1b1d24':'#e6e9ee';ctx.strokeStyle=hand?'#9a9da5':'#424957';ctx.lineWidth=1;
+  ctx.fillRect(17+recoil,-5,17,5);ctx.strokeRect(17+recoil,-5,17,5);ctx.fillStyle='#47362d';ctx.fillRect(18+recoil,0,5,7);
+  ctx.restore();
+ }
+ ctx.restore();
+ for(const f of e.flash){ctx.save();ctx.translate(f.x,f.y);ctx.rotate(f.angle);ctx.fillStyle=f.hand?'#ffd483':'#fff5d6';ctx.beginPath();ctx.moveTo(0,-4);ctx.lineTo(14,0);ctx.lineTo(0,4);ctx.fill();ctx.restore();}
+}
+const eiDrawBase=danteDraw;
+danteDraw=function(n){eiDrawBase(n);if(n.dante&&n.dante.arm===4)eiDraw(n);};
+
+// Render old Forms with their actual body renderer, without touching the player,
+// loadout or localStorage. Keep the sample below the shield text, outside hit areas.
+const formSamples=new Map();
+const formPreviewBase=drawCustomMenu;
+drawCustomMenu=function(){
+ formPreviewBase();
+ if(!danteOn()&&!apexOn()){
+  const form=xForm?7:currentForm;
+  let sample=formSamples.get(form);
+  if(!sample){
+   if(xForm){sample=new MegaManXBoss(1);sample.giap='thuong';sample.laChoi=true;sample.aS='khong';sample.grounded=true;}
+   else{sample=new Player(2,0,form,0,false);sample.id=0;sample.ammoType=-1;}
+   formSamples.set(form,sample);
+  }
+  ctx.save();ctx.fillStyle='#101820';ctx.fillRect(446,477,180,54);
+  ctx.beginPath();ctx.rect(446,477,180,54);ctx.clip();
+  ctx.translate(520,482);ctx.scale(xForm?.75:.9,xForm?.75:.9);
+  if(xForm)sample.veThan(0,0,1,{});else sample.drawDinoBody(0,0,form,false,false,null);ctx.restore();
+ }
+};
+const eiUIBase=drawUI;
+drawUI=function(){
+ eiUIBase();
+ if(!danteOn()||!dino?.dante||dino.dante.arm!==4)return;
+ const p=dino.dante;
+ ctx.save();if(dojoMode)ctx.translate(0,15);ctx.fillStyle='#1c1119';ctx.fillRect(15,92,275,20);ctx.fillStyle='#f3dddd';ctx.textAlign='left';ctx.font='11px Consolas';
+ ctx.fillText(p.k!==null?'CHARGED SHOT: '+Math.min(100,Math.floor(p.k/45*100))+'%':p.attack?p.attack.name:'J: FIRE · K: STYLE · HOLD K: CHARGE',20,105);ctx.restore();
+};
+const eiHelpBase=drawCustomMenu;
+drawCustomMenu=function(){
+ eiHelpBase();if(!danteOn()||dino?.dante?.arm!==4)return;
+ ctx.save();ctx.fillStyle='#190e14';ctx.fillRect(708,135,262,380);ctx.fillStyle='#ffd483';ctx.font='bold 12px Consolas';ctx.textAlign='left';ctx.fillText('EBONY & IVORY · Q/E',716,157);ctx.font='11px Consolas';ctx.fillStyle='#eee0df';
+ apexWrap(LT('Giữ J: bắn luân phiên 2 súng\nGiữ K 0.75s: CHARGED SHOT\nGUNSLINGER — nhả K nhanh:\nĐất: TWOSOME TIME (hai phía)\nCúi: HONEYCOMB FIRE (liên thanh)\nTrên không: RAIN STORM\nStyle khác: K bắn kép', 'Hold J: alternating pistol fire\nHold K 0.75s: CHARGED SHOT\nGUNSLINGER — tap K:\nGround: TWOSOME TIME (both sides)\nDown: HONEYCOMB FIRE (rapid fire)\nAir: RAIN STORM\nOther styles: K twin shots'),716,185,246,22);ctx.restore();
+};
+// Apply saved selection before the first rendered frame, even without Customize.
+danteSync();
 </script>
 </body>
 </html>
