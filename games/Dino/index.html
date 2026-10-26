@@ -103716,10 +103716,10 @@ function danteAttack(special,charge){
  p.attack={name,arm,dir,reach,dmg:dmg+bonus,wind,duration,pulses,interval,kind,lift,age:0,hit:new Set(),special,full};p.cd=duration;
  if(special)danteLabel(name);
 }
-function danteHit(p,o,damage){const dealt=sgDamage(dino,o,damage,'dante');if(dealt>0&&!p.dt)ultCharge=Math.min(100,ultCharge+dealt*.7);return dealt;}
+function danteHit(p,o,damage,arm=p.damageArm??p.arm){const scale=arm===1?.8:arm===2?.75:arm===3?.8:arm===5?.8:1;const dealt=sgDamage(dino,o,damage*scale,'dante');if(dealt>0&&!p.dt)ultCharge=Math.min(100,ultCharge+dealt*.7);return dealt;}
 function dantePulse(n,p,a){
  const cx=n.x+n.w/2,cy=n.y+n.h/2;
- function round(x,y,vx,vy,r,kind,damage,life=65){p.rounds.push({x,y,vx,vy,r,kind,damage,life,age:0,hit:new Set(),dir:a.dir});}
+ function round(x,y,vx,vy,r,kind,damage,life=65){p.rounds.push({arm:a.arm,x,y,vx,vy,r,kind,damage,life,age:0,hit:new Set(),dir:a.dir});}
  if(a.kind==='gun'||a.kind==='shotgun'){
   const count=a.kind==='gun'?1:5;
   for(let i=0;i<count;i++){const angle=(i-(count-1)/2)*.13;round(cx+a.dir*20,cy-10,Math.cos(angle)*a.dir*15,Math.sin(angle)*15,a.kind==='gun'?3:5,'bullet',a.dmg,a.kind==='gun'?55:24);}
@@ -103754,7 +103754,7 @@ function danteTick(){
   if(q.kind==='hat'&&q.age>25){const angle=Math.atan2(n.y+n.h/2-q.y,n.x+n.w/2-q.x);q.vx=Math.cos(angle)*12;q.vy=Math.sin(angle)*12;if(Math.hypot(n.x+n.w/2-q.x,n.y+n.h/2-q.y)<18)q.life=0;}
   q.x+=q.vx;q.y+=q.vy;
   const box={x:Math.min(oldX,q.x)-q.r,y:Math.min(oldY,q.y)-q.r,w:Math.abs(q.x-oldX)+q.r*2,h:Math.abs(q.y-oldY)+q.r*2};
-  for(const o of sgTargets(n)){const id=o.__goc||o;if(!q.hit.has(id)&&checkAABB(box,o)){q.hit.add(id);danteHit(p,o,q.damage);if(q.kind==='bullet'||q.kind==='meteor'){q.life=0;break;}}}
+  for(const o of sgTargets(n)){const id=o.__goc||o;if(!q.hit.has(id)&&checkAABB(box,o)){q.hit.add(id);danteHit(p,o,q.damage,q.arm??4);if(q.kind==='bullet'||q.kind==='meteor'){q.life=0;break;}}}
   if(q.kind==='meteor'&&q.life===0)p.fx.push({x:q.x,y:q.y,dir:1,r:50,kind:'fire',t:12,max:12,col:'#ff5533'});
  }
  p.rounds=p.rounds.filter(q=>q.life>0);p.fx=p.fx.filter(f=>--f.t>0);
@@ -103826,11 +103826,13 @@ function dswFloor(x,feet){
 function dswControl(o,opt={}){
  o=o.__goc||o;
  if(!o||o.invulnAll||o.hp<=0)return;
+ if(!danteControlAllowed(o))return null;
  const p=dino.dante,s=dswState(p);
  let c=o._dswControl;
  if(!c){
   const own=Object.prototype.hasOwnProperty.call(o,'update'),old=o.update;
-  c={stun:0,vx:0,vy:0,air:false,hold:false,slam:false,targetY:null,life:300,wall:false,own,old,owner:dino};
+  c={stun:0,vx:0,vy:0,air:false,hold:false,slam:false,targetY:null,life:300,wall:false,own,old,owner:dino,arm:p.damageArm??p.arm};
+  if(danteIsBoss(o)){const b=danteBossWindows.get(o);if(!b||frames>=b.until){const duration=danteBossOpening(o)?36:6;danteBossWindows.set(o,{until:frames+duration,ready:frames+duration+120});}c.bossOrigin={y:o.y,grounded:o.grounded};}
   o._dswControl=c;s.controls.add(o);
   const release=()=>{
    if(o.update===c.wrap){if(own)o.update=old;else delete o.update;}
@@ -103838,6 +103840,10 @@ function dswControl(o,opt={}){
   };
   c.release=release;
   c.wrap=function(...args){
+   if(c.bossOrigin&&frames>=danteBossWindows.get(this).until){
+    this.y=c.bossOrigin.y;this.grounded=c.bossOrigin.grounded;this.dy=0;if('vy' in this)this.vy=0;
+    release();return typeof old==='function'?old.apply(this,args):undefined;
+   }
    if(this.hp<=0||!danteOn()||dino!==c.owner||dino.hp<=0||--c.life<=0){
     release();
     return typeof old==='function'?old.apply(this,args):undefined;
@@ -103887,7 +103893,7 @@ function dswControl(o,opt={}){
     const minX=(typeof worldL==='function'?worldL():12),maxX=(typeof worldR==='function'?worldR():canvas.width-12)-ow;
     this.x=Math.max(minX,Math.min(maxX,raw));
     if(c.wall&&this.x!==raw){
-     danteHit(p,this,5);
+     danteHit(p,this,5,c.arm);
      c.wall=false;c.vx=-c.vx*0.35;
      visualEffects.push(new Effect(this.x+ow/2,this.y+oh/2,'explosion',true,42));
      shakeTimer=Math.max(shakeTimer,14);
@@ -104260,6 +104266,7 @@ function dswStrike(n,p,a,pulse,prevAge){
   if(!dealt)continue;
   a.hit.set(root,pulse);
 
+  if(!danteControlAllowed(root))continue;
   const held=root._dswControl;
   dswControl(o,{
    launch:a.launch,
@@ -104835,7 +104842,8 @@ function blrSpawnFireWave(n, p, b, dir){
   vy: 0,
   r: 26,
   kind: 'drive',
-  damage: dmg,
+  arm: 1,
+  damage: 0, // The ground flame already applies this move's damage once.
   life: 50,
   age: 0,
   hit: new Set(),
@@ -105041,6 +105049,7 @@ function blrStrike(n, p, b, a, pulse, customDmg = null, customOpt = {}){
   const ox = o.x + (o.w||40)/2, oy = o.y + (o.h||50)/2;
   visualEffects.push(new Effect(ox, oy, (b.ignite > 0 || a.fire) ? 'explosion' : 'parry', a.dir < 0, a.pose === 'magmaFin' || a.id === 'rimpact' ? 38 : 20));
 
+  if(!danteControlAllowed(root))continue;
   const held = root._dswControl;
   if(a.stunOnly){
    const ctrl = dswControl(o, {});
@@ -105107,10 +105116,10 @@ function blrTick(n, p){
  if(n.grounded && !p.attack) b.airSlow = 0;
  if(b.pillar && --b.pillar.t <= 0) b.pillar = null;
 
- // GIỮ J (>= 13 frame) -> Đấm liên hoàn máy khâu Rapid Jab
+ // GIỮ J (>= 20 frame) -> Đấm liên hoàn máy khâu Rapid Jab
  if(p.arm === 1 && keys.KeyJ && n.grounded && !keys.KeyS && !keys.ArrowDown){
   b.holdJ++;
-  if(b.holdJ >= 13 && (!p.attack || ['j1','j2'].includes(p.attack.id))){
+  if(b.holdJ >= 20 && (!p.attack || ['j1','j2'].includes(p.attack.id))){
    blrStart('rjab', { loops: 0 });
   }
  } else {
@@ -105136,26 +105145,26 @@ function blrTick(n, p){
 
   // 1. REAL IMPACT
   if(a.id === 'rimpact'){
-   if(a.age === 8){
+   if(a.age === 10){
     dashVx = a.dir * 8;
     blrStrike(n, p, b, a, 0, 3, { hold: true });
     if(SFX.tone) SFX.tone(180, 0.15, 'sawtooth', 0.2, 90);
    }
-   if(a.age === 24){
+   if(a.age === 30){
     n.dy = -13.5; n.grounded = false; b.airSlow = 55;
     b.pillar = { x: n.x + n.w/2 + a.dir * 38, t: 24, max: 24 };
     blrStrike(n, p, b, a, 1, 4, { launch: true });
     shakeTimer = Math.max(shakeTimer, 26);
     if(SFX.bossExplode) SFX.bossExplode();
    }
-   if(a.age === 32){
+   if(a.age === 40){
     blrStrike(n, p, b, a, 2, 8, { launch: true });
    }
   }
   // 2. FLINT WHEEL
   else if(a.id === 'fwheel'){
    n.dy = 12; dashVx = a.dir * 10;
-   if(a.age % 5 === 0) blrStrike(n, p, b, a, Math.floor(a.age / 5), 1, { hold: true });
+   if(a.age % 7 === 0) blrStrike(n, p, b, a, Math.floor(a.age / 7), 1, { hold: true });
    if(n.grounded && a.age > 4){
     blrStrike(n, p, b, a, 99, 4, { push: 12 });
     visualEffects.push(new Effect(n.x + n.w/2, n.y + n.h, 'explosion', true, 32));
@@ -105790,6 +105799,7 @@ function cavStrike(n, p, c, a, pulse){
    });
   }
 
+  if(!danteControlAllowed(root))continue;
   // 1. WHEELIE JUMP: Cuốn kẻ địch bay lên trời cùng độ cao với chiếc xe của Dante!
   if(a.launchWithMe){
    const ctrl = dswControl(o, { launch: true });
@@ -105862,10 +105872,10 @@ function cavTick(n, p){
 
   // Duy trì lướt tiến mượt mà khi đang ủi xe hoặc đẩy cưa
   if(a.id === 'k1_rush' && a.age >= a.wind && a.age <= a.end && n.grounded){
-   n.x = Math.max(12, Math.min(canvas.width - n.w - 12, n.x + a.dir * 7.5));
+   n.x = Math.max(12, Math.min(canvas.width - n.w - 12, n.x + a.dir * 6));
   }
   if((a.id === 'j2' || a.id === 'dashsaw') && a.age >= a.wind && a.age <= a.end && n.grounded){
-   n.x = Math.max(12, Math.min(canvas.width - n.w - 12, n.x + a.dir * 3.8));
+   n.x = Math.max(12, Math.min(canvas.width - n.w - 12, n.x + a.dir * 3));
   }
   if(a.id === 'airgrind'){
    n.dy = Math.min(n.dy, 0.25);
@@ -106427,6 +106437,7 @@ function kcbStrike(n, p, c, a, pulse){
    endX = ox; endY = oy;
    if(danteHit(p, target, dmg)){
     visualEffects.push(new Effect(ox, oy, 'lightning_shock', true, 32));
+    if(danteControlAllowed(target)){
     if(a.whipAirPull){
      const ctrl = dswControl(target, { hold: true });
      if(ctrl){
@@ -106446,6 +106457,7 @@ function kcbStrike(n, p, c, a, pulse){
      const pullX = cx + a.dir * 62 - (target.w||40)/2;
      target.x += (pullX - target.x) * 0.55;
     }
+   }
    }
   }
   c.whipLine = { x1: cx + a.dir * 14, y1: cy - 4, x2: endX, y2: endY, t: 10, max: 10 };
@@ -106493,6 +106505,7 @@ function kcbStrike(n, p, c, a, pulse){
    });
   }
 
+  if(!danteControlAllowed(root))continue;
   if(a.holdAir){
    const ctrl = dswControl(o, { hold: true });
    if(ctrl){
@@ -106554,7 +106567,7 @@ function kcbTick(n, p){
 
  if(p.arm === 3 && keys.KeyK && n.grounded && !keys.KeyS && !keys.ArrowDown){
   c.holdK++;
-  if(c.holdK >= 16 && (!p.attack || p.attack.id === 'k1')){
+  if(c.holdK >= 24 && (!p.attack || p.attack.id === 'k1')){
    kcbStart('clap');
   }
  } else {
@@ -106575,7 +106588,7 @@ function kcbTick(n, p){
    n.dy = Math.min(n.dy, 0.15);
   }
   if((a.id === 'revolver' || a.id === 'pole') && a.age >= a.wind && a.age <= a.end){
-   n.x = Math.max(12, Math.min(canvas.width - n.w - 12, n.x + a.dir * 5.2));
+   n.x = Math.max(12, Math.min(canvas.width - n.w - 12, n.x + a.dir * 4.2));
   }
 
   if(a.hits){
@@ -107076,7 +107089,7 @@ function eiCommand(special,charge){
 function eiShoot(n,p,a,angle,hand,damage,charged=false){
  const e=eiState(p),x=n.x+n.w/2+Math.cos(angle)*34+(hand?-9:9),y=n.y+22+Math.sin(angle)*18+(hand?3:-3);
  const speed=charged?21:18;
- p.rounds.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:charged?5:2.5,kind:charged?'ei-charge':'bullet',color:danteBulletColor(p),damage:danteRangedBase(p,charged?damage:1,charged)+(p.dt?2:0),life:50,age:0,hit:new Set(),dir:a.dir});
+ p.rounds.push({arm:4,x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:charged?5:2.5,kind:charged?'ei-charge':'bullet',color:danteBulletColor(p),damage:danteRangedBase(p,charged?damage:1,charged)+(p.dt?2:0),life:50,age:0,hit:new Set(),dir:a.dir});
  e.flash.push({x,y,angle,hand,t:4});
 }
 // Sequences are recorded on real presses and successful dashes, never on auto-fire.
@@ -107322,7 +107335,7 @@ function faustCommand(special,charge=0){
  if(special)danteLabel(p.attack.name);
 }
 function faustRound(n,p,angle,damage){
- p.rounds.push({x:n.x+n.w/2+Math.cos(angle)*27,y:n.y+23,vx:Math.cos(angle)*16,vy:Math.sin(angle)*16,r:4,kind:'bullet',color:danteBulletColor(p),damage:danteRangedBase(p,1)+(p.dt?2:0),life:65,age:0,hit:new Set()});
+ p.rounds.push({arm:5,x:n.x+n.w/2+Math.cos(angle)*27,y:n.y+23,vx:Math.cos(angle)*16,vy:Math.sin(angle)*16,r:4,kind:'bullet',color:danteBulletColor(p),damage:danteRangedBase(p,1)+(p.dt?2:0),life:65,age:0,hit:new Set()});
  faustState(p).flash=5;if(SFX.tone)SFX.tone(480,.04,'triangle',.045,150);
 }
 function faustHatShape(x,y,rotation=0,scale=1){
@@ -107356,7 +107369,7 @@ function faustStrike(n,p,a){
   if(a.hit.has(root)||sgSegmentBox(prev.x,prev.y,current.x,current.y,o,19)===null)continue;
   a.hit.add(root);
   if(danteHit(p,o,(a.id==='upper'?7:5)+(p.dt?2:0))>0){
-   if(a.id==='upper'&&Number.isFinite(o.dy))o.dy=-9;
+   if(a.id==='upper')dswControl(o,{launch:true});
    const x=Math.max(o.x,Math.min(current.x,o.x+o.w)),y=Math.max(o.y,Math.min(current.y,o.y+o.h));
    faustParticles(f,x,y);f.impacts.push({x,y,t:10,max:10,r:30});shakeTimer=Math.max(shakeTimer,3);
   }
@@ -107415,7 +107428,7 @@ function faustOrbit(n,p,f){
    const root=o.__goc||o;
    if(f.ringHits.has(root))continue;
    if(sgSegmentBox(cx+Math.cos(b)*radius,cy+Math.sin(b)*radius,x,y,o,5)!==null){
-    f.ringHits.set(root,frames+12);danteHit(p,o,danteRangedBase(p,1)+(p.dt?2:0));
+    f.ringHits.set(root,frames+18);danteHit(p,o,danteRangedBase(p,1)+(p.dt?2:0));
    }
   }
  }
@@ -107449,7 +107462,7 @@ function faustTick(){
   if(['slash','upper','dash','air'].includes(a.id)){p.body._swordLean=(a.id==='upper'?-.25:.23)*hit;p.body._swordLunge=12*hit;p.body._faustLegs={mode:a.id,t:hit};}
   if(a.id==='meteor'||a.id==='beam')p.body._faustLegs={mode:'cast',t:1};
  }
- const shooting=keys.KeyJ&&!keys.KeyK&&p.k===null&&!n.isShielding()&&(!a||a.id==='shot')&&p.cd<=9;
+ const shooting=keys.KeyJ&&!keys.KeyK&&p.k===null&&!n.isShielding()&&(!a||a.id==='shot')&&p.cd<=FAUST_MOVES.shot.T;
  f.hold=shooting?f.hold+1:0;f.orbit=shooting&&f.hold>=18?1:0;
  if(f.orbit)faustOrbit(n,p,f);
  else if(shooting&&!a&&p.cd<=0)faustCommand(false);
@@ -107630,7 +107643,12 @@ parry=function(y){if(danteRoyalShield()){danteGuardContact(1,danteGuardSource())
 const styleShieldBase=Player.prototype.isShielding;
 Player.prototype.isShielding=function(){if(danteStyleLive()&&this===dino)return frames<danteStyleState(this.dante).guardUntil;return styleShieldBase.call(this);};
 const styleDamageBase=Player.prototype.takeDamage;
-Player.prototype.takeDamage=function(amount=1,...args){if(this===dino&&danteRoyalShield()){danteGuardContact(amount);return;}return styleDamageBase.call(this,amount,...args);};
+Player.prototype.takeDamage=function(amount=1,...args){
+ if(this===dino&&danteRoyalShield()){danteGuardContact(amount);return;}
+ const hp=this.hp,result=styleDamageBase.call(this,amount,...args);
+ if(this.hp<hp&&this.dante?.styles)this.dante.styles.swords=[];
+ return result;
+};
 function danteGuardPress(){
  const n=dino,p=n.dante,s=danteStyleState(p);
  if(danteStyle()===2&&frames-s.lastDash<=24&&s.bank>0){
@@ -107669,6 +107687,8 @@ const styleKeyBase=danteKey;
 danteKey=function(code,repeat){
  if(danteStyleLive()){
   const p=dino.dante,s=danteStyleState(p);
+  if(['KeyQ','KeyE'].includes(code)){keys[code]=true;if(!paused&&!repeat)danteSwapWeapon(code==='KeyE'?1:-1);return true;}
+  if(!paused&&!repeat&&['KeyJ','KeyK'].includes(code)&&frames<(p.swapReady||0)){keys[code]=true;p.swapInput=code;return true;}
   if(['KeyI','KeyO','KeyL'].includes(code)){
    keys[code]=true;if(paused||repeat)return true;
    if(code==='KeyL')danteGuardPress();else danteSetStyle(danteStyle()+(code==='KeyO'?1:-1));return true;
@@ -107694,37 +107714,123 @@ doDash=function(...args){
  if(danteStyle()===3){dashVx*=1.45;danteGhost(n);}
 };
 function danteSwordCount(){return styleRankIdx>=6?4:styleRankIdx>=4?3:styleRankIdx>=2?2:1;}
-// Custom Swordmaster: autonomous supporting cuts, with the user's rank/damage rules.
-// Formation, slash and dissolve are separate phases; these are not extra held weapons.
+// Custom Swordmaster: sequential cuts, fan stabs and a converging Stinger drill.
+// Integrates the supplied choreography while preserving the other three styles.
 function danteSwordMove(a){
  if(!a||a.royal||a.ebony||a.guard)return null;
- let pose=a.pose,wind=a.wind??4;
+ let pose=a.pose||'',id=a.id||'',wind=a.wind??4;
  if(a.faust){
-  if(!['slash','upper','dash','air'].includes(a.id))return null;
-  pose=a.id==='upper'||a.combo===1?'up':'down';wind=5;
+  if(!['slash','upper','dash','air'].includes(id))return null;
+  pose=id==='upper'||a.combo===1?'up':'down';wind=5;
  }else if(!a.sword&&!a.balrog&&!a.cavaliere&&!a.cerberus)return null;
- const kind=/up|bikeUp/i.test(pose)?'rise':/thrust|stab|poke|jab|oneTwo|magmaFin/i.test(pose)?'thrust':'cut';
- return {kind,trigger:wind+1};
+
+ // Phân loại rõ 4 kiểu đội hình kiếm ảo ảnh:
+ // 1. 'drill' : Stinger / Power Thrust / Siêu Trọng Quyền / Đâm Trường Côn -> Chụm mũi kiếm tạo MŨI KHOAN XOÁY!
+ // 2. 'fan'   : Million Stab / Rapid Jab / MultiPoke -> Đâm chĩa ra nhiều hướng tầm cực xa!
+ // 3. 'rise'  : High Time / Updraft / Chọc Gậy Lên -> Chém vớt vòng cung từ dưới đất lên trời!
+ // 4. 'cut'   : Các đòn chém thường -> Bay ra chém lần lượt từng thanh nối tiếp nhau mượt mà!
+ // j3/j4 are shared IDs: only Balrog j4 is a punch drill, and Cerberus j3 a fan stab.
+ const isDrill=/^(stinger|thrust|dhit|mdragon|bcounter|hjolt|pole)$/.test(id)||(a.balrog&&id==='j4')||/thrust|magmaFin|pokeFront/i.test(pose);
+ const isFan=/^(million|bstab|dstab|rjab)$/.test(id)||(a.cerberus&&id==='j3')||/stab|rjab|multiPoke/i.test(pose);
+ const isRise=/up|bikeUp|pokeUp|upper/i.test(pose)||/^(high|updraft|Kautilya)$/.test(id);
+
+ const kind=isDrill?'drill':isFan?'fan':isRise?'rise':'cut';
+ return {kind,trigger:Math.max(1,wind)};
 }
 function danteSwordPose(n,sword,stroke=sword.stroke){
- const spread=sword.i-(sword.count-1)/2;
- const sx=-28-(sword.i%2)*10,sy=19+spread*9;
- const rising=(sword.move.kind==='rise')!==(sword.i%2===1),vertical=rising?-1:1;
- const progress=Math.max(0,Math.min(1,stroke/9)),ease=progress*progress*(3-2*progress);
- let x=sx,y=sy,angle=-vertical*2.05+spread*.08;
- if(sword.move.kind==='thrust'){
-  // Short coordinated thrust, returning toward the formation rather than flying away.
-  x+=58*Math.sin(progress*Math.PI*.8);y+=Math.sin(progress*Math.PI)*spread*3;angle=spread*.12;
- }else{
-  // A free hilt sweeps from the rear formation around the flank and into a local cut.
-  // Alternating upper/lower cuts keep each blade readable without copying Dante's rig.
-  x+=54*Math.sin(progress*Math.PI*.65);
-  y+=vertical*(24*ease-6*Math.sin(progress*Math.PI));
-  angle+=vertical*3.5*ease;
+ const i=sword.i,count=sword.count;
+ const spread=i-(count-1)/2;
+ const kind=sword.move.kind;
+ const ox=sword.origin?.x??(n.x+n.w/2);
+ const oy=sword.origin?.y??n.y;
+ const dir=sword.dir;
+
+ // Vị trí treo mặc định sau vai Dante (Xếp hình cánh chim Awakened DSD)
+ const wingX=-24-Math.abs(spread)*8-(i%2)*6;
+ const wingY=12+spread*10;
+
+ // 1. KHI CHƯA PHÓNG (Đang xếp đội hình chờ tới lượt chém)
+ if(stroke<=0){
+  const hover=Math.sin(frames*0.18+i*1.2)*2.5;
+  const angle=-0.35+spread*0.18;
+  const len=66,flat=0.85;
+  const x=ox+dir*wingX,y=oy+wingY+hover;
+  return {x,y,angle,len,flat,tx:x+dir*Math.cos(angle)*len,ty:y+Math.sin(angle)*len*flat,drillSpin:0};
  }
- const len=58,flat=sword.move.kind==='thrust'?.75:1;
- x=(sword.origin?.x??n.x+n.w/2)+sword.dir*x;y=(sword.origin?.y??n.y)+y;
- return {x,y,angle,len,flat,tx:x+sword.dir*Math.cos(angle)*len,ty:y+Math.sin(angle)*len*flat};
+
+ // 2. KIỂU 'DRILL' (STINGER / POWER THRUST): Các đầu mũi kiếm chụm khít lại ở mũi kiếm chính tạo thành MŨI KHOAN XOÁY!
+ if(kind==='drill'){
+  const dur=14;
+  const p=Math.max(0,Math.min(1,stroke/dur));
+  const thrustEase=Math.sin(p*Math.PI*0.88);
+  const spin=stroke*0.85+(i*Math.PI*2/Math.max(1,count));
+  const bladeLength=78;
+
+  // Điểm hội tụ của tất cả các đầu mũi kiếm nằm xa phía trước mũi kiếm của Dante (136px!)
+  const focalX=52+86*thrustEase;
+  const focalY=25;
+
+  // Phần chuôi kiếm xòe ra thành vòng tròn và quay tít quanh trục đâm tạo hình nón Mũi Khoan 3D
+  const coneRadius=(18-6*thrustEase)*(count>1?1:0.4);
+  const hiltsSpreadY=Math.sin(spin)*coneRadius;
+  const hiltsSpreadX=Math.cos(spin)*6;
+
+  const tx=ox+dir*focalX;
+  const ty=oy+focalY+Math.sin(spin)*2.5; // Đầu mũi kiếm chụm sát nhau xoáy nhẹ
+  const hx=tx-dir*(bladeLength-hiltsSpreadX);
+  const hy=ty+hiltsSpreadY;
+  const flat=0.55+0.35*Math.abs(Math.cos(spin));
+  // Match the rendered tip to the collision tip after the perspective transform.
+  const dx=(tx-hx)*dir,dy=(ty-hy)/flat;
+  const angle=Math.atan2(dy,dx),len=Math.hypot(dx,dy);
+
+  return {x:hx,y:hy,angle,len,flat,tx,ty,drillSpin:spin,isDrill:true,focalX:tx,focalY:ty,coneR:coneRadius};
+ }
+
+ // 3. KIỂU 'FAN' (MILLION STAB): Phóng vọt ra xa tới 120px và chĩa ra nhiều hướng hình rẻ quạt!
+ if(kind==='fan'){
+  const dur=11;
+  const p=Math.max(0,Math.min(1,stroke/dur));
+  // Hàm lao vọt ra cực nhanh rồi thu nhẹ về
+  const jab=Math.sin(p*Math.PI);
+  const fanAng=spread*0.24+(sword.fanJitter||0);
+  const reach=18+98*jab; // Vươn xa hơn hẳn vũ khí thường!
+  const len=74,flat=0.72;
+
+  const x=ox+dir*(wingX*(1-jab)+Math.cos(fanAng)*reach);
+  const y=oy+wingY*(1-jab*0.6)+24*jab+Math.sin(fanAng)*reach*0.85;
+  return {x,y,angle:fanAng,len,flat,tx:x+dir*Math.cos(fanAng)*len,ty:y+Math.sin(fanAng)*len*flat,isFan:true};
+ }
+
+ // 4. KIỂU 'CUT' & 'RISE' (CHÉM LẦN LƯỢT TỪNG THANH):
+ // Mỗi thanh kiếm bay vòng từ sau lưng ra phía trước và quét một đường vòng cung cực rộng & mượt!
+ const dur=12;
+ const p=Math.max(0,Math.min(1,stroke/dur));
+ // Nội suy Ease-In-Out mượt mà cho quỹ đạo vung kiếm
+ const ease=p<0.5?(2*p*p):(1-Math.pow(-2*p+2,2)/2);
+ const arcSin=Math.sin(p*Math.PI);
+
+ // Đan xen hướng chém của từng thanh kiếm (Thanh 1 chém bổ xuống, Thanh 2 chém vớt lên, Thanh 3 chém ngang...)
+ const rising=(kind==='rise')?(i%2===0):(i%2===1);
+ const vert=rising?-1:1;
+
+ // Tầm vươn ra phía trước xa hơn vũ khí chính (chuôi kiếm bay ra tới +68px, cộng thêm lưỡi kiếm dài 74px = tầm 142px!)
+ const reachX=wingX*(1-arcSin)+68*arcSin;
+ const centerY=24+spread*5;
+ const sweepY=centerY-vert*34*Math.cos(ease*Math.PI);
+
+ // Góc xoay lưỡi kiếm quét trọn một cung 210 độ tạo vệt lụa tròn trịa
+ const startAng=vert*2.25+spread*0.1;
+ const endAng=-vert*1.65+spread*0.1;
+ const angle=startAng+(endAng-startAng)*ease;
+
+ const len=74;
+ // Độ nghiêng mặt phẳng chém (3D perspective) khác nhau cho mỗi thanh kiếm để nhìn rõ từng đường kiếm tách biệt
+ const flat=(i%3===2)?0.48:0.88;
+ const x=ox+dir*reachX;
+ const y=oy+sweepY;
+
+ return {x,y,angle,len,flat,tx:x+dir*Math.cos(angle)*len,ty:y+Math.sin(angle)*len*flat};
 }
 function danteSwordStart(){
  const n=dino,p=n.dante,s=danteStyleState(p),a=p.attack;
@@ -107732,47 +107838,96 @@ function danteSwordStart(){
  s.seenAttacks.add(a);
  const move=danteSwordMove(a);if(danteStyle()!==0||!move)return;
  const count=danteSwordCount(),dir=a.dir||(n.isFacingLeft?-1:1);
- // One simultaneous group per accepted melee action, including attacks that miss.
- s.swords=[];
+
+ // Delayed cuts from the preceding combo finish alongside the new group.
+ s.swords=s.swords.filter(sword=>sword.arm===p.arm);
  for(let i=0;i<count;i++){
-  const sword={attack:a,move,dir,i,count,age:0,stroke:0,launched:false,origin:null,phase:'formation',alpha:.35,hit:false,color:'#ff355d',trail:[]};
-  Object.assign(sword,danteSwordPose(n,sword));s.swords.push(sword);
+  // ĐỘ TRỄ LẦN LƯỢT (`delay`):
+  // - Nếu là Mũi Khoan Stinger ('drill'): Cả đội hình lao ra xoáy cùng lúc (delay = 0) để hợp thành mũi khoan!
+  // - Nếu là Đâm Million Stab ('fan'): Phóng nối đuôi nhau siêu nhanh (cách nhau 2 frame).
+  // - Nếu là Chém ('cut' / 'rise'): Chém lần lượt từng thanh cách nhau 3 frame để tạo chuỗi đường kiếm nối tiếp tuyệt đẹp!
+  const stepDelay=move.kind==='drill'?0:(move.kind==='fan'?i*2:i*3);
+  const fanJitter=(Math.random()-0.5)*0.12;
+  const sword={
+   attack:a,move,dir,i,count,arm:p.arm,
+   age:0,stroke:0,
+   delay:stepDelay,
+   fanJitter,
+   launched:false,origin:null,
+   phase:'formation',alpha:0.45,
+   hit:false,color:'#ff2a55',trail:[]
+  };
+  Object.assign(sword,danteSwordPose(n,sword,0));
+  s.swords.push(sword);
  }
+ if(s.swords.length>16)s.swords.splice(0,s.swords.length-16);
 }
 const styleAttackBase=danteAttack;
 danteAttack=function(...args){const result=styleAttackBase(...args);if(danteStyleLive())danteSwordStart();return result;};
 function danteSwordsTick(n,p,s){
- // Guard, damage, weapon/style changes and combo transitions cannot leave a stray hit.
- s.swords=s.swords.filter(sword=>sword.attack===p.attack&&sword.stroke<15);
+ // Cho phép các thanh kiếm ảo ảnh hoàn thành nốt đường chém của mình kể cả khi các thanh sau chém trễ hơn vài frame!
+ s.swords=s.swords.filter(sword=>{
+  const maxStroke=sword.move.kind==='drill'?18:16;
+  const alive=sword.stroke<maxStroke;
+  // Chỉ hủy sớm nếu Dante bị trúng đòn hoặc bấm Khiên Royal Guard
+  const interrupted=n.hp<=0||sword.arm!==p.arm||n.isShielding()||(p.attack&&p.attack!==sword.attack&&p.attack.royal);
+  return alive&&!interrupted;
+ });
  if(!s.swords.length)return;
+
  let targets=null;
  for(const sword of s.swords){
-  const previous=sword.stroke;sword.age++;
-  if(!sword.launched&&sword.attack.age>=sword.move.trigger){
-   sword.launched=true;sword.origin={x:n.x+n.w/2,y:n.y};
+  const previous=sword.stroke;
+  sword.age++;
+
+  // Cập nhật tâm bám theo Dante trước khi thanh kiếm đó đến lượt phóng ra
+  const triggerFrame=sword.move.trigger+(sword.delay||0);
+  const atkAge=(sword.attack===p.attack&&p.attack)?p.attack.age:sword.age;
+
+  if(!sword.launched&&atkAge>=triggerFrame){
+   sword.launched=true;
+   sword.origin={x:n.x+n.w/2,y:n.y};
+   if(SFX.tone&&sword.i===0)SFX.tone(sword.move.kind==='drill'?620:980,0.04,'sine',0.06,420);
+  }else if(sword.launched&&sword.move.kind==='drill'){
+   // Với Stinger Drill, mũi khoan lướt đi cùng vị trí của Dante!
+   sword.origin={x:n.x+n.w/2,y:n.y};
   }
+
   if(sword.launched)sword.stroke++;
-  sword.phase=!sword.launched?'formation':sword.stroke<=9?'slash':'dissolve';
-  sword.alpha=Math.min(1,(sword.age+1)/3)*Math.max(0,1-Math.max(0,sword.stroke-9)/6);
+
+  const activeEnd=sword.move.kind==='drill'?14:(sword.move.kind==='fan'?11:12);
+  sword.phase=!sword.launched?'formation':sword.stroke<=activeEnd?'slash':'dissolve';
+  sword.alpha=Math.min(1,(sword.age+1)/3)*Math.max(0,1-Math.max(0,sword.stroke-activeEnd)/4);
+
   Object.assign(sword,danteSwordPose(n,sword));
+
   if(sword.phase==='slash'){
    targets=targets||sgTargets(n);
-   for(let step=1;step<=4;step++){
-    const v=danteSwordPose(n,sword,previous+(sword.stroke-previous)*step/4);
-    sword.trail.push({x:v.x,y:v.y,tx:v.tx,ty:v.ty,age:sword.age});
-    if(!sword.hit)for(const o of targets){
-     // Only the local forward swing can hit. There is no target lock or travel path.
-     if((o.x+o.w/2-sword.origin.x)*sword.dir<0)continue;
-     if(sgSegmentBox(v.x,v.y,v.tx,v.ty,o,6)!==null&&sgDamage(n,o,1,'phantom')>0){sword.hit=true;break;}
+   // Nội suy 5 bước mịn mỗi frame để vệt lụa kiếm khí (trail) cong mượt không bị gãy góc
+   for(let step=1;step<=5;step++){
+    const subStroke=previous+(sword.stroke-previous)*step/5;
+    const v=danteSwordPose(n,sword,subStroke);
+    sword.trail.push({x:v.x,y:v.y,tx:v.tx,ty:v.ty,age:sword.age-1+step/5});
+
+    if(!sword.hit){
+     for(const o of targets){
+      if((o.x+o.w/2-(sword.origin?.x??n.x))*sword.dir<-15)continue;
+      if(sgSegmentBox(v.x,v.y,v.tx,v.ty,o,10)!==null&&sgDamage(n,o,1,'phantom')>0){
+       sword.hit=true;
+       break;
+      }
+     }
     }
    }
   }
-  sword.trail=sword.trail.filter(v=>sword.age-v.age<4);if(sword.trail.length>16)sword.trail.splice(0,sword.trail.length-16);
+  sword.trail=sword.trail.filter(v=>sword.age-v.age<4.5);
+  if(sword.trail.length>22)sword.trail.splice(0,sword.trail.length-22);
  }
 }
 function danteStylesTick(){
  if(!danteStyleLive()||paused)return;
  const n=dino,p=n.dante,s=danteStyleState(p);
+ if(p.swapInput&&frames>=(p.swapReady||0)){const code=p.swapInput,held=!!keys[code];p.swapInput=null;danteKey(code,false);keys[code]=held;}
  s.ghosts=s.ghosts.filter(g=>--g.t>0);danteSwordStart();danteSwordsTick(n,p,s);
  if(s.royalFx&&++s.royalFx.t>DANTE_ROYAL_FX)s.royalFx=null;p.body._trickPhase=Math.max(0,(s.phaseUntil-frames)/8);
  n.meleeTimer=Math.max(0,Math.min(n.meleeTimer,s.guardUntil-frames));n.parryWindow=Math.max(0,s.perfectUntil-frames);
@@ -107809,16 +107964,109 @@ function danteDrawShadow(g){
 }
 function danteDrawSword(sword){
  const alpha=sword.alpha;
- ctx.save();ctx.lineCap='round';
- for(let i=1;i<sword.trail.length;i++){
-  const prev=sword.trail[i-1],v=sword.trail[i];
-  ctx.globalAlpha=alpha*(1-(sword.age-v.age)/4)*.12;
-  ctx.fillStyle='#ff214d';ctx.beginPath();ctx.moveTo(prev.x,prev.y);ctx.lineTo(prev.tx,prev.ty);ctx.lineTo(v.tx,v.ty);ctx.lineTo(v.x,v.y);ctx.closePath();ctx.fill();
-  ctx.globalAlpha*=2;ctx.strokeStyle='#ff375d';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(prev.tx,prev.ty);ctx.lineTo(v.tx,v.ty);ctx.stroke();
+ if(alpha<=0.02)return;
+ ctx.save();
+ ctx.lineCap='round';ctx.lineJoin='round';
+
+ // 1. VẼ VỆT LỤA KIẾM KHÍ (RIBBON SLASH TRAIL) MƯỢT MÀ CỦA TỪNG LƯỠI KIẾM
+ if(sword.trail.length>=2){
+  for(let i=1;i<sword.trail.length;i++){
+   const prev=sword.trail[i-1],v=sword.trail[i];
+   const fade=Math.max(0,1-(sword.age-v.age)/4.5);
+   // Dải lụa đỏ huyết ngọc từ giữa thân kiếm ra tới mũi kiếm
+   ctx.globalAlpha=alpha*fade*0.28;
+   ctx.fillStyle='#ff1744';
+   ctx.beginPath();
+   ctx.moveTo(prev.x+(prev.tx-prev.x)*0.35,prev.y+(prev.ty-prev.y)*0.35);
+   ctx.lineTo(prev.tx,prev.ty);
+   ctx.lineTo(v.tx,v.ty);
+   ctx.lineTo(v.x+(v.tx-v.x)*0.35,v.y+(v.ty-v.y)*0.35);
+   ctx.closePath();ctx.fill();
+
+   // Đường viền mũi kiếm sáng trắng-hồng sắc lẹm để nhìn rõ thứ tự từng nhát chém
+   ctx.globalAlpha=alpha*fade*0.85;
+   ctx.strokeStyle='#ff80ab';
+   ctx.lineWidth=3.2*fade;
+   ctx.beginPath();ctx.moveTo(prev.tx,prev.ty);ctx.lineTo(v.tx,v.ty);ctx.stroke();
+
+   ctx.strokeStyle='#ffffff';
+   ctx.lineWidth=1.2*fade;
+   ctx.beginPath();ctx.moveTo(prev.tx,prev.ty);ctx.lineTo(v.tx,v.ty);ctx.stroke();
+  }
  }
- ctx.globalAlpha=alpha*.85;ctx.translate(sword.x,sword.y);ctx.scale(sword.dir,sword.flat);ctx.rotate(sword.angle);ctx.shadowColor='#ff194d';ctx.shadowBlur=8;
- ctx.fillStyle=sword.color;ctx.beginPath();ctx.moveTo(3,-4);ctx.lineTo(sword.len-18,-6);ctx.lineTo(sword.len,0);ctx.lineTo(sword.len-18,6);ctx.lineTo(3,4);ctx.closePath();ctx.fill();
- ctx.strokeStyle='#ffc3cf';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(5,0);ctx.lineTo(sword.len-4,0);ctx.stroke();ctx.fillStyle='#ce153d';ctx.fillRect(-2,-10,4,20);ctx.fillRect(-12,-2,12,4);ctx.restore();
+
+ // 2. HIỆU ỨNG MŨI KHOAN XOÁY ỐC (SPIRAL DRILL RINGS) KHI DÙNG STINGER / THRUST
+ if(sword.isDrill&&sword.phase==='slash'&&sword.i===0){
+  ctx.save();
+  ctx.globalAlpha=alpha*0.85;
+  ctx.shadowColor='#ff1744';ctx.shadowBlur=16;
+  // Các vòng xoắn ốc đỏ-trắng cuộn quanh đầu mũi khoan
+  for(let r=0;r<3;r++){
+   const rx=sword.focalX-sword.dir*(12+r*18);
+   const ry=sword.focalY;
+   const radY=Math.max(3,(sword.coneR||14)*(1-r*0.22)+4);
+   ctx.strokeStyle=r===0?'#ffffff':'#ff1744';
+   ctx.lineWidth=r===0?2.5:3.5;
+   ctx.beginPath();
+   ctx.ellipse(rx,ry,5,radY,0,sword.drillSpin+r,sword.drillSpin+r+Math.PI*1.35);
+   ctx.stroke();
+  }
+  // Mũi nhọn ánh sáng xuyên phá ở đỉnh mũi khoan
+  ctx.fillStyle='#ffffff';
+  ctx.beginPath();
+  ctx.moveTo(sword.focalX+sword.dir*18,sword.focalY);
+  ctx.lineTo(sword.focalX-sword.dir*10,sword.focalY-7);
+  ctx.lineTo(sword.focalX-sword.dir*10,sword.focalY+7);
+  ctx.closePath();ctx.fill();
+  ctx.restore();
+ }
+
+ // 3. HIỆU ỨNG TIA ĐÂM RẺ QUẠT (FAN STAB SPARK) KHI DÙNG MILLION STAB
+ if(sword.isFan&&sword.phase==='slash'&&sword.stroke>=3&&sword.stroke<=8){
+  ctx.save();
+  ctx.globalAlpha=alpha*0.75;
+  ctx.strokeStyle='#ffffff';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(sword.x,sword.y);ctx.lineTo(sword.tx+sword.dir*12,sword.ty);ctx.stroke();
+  ctx.restore();
+ }
+
+ // 4. VẼ THANH KIẾM NĂNG LƯỢNG SUMMONED SWORD (Thiết kế chuẩn Mirage Blade của Dante)
+ ctx.globalAlpha=alpha*0.92;
+ ctx.translate(sword.x,sword.y);
+ ctx.scale(sword.dir,sword.flat);
+ ctx.rotate(sword.angle);
+ ctx.shadowColor='#ff1744';ctx.shadowBlur=12;
+
+ // Thân lưỡi kiếm năng lượng đỏ bán trong suốt có gai ngạnh
+ ctx.fillStyle='#ff1744';
+ ctx.beginPath();
+ ctx.moveTo(2,-4.5);
+ ctx.lineTo(18,-7);
+ ctx.lineTo(14,-3.5);
+ ctx.lineTo(sword.len-16,-5.5);
+ ctx.lineTo(sword.len,0);
+ ctx.lineTo(sword.len-16,5.5);
+ ctx.lineTo(14,3.5);
+ ctx.lineTo(18,7);
+ ctx.lineTo(2,4.5);
+ ctx.closePath();ctx.fill();
+
+ // Lõi ánh sáng trắng hồng rực rỡ chạy dọc sống kiếm
+ ctx.fillStyle='#ffe4ec';
+ ctx.beginPath();
+ ctx.moveTo(6,-1.8);
+ ctx.lineTo(sword.len-4,0);
+ ctx.lineTo(6,1.8);
+ ctx.closePath();ctx.fill();
+
+ // Hộ thủ cánh dơi quỷ & Chuôi kiếm năng lượng
+ ctx.fillStyle='#d50032';
+ ctx.beginPath();
+ ctx.moveTo(-2,-11);ctx.lineTo(5,-3);ctx.lineTo(5,3);ctx.lineTo(-2,11);ctx.lineTo(-5,0);
+ ctx.closePath();ctx.fill();
+ ctx.fillRect(-14,-2,12,4);
+
+ ctx.restore();
 }
 // Pure Royal Release effect: a short impact burst, plus a central pressure wave
 // at 30 stored damage. No detached hand, projectile or second damage event.
@@ -107878,8 +108126,46 @@ const styleMenuBase=drawCustomMenu;
 drawCustomMenu=function(){
  styleMenuBase();if(!danteOn()||!dino?.dante)return;
  ctx.save();ctx.fillStyle='#190e14';ctx.fillRect(28,117,266,405);ctx.textAlign='left';ctx.font='11px Consolas,monospace';ctx.fillStyle='#eee0df';
- apexWrap(LT('I/O: đổi 4 STANCE riêng\n\nSWORDMASTER\nKiếm đỏ tự chém phụ cận chiến\nD/C: 1 · B/A: 2 · S/SS: 3\nSSS: 4 kiếm cùng lúc\n\nGUNSLINGER\nĐạn thường: 1 → 2, chuyển đỏ\nĐòn mạnh tăng lực; thêm meteor\n\nROYAL GUARD\nPerfect L: hồi đỡ ngay, tích kho\nDash L: trả kho vào 1 mục tiêu\nTích 30 sát thương: thêm sóng\n\nTRICKSTER\nDash xa, bóng đen mờ\nGần <2cm: ra sau lưng mục tiêu\nCúi → Nhảy: bật lên, dịch tới\n\nQ/E: vũ khí · U: Devil Trigger', 'I/O: cycle 4 DANTE STYLES\n\nSWORDMASTER\nRed swords: supporting cuts, 1 dmg\nD/C: 1 · B/A: 2 · S/SS: 3\nSSS: 4 simultaneous swords\n\nGUNSLINGER\nNormal rounds: 1 → 2, turn red\nStronger specials, extra meteor\n\nROYAL GUARD\nPerfect L: guard reset, store\nDash L: release bank at 1 enemy\n30 stored damage: pressure wave\n\nTRICKSTER\nLong dash, dark afterimages\nWithin <2cm: cross behind foe\nCrouch → Jump: rise + teleport\n\nQ/E: weapons · U: Devil Trigger'),38,139,246,17);ctx.restore();
+ apexWrap(LT('I/O: đổi 4 STANCE riêng\n\nSWORDMASTER\nKiếm đỏ tự chém phụ cận chiến\nD/C: 1 · B/A: 2 · S/SS: 3\nSSS: đội hình 4 kiếm\n\nGUNSLINGER\nĐạn thường: 1 → 2, chuyển đỏ\nĐòn mạnh tăng lực; thêm meteor\n\nROYAL GUARD\nPerfect L: hồi đỡ ngay, tích kho\nDash L: trả kho vào 1 mục tiêu\nTích 30 sát thương: thêm sóng\n\nTRICKSTER\nDash xa, bóng đen mờ\nGần <2cm: ra sau lưng mục tiêu\nCúi → Nhảy: bật lên, dịch tới\n\nQ/E: đổi giữa combo · U: DT', 'I/O: cycle 4 DANTE STYLES\n\nSWORDMASTER\nRed swords: supporting cuts, 1 dmg\nD/C: 1 · B/A: 2 · S/SS: 3\nSSS: four-sword formation\n\nGUNSLINGER\nNormal rounds: 1 → 2, turn red\nStronger specials, extra meteor\n\nROYAL GUARD\nPerfect L: guard reset, store\nDash L: release bank at 1 enemy\n30 stored damage: pressure wave\n\nTRICKSTER\nLong dash, dark afterimages\nWithin <2cm: cross behind foe\nCrouch → Jump: rise + teleport\n\nQ/E: swap mid-combo · U: DT'),38,139,246,17);ctx.restore();
 };
+
+// Dante balance: slower recovery/combos for the four previously overtuned weapons.
+for(const table of [BLR_MOVES,CAV_MOVES,KCB_MOVES])for(const m of Object.values(table)){
+ for(const key of ['T','wind','end','cancel'])if(Number.isFinite(m[key]))m[key]=Math.ceil(m[key]*1.25);
+ if(m.hits)m.hits=m.hits.map(t=>Math.ceil(t*1.25));
+}
+for(const m of Object.values(FAUST_MOVES))m.T=Math.ceil(m.T*1.35);
+const danteBossWindows=new WeakMap();
+function danteIsBoss(o){return bosses.includes(o.__goc||o);}
+function danteBossOpening(o){return /^(idle|rest|recover|recovery|stunned|stun|open|opening|dizzy|tired|vulnerable)$/.test(o.state||'');}
+function danteControlAllowed(target){
+ const o=target.__goc||target;if(!danteIsBoss(o))return true;
+ const window=danteBossWindows.get(o);
+ if(window&&frames<window.until)return true;
+ if(window&&frames<window.ready)return false;
+ return danteBossOpening(o)||['high','prop','updraft','rimpact','Kautilya','revslam','j4','upper'].includes(dino.dante?.attack?.id);
+}
+function danteSwapWeapon(step){
+ const n=dino,p=n.dante;if(frames<(p.nextSwap||0))return;
+ const a=p.attack,remaining=a?Math.max(0,(a.cancel??a.duration)-a.age):p.cd;
+ p.attack=null;p.k=null;p.swapInput=null;p.swapReady=frames+Math.max(8,Math.min(18,remaining||0));p.nextSwap=frames+12;
+ for(const state of [p.sword,p.balrog,p.cavaliere,p.cerberus])if(state){state.queue=[];state.last='';state.airSlow=0;state.lastDash=-1000;}
+ if(p.sword){dswReleaseHolds(p.sword);p.sword.round=null;}
+ if(p.balrog){p.balrog.holdJ=0;p.balrog.hitstop=0;}
+ if(p.cerberus)p.cerberus.holdK=0;
+ faustReset(p);const styles=danteStyleState(p);styles.swords=[];styles.release=null;
+ p.body._swordLean=p.body._swordLunge=0;p.body._swordTurn=1;p.body._faustLegs=null;p.body._cavRide=null;
+ p.arm=(p.arm+step+6)%6;p.combo=0;p.cd=Math.max(0,p.swapReady-frames);
+ danteLabel(DT_ARMS[p.arm].n);
+}
+// Commands respect weapon transition recovery, including automatic held attacks.
+for(const name of ['dswCommand','blrCommand','cavCommand','kcbCommand','eiCommand','faustCommand']){
+ const base=window[name];window[name]=function(...args){if(dino?.dante&&frames<(dino.dante.swapReady||0))return;return base(...args);};
+}
+// Secondary effects retain the originating weapon's damage scale after swapping.
+for(const [name,arm] of [['dswTick',0],['blrTick',1],['cavTick',2],['kcbTick',3],['eiTick',4],['faustTick',5]]){
+ const base=window[name];window[name]=function(...args){const p=dino?.dante;if(!p)return base(...args);const before=p.damageArm;p.damageArm=arm;try{return base(...args);}finally{p.damageArm=before;}};
+}
 </script>
 </body>
 </html>
