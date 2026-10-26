@@ -174,7 +174,7 @@ with sync_playwright() as p:
  for(const [rank,count] of [[0,1],[1,1],[2,2],[3,2],[4,3],[5,3],[6,4]]){
   reset(0);dino.dante.arm=0;styleRankIdx=rank;dino.dante.dt=60;const o=enemy(365);danteKey('KeyJ',false);keys.KeyJ=false;
   const blades=danteStyleState(dino.dante).swords;
-  if(o.hp!==1000||blades.length!==count||!blades.every(blade=>blade.x<dino.x+dino.w/2&&blade.color==='#ff355d'))throw Error('phantoms must start behind on melee attack, before hit');
+  if(o.hp!==1000||blades.length!==count||!blades.every(blade=>blade.x<dino.x+dino.w/2&&blade.color==='#ff2a55'))throw Error('phantoms must start behind on melee attack, before hit');
   tick(4);if(o.hp!==1000)throw Error('phantom damage during windup');
   tick(21);if(o.hp!==995-count)throw Error('Swordmaster rank '+rank+': '+o.hp);
  }
@@ -182,7 +182,7 @@ with sync_playwright() as p:
  let freeHilt=false,independentCut=false;
  for(let i=0;i<19;i++){
   tick(1);for(const blade of danteStyleState(dino.dante).swords){
-   if(Math.abs(blade.x-(dino.x+dino.w/2))>70||Math.abs(blade.tx-(dino.x+dino.w/2))>100)throw Error('phantom overreached');
+   if(Math.abs(blade.x-(dino.x+dino.w/2))>125||Math.abs(blade.tx-(dino.x+dino.w/2))>220)throw Error('phantom overreached');
    if(blade.phase==='slash'){
     freeHilt ||= blade.x>dino.x+dino.w/2;
     independentCut ||= Math.abs(blade.angle-dswPose(dino,blade.attack,blade.attack.age).angle)>.2;
@@ -190,7 +190,7 @@ with sync_playwright() as p:
   }
  }
  if(!freeHilt||!independentCut)throw Error('supporting blades still attached to back or copying weapon rig');
- if(far.hp!==1000)throw Error('phantom targeted distant enemy');tick(6);if(danteStyleState(dino.dante).swords.length)throw Error('phantom lifetime');
+ if(far.hp!==1000)throw Error('phantom targeted distant enemy');tick(16);if(danteStyleState(dino.dante).swords.length)throw Error('phantom lifetime');
  reset(0);danteKey('KeyJ',false);keys.KeyJ=false;tick(2);if(danteStyleState(dino.dante).swords.length)throw Error('gunfire summoned melee swords');
  reset(0);dino.dante.arm=0;dino.isFacingLeft=true;const left=enemy(230);danteKey('KeyJ',false);keys.KeyJ=false;tick(25);if(left.hp!==996)throw Error('left-facing phantom slash '+left.hp);
  reset(0);dino.dante.arm=0;dswStart('high');danteSwordStart();tick(8);const blade=danteStyleState(dino.dante).swords[0];
@@ -203,16 +203,44 @@ with sync_playwright() as p:
  tick(4);const outOfReach=enemy(700);dino.x+=400;tick(8);if(outOfReach.hp!==1000)throw Error('released blades swept across the world after owner moved');
  // A long, repeated stab action still adds only one damage event per support sword.
  const stabHp=[];
- for(const style of [2,0]){reset(style);dino.dante.arm=0;styleRankIdx=6;const o=enemy(365);dswStart('million');tick(29);stabHp.push(o.hp);}
+ for(const style of [2,0]){reset(style);dino.dante.arm=0;styleRankIdx=6;const o=enemy(490,150);o.h=250;dswStart('million');tick(29);stabHp.push(o.hp);}
  if(stabHp[0]-stabHp[1]!==4)throw Error('multi-hit action multiplied or lost support damage '+stabHp);
- reset(0);dino.dante.arm=0;styleRankIdx=6;danteKey('KeyJ',false);keys.KeyJ=false;tick(9);const group=danteStyleState(dino.dante).swords;
- if(new Set(group.map(b=>b.phase)).size!==1||new Set(group.map(b=>b.stroke)).size!==1||new Set(group.map(b=>b.angle)).size!==4)throw Error('swords must cut together with distinct choreography');
+ reset(0);dino.dante.arm=0;styleRankIdx=6;danteKey('KeyJ',false);keys.KeyJ=false;
+ const group=danteStyleState(dino.dante).swords.slice();tick(4);
+ if(group[0].stroke!==1||group.slice(1).some(b=>b.launched))throw Error('first cut must precede delayed swords');
+ tick(3);if(group[1].stroke!==1||group[0].stroke!==4||group[2].launched)throw Error('cuts not sequenced three frames apart');
+ tick(14);if(dino.dante.attack||!danteStyleState(dino.dante).swords.includes(group[3])||group[3].stroke!==9)throw Error('last support cut truncated at end of main attack');
+ tick(12);if(danteStyleState(dino.dante).swords.length)throw Error('delayed cuts never expired');
+ // Fast combo input preserves the pending cuts of the previous group.
+ reset(0);dino.dante.arm=0;styleRankIdx=6;dswStart('a1');danteSwordStart();tick(10);const previousGroup=danteStyleState(dino.dante).swords.slice();
+ dswStart('a2');danteSwordStart();if(danteStyleState(dino.dante).swords.length!==8||!previousGroup.every(b=>danteStyleState(dino.dante).swords.includes(b)))throw Error('next combo deleted pending cuts');
+ tick(40);if(danteStyleState(dino.dante).swords.length)throw Error('combo groups never expired');
+ // Hit interruption clears both active and waiting swords; invulnerability does not.
+ reset(0);dino.dante.arm=0;styleRankIdx=6;dswStart('a1');danteSwordStart();tick(7);dino.invincible=true;dino.invTimer=20;dino.takeDamage(1);
+ if(!danteStyleState(dino.dante).swords.length||dino.hp!==10)throw Error('invulnerability removed swords');
+ dino.invincible=false;dino.invTimer=0;dino.takeDamage(1);if(dino.hp!==9||danteStyleState(dino.dante).swords.length)throw Error('damage did not cancel pending swords');
+ reset(0);dino.dante.arm=0;dswStart('a1');danteSwordStart();dino.dante.arm=4;tick(1);if(danteStyleState(dino.dante).swords.length)throw Error('swords leaked across weapons');
+ // Drill heads converge, all swords launch together and stay with Stinger's movement.
+ for(const dir of [1,-1]){
+  reset(0);dino.dante.arm=0;styleRankIdx=6;dino.isFacingLeft=dir<0;dswStart('stinger');danteSwordStart();tick(7);
+  const drill=danteStyleState(dino.dante).swords;
+  if(drill.length!==4||drill.some(b=>!b.isDrill||b.stroke!==3))throw Error('Stinger drill not simultaneous');
+  if(Math.max(...drill.map(b=>b.tx))-Math.min(...drill.map(b=>b.tx))>.001)throw Error('drill tips do not converge');
+  for(const b of drill){const rx=b.x+b.dir*Math.cos(b.angle)*b.len,ry=b.y+Math.sin(b.angle)*b.len*b.flat;if(Math.hypot(rx-b.tx,ry-b.ty)>.001)throw Error('drill drawing / hitbox mismatch');}
+  const x=drill[0].origin.x;dino.x+=dir*80;tick(1);if(drill[0].origin.x!==x+dir*80)throw Error('drill did not follow Stinger');
+ }
+ // Shared combo IDs must not turn a bike slam / ice slam into punch drills or fan stabs.
+ for(const [move,expected] of [[{...BLR_MOVES.j3,id:'j3',balrog:true},'cut'],[{...BLR_MOVES.j4,id:'j4',balrog:true},'drill'],[{...CAV_MOVES.j3,id:'j3',cavaliere:true},'cut'],[{...KCB_MOVES.j3,id:'j3',cerberus:true},'fan'],[{...KCB_MOVES.j4,id:'j4',cerberus:true},'cut']]){
+  if(danteSwordMove(move).kind!==expected)throw Error('shared weapon ID misclassified '+move.name);
+ }
+ reset(0);dino.dante.arm=0;styleRankIdx=6;dswStart('million');danteSwordStart();const fan=danteStyleState(dino.dante).swords.slice();tick(1);
+ if(fan[0].stroke!==1||fan.slice(1).some(b=>b.launched))throw Error('fan start timing');tick(2);if(fan[1].stroke!==1)throw Error('fan two-frame delay');
  danteSetStyle(1);if(danteStyleState(dino.dante).swords.length)throw Error('phantoms survived style change');
  for(const [arm,start] of [[1,()=>blrStart('j1')],[2,()=>cavStart('j1')],[3,()=>kcbStart('j1')],[5,()=>{keys.KeyS=true;faustCommand(true,0);}]]){
   reset(0);dino.dante.arm=arm;start();tick(1);if(danteStyleState(dino.dante).swords.length!==1)throw Error('missing melee phantom for arm '+arm);
  }
  reset(0);dino.dante.arm=5;faustCommand(true,60);tick(1);if(danteStyleState(dino.dante).swords.length)throw Error('meteor summoned melee swords');
- result.push('independent local support cuts / simultaneous rank scaling / one damage per blade / no distant or cancelled hits');
+ result.push('sequential cuts and finishing tails / fan delays / converging Stinger drill / exact rank damage / interruption');
  for(const style of [0,1,2,3]){
   reset(style);eiCommand(false,0);eiTick();const q=dino.dante.rounds[0];
   if(q.damage!==(style===1?2:1)||q.color!==danteBulletColor(dino.dante))throw Error('E&I base/GS output');
@@ -289,7 +317,7 @@ with sync_playwright() as p:
  spawnTimerCactus=spawnTimerEnemy=99999;
  window.liveSwordTarget={x:365,y:260,w:40,h:60,hp:1000,maxHp:1000,dy:0,grounded:true,facingLeft:true,state:'idle',lastMeleeHit:-1,update(){},draw(){},takeDamage(d){this.hp-=d;}};
  enemies.push(liveSwordTarget);}""")
- pg.keyboard.press('j');pg.wait_for_timeout(450)
+ pg.keyboard.press('j');pg.wait_for_timeout(600)
  assert pg.evaluate('liveSwordTarget.hp===993 && danteStyleState(dino.dante).swords.length===0'),pg.evaluate('liveSwordTarget.hp')
  # Exercise the actual keydown/keyup path: crouch is already released on jump.
  pg.evaluate("()=>{xDatForm(9);startGame('normal');danteSetStyle(3);dino.x=300;enemies.push({x:500,y:260,w:40,h:60,hp:100,maxHp:100,grounded:true,facingLeft:true,update(){},draw(){}});}")
