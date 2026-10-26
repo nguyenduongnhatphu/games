@@ -179,24 +179,40 @@ with sync_playwright() as p:
   tick(21);if(o.hp!==995-count)throw Error('Swordmaster rank '+rank+': '+o.hp);
  }
  reset(0);dino.dante.arm=0;const far=enemy(700);danteKey('KeyJ',false);keys.KeyJ=false;
+ let freeHilt=false,independentCut=false;
  for(let i=0;i<19;i++){
   tick(1);for(const blade of danteStyleState(dino.dante).swords){
-   if(Math.abs(blade.x-(dino.x+dino.w/2))>32||Math.abs(blade.tx-(dino.x+dino.w/2))>110)throw Error('phantom detached / overreached');
-   if(Math.abs(blade.angle-dswPose(dino,blade.attack,blade.attack.age).angle)>.001)throw Error('phantom not synchronized with sword swing');
+   if(Math.abs(blade.x-(dino.x+dino.w/2))>70||Math.abs(blade.tx-(dino.x+dino.w/2))>100)throw Error('phantom overreached');
+   if(blade.phase==='slash'){
+    freeHilt ||= blade.x>dino.x+dino.w/2;
+    independentCut ||= Math.abs(blade.angle-dswPose(dino,blade.attack,blade.attack.age).angle)>.2;
+   }
   }
  }
+ if(!freeHilt||!independentCut)throw Error('supporting blades still attached to back or copying weapon rig');
  if(far.hp!==1000)throw Error('phantom targeted distant enemy');tick(6);if(danteStyleState(dino.dante).swords.length)throw Error('phantom lifetime');
  reset(0);danteKey('KeyJ',false);keys.KeyJ=false;tick(2);if(danteStyleState(dino.dante).swords.length)throw Error('gunfire summoned melee swords');
  reset(0);dino.dante.arm=0;dino.isFacingLeft=true;const left=enemy(230);danteKey('KeyJ',false);keys.KeyJ=false;tick(25);if(left.hp!==996)throw Error('left-facing phantom slash '+left.hp);
  reset(0);dino.dante.arm=0;dswStart('high');danteSwordStart();tick(8);const blade=danteStyleState(dino.dante).swords[0];
- if(Math.abs(blade.angle-dswPose(dino,dino.dante.attack,dino.dante.attack.age).angle)>.001)throw Error('upward phantom slash');
- const bx=blade.x;dino.x+=180;tick(1);if(Math.abs(blade.x-bx-180)>.001)throw Error('phantom hilt must follow owner');
+ if(blade.move.kind!=='rise'||blade.phase!=='slash')throw Error('upward support cut');
+ const bx=blade.x,origin=blade.origin.x;dino.x+=180;tick(1);if(Math.abs(blade.x-bx)>30||blade.origin.x!==origin)throw Error('released support sword dragged along with player');
+ paused=true;const stroke=blade.stroke;tick(4);paused=false;if(blade.stroke!==stroke)throw Error('support cut advanced while paused');
  danteKey('KeyL',false);tick(1);if(danteStyleState(dino.dante).swords.length)throw Error('guard-cancelled melee left damaging swords');
+ reset(0);dino.dante.arm=0;dswStart('a1');danteSwordStart();const forming=danteStyleState(dino.dante).swords[0];
+ const formingX=forming.x;dino.x+=50;tick(1);if(Math.abs(forming.x-formingX-50)>.001||forming.origin)throw Error('rear formation failed to follow before launch');
+ tick(4);const outOfReach=enemy(700);dino.x+=400;tick(8);if(outOfReach.hp!==1000)throw Error('released blades swept across the world after owner moved');
+ // A long, repeated stab action still adds only one damage event per support sword.
+ const stabHp=[];
+ for(const style of [2,0]){reset(style);dino.dante.arm=0;styleRankIdx=6;const o=enemy(365);dswStart('million');tick(29);stabHp.push(o.hp);}
+ if(stabHp[0]-stabHp[1]!==4)throw Error('multi-hit action multiplied or lost support damage '+stabHp);
+ reset(0);dino.dante.arm=0;styleRankIdx=6;danteKey('KeyJ',false);keys.KeyJ=false;tick(9);const group=danteStyleState(dino.dante).swords;
+ if(new Set(group.map(b=>b.phase)).size!==1||new Set(group.map(b=>b.stroke)).size!==1||new Set(group.map(b=>b.angle)).size!==4)throw Error('swords must cut together with distinct choreography');
+ danteSetStyle(1);if(danteStyleState(dino.dante).swords.length)throw Error('phantoms survived style change');
  for(const [arm,start] of [[1,()=>blrStart('j1')],[2,()=>cavStart('j1')],[3,()=>kcbStart('j1')],[5,()=>{keys.KeyS=true;faustCommand(true,0);}]]){
   reset(0);dino.dante.arm=arm;start();tick(1);if(danteStyleState(dino.dante).swords.length!==1)throw Error('missing melee phantom for arm '+arm);
  }
  reset(0);dino.dante.arm=5;faustCommand(true,60);tick(1);if(danteStyleState(dino.dante).swords.length)throw Error('meteor summoned melee swords');
- result.push('owner-bound melee slashes / synchronized poses / no distant hits or gun summons / rank damage');
+ result.push('independent local support cuts / simultaneous rank scaling / one damage per blade / no distant or cancelled hits');
  for(const style of [0,1,2,3]){
   reset(style);eiCommand(false,0);eiTick();const q=dino.dante.rounds[0];
   if(q.damage!==(style===1?2:1)||q.color!==danteBulletColor(dino.dante))throw Error('E&I base/GS output');
@@ -268,6 +284,13 @@ with sync_playwright() as p:
  currentShieldType=0;startGame('normal');dino.meleeTimer=10;if(!dino.isShielding())throw Error('Dino guard was replaced');
  return result;
  }"""))
+ # Actual keyboard input and live movement must produce the four support hits too.
+ pg.evaluate("""()=>{xDatForm(9);startGame('normal');danteSetStyle(0);dino.x=300;dino.dante.arm=0;stylePoints=350;styleRankIdx=6;
+ spawnTimerCactus=spawnTimerEnemy=99999;
+ window.liveSwordTarget={x:365,y:260,w:40,h:60,hp:1000,maxHp:1000,dy:0,grounded:true,facingLeft:true,state:'idle',lastMeleeHit:-1,update(){},draw(){},takeDamage(d){this.hp-=d;}};
+ enemies.push(liveSwordTarget);}""")
+ pg.keyboard.press('j');pg.wait_for_timeout(450)
+ assert pg.evaluate('liveSwordTarget.hp===993 && danteStyleState(dino.dante).swords.length===0'),pg.evaluate('liveSwordTarget.hp')
  # Exercise the actual keydown/keyup path: crouch is already released on jump.
  pg.evaluate("()=>{xDatForm(9);startGame('normal');danteSetStyle(3);dino.x=300;enemies.push({x:500,y:260,w:40,h:60,hp:100,maxHp:100,grounded:true,facingLeft:true,update(){},draw(){}});}")
  pg.keyboard.press('s');pg.wait_for_timeout(100);pg.keyboard.press('Space');pg.wait_for_timeout(40)
