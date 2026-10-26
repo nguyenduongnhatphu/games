@@ -172,13 +172,31 @@ with sync_playwright() as p:
  function tick(count){for(let i=0;i<count;i++){frames++;danteTick();}}
  const result=[];
  for(const [rank,count] of [[0,1],[1,1],[2,2],[3,2],[4,3],[5,3],[6,4]]){
-  reset(0);styleRankIdx=rank;dino.dante.dt=60;const o=enemy();danteKey('KeyJ',false);keys.KeyJ=false;
+  reset(0);dino.dante.arm=0;styleRankIdx=rank;dino.dante.dt=60;const o=enemy(365);danteKey('KeyJ',false);keys.KeyJ=false;
   const blades=danteStyleState(dino.dante).swords;
-  if(o.hp!==1000||blades.length!==count||!blades.every(blade=>blade.x<dino.x+dino.w/2&&blade.color==='#ff355d'))throw Error('phantoms must start behind on attack, before hit');
-  tick(25);if(o.hp!==997-count)throw Error('Swordmaster rank '+rank+': '+o.hp);
+  if(o.hp!==1000||blades.length!==count||!blades.every(blade=>blade.x<dino.x+dino.w/2&&blade.color==='#ff355d'))throw Error('phantoms must start behind on melee attack, before hit');
+  tick(4);if(o.hp!==1000)throw Error('phantom damage during windup');
+  tick(21);if(o.hp!==995-count)throw Error('Swordmaster rank '+rank+': '+o.hp);
  }
- reset(0);danteKey('KeyJ',false);keys.KeyJ=false;if(danteStyleState(dino.dante).swords.length!==1)throw Error('missed attack still summons');tick(25);if(danteStyleState(dino.dante).swords.length)throw Error('phantom lifetime');
- result.push('red swords behind on start, including misses / rank scaling / exact damage');
+ reset(0);dino.dante.arm=0;const far=enemy(700);danteKey('KeyJ',false);keys.KeyJ=false;
+ for(let i=0;i<19;i++){
+  tick(1);for(const blade of danteStyleState(dino.dante).swords){
+   if(Math.abs(blade.x-(dino.x+dino.w/2))>32||Math.abs(blade.tx-(dino.x+dino.w/2))>110)throw Error('phantom detached / overreached');
+   if(Math.abs(blade.angle-dswPose(dino,blade.attack,blade.attack.age).angle)>.001)throw Error('phantom not synchronized with sword swing');
+  }
+ }
+ if(far.hp!==1000)throw Error('phantom targeted distant enemy');tick(6);if(danteStyleState(dino.dante).swords.length)throw Error('phantom lifetime');
+ reset(0);danteKey('KeyJ',false);keys.KeyJ=false;tick(2);if(danteStyleState(dino.dante).swords.length)throw Error('gunfire summoned melee swords');
+ reset(0);dino.dante.arm=0;dino.isFacingLeft=true;const left=enemy(230);danteKey('KeyJ',false);keys.KeyJ=false;tick(25);if(left.hp!==996)throw Error('left-facing phantom slash '+left.hp);
+ reset(0);dino.dante.arm=0;dswStart('high');danteSwordStart();tick(8);const blade=danteStyleState(dino.dante).swords[0];
+ if(Math.abs(blade.angle-dswPose(dino,dino.dante.attack,dino.dante.attack.age).angle)>.001)throw Error('upward phantom slash');
+ const bx=blade.x;dino.x+=180;tick(1);if(Math.abs(blade.x-bx-180)>.001)throw Error('phantom hilt must follow owner');
+ danteKey('KeyL',false);tick(1);if(danteStyleState(dino.dante).swords.length)throw Error('guard-cancelled melee left damaging swords');
+ for(const [arm,start] of [[1,()=>blrStart('j1')],[2,()=>cavStart('j1')],[3,()=>kcbStart('j1')],[5,()=>{keys.KeyS=true;faustCommand(true,0);}]]){
+  reset(0);dino.dante.arm=arm;start();tick(1);if(danteStyleState(dino.dante).swords.length!==1)throw Error('missing melee phantom for arm '+arm);
+ }
+ reset(0);dino.dante.arm=5;faustCommand(true,60);tick(1);if(danteStyleState(dino.dante).swords.length)throw Error('meteor summoned melee swords');
+ result.push('owner-bound melee slashes / synchronized poses / no distant hits or gun summons / rank damage');
  for(const style of [0,1,2,3]){
   reset(style);eiCommand(false,0);eiTick();const q=dino.dante.rounds[0];
   if(q.damage!==(style===1?2:1)||q.color!==danteBulletColor(dino.dante))throw Error('E&I base/GS output');
@@ -211,11 +229,20 @@ with sync_playwright() as p:
  // Dash L releases the stored amount once to one enemy; switching cannot leave a stuck action.
  reset(2);const target=enemy(365),other=enemy(380);danteStyleState(dino.dante).bank=40;doDash(1);danteKey('KeyL',false);tick(30);
  if(target.hp!==960||other.hp!==1000||danteStyleState(dino.dante).bank!==0)throw Error('Royal Release exact damage / one target');
- if(!danteStyleState(dino.dante).royalFx||shakeTimer<18||dino.dante.body._faustLegs)throw Error('Midas counter impact / pose recovery');
+ if(!danteStyleState(dino.dante).royalFx?.wave||shakeTimer<18||dino.dante.body._faustLegs)throw Error('Royal pressure wave / pose recovery');
+ const oldMidas=midasVeDam,oldFist=midasVeNamDam;let fists=0;
+ try{midasVeDam=midasVeNamDam=()=>{fists++;};danteDraw(dino);}finally{midasVeDam=oldMidas;midasVeNamDam=oldFist;}
+ if(fists||target.hp!==960)throw Error('Royal visual drew Midas fist or applied damage');
  tick(60);if(danteStyleState(dino.dante).royalFx)throw Error('counter visual expiry');
  danteStyleState(dino.dante).bank=20;dashCd=0;doDash(1);danteKey('KeyL',false);danteKey('KeyO',false);
  if(dino.dante.attack?.royal||dino.isShielding())throw Error('release/guard leaked after switching');
- result.push('perfect melee/projectile, no duplicate, cooldown/expiry, exact release');
+ for(const power of [29,30]){
+  reset(2);const o=enemy(365);danteStyleState(dino.dante).bank=power;doDash(1);danteKey('KeyL',false);tick(8);
+  const fx=danteStyleState(dino.dante).royalFx;
+  if(fx.wave!==(power>=30)||o.hp!==1000-power)throw Error('Royal wave threshold / stored damage');
+  for(let i=0;i<3;i++)danteDraw(dino);if(o.hp!==1000-power)throw Error('Royal effect applied extra damage');
+ }
+ result.push('perfect melee/projectile, no duplicate, cooldown/expiry, exact release, hand-free wave at 30');
  reset(3);const t=enemy(440);const start=dino.x;doDash(1);
  if(dashVx<30||afterimages.length)throw Error('Trickster dash range / Dino decoy leak');
  dino.x=355;tick(1);if(dino.x<=t.x+t.w||!dino.isFacingLeft||danteStyleState(dino.dante).ghosts.length<2)throw Error('dash cross-behind');

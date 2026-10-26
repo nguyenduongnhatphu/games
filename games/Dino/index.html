@@ -107583,6 +107583,7 @@ drawCustomMenu=function(){faustMenuBase();if(!danteOn()||dino?.dante?.arm!==5||r
 // Playable Dante owns four styles. combatStance is only a compatibility selector;
 // Trickster and Swordmaster use neutral 3 so Dino's stance passives cannot leak in.
 const DANTE_STYLES=['SWORDMASTER','GUNSLINGER','ROYAL GUARD','TRICKSTER'];
+const DANTE_ROYAL_WAVE=30,DANTE_ROYAL_FX=40;
 function danteStyle(p=dino?.dante){return p?.style??1;}
 function danteStyleState(p){return p.styles||(p.styles={guardUntil:-100,perfectUntil:-100,guardReady:0,bank:0,contacts:new WeakMap(),unknown:-100,lastDash:-100,dashDir:1,crossed:true,teleReady:0,phaseUntil:-100,ghosts:[],swords:[],seenAttacks:new WeakSet(),crouchArmed:false,royalFx:null,release:null});}
 function danteStyleLive(){return danteActive(dino)&&!!dino.dante&&!gameOver&&!gameVictory;}
@@ -107693,46 +107694,61 @@ doDash=function(...args){
  if(danteStyle()===3){dashVx*=1.45;danteGhost(n);}
 };
 function danteSwordCount(){return styleRankIdx>=6?4:styleRankIdx>=4?3:styleRankIdx>=2?2:1;}
+function danteSwordMove(a){
+ if(!a||a.royal||a.ebony||a.guard)return null;
+ if(a.sword)return a;
+ if(a.faust){
+  if(!['slash','upper','dash','air'].includes(a.id))return null;
+  return {...a,wind:5,end:16,pose:a.id==='upper'||a.combo===1?'up':a.id==='air'?'spin':'down'};
+ }
+ if(!a.balrog&&!a.cavaliere&&!a.cerberus)return null;
+ const pose=/upper|pokeUp|bikeUp/i.test(a.pose)?'up':/poke|jab|oneTwo|magmaFin/i.test(a.pose)?'thrust':/spin|capo|wheel|drift|dance|revolver/i.test(a.pose)?'spin':/sweep|cross|whip/i.test(a.pose)?'cross':'down';
+ return {...a,pose};
+}
+// These swords rotate about Dante's back. No target coordinates or projectile motion.
+function danteSwordPose(n,sword,age){
+ const a=sword.move,v=dswPose(n,a,age),spread=sword.i-(sword.count-1)/2;
+ const x=n.x+n.w/2-sword.dir*(18+sword.i*4),y=n.y+24+spread*7;
+ const angle=v.angle+spread*.075,len=78,flat=v.flat;
+ return {x,y,angle,len,flat,tx:x+sword.dir*Math.cos(angle)*len,ty:y+Math.sin(angle)*len*flat};
+}
 function danteSwordStart(){
  const n=dino,p=n.dante,s=danteStyleState(p),a=p.attack;
  if(!a||s.seenAttacks.has(a))return;
  s.seenAttacks.add(a);
- if(danteStyle()!==0||a.royal)return;
+ const move=danteSwordMove(a);if(danteStyle()!==0||!move)return;
  const count=danteSwordCount(),dir=a.dir||(n.isFacingLeft?-1:1);
- const target=sgTargets(n).filter(o=>(o.x+o.w/2-n.x-n.w/2)*dir>=-12&&Math.hypot(o.x-n.x,o.y-n.y)<=780).sort((a,b)=>Math.hypot(a.x-n.x,a.y-n.y)-Math.hypot(b.x-n.x,b.y-n.y))[0]||null;
  for(let i=0;i<count;i++){
-  const x=n.x+n.w/2-dir*(32+i*10),y=n.y+8+i*9;
-  s.swords.push({x,y,sx:x,sy:y,dir,i,count,age:0,t:24,target,tx:null,ty:null,hit:false,color:'#ff355d',angle:-.65*dir,trail:[]});
+  const sword={attack:a,move,dir,i,count,age:a.age,t:a.duration,hit:false,color:'#ff355d',trail:[]};
+  Object.assign(sword,danteSwordPose(n,sword,a.age));s.swords.push(sword);
  }
  if(s.swords.length>24)s.swords.splice(0,s.swords.length-24);
 }
 const styleAttackBase=danteAttack;
 danteAttack=function(...args){const result=styleAttackBase(...args);if(danteStyleLive())danteSwordStart();return result;};
 function danteSwordsTick(n,p,s){
+ s.swords=s.swords.filter(sword=>sword.attack===p.attack);
  for(const sword of s.swords){
-  const oldX=sword.x,oldY=sword.y;sword.age++;sword.t--;
-  if(sword.age<=4){
-   sword.x=n.x+n.w/2-sword.dir*(32+sword.i*10);sword.y=n.y+8+sword.i*9;sword.sx=sword.x;sword.sy=sword.y;
-  }else{
-   if(sword.tx===null){sword.tx=sword.target?sword.target.x+sword.target.w/2:n.x+n.w/2+sword.dir*85;sword.ty=(sword.target?sword.target.y+sword.target.h/2:n.y+30)+(sword.i-(sword.count-1)/2)*9;}
-   const t=Math.max(0,Math.min(1,(sword.age-4)/10)),ease=t*t*(3-2*t);
-   sword.x=sword.sx+(sword.tx-sword.sx)*ease;
-   sword.y=sword.sy+(sword.ty-sword.sy)*ease-Math.sin(t*Math.PI)*(25+sword.i*8);
-   sword.angle=sword.dir*(-1.7+ease*3.2+(sword.i-(sword.count-1)/2)*.12);
-   if(sword.age<=16){sword.trail.push({x:sword.x,y:sword.y,t:7});if(sword.trail.length>7)sword.trail.shift();}
-   // Each blade has one damage event, with no DT multiplier or recursive summons.
-   if(!sword.hit&&sword.age>=10&&sword.age<=16){
-    for(const o of sgTargets(n))if(sgSegmentBox(oldX,oldY,sword.x,sword.y,o,15)!==null){sgDamage(n,o,1,'phantom');sword.hit=true;break;}
+  const a=sword.attack,previous=sword.age;sword.age=a.age;sword.t=a.duration-a.age;
+  Object.assign(sword,danteSwordPose(n,sword,a.age));
+  const active=a.age>sword.move.wind&&a.age<=sword.move.end;
+  // Sample the rotating blade, using the same pose and active frames as the melee move.
+  // Each blade adds exactly one damage event; DT and multi-hit moves cannot multiply it.
+  if(active){
+   for(let step=1;step<=4;step++){
+    const v=danteSwordPose(n,sword,previous+(a.age-previous)*step/4);
+    sword.trail.push({x:v.x,y:v.y,tx:v.tx,ty:v.ty,age:a.age});
+    if(!sword.hit)for(const o of sgTargets(n))if(sgSegmentBox(v.x,v.y,v.tx,v.ty,o,7)!==null){sgDamage(n,o,1,'phantom');sword.hit=true;break;}
    }
   }
+  sword.trail=sword.trail.filter(v=>a.age-v.age<4);if(sword.trail.length>16)sword.trail.splice(0,sword.trail.length-16);
  }
- s.swords=s.swords.filter(sword=>sword.t>0);
 }
 function danteStylesTick(){
  if(!danteStyleLive()||paused)return;
  const n=dino,p=n.dante,s=danteStyleState(p);
  s.ghosts=s.ghosts.filter(g=>--g.t>0);danteSwordStart();danteSwordsTick(n,p,s);
- if(s.royalFx&&++s.royalFx.t>MIDAS_DAM_KHUNG)s.royalFx=null;p.body._trickPhase=Math.max(0,(s.phaseUntil-frames)/8);
+ if(s.royalFx&&++s.royalFx.t>DANTE_ROYAL_FX)s.royalFx=null;p.body._trickPhase=Math.max(0,(s.phaseUntil-frames)/8);
  n.meleeTimer=Math.max(0,Math.min(n.meleeTimer,s.guardUntil-frames));n.parryWindow=Math.max(0,s.perfectUntil-frames);
  if(danteStyle()===3&&!s.crossed&&frames-s.lastDash<14){
   if(frames%2===0)danteGhost(n);
@@ -107745,7 +107761,7 @@ function danteStylesTick(){
   const a=p.attack;a.age++;s.release.age=a.age;
   const strength=a.age<8?-a.age/8:Math.exp(-(a.age-8)/10);p.body._swordLean=.35*strength;p.body._swordLunge=20*Math.max(0,strength);p.body._faustLegs={mode:'cast',t:1};
   if(a.age===8){
-   s.royalFx={t:0,d:s.release.power,dir:a.dir,sc:1,tam:180,hat:frames%997,ng:n,dat:n.y+n.h,x:n.x+n.w/2+a.dir*26,y:n.y+n.h*.46};
+   s.royalFx={t:0,power:s.release.power,wave:s.release.power>=DANTE_ROYAL_WAVE,dir:a.dir,x:n.x+n.w/2+a.dir*22,y:n.y+n.h*.46,ground:n.y+n.h};
    const box={x:a.dir>0?n.x+n.w:n.x-160,y:n.y-10,w:160,h:n.h+20};
    const target=sgTargets(n).filter(o=>checkAABB(box,o)).sort((a,b)=>Math.abs(a.x-n.x)-Math.abs(b.x-n.x))[0];
    if(target&&s.bank>0){const damage=s.bank;sgDamage(n,target,damage,'royal');s.bank=0;s.release.hit=true;hitDam(target.x+target.w/2,target.y+target.h/2,a.dir,true,[255,213,100]);shakeTimer=Math.max(shakeTimer,18);
@@ -107765,39 +107781,77 @@ function danteDrawShadow(g){
  ctx.beginPath();ctx.moveTo(9,12);ctx.lineTo(8,2);ctx.lineTo(15,-5);ctx.lineTo(20,-2);ctx.lineTo(24,-6);ctx.lineTo(31,2);ctx.lineTo(31,13);ctx.closePath();ctx.fill();
  ctx.fillRect(10,37,9,23);ctx.fillRect(24,37,9,23);ctx.strokeStyle='#080916';ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(30,20);ctx.lineTo(35,34);ctx.lineTo(43,33);ctx.stroke();ctx.restore();
 }
+function danteDrawSword(sword){
+ const alpha=Math.min(1,(sword.age+1)/3,sword.t/6);
+ ctx.save();ctx.lineCap='round';
+ for(let i=1;i<sword.trail.length;i++){
+  const prev=sword.trail[i-1],v=sword.trail[i];
+  ctx.globalAlpha=alpha*(1-(sword.age-v.age)/4)*.12;
+  ctx.fillStyle='#ff214d';ctx.beginPath();ctx.moveTo(prev.x,prev.y);ctx.lineTo(prev.tx,prev.ty);ctx.lineTo(v.tx,v.ty);ctx.lineTo(v.x,v.y);ctx.closePath();ctx.fill();
+  ctx.globalAlpha*=2;ctx.strokeStyle='#ff375d';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(prev.tx,prev.ty);ctx.lineTo(v.tx,v.ty);ctx.stroke();
+ }
+ ctx.globalAlpha=alpha*.85;ctx.translate(sword.x,sword.y);ctx.scale(sword.dir,sword.flat);ctx.rotate(sword.angle);ctx.shadowColor='#ff194d';ctx.shadowBlur=8;
+ ctx.fillStyle=sword.color;ctx.beginPath();ctx.moveTo(3,-4);ctx.lineTo(sword.len-18,-6);ctx.lineTo(sword.len,0);ctx.lineTo(sword.len-18,6);ctx.lineTo(3,4);ctx.closePath();ctx.fill();
+ ctx.strokeStyle='#ffc3cf';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(5,0);ctx.lineTo(sword.len-4,0);ctx.stroke();ctx.fillStyle='#ce153d';ctx.fillRect(-2,-10,4,20);ctx.fillRect(-12,-2,12,4);ctx.restore();
+}
+// Pure Royal Release effect: a short impact burst, plus a central pressure wave
+// at 30 stored damage. No detached hand, projectile or second damage event.
+function danteDrawRoyal(f){
+ const t=f.t,fade=Math.pow(Math.max(0,1-t/DANTE_ROYAL_FX),1.5),e=1-Math.pow(1-t/DANTE_ROYAL_FX,3);
+ ctx.save();ctx.translate(f.x,f.y);ctx.scale(f.dir,1);ctx.lineCap='round';
+ if(t<12){
+  const k=1-t/12,r=10+t*2.8;
+  ctx.globalAlpha=k;ctx.strokeStyle='#fff5d5';ctx.lineWidth=3*k;
+  ctx.beginPath();ctx.ellipse(0,0,Math.max(1,r*.4),r,0,0,Math.PI*2);ctx.stroke();
+  for(let i=0;i<9;i++){const a=i*Math.PI*2/9;ctx.beginPath();ctx.moveTo(Math.cos(a)*8,Math.sin(a)*8);ctx.lineTo(Math.cos(a)*r*1.6,Math.sin(a)*r);ctx.stroke();}
+ }
+ const distance=(f.wave?150:65)*e;
+ ctx.globalAlpha=fade*.6;ctx.strokeStyle='#ffce75';ctx.lineWidth=1.5;
+ for(let i=0;i<10;i++){
+  const y=Math.sin(i*2.4)*(f.wave?45:18),x=((i*19)%70)/70*distance;
+  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+12+(i%3)*8,y);ctx.stroke();
+ }
+ if(f.wave){
+  const radius=28+e*46,x=12+distance;
+  for(let i=2;i>=0;i--){
+   ctx.globalAlpha=fade*(.8-i*.2);ctx.strokeStyle=i===0?'#fff9e6':'#ffc56b';ctx.lineWidth=i===0?4:7;
+   ctx.shadowColor='#ffa52f';ctx.shadowBlur=i===0?12:0;
+   ctx.beginPath();ctx.ellipse(x-i*12,0,12+e*13,radius-i*6,0,-Math.PI*.5,Math.PI*.5);ctx.stroke();
+  }
+ }
+ ctx.shadowBlur=0;ctx.globalAlpha=fade*.5;ctx.strokeStyle='#ffe2a0';ctx.lineWidth=2;
+ const ground=f.ground-f.y;
+ for(let i=0;i<6;i++){
+  const x=i*distance/6,height=(6+i%3*5)*Math.sin(e*Math.PI);
+  ctx.beginPath();ctx.moveTo(x,ground);ctx.lineTo(x+6,ground-height);ctx.stroke();
+ }
+ ctx.restore();
+}
 const styleDrawBase=danteDraw;
 danteDraw=function(n){
  const p=n.dante,s=p?danteStyleState(p):null;
  if(s){
   for(const g of s.ghosts)danteDrawShadow(g);
+  for(const sword of s.swords)danteDrawSword(sword);
  }
  styleDrawBase(n);
  if(!s)return;
- for(const sword of s.swords){
-  ctx.save();ctx.globalAlpha=Math.min(1,sword.age/3,sword.t/7);ctx.strokeStyle='#ff375d';ctx.lineWidth=5;ctx.lineCap='round';
-  if(sword.trail.length>1){ctx.beginPath();ctx.moveTo(sword.trail[0].x,sword.trail[0].y);for(const point of sword.trail)ctx.lineTo(point.x,point.y);ctx.stroke();}
-  ctx.translate(sword.x,sword.y);ctx.rotate(sword.angle);ctx.shadowColor='#ff194d';ctx.shadowBlur=9;
-  ctx.fillStyle=sword.color;ctx.beginPath();ctx.moveTo(-3,-25);ctx.lineTo(3,-25);ctx.lineTo(5,16);ctx.lineTo(0,32);ctx.lineTo(-5,16);ctx.closePath();ctx.fill();
-  ctx.strokeStyle='#ffc3cf';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(0,-24);ctx.lineTo(0,26);ctx.stroke();ctx.fillStyle='#a9153b';ctx.fillRect(-10,-21,20,4);ctx.fillRect(-2,-32,4,10);ctx.restore();
- }
  if(s.release&&s.release.age<8){ctx.save();ctx.translate(n.x+n.w/2,n.y+n.h/2);ctx.globalAlpha=.3+s.release.age/16;ctx.strokeStyle='#ffce75';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,12+s.release.age*2,0,Math.PI*2);ctx.stroke();ctx.restore();}
- // Reuse the actual Midas visual: fist, expanding shock fronts, speed lines and ground cracks.
- // This renderer has no damage side effects; Royal Release still spends the bank on one target.
- if(s.royalFx)midasVeDam(n,{dam:s.royalFx});
+ if(s.royalFx)danteDrawRoyal(s.royalFx);
 
 };
 const styleUIBase=drawUI;
 drawUI=function(){
  styleUIBase();if(!danteOn()||!dino?.dante)return;
  const p=dino.dante,s=danteStyleState(p);ctx.save();if(dojoMode)ctx.translate(0,15);ctx.fillStyle='#1c1119';ctx.fillRect(15,72,275,18);ctx.fillRect(15,151,275,22);ctx.textAlign='left';ctx.font='11px Consolas,monospace';ctx.fillStyle='#e6e5ff';ctx.fillText('I/O: '+DANTE_STYLES[danteStyle()],20,85);
- const info=danteStyle()===2?'RG '+s.bank+' · Dash L: RELEASE':danteStyle()===3?'TRICKSTER · Crouch → Jump: RISE':danteStyle()===0?'PHANTOM SWORDS: '+(styleRankIdx>=6?4:styleRankIdx>=4?3:styleRankIdx>=2?2:1):'RED BULLETS · STRONG SHOTS +';
+ const info=danteStyle()===2?'RG '+s.bank+(s.bank>=DANTE_ROYAL_WAVE?' · WAVE READY':' · WAVE AT 30')+' · Dash L':danteStyle()===3?'TRICKSTER · Crouch → Jump: RISE':danteStyle()===0?'PHANTOM SWORDS: '+danteSwordCount():'RED BULLETS · STRONG SHOTS +';
  ctx.fillText(info,20,165);ctx.restore();
 };
 const styleMenuBase=drawCustomMenu;
 drawCustomMenu=function(){
  styleMenuBase();if(!danteOn()||!dino?.dante)return;
  ctx.save();ctx.fillStyle='#190e14';ctx.fillRect(28,117,266,405);ctx.textAlign='left';ctx.font='11px Consolas,monospace';ctx.fillStyle='#eee0df';
- apexWrap(LT('I/O: đổi 4 STANCE riêng\n\nSWORDMASTER\nKiếm đỏ sau lưng, chém cùng đòn\nD/C: 1 · B/A: 2 · S/SS: 3\nSSS: 4 kiếm cùng lúc\n\nGUNSLINGER\nĐạn thường: 1 → 2, chuyển đỏ\nĐòn mạnh tăng lực; thêm meteor\n\nROYAL GUARD\nPerfect L: hồi đỡ ngay, tích kho\nDash L: trả kho vào 1 mục tiêu\n\nTRICKSTER\nDash xa, bóng đen mờ\nGần <2cm: ra sau lưng mục tiêu\nCúi → Nhảy: bật lên, dịch tới\n\nQ/E: vũ khí · U: Devil Trigger', 'I/O: cycle 4 DANTE STYLES\n\nSWORDMASTER\nRed blades behind you, 1 dmg\nD/C: 1 · B/A: 2 · S/SS: 3\nSSS: 4 simultaneous swords\n\nGUNSLINGER\nNormal rounds: 1 → 2, turn red\nStronger specials, extra meteor\n\nROYAL GUARD\nPerfect L: guard reset, store\nDash L: release bank at 1 enemy\n\nTRICKSTER\nLong dash, dark afterimages\nWithin <2cm: cross behind foe\nCrouch → Jump: rise + teleport\n\nQ/E: weapons · U: Devil Trigger'),38,139,246,17);ctx.restore();
+ apexWrap(LT('I/O: đổi 4 STANCE riêng\n\nSWORDMASTER\nKiếm sau vai, chém cùng cận chiến\nD/C: 1 · B/A: 2 · S/SS: 3\nSSS: 4 kiếm cùng lúc\n\nGUNSLINGER\nĐạn thường: 1 → 2, chuyển đỏ\nĐòn mạnh tăng lực; thêm meteor\n\nROYAL GUARD\nPerfect L: hồi đỡ ngay, tích kho\nDash L: trả kho vào 1 mục tiêu\nTích 30 sát thương: thêm sóng\n\nTRICKSTER\nDash xa, bóng đen mờ\nGần <2cm: ra sau lưng mục tiêu\nCúi → Nhảy: bật lên, dịch tới\n\nQ/E: vũ khí · U: Devil Trigger', 'I/O: cycle 4 DANTE STYLES\n\nSWORDMASTER\nBack-mounted melee blades, 1 dmg\nD/C: 1 · B/A: 2 · S/SS: 3\nSSS: 4 simultaneous swords\n\nGUNSLINGER\nNormal rounds: 1 → 2, turn red\nStronger specials, extra meteor\n\nROYAL GUARD\nPerfect L: guard reset, store\nDash L: release bank at 1 enemy\n30 stored damage: pressure wave\n\nTRICKSTER\nLong dash, dark afterimages\nWithin <2cm: cross behind foe\nCrouch → Jump: rise + teleport\n\nQ/E: weapons · U: Devil Trigger'),38,139,246,17);ctx.restore();
 };
 </script>
 </body>
