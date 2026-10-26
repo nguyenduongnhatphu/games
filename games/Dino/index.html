@@ -103461,7 +103461,7 @@ class DantePlayerRig {
             // 6. TAY TRAI (Tay sau — Tạo thế cân bằng khi vung kiếm)
             let ar = b.armR || 0, al = b.armL || (b._swordBackArm || 0.25);
             if (b.stab > 0) ar = -1.55 + (Math.random() - 0.5) * 0.25;
-            if(![1,2,3,4].includes(arm)){
+            if(![1,2,3,4,5].includes(arm)){
             ctx.save(); ctx.translate(cxb - 13, y + 19); ctx.rotate(al);
             ctx.fillStyle = "#8E1B1B"; ctx.fillRect(-3.5, 0, 7, 13);
             ctx.fillStyle = "#263238"; ctx.fillRect(-4, 11, 8, 3);
@@ -103683,6 +103683,7 @@ function danteRelease(){if(!danteActive(dino)||!dino.dante)return;const p=dino.d
 function danteAttack(special,charge){
  if(dino.dante&&dino.dante.arm===0){dswCommand({key:special?'K':'J',charge,down:!!(keys.KeyS||keys.ArrowDown),air:!dino.grounded,dash:frames-dswState(dino.dante).lastDash<=24});return;}
  if(dino.dante&&dino.dante.arm===4){eiCommand(special,charge);return;}
+ if(dino.dante&&dino.dante.arm===5){faustCommand(special,charge);return;}
  const n=dino,p=n.dante;if(!p||p.cd>0||p.attack||n.isShielding()||n.hp<=0)return;
  const arm=p.arm,dir=n.isFacingLeft?-1:1,air=!n.grounded,down=keys.KeyS||keys.ArrowDown,dash=Math.abs(dashVx)>1;
  if(frames-p.lastJ>40)p.combo=0;const combo=p.combo++%3;p.lastJ=frames;
@@ -103694,14 +103695,12 @@ function danteAttack(special,charge){
   if(arm===2){name='CAVALIERE';dmg=2;reach=105;duration=30;pulses=4;kind='wheel';}
   if(arm===3){name='CERBERUS';dmg=4;reach=120;duration=20;kind='ice';}
   if(arm===4){name='EBONY & IVORY';dmg=2;wind=0;duration=8;kind='gun';}
-  if(arm===5){name='HAT TRICK';dmg=5;wind=4;duration=28;kind='hat';}
  }else{
   if(arm===0){name=air?'HELM BREAKER':full?'OVERDRIVE':'DRIVE';dmg=full?16:8;reach=145;duration=30;kind=air?'slam':'drive';}
   if(arm===1){name='REAL IMPACT';dmg=full?20:10;reach=80;wind=10;duration=34;lift=true;kind='fist';}
   if(arm===2){name='FULL THROTTLE';dmg=3;reach=110;duration=44;pulses=6;kind='wheel';}
   if(arm===3){name=full?'HOT STUFF':'REVOLVER';dmg=full?6:3;reach=full?155:125;duration=38;pulses=4;kind=full?'fire':'ice';}
   if(arm===4){name=full?'CHARGED SHOT':'COYOTE-A';dmg=full?6:3;wind=3;duration=28;kind='shotgun';}
-  if(arm===5){name=full?'RED HOT NIGHT':'RED ORBS';dmg=full?10:5;wind=12;duration=45;kind='meteor';pulses=full?3:2;interval=10;}
  }
  if(name==='STINGER'||name==='FULL THROTTLE')dashVx=dir*(name==='STINGER'?14:18);
  p.attack={name,arm,dir,reach,dmg:dmg+bonus,wind,duration,pulses,interval,kind,lift,age:0,hit:new Set(),special,full};p.cd=duration;
@@ -103732,9 +103731,9 @@ function danteTick(){
  if(!dino.dante)danteInit(dino);
  const n=dino,p=n.dante;if(p.cd>0)p.cd--;
  if(p.k!==null){if(keys.KeyK)p.k=Math.min(120,p.k+1);else danteRelease();}
- if(p.arm!==0&&p.arm!==1&&p.arm!==2&&p.arm!==3&&keys.KeyJ&&!keys.KeyK&&!p.attack&&p.cd<=0)danteAttack(false,0);
+ if(p.arm!==0&&p.arm!==1&&p.arm!==2&&p.arm!==3&&p.arm!==5&&keys.KeyJ&&!keys.KeyK&&!p.attack&&p.cd<=0)danteAttack(false,0);
  if(p.dt>0){p.dt--;ultCharge=0;if(++p.regen>=120){p.regen=0;n.hp=Math.min(n.maxHp,n.hp+1);}}
- if(p.attack&&!p.attack.sword&&!p.attack.balrog&&!p.attack.cavaliere&&!p.attack.cerberus&&!p.attack.ebony){const a=p.attack;a.age++;
+ if(p.attack&&!p.attack.sword&&!p.attack.balrog&&!p.attack.cavaliere&&!p.attack.cerberus&&!p.attack.ebony&&!p.attack.faust){const a=p.attack;a.age++;
   if(a.kind==='slam'&&!n.grounded){a.age=Math.min(a.age,a.wind);n.dy=Math.max(n.dy,9);}
   if(a.age>=a.wind+1&&(a.age-a.wind-1)%a.interval===0&&a.pulses>0){dantePulse(n,p,a);a.pulses--;}
   if(a.kind==='slam'&&!n.grounded)n.dy=Math.max(n.dy,9);
@@ -103753,9 +103752,9 @@ function danteTick(){
  b.armR=p.attack?Math.sin(p.attack.age/p.attack.duration*Math.PI*2)*1.4-.6:0;b.armL=p.arm===4&&p.attack?-1.3:0;
 }
 function danteDraw(n){const p=n.dante;if(!p)return;const b=p.body;ctx.save();if(n.invincible&&frames%6<3)ctx.globalAlpha=.5;ctx.translate(n.x,n.y);ctx.scale(n.w/DT_W,n.h/DT_H);drawDantePlayerBody(b,0,0);if(p.dt)drawDantePlayerDtOverlay(b,0,0);ctx.restore();
- for(const q of p.rounds){ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.kind==='hat'?q.age*.35:Math.atan2(q.vy,q.vx));ctx.fillStyle=q.kind==='bullet'?'#ffe6a0':q.kind==='ei-charge'?'#a4dfff':'#ff5264';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=12;ctx.beginPath();ctx.ellipse(0,0,q.r,q.kind==='hat'?6:q.r,0,0,Math.PI*2);ctx.fill();if(q.kind==='drive'){ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(-10,0,25,-1.2,1.2);ctx.stroke();}ctx.restore();}
+ for(const q of p.rounds){ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.kind==='hat'?q.age*.35:Math.atan2(q.vy,q.vx));ctx.fillStyle=q.color||(q.kind==='bullet'?'#ffe6a0':q.kind==='ei-charge'?'#a4dfff':'#ff5264');ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=12;ctx.beginPath();ctx.ellipse(0,0,q.r,q.kind==='hat'?6:q.r,0,0,Math.PI*2);ctx.fill();if(q.kind==='drive'){ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(-10,0,25,-1.2,1.2);ctx.stroke();}ctx.restore();}
  for(const f of p.fx){ctx.save();ctx.translate(f.x,f.y);ctx.scale(f.dir,1);ctx.globalAlpha=f.t/f.max;ctx.strokeStyle=f.col;ctx.shadowColor=f.col;ctx.shadowBlur=14;ctx.lineWidth=6;ctx.beginPath();if(['ice','fire','wheel'].includes(f.kind))ctx.arc(0,0,f.r*(1-f.t/f.max*.25),0,Math.PI*2);else ctx.ellipse(0,0,f.r,f.r*.65,-.6,-1.3,1.2);ctx.stroke();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.restore();}
- if(p.k!==null){ctx.save();ctx.strokeStyle=p.k>=45?'#fff1b0':'#ff5566';ctx.lineWidth=3;ctx.beginPath();ctx.arc(n.x+n.w/2,n.y+n.h/2,25,0,Math.PI*2*Math.min(1,p.k/45));ctx.stroke();ctx.restore();}
+ if(p.k!==null){const chargeMax=p.arm===5?60:45;ctx.save();ctx.strokeStyle=p.k>=chargeMax?'#fff1b0':'#ff5566';ctx.lineWidth=3;ctx.beginPath();ctx.arc(n.x+n.w/2,n.y+n.h/2,25,0,Math.PI*2*Math.min(1,p.k/chargeMax));ctx.stroke();ctx.restore();}
  if(n.isShielding()){ctx.save();ctx.strokeStyle=combatStance===2?'#ffb341':'#79dfff';ctx.fillStyle='rgba(100,180,255,.12)';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(n.x+n.w/2,n.y+n.h/2,n.w*.9,n.h*.65,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();}
 }
 const danteDrawBase=Player.prototype.draw;Player.prototype.draw=function(...args){if(danteOn()&&this===dino&&this.dante){danteDraw(this);return;}return danteDrawBase.apply(this,args);};
@@ -104713,7 +104712,7 @@ function dswDraw(n){
 const dswDrawBase=danteDraw;
 danteDraw=function(n){
  const p=n.dante;
- if(p){p.body._swordCustom=p.arm===0||p.arm===1||p.arm===2||p.arm===3||p.arm===4;if(p.arm===0)p.body.drawn=true;}
+ if(p){p.body._swordCustom=p.arm===0||p.arm===1||p.arm===2||p.arm===3||p.arm===4||p.arm===5;if(p.arm===0)p.body.drawn=true;}
  dswDrawBase(n);
  if(p&&(p.arm===0||p.sword))dswDraw(n);
 };
@@ -107274,6 +107273,161 @@ drawCustomMenu=function(){
 };
 // Apply saved selection before the first rendered frame, even without Customize.
 danteSync();
+</script>
+<script>
+// DR. FAUST — gunfire / Man Hat on J, physical hat techniques on K.
+const FAUST_MOVES={
+ shot:{name:'DR. FAUST · GUNFIRE',T:9},
+ throw:{name:'SET HAT',T:24},
+ trick:{name:'HAT TRICK',T:22},
+ slash:{name:'MAD HATTER',T:24},
+ upper:{name:'MAD HATTER · RISING BRIM',T:28},
+ air:{name:'MAD HATTER · AIR SPIN',T:30},
+ dash:{name:'HAT TRICK · SLIDE',T:30},
+ meteor:{name:'RED HOT NIGHT',T:56}
+};
+function faustState(p){return p.faust||(p.faust={hold:0,orbit:0,angle:0,ringHits:new Map(),hat:null,combo:0,lastSlash:-1000,lastDash:-1000,flash:0,trail:[]});}
+function faustActive(){return danteActive(dino)&&dino.dante?.arm===5&&!gameOver&&!gameVictory;}
+function faustReset(p){if(!p?.faust)return;const f=p.faust;f.hold=f.orbit=0;f.hat=null;f.ringHits.clear();f.trail=[];p.body.hat=null;}
+function faustCommand(special,charge=0){
+ if(!faustActive()||paused)return;
+ const n=dino,p=n.dante,f=faustState(p);
+ if(p.cd>0||p.attack||n.isShielding())return;
+ let id='shot';
+ if(special){
+  f.hold=f.orbit=0;f.ringHits.clear();
+  if(charge>=60)id='meteor';
+  else if(f.hat)id='trick';
+  else if(frames-f.lastDash<=24){id='dash';f.lastDash=-1000;}
+  else if(!n.grounded)id='air';
+  else if(keys.KeyS||keys.ArrowDown){
+   f.combo=frames-f.lastSlash<=42?(f.combo+1)%3:0;f.lastSlash=frames;id=f.combo===2?'upper':'slash';
+  }else id='throw';
+ }
+ p.attack={faust:true,id,name:FAUST_MOVES[id].name,duration:FAUST_MOVES[id].T,age:0,dir:n.isFacingLeft?-1:1,hit:new Set()};p.cd=p.attack.duration;
+ if(special)danteLabel(p.attack.name);
+}
+function faustRound(n,p,angle,damage){
+ p.rounds.push({x:n.x+n.w/2+Math.cos(angle)*27,y:n.y+23,vx:Math.cos(angle)*16,vy:Math.sin(angle)*16,r:4,kind:'bullet',color:'#ff556f',damage:damage+(p.dt?2:0),life:65,age:0,hit:new Set()});
+ faustState(p).flash=5;if(SFX.tone)SFX.tone(480,.04,'triangle',.045,150);
+}
+function faustHatShape(x,y,rotation=0,scale=1){
+ ctx.save();ctx.translate(x,y);ctx.rotate(rotation);ctx.scale(scale,scale);
+ ctx.fillStyle='#3c0922';ctx.strokeStyle='#ff7a9e';ctx.lineWidth=1;
+ ctx.beginPath();ctx.ellipse(0,0,18,5,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+ ctx.fillStyle='#872047';ctx.beginPath();ctx.moveTo(-11,-2);ctx.lineTo(-8,-15);ctx.lineTo(8,-15);ctx.lineTo(11,-2);ctx.closePath();ctx.fill();ctx.stroke();
+ ctx.fillStyle='#ffb46b';ctx.fillRect(-10,-6,20,3);ctx.restore();
+}
+function faustStrike(n,p,a,radius,damage,allAround=false){
+ const cx=n.x+n.w/2,cy=n.y+n.h/2;
+ for(const o of sgTargets(n)){
+  const root=o.__goc||o;
+  const x=Math.max(o.x,Math.min(cx,o.x+o.w)),y=Math.max(o.y,Math.min(cy,o.y+o.h));
+  if(a.hit.has(root)||Math.hypot(x-cx,y-cy)>radius||(!allAround&&(o.x+o.w/2-cx)*a.dir<-12))continue;
+  a.hit.add(root);if(danteHit(p,o,damage+(p.dt?2:0))>0&&a.id==='upper'&&Number.isFinite(o.dy))o.dy=-9;
+ }
+}
+function faustOrbit(n,p,f){
+ const cx=n.x+n.w/2,cy=n.y+n.h/2,radius=64,old=f.angle;
+ f.angle+=.13;
+ for(const [root,until] of f.ringHits)if(until<=frames||root.hp<=0)f.ringHits.delete(root);
+ for(let i=0;i<6;i++){
+  const a=f.angle+i*Math.PI/3,b=old+i*Math.PI/3;
+  const x=cx+Math.cos(a)*radius,y=cy+Math.sin(a)*radius;
+  for(const o of sgTargets(n)){
+   const root=o.__goc||o;
+   if(f.ringHits.has(root))continue;
+   if(sgSegmentBox(cx+Math.cos(b)*radius,cy+Math.sin(b)*radius,x,y,o,5)!==null){
+    f.ringHits.set(root,frames+12);danteHit(p,o,1+(p.dt?2:0));
+   }
+  }
+ }
+}
+function faustHatTick(n,p,f){
+ const h=f.hat;if(!h)return;
+ const oldX=h.x,oldY=h.y;h.age++;
+ if(h.age>=22)h.returning=true;
+ if(h.returning){const dx=n.x+n.w/2-h.x,dy=n.y+18-h.y,d=Math.hypot(dx,dy);if(d<20||h.age>=100){f.hat=null;return;}h.vx=dx/d*13;h.vy=dy/d*13;}
+ h.x+=h.vx;h.y+=h.vy;
+ const hits=h.returning?h.back:h.out;
+ for(const o of sgTargets(n)){
+  const root=o.__goc||o;if(hits.has(root))continue;
+  if(sgSegmentBox(oldX,oldY,h.x,h.y,o,16)!==null){hits.add(root);danteHit(p,o,4+(p.dt?2:0));}
+ }
+ f.trail.push({x:h.x,y:h.y,t:10});
+}
+function faustTick(){
+ if(!dino?.dante)return;
+ const n=dino,p=n.dante;
+ if(!faustActive()){faustReset(p);return;}
+ if(paused)return;
+ const f=faustState(p),a=p.attack;
+ f.flash=Math.max(0,f.flash-1);f.trail=f.trail.filter(t=>--t.t>0);
+ const shooting=keys.KeyJ&&!keys.KeyK&&p.k===null&&!n.isShielding()&&(!a||a.id==='shot')&&p.cd<=9;
+ f.hold=shooting?f.hold+1:0;f.orbit=shooting&&f.hold>=18?1:0;
+ if(f.orbit)faustOrbit(n,p,f);
+ else if(shooting&&!a&&p.cd<=0)faustCommand(false);
+ if(!shooting)f.ringHits.clear();
+ faustHatTick(n,p,f);
+ if(a?.faust){
+  a.age++;
+  if(a.id==='shot'&&a.age===1)faustRound(n,p,eiAim(n,a.dir),2);
+  if(a.id==='throw'&&a.age===6&&!f.hat)f.hat={x:n.x+n.w/2,y:n.y+18,vx:a.dir*11,vy:0,age:0,returning:false,out:new Set(),back:new Set()};
+  if(a.id==='trick'&&a.age===5&&f.hat){
+   const h=f.hat;
+   for(const o of sgTargets(n))if(Math.hypot(o.x+o.w/2-h.x,o.y+o.h/2-h.y)<65)danteHit(p,o,6+(p.dt?2:0));
+   p.fx.push({x:h.x,y:h.y,dir:1,r:65,kind:'fire',t:14,max:14,col:'#ff6799'});h.returning=true;
+  }
+  if(['slash','upper','air','dash'].includes(a.id)){
+   if(a.id==='dash'&&a.age<=10)dashVx=a.dir*12;
+   if(a.id==='air'&&!n.grounded&&a.age<18)n.dy=Math.min(n.dy,1);
+   if(a.age>=6&&a.age<=15)faustStrike(n,p,a,a.id==='dash'?105:85,a.id==='upper'?7:5,a.id==='air');
+  }
+  if(a.id==='meteor'&&[18,28,38].includes(a.age)){
+   const t=sgTargets(n).filter(o=>(o.x+o.w/2-n.x-n.w/2)*a.dir>=0).sort((a,b)=>Math.abs(a.x-n.x)-Math.abs(b.x-n.x))[0];
+   p.rounds.push({x:t?t.x+t.w/2:n.x+n.w/2+a.dir*(130+(a.age-18)*3),y:n.y-210,vx:0,vy:12,r:22,kind:'meteor',damage:8+(p.dt?2:0),life:95,age:0,hit:new Set()});
+  }
+  if(a.age>=a.duration)p.attack=null;
+ }
+ p.body.hat=!!f.hat||!!(a?.faust&&['slash','upper','air','dash'].includes(a.id));
+}
+const faustKeyBase=danteKey;
+danteKey=function(code,repeat){
+ if(faustActive()&&!paused&&!repeat){
+  const p=dino.dante,f=faustState(p),a=p.attack;
+  if(a?.faust&&((a.id==='shot'&&a.age>=1)||a.age>=16)&&['KeyQ','KeyE','KeyK'].includes(code)){p.attack=null;p.cd=0;}
+  const result=faustKeyBase(code,repeat);
+  if(p.arm!==5){faustReset(p);f.lastDash=-1000;}
+  return result;
+ }
+ return faustKeyBase(code,repeat);
+};
+const faustDashBase=doDash;
+doDash=function(...args){const using=faustActive()&&!paused,before=dashCd;faustDashBase(...args);if(using&&dashCd>before){const p=dino.dante;faustState(p).lastDash=frames;if(p.attack?.id==='shot'){p.attack=null;p.cd=0;}}};
+const faustTickBase=danteTick;
+danteTick=function(){faustTickBase();faustTick();};
+const faustDamageBase=Player.prototype.takeDamage;
+Player.prototype.takeDamage=function(...args){const hp=this.hp,result=faustDamageBase.apply(this,args);if(this.dante&&this.hp<hp)faustReset(this.dante);return result;};
+function faustDraw(n){
+ const p=n.dante,f=faustState(p),a=p.attack,cx=n.x+n.w/2,cy=n.y+n.h/2,dir=n.isFacingLeft?-1:1;
+ ctx.save();ctx.translate(cx,n.y+20);ctx.scale(dir,1);ctx.lineCap='round';
+ const swinging=a?.faust&&['slash','upper','air','dash'].includes(a.id),progress=swinging?Math.min(1,a.age/18):0;
+ const gesture=a?.id==='throw'?-1.5+Math.min(1,a.age/12)*2.2:a?.id==='trick'?-.8:p.k!==null?-1.6:.2;
+ const angle=swinging?-2.3+progress*4.5:f.orbit?-.5:gesture;
+ for(const side of [-1,1]){ctx.save();ctx.translate(side*10,0);ctx.rotate(side>0?angle:.4);ctx.strokeStyle=side>0?'#ae2537':'#7f1b2a';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(5,11);ctx.lineTo(15,11);ctx.stroke();ctx.fillStyle='#e6bf9c';ctx.fillRect(12,8,6,5);if(swinging&&side>0)faustHatShape(22,9,Math.PI/2,.9);ctx.restore();}
+ if(f.flash){ctx.fillStyle='#ff628d';ctx.shadowColor='#ff466c';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(27,3,6,0,Math.PI*2);ctx.fill();}ctx.restore();
+ if(f.orbit){ctx.save();ctx.strokeStyle='rgba(255,70,120,.25)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,64,0,Math.PI*2);ctx.stroke();
+ for(let i=0;i<6;i++){const angle=f.angle+i*Math.PI/3;ctx.save();ctx.translate(cx+Math.cos(angle)*64,cy+Math.sin(angle)*64);ctx.rotate(angle+Math.PI/2);ctx.fillStyle='#ff537f';ctx.shadowColor='#ff4064';ctx.shadowBlur=12;ctx.beginPath();ctx.moveTo(0,-9);ctx.lineTo(5,0);ctx.lineTo(0,9);ctx.lineTo(-5,0);ctx.closePath();ctx.fill();ctx.restore();}ctx.restore();}
+ for(const t of f.trail){ctx.save();ctx.globalAlpha=t.t/30;faustHatShape(t.x,t.y,frames*.3,.8);ctx.restore();}
+ if(f.hat)faustHatShape(f.hat.x,f.hat.y,f.hat.age*.32);
+ if(swinging){ctx.save();ctx.translate(cx,cy);ctx.scale(dir,1);ctx.strokeStyle='#ff779f';ctx.lineWidth=4;ctx.globalAlpha=.7;ctx.beginPath();ctx.arc(0,0,a.id==='dash'?95:75,-2+progress*4,-1+progress*4);ctx.stroke();ctx.restore();}
+}
+const faustDrawBase=danteDraw;
+danteDraw=function(n){faustDrawBase(n);if(danteOn()&&n.dante?.arm===5)faustDraw(n);};
+const faustUIBase=drawUI;
+drawUI=function(){faustUIBase();if(!danteOn()||dino?.dante?.arm!==5)return;const p=dino.dante,f=faustState(p);ctx.save();if(dojoMode)ctx.translate(0,15);ctx.fillStyle='#1c1119';ctx.fillRect(15,92,275,20);ctx.font='11px Consolas,monospace';ctx.fillStyle='#ffb4cd';ctx.textAlign='left';ctx.fillText(p.k!==null?'RED HOT NIGHT: '+Math.min(100,Math.floor(p.k/60*100))+'%':f.orbit?'MAN HAT · ORBIT':p.attack?p.attack.name:'J: FIRE / HOLD: ORBIT · K: HAT',20,105);ctx.restore();};
+const faustMenuBase=drawCustomMenu;
+drawCustomMenu=function(){faustMenuBase();if(!danteOn()||dino?.dante?.arm!==5||runePicker!==null||ammoPicker||ammoXem!==null)return;ctx.save();ctx.fillStyle='#190e14';ctx.fillRect(708,135,262,380);ctx.font='bold 14px Consolas,monospace';ctx.fillStyle='#ff85ab';ctx.textAlign='left';ctx.fillText('DR. FAUST · Q/E',716,157);ctx.font='11px Consolas,monospace';ctx.fillStyle='#eee0df';apexWrap(LT('J: bắn đạn đỏ\nGiữ J 0.3s: MAN HAT\n6 viên xoay quanh người, gây dmg\nNhả J / đỡ đòn: tắt vòng đạn\n\nK: SET HAT — ném mũ, tự bay về\nK khi mũ bay: HAT TRICK\nNổ quanh mũ rồi gọi mũ về\nCúi K ×3: chém → chém → hất\nTrên không K: chém xoay mũ\nDash K: lướt chém bằng vành mũ\nGiữ K 1s: RED HOT NIGHT\nNhả K: gọi 3 thiên thạch đỏ', 'J: fire red bullets\nHold J 0.3s: MAN HAT\n6 orbiting rounds deal damage\nRelease J / guard: end orbit\n\nK: SET HAT — throw and return\nK with hat out: HAT TRICK\nBurst at the hat, then recall it\nDown K x3: slash, slash, launch\nAir K: spinning hat slash\nDash K: sliding brim slash\nHold K 1s: RED HOT NIGHT\nRelease K: call 3 red meteors'),716,183,248,22);ctx.restore();};
 </script>
 </body>
 </html>
