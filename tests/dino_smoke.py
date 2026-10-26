@@ -172,10 +172,13 @@ with sync_playwright() as p:
  function tick(count){for(let i=0;i<count;i++){frames++;danteTick();}}
  const result=[];
  for(const [rank,count] of [[0,1],[1,1],[2,2],[3,2],[4,3],[5,3],[6,4]]){
-  reset(0);styleRankIdx=rank;dino.dante.dt=60;const o=enemy();danteHit(dino.dante,o,2);
-  if(o.hp!==998-count||danteStyleState(dino.dante).swords.length!==count)throw Error('Swordmaster rank '+rank+': '+o.hp);
+  reset(0);styleRankIdx=rank;dino.dante.dt=60;const o=enemy();danteKey('KeyJ',false);keys.KeyJ=false;
+  const blades=danteStyleState(dino.dante).swords;
+  if(o.hp!==1000||blades.length!==count||!blades.every(blade=>blade.x<dino.x+dino.w/2&&blade.color==='#ff355d'))throw Error('phantoms must start behind on attack, before hit');
+  tick(25);if(o.hp!==997-count)throw Error('Swordmaster rank '+rank+': '+o.hp);
  }
- result.push('phantom ranks / exact 1 damage / no DT recursion');
+ reset(0);danteKey('KeyJ',false);keys.KeyJ=false;if(danteStyleState(dino.dante).swords.length!==1)throw Error('missed attack still summons');tick(25);if(danteStyleState(dino.dante).swords.length)throw Error('phantom lifetime');
+ result.push('red swords behind on start, including misses / rank scaling / exact damage');
  for(const style of [0,1,2,3]){
   reset(style);eiCommand(false,0);eiTick();const q=dino.dante.rounds[0];
   if(q.damage!==(style===1?2:1)||q.color!==danteBulletColor(dino.dante))throw Error('E&I base/GS output');
@@ -206,8 +209,10 @@ with sync_playwright() as p:
  reset(2);enemy();danteKey('KeyL',false);tick(8);dino.invincible=false;bossProjectiles.push({x:dino.x+10,y:dino.y+15,w:8,h:8,dmg:2,isPiercing:true});checkCollisions();
  if(dino.hp!==8||danteStyleState(dino.dante).bank!==0)throw Error('late piercing block should fail');
  // Dash L releases the stored amount once to one enemy; switching cannot leave a stuck action.
- reset(2);const target=enemy(365),other=enemy(380);danteStyleState(dino.dante).bank=40;doDash(1);danteKey('KeyL',false);tick(22);
+ reset(2);const target=enemy(365),other=enemy(380);danteStyleState(dino.dante).bank=40;doDash(1);danteKey('KeyL',false);tick(30);
  if(target.hp!==960||other.hp!==1000||danteStyleState(dino.dante).bank!==0)throw Error('Royal Release exact damage / one target');
+ if(!danteStyleState(dino.dante).royalFx||shakeTimer<18||dino.dante.body._faustLegs)throw Error('Midas counter impact / pose recovery');
+ tick(60);if(danteStyleState(dino.dante).royalFx)throw Error('counter visual expiry');
  danteStyleState(dino.dante).bank=20;dashCd=0;doDash(1);danteKey('KeyL',false);danteKey('KeyO',false);
  if(dino.dante.attack?.royal||dino.isShielding())throw Error('release/guard leaked after switching');
  result.push('perfect melee/projectile, no duplicate, cooldown/expiry, exact release');
@@ -216,7 +221,11 @@ with sync_playwright() as p:
  dino.x=355;tick(1);if(dino.x<=t.x+t.w||!dino.isFacingLeft||danteStyleState(dino.dante).ghosts.length<2)throw Error('dash cross-behind');
  reset(3);enemy(500);keys.KeyS=true;danteKey('Space',false);
  if(dino.x>=500||dino.x<=400||!dino.invincible||dino.invTimer<8)throw Error('down jump front teleport');
+ if(dino.dy>=0||dino.grounded)throw Error('teleport must jump upwards');
  const x=dino.x;danteKey('Space',false);if(dino.x!==x)throw Error('teleport cooldown');
+ reset(3);enemy(500);danteKey('KeyS',false);keys.KeyS=false;tick(75);danteKey('Space',false);
+ if(dino.x<=400||dino.dy>=0||dino.grounded||danteStyleState(dino.dante).crouchArmed)throw Error('crouch released then jump / consume input');
+ reset(3);enemy(500);danteKey('ArrowDown',false);keys.ArrowDown=false;danteSetStyle(1);danteSetStyle(3);danteKey('Space',false);if(dino.x!==300)throw Error('crouch buffer leaked across styles');
  reset(3);const wallTarget=enemy(500);platforms.push({x:435,w:50,top:200,h:150,pillar:true});keys.KeyS=true;danteKey('Space',false);
  if(dino.x!==300)throw Error('teleport into solid');
  reset(3);const near=enemy(500);doDash(1);dino.x=near.x-dino.w-2*CM;tick(1);if(dino.x!==near.x-dino.w-2*CM)throw Error('2cm threshold must be strict');
@@ -232,6 +241,10 @@ with sync_playwright() as p:
  currentShieldType=0;startGame('normal');dino.meleeTimer=10;if(!dino.isShielding())throw Error('Dino guard was replaced');
  return result;
  }"""))
+ # Exercise the actual keydown/keyup path: crouch is already released on jump.
+ pg.evaluate("()=>{xDatForm(9);startGame('normal');danteSetStyle(3);dino.x=300;enemies.push({x:500,y:260,w:40,h:60,hp:100,maxHp:100,grounded:true,facingLeft:true,update(){},draw(){}});}")
+ pg.keyboard.press('s');pg.wait_for_timeout(100);pg.keyboard.press('Space');pg.wait_for_timeout(40)
+ assert pg.evaluate('dino.x>400 && dino.y<260 && dino.dy<0 && !dino.grounded')
  for style in range(4):
   pg.evaluate(f"()=>{{xDatForm(9);startGame('normal');danteSetStyle({style});}}")
   pg.wait_for_timeout(80)
