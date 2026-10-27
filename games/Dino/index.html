@@ -108403,155 +108403,942 @@ drawUI=function(){
 
 </script>
 <script>
-// Boss Dante prioritizes approaching melee. DSD shares player move data, poses and blade collision.
-const DANTE_BOSS_MELEE={
- dsd_a:{arm:0,label:'DSD · COMBO A',steps:[['down',14,96,6],['up',14,100,7],['spin',20,122,9]]},
- dsd_b:{arm:0,label:'DSD · COMBO B',steps:[['spin',16,108,5],['spin',16,110,5],['stab',18,112,4],['thrust',22,132,10]]},
- dance:{arm:0,label:'DANCE MACABRE',steps:[['ram',16,80,10],['down',14,102,6],['up',14,108,6],['spin',16,118,7],['cross',24,140,10]]},
- balrog_a:{arm:1,label:'BALROG · BLOW COMBO',steps:[['thrust',14,86,6],['cross',14,92,6],['up',16,94,6],['thrust',22,108,10]]},
- balrog_b:{arm:1,label:'BALROG · KICK COMBO',steps:[['spin',16,94,5],['spin',16,100,6],['down',22,112,8]]},
- cerberus_a:{arm:3,label:'CERBERUS · COMBO A',steps:[['down',16,112,5],['cross',16,118,6],['thrust',20,130,8]]},
- cerberus_b:{arm:3,label:'CERBERUS · COMBO B',steps:[['cross',18,142,4],['up',18,116,5],['down',24,128,8]]},
- cavaliere_a:{arm:2,label:'CAVALIERE · SAW COMBO',steps:[['cross',18,108,6],['spin',18,112,6],['down',24,128,8]]},
- cavaliere_b:{arm:2,label:'CAVALIERE · CROSSLINE',steps:[['thrust',18,112,9],['spin',20,118,6],['down',24,132,8]]}
-};
-// Combo A/B and the complete Dance Macabre use the player's actual move definitions.
-DANTE_BOSS_MELEE.dsd_a.moves=['a1','a2','a3'];
-DANTE_BOSS_MELEE.dsd_b.moves=['a1','bspin','bstab','thrust'];
-DANTE_BOSS_MELEE.dance.moves=DSW_DANCE.slice();
-for(const p of Object.values(DANTE_BOSS_MELEE))if(p.moves)p.steps=p.moves.map(id=>{const m=DSW_MOVES[id];return [m.pose,Math.max(14,m.wind),m.pose==='thrust'?120:104,m.advance||4];});
-DanteBoss.prototype.meleePriority=true;
-function danteBossCloseMotion(f){
- const step=f.pattern.steps[f.index],source=f.pattern.moves?DSW_MOVES[f.pattern.moves[f.index]]:null;
- const wind=step[1],active=source?Math.max(1,source.end-source.wind):16,recover=source?Math.max(6,source.T-source.end):2;
- return {...(source||{}),id:f.pattern.moves?.[f.index]||'boss-close',pose:step[0],dir:f.dir,wind,end:wind+active,T:wind+active+recover,active,recover,red:!!source?.red||f.index===f.pattern.steps.length-1};
-}
-function danteBossClosePose(boss,f,age){
- const motion=danteBossCloseMotion(f);
- if(!f.pattern.moves)return dswPose(boss,motion,age);
- const source=DSW_MOVES[motion.id],time=age<=motion.wind?age/motion.wind*source.wind:source.wind+age-motion.wind;
- return dswPose(boss,{...source,dir:f.dir},time);
-}
-function danteBossMeleePool(arm){return Object.keys(DANTE_BOSS_MELEE).filter(id=>DANTE_BOSS_MELEE[id].arm===arm);}
-DanteBoss.prototype.startCloseCombo=function(id,trick=true){
- const pattern=DANTE_BOSS_MELEE[id];if(!pattern||this.phase!==1||this.suSt||this.hp<=0||!this.grounded)return false;
- this.cancelCloseCombo();this.arms=pattern.arm;this.chuoi=[];this.slash=this.tel=this.bike=null;this.rg=0;this.fly=0;this.dashV=0;this._ketDon=false;this._dayLui=0;this.trickTo=null;this.faceP();
- const dir=this.dir(),goal=Math.max(worldL()+8,Math.min(worldR()-this.w-8,dino.x+dino.w/2-dir*82-this.w/2));
- this._closeCombo={id,pattern,state:'d_comboA_close',phase:trick?'approach':'wind',tick:0,index:0,dir,goal,approachEnd:Math.max(32,14+Math.ceil(Math.abs(goal-this.x)/18)),trail:[],recover:0,hit:false,prevX:this.x};
- this.state='d_comboA_close';this.subTimer=0;this._closeReady=frames+40;const planned=pattern.steps.reduce((sum,step,i)=>{const m=pattern.moves?DSW_MOVES[pattern.moves[i]]:null;return sum+step[1]+(m?m.end-m.wind+Math.max(6,m.T-m.end):18);},0)+this._closeCombo.approachEnd+80;this.switchT=Math.max(this.switchT,planned);this.hpAtSwitch=this.hp;
- this.drawn=true;this._swordCustom=true;
- floatingTexts.push(new FloatingText(this.x-60,this.y-42,(trick?'TRICKSTER → ':'')+pattern.label));return true;
-};
-DanteBoss.prototype.cancelCloseCombo=function(){
- if(this.slash?._closeCombo)this.slash=null;
- this._closeCombo=null;this._closePose=null;this._closeKick=null;this._swordCustom=false;this._swordLean=0;this._swordTurn=1;this.armR=this.armL=0;
-};
-DanteBoss.prototype.closeComboRecover=function(){
- const f=this._closeCombo;if(!f)return;f.phase='recover';f.tick=0;this.state='recovery';this.slash=this.tel=null;this.dashV=0;this._closePose=null;this._closeKick=null;this._swordCustom=false;this.armR=this.armL=0;this._swordLean=0;
-};
-DanteBoss.prototype.runCloseCombo=function(){
- const f=this._closeCombo;if(!f)return;f.tick++;this.subTimer++;
- f.trail=f.trail.filter(v=>--v.t>0);
- if(f.phase==='approach'){
-  this._swordCustom=false;
-  if(f.tick===1){this.styleFx=14;this.warn(100,10,12);}
-  if(f.tick>=12&&f.tick<=f.approachEnd-2){
-   const old=this.x;this.x+=Math.sign(f.goal-this.x)*Math.min(18,Math.abs(f.goal-this.x));
-   if(mapTheme==='tetris')resolveTetrisWalls(this,this.x-old);else resolveSolidPillars(this);
-   this.x=Math.max(worldL()+8,Math.min(worldR()-this.w-8,this.x));if(f.tick%2===0)this.ghost();
-  }
-  if(f.tick>=f.approachEnd){this.tel=null;f.phase='wind';f.tick=0;this._swordCustom=true;}return;
- }
- if(f.phase==='recover'){
-  if(f.tick>=52){this.cancelCloseCombo();this._closeReady=frames+8;this.chuoi=[];this.noiThem=0;this.toIdle(16);}return;
- }
- const [pose,wind,reach,advance]=f.pattern.steps[f.index],last=f.index===f.pattern.steps.length-1,motion=danteBossCloseMotion(f);
- this._closeKick=f.id==='balrog_b'?{t:f.phase==='strike'?Math.sin(Math.min(1,f.tick/18)*Math.PI):0,high:last}:null;
- if(f.phase==='wind'){
-  if(f.tick===1){
-   if(Math.abs(this.gap())>260||Math.abs(dino.y-this.y)>160){this.closeComboRecover();return;}
-   this.faceP();f.dir=this.dir();if(this.arms===3)this.cerb=f.id==='cerberus_b'?(f.index===0?1:0):(f.index===2?0:2);this.warn(reach,pose==='up'?45:12,wind);this.drawn=true;this._swordCustom=true;
-  }
-  this.facingLeft=f.dir<0;this.armR=pose==='up'?1.3:-1.5;
-  if(f.tick>=wind){
-   this.tel=null;this.doSlash(reach,pose==='up'?45:12,8,1);this.slash._closeCombo=true;if(f.pattern.moves)this.slash=null;this.dashV=f.dir*advance;f.hit=false;f.prevX=this.x;
-   f.phase='strike';f.tick=0;if(SFX.tone)SFX.tone(220+this.arms*130,.05,'sawtooth',.08,100);
-  }
- }else if(f.phase==='strike'){
-  this.facingLeft=f.dir<0;this.armR=-1.4+Math.min(1,f.tick/10)*2.7;this.armL=this.arms===1?-this.armR*.6:0;this._swordLean=Math.sin(f.tick/16*Math.PI)*.12;
-  if(f.tick>=motion.active+motion.recover){
-   this.slash=null;f.index++;f.tick=0;if(f.index>=f.pattern.steps.length){this.closeComboRecover();return;}f.phase='wind';
-  }
- }
- if(this._closeCombo&&f.phase!=='recover'){
-  const age=f.phase==='wind'?f.tick:wind+Math.min(f.tick,motion.active+motion.recover);
-  this._closePose=danteBossClosePose(this,f,age);
-  if(f.pattern.moves){
-   const progress=Math.max(0,Math.min(1,(age-wind)/motion.active));
-   this._swordLean=(pose==='up'?-.14:pose==='thrust'||pose==='stab'?.26:.1)*Math.sin(progress*Math.PI);
-   this._swordTurn=pose==='spin'?Math.cos(progress*Math.PI*2*(motion.id==='bspin'?2:1)):1;
-  }
-  if(f.phase==='strike'&&f.tick>0&&f.tick<=motion.active){
-   for(let sample=1;sample<=3;sample++){
-    const v=danteBossClosePose(this,f,age-1+sample/3);v.t=8;
-    if(f.pattern.moves&&!f.hit){const shift=(f.prevX-this.x)*(1-sample/3);const hitPose={...v,x:v.x+shift,tx:v.tx+shift};if(dswBladeTouches(dino,hitPose,12)){f.hit=true;this.hurtP(1);}}
-    f.trail.push(v);
-   }
-   if(f.trail.length>24)f.trail.splice(0,f.trail.length-24);
-  }
-  f.prevX=this.x;
- }
+// =============================================================================
+// Boss Dante melee integration from the user-provided DanteBoss - Gemini.js.
+// Use the live player move tables; keep native boss phases, damage and guard handling.
+// Sử dụng trực tiếp DSW_MOVES, BLR_MOVES, CAV_MOVES, KCB_MOVES của người chơi
+// =============================================================================
 
-};
-const bossClosePickBase=DanteBoss.prototype.pickSkill;
-DanteBoss.prototype.pickSkill=function(noiChuoi){
- if(this.phase!==1||this.suSt||this.suYeu||this.hp<=0||!this.grounded)return bossClosePickBase.call(this,noiChuoi);
- if(this.chuoi?.[0]?.startsWith('close:')){this.raChieu(this.chuoi.shift());return;}
- // Replace old queued ranged chains too: at most one deliberate ranged attack after two melee strings.
- this.chuoi=[];
- if(frames<(this._closeReady||0)){this.actionTimer=Math.min(12,this._closeReady-frames);return;}
- const gap=Math.abs(this.gap());
- if((this._closeStreak||0)>=2&&gap<300){
-  this._closeStreak=0;const ranged=['g_ei','d_drive','g_coyote'];this.raChieu(ranged[(this._closeRanged||0)%ranged.length]);this._closeRanged=(this._closeRanged||0)+1;return;
- }
- if(!dino.grounded&&Math.abs(dino.y-this.y)>150){this.chuoi=['d_air'];this.raChieu('d_hightime');return;}
- const deck=['dsd_a','dsd_b','dance','balrog_a','cerberus_a','cavaliere_a','balrog_b','cerberus_b','cavaliere_b'];
- const id=deck[(this._closeCursor||0)%deck.length];this._closeCursor=(this._closeCursor||0)+1;
- if(this.startCloseCombo(id,gap>110)){this._closeStreak=(this._closeStreak||0)+1;return;}
- return bossClosePickBase.call(this,noiChuoi);
+const DANTE_BOSS_MELEE = {
+    // 1. DEVIL SWORD DANTE (Arm 0)
+    dsd_a: {
+        arm: 0, table: 'DSW', label: 'DSD · COMBO A',
+        moves: ['a1', 'a2', 'a3']
+    },
+    dsd_b: {
+        arm: 0, table: 'DSW', label: 'DSD · COMBO B',
+        moves: ['a1', 'bspin', 'bstab', 'thrust']
+    },
+    dsd_prop_shred: {
+        arm: 0, table: 'DSW', label: 'DSD · PROP & SHREDDER',
+        moves: ['a1', 'prop', 'shred', 'drive']
+    },
+    dance: {
+        arm: 0, table: 'DSW', label: 'DANCE MACABRE',
+        moves: ['dhit', 'ddown', 'dup', 'dcross', 'dspin', 'dstab', 'dwave1', 'dwave2', 'dfinish']
+    },
 
+    // 2. BALROG — BLOW & KICK MODE (Arm 1)
+    balrog_a: {
+        arm: 1, table: 'BLR', label: 'BALROG · BOXING COMBO A',
+        moves: ['j1', 'j2', 'j3', 'j4']
+    },
+    balrog_b: {
+        arm: 1, table: 'BLR', label: 'BALROG · CAPOEIRA COMBO B',
+        moves: ['k1', 'k2', 'k3', 'fwave']
+    },
+    balrog_rush: {
+        arm: 1, table: 'BLR', label: 'BALROG · RAPID BLOW & JOLT',
+        moves: ['mdragon', 'j1', 'rjab', 'hjolt']
+    },
+    balrog_pyro: {
+        arm: 1, table: 'BLR', label: 'BALROG · PYROMANIA',
+        moves: ['pyro1', 'pyro2', 'pyro3']
+    },
+
+    // 3. CAVALIERE — DUAL GIANT SAWS & FULL THROTTLE (Arm 2)
+    cavaliere_a: {
+        arm: 2, table: 'CAV', label: 'CAVALIERE · SAW GRINDER A',
+        moves: ['j1', 'j2', 'j3']
+    },
+    cavaliere_b: {
+        arm: 2, table: 'CAV', label: 'CAVALIERE · FULL THROTTLE DRIFT',
+        moves: ['k1_rush', 'k2_drift', 'k3_redline']
+    },
+    cavaliere_gear: {
+        arm: 2, table: 'CAV', label: 'CAVALIERE · GEARSHIFT COMBO',
+        moves: ['dashsaw', 'j1', 'k1_rush', 'k2_drift']
+    },
+
+    // 4. KING CERBERUS — TRI-ELEMENT NUNCHAKU & BO STAFF (Arm 3)
+    cerberus_a: {
+        arm: 3, table: 'KCB', label: 'CERBERUS · TRI-STAFF COMBO A',
+        moves: ['j1', 'j2', 'j3', 'j4']
+    },
+    cerberus_b: {
+        arm: 3, table: 'KCB', label: 'CERBERUS · POLE VAULT COMBO B',
+        moves: ['k1', 'k2', 'k3']
+    },
+    cerberus_storm: {
+        arm: 3, table: 'KCB', label: 'CERBERUS · REVOLVER & THUNDER',
+        moves: ['pole', 'revolver', 'revslam', 'clap']
+    }
 };
-const bossCloseStartBase=DanteBoss.prototype.raChieu;
-DanteBoss.prototype.raChieu=function(id){if(id==='d_comboA'&&this.phase===1&&this.grounded){if(this.startCloseCombo('dsd_a',Math.abs(this.gap())>140))return;}if(id.startsWith('close:')&&DANTE_BOSS_MELEE[id.slice(6)]){if(this.startCloseCombo(id.slice(6),false))return;}return bossCloseStartBase.call(this,id);};
-const bossCloseEvadeBase=DanteBoss.prototype.batNe;
-DanteBoss.prototype.batNe=function(direction,...args){
- bossCloseEvadeBase.call(this,direction,...args);const pool=danteBossMeleePool(this.arms);
- if(direction>0&&this.phase===1&&frames>=(this._closeReady||0)&&pool.length&&Math.random()<.5)this.chuoi=['close:'+pool[Math.floor(Math.random()*pool.length)]];
+
+DanteBoss.prototype.meleePriority = true;
+
+function danteBossLookupMove(table, id) {
+    if (table === 'DSW' && typeof DSW_MOVES !== 'undefined') return DSW_MOVES[id];
+    if (table === 'BLR' && typeof BLR_MOVES !== 'undefined') return BLR_MOVES[id];
+    if (table === 'CAV' && typeof CAV_MOVES !== 'undefined') return CAV_MOVES[id];
+    if (table === 'KCB' && typeof KCB_MOVES !== 'undefined') return KCB_MOVES[id];
+    return null;
+}
+
+function danteBossGetStepMove(f, idx = f.index) {
+    const id = f.pattern.moves[idx];
+    const src = danteBossLookupMove(f.pattern.table, id);
+    if (!src) throw new Error('Unknown Dante boss move: ' + f.pattern.table + '.' + id);
+    const wind = Math.max(2, src.wind ?? 4);
+    const end = Math.max(wind + 3, src.end ?? 16);
+    const T = Math.max(end + 2, src.T ?? 22);
+    // Chuyển đòn ngay tại frame cancel/end để nối combo liền mạch như người chơi!
+    const cancel = Math.max(end - 1, Math.min(T - 2, src.cancel ?? (end + 2)));
+    return {
+        ...src,
+        id,
+        table: f.pattern.table,
+        dir: f.dir,
+        wind,
+        end,
+        T,
+        cancel,
+        pose: src.pose || 'down',
+        advance: src.advance ?? 6,
+        red: !!src.red || idx === f.pattern.moves.length - 1
+    };
+}
+
+function danteBossMeleePool(arm) {
+    return Object.keys(DANTE_BOSS_MELEE).filter(id => DANTE_BOSS_MELEE[id].arm === arm);
+}
+
+// Khởi tạo trạng thái hiệu ứng phụ trên Boss (Tia đâm, Vệt đấm, Cột băng/sét, Sóng kiếm...)
+function danteBossEnsureFx(boss) {
+    if (!boss._comboFx) {
+        boss._comboFx = {
+            sparks: [],
+            punchArcs: [],
+            cerbArcs: [],
+            thrownBike: null,
+            whipLine: null,
+            phantomSwords: [],
+            spin: 0
+        };
+    }
+    return boss._comboFx;
+}
+
+// Triệu hồi Kiếm Ảo Ảnh (Swordmaster) hỗ trợ Boss khi đang tung đòn cận chiến
+function danteBossSpawnPhantomSwords(boss, f, m) {
+    if (boss.dtStage < 2 && boss.hang() < 2) return;
+    const fx = danteBossEnsureFx(boss);
+    const count = boss.dtStage >= 2 ? 3 : 2;
+    // Shared j3/j4 IDs have different meanings for each weapon.
+    const move = danteSwordMove({ ...m, sword: m.table === 'DSW', balrog: m.table === 'BLR', cavaliere: m.table === 'CAV', cerberus: m.table === 'KCB' });
+    const kind = move?.kind || 'cut';
+
+    fx.phantomSwords = [];
+    for (let i = 0; i < count; i++) {
+        fx.phantomSwords.push({
+            i, count, dir: f.dir, kind,
+            delay: kind === 'drill' ? 0 : i * 3,
+            age: 0, stroke: 0, launched: false, hit: false,
+            origin: { x: boss.cx(), y: boss.y },
+            trail: []
+        });
+    }
+}
+
+DanteBoss.prototype.startCloseCombo = function(id, trick = true) {
+    const pattern = DANTE_BOSS_MELEE[id];
+    if (!pattern || this.phase !== 1 || this.suSt || this.hp <= 0 || !this.grounded) return false;
+
+    this.cancelCloseCombo();
+    this.arms = pattern.arm;
+    this.chuoi = [];
+    this.slash = this.tel = this.bike = null;
+    this.rg = 0; this.fly = 0; this.dashV = 0;
+    this._ketDon = false; this._dayLui = 0; this.trickTo = null;
+    this.faceP();
+
+    const dir = this.dir();
+    const idealDist = pattern.arm === 3 ? 88 : (pattern.arm === 1 ? 62 : 76);
+    const goal = Math.max(worldL() + 8, Math.min(worldR() - this.w - 8, dino.x + dino.w / 2 - dir * idealDist - this.w / 2));
+    const approachEnd = trick ? Math.max(18, 10 + Math.ceil(Math.abs(goal - this.x) / 22)) : 6;
+
+    this._closeCombo = {
+        id, pattern,
+        state: 'd_comboA_close',
+        phase: trick ? 'approach' : 'ready',
+        tick: 0,
+        index: 0,
+        dir, goal, approachEnd,
+        trail: [],
+        hitMap: new Set(),
+        prevX: this.x
+    };
+
+    this.state = 'd_comboA_close';
+    this.subTimer = 0;
+    this._closeReady = frames + 28;
+    // A long Dance must finish before the ordinary timed weapon switch.
+    const planned = pattern.moves.reduce((sum, _, i) => {
+        const m = danteBossGetStepMove(this._closeCombo, i);
+        return sum + (i < pattern.moves.length - 1 ? m.cancel : m.T);
+    }, 0) + approachEnd + 60;
+    this.switchT = Math.max(this.switchT, planned);
+    this.hpAtSwitch = this.hp;
+    this.drawn = true;
+    this._swordCustom = true;
+    danteBossEnsureFx(this);
+
+    floatingTexts.push(new FloatingText(this.x - 54, this.y - 42, (trick ? 'TRICKSTER → ' : '') + pattern.label));
+    return true;
 };
-const bossCloseRunBase=DanteBoss.prototype.runSkill;
-DanteBoss.prototype.runSkill=function(){if(this._closeCombo&&(this.state===this._closeCombo.state||this.state==='recovery'))return this.runCloseCombo();return bossCloseRunBase.call(this);};
-const bossCloseChainBase=DanteBoss.prototype.dmcNoi;
-DanteBoss.prototype.dmcNoi=function(...args){if(this._closeCombo)return;return bossCloseChainBase.apply(this,args);};
-const bossCloseUpdateBase=DanteBoss.prototype.update;
-DanteBoss.prototype.update=function(...args){
- if(this._closeCombo&&(this.phase!==1||this.hp<=0||this.suSt||![this._closeCombo.state,'recovery'].includes(this.state)))this.cancelCloseCombo();
- const result=bossCloseUpdateBase.apply(this,args);
- if(this._closeCombo&&(this.phase!==1||this.hp<=0||this.suSt||![this._closeCombo.state,'recovery'].includes(this.state)))this.cancelCloseCombo();return result;
+
+DanteBoss.prototype.cancelCloseCombo = function() {
+    if (this.slash?._closeCombo) this.slash = null;
+    this._closeCombo = null;
+    this._closePose = null;
+    this._closeMove = null;
+    this._closeKick = null;
+    this._swordCustom = false;
+    this._swordLean = 0;
+    this._swordLunge = 0;
+    this._swordTurn = 1;
+    this.armR = this.armL = 0;
+    this._comboFx = null;
 };
-const bossCloseDrawBase=DanteBoss.prototype.draw;
-DanteBoss.prototype.draw=function(){
- bossCloseDrawBase.call(this);const f=this._closeCombo,v=this._closePose;if(!f||!v||f.phase==='recover'||f.phase==='approach')return;
- if(f.phase==='wind'&&f.pattern.moves&&danteBossCloseMotion(f).pose==='spin'){ctx.save();ctx.globalAlpha=.45;ctx.strokeStyle='#ff536d';ctx.lineWidth=2;ctx.setLineDash([5,5]);ctx.beginPath();ctx.arc(this.cx(),this.cy(),94,0,Math.PI*2);ctx.stroke();ctx.restore();}
- const color=this.arms===1?'#ff8e35':this.arms===3?(this.cerb===0?'#ff792f':this.cerb===1?'#ffe36a':'#7deaff'):this.arms===2?'#b2e9ff':'#ff6687';
- ctx.save();ctx.lineCap='round';
- for(let i=1;i<f.trail.length;i++){const a=f.trail[i-1],b=f.trail[i];ctx.globalAlpha=b.t/10*.18;ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(a.tx,a.ty);ctx.lineTo(b.tx,b.ty);ctx.lineTo(b.x,b.y);ctx.closePath();ctx.fill();}
- ctx.globalAlpha=1;
- const sx=this.cx()+f.dir*9,sy=this.y+21;
- if(this.arms===0){ctx.save();ctx.translate(v.x,v.y);ctx.scale(f.dir,1);dswPaintBlade(0,0,v.angle,v.len,v.red,v.flat);ctx.restore();dswPaintArmIK(sx,sy,v.x,v.y,f.dir);}
- else if(this.arms===1){const t=f.phase==='strike'?Math.sin(Math.min(1,f.tick/18)*Math.PI):0;blrPaintFistArm(sx,sy,this.cx()+f.dir*(18+t*39),this.y+24+(f.index%2?-12:6)*t,f.dir,this.dtStage>=2,t>.2);}
- else if(this.arms===2){dswPaintArmIK(sx,sy,v.x,v.y,f.dir);cavPaintGiantSaw(v.x,v.y,v.angle,frames*.65,f.dir,f.phase==='strike');cavPaintGiantSaw(this.cx()-f.dir*14,this.y+27,-v.angle,frames*.65,f.dir,false);}
- else {dswPaintArmIK(sx,sy,v.x,v.y,f.dir);ctx.save();ctx.translate(v.x,v.y);ctx.scale(f.dir,1);ctx.rotate(v.angle);kcbPaintBoStaff(126,color);ctx.restore();}
- ctx.restore();
+
+DanteBoss.prototype.closeComboRecover = function() {
+    const f = this._closeCombo;
+    if (!f) return;
+    f.phase = 'recover';
+    f.tick = 0;
+    this.state = 'recovery';
+    this.slash = this.tel = null;
+    this.dashV = 0;
+    this._closePose = null;
+    this._closeMove = null;
+    this._closeKick = null;
+    this._swordCustom = false;
+    this.armR = this.armL = 0;
+    this._swordLean = 0;
+    this._swordLunge = 0;
+    this._swordTurn = 1;
+};
+
+// Xử lý va chạm và hiệu ứng đặc biệt cho từng vũ khí trong chuỗi Combo
+function danteBossExecuteHit(boss, f, m, hitIndex) {
+    const fx = danteBossEnsureFx(boss);
+    const cx = boss.cx(), cy = boss.cy(), dir = f.dir;
+
+    // 1. DEVIL SWORD DANTE (DSW)
+    if (m.table === 'DSW') {
+        if (m.waves) {
+            const bp = new BossProjectile(cx + dir * 24, boss.y + 8, dir * 13.5, 0, false, 1);
+            bp.w = 28; bp.h = 56; bp.color = '#FF1744'; bp.crescent = true; bp.isPiercing = true;
+            bossProjectiles.push(bp);
+            if (SFX.bossSkill) SFX.bossSkill();
+            return;
+        }
+        if (m.pose === 'stab') {
+            fx.sparks.push({
+                x: cx + dir * 18,
+                y: boss.y + 26 + (Math.random() - 0.5) * 20,
+                dir, len: 82 + Math.random() * 26,
+                ang: (Math.random() - 0.5) * 0.18,
+                t: 6, max: 6
+            });
+        }
+        // DSD damage comes exclusively from the visible blade sweep below.
+        // A second front rectangle would double-hit and reach outside the sword.
+        if (SFX.tone) SFX.tone(m.pose === 'stab' ? 1450 : 780, 0.04, 'square', 0.08, 900);
+    }
+
+    // 2. BALROG (BLR)
+    else if (m.table === 'BLR') {
+        boss._dayLui = 0;
+        let arcType = m.pose;
+        if (m.pose === 'oneTwo') arcType = (hitIndex === 0) ? 'jabL' : 'crossR';
+        if (m.pose === 'corkspin') arcType = (hitIndex === 0) ? 'upper' : 'spinBack';
+        fx.punchArcs.push({ type: arcType, dir, fire: !!m.fire || boss.dtStage >= 2, t: 9, max: 9 });
+
+        if (m.id === 'fwave') {
+            const bp = new BossProjectile(cx + dir * 24, 320 - 84, dir * 11.5, 0, false, 1);
+            bp.w = 42; bp.h = 84; bp.color = '#FF6D00'; bp.fire = true; bp.isPiercing = true;
+            bossProjectiles.push(bp);
+            visualEffects.push(new Effect(cx + dir * 28, boss.y + boss.h - 8, 'explosion', true, 28));
+        }
+
+        const is360 = m.pose === 'capo' || m.pose === 'tatsumaki';
+        const reach = is360 ? 92 : (m.pose === 'magmaFin' ? 98 : 86);
+        const box = {
+            x: is360 ? cx - reach : (dir < 0 ? boss.x - reach + 8 : boss.x + boss.w - 8),
+            y: boss.y - 12,
+            w: is360 ? reach * 2 : reach,
+            h: boss.h + 20
+        };
+        if (checkAABB(dino, box)) {
+            boss._dayLui = m.push ? 24 : 4;
+            boss.hurtP(1);
+            visualEffects.push(new Effect(dino.x + dino.w / 2, dino.y + dino.h / 2, 'explosion', true, 20));
+        }
+        if (SFX.tone) SFX.tone(240 + (hitIndex % 3) * 55, 0.05, 'sawtooth', 0.10, 120);
+    }
+
+    // 3. CAVALIERE (CAV)
+    else if (m.table === 'CAV') {
+        boss._dayLui = 0;
+        if (m.launchBike) {
+            fx.thrownBike = { x: cx + dir * 32, y: boss.y + boss.h, dir, vx: dir * 15, t: 0, hit: false };
+            if (SFX.bossExplode) SFX.bossExplode();
+        }
+        const isAround = m.pose === 'bikeDrift' || m.pose === 'airSaw';
+        const reach = 106;
+        const box = {
+            x: isAround ? cx - reach : (dir < 0 ? boss.x - reach + 10 : boss.x + boss.w - 10),
+            y: boss.y - 14,
+            w: isAround ? reach * 2 : reach,
+            h: boss.h + 24
+        };
+        if (checkAABB(dino, box)) {
+            boss._dayLui = m.push ? 22 : 6;
+            boss.hurtP(1);
+            visualEffects.push(new Effect(dino.x + dino.w / 2, dino.y + dino.h / 2, 'parry', dir < 0));
+        }
+        if (SFX.tone) SFX.tone(145 + (hitIndex % 3) * 35, 0.05, 'sawtooth', 0.12, 95);
+    }
+
+    // 4. KING CERBERUS (KCB)
+    else if (m.table === 'KCB') {
+        boss._dayLui = 0;
+        boss.cerb = m.elem === 'fire' ? 0 : (m.elem === 'bolt' ? 1 : 2);
+        if (['slashDown', 'sweepSide', 'multiPoke', 'pokeFront', 'pokeUp', 'boSlam'].includes(m.pose)) {
+            fx.cerbArcs.push({ pose: m.pose, dir, sub: hitIndex, t: 9, max: 9 });
+        }
+        if (m.whipGround) {
+            const endX = cx + dir * 185, endY = cy;
+            fx.whipLine = { x1: cx + dir * 14, y1: cy - 4, x2: endX, y2: endY, t: 10, max: 10 };
+            const boxW = { x: dir < 0 ? cx - 185 : cx, y: boss.y - 16, w: 185, h: boss.h + 28 };
+            if (checkAABB(dino, boxW)) boss.hurtP(1);
+            if (SFX.tone) SFX.tone(920, 0.06, 'sawtooth', 0.14, 420);
+            return;
+        }
+        if (m.iceSpike && hitIndex === 0) {
+            for (let k = 1; k <= 3; k++) {
+                const sx = Math.max(40, Math.min(canvas.width - 40, cx + dir * (42 + k * 38)));
+                boss.spikes.push({ x: sx, t: 14 + k * 3 });
+            }
+        }
+        if (m.thunderStorm && hitIndex === 0) {
+            for (let k = 1; k <= 3; k++) {
+                const bx = Math.max(40, Math.min(canvas.width - 40, cx + dir * (48 + k * 60)));
+                visualEffects.push(new Effect(bx, 290, 'lightning_shock', true, 36));
+                if (checkAABB(dino, { x: bx - 22, y: 120, w: 44, h: 200 })) boss.hurtP(1);
+            }
+            if (SFX.bossExplode) SFX.bossExplode();
+        }
+        const is360 = ['airDance', 'iceAge', 'revolver'].includes(m.pose);
+        const reach = ['multiPoke', 'pokeFront', 'pokeUp', 'boSlam'].includes(m.pose) ? 120 : 98;
+        const box = {
+            x: is360 ? cx - reach : (dir < 0 ? boss.x - reach + 10 : boss.x + boss.w - 10),
+            y: boss.y - 14,
+            w: is360 ? reach * 2 : reach,
+            h: boss.h + 24
+        };
+        if (checkAABB(dino, box)) {
+            boss._dayLui = m.push ? 22 : 5;
+            boss.hurtP(1);
+        }
+        if (SFX.tone) SFX.tone(m.elem === 'bolt' ? 780 : (m.elem === 'fire' ? 190 : 520), 0.05, 'triangle', 0.11, 220);
+    }
+}
+
+DanteBoss.prototype.runCloseCombo = function() {
+    const f = this._closeCombo;
+    if (!f) return;
+    const fx = danteBossEnsureFx(this);
+    fx.spin += 0.62;
+    this.subTimer++;
+
+    // Cập nhật các hiệu ứng hạt & mô-tô phóng đi
+    f.trail = f.trail.filter(v => --v.t > 0);
+    fx.sparks = fx.sparks.filter(sp => --sp.t > 0);
+    fx.punchArcs = fx.punchArcs.filter(pa => --pa.t > 0);
+    fx.cerbArcs = fx.cerbArcs.filter(ca => --ca.t > 0);
+    if (fx.whipLine && --fx.whipLine.t <= 0) fx.whipLine = null;
+
+    if (fx.thrownBike) {
+        const tb = fx.thrownBike;
+        tb.x += tb.vx; tb.t++;
+        if (!tb.hit && checkAABB(dino, { x: tb.x - 46, y: tb.y - 52, w: 92, h: 52 })) {
+            tb.hit = true;
+            this._dayLui = 0;
+            this.hurtP(1);
+            visualEffects.push(new Effect(tb.x, tb.y - 22, 'explosion', true, 44));
+        }
+        if (tb.t > 38 || tb.x < -60 || tb.x > canvas.width + 60) fx.thrownBike = null;
+    }
+
+    // 1. PHA TIẾP CẬN (TRICKSTER DASH)
+    if (f.phase === 'approach') {
+        f.tick++;
+        this._swordCustom = false;
+        if (f.tick === 1) {
+            this.styleFx = 14;
+            this.warn(96, 12, 10);
+            if (SFX.tone) SFX.tone(1250, 0.05, 'sine', 0.08, 500);
+        }
+        if (f.tick >= 8 && f.tick <= f.approachEnd - 2) {
+            const idealDist = this.arms === 3 ? 88 : (this.arms === 1 ? 62 : 76);
+            f.goal = Math.max(worldL() + 8, Math.min(worldR() - this.w - 8, dino.x + dino.w / 2 - this.dir() * idealDist - this.w / 2));
+            const old = this.x;
+            this.x += Math.sign(f.goal - this.x) * Math.min(22, Math.abs(f.goal - this.x));
+            if (mapTheme === 'tetris') resolveTetrisWalls(this, this.x - old);
+            else resolveSolidPillars(this);
+            this.x = Math.max(worldL() + 8, Math.min(worldR() - this.w - 8, this.x));
+            if (f.tick % 2 === 0) this.ghost();
+        }
+        if (f.tick >= f.approachEnd) {
+            this.tel = null;
+            f.phase = 'ready';
+            f.tick = 0;
+            f.hitMap.clear();
+            this._swordCustom = true;
+        }
+        return;
+    }
+
+    // Give the whole string a readable startup, then retain Gemini's continuous
+    // player-table timings inside it instead of adding pauses to every strike.
+    if (f.phase === 'ready') {
+        f.tick++;
+        if (f.tick === 1) {
+            this.faceP(); f.dir = this.dir();
+            this.warn(this.arms === 3 ? 150 : 110, 20, 12);
+        }
+        if (f.tick >= 12) { this.tel = null; f.phase = 'step'; f.tick = 0; }
+        return;
+    }
+
+    // 2. PHA HỒI CHIÊU (NGẮN & MƯỢT NHƯ PLAYER)
+    if (f.phase === 'recover') {
+        f.tick++;
+        if (f.tick >= 24) {
+            this.cancelCloseCombo();
+            this._closeReady = frames + 10;
+            this.chuoi = [];
+            this.noiThem = 0;
+            this.toIdle(12);
+        }
+        return;
+    }
+
+    // 3. PHA THỰC THI TỪNG NHỊP TRONG CHUỖI COMBO (KHÔNG DELAY GIỮA CÁC ĐÒN!)
+    const prevTick = f.tick;
+    f.tick++;
+    const m = danteBossGetStepMove(f);
+    this._closeMove = m;
+
+    // Khởi tạo ở frame đầu tiên của mỗi nhịp đòn
+    if (f.tick === 1) {
+        // Nếu người chơi chạy quá xa ngoài tầm với thì cho phép lướt đuổi theo hoặc ngắt chuỗi hợp lý
+        if (Math.abs(this.gap()) > 290 || Math.abs(dino.y - this.y) > 170) {
+            this.closeComboRecover();
+            return;
+        }
+        if (f.index > 0) this.faceP();
+        f.dir = this.dir();
+        f.hitMap.clear();
+        this.drawn = true;
+        this._swordCustom = true;
+        this._dayLui = 0;
+        this.warn(m.whipGround ? 185 : 110, m.launch ? 38 : 14, m.wind);
+        danteBossSpawnPhantomSwords(this, f, m);
+    }
+
+    this.facingLeft = f.dir < 0;
+
+    // Bước tiến (Micro-step / Advance) đúng nhịp vung vũ khí giống người chơi
+    if (f.tick === m.wind + 1 && this.grounded) {
+        const gap = Math.abs(this.gap());
+        const stepVel = gap > 46 ? m.advance : m.advance * 0.35;
+        this.dashV = f.dir * stepVel;
+    }
+    // Duy trì trượt tiến cho các đòn lướt xe / xoay côn / đấm rush
+    if ((m.id === 'k1_rush' || m.id === 'dashsaw' || m.id === 'revolver' || m.id === 'pole' || m.id === 'pyro1') && f.tick >= m.wind && f.tick <= m.end) {
+        const old = this.x;
+        this.x = Math.max(worldL() + 8, Math.min(worldR() - this.w - 8, this.x + f.dir * 4.5));
+        if (mapTheme === 'tetris') resolveTetrisWalls(this, this.x - old);
+        else resolveSolidPillars(this);
+    }
+
+    // Xử lý phát đòn theo đúng chuẩn cấu trúc move của Player:
+    // A. Đòn đâm/đấm liên hoàn theo `count` (Million Stab, Dance 12 Stabs, Rapid Jab)
+    if (m.count) {
+        const span = m.id === 'dstab' ? 56 : (m.end - m.wind);
+        const k = Math.floor((f.tick - m.wind - 1) * m.count / Math.max(1, span));
+        const oldK = Math.floor((prevTick - m.wind - 1) * m.count / Math.max(1, span));
+        if (k >= 0 && k < m.count && k !== oldK) {
+            danteBossExecuteHit(this, f, m, k);
+        }
+    }
+    // B. Đòn đa nhịp theo mảng `hits` (Double Spin, Shredder, Balrog Combo A/B, Cavaliere, Cerberus)
+    else if (m.hits && m.hits.length) {
+        const hIdx = m.hits.indexOf(f.tick);
+        if (hIdx >= 0) {
+            m.subIdx = hIdx;
+            danteBossExecuteHit(this, f, m, hIdx);
+        }
+    }
+    // C. Đòn chém đơn / phóng sóng kiếm của DSD
+    else {
+        if (f.tick === m.wind + (m.waves ? 1 : 2)) {
+            danteBossExecuteHit(this, f, m, 0);
+        }
+    }
+
+    // Tính toán Pose cánh tay, nghiêng người (_swordLean), chồm tới (_swordLunge), xoay thân (_swordTurn)
+    const progress = Math.max(0, Math.min(1, (f.tick - m.wind) / Math.max(1, m.end - m.wind)));
+    const swingSin = Math.sin(progress * Math.PI);
+
+    // Chân đá Cước Balrog / Chống sào đá Cerberus
+    if (f.pattern.table === 'BLR' && ['capo', 'heel', 'waveK', 'tatsumaki', 'sidekick'].includes(m.pose)) {
+        this._closeKick = { t: swingSin, high: m.pose === 'heel' || m.pose === 'sidekick' };
+    } else if (f.pattern.table === 'KCB' && m.pose === 'poleVault') {
+        this._closeKick = { t: swingSin, high: true };
+    } else {
+        this._closeKick = null;
+    }
+
+    if (['spin', 'capo', 'tatsumaki', 'corkspin', 'bikeDrift', 'airDance', 'iceAge'].includes(m.pose)) {
+        const loops = m.id === 'bspin' ? 2 : 1;
+        this._swordTurn = Math.cos(progress * Math.PI * 2 * loops);
+        this._swordLean = 0.22 * swingSin;
+        this._swordLunge = 6 * swingSin;
+    } else if (['thrust', 'stab', 'ram', 'magmaFin', 'pokeFront', 'multiPoke'].includes(m.pose)) {
+        this._swordTurn = 1;
+        this._swordLean = 0.28 * swingSin;
+        this._swordLunge = 11 * swingSin;
+    } else if (['up', 'upper', 'pokeUp', 'bikeUp'].includes(m.pose)) {
+        this._swordTurn = 1;
+        this._swordLean = -0.18 * swingSin;
+        this._swordLunge = 6 * swingSin;
+    } else {
+        this._swordTurn = 1;
+        this._swordLean = 0.16 * swingSin;
+        this._swordLunge = 5 * swingSin;
+    }
+
+    // Cập nhật Pose kiếm `dswPose` và vệt lụa kiếm khí (Slash Trail)
+    if (typeof dswPose === 'function') {
+        this._closePose = dswPose(this, m, f.tick);
+        if (f.tick > m.wind && f.tick <= m.end) {
+            for (let sample = 1; sample <= 3; sample++) {
+                const subAge = f.tick - 1 + sample / 3;
+                const v = dswPose(this, m, subAge);
+                v.t = 8;
+                // Kiểm tra lưỡi kiếm DSD thật quét trúng người chơi
+                const hitIndex = m.count ? Math.floor((f.tick - m.wind - 1) * m.count / (m.id === 'dstab' ? 56 : m.end - m.wind)) : m.hits ? m.hits.filter(t => t <= f.tick).length - 1 : 0;
+                const hitKey = 'blade:' + hitIndex;
+                if (m.table === 'DSW' && !m.waves && hitIndex >= 0 && hitIndex < (m.count || m.hits?.length || 1) && !f.hitMap.has(hitKey) && typeof dswBladeTouches === 'function') {
+                    const shift = (f.prevX - this.x) * (1 - sample / 3);
+                    const hitPose = { ...v, x: v.x + shift, tx: v.tx + shift };
+                    if (dswBladeTouches(dino, hitPose, 13)) {
+                        f.hitMap.add(hitKey);
+                        this._dayLui = m.push ? Math.min(28, m.push) : 6;
+                        const hp = dino.hp;
+                        this.hurtP(1);
+                        if (dino.hp < hp && m.launch && dino.grounded) { dino.dy = -9.5; dino.grounded = false; }
+                    }
+                }
+                f.trail.push(v);
+            }
+            if (f.trail.length > 24) f.trail.splice(0, f.trail.length - 24);
+        }
+    }
+    f.prevX = this.x;
+
+    // Cập nhật Kiếm Ảo Ảnh (Phantom Swords) bay kèm đòn đánh của Boss
+    if (fx.phantomSwords.length && typeof danteSwordPose === 'function') {
+        for (const sw of fx.phantomSwords) {
+            sw.age++;
+            if (!sw.launched && f.tick >= m.wind + sw.delay) {
+                sw.launched = true;
+                sw.origin = { x: this.cx(), y: this.y };
+            } else if (sw.launched && sw.kind === 'drill') {
+                sw.origin = { x: this.cx(), y: this.y };
+            }
+            if (sw.launched) sw.stroke++;
+            sw.phase = !sw.launched ? 'formation' : (sw.stroke <= 12 ? 'slash' : 'dissolve');
+            sw.alpha = Math.min(1, (sw.age + 1) / 3) * Math.max(0, 1 - Math.max(0, sw.stroke - 12) / 4);
+            const pose = danteSwordPose(this, { ...sw, move: { kind: sw.kind } }, sw.stroke);
+            Object.assign(sw, pose);
+            if (sw.phase === 'slash') {
+                sw.trail.push({ x: sw.x, y: sw.y, tx: sw.tx, ty: sw.ty, age: sw.age });
+                if (!sw.hit && typeof sgSegmentBox === 'function' && sgSegmentBox(sw.x, sw.y, sw.tx, sw.ty, dino, 10) !== null) {
+                    sw.hit = true;
+                    this.hurtP(1);
+                }
+            }
+            sw.trail = sw.trail.filter(v => sw.age - v.age < 4.5);
+        }
+        fx.phantomSwords = fx.phantomSwords.filter(sw => sw.stroke < 16);
+    }
+
+    // CHUYỂN SANG ĐÒN TIẾP THEO TRONG CHUỖI NGAY TẠI FRAME CANCEL (MƯỢT NHƯ PLAYER!)
+    const stepLimit = (f.index < f.pattern.moves.length - 1) ? m.cancel : m.T;
+    if (f.tick >= stepLimit) {
+        f.index++;
+        f.tick = 0;
+        if (f.index >= f.pattern.moves.length) {
+            this.closeComboRecover();
+            return;
+        }
+    }
+};
+
+// =============================================================================
+// ĐIỀU PHỐI AI CHỌN COMBO & VẼ VŨ KHÍ ĐỒNG BỘ 100% VỚI DANTEFORM.JS
+// =============================================================================
+const bossClosePickBase = DanteBoss.prototype.pickSkill;
+DanteBoss.prototype.pickSkill = function(noiChuoi) {
+    if (this.phase !== 1 || this.suSt || this.suYeu || this.hp <= 0 || !this.grounded) {
+        return bossClosePickBase.call(this, noiChuoi);
+    }
+    if (this.chuoi?.[0]?.startsWith('close:')) {
+        this.raChieu(this.chuoi.shift());
+        return;
+    }
+    this.chuoi = [];
+    if (frames < (this._closeReady || 0)) {
+        this.actionTimer = Math.min(10, this._closeReady - frames);
+        return;
+    }
+    const gap = Math.abs(this.gap());
+    // Cứ sau 2-3 chuỗi combo cận chiến thì điểm xuyết 1 đòn tầm xa (Drive / E&I / Coyote-A)
+    if ((this._closeStreak || 0) >= 3 && gap < 320) {
+        this._closeStreak = 0;
+        const ranged = ['d_drive', 'g_twosome', 'g_coyote', 'f_hat'];
+        this.raChieu(ranged[(this._closeRanged || 0) % ranged.length]);
+        this._closeRanged = (this._closeRanged || 0) + 1;
+        return;
+    }
+    if (!dino.grounded && Math.abs(dino.y - this.y) > 140) {
+        this.chuoi = ['d_air'];
+        this.raChieu('d_hightime');
+        return;
+    }
+    // Danh sách xoay vòng đầy đủ Combo A, Combo B, Dance Macabre và các vũ khí
+    const deck = [
+        'dsd_a', 'dsd_b', 'dance',
+        'balrog_a', 'balrog_b', 'balrog_rush',
+        'cerberus_a', 'cerberus_b', 'cerberus_storm',
+        'cavaliere_a', 'cavaliere_b', 'dsd_prop_shred', 'balrog_pyro', 'cavaliere_gear'
+    ];
+    const id = deck[(this._closeCursor || 0) % deck.length];
+    this._closeCursor = (this._closeCursor || 0) + 1;
+    if (this.startCloseCombo(id, gap > 105)) {
+        this._closeStreak = (this._closeStreak || 0) + 1;
+        return;
+    }
+    return bossClosePickBase.call(this, noiChuoi);
+};
+
+const bossCloseStartBase = DanteBoss.prototype.raChieu;
+DanteBoss.prototype.raChieu = function(id) {
+    if (id === 'd_comboA' && this.phase === 1 && this.grounded) {
+        const dsdPool = ['dsd_a', 'dsd_b', 'dance'];
+        const pick = dsdPool[Math.floor(Math.random() * dsdPool.length)];
+        if (this.startCloseCombo(pick, Math.abs(this.gap()) > 120)) return;
+    }
+    if (id.startsWith('close:') && DANTE_BOSS_MELEE[id.slice(6)]) {
+        if (this.startCloseCombo(id.slice(6), false)) return;
+    }
+    return bossCloseStartBase.call(this, id);
+};
+
+const bossCloseEvadeBase = DanteBoss.prototype.batNe;
+DanteBoss.prototype.batNe = function(direction, ...args) {
+    bossCloseEvadeBase.call(this, direction, ...args);
+    const pool = danteBossMeleePool(this.arms);
+    if (direction > 0 && this.phase === 1 && frames >= (this._closeReady || 0) && pool.length && Math.random() < 0.65) {
+        this.chuoi = ['close:' + pool[Math.floor(Math.random() * pool.length)]];
+    }
+};
+
+const bossCloseRunBase = DanteBoss.prototype.runSkill;
+DanteBoss.prototype.runSkill = function() {
+    if (this._closeCombo && (this.state === this._closeCombo.state || this.state === 'recovery')) {
+        return this.runCloseCombo();
+    }
+    return bossCloseRunBase.call(this);
+};
+
+const bossCloseChainBase = DanteBoss.prototype.dmcNoi;
+DanteBoss.prototype.dmcNoi = function(...args) {
+    if (this._closeCombo) return;
+    return bossCloseChainBase.apply(this, args);
+};
+
+const bossCloseUpdateBase = DanteBoss.prototype.update;
+DanteBoss.prototype.update = function(...args) {
+    if (this._closeCombo && (this.phase !== 1 || this.hp <= 0 || this.suSt || ![this._closeCombo.state, 'recovery'].includes(this.state))) {
+        this.cancelCloseCombo();
+    }
+    const result = bossCloseUpdateBase.apply(this, args);
+    if (this._closeCombo && (this.phase !== 1 || this.hp <= 0 || this.suSt || ![this._closeCombo.state, 'recovery'].includes(this.state))) {
+        this.cancelCloseCombo();
+    }
+    return result;
+};
+
+// Vẽ đầy đủ hoạt ảnh vũ khí IK, Vệt Lụa Kiếm, Vệt Quyền Anh, Mô-tô & Trường Côn như Player
+const bossCloseDrawBase = DanteBoss.prototype.draw;
+DanteBoss.prototype.draw = function() {
+    bossCloseDrawBase.call(this);
+    const f = this._closeCombo, v = this._closePose, m = this._closeMove, fx = this._comboFx;
+    // Redline keeps travelling during recovery: its damaging bike stays visible.
+    if (f && fx?.thrownBike) cavPaintFullBike(fx.thrownBike.x, fx.thrownBike.y, fx.thrownBike.dir, fx.spin * 1.4, -0.1, 1);
+    if (!f || !v || !m || f.phase === 'recover' || f.phase === 'approach') return;
+
+    const cx = this.cx(), cy = this.cy(), dir = f.dir;
+    const sx = cx + dir * 9 + (this._swordLunge || 0) * dir * 0.5, sy = this.y + 21;
+
+    ctx.save();
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+    // 0. Vẽ Kiếm Ảo Ảnh (Swordmaster Phantom Swords) của Boss
+    if (fx && fx.phantomSwords.length && typeof danteDrawSword === 'function') {
+        for (const sw of fx.phantomSwords) danteDrawSword(sw);
+    }
+
+    // 1. DEVIL SWORD DANTE (Arm 0): Vệt lụa đỏ 2 lớp + Cưa Shredder + Tia Million Stab + Mũi Giáo Stinger
+    if (this.arms === 0) {
+        for (let i = 1; i < f.trail.length; i++) {
+            const u = f.trail[i - 1], w = f.trail[i];
+            const alpha = (w.t / 8) * 0.45;
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = w.red ? '#FF1744' : '#FF5252';
+            ctx.beginPath();
+            ctx.moveTo(u.x + (u.tx - u.x) * 0.45, u.y + (u.ty - u.y) * 0.45);
+            ctx.lineTo(u.tx, u.ty); ctx.lineTo(w.tx, w.ty);
+            ctx.lineTo(w.x + (w.tx - w.x) * 0.45, w.y + (w.ty - w.y) * 0.45);
+            ctx.closePath(); ctx.fill();
+
+            ctx.globalAlpha = alpha * 1.25;
+            ctx.strokeStyle = w.red ? '#FFF8E1' : '#FFCDD2';
+            ctx.lineWidth = 2.4;
+            ctx.beginPath(); ctx.moveTo(u.tx, u.ty); ctx.lineTo(w.tx, w.ty); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+
+        if (v.spinbuzz && ['prop', 'shred'].includes(m.id)) {
+            ctx.save();
+            ctx.translate(v.x + dir * 24, v.y - 6);
+            for (let k = 0; k < 3; k++) {
+                const sa = v.angle + k * (Math.PI * 2 / 3);
+                ctx.globalAlpha = 0.45;
+                ctx.strokeStyle = k % 2 === 0 ? '#FF1744' : '#FFFFFF';
+                ctx.lineWidth = 6 - k;
+                ctx.beginPath(); ctx.arc(0, 0, 54 - k * 8, sa, sa + 1.7); ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        for (const sp of fx?.sparks || []) {
+            const ratio = sp.t / sp.max;
+            ctx.save();
+            ctx.globalAlpha = ratio;
+            ctx.translate(sp.x, sp.y); ctx.rotate(sp.ang);
+            ctx.shadowColor = '#FF1744'; ctx.shadowBlur = 12;
+            const ex = sp.dir * sp.len;
+            ctx.strokeStyle = '#FF1744'; ctx.lineWidth = 4 * ratio;
+            ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(ex, 0); ctx.stroke();
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.moveTo(ex + sp.dir * 14, 0);
+            ctx.lineTo(ex - sp.dir * 6, -4.5 * ratio);
+            ctx.lineTo(ex - sp.dir * 6, 4.5 * ratio);
+            ctx.closePath(); ctx.fill();
+            ctx.restore();
+        }
+
+        ctx.save();
+        ctx.translate(v.x, v.y); ctx.scale(dir, 1);
+        dswPaintBlade(0, 0, v.angle, v.len, v.red, v.flat);
+        if (v.thrustCone > 0.15 && v.pose === 'thrust') {
+            const c = v.thrustCone;
+            ctx.rotate(v.angle);
+            ctx.globalAlpha = 0.85 * c;
+            const grad = ctx.createLinearGradient(20, 0, v.len + 55, 0);
+            grad.addColorStop(0, 'rgba(255, 23, 68, 0.05)');
+            grad.addColorStop(0.5, 'rgba(255, 23, 68, 0.75)');
+            grad.addColorStop(1, '#FFFFFF');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(22, -16 * c); ctx.lineTo(v.len + 52 * c, 0);
+            ctx.lineTo(22, 16 * c); ctx.lineTo(38, 0);
+            ctx.closePath(); ctx.fill();
+        }
+        ctx.restore();
+        dswPaintArmIK(sx, sy, v.x, v.y, dir);
+    }
+
+    // 2. BALROG (Arm 1): Đôi găng tay Boxing 1-2 Jab, Liver Hook, Corkscrew, Magma Straight & Vệt Lửa
+    else if (this.arms === 1) {
+        const ign = this.dtStage >= 2 || !!m.fire;
+        for (const pa of fx?.punchArcs || []) {
+            const k = pa.t / pa.max;
+            ctx.save();
+            ctx.translate(cx, cy - 4); ctx.scale(pa.dir, 1);
+            ctx.globalAlpha = k * 0.9;
+            ctx.shadowColor = '#FF6D00'; ctx.shadowBlur = 16;
+            const colOuter = pa.fire ? '#FF3D00' : '#FF9100';
+            if (pa.type === 'jabL' || pa.type === 'crossR' || pa.type === 'magmaFin') {
+                const reach = (pa.type === 'magmaFin' ? 84 : (pa.type === 'crossR' ? 66 : 54)) * (1.15 - 0.15 * k);
+                const yOff = pa.type === 'jabL' ? -6 : (pa.type === 'crossR' ? 3 : 0);
+                const thick = pa.type === 'magmaFin' ? 17 : 11;
+                ctx.fillStyle = colOuter;
+                ctx.beginPath();
+                ctx.moveTo(8, yOff - thick * k); ctx.lineTo(reach, yOff - 5 * k);
+                ctx.arc(reach, yOff, (thick + 2) * k, -Math.PI / 2, Math.PI / 2);
+                ctx.lineTo(8, yOff + thick * k); ctx.closePath(); ctx.fill();
+            } else {
+                ctx.strokeStyle = colOuter; ctx.lineWidth = 14 * k;
+                ctx.beginPath(); ctx.ellipse(12, 2, 64, 22, 0, -1.2, 1.15); ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        const pr = Math.max(0, Math.min(1, (f.tick - m.wind) / Math.max(1, m.end - m.wind)));
+        const punch = Math.sin(pr * Math.PI);
+        let rx = cx + dir * 15, ry = this.y + 18;
+        let lx = cx + dir * 20, ly = this.y + 19;
+        let rPunch = false, lPunch = false;
+
+        if (m.pose === 'oneTwo') {
+            if (f.tick < 7) {
+                const p1 = Math.sin(Math.min(1, f.tick / 6) * Math.PI);
+                lx = cx + dir * (16 + 34 * p1); ly = this.y + 17; lPunch = p1 > 0.2;
+            } else {
+                const p2 = Math.sin(Math.min(1, (f.tick - 6) / 8) * Math.PI);
+                rx = cx + dir * (14 + 40 * p2); ry = this.y + 19; rPunch = p2 > 0.2;
+            }
+        } else if (m.pose === 'bodyHook') {
+            rx = cx + dir * (10 + 42 * punch); ry = this.y + 27 - 6 * punch; rPunch = punch > 0.2;
+        } else if (m.pose === 'corkspin') {
+            if (f.tick < 9) {
+                lx = cx + dir * (16 + 22 * punch); ly = this.y + 32 - 24 * pr; lPunch = true;
+            } else {
+                rx = cx + dir * (14 + 44 * punch); ry = this.y + 18; rPunch = true;
+            }
+        } else if (m.pose === 'magmaFin') {
+            rx = cx + dir * (f.tick <= m.wind ? -10 : 12 + 48 * punch); ry = this.y + 19; rPunch = true;
+        } else if (m.pose === 'rjab') {
+            const alt = Math.sin(f.tick * 1.55);
+            rx = cx + dir * (22 + 24 * Math.max(0, alt)); ry = this.y + 19;
+            lx = cx + dir * (22 + 24 * Math.max(0, -alt)); ly = this.y + 23;
+            rPunch = alt > 0; lPunch = alt < 0;
+        }
+        blrPaintFistArm(cx - dir * 6, this.y + 20, lx, ly, dir, ign, lPunch);
+        blrPaintFistArm(cx + dir * 8, this.y + 20, rx, ry, dir, ign, rPunch);
+    }
+
+    // 3. CAVALIERE (Arm 2): Song Đại Cưa Máy hoặc Hợp Thể Siêu Mô-tô Drift
+    else if (this.arms === 2) {
+        const spin = fx ? fx.spin : frames * 0.65;
+        if (m.bikeMode && typeof cavPaintFullBike === 'function') {
+            const driftScale = m.pose === 'bikeDrift' ? (Math.cos((f.tick / m.T) * Math.PI * 2) || 0.2) : 1;
+            cavPaintFullBike(cx, this.y + this.h, dir, spin, 0, driftScale);
+        } else {
+            const pr = Math.max(0, Math.min(1, (f.tick - m.wind) / Math.max(1, m.end - m.wind)));
+            const swing = Math.sin(pr * Math.PI);
+            let angL = 0.45, angR = 0.25, offLX = -10, offLY = 20, offRX = 10, offRY = 22;
+            if (m.pose === 'crossSaw') {
+                angL = -0.75 + 1.35 * swing; offLX = 6 + 14 * swing; offLY = 16;
+                angR = 0.75 - 1.35 * swing;  offRX = 12 + 16 * swing; offRY = 24;
+            } else if (m.pose === 'grindSaw') {
+                angL = -0.12; offLX = 18; offLY = 16;
+                angR = 0.12;  offRX = 24; offRY = 26;
+            } else if (m.pose === 'slamSaw') {
+                angL = f.tick < 10 ? -1.6 : 0.45;
+                angR = f.tick < 10 ? -1.45 : 0.55;
+                offLX = 18; offRX = 24;
+            }
+            cavPaintGiantSaw(cx + dir * offLX, this.y + offLY, angL, spin, dir, true);
+            cavPaintGiantSaw(cx + dir * offRX, this.y + offRY, angR, spin, dir, true);
+        }
+    }
+
+    // 4. KING CERBERUS (Arm 3): Vụt Côn Băng, Chọc Trường Côn Lửa, Chống Sào Đá, Múa Tam Khúc & Roi Sét
+    else if (this.arms === 3) {
+        const spin = fx ? fx.spin : frames * 0.55;
+        if (fx?.whipLine) {
+            const wl = fx.whipLine, k = wl.t / wl.max;
+            ctx.save();
+            ctx.globalAlpha = k;
+            ctx.strokeStyle = '#E040FB'; ctx.lineWidth = 6 * k;
+            ctx.beginPath(); ctx.moveTo(wl.x1, wl.y1); ctx.lineTo((wl.x1 + wl.x2) / 2, wl.y1 - 12); ctx.lineTo(wl.x2, wl.y2); ctx.stroke();
+            ctx.strokeStyle = '#FFFDE7'; ctx.lineWidth = 2.5 * k; ctx.stroke();
+            ctx.restore();
+        }
+        for (const ar of fx?.cerbArcs || []) {
+            const k = ar.t / ar.max;
+            ctx.save();
+            ctx.translate(cx, cy - 2); ctx.scale(ar.dir, 1);
+            ctx.globalAlpha = k * 0.88;
+            if (ar.pose === 'slashDown' || ar.pose === 'sweepSide') {
+                ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 13 * k;
+                ctx.beginPath(); ctx.arc(12, 0, 68, -1.25, 0.95); ctx.stroke();
+            } else if (ar.pose === 'multiPoke' || ar.pose === 'pokeFront') {
+                const yOff = ar.pose === 'multiPoke' ? (ar.sub - 1) * 7 : 0;
+                ctx.fillStyle = '#FF6D00';
+                ctx.beginPath(); ctx.moveTo(12, yOff - 10 * k); ctx.lineTo(114, yOff); ctx.lineTo(12, yOff + 10 * k); ctx.closePath(); ctx.fill();
+            } else if (ar.pose === 'boSlam') {
+                ctx.strokeStyle = '#FF6D00'; ctx.lineWidth = 14 * k;
+                ctx.beginPath(); ctx.arc(16, 4, 80, -1.4, 0.45); ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        const pr = Math.max(0, Math.min(1, (f.tick - m.wind) / Math.max(1, m.end - m.wind)));
+        if (['airDance', 'iceAge', 'revolver'].includes(m.pose)) {
+            ctx.save();
+            ctx.translate(cx + dir * 12, cy);
+            const cols = ['#00E5FF', '#FF6D00', '#E040FB'];
+            for (let k = 0; k < 3; k++) {
+                const ang = spin * 1.4 + k * (Math.PI * 2 / 3);
+                ctx.strokeStyle = cols[k]; ctx.lineWidth = 6;
+                ctx.beginPath(); ctx.arc(0, 0, 56 - k * 4, ang - 1.2, ang); ctx.stroke();
+            }
+            ctx.restore();
+        } else if (['pokeUp', 'pokeFront', 'multiPoke'].includes(m.pose)) {
+            const pitch = m.pose === 'pokeUp' ? -0.78 : (m.pose === 'multiPoke' ? ((m.subIdx || 0) - 1) * 0.14 : 0);
+            const thrust = f.tick <= m.wind ? -12 : 42 * Math.sin(pr * Math.PI);
+            ctx.save();
+            ctx.translate(sx, sy + 2); ctx.scale(dir, 1); ctx.rotate(pitch); ctx.translate(thrust, 0);
+            kcbPaintBoStaff(116, '#FF6D00');
+            ctx.restore();
+        } else if (m.pose === 'poleVault') {
+            ctx.save();
+            ctx.translate(cx + dir * 24, this.y + this.h - 46);
+            ctx.rotate(Math.PI / 2 + dir * 0.12);
+            kcbPaintBoStaff(104, '#FF6D00');
+            ctx.restore();
+        } else {
+            const col = m.elem === 'bolt' ? '#E040FB' : (m.elem === 'fire' ? '#FF6D00' : '#00E5FF');
+            dswPaintArmIK(sx, sy, v.x, v.y, dir);
+            ctx.save();
+            ctx.translate(v.x, v.y); ctx.scale(dir, 1); ctx.rotate(v.angle);
+            kcbPaintBoStaff(118, col);
+            ctx.restore();
+        }
+    }
+
+    ctx.restore();
 };
 
 </script>
