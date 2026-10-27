@@ -24781,6 +24781,14 @@ class DilophosBoss {
             ctx.lineTo(cxb - 3, y + 26);
             ctx.closePath(); ctx.fill();
 
+            // The boss kick string uses two articulated legs instead of an extra overlay leg.
+            if(b._closeKick){
+                const t=b._closeKick.t,high=b._closeKick.high;
+                const legs=[{kx:cxb-7,ky:y+49,fx:cxb-7,fy:y+59},{kx:cxb+7+t*18,ky:y+48-t*15,fx:cxb+9+t*(high?32:50),fy:y+59-t*(high?47:27)}];
+                ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+                for(const leg of legs){ctx.strokeStyle='#21212b';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(cxb+(leg===legs[0]?-5:5),y+40);ctx.lineTo(leg.kx,leg.ky);ctx.lineTo(leg.fx,leg.fy);ctx.stroke();ctx.fillStyle='#373746';ctx.fillRect(leg.kx-3,leg.ky-2,6,4);ctx.fillStyle='#ff6d00';ctx.fillRect(leg.fx-4,leg.fy-6,12,8);ctx.fillStyle='#ffd54f';ctx.fillRect(leg.fx-2,leg.fy-5,8,2);}
+                ctx.restore();
+            }else{
             // 3. CHAN + GIAY BOOTS + GIAP CHAN BALROG (neu dang cam Balrog)
             let lOff = (!b.grounded) ? -3 : walkCycle, rOff = (!b.grounded) ? 2 : -walkCycle;
             // Quan da den
@@ -24805,6 +24813,8 @@ class DilophosBoss {
                 ctx.fillStyle = "#78909C"; // khoa giay bac
                 ctx.fillRect(cxb - 5, y + DT_H - 5, 3, 2);
                 ctx.fillRect(cxb + 8, y + DT_H - 5, 3, 2);
+            }
+
             }
 
             // 4. THAN AO TRONG (Henley den xam + day dai nguc + that lung)
@@ -108202,7 +108212,7 @@ dswStart=function(id,...args){
  sinSwordStartBase(id,...args);if(danteSin(p)&&p.attack?.sword){p.attack.damage*=2.2;p.attack.name='SIN · '+p.attack.name;}
 };
 const sinPoseBase=dswPose;
-dswPose=function(...args){const v=sinPoseBase(...args);if(danteSin(args[0]?.dante)){v.len*=1.35;v.tx=v.x+v.dir*Math.cos(v.angle)*v.len;v.ty=v.y+Math.sin(v.angle)*v.len*v.flat;v.red=true;}return v;};
+dswPose=function(...args){const v=sinPoseBase(...args);if(args[0]?.dante&&danteSin(args[0].dante)){v.len*=1.35;v.tx=v.x+v.dir*Math.cos(v.angle)*v.len;v.ty=v.y+Math.sin(v.angle)*v.len*v.flat;v.red=true;}return v;};
 function danteSinBlink(){
  const n=dino,dir=n.isFacingLeft?-1:1;
  const target=sgTargets(n).filter(o=>{const gap=dir>0?o.x-n.x-n.w:n.x-o.x-o.w;return gap>=0&&gap<2*CM&&n.y<o.y+o.h&&n.y+n.h>o.y;}).sort((a,b)=>Math.abs(a.x-n.x)-Math.abs(b.x-n.x))[0];
@@ -108389,6 +108399,115 @@ drawUI=function(){
  ctx.fillText(p.judgement?'JUDGEMENT · '+Math.round(p.judgement.total):danteSin(p)?'SDT · J: SWORD · K: LUCE · Dash K: DRILL':'SDT '+Math.floor(danteSinCharge(p))+'% · HIT WITH FULL DT',18,190);
  ctx.fillStyle='#4c2332';ctx.fillRect(18,198,260,6);ctx.fillStyle='#ffab40';ctx.fillRect(18,198,260*(danteSin(p)?p.sinTime/DANTE_SIN_MAX:danteSinCharge(p)/100),6);
  ctx.fillStyle='#e8d8cf';ctx.fillText(danteSin(p)?'U: JUDGEMENT · LUCE '+(p.sinShotCount||0)+'/200':p.dt?'U: ENTER SDT · USE STORED CHARGE':danteSinCharge(p)>0&&ultCharge<100?'U: SDT · '+(danteSinCharge(p)*.15).toFixed(1)+'s STORED':'U: DT → U: SDT → U: JUDGEMENT',18,216);ctx.restore();
+};
+
+</script>
+<script>
+// A small set of player-inspired boss strings; existing ranged AI and SDT are unchanged.
+const DANTE_BOSS_MELEE={
+ dsd_a:{arm:0,label:'DSD · COMBO A',steps:[['down',14,96,6],['up',14,100,7],['spin',20,122,9]]},
+ dsd_b:{arm:0,label:'DSD · COMBO B',steps:[['spin',16,108,5],['spin',16,110,5],['stab',18,112,4],['thrust',22,132,10]]},
+ dance:{arm:0,label:'DANCE MACABRE',steps:[['ram',16,80,10],['down',14,102,6],['up',14,108,6],['spin',16,118,7],['cross',24,140,10]]},
+ balrog_a:{arm:1,label:'BALROG · BLOW COMBO',steps:[['thrust',14,86,6],['cross',14,92,6],['up',16,94,6],['thrust',22,108,10]]},
+ balrog_b:{arm:1,label:'BALROG · KICK COMBO',steps:[['spin',16,94,5],['spin',16,100,6],['down',22,112,8]]},
+ cerberus_a:{arm:3,label:'CERBERUS · COMBO A',steps:[['down',16,112,5],['cross',16,118,6],['thrust',20,130,8]]},
+ cerberus_b:{arm:3,label:'CERBERUS · COMBO B',steps:[['cross',18,142,4],['up',18,116,5],['down',24,128,8]]},
+ cavaliere_a:{arm:2,label:'CAVALIERE · SAW COMBO',steps:[['cross',18,108,6],['spin',18,112,6],['down',24,128,8]]},
+ cavaliere_b:{arm:2,label:'CAVALIERE · CROSSLINE',steps:[['thrust',18,112,9],['spin',20,118,6],['down',24,132,8]]}
+};
+function danteBossMeleePool(arm){return Object.keys(DANTE_BOSS_MELEE).filter(id=>DANTE_BOSS_MELEE[id].arm===arm);}
+DanteBoss.prototype.startCloseCombo=function(id,trick=true){
+ const pattern=DANTE_BOSS_MELEE[id];if(!pattern||this.phase!==1||this.suSt||this.hp<=0||!this.grounded)return false;
+ this.cancelCloseCombo();this.arms=pattern.arm;this.chuoi=[];this.slash=this.tel=this.bike=null;this.rg=0;this.fly=0;this.dashV=0;this._ketDon=false;this._dayLui=0;this.trickTo=null;this.faceP();
+ const dir=this.dir(),goal=Math.max(worldL()+8,Math.min(worldR()-this.w-8,dino.x+dino.w/2-dir*82-this.w/2));
+ this._closeCombo={id,pattern,state:'d_comboA_close',phase:trick?'approach':'wind',tick:0,index:0,dir,goal,trail:[],recover:0};
+ this.state='d_comboA_close';this.subTimer=0;this._closeReady=frames+480;this.switchT=Math.max(this.switchT,320);this.hpAtSwitch=this.hp;
+ this.drawn=true;this._swordCustom=true;
+ floatingTexts.push(new FloatingText(this.x-60,this.y-42,(trick?'TRICKSTER → ':'')+pattern.label));return true;
+};
+DanteBoss.prototype.cancelCloseCombo=function(){
+ if(this.slash?._closeCombo)this.slash=null;
+ this._closeCombo=null;this._closePose=null;this._closeKick=null;this._swordCustom=false;this._swordLean=0;this._swordTurn=1;this.armR=this.armL=0;
+};
+DanteBoss.prototype.closeComboRecover=function(){
+ const f=this._closeCombo;if(!f)return;f.phase='recover';f.tick=0;this.state='recovery';this.slash=this.tel=null;this.dashV=0;this._closePose=null;this._closeKick=null;this._swordCustom=false;this.armR=this.armL=0;this._swordLean=0;
+};
+DanteBoss.prototype.runCloseCombo=function(){
+ const f=this._closeCombo;if(!f)return;f.tick++;this.subTimer++;
+ f.trail=f.trail.filter(v=>--v.t>0);
+ if(f.phase==='approach'){
+  this._swordCustom=false;
+  if(f.tick===1){this.styleFx=14;this.warn(100,10,12);}
+  if(f.tick>=12&&f.tick<=30){
+   const old=this.x;this.x+=Math.sign(f.goal-this.x)*Math.min(18,Math.abs(f.goal-this.x));
+   if(mapTheme==='tetris')resolveTetrisWalls(this,this.x-old);else resolveSolidPillars(this);
+   this.x=Math.max(worldL()+8,Math.min(worldR()-this.w-8,this.x));if(f.tick%2===0)this.ghost();
+  }
+  if(f.tick>=32){this.tel=null;f.phase='wind';f.tick=0;this._swordCustom=true;}return;
+ }
+ if(f.phase==='recover'){
+  if(f.tick>=52){this.cancelCloseCombo();this.chuoi=[];this.noiThem=0;this.toIdle(16);}return;
+ }
+ const [pose,wind,reach,advance]=f.pattern.steps[f.index],last=f.index===f.pattern.steps.length-1;
+ this._closeKick=f.id==='balrog_b'?{t:f.phase==='strike'?Math.sin(Math.min(1,f.tick/18)*Math.PI):0,high:last}:null;
+ if(f.phase==='wind'){
+  if(f.tick===1){
+   if(Math.abs(this.gap())>260||Math.abs(dino.y-this.y)>160){this.closeComboRecover();return;}
+   this.faceP();f.dir=this.dir();if(this.arms===3)this.cerb=f.id==='cerberus_b'?(f.index===0?1:0):(f.index===2?0:2);this.warn(reach,pose==='up'?45:12,wind);this.drawn=true;this._swordCustom=true;
+  }
+  this.facingLeft=f.dir<0;this.armR=pose==='up'?1.3:-1.5;
+  if(f.tick>=wind){
+   this.tel=null;this.doSlash(reach,pose==='up'?45:12,8,1);this.slash._closeCombo=true;this.dashV=f.dir*advance;
+   f.phase='strike';f.tick=0;if(SFX.tone)SFX.tone(220+this.arms*130,.05,'sawtooth',.08,100);
+  }
+ }else if(f.phase==='strike'){
+  this.facingLeft=f.dir<0;this.armR=-1.4+Math.min(1,f.tick/10)*2.7;this.armL=this.arms===1?-this.armR*.6:0;this._swordLean=Math.sin(f.tick/16*Math.PI)*.12;
+  if(f.tick>=18){
+   this.slash=null;f.index++;f.tick=0;if(f.index>=f.pattern.steps.length){this.closeComboRecover();return;}f.phase='wind';
+  }
+ }
+ if(this._closeCombo&&f.phase!=='recover'){
+  const age=f.phase==='wind'?f.tick:wind+f.tick,m={id:'boss-close',pose,dir:f.dir,wind,end:wind+16,T:wind+24,red:last};
+  this._closePose=dswPose(this,m,age);
+  if(f.phase==='strike'&&f.tick<15){f.trail.push({...this._closePose,t:10});if(f.trail.length>18)f.trail.shift();}
+ }
+};
+const bossClosePickBase=DanteBoss.prototype.pickSkill;
+DanteBoss.prototype.pickSkill=function(noiChuoi){
+ const pool=danteBossMeleePool(this.arms);
+ if(!noiChuoi&&!this.chuoi?.length&&this.phase===1&&!this.suSt&&!this.suYeu&&this.grounded&&dino.grounded&&Math.abs(this.gap())<440&&frames>=(this._closeReady||0)&&pool.length&&Math.random()<.34){this.startCloseCombo(pool[Math.floor(Math.random()*pool.length)],true);return;}
+ return bossClosePickBase.call(this,noiChuoi);
+};
+const bossCloseStartBase=DanteBoss.prototype.raChieu;
+DanteBoss.prototype.raChieu=function(id){if(id.startsWith('close:')&&DANTE_BOSS_MELEE[id.slice(6)]){if(this.startCloseCombo(id.slice(6),false))return;}return bossCloseStartBase.call(this,id);};
+const bossCloseEvadeBase=DanteBoss.prototype.batNe;
+DanteBoss.prototype.batNe=function(direction,...args){
+ bossCloseEvadeBase.call(this,direction,...args);const pool=danteBossMeleePool(this.arms);
+ if(direction>0&&this.phase===1&&frames>=(this._closeReady||0)&&pool.length&&Math.random()<.5)this.chuoi=['close:'+pool[Math.floor(Math.random()*pool.length)]];
+};
+const bossCloseRunBase=DanteBoss.prototype.runSkill;
+DanteBoss.prototype.runSkill=function(){if(this._closeCombo&&(this.state===this._closeCombo.state||this.state==='recovery'))return this.runCloseCombo();return bossCloseRunBase.call(this);};
+const bossCloseChainBase=DanteBoss.prototype.dmcNoi;
+DanteBoss.prototype.dmcNoi=function(...args){if(this._closeCombo)return;return bossCloseChainBase.apply(this,args);};
+const bossCloseUpdateBase=DanteBoss.prototype.update;
+DanteBoss.prototype.update=function(...args){
+ if(this._closeCombo&&(this.phase!==1||this.hp<=0||this.suSt||![this._closeCombo.state,'recovery'].includes(this.state)))this.cancelCloseCombo();
+ const result=bossCloseUpdateBase.apply(this,args);
+ if(this._closeCombo&&(this.phase!==1||this.hp<=0||this.suSt||![this._closeCombo.state,'recovery'].includes(this.state)))this.cancelCloseCombo();return result;
+};
+const bossCloseDrawBase=DanteBoss.prototype.draw;
+DanteBoss.prototype.draw=function(){
+ bossCloseDrawBase.call(this);const f=this._closeCombo,v=this._closePose;if(!f||!v||f.phase==='recover'||f.phase==='approach')return;
+ const color=this.arms===1?'#ff8e35':this.arms===3?(this.cerb===0?'#ff792f':this.cerb===1?'#ffe36a':'#7deaff'):this.arms===2?'#b2e9ff':'#ff6687';
+ ctx.save();ctx.lineCap='round';
+ for(let i=1;i<f.trail.length;i++){const a=f.trail[i-1],b=f.trail[i];ctx.globalAlpha=b.t/10*.18;ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(a.tx,a.ty);ctx.lineTo(b.tx,b.ty);ctx.lineTo(b.x,b.y);ctx.closePath();ctx.fill();}
+ ctx.globalAlpha=1;
+ const sx=this.cx()+f.dir*9,sy=this.y+21;
+ if(this.arms===0){ctx.save();ctx.translate(v.x,v.y);ctx.scale(f.dir,1);dswPaintBlade(0,0,v.angle,v.len,v.red,v.flat);ctx.restore();dswPaintArmIK(sx,sy,v.x,v.y,f.dir);}
+ else if(this.arms===1){const t=f.phase==='strike'?Math.sin(Math.min(1,f.tick/18)*Math.PI):0;blrPaintFistArm(sx,sy,this.cx()+f.dir*(18+t*39),this.y+24+(f.index%2?-12:6)*t,f.dir,this.dtStage>=2,t>.2);}
+ else if(this.arms===2){dswPaintArmIK(sx,sy,v.x,v.y,f.dir);cavPaintGiantSaw(v.x,v.y,v.angle,frames*.65,f.dir,f.phase==='strike');cavPaintGiantSaw(this.cx()-f.dir*14,this.y+27,-v.angle,frames*.65,f.dir,false);}
+ else {dswPaintArmIK(sx,sy,v.x,v.y,f.dir);ctx.save();ctx.translate(v.x,v.y);ctx.scale(f.dir,1);ctx.rotate(v.angle);kcbPaintBoStaff(126,color);ctx.restore();}
+ ctx.restore();
 };
 
 </script>
