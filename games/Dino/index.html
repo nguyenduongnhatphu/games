@@ -5755,6 +5755,7 @@
                 if (!this.dop) return;
                 let h = this.hist[Math.max(0, this.hist.length - 1 - VG_DOP_LAG)];
                 if (h){ this.dop.x = canvas.width - h.x - this.w; this.dop.y = h.y; this.dop.left = !h.left; this.dop.drawn = h.drawn; this.dop.armR = -h.armR; }
+                if(typeof this.syncAttackerDoppelganger==='function')this.syncAttackerDoppelganger();
                 if (this.dop.slash){ this.dop.slash.t--; if (this.dop.slash.t <= 0) this.dop.slash = null; }
                 if (this.dop.slash){
                     let a = this.dop.slash;
@@ -5767,7 +5768,7 @@
                     if (e.t > 0) continue;
                     this.dopEv.splice(i, 1);
                     if (e.kind === 'slash'){
-                        this.dop.slash = { t: e.d.life, dir: -e.d.dir, reach: e.d.reach, up: e.d.up, hit: false };
+                        this.dop.slash = { t: e.d.life, dir: this.phase===1&&typeof this.syncAttackerDoppelganger==='function'?(this.dop.left?-1:1):-e.d.dir, reach: e.d.reach, up: e.d.up, hit: false };
                     } else if (e.kind === 'swords'){
                         let n = e.d.n || 3;
                         for (let k = 0; k < n; k++){
@@ -108096,7 +108097,7 @@ for(const table of [BLR_MOVES,CAV_MOVES,KCB_MOVES])for(const m of Object.values(
 for(const m of Object.values(FAUST_MOVES))m.T=Math.ceil(m.T*1.35);
 const danteBossWindows=new WeakMap();
 function danteIsBoss(o){return bosses.includes(o.__goc||o);}
-function danteBossOpening(o){return /^(idle|rest|recover|recovery|stunned|stun|open|opening|dizzy|tired|vulnerable)$/.test(o.state||'');}
+function danteBossOpening(o){return (o.state==='v_attacker_str'&&o._atkString?.phase==='sheathe')||/^(idle|rest|recover|recovery|stunned|stun|open|opening|dizzy|tired|vulnerable)$/.test(o.state||'');}
 function danteControlAllowed(target){
  const o=target.__goc||target;if(o._beamClashPoint)return false;if(!danteIsBoss(o))return true;
  const window=danteBossWindows.get(o);
@@ -111360,6 +111361,759 @@ const vgUltBusyBase=dojoUltBusy;
 dojoUltBusy=function(n){return !!(vergilOn()&&n===dino&&n.vergil&&(n.vergil.sdt>0||n.vergil.jce))||vgUltBusyBase(n);};
 // Apply the saved Form before the first frame, even without opening Customize.
 if(vergilForm)xDatForm(VG_FORM_IDX);
+
+</script>
+<script>
+// Boss Vergil attacker extension from the user-provided VergilBoss - Gemini.js.
+// =============================================================================
+// HỆ THỐNG PLAYER-LIKE ATTACKER COMBO CHO VERGIL BOSS (ĐỒNG BỘ VỚI VERGILFORM-V2)
+// - Phong cách: Đánh theo chuỗi nhịp nhàng (Combo A, Combo C, Mirage Edge Twin,
+//   Rapid Slash -> Rising Star, Upper Slash -> Aerial Rave B, Triple Judgement Cut).
+// - Kiểm soát nhịp độ (Pacing): Không dí liên hoàn vô tận! Sau mỗi chuỗi cận chiến
+//   sẽ có nhịp Tra Kiếm (Sheathe Window ~28-36f) đứng tại chỗ và lùi Trick Down
+//   giữ khoảng cách đi bộ lạnh lùng hoặc rỉa Mirage Blades để người chơi thở & phản công.
+// - Hiệu ứng vùng tím / không gian (Judgement Cut, Void Slash, JCE) trong suốt
+//   để người chơi luôn nhìn rõ báo đòn (telegraph) và chuyển động của Boss.
+// =============================================================================
+
+const VERGIL_BOSS_STRINGS = {
+    // 1. YAMATO COMBO A (4 nhịp rút kiếm chuẩn + Tra kiếm lóe sáng ở cuối)
+    ymt_combo_a: {
+        label: 'YAMATO · COMBO A',
+        warpIn: true,
+        sheathePause: 30,
+        moves: ['a1', 'a2', 'a3', 'a4']
+    },
+    // 2. YAMATO COMBO C (2 nhát mở màn -> Ngừng 1 nhịp ngắn -> Chém bão táp Millennium Slash -> Dimension Rend)
+    ymt_combo_c: {
+        label: 'YAMATO · COMBO C (FLURRY)',
+        warpIn: true,
+        sheathePause: 36,
+        moves: ['a1', 'a2', 'c_flurry', 'c_finish']
+    },
+    // 3. MIRAGE EDGE TWIN COMBO (Song kiếm Yamato + Mirage Edge chém xoáy liên hoàn)
+    mirage_twin: {
+        label: 'YAMATO & MIRAGE EDGE · TWIN COMBO',
+        warpIn: true,
+        sheathePause: 30,
+        moves: ['m_combo1', 'm_combo2', 'm_combo3']
+    },
+    // 4. MIRAGE DEEP STINGER & ROUND TRIP (Khoan song kiếm rồi ném kiếm xoay tại chỗ và lùi ra)
+    mirage_press: {
+        label: 'MIRAGE EDGE · DEEP STINGER & ROUND TRIP',
+        warpIn: false,
+        sheathePause: 34,
+        retreatAfter: true,
+        moves: ['m_stinger', 'm_round']
+    },
+    // 5. RAPID SLASH -> RISING STAR -> ECLIPSE DROP (Lướt xuyên qua -> Xoay kiếm bay lên -> Bổ xuống)
+    rapid_rising: {
+        label: 'YAMATO · RAPID SLASH ⯈ RISING STAR',
+        warpIn: false,
+        sheathePause: 34,
+        moves: ['rapid', 'rstar', 'airb2']
+    },
+    // 6. UPPER SLASH -> AERIAL RAVE B (Chém hất lên -> Bay theo chém 2 nhát -> Bổ Helm Breaker)
+    aerial_rave: {
+        label: 'YAMATO · UPPER SLASH ⯈ AERIAL RAVE',
+        warpIn: true,
+        sheathePause: 32,
+        moves: ['upper2', 'air1', 'air2', 'helm']
+    },
+    // 7. VOID SLASH -> PERFECT JUDGEMENT CUT (Chém nứt không gian làm chậm -> Lùi nhẹ cắt cầu không gian)
+    void_jcut: {
+        label: 'YAMATO · VOID SLASH ⯈ JUDGEMENT CUT',
+        warpIn: true,
+        sheathePause: 34,
+        retreatAfter: true,
+        moves: ['vslash', 'pjcut']
+    },
+    // 8. TRIPLE PERFECT JUDGEMENT CUT (Đứng từ xa rút kiếm cắt 3 quả cầu không gian liên tiếp — không lao vào dí!)
+    triple_jcut: {
+        label: 'YAMATO · TRIPLE JUDGEMENT CUT',
+        warpIn: false,
+        sheathePause: 38,
+        moves: ['jcut', 'pjcut', 'pjcut']
+    }
+};
+
+// Dữ liệu chiêu thức nội bộ (tự động đồng bộ với YMT_MOVES của VergilForm-v2 nếu có, hoặc dùng bảng fallback chuẩn)
+const VG_BOSS_FALLBACK_MOVES = {
+    a1:       { T: 20, wind: 5,  cancel: 12, end: 15, pose: 'iaiSlash',  hits: [6],             advance: 5 },
+    a2:       { T: 20, wind: 5,  cancel: 12, end: 15, pose: 'revSlash',  hits: [6],             advance: 5 },
+    a3:       { T: 22, wind: 5,  cancel: 14, end: 17, pose: 'sayaBash',  hits: [6, 11],         advance: 7 },
+    a4:       { T: 34, wind: 8,  cancel: 24, end: 22, pose: 'wideIai',   hits: [10],            advance: 10, sheatheAt: 24 },
+    c_flurry: { T: 44, wind: 6,  cancel: 36, end: 38, pose: 'flurry',    count: 7,              advance: 3 },
+    c_finish: { T: 36, wind: 9,  cancel: 26, end: 24, pose: 'wideIai',   hits: [11],            advance: 12, sheatheAt: 26 },
+    upper1:   { T: 26, wind: 6,  cancel: 16, end: 19, pose: 'upperIai',  hits: [8],             advance: 6,  launch: true, sheatheAt: 20 },
+    upper2:   { T: 28, wind: 6,  cancel: 18, end: 21, pose: 'upperIai',  hits: [8],             advance: 7,  launchWithMe: true },
+    air1:     { T: 19, wind: 4,  cancel: 12, end: 15, pose: 'iaiSlash',  hits: [6] },
+    air2:     { T: 19, wind: 4,  cancel: 12, end: 15, pose: 'revSlash',  hits: [6] },
+    airb2:    { T: 28, wind: 7,  cancel: 20, end: 22, pose: 'downIai',   hits: [9],             slam: true },
+    rapid:    { T: 30, wind: 6,  cancel: 22, end: 24, pose: 'rapid',     hits: [7, 11, 15, 19], advance: 16, sheatheAt: 23 },
+    rstar:    { T: 34, wind: 5,  cancel: 26, end: 28, pose: 'spinUp',    hits: [6, 12, 18, 23],advance: 10, launchWithMe: true },
+    vslash:   { T: 34, wind: 9,  cancel: 24, end: 24, pose: 'voidArc',   hits: [11],            slowBubble: true, sheatheAt: 25 },
+    helm:     { T: 28, wind: 6,  cancel: 20, end: 22, pose: 'helm',      slam: true,            sheatheAt: 21 },
+    jcut:     { T: 26, wind: 7,  cancel: 16, end: 20, pose: 'jcutPose',  isJCut: true, perfect: false, sheatheAt: 15 },
+    pjcut:    { T: 22, wind: 5,  cancel: 13, end: 17, pose: 'jcutPose',  isJCut: true, perfect: true,  sheatheAt: 12 },
+    m_combo1: { T: 20, wind: 5,  cancel: 12, end: 16, pose: 'mirage1',   hits: [6, 11],         advance: 7,  mirageMelee: true },
+    m_combo2: { T: 22, wind: 5,  cancel: 14, end: 18, pose: 'mirage2',   hits: [6, 12],         advance: 8,  mirageMelee: true },
+    m_combo3: { T: 28, wind: 7,  cancel: 20, end: 22, pose: 'mirageFin', hits: [9, 15],         advance: 10, mirageMelee: true, sheatheAt: 22 },
+    m_stinger:{ T: 32, wind: 7,  cancel: 24, end: 27, pose: 'mStinger',  hits: [8, 12, 16, 20, 24], advance: 16, mirageMelee: true },
+    m_round:  { T: 26, wind: 7,  cancel: 18, end: 20, pose: 'mirageFin', hits: [9],             mirageMelee: true, spawnRoundTrip: true }
+};
+
+function vgBossGetMoveDef(id) {
+    const base = (typeof YMT_MOVES !== 'undefined' && YMT_MOVES[id]) ? YMT_MOVES[id] : (VG_BOSS_FALLBACK_MOVES[id] || VG_BOSS_FALLBACK_MOVES.a1);
+    // Cho Boss thêm 2-3 frame windup nhẹ so với Player để người chơi kịp nhìn phản xạ & Parry!
+    const wind = Math.max(4, (base.wind || 4) + 2);
+    const end = Math.max(wind + 4, (base.end || 14) + 2);
+    const T = Math.max(end + 3, (base.T || 20) + 3);
+    const cancel = Math.max(end - 1, Math.min(T - 2, (base.cancel || end) + 2));
+    const delay=wind-(base.wind||4);
+    return { ...base, id, wind, end, T, cancel,
+        hits:base.hits?.map(t=>t+delay),
+        sheatheAt:base.sheatheAt===undefined?undefined:base.sheatheAt+delay };
+}
+
+function vgBossEnsureFx(boss) {
+    if (!boss._atkFx) {
+        boss._atkFx = {
+            slashTrail: [],
+            mirageTrail: [],
+            roundSword: null,
+            sheatheSpark: 0,
+            sparks: []
+        };
+    }
+    return boss._atkFx;
+}
+
+// Tính toán Pose thanh Yamato & Mirage Edge cho Boss (dùng chung công thức của VergilForm-v2)
+function vgBossComputePose(boss, m, age, dir) {
+    if (typeof ymtPose === 'function') {
+        return ymtPose(boss, { mirageStance: m.mirageMelee ? 10 : 0 }, { ...m, dir, sheathed: age >= (m.sheatheAt || 999) }, age);
+    }
+    const ox = boss.cx(), oy = boss.y;
+    const pr = Math.max(0, Math.min(1, (age - m.wind) / Math.max(1, m.end - m.wind)));
+    const ease = 1 - Math.pow(1 - pr, 3);
+    const drawn = age >= m.wind && age < (m.sheatheAt || 999);
+    let angle = 2.1 - 3.6 * ease, mAngle = -2.1 + 3.6 * ease;
+    let hx = 14 * Math.sin(ease * Math.PI), hy = 22, len = 86, flat = 0.48;
+    if (m.pose === 'upperIai' || m.pose === 'spinUp') { angle = 1.8 - 3.7 * ease; flat = 0.85; }
+    else if (m.pose === 'downIai' || m.pose === 'helm') { angle = -2.3 + 3.5 * ease; flat = 0.9; }
+    else if (m.pose === 'jcutPose') { drawn = age >= m.wind && age <= m.wind + 3; angle = -0.3; hx = -4; }
+    const wx = ox + dir * hx, wy = oy + hy;
+    const mwx = ox + dir * (hx - 4), mwy = oy + hy + 2;
+    return {
+        x: wx, y: wy,
+        tx: wx + dir * Math.cos(angle) * len,
+        ty: wy + Math.sin(angle) * len * flat,
+        mx: mwx, my: mwy,
+        mtx: mwx + dir * Math.cos(mAngle) * (len * 0.94),
+        mty: mwy + Math.sin(mAngle) * (len * 0.94) * flat,
+        mAngle,
+        sayaX: ox - dir * 10, sayaY: oy + 28,
+        angle, len, flat, dir, drawn,
+        mirageBlade: !!m.mirageMelee
+    };
+}
+
+// Bắt đầu một chuỗi Attacker Combo của Boss Vergil
+VergilBoss.prototype.startAttackerString = function(strId) {
+    const pattern = VERGIL_BOSS_STRINGS[strId];
+    if (!pattern || this.phase !== 1 || this.suSt || this.suYeu || this.hp <= 0) return false;
+
+    this.cancelAttackerString();
+    this.chuoi = [];
+    this.slash = null; this.tel = null; this.beo = false;
+    this.faceP();
+
+    const dir = this.dir();
+    const gap = Math.abs(this.gap());
+    // Chỉ dịch chuyển áp sát nếu chuỗi yêu cầu `warpIn` VÀ khoảng cách đang ở xa (> 115px)
+    // Không warp liên tục sát mặt khiến người chơi không kịp trở tay!
+    const needWarp = pattern.warpIn && gap > 115;
+
+    this._atkString = {
+        id: strId,
+        pattern,
+        phase: needWarp ? 'warp_in' : 'step',
+        tick: 0,
+        index: 0,
+        dir,
+        hitDone: new Set(),
+        sheatheWait: pattern.sheathePause || 30
+    };
+
+    this.state = 'v_attacker_str';
+    this.subTimer = 0;
+    vgBossEnsureFx(this);
+    floatingTexts.push(new FloatingText(this.x - 42, this.y - 38, pattern.label));
+    return true;
+};
+
+VergilBoss.prototype.cancelAttackerString = function() {
+    this._atkString = null;
+    this._atkPose = null;
+    this._atkMove = null;
+    this.mirageWep = false;
+    this.drawn = false;
+    this.armR = 0; this.armL = 0;
+    if (this._atkFx) {
+        this._atkFx.slashTrail = [];
+        this._atkFx.mirageTrail = [];
+    }
+};
+
+// Thực thi sát thương và hiệu ứng cho từng nhịp trong chuỗi Attacker của Boss Vergil
+function vgBossTriggerStepHit(boss, st, m, hitIdx) {
+    const fx = vgBossEnsureFx(boss);
+    const cx = boss.cx(), cy = boss.cy(), dir = st.dir;
+
+    // 1. Nếu là đòn ném đại kiếm xoay Mirage Edge Round Trip:
+    if (m.spawnRoundTrip) {
+        fx.roundSword = {
+            x: cx + dir * 34, y: cy,
+            tx: dino.x + dino.w / 2, ty: dino.y + dino.h / 2,
+            t: 0, life: 95, hitCd: 0
+        };
+        if (SFX.bossSkill) SFX.bossSkill();
+        return;
+    }
+
+    // 2. Nếu là Judgement Cut / Perfect Judgement Cut:
+    if (m.isJCut) {
+        const jx = dino.x + dino.w / 2 + (hitIdx > 0 ? (Math.random() - 0.5) * 90 : 0);
+        const jy = dino.y + dino.h / 2 + (hitIdx > 0 ? (Math.random() - 0.5) * 36 : 0);
+        // Thời gian báo đòn 24-28 frame để người chơi kịp lướt hoặc nhảy thoát khỏi quả cầu!
+        boss.addCut(jx, jy, m.perfect ? 76 : 64, m.perfect ? 24 : 28, 1);
+        boss.pushDop('cut', { x: jx, y: jy, r: 64 });
+        if (SFX.tone) SFX.tone(m.perfect ? 1850 : 1500, 0.08, 'sine', 0.11, 520);
+        return;
+    }
+
+    // 3. Nếu là Void Slash (Chém nứt không gian phía trước):
+    if (m.slowBubble && hitIdx === 0) {
+        boss._voidFx = { x: cx + dir * 66, y: cy - 4, t: 32, max: 32 };
+        if (SFX.bossSkill) SFX.bossSkill();
+    }
+
+    // 4. Các đòn chém cận chiến Yamato & Mirage Edge:
+    const isAround = m.pose === 'spinUp' || m.pose === 'rapid' || m.pose === 'mirage2';
+    const reach = (m.pose === 'wideIai' || m.pose === 'voidArc' || m.pose === 'mStinger') ? 112 : (m.mirageMelee ? 100 : 92);
+    const up = (m.launch || m.launchWithMe || m.pose === 'upperIai') ? 44 : 14;
+
+    boss.doSlash(reach, up, 9);
+    if (m.mirageMelee && boss.slash) boss.slash.mirage = true;
+
+    const box = {
+        x: isAround ? (cx - reach * 0.8) : (dir < 0 ? boss.x - reach + 8 : boss.x + boss.w - 8),
+        y: boss.y - up,
+        w: isAround ? reach * 1.6 : reach,
+        h: boss.h + up + 12
+    };
+
+    if(boss.slash)boss.slash.attackerBox={x:box.x-boss.x,y:box.y-boss.y,w:box.w,h:box.h};
+    if (checkAABB(dino, box)) {
+        if(boss.slash)boss.slash.hit=true;
+        const before=dino.hp;
+        boss.hurtP(1);
+        // Chỉ hất nhẹ người chơi ở nhát Upper Slash nếu người chơi không bật khiên
+        if (dino.hp<before && (m.launch || m.launchWithMe) && !dino.isShielding() && dino.grounded) {
+            dino.dy = -10.5;
+            dino.grounded = false;
+        }
+        fx.sparks.push({
+            x: dino.x + dino.w / 2, y: dino.y + dino.h / 2,
+            ang: (Math.random() - 0.5) * 1.6, len: 38, t: 7, max: 7
+        });
+    }
+
+    if (SFX.tone) {
+        SFX.tone(m.mirageMelee ? 740 : (580 + (hitIdx % 3) * 90), 0.04, 'triangle', 0.09, 300);
+    }
+}
+
+VergilBoss.prototype.runAttackerString = function() {
+    const st = this._atkString;
+    if (!st) return;
+    const fx = vgBossEnsureFx(this);
+    const sp = this.spd();
+    this.subTimer += sp;
+
+    // 1. PHA DỊCH CHUYỂN ÁP SÁT ĐẦU CHUỖI (WARP IN — Có báo trước 14 frame cho người chơi chuẩn bị!)
+    if (st.phase === 'warp_in') {
+        st.tick++;
+        if (st.tick === 2) {
+            const side = (dino.x + dino.w / 2) < canvas.width / 2 ? 1 : -1;
+            const targetX = dino.x + dino.w / 2 + side * 78 - this.w / 2;
+            this.warpTo(targetX, this.baseY);
+            this.warn(90, 16, 14);
+        }
+        if (st.tick >= 16) {
+            this.tel = null;
+            this.faceP();
+            st.dir = this.dir();
+            st.phase = 'step';
+            st.tick = 0;
+        }
+        return;
+    }
+
+    // 2. PHA TRA KIẾM VÀO VỎ CUỐI CHUỖI (SHEATHE RECOVERY — Khoảng nghỉ quý giá cho người chơi!)
+    if (st.phase === 'sheathe') {
+        st.tick++;
+        this.drawn = false;
+        this.mirageWep = false;
+        this._atkPose = null;
+        if (st.tick === 2) {
+            fx.sheatheSpark = 14;
+            this.tapTrung = Math.min(330, (this.tapTrung || 0) + 22);
+            if (SFX.tone) SFX.tone(1820, 0.05, 'sine', 0.08, 1400);
+            // Nếu chuỗi có cờ `retreatAfter` -> Boss lùi nhẹ biến ảnh Trick Down ra xa nhường khoảng trống!
+            if (st.pattern.retreatAfter && Math.abs(this.gap()) < 140) {
+                this.dashV = -this.dir() * 14;
+                this.ghost();
+            }
+        }
+        if (st.tick >= st.sheatheWait) {
+            this.cancelAttackerString();
+            // Đặt cooldown trước khi được phép tung chuỗi cận chiến tiếp theo (xen kẽ đi bộ / bắn kiếm xa)
+            this._nextMeleeStr = frames + (this.stage === 3 ? 45 : 70);
+            this.toIdle(26);
+        }
+        return;
+    }
+
+    // 3. PHA THỰC THI TỪNG NHỊP TRONG CHUỖI COMBO
+    const prevTick = st.tick;
+    st.tick++;
+    const moveId = st.pattern.moves[st.index];
+    const m = vgBossGetMoveDef(moveId);
+    this._atkMove = m;
+
+    if (st.tick === 1) {
+        // Nếu người chơi đã chạy thoát ra quá xa (> 310px) giữa chừng và đây là đòn cận chiến -> Dừng chuỗi chuyển sang tra kiếm luôn, KHÔNG lướt đuổi theo tới cùng!
+        if (!m.isJCut && !m.spawnRoundTrip && Math.abs(this.gap()) > 310 && st.index > 0) {
+            st.phase = 'sheathe';
+            st.tick = 0;
+            return;
+        }
+        this.faceP();
+        st.dir = this.dir();
+        st.hitDone.clear();
+        this.mirageWep = !!m.mirageMelee;
+
+        // Báo đòn (Telegraph) ngắn ở các nhịp khởi đầu hoặc nhịp kết lớn
+        if (st.index === 0 || m.pose === 'wideIai' || m.pose === 'voidArc') {
+            this.warn(96, 18, m.wind);
+        }
+
+        // Nhảy lên không cùng mục tiêu nếu là Upper Slash II hoặc Rising Star
+        if (m.launchWithMe && this.grounded) {
+            this.dy = -10.8;
+            this.grounded = false;
+        }
+    }
+
+    this.facingLeft = st.dir < 0;
+
+    // Giữ độ cao vừa phải khi đang chém Aerial Rave trên không
+    if ((m.id === 'air1' || m.id === 'air2') && !this.grounded) {
+        this.dy = Math.min(this.dy, 0.35);
+    }
+
+    // Bước tiến (Micro-advance) vừa phải, không dí sát rạt vào người chơi
+    if (m.advance && st.tick === m.wind + 1 && this.grounded) {
+        const gap = Math.abs(this.gap());
+        const stepSpeed = gap > 64 ? m.advance * 0.85 : m.advance * 0.25;
+        this.dashV = st.dir * stepSpeed;
+    }
+    if ((m.id === 'rapid' || m.id === 'm_stinger') && st.tick >= m.wind && st.tick <= m.end) {
+        this.x = Math.max(8, Math.min(canvas.width - this.w - 8, this.x + st.dir * 5.8));
+        if (st.tick % 3 === 0) this.ghost();
+    }
+
+    // Xử lý Helm Breaker / Eclipse Drop bổ từ trên không xuống đất
+    if (m.slam) {
+        if (st.tick === m.wind) this.dy = 18;
+        if (this.grounded && st.tick >= m.wind && !st.hitDone.has('slam')) {
+            st.hitDone.add('slam');
+            vgBossTriggerStepHit(this, st, m, 0);
+            shakeTimer = Math.max(shakeTimer, 18);
+            visualEffects.push(new Effect(this.cx(), this.y + this.h, 'explosion', true, 36));
+            st.index++;
+            st.tick = 0;
+            if (st.index >= st.pattern.moves.length) {
+                st.phase = 'sheathe';
+            }
+            return;
+        }
+    }
+    // Đòn chém bão táp theo `count` (Combo C Flurry)
+    else if (m.count) {
+        const span = Math.max(1, m.end - m.wind);
+        const k = Math.floor((st.tick - m.wind - 1) * m.count / span);
+        const oldK = Math.floor((prevTick - m.wind - 1) * m.count / span);
+        if (k >= 0 && k < m.count && k !== oldK) {
+            vgBossTriggerStepHit(this, st, m, k);
+        }
+    }
+    // Đòn đánh theo mảng `hits`
+    else if (m.hits && m.hits.length) {
+        const idx = m.hits.indexOf(st.tick);
+        if (idx >= 0) {
+            vgBossTriggerStepHit(this, st, m, idx);
+        }
+    }
+    // Judgement Cut tầm xa
+    else if (m.isJCut && st.tick === m.wind + 1) {
+        vgBossTriggerStepHit(this, st, m, st.index);
+    }
+
+    // Cập nhật Pose thanh Yamato & Vệt Lụa Kiếm Khí
+    const pose = vgBossComputePose(this, m, st.tick, st.dir);
+    this._atkPose = pose;
+    this.drawn = pose.drawn;
+    this.armR = pose.drawn ? (pose.angle - 0.5) : 0.15;
+    this.armL = pose.mirageBlade ? (pose.mAngle - 0.4) : -0.25;
+
+    if (pose.drawn && !m.isJCut && st.tick >= m.wind && st.tick <= m.end) {
+        for (let s = 1; s <= 2; s++) {
+            const subPose = vgBossComputePose(this, m, st.tick - 1 + s / 2, st.dir);
+            fx.slashTrail.push({ ...subPose, t: 7, max: 7 });
+            if (m.mirageMelee) {
+                fx.mirageTrail.push({ x: subPose.mx, y: subPose.my, tx: subPose.mtx, ty: subPose.mty, t: 7, max: 7 });
+            }
+        }
+        if (fx.slashTrail.length > 18) fx.slashTrail.splice(0, fx.slashTrail.length - 18);
+        if (fx.mirageTrail.length > 18) fx.mirageTrail.splice(0, fx.mirageTrail.length - 18);
+    }
+
+    if (m.sheatheAt && st.tick === m.sheatheAt) {
+        fx.sheatheSpark = 12;
+    }
+
+    // Chuyển sang đòn tiếp theo tại frame `cancel`, hoặc sang pha `sheathe` ở cuối chuỗi
+    const limit = (st.index < st.pattern.moves.length - 1) ? m.cancel : m.T;
+    if (st.tick >= limit) {
+        st.index++;
+        st.tick = 0;
+        if (st.index >= st.pattern.moves.length) {
+            st.phase = 'sheathe';
+        }
+    }
+};
+
+// =============================================================================
+// ĐIỀU PHỐI AI PACING: XEN KẼ CHUỖI ATTACKER, BẮN MIRAGE BLADES XA & GIỮ KHOẢNG CÁCH
+// =============================================================================
+const vgBossOrigPick = VergilBoss.prototype.pickSkill;
+VergilBoss.prototype.pickSkill = function() {
+    if (this.phase !== 1 || this.suSt || this.suYeu || this.hp <= 0) {
+        return vgBossOrigPick.call(this);
+    }
+
+    // Nếu vừa mới tung xong một chuỗi cận chiến (hoặc đã đánh 2 chuỗi liên tiếp),
+    // Boss sẽ ưu tiên dùng kỹ năng tầm xa (Summoned Swords / Storm / Heavy Rain / Judgement Cut)
+    // để người chơi có khoảng trống thở thay vì bị dí sát mặt liên tục!
+    const gap = Math.abs(this.gap());
+    const meleeLocked = frames < (this._nextMeleeStr || 0) || (this._meleeStreak || 0) >= 2;
+
+    if (meleeLocked) {
+        this._meleeStreak = 0;
+        this.chuoi = [];
+        const rangedPool = this.stage >= 2
+            ? ['v_swords', 'v_storm', 'v_heavyrain', 'v_jcut', 'v_spiral']
+            : ['v_swords', 'v_jcut', 'v_void'];
+        const pickR = rangedPool[(this._rangedCursor || 0) % rangedPool.length];
+        this._rangedCursor = (this._rangedCursor || 0) + 1;
+        this.batChieu(pickR);
+        return;
+    }
+
+    // Ở khoảng cách xa (> 250px): 50% tỉ lệ đứng từ xa cắt Triple Judgement Cut hoặc phóng Mirage Press, 50% mới áp sát
+    let deck;
+    if (gap > 250) {
+        deck = ['triple_jcut', 'rapid_rising', 'mirage_press', 'ymt_combo_a'];
+    } else if (!dino.grounded && dino.y + dino.h < 285) {
+        deck = ['aerial_rave', 'void_jcut'];
+    } else {
+        deck = [
+            'ymt_combo_a',
+            'mirage_twin',
+            'ymt_combo_c',
+            'rapid_rising',
+            'void_jcut',
+            'aerial_rave',
+            'mirage_press'
+        ];
+    }
+
+    const strId = deck[(this._strCursor || 0) % deck.length];
+    this._strCursor = (this._strCursor || 0) + 1;
+
+    if (this.startAttackerString(strId)) {
+        this._meleeStreak = (this._meleeStreak || 0) + 1;
+        return;
+    }
+    return vgBossOrigPick.call(this);
+};
+
+const vgBossOrigRun = VergilBoss.prototype.runSkill;
+VergilBoss.prototype.runSkill = function() {
+    if (this._atkString && this.state === 'v_attacker_str') {
+        return this.runAttackerString();
+    }
+    return vgBossOrigRun.call(this);
+};
+
+const vgBossOrigUpdate = VergilBoss.prototype.update;
+VergilBoss.prototype.update = function(...args) {
+    if (this._atkString && (this.phase !== 1 || this.hp <= 0 || this.suSt || this.state !== 'v_attacker_str')) {
+        this.cancelAttackerString();
+    }
+    // Cập nhật hiệu ứng phụ (Vệt kiếm, Đại kiếm xoay Round Trip của Boss)
+    if (this._atkFx) {
+        const fx = this._atkFx;
+        if (fx.sheatheSpark > 0) fx.sheatheSpark--;
+        fx.slashTrail = fx.slashTrail.filter(st => --st.t > 0);
+        fx.mirageTrail = fx.mirageTrail.filter(mt => --mt.t > 0);
+        fx.sparks = fx.sparks.filter(sp => --sp.t > 0);
+
+        if(fx.roundSword&&(this.phase!==1||this.hp<=0||this.suSt))fx.roundSword=null;
+        if (fx.roundSword) {
+            const rs = fx.roundSword;
+            rs.t++; rs.life--;
+            rs.tx = dino.x + dino.w / 2;
+            rs.ty = dino.y + dino.h / 2;
+            rs.x += (rs.tx - rs.x) * 0.12;
+            rs.y += (rs.ty - rs.y) * 0.12;
+            if (rs.hitCd > 0) rs.hitCd--;
+            else if (checkAABB(dino, { x: rs.x - 36, y: rs.y - 36, w: 72, h: 72 })) {
+                rs.hitCd = 22;
+                this.hurtP(1);
+            }
+            if (rs.life <= 0 || this.phase !== 1 || this.hp <= 0) fx.roundSword = null;
+        }
+    }
+
+    const res = vgBossOrigUpdate.apply(this, args);
+    if(this._atkString&&this.state!=='v_attacker_str')this.cancelAttackerString();
+    return res;
+};
+
+// =============================================================================
+// NÂNG CẤP HÀM VẼ BOSS VERGIL: TRONG SUỐT CÁC VÙNG TÍM & VẼ SONG KIẾM MƯỢT MÀ
+// =============================================================================
+const vgBossOrigDraw = VergilBoss.prototype.draw;
+VergilBoss.prototype.draw = function() {
+    // Tạm thời làm nhẹ các vùng tím (jce, dome, dim, cuts, _voidFx) trước khi gọi draw gốc
+    // để không bao giờ che khuất tầm nhìn của người chơi!
+    const savedCuts = this.cuts;
+    const savedVoid = this._voidFx;
+    const savedJce  = this.jce;
+    const savedDome = this.dome;
+    const savedDim  = this.dim;
+
+    const posed=this.phase===1&&this.state==='v_attacker_str'&&this._atkPose;
+    const savedDrawn=this.drawn,savedMirage=this.mirageWep,savedSlash=this.slash;
+    this.cuts = [];
+    this._voidFx = null;
+    this.jce = null;
+    this.dome = null;
+    this.dim = null;
+
+    try {
+        if(posed){this.drawn=false;this.mirageWep=false;this.slash=null;}
+        vgBossOrigDraw.call(this);
+    } finally {
+        this.cuts=savedCuts;this._voidFx=savedVoid;this.jce=savedJce;
+        this.dome=savedDome;this.dim=savedDim;
+        this.drawn=savedDrawn;this.mirageWep=savedMirage;
+        this.slash=savedSlash;
+    }
+
+    const dt = this.stage === 3;
+    ctx.save();
+
+    // 1. Vẽ Vết Nứt Không Gian VOID SLASH (Trong suốt, thanh mảnh)
+    if (this._voidFx) {
+        const vf = this._voidFx, k = vf.t / vf.max;
+        ctx.save();
+        ctx.translate(vf.x, vf.y);
+        ctx.globalAlpha = k * 0.48;
+        ctx.fillStyle = 'rgba(0, 176, 255, 0.08)';
+        ctx.beginPath(); ctx.ellipse(0, 0, 52, 36, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 1.8;
+        ctx.setLineDash([6, 5]);
+        ctx.beginPath(); ctx.ellipse(0, 0, 52, 36, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+    }
+
+    // 2. Vẽ Quả Cầu JUDGEMENT CUT của Boss (Trong suốt, rõ ranh giới né đòn)
+    for (const c of this.cuts) {
+        ctx.save();
+        if (c.t > 0) {
+            const k = 1 - c.t / c.warn;
+            ctx.globalAlpha = 0.28 + 0.42 * k;
+            ctx.strokeStyle = dt ? '#B388FF' : '#40C4FF';
+            ctx.lineWidth = 2.0;
+            ctx.setLineDash([6, 6]); ctx.lineDashOffset = -frames;
+            ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.globalAlpha = 0.55;
+            ctx.beginPath(); ctx.arc(c.x, c.y, c.r * (0.2 + 0.8 * k), 0, Math.PI * 2); ctx.stroke();
+        } else {
+            const k = c.boom / 20;
+            ctx.globalAlpha = k * 0.78;
+            ctx.fillStyle = 'rgba(64, 196, 255, 0.07)';
+            ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2.0 * k;
+            for (let i = 0; i < 6; i++) {
+                const a = (i / 6) * Math.PI + frames * 0.02, R = c.r * (1.12 - 0.1 * k);
+                ctx.beginPath();
+                ctx.moveTo(c.x - Math.cos(a) * R, c.y - Math.sin(a) * R);
+                ctx.lineTo(c.x + Math.cos(a) * R, c.y + Math.sin(a) * R);
+                ctx.stroke();
+            }
+        }
+        ctx.restore();
+    }
+
+    // 3. Vẽ Vùng JUDGEMENT CUT END / DOME / DIMENSION SLASH của Boss (Làm trong suốt 85% để nhìn rõ đường thoát!)
+    if (this.jce) {
+        const k = 1 - this.jce.t / this.jce.max;
+        ctx.save();
+        ctx.fillStyle = 'rgba(124, 77, 255, 0.08)';
+        ctx.fillRect(this.jce.x - 140, 90, 280, 240);
+        ctx.globalAlpha = 0.75;
+        ctx.strokeStyle = (frames % 8 < 4) ? '#FFFFFF' : '#80D8FF';
+        ctx.lineWidth = 2.2;
+        ctx.strokeRect(this.jce.x - 140, 90, 280, 240);
+        ctx.fillStyle = '#E1F5FE'; ctx.font = 'bold 12px Consolas, monospace'; ctx.textAlign = 'center';
+        ctx.fillText('JCE · ' + Math.ceil(this.jce.t / 60) + 's', this.jce.x, 112);
+        ctx.restore();
+    }
+    if (this.dome) {
+        const k = 1 - this.dome.t / this.dome.max;
+        ctx.save();
+        ctx.fillStyle = 'rgba(124, 77, 255, 0.08)';
+        ctx.beginPath(); ctx.arc(this.dome.x, 320, this.dome.r, Math.PI, 0); ctx.fill();
+        ctx.globalAlpha = 0.75;
+        ctx.strokeStyle = (frames % 8 < 4) ? '#FFFFFF' : '#80D8FF';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath(); ctx.arc(this.dome.x, 320, this.dome.r, Math.PI, 0); ctx.stroke();
+        ctx.restore();
+    }
+    if (this.dim && !this.dim.go) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(124, 77, 255, 0.09)';
+        ctx.fillRect(0, this.dim.y - 34, canvas.width, 68);
+        ctx.strokeStyle = '#80D8FF'; ctx.lineWidth = 2.0;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.moveTo(0, this.dim.y - 34); ctx.lineTo(canvas.width, this.dim.y - 34);
+        ctx.moveTo(0, this.dim.y + 34); ctx.lineTo(canvas.width, this.dim.y + 34);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+    }
+
+    // 4. Vẽ Dải Lụa Kiếm Khí Yamato, Mirage Edge & Ngôi Sao Tra Kiếm của Boss
+    const fx = this._atkFx;
+    if (fx) {
+        for (let i = 1; i < fx.slashTrail.length; i++) {
+            const u = fx.slashTrail[i - 1], w = fx.slashTrail[i];
+            const alpha = (w.t / w.max) * 0.36;
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = dt ? '#7C4DFF' : '#00B0FF';
+            ctx.beginPath();
+            ctx.moveTo(u.x + (u.tx - u.x) * 0.45, u.y + (u.ty - u.y) * 0.45);
+            ctx.lineTo(u.tx, u.ty); ctx.lineTo(w.tx, w.ty);
+            ctx.lineTo(w.x + (w.tx - w.x) * 0.45, w.y + (w.ty - w.y) * 0.45);
+            ctx.closePath(); ctx.fill();
+
+            ctx.globalAlpha = alpha * 1.5;
+            ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2.0;
+            ctx.beginPath(); ctx.moveTo(u.tx, u.ty); ctx.lineTo(w.tx, w.ty); ctx.stroke();
+        }
+        for (let i = 1; i < fx.mirageTrail.length; i++) {
+            const u = fx.mirageTrail[i - 1], w = fx.mirageTrail[i];
+            const alpha = (w.t / w.max) * 0.34;
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = '#00E5FF';
+            ctx.beginPath();
+            ctx.moveTo(u.x + (u.tx - u.x) * 0.45, u.y + (u.ty - u.y) * 0.45);
+            ctx.lineTo(u.tx, u.ty); ctx.lineTo(w.tx, w.ty);
+            ctx.lineTo(w.x + (w.tx - w.x) * 0.45, w.y + (w.ty - w.y) * 0.45);
+            ctx.closePath(); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        // Đại kiếm xoay Round Trip của Boss
+        if (fx.roundSword) {
+            const rs = fx.roundSword;
+            ctx.save();
+            ctx.translate(rs.x, rs.y);
+            ctx.globalAlpha = 0.55;
+            ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.arc(0, 0, 38, rs.t * 0.45, rs.t * 0.45 + 4.2); ctx.stroke();
+            if (typeof vgDrawMirageEdgeBlade === 'function') {
+                vgDrawMirageEdgeBlade(0, 0, rs.t * 0.55, 58, 1);
+            }
+            ctx.restore();
+        }
+
+        // Ngôi sao 4 cánh lóe sáng ở hông trái khi Boss Vergil tra kiếm vào vỏ (Báo hiệu cho người chơi đây là lúc phản công!)
+        if (fx.sheatheSpark > 0) {
+            const sx = this.cx() - this.dir() * 10, sy = this.y + 24;
+            ctx.save();
+            ctx.translate(sx, sy);
+            ctx.rotate(frames * 0.25);
+            ctx.shadowColor = '#00E5FF'; ctx.shadowBlur = 14;
+            ctx.fillStyle = '#00E5FF';
+            for (let k = 0; k < 2; k++) {
+                ctx.rotate(Math.PI / 2);
+                ctx.beginPath();
+                ctx.moveTo(-15, 0); ctx.lineTo(0, -3);
+                ctx.lineTo(15, 0);  ctx.lineTo(0, 3);
+                ctx.closePath(); ctx.fill();
+            }
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath(); ctx.arc(0, 0, 3.5, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+        }
+    }
+
+
+    if(posed){
+        const v=this._atkPose;
+        if(v.mirageBlade&&typeof vgDrawMirageEdgeBlade==='function'){
+            ctx.save();ctx.translate(v.mx,v.my);ctx.scale(v.dir,1);
+            vgDrawMirageEdgeBlade(0,0,v.mAngle,v.len*.94,v.flat);ctx.restore();
+        }
+        if(v.drawn&&typeof vgDrawKatana==='function'){
+            ctx.save();ctx.translate(v.x,v.y);ctx.scale(v.dir,1);
+            vgDrawKatana(0,0,v.angle,v.len,v.flat,dt);ctx.restore();
+        }
+    }
+    ctx.restore();
+};
+
+const vgBossSlashRectBase=VergilBoss.prototype.slashRect;
+VergilBoss.prototype.slashRect=function(){
+    const r=this.slash?.attackerBox;
+    return r?{x:this.x+r.x,y:this.y+r.y,w:r.w,h:r.h}:vgBossSlashRectBase.call(this);
+};
+VergilBoss.prototype.syncAttackerDoppelganger=function(){
+    if(!this.dop||this.phase!==1)return;
+    const dir=this.dir();
+    this.dop.x=Math.max(16,Math.min(canvas.width-this.w-16,this.x-dir*84));
+    this.dop.y=this.y-12;this.dop.left=this.facingLeft;
+};
 
 </script>
 </body>
