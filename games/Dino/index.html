@@ -103716,7 +103716,7 @@ function danteAttack(special,charge){
  p.attack={name,arm,dir,reach,dmg:dmg+bonus,wind,duration,pulses,interval,kind,lift,age:0,hit:new Set(),special,full};p.cd=duration;
  if(special)danteLabel(name);
 }
-function danteHit(p,o,damage,arm=p.damageArm??p.arm){const scale=arm===1?.8:arm===2?.75:arm===3?.8:arm===5?.8:1;const dealt=sgDamage(dino,o,damage*scale,'dante');if(dealt>0&&!p.dt)ultCharge=Math.min(100,ultCharge+dealt*.7);return dealt;}
+function danteHit(p,o,damage,arm=p.damageArm??p.arm){const scale=arm===1?.8:arm===2?.75:arm===3?.8:arm===5?.8:1;const dealt=sgDamage(dino,o,damage*scale,'dante');if(dealt>0&&!p.dt&&!p.sinTime&&!p.judgement)ultCharge=Math.min(100,ultCharge+dealt*.7);return dealt;}
 function dantePulse(n,p,a){
  const cx=n.x+n.w/2,cy=n.y+n.h/2;
  function round(x,y,vx,vy,r,kind,damage,life=65){p.rounds.push({arm:a.arm,x,y,vx,vy,r,kind,damage,life,age:0,hit:new Set(),dir:a.dir});}
@@ -107912,7 +107912,7 @@ function danteSwordsTick(n,p,s){
     if(!sword.hit){
      for(const o of targets){
       if((o.x+o.w/2-(sword.origin?.x??n.x))*sword.dir<-15)continue;
-      if(sgSegmentBox(v.x,v.y,v.tx,v.ty,o,10)!==null&&sgDamage(n,o,1,'phantom')>0){
+      if(sgSegmentBox(v.x,v.y,v.tx,v.ty,o,10)!==null&&sgDamage(n,o,p.sinTime>0?2:1,'phantom')>0){
        sword.hit=true;
        break;
       }
@@ -108166,6 +108166,170 @@ for(const name of ['dswCommand','blrCommand','cavCommand','kcbCommand','eiComman
 for(const [name,arm] of [['dswTick',0],['blrTick',1],['cavTick',2],['kcbTick',3],['eiTick',4],['faustTick',5]]){
  const base=window[name];window[name]=function(...args){const p=dino?.dante;if(!p)return base(...args);const before=p.damageArm;p.damageArm=arm;try{return base(...args);}finally{p.damageArm=before;}};
 }
+</script>
+<script>
+// Playable Sin Devil Trigger. Boss renderers are reused only for drawing, never AI/damage.
+const DANTE_SIN_MAX=900,DANTE_SIN_PARTICLES=200;
+function danteSin(p=dino?.dante){return !!(p&&(p.sinTime>0||p.judgement));}
+function danteSinCharge(p=dino?.dante){return p?.sinCharge||0;}
+function danteSinClean(p){
+ p.attack=null;p.k=null;p.cd=0;p.swapInput=null;p.swapReady=0;p.rounds=[];
+ for(const s of [p.sword,p.balrog,p.cavaliere,p.cerberus])if(s){s.queue=[];s.airSlow=0;s.last='';}
+ if(p.sword){dswReleaseHolds(p.sword);p.sword.round=null;p.sword.waves=[];p.sword.pose=null;p.sword.trail=[];}
+ faustReset(p);const s=danteStyleState(p);s.swords=[];s.release=null;s.guardUntil=s.perfectUntil=-100;
+ p.body._swordLean=p.body._swordLunge=0;p.body._swordTurn=1;p.body._faustLegs=null;p.body._sinDrill=false;p.body._gunRoll=0;
+}
+function danteSinEnter(){
+ const p=dino.dante;if(!p.dt||danteSinCharge(p)<100)return false;
+ const saved={arm:p.arm,style:danteStyle(p)};danteSinClean(p);p.sinSaved=saved;p.dt=0;p.sinCharge=0;p.sinTime=DANTE_SIN_MAX;p.sinShotCount=0;p.sinShotReady=0;p.sinDash=-100;p.sinBullets=[];
+ p.arm=0;p.style=0;combatStance=3;ultCharge=0;p.body._sin=true;dashCd=0;
+ if(SFX.tone)SFX.tone(100,.2,'sawtooth',.1,500);danteLabel('SIN DEVIL TRIGGER');visualEffects.push(new Effect(dino.x+dino.w/2,dino.y+30,'charge_wave',true,2));return true;
+}
+function danteSinExit(){
+ const p=dino.dante,saved=p.sinSaved||{arm:0,style:0};danteSinClean(p);p.sinTime=0;p.judgement=null;p.sinBullets=[];p.body._sin=false;p.body._sinDrill=false;p.dt=0;p.arm=saved.arm;p.style=saved.style;combatStance=p.style===1?0:p.style===2?2:3;p.sinSaved=null;dashVx=0;ultCharge=0;
+}
+const sinHitBase=danteHit;
+danteHit=function(p,o,damage,...args){
+ const full=ultCharge>=100&&!p.dt&&!danteSin(p),dealt=sinHitBase(p,o,damage,...args);
+ if(full&&dealt>0)p.sinCharge=Math.min(100,danteSinCharge(p)+dealt*.35);
+ return dealt;
+};
+const sinSwordCountBase=danteSwordCount;
+danteSwordCount=function(){return danteSin()?6:sinSwordCountBase();};
+const sinSwordStartBase=dswStart;
+dswStart=function(id,...args){
+ const p=dino?.dante;if(danteSin(p)&&id==='stinger'){danteSinDrill();return;}
+ sinSwordStartBase(id,...args);if(danteSin(p)&&p.attack?.sword){p.attack.damage*=2.2;p.attack.name='SIN · '+p.attack.name;}
+};
+const sinPoseBase=dswPose;
+dswPose=function(...args){const v=sinPoseBase(...args);if(danteSin(args[0]?.dante)){v.len*=1.35;v.tx=v.x+v.dir*Math.cos(v.angle)*v.len;v.ty=v.y+Math.sin(v.angle)*v.len*v.flat;v.red=true;}return v;};
+function danteSinBlink(){
+ const n=dino,dir=n.isFacingLeft?-1:1;
+ const target=sgTargets(n).filter(o=>{const gap=dir>0?o.x-n.x-n.w:n.x-o.x-o.w;return gap>=0&&gap<2*CM&&n.y<o.y+o.h&&n.y+n.h>o.y;}).sort((a,b)=>Math.abs(a.x-n.x)-Math.abs(b.x-n.x))[0];
+ return target?danteTeleport(target,true):false;
+}
+const sinDashBase=doDash;
+doDash=function(direction){
+ if(!danteSin())return sinDashBase(direction);if(!danteStyleLive()||paused||dino.dante.judgement)return;
+ const n=dino,p=n.dante,dir=direction===-1?-1:direction===1?1:n.isFacingLeft?-1:1;
+ if(p.attack?.sinDrill){p.attack=null;p.cd=0;p.body._sinDrill=false;}
+ n.isFacingLeft=dir<0;n.dashDir=dir;dashCd=0;dashVx=dir*25;p.sinDash=frames;dswState(p).lastDash=frames;
+ n.invincible=true;n.invTimer=Math.max(n.invTimer,8);danteGhost(n);danteSinBlink();
+};
+function danteSinDrill(){
+ const p=dino.dante;if(!p.sinTime||p.judgement||p.sinTime<45)return;
+ p.sinTime-=45;p.k=null;p.attack={sinDrill:true,royal:true,age:0,duration:28,dir:dino.isFacingLeft?-1:1,hit:new Map(),crossed:false,name:'SIN STINGER · DRILL'};p.cd=28;dswState(p).queue=[];danteStyleState(p).swords=[];
+}
+function danteSinFire(){
+ const n=dino,p=n.dante;if(!p.sinTime||p.judgement||p.sinTime<36||p.sinShotCount>=DANTE_SIN_PARTICLES||frames<(p.sinShotReady||0)||p.attack)return;
+ const count=Math.min(10,DANTE_SIN_PARTICLES-p.sinShotCount),dir=n.isFacingLeft?-1:1;
+ const target=sgTargets(n).filter(o=>(o.x+o.w/2-n.x-n.w/2)*dir>=0&&Math.hypot(o.x-n.x,o.y-n.y)<1000).sort((a,b)=>Math.hypot(a.x-n.x,a.y-n.y)-Math.hypot(b.x-n.x,b.y-n.y))[0];
+ const aim=target?Math.atan2(target.y+target.h/2-n.y-24,target.x+target.w/2-n.x-n.w/2):dir>0?0:Math.PI;
+ for(let i=0;i<count;i++){const angle=aim+(i-(count-1)/2)*.045;p.sinBullets.push({x:n.x+n.w/2-dir*12,y:n.y+12+(i%5)*6,vx:Math.cos(angle)*19,vy:Math.sin(angle)*19,life:65,target});}
+ p.sinShotCount+=count;p.sinTime-=36;p.sinShotReady=frames+4;
+}
+function danteJudgement(){
+ const n=dino,p=n.dante;if(!p.sinTime||p.judgement)return;
+ const ratio=Math.max(0,Math.min(1,p.sinTime/DANTE_SIN_MAX)),total=50+450*ratio;
+ danteSinClean(p);p.sinTime=0;p.sinCharge=0;p.sinBullets=[];ultCharge=0;
+ const target=sgTargets(n).filter(o=>Math.hypot(o.x-n.x,o.y-n.y)<800).sort((a,b)=>Math.hypot(a.x-n.x,a.y-n.y)-Math.hypot(b.x-n.x,b.y-n.y))[0];
+ if(target)danteTeleport(target,false);
+ p.judgement={landY:dswFloor(n.x+n.w/2,n.y+n.h)-n.h,grounded:n.grounded,age:0,total,x:target?target.x+target.w/2:n.x+n.w/2+(n.isFacingLeft?-100:100),y:target?target.y+target.h/2:n.y+30,homeX:n.x,homeY:n.y,fx:{mua:true,pha:'goi',kiem:[]},arcs:[]};
+ danteLabel('JUDGEMENT · '+Math.round(total));dashVx=0;
+}
+const sinKeyBase=danteKey;
+danteKey=function(code,repeat){
+ if(!danteStyleLive())return sinKeyBase(code,repeat);
+ const p=dino.dante;
+ if(p.judgement&&['KeyJ','KeyK','KeyU','KeyQ','KeyE','KeyI','KeyO','KeyL','ShiftLeft','ShiftRight'].includes(code))return true;
+ if(code==='KeyU'&&p.dt&&!repeat&&!paused){if(!danteSinEnter())danteLabel('SDT '+Math.floor(danteSinCharge(p))+' / 100');return true;}
+ if(danteSin(p)){
+  if(['KeyQ','KeyE','KeyI','KeyO','KeyL'].includes(code))return true;
+  if(code==='KeyU'){if(!repeat&&!paused)danteJudgement();return true;}
+  if(code==='KeyK'){keys[code]=true;if(!repeat&&!paused){if(frames-(p.sinDash??-100)<=24)danteSinDrill();else danteSinFire();}return true;}
+ }
+ return sinKeyBase(code,repeat);
+};
+const sinSetStyleBase=danteSetStyle;
+danteSetStyle=function(index){if(danteSin())return;return sinSetStyleBase(index);};
+const sinSwapBase=danteSwapWeapon;
+danteSwapWeapon=function(...args){if(danteSin())return;return sinSwapBase(...args);};
+function danteSinTick(){
+ if(!danteStyleLive()||paused)return;const n=dino,p=n.dante;
+ if(!danteSin(p)){p.body._sin=false;return;}
+ p.arm=0;p.style=0;combatStance=3;p.dt=0;ultCharge=0;p.body._sin=true;p.body.wing=(p.body.wing||0)+.12;
+ if(p.judgement){
+  const j=p.judgement;j.age++;n.invincible=true;n.invTimer=Math.max(n.invTimer,3);n.dy=0;dashVx=0;n.x=j.homeX;n.y=j.homeY;n.grounded=j.grounded;
+  const phase=Math.max(0,Math.min(3,Math.floor((j.age-4)/18))),id=['a1','a2','a3','high'][phase],age=Math.max(0,(j.age-4)%18);
+  if(j.age>=78){const rise=j.age<110?Math.min(120,(j.age-78)*8):Math.max(0,120-(j.age-110)*15);n.y=j.landY-rise;n.grounded=rise===0;}
+  dswState(p).pose=dswPose(n,j.age<78?{...DSW_MOVES[id],id,dir:n.isFacingLeft?-1:1}:null,age);p.body.armR=j.age<78?Math.sin(age/18*Math.PI)*-1.8:j.age<118?-2.2:.3;
+  if([12,30,48,66].includes(j.age)){
+   for(const o of sgTargets(n))if(Math.hypot(o.x+o.w/2-j.x,o.y+o.h/2-j.y)<320)sgDamage(n,o,j.total*.15,'judgement');
+   j.arcs.push({t:14,angle:(j.age/18%2?1:-1)*.9});shakeTimer=Math.max(shakeTimer,8);
+  }
+  j.arcs=j.arcs.filter(a=>--a.t>0);
+  if(j.age>=78&&j.age<100&&j.age%2===0){const i=j.fx.kiem.length;j.fx.kiem.push({x:j.x+(i%2?-1:1)*(40+i*13),y:j.y-170-i%4*12,tx:j.x+(i%5-2)*24,ty:j.y+20,pha:'treo',t:0});}
+  if(j.age>=100&&j.age<118){j.fx.pha='ban';for(const k of j.fx.kiem){k.pha='bay';k.vx=(k.tx-k.x)*.22;k.vy=(k.ty-k.y)*.22;k.x+=k.vx;k.y+=k.vy;}}
+  if(j.age===118){
+   j.fx.pha='xong';for(const k of j.fx.kiem){k.pha='no';k.t=14;}
+   for(const o of sgTargets(n))if(Math.hypot(o.x+o.w/2-j.x,o.y+o.h/2-j.y)<320)sgDamage(n,o,j.total*.4,'judgement');
+   visualEffects.push(new Effect(n.x+n.w/2,n.y+n.h,'body_slam_shockwave',true,180));visualEffects.push(new Effect(j.x,j.y,'lightning_burst',true,3.2));shakeTimer=Math.max(shakeTimer,30);
+   if(SFX.bossExplode)SFX.bossExplode();
+  }
+  for(const k of j.fx.kiem)if(k.pha==='no'){if(--k.t<=0)k.pha='het';}
+  if(j.age>=140)danteSinExit();return;
+ }
+ p.sinTime--;
+ if(frames%2===0&&Math.abs(dashVx)>2){danteGhost(n);danteSinBlink();}
+ if(keys.KeyK)danteSinFire();
+ const a=p.attack;p.body._sinDrill=!!a?.sinDrill;
+ if(a?.sinDrill){
+  a.age++;const old=n.x;n.x=Math.max(worldL(),Math.min(worldR()-n.w,n.x+a.dir*14));if(mapTheme==='tetris')resolveTetrisWalls(n,n.x-old);else resolveSolidPillars(n);n.isFacingLeft=a.dir<0;n.invincible=true;n.invTimer=Math.max(n.invTimer,3);n.dy=0;
+  if(!a.crossed&&danteSinBlink()){a.crossed=true;a.dir=n.isFacingLeft?-1:1;}
+  for(const o of sgTargets(n))if(checkAABB({x:Math.min(old,n.x)-30,y:n.y-12,w:Math.abs(n.x-old)+n.w+60,h:n.h+24},o)&&a.age-(a.hit.get(o.__goc||o)??-20)>=10){sgDamage(n,o,8,'sin-drill');a.hit.set(o.__goc||o,a.age);}
+  if(a.age>=a.duration){p.attack=null;p.cd=0;p.body._sinDrill=false;}
+ }
+ const sinTargets=sgTargets(n);
+ for(const q of p.sinBullets||[]){
+  const ox=q.x,oy=q.y;q.life--;
+  if(q.target?.hp>0){const goal=Math.atan2(q.target.y+q.target.h/2-q.y,q.target.x+q.target.w/2-q.x),angle=Math.atan2(q.vy,q.vx),delta=Math.atan2(Math.sin(goal-angle),Math.cos(goal-angle));q.vx=Math.cos(angle+Math.max(-.06,Math.min(.06,delta)))*19;q.vy=Math.sin(angle+Math.max(-.06,Math.min(.06,delta)))*19;}
+  q.x+=q.vx;q.y+=q.vy;
+  for(const o of sinTargets)if(o.hp>0&&sgSegmentBox(ox,oy,q.x,q.y,o,4)!==null){sgDamage(n,o,2,'sin-particle');q.life=0;break;}
+ }
+ p.sinBullets=(p.sinBullets||[]).filter(q=>q.life>0);
+ if(p.sinTime<=0)danteSinExit();
+}
+const sinTickBase=danteTick;
+danteTick=function(){sinTickBase();danteSinTick();};
+const sinBodyBase=drawDantePlayerBody;
+drawDantePlayerBody=function(b,x,y){if(!b._sin)return sinBodyBase(b,x,y);
+ if(b._sinDrill){
+  ctx.save();ctx.translate(x+20,y+30);ctx.scale(b.facingLeft?-1:1,1);ctx.fillStyle='#24080c';ctx.strokeStyle='#ff5722';ctx.lineWidth=2;
+  for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(-42,side*27);ctx.lineTo(48,0);ctx.lineTo(-20,side*8);ctx.closePath();ctx.fill();ctx.stroke();}
+  ctx.fillStyle='#9a1b21';ctx.beginPath();ctx.ellipse(0,0,28,12,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#ffc400';ctx.beginPath();ctx.moveTo(-22,0);ctx.lineTo(38,0);ctx.stroke();ctx.restore();return;
+ }
+ drawSdtDante({...b,drawn:false},x-13,y-28);};
+const sinDrawBase=danteDraw;
+danteDraw=function(n){
+ sinDrawBase(n);const p=n.dante;if(!p||!danteSin(p))return;
+ for(const q of p.sinBullets||[]){ctx.save();ctx.strokeStyle='#fff2bb';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(q.x-q.vx*.7,q.y-q.vy*.7);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.restore();}
+ if(p.attack?.sinDrill)for(let i=0;i<6;i++){const b={move:{kind:'drill'},stroke:Math.min(14,p.attack.age),i,count:6,dir:p.attack.dir,origin:{x:n.x+n.w/2,y:n.y},alpha:1,age:p.attack.age,phase:'slash',trail:[]};Object.assign(b,danteSwordPose(n,b));danteDrawSword(b);}
+ if(p.judgement){const j=p.judgement;SDT_ULT.veDonKet.call({suVung:j.fx});for(const a of j.arcs){ctx.save();ctx.globalAlpha=a.t/14;ctx.translate(j.x,j.y);ctx.rotate(a.angle);ctx.strokeStyle='#ffb68f';ctx.lineWidth=6;ctx.beginPath();ctx.ellipse(0,0,180,70,0,-2.4,1.2);ctx.stroke();ctx.restore();}}
+};
+const sinUIBase=drawUI;
+drawUI=function(){
+ sinUIBase();if(!danteOn()||!dino?.dante)return;const p=dino.dante;ctx.save();if(dojoMode)ctx.translate(0,15);
+ if(danteSin(p)){
+  ctx.fillStyle='#1c1119';ctx.fillRect(10,45,282,129);ctx.textAlign='left';ctx.font='bold 13px Consolas,monospace';ctx.fillStyle='#ffba79';ctx.fillText('DANTE · SIN DEVIL TRIGGER',18,65);
+  ctx.font='11px Consolas,monospace';ctx.fillStyle='#f3dddd';ctx.fillText('DEVIL SWORD DANTE · SWORDMASTER',18,85);ctx.fillText(p.judgement?'JUDGEMENT · '+Math.round(p.judgement.total):p.attack?p.attack.name:'J: SIN SWORD · K: THE LUCE',18,105);
+  ctx.fillText('Dash K: DRILL · U: JUDGEMENT',18,125);ctx.fillText(p.judgement?'FOUR SLASHES → SIN SWORDS → IMPACT':'SDT '+(p.sinTime/60).toFixed(1)+'s · FREE DASH',18,145);ctx.fillText('HP '+Math.ceil(dino.hp)+' / '+dino.maxHp,18,165);
+ }
+ ctx.fillStyle='#1c1119';ctx.fillRect(10,176,282,45);ctx.textAlign='left';ctx.font='11px Consolas,monospace';ctx.fillStyle='#ffe3a3';
+ ctx.fillText(p.judgement?'JUDGEMENT · '+Math.round(p.judgement.total):danteSin(p)?'SDT · J: SWORD · K: LUCE · Dash K: DRILL':'SDT '+Math.floor(danteSinCharge(p))+'% · HIT WITH FULL DT',18,190);
+ ctx.fillStyle='#4c2332';ctx.fillRect(18,198,260,6);ctx.fillStyle='#ffab40';ctx.fillRect(18,198,260*(danteSin(p)?p.sinTime/DANTE_SIN_MAX:danteSinCharge(p)/100),6);
+ ctx.fillStyle='#e8d8cf';ctx.fillText(danteSin(p)?'U: JUDGEMENT · LUCE '+(p.sinShotCount||0)+'/200':p.dt?'U: ENTER SDT (NEEDS 100%)':'U: DT → U: SDT → U: JUDGEMENT',18,216);ctx.restore();
+};
+
 </script>
 </body>
 </html>
