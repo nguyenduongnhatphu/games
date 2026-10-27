@@ -74764,7 +74764,7 @@ class PulsarCloneBoss {
                    "Skeleton — 4 HP. A red Core always sits in its chest. First death: the bones burst apart, the Core floats up and pulls them back together, reviving you with max HP reduced to 2 (the very last revive, after every revive rune). +5% run speed, higher jump, faster Dash recharge."));
             formDesc.push(LT("Apex — 8 HP. Claws cố định; khóa Power, Rune và phụ kiện. Nhảy đôi, bật tường, bám mép. J cào / giữ J cắn; K tụ đạn. Shift lướt. Bốn biến thể: đánh xa / cận chiến / khống chế / đột kích; U dùng chiêu cuối riêng. ","Apex — 8 HP. Fixed Claws, no Power, Runes or accessories. Double jump, wall kick, ledge grab. J claws / hold J bite; K charge. Shift dash. Four roles: ranged / melee / control / assault, each with its own U ultimate. "));
             formDesc.push(LT("Dante — 10 HP. J combo, K đặc biệt (giữ 1s cường hóa), Q/E đổi 6 vũ khí; I/O đổi thế. U: Devil Trigger 10s, +2 sát thương/hit, hồi 1 HP/2s. Khóa Power, Rune và phụ kiện.","Dante — 10 HP. J combo; K special (charge 1s); Q/E six weapons; I/O styles. U: 10-second Devil Trigger, +2 damage/hit, heal 1 HP/2s. Power, Runes and accessories locked."));
-            formDesc.push(LT("Vergil — 10 HP. Yamato, Concentration, bốn đội hình Mirage Blades. Shift: Dark Slayer. U: SDT + Doppelganger; U lần nữa: Judgement Cut End. Khóa Power, Rune và phụ kiện.", "Vergil — 10 HP. Yamato, Concentration and four Mirage Blade formations. Shift: Dark Slayer. U: SDT + Doppelganger; U again: Judgement Cut End. Power, Runes and accessories locked."));
+            formDesc.push(LT("Vergil — 10 HP. J/K: Yamato; I: kiếm tầm xa; O: song kiếm. Q/E đổi đội hình. Shift dịch chuyển. U: SDT → JCE. Khóa Power, Rune, phụ kiện.", "Vergil — 10 HP. J/K: Yamato; I: ranged blades; O: dual blades. Q/E: formation. Shift: Trick. U: SDT → JCE. Equipment locked."));
             { let _fi = (typeof xFormIdx === 'function') ? xFormIdx() : currentForm;
               selRow(86,  LT("DẠNG","FORM"), forms[_fi], _fi === X_N_DANG - 1 ? "#42A5F5" : "#ECEFF1", formDesc[_fi], 66); }
             { let _pk = PHU_KIEN[phuKien];
@@ -74788,7 +74788,7 @@ class PulsarCloneBoss {
                 ctx.fillText("🔒", 443, 257); ctx.fillText("🔒", 649, 257);
                 ctx.fillStyle = "#90A4AE"; ctx.font = "11px Consolas, monospace"; ctx.textAlign = "left";
                 ctx.save(); ctx.beginPath(); ctx.rect(336, 270, 330, 36); ctx.clip();
-                formAmmoSummary((typeof vergilOn==='function'&&vergilOn()) ? LT("Yamato và Mirage Blades riêng. Q/E đổi đội hình, I/O phóng kiếm.","Yamato and Mirage Blades. Q/E cycle formations; I/O fire blades.") : danteOn() ? LT("Bộ vũ khí riêng của Dante. Q/E đổi vũ khí trong trận.","Dante weapon set. Q/E cycle weapons in battle.") : apexOn() ? LT("J: cào; J → Nhảy: xoay đuôi hất tung. Giữ J: cắn / cưa lưng. Dash → J: xoay đuôi. J → Dash: xoay tử thần; J tiếp: kết nổ. K: đạn nhỏ, cầu xoáy, Laser. U: chiêu cuối riêng theo biến thể.","J: claw / hold: bite or aerial saw. Dash → J: tail spin. J → Dash: death roll; press J during roll: explosive finale. K: small shot, charged orb, laser. U: variant ultimate.") : _xK ? LT("Đang ở Dạng X nên đạn bị khoá. X có hệ vũ khí riêng: đổi hệ bằng I / O ngay trong trận.",
+                formAmmoSummary((typeof vergilOn==='function'&&vergilOn()) ? LT("Q/E đổi đội hình. I: kiếm tầm xa; O: bật/tắt song kiếm, nối J/K.","Q/E cycle formations. I: ranged blades; O: toggle melee stance, then J/K.") : danteOn() ? LT("Bộ vũ khí riêng của Dante. Q/E đổi vũ khí trong trận.","Dante weapon set. Q/E cycle weapons in battle.") : apexOn() ? LT("J: cào; J → Nhảy: xoay đuôi hất tung. Giữ J: cắn / cưa lưng. Dash → J: xoay đuôi. J → Dash: xoay tử thần; J tiếp: kết nổ. K: đạn nhỏ, cầu xoáy, Laser. U: chiêu cuối riêng theo biến thể.","J: claw / hold: bite or aerial saw. Dash → J: tail spin. J → Dash: death roll; press J during roll: explosive finale. K: small shot, charged orb, laser. U: variant ultimate.") : _xK ? LT("Đang ở Dạng X nên đạn bị khoá. X có hệ vũ khí riêng: đổi hệ bằng I / O ngay trong trận.",
                                   "Form X is active so ammo is locked. X has its own weapons: swap them with I / O in battle.")
                             : LT("Đang đeo UNITY nên ô này bị khoá. Ba loại đạn của bạn chọn ở bảng UNITY bên phải, và trong trận đổi giữa chúng bằng Q / E.",
                             "UNITY is equipped so this row is locked. Pick your three types in the UNITY panel on the right and swap between them with Q / E in battle."),
@@ -109383,43 +109383,48 @@ DanteBoss.prototype.draw = function() {
 
 </script>
 <script>
-// Playable Vergil, integrated from the user-provided VergilForm.js.
+// Playable Vergil v2, integrated from the updated user-provided VergilForm.js.
 /* =============================================================================
- * Form Vergil (Player) — Chuyên sâu YAMATO & DARK SLAYER (Devil May Cry 5)
+ * Form Vergil (Player) — v2: Chuyên sâu YAMATO & MIRAGE STANCE (Devil May Cry 5)
  * Tương thích hoàn toàn với kiến trúc của DanteForm.js & VergilBoss - Gemini.js
  *
- * Cơ chế cốt lõi:
- *  1. PURE YAMATO IAIJUTSU: Toàn bộ đòn đánh xoay quanh thuật rút kiếm (Iaijutsu)
- *     và tra kiếm vào vỏ (Sheathe). Khi nhịp thu kiếm lóe sáng lam ở hông trái,
- *     nếu đứng yên hoàn thành động tác tra kiếm -> hồi ngay CONCENTRATION + ULT!
- *  2. THANH CONCENTRATION (0 -> 300, 3 Nấc Level 0 / 1 / 2):
- *     - Tăng khi đứng tĩnh, đi bộ, né chuẩn (Trick Dodge), đỡ đòn và đánh trúng.
- *     - Giảm khi chạy loạn xạ, chém trượt hoặc bị trúng đòn.
- *     - Level 2 mở khóa bán kính rộng hơn, thêm nhát chém không gian và nối
- *       3x PERFECT JUDGEMENT CUT liên hoàn!
- *  3. JUST JUDGEMENT CUT (Giữ J hoặc K nhả đúng nhịp lóe sáng ở vỏ kiếm):
- *     - Tạo quả cầu cắt không gian đa diện ngay tại vị trí mục tiêu (không cần chạy lại gần).
- *     - Ở Concentration Lv2: có thể bấm J đúng nhịp ngay sau khi nổ để nối 3 quả cầu liên tiếp!
- *  4. 4 HỆ MIRAGE BLADES (Q / E để xoay vòng đội hình kiếm ảo ảnh, I / O để bắn Độc Lập
- *     mà KHÔNG làm ngắt nhịp chém Yamato của Vergil!):
- *     - [0] SHOOTING BLADES : Bắn kiếm ghim mục tiêu (Giữ I để đánh dấu Grim Trick).
- *     - [1] SPIRAL BLADES   : 6 thanh kiếm xoay quanh thân hộ thể & nghiền cự ly gần.
- *     - [2] STORM BLADES    : 6 thanh kiếm vây quanh mục tiêu rồi đồng loạt đâm xuyên tâm.
- *     - [3] HEAVY RAIN      : Mưa kiếm rơi thẳng đứng từ đỉnh đầu khóa cứng kẻ địch.
- *  5. DARK SLAYER TRICK (Shift):
- *     - Bấm Shift: Grim Trick (dịch chuyển tức thời tới mục tiêu đang bị găm kiếm).
- *     - Bấm S + Shift: Trick Down (lùi biến ảnh né đòn khẩn cấp, có i-frames).
- *     - Bấm W/Space + Shift: Trick Up (biến ảnh vọt lên đỉnh đầu mục tiêu để nối Aerial Rave).
- *  6. DOPPELGANGER & SIN DEVIL TRIGGER (Phím U):
- *     - U lần 1 (khi đầy 100% Ult): Triệu hồi DOPPELGANGER + Hóa SIN DEVIL TRIGGER (12s).
- *     - Phân thân Doppelganger lặp lại mọi đường kiếm Yamato của bạn sau 12 frame!
- *     - Bấm U lần 2 khi đang ở SDT (và Concentration >= Lv2): Thi triển tuyệt kỹ tối thượng
- *       JUDGEMENT CUT END (Ngưng đọng thời gian, lướt chém toàn màn hình rồi tra kiếm kích nổ!).
+ * BẢN CẬP NHẬT v2 (Theo yêu cầu tinh chỉnh):
+ *  1. FIX JUDGEMENT CUT END (JCE):
+ *     - Ghim vị trí hạ thổ chuẩn xác trên mặt sàn (floorY) và tập trung các đường cắt
+ *       không gian cắt qua đúng tâm các mục tiêu đang có trên sân thay vì chệch lên trời.
+ *     - Lớp phủ màn hình và các nhát cắt cực kỳ trong suốt (alpha thấp, nét mảnh sắc)
+ *       để luôn nhìn rõ hành động của Boss.
+ *  2. LÀM TRONG SUỐT CÁC VÙNG TÍM / KHÔNG GIAN (Void Slash, Judgement Cut):
+ *     - Giảm tối đa độ đục nền (chỉ còn 0.05 - 0.10), chuyển sang vẽ viền mảnh và
+ *       tia cắt mảnh để không bao giờ che khuất telegraph hay đòn đánh của Boss.
+ *  3. TÁCH BIỆT HOÀN TOÀN PHÍM I VÀ O:
+ *     - Phím I (RANGED MIRAGE BLADES): Bắn kiếm ảo ảnh tầm xa độc lập theo 4 chế độ Q/E
+ *       (Shooting / Spiral / Storm / Heavy Rain) mà không ngắt đòn Yamato.
+ *     - Phím O (MIRAGE BLADE STANCE — CẬN CHIẾN KẾT HỢP J / K):
+ *       Bật/Tắt thế cầm "Song Kiếm Yamato + Mirage Edge" (hoặc bấm O rồi nối J/K):
+ *         + O -> J -> J -> J : MIRAGE COMBO B (Song kiếm chém xoáy cận chiến tốc độ cao)
+ *         + O -> S + J       : HIGH TIME -> HELM BREAKER (Hất lên rồi bổ song kiếm)
+ *         + O -> K           : DEEP STINGER (Xoay song kiếm khoan xuyên giáp mục tiêu)
+ *         + O -> S + K       :ROUND TRIP (Phóng đại kiếm Mirage Edge xoay tại chỗ)
+ *  4. CHỐNG SPAM KHỐNG CHẾ (ANTI-INFINITE CC & 2-SECOND SAME-MOVE LOCKOUT):
+ *     - Bỏ hoàn toàn stun/pull/hold của các đòn chém thường (Combo A, Combo C, Rapid Slash,
+ *       Shooting/Spiral Blades, Judgement Cut thường).
+ *     - Chỉ 4 chiêu chuyên biệt có khống chế: Upper Slash (`upper1`/`upper2`),
+ *       Void Slash (`vslash`), Heavy Rain (`rain`), và Deep Stinger (`m_stinger`).
+ *     - CƠ CHẾ KHÓA 2 GIÂY (120 frames): Cùng một chiêu (hoặc cùng nhóm khống chế)
+ *       không thể khống chế mục tiêu liên tiếp trong vòng 2 giây! Nếu spam lại chiêu đó
+ *       trong 2 giây, đòn đánh chỉ gây sát thương chứ KHÔNG làm khựng/hất tung mục tiêu,
+ *       buộc người chơi phải đổi sang bắn xa hoặc tung chiêu khác.
+ *  5. FIX VỊ TRÍ DOPPELGANGER:
+ *     - Phân thân đứng tách hẳn ra xa (cách 78px phía sau hoặc đối xứng bên kia mục tiêu
+ *       khi tấn công, lơ lửng cao hơn 14px) với hiệu ứng hologram thanh thoát, không bao giờ
+ *       đè chồng lên người chơi nữa.
  * ============================================================================= */
 
-const VG_FORM_IDX = 10; // Slot Form Vergil (có thể chọn qua xDatForm(10) hoặc phím tắt)
+const VG_FORM_IDX = 10;
 const VG_CONC_MAX = 300;
 const VG_SDT_MAX  = 720; // 12 giây ở 60fps
+const VG_CC_LOCKOUT = 120; // 2 giây (120 frames) khóa khống chế cùng chiêu!
 
 const VG_MIRAGE_MODES = [
     { n: 'SHOOTING BLADES', c: '#40C4FF', cost: 0 },
@@ -109429,39 +109434,50 @@ const VG_MIRAGE_MODES = [
 ];
 
 // =============================================================================
-// BẢNG CHIÊU THỨC CHUYÊN SÂU CỦA THANH KATANA YAMATO (CHUẨN FRAME DATA 60HZ)
+// BẢNG CHIÊU THỨC YAMATO & MIRAGE EDGE CẬN CHIẾN (TỐI ƯU KHỐNG CHẾ & FRAME DATA)
+// Chỉ những chiêu có thuộc tính `ccKey` mới được phép gây khống chế (và chịu khóa 2s)!
 // =============================================================================
 const YMT_MOVES = {
-    // 1. YAMATO COMBO A (J -> J -> J -> J): 3 nhát rút kiếm nhanh + 1 nhát chém xẻ không gian rồi tra kiếm
+    // 1. YAMATO COMBO A (J -> J -> J -> J): Thuần sát thương & tốc độ, không gây stun khóa cứng
     a1: { name: 'YAMATO COMBO A · IAI DRAW',     T: 18, wind: 3, cancel: 10, end: 13, damage: 2.8, pose: 'iaiSlash',  hits: [4],         advance: 6,  conc: 12 },
     a2: { name: 'YAMATO COMBO A · REVERSE CUT',  T: 18, wind: 3, cancel: 10, end: 13, damage: 2.8, pose: 'revSlash',  hits: [4],         advance: 6,  conc: 12 },
-    a3: { name: 'YAMATO COMBO A ·SAYA STRIKE',   T: 20, wind: 3, cancel: 12, end: 15, damage: 2.2, pose: 'sayaBash',  hits: [4, 9],      advance: 8,  conc: 15 },
-    a4: { name: 'YAMATO COMBO A ·VOID CLEAVE',   T: 32, wind: 6, cancel: 22, end: 20, damage: 5.5, pose: 'wideIai',   hits: [8],         advance: 12, push: 16, conc: 28, sheatheAt: 22 },
+    a3: { name: 'YAMATO COMBO A · SAYA STRIKE',  T: 20, wind: 3, cancel: 12, end: 15, damage: 2.2, pose: 'sayaBash',  hits: [4, 9],      advance: 8,  conc: 15 },
+    a4: { name: 'YAMATO COMBO A · VOID CLEAVE',  T: 32, wind: 6, cancel: 22, end: 20, damage: 5.5, pose: 'wideIai',   hits: [8],         advance: 12, conc: 28, sheatheAt: 22 },
 
-    // 2. YAMATO COMBO C (J -> J -> Đợi nhịp lóe sáng -> J liên hoàn): Chém điên cuồng vắt kiệt không gian
+    // 2. YAMATO COMBO C (J -> J -> Đợi nhịp -> J): Chém bão táp sát thương thuần
     c_flurry: { name: 'YAMATO COMBO C · MILLENNIUM SLASH', T: 42, wind: 2, cancel: 34, end: 36, damage: 1.1, pose: 'flurry', count: 9, advance: 4, conc: 25 },
-    c_finish: { name: 'YAMATO COMBO C · DIMENSION REND',   T: 34, wind: 7, cancel: 24, end: 22, damage: 6.0, pose: 'wideIai', hits: [9], advance: 14, push: 20, wall: true, conc: 35, sheatheAt: 24 },
+    c_finish: { name: 'YAMATO COMBO C · DIMENSION REND',   T: 34, wind: 7, cancel: 24, end: 22, damage: 6.0, pose: 'wideIai', hits: [9], advance: 14, conc: 35, sheatheAt: 24 },
 
-    // 3. UPPER SLASH (Cúi + J -> Giữ J để bay lên cùng mục tiêu):
-    upper1: { name: 'UPPER SLASH · RISING IAI',    T: 24, wind: 4, cancel: 14, end: 17, damage: 4.2, pose: 'upperIai', hits: [6], launch: true, advance: 6, conc: 18, sheatheAt: 18 },
-    upper2: { name: 'UPPER SLASH II · ASCENSION',  T: 26, wind: 3, cancel: 16, end: 19, damage: 4.5, pose: 'upperIai', hits: [5], launchWithMe: true, advance: 8, conc: 22 },
+    // 3. UPPER SLASH (Cúi + J): CÓ KHỐNG CHẾ HẤT TUNG (Chịu khóa `ccKey: 'upper'` 2 giây!)
+    upper1: { name: 'UPPER SLASH · RISING IAI',    T: 24, wind: 4, cancel: 14, end: 17, damage: 4.2, pose: 'upperIai', hits: [6], ccKey: 'upper', launch: true, advance: 6, conc: 18, sheatheAt: 18 },
+    upper2: { name: 'UPPER SLASH II · ASCENSION',  T: 26, wind: 3, cancel: 16, end: 19, damage: 4.5, pose: 'upperIai', hits: [5], ccKey: 'upper', launchWithMe: true, advance: 8, conc: 22 },
 
-    // 4. AERIAL RAVE (Trên không: J -> J -> J hoặc J -> J -> Đợi nhịp -> J -> J):
-    air1:  { name: 'AERIAL RAVE A · SKY DRAW',     T: 17, wind: 3, cancel: 10, end: 13, damage: 2.8, pose: 'iaiSlash', hits: [4], holdAir: true, conc: 12 },
-    air2:  { name: 'AERIAL RAVE A · SKY REVERSE',  T: 17, wind: 3, cancel: 10, end: 13, damage: 2.8, pose: 'revSlash', hits: [4], holdAir: true, conc: 12 },
-    air3:  { name: 'AERIAL RAVE A · MOON CLEAVE',  T: 24, wind: 5, cancel: 16, end: 18, damage: 5.0, pose: 'downIai',  hits: [7], push: 16, conc: 20, sheatheAt: 18 },
-    airb1: { name: 'AERIAL RAVE B · SPIRAL RISE',  T: 22, wind: 3, cancel: 15, end: 18, damage: 2.4, pose: 'spinUp',   hits: [4, 10], launchWithMe: true, conc: 18 },
-    airb2: { name: 'AERIAL RAVE B · ECLIPSE DROP', T: 26, wind: 5, cancel: 18, end: 20, damage: 5.5, pose: 'downIai',  hits: [7], slam: true, conc: 24 },
+    // 4. AERIAL RAVE (Trên không J): Chỉ giữ nhẹ khi mục tiêu đang ở sẵn trên không
+    air1:  { name: 'AERIAL RAVE A · SKY DRAW',     T: 17, wind: 3, cancel: 10, end: 13, damage: 2.8, pose: 'iaiSlash', hits: [4], airJuggle: true, conc: 12 },
+    air2:  { name: 'AERIAL RAVE A · SKY REVERSE',  T: 17, wind: 3, cancel: 10, end: 13, damage: 2.8, pose: 'revSlash', hits: [4], airJuggle: true, conc: 12 },
+    air3:  { name: 'AERIAL RAVE A · MOON CLEAVE',  T: 24, wind: 5, cancel: 16, end: 18, damage: 5.0, pose: 'downIai',  hits: [7], conc: 20, sheatheAt: 18 },
+    airb1: { name: 'AERIAL RAVE B · SPIRAL RISE',  T: 22, wind: 3, cancel: 15, end: 18, damage: 2.4, pose: 'spinUp',   hits: [4, 10], airJuggle: true, conc: 18 },
+    airb2: { name: 'AERIAL RAVE B · ECLIPSE DROP', T: 26, wind: 5, cancel: 18, end: 20, damage: 5.5, pose: 'downIai',  hits: [7], ccKey: 'slam', slam: true, conc: 24 },
 
-    // 5. KỸ NĂNG NÚT K (Chuyên sâu Yamato — Rapid Slash, Rising Star, Void Slash, Helm Breaker):
-    rapid:   { name: 'RAPID SLASH',                T: 28, wind: 3, cancel: 20, end: 22, damage: 1.5, pose: 'rapid',    hits: [4, 8, 12, 16, 20], advance: 20, crossThrough: true, conc: 22, sheatheAt: 21 },
-    rstar:   { name: 'RISING STAR',                T: 32, wind: 3, cancel: 24, end: 26, damage: 1.8, pose: 'spinUp',   hits: [4, 9, 14, 19], launchWithMe: true, advance: 12, conc: 28 },
-    vslash:  { name: 'VOID SLASH · SPACE SHATTER', T: 32, wind: 7, cancel: 22, end: 22, damage: 4.8, pose: 'voidArc',  hits: [9], pullIn: true, slowBubble: true, conc: 25, sheatheAt: 23 },
-    helm:    { name: 'AERIAL CLEAVE · HELM BREAKER',T: 26, wind: 4, cancel: 18, end: 20, damage: 5.5, pose: 'helm',     slam: true, conc: 20, sheatheAt: 19 },
+    // 5. KỸ NĂNG NÚT K THUẦN YAMATO (Rapid Slash / Rising Star / Void Slash / Helm Breaker):
+    rapid:   { name: 'RAPID SLASH',                 T: 28, wind: 3, cancel: 20, end: 22, damage: 1.5, pose: 'rapid',    hits: [4, 8, 12, 16, 20], advance: 20, crossThrough: true, conc: 22, sheatheAt: 21 },
+    rstar:   { name: 'RISING STAR',                 T: 32, wind: 3, cancel: 24, end: 26, damage: 1.8, pose: 'spinUp',   hits: [4, 9, 14, 19], ccKey: 'rstar', launchWithMe: true, advance: 12, conc: 28 },
+    vslash:  { name: 'VOID SLASH · SPACE SHATTER',  T: 32, wind: 7, cancel: 22, end: 22, damage: 4.8, pose: 'voidArc',  hits: [9], ccKey: 'void', pullIn: true, slowBubble: true, conc: 25, sheatheAt: 23 },
+    helm:    { name: 'AERIAL CLEAVE · HELM BREAKER',T: 26, wind: 4, cancel: 18, end: 20, damage: 5.5, pose: 'helm',     ccKey: 'slam', slam: true, conc: 20, sheatheAt: 19 },
 
-    // 6. JUDGEMENT CUT & PERFECT JUDGEMENT CUT (Tầm xa không gian siêu tốc):
-    jcut:    { name: 'JUDGEMENT CUT',              T: 24, wind: 4, cancel: 14, end: 18, damage: 4.5, pose: 'jcutPose', isJCut: true, perfect: false, conc: 20, sheatheAt: 13 },
-    pjcut:   { name: 'PERFECT JUDGEMENT CUT!',     T: 20, wind: 2, cancel: 10, end: 15, damage: 7.2, pose: 'jcutPose', isJCut: true, perfect: true,  conc: 35, sheatheAt: 9 }
+    // 6. JUDGEMENT CUT & PERFECT JUDGEMENT CUT (Tầm xa — Gây sát thương thuần, không khóa cứng vô hạn):
+    jcut:    { name: 'JUDGEMENT CUT',               T: 24, wind: 4, cancel: 14, end: 18, damage: 4.5, pose: 'jcutPose', isJCut: true, perfect: false, conc: 20, sheatheAt: 13 },
+    pjcut:   { name: 'PERFECT JUDGEMENT CUT!',      T: 20, wind: 2, cancel: 10, end: 15, damage: 7.2, pose: 'jcutPose', isJCut: true, perfect: true,  conc: 35, sheatheAt: 9 },
+
+    // =========================================================================
+    // 7. NHÁNH PHÍM O — MIRAGE BLADE MELEE (KẾT HỢP CẬN CHIẾN CÙNG J HOẶC K)
+    // =========================================================================
+    m_combo1:  { name: 'MIRAGE EDGE · TWIN SLASH I',   T: 18, wind: 3, cancel: 10, end: 14, damage: 3.0, pose: 'mirage1',   hits: [4, 9],       advance: 8,  mirageMelee: true, conc: 14 },
+    m_combo2:  { name: 'MIRAGE EDGE · TWIN VORTEX II', T: 20, wind: 3, cancel: 12, end: 16, damage: 3.2, pose: 'mirage2',   hits: [4, 10],      advance: 9,  mirageMelee: true, conc: 16 },
+    m_combo3:  { name: 'MIRAGE EDGE · CROSS REND III', T: 26, wind: 5, cancel: 18, end: 20, damage: 5.8, pose: 'mirageFin', hits: [7, 13],      advance: 12, mirageMelee: true, conc: 24, sheatheAt: 20 },
+    m_stinger: { name: 'MIRAGE EDGE · DEEP STINGER',   T: 30, wind: 4, cancel: 22, end: 25, damage: 1.6, pose: 'mStinger',  hits: [5, 9, 13, 17, 21], advance: 22, mirageMelee: true, ccKey: 'mstinger', stunOnly: 24, conc: 26 },
+    m_round:   { name: 'MIRAGE EDGE · ROUND TRIP',     T: 24, wind: 5, cancel: 15, end: 18, damage: 2.5, pose: 'mirageFin', hits: [7],          mirageMelee: true, spawnRoundTrip: true, conc: 18 },
+    m_high:    { name: 'MIRAGE EDGE · SPIRAL LAUNCH',  T: 24, wind: 4, cancel: 14, end: 18, damage: 4.4, pose: 'upperIai',  hits: [6],          mirageMelee: true, ccKey: 'upper', launchWithMe: true, conc: 20 }
 };
 
 let vergilForm = false, vergilLoadout = null;
@@ -109505,7 +109521,35 @@ function vergilLabel(s, col) {
     floatingTexts.push(ft);
 }
 
-// Khởi tạo trạng thái chuyên biệt của Vergil trên đối tượng `dino`
+// =============================================================================
+// CƠ CHẾ KHÓA KHỐNG CHẾ 2 GIÂY (ANTI-SPAM CC LOCKOUT)
+// Mỗi mục tiêu lưu bảng thời gian bị khống chế bởi từng `ccKey`.
+// Trong vòng 120 frames (2 giây), chiêu đó không thể tiếp tục gây khống chế!
+// =============================================================================
+const vgTargetCcMap = new WeakMap();
+
+function vgCanApplyCC(target, ccKey) {
+    if (!target || !ccKey) return false;
+    const root = target.__goc || target;
+    if (root.invulnAll || root.hp <= 0 || root._beamClashPoint || !danteControlAllowed(root)) return false;
+    let record = vgTargetCcMap.get(root);
+    if (!record) {
+        record = { globalUntil: -100, keys: {} };
+        vgTargetCcMap.set(root, record);
+    }
+    // 1. Nếu cùng một kỹ năng (`ccKey`) vừa khống chế mục tiêu chưa quá 2 giây (120 frames) -> CHẶN!
+    if (frames < (record.keys[ccKey] || -100)) {
+        return false;
+    }
+    // 2. Nếu mục tiêu vừa kết thúc chuỗi khống chế trước đó, cho 45 frames miễn nhiễm ngắn để tránh nối vô hạn
+    if (frames < record.globalUntil) {
+        return false;
+    }
+    record.keys[ccKey] = frames + VG_CC_LOCKOUT; // Khóa chiêu này trong 2 giây (120f)
+    record.globalUntil = frames + 42;            // Khoảng nghỉ ngắn giữa các hiệu ứng khống chế
+    return true;
+}
+
 function vergilInit(n) {
     const feet = n.y + n.h;
     n.form = 0; n.ammoType = 0;
@@ -109514,10 +109558,11 @@ function vergilInit(n) {
     n.h = typeof VG_H !== 'undefined' ? VG_H : 58;
     n.y = feet - n.h;
     n.vergil = {
-        conc: 120,              // Khởi đầu ở Concentration Level 1
-        sdt: 0,                 // Thời gian Sin Devil Trigger (tối đa 720f = 12s)
+        conc: 120,
+        sdt: 0,
         regen: 0,
-        mirageMode: 0,          // 0: Shooting, 1: Spiral, 2: Storm, 3: Heavy Rain
+        mirageMode: 0,          // Phím Q/E: Đổi 4 chế độ bắn xa của phím I
+        mirageStance: 0,        // Phím O: Kích hoạt trạng thái Mirage Blade Cận Chiến (kết hợp với J/K)
         attack: null,
         queue: [],
         last: '',
@@ -109527,34 +109572,34 @@ function vergilInit(n) {
         holdJ: 0,
         holdK: 0,
         holdI: 0,
-        justWindow: 0,          // Cửa sổ nhả phím hoặc bấm nối Perfect Judgement Cut (loé sáng xanh ở vỏ kiếm)
-        jcutChain: 0,           // Đếm chuỗi nối Perfect Judgement Cut (tối đa 3 quả liên tiếp ở Lv2)
-        sheatheSpark: 0,        // Hiệu ứng lóe sáng ở chuôi Yamato khi tra kiếm vào vỏ (Saya)
+        justWindow: 0,
+        jcutChain: 0,
+        sheatheSpark: 0,
         guardUntil: -100,
         perfectUntil: -100,
         guardReady: 0,
-        markedTarget: null,     // Mục tiêu đang bị găm Mirage Blade để Grim Trick dịch chuyển tới
+        markedTarget: null,
         markTimer: 0,
-        swords: [],             // Danh sách Summoned Swords / Mirage Blades của người chơi
-        cuts: [],               // Quả cầu không gian Judgement Cut
-        voidZones: [],          // Vết nứt ngưng đọng thời gian của Void Slash
-        slashTrail: [],         // Vệt lụa katana xanh băng giá
-        sparks: [],             // Tia chớp không gian
-        ghosts: [],             // Tàn ảnh dịch chuyển Dark Slayer
-        dop: null,              // Phân thân Doppelganger
-        dopHist: [],            // Lịch sử hành động để Doppelganger chém nhại lại sau 12 frame
-        jce: null,              // Trạng thái tuyệt kỹ tối thượng Judgement Cut End
+        swords: [],             // Phím I: Kiếm ảo ảnh bắn xa
+        roundSword: null,       // Phím O + S + K: Đại kiếm Mirage Edge xoay tại chỗ
+        cuts: [],               // Quả cầu không gian Judgement Cut (đã làm trong suốt)
+        voidZones: [],          // Vết nứt Void Slash (đã làm trong suốt)
+        slashTrail: [],
+        mirageTrail: [],        // Vệt kiếm xanh ngọc của thanh Mirage Edge khi bấm O + J/K
+        sparks: [],
+        ghosts: [],
+        dop: null,
+        dopHist: [],
+        jce: null,
         body: {
             facingLeft: false,
             stage: 1,
             drawn: false,
+            mirageWep: false,
             armR: 0,
             armL: 0,
             wing: 0,
-            dashV: 0,
-            _lean: 0,
-            _lunge: 0,
-            _turn: 1
+            dashV: 0
         }
     };
     if (typeof ultCharge !== 'undefined') ultCharge = (typeof dojoMode !== 'undefined' && dojoMode) ? 100 : 0;
@@ -109582,12 +109627,15 @@ function vgAddGhost(n, v) {
     v.ghosts.push({
         x: n.x, y: n.y, left: n.isFacingLeft,
         drawn: v.body.drawn, armR: v.body.armR, armL: v.body.armL,
-        sdt: v.sdt > 0, t: 14, max: 14
+        sdt: v.sdt > 0, t: 12, max: 12
     });
-    if (v.ghosts.length > 10) v.ghosts.shift();
+    if (v.ghosts.length > 8) v.ghosts.shift();
 }
 
-// Tìm mục tiêu ưu tiên phía trước hoặc gần nhất cho Judgement Cut / Mirage Blades / Grim Trick
+function v_markedValid(v) {
+    return v && v.markedTarget && !v.markedTarget._beamClashPoint && v.markedTarget.hp > 0 && v.markTimer > 0;
+}
+
 function vgFindTarget(n, dir, maxDist = 720, physical = false) {
     const cx = n.x + n.w / 2, cy = n.y + n.h / 2;
     const all = (typeof sgTargets === 'function' ? sgTargets(n) : (typeof allTargets === 'function' ? allTargets() : bosses))
@@ -109599,11 +109647,6 @@ function vgFindTarget(n, dir, maxDist = 720, physical = false) {
     return pool[0] || null;
 }
 
-function v_markedValid(v) {
-    return v && v.markedTarget && !v.markedTarget._beamClashPoint && v.markedTarget.hp > 0 && v.markTimer > 0;
-}
-
-// Hàm gây sát thương chuẩn của Vergil (Nhận thưởng sát thương theo cấp độ Concentration Lv0/1/2 + SDT)
 function vgControl(o,opt){return dswControl(o,opt,dino.vergil);}
 
 function vgDealDamage(v, target, baseDmg, tag = 'yamato') {
@@ -109631,25 +109674,22 @@ function vgDealDamage(v, target, baseDmg, tag = 'yamato') {
 }
 
 // =============================================================================
-// HỆ THỐNG DARK SLAYER TRICK (GRIM TRICK / TRICK UP / TRICK DOWN)
+// HỆ THỐNG DARK SLAYER TRICK (SHIFT)
 // =============================================================================
 function vgPerformTrick(n, v, mode) {
     const dir = n.isFacingLeft ? -1 : 1;
-    vgAddGhost(n, v);
     vgAddGhost(n, v);
 
     let nx = n.x, ny = n.y;
     const target = vgFindTarget(n, dir, 680, true);
 
     if (mode === 'down') {
-        // TRICK DOWN: Lùi chớp nhoáng ra sau né đòn và đưa cơ thể về mặt đất
         const backDir = target ? (target.x + (target.w || 40) / 2 > n.x + n.w / 2 ? -1 : 1) : -dir;
         nx = n.x + backDir * 155;
         ny = typeof dswFloor === 'function' ? dswFloor(nx, n.y + n.h) - n.h : n.y;
         n.dy = 0;
         vergilLabel('TRICK DOWN');
     } else if (mode === 'up') {
-        // TRICK UP: Dịch chuyển thẳng lên không trung phía trên mục tiêu để nối Aerial Rave / Helm Breaker
         if (target) {
             const side = (target.x + (target.w || 40) / 2 > n.x + n.w / 2) ? -1 : 1;
             nx = target.x + (target.w || 40) / 2 + side * 42 - n.w / 2;
@@ -109659,19 +109699,17 @@ function vgPerformTrick(n, v, mode) {
             ny = Math.max(36, n.y - 105);
         }
         n.dy = -3.5; n.grounded = false;
-        v.airSlow = 55;
+        v.airSlow = 45;
         vergilLabel('TRICK UP');
     } else {
-        // GRIM TRICK: Dịch chuyển tức thời áp sát ngay trước mặt hoặc sau lưng mục tiêu
         if (target) {
             const tcx = target.x + (target.w || 40) / 2;
             const gap = Math.abs(tcx - (n.x + n.w / 2));
-            // Nếu đang ở rất gần (< 110px) thì biến ảnh vòng ra sau lưng mục tiêu!
             const crossBehind = gap < 110;
             const side = crossBehind ? (tcx >= n.x + n.w / 2 ? 1 : -1) : (tcx >= n.x + n.w / 2 ? -1 : 1);
             nx = tcx + side * 52 - n.w / 2;
             ny = Math.max(36, (target.y + (target.h || 50)) - n.h);
-            if (!target.grounded) { n.dy = -2.5; n.grounded = false; v.airSlow = 50; }
+            if (!target.grounded) { n.dy = -2.5; n.grounded = false; v.airSlow = 45; }
         } else {
             nx = n.x + dir * 165;
         }
@@ -109700,16 +109738,16 @@ function vgPerformTrick(n, v, mode) {
 }
 
 // =============================================================================
-// HỆ THỐNG MIRAGE BLADES ĐỘC LẬP (4 CHẾ ĐỘ: SHOOTING / SPIRAL / STORM / HEAVY RAIN)
-// Có thể bắn ngay trong lúc đang múa kiếm Yamato mà không bị ngắt động tác!
+// PHÍM I: BẮN KIẾM ẢO ẢNH TẦM XA ĐỘC LẬP (4 CHẾ ĐỘ Q/E)
+// Chỉ Heavy Rain (mode 3) mới có khả năng ghim chậm mục tiêu (và chịu khóa 2 giây)
 // =============================================================================
-function vgFireMirageBlade(n, v, forceMode = null) {
+function vgFireRangedMirage(n, v, forceMode = null) {
     const mode = forceMode !== null ? forceMode : v.mirageMode;
     const dir = n.isFacingLeft ? -1 : 1;
     const cx = n.x + n.w / 2, cy = n.y + n.h / 2;
     const target = vgFindTarget(n, dir, 750);
 
-    // [0] SHOOTING BLADES: Triệu hồi 1 thanh kiếm bên vai phóng thẳng tới ghim mục tiêu
+    // [0] SHOOTING BLADES: Bắn kiếm tầm xa thuần sát thương + găm dấu ấn Grim Trick
     if (mode === 0) {
         const side = (v.swords.length % 2 === 0) ? -1 : 1;
         const sx = cx - dir * 14, sy = n.y + 12 + side * 10;
@@ -109718,15 +109756,15 @@ function vgFireMirageBlade(n, v, forceMode = null) {
         const ang = Math.atan2(ty - sy, tx - sx);
         v.swords.push({
             mode: 'shoot', x: sx, y: sy,
-            vx: Math.cos(ang) * 18, vy: Math.sin(ang) * 18,
-            ang, t: 0, wait: 3, life: 48,
-            damage: 1.5, hit: new Set(), markOnHit: true
+            vx: Math.cos(ang) * 19, vy: Math.sin(ang) * 19,
+            ang, t: 0, wait: 2, life: 48,
+            damage: 1.6, hit: new Set(), markOnHit: true
         });
         if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(1520, 0.04, 'triangle', 0.07, 920);
         return;
     }
 
-    // [1] SPIRAL BLADES: 6 thanh kiếm xoay quanh người Vergil như bánh xe hộ thể
+    // [1] SPIRAL BLADES: 6 kiếm xoay quanh người gây sát thương tầm gần (không khóa cứng)
     if (mode === 1) {
         if (v.conc < 20 && v.sdt <= 0) { vergilLabel('NEED CONCENTRATION!'); return; }
         if (v.sdt <= 0) vgAddConc(v, -20);
@@ -109735,7 +109773,7 @@ function vgFireMirageBlade(n, v, forceMode = null) {
             v.swords.push({
                 mode: 'spiral', x: cx, y: cy,
                 ang: (k / 6) * Math.PI * 2, r: 58,
-                t: 0, life: 240, damage: 1.2, hitCd: new Map()
+                t: 0, life: 220, damage: 1.2, hitCd: new Map()
             });
         }
         vergilLabel('SPIRAL BLADES');
@@ -109743,7 +109781,7 @@ function vgFireMirageBlade(n, v, forceMode = null) {
         return;
     }
 
-    // [2] STORM BLADES: 6 thanh kiếm bao vây quanh mục tiêu rồi đồng loạt đâm xuyên tâm hất tung!
+    // [2] STORM BLADES: 6 kiếm vây quanh mục tiêu rồi đâm xuyên tâm (chỉ gây sát thương, bỏ launch liên tục)
     if (mode === 2) {
         if (v.conc < 25 && v.sdt <= 0) { vergilLabel('NEED CONCENTRATION!'); return; }
         if (v.sdt <= 0) vgAddConc(v, -25);
@@ -109756,8 +109794,8 @@ function vgFireMirageBlade(n, v, forceMode = null) {
                 tx, ty, target,
                 x: tx + Math.cos(a) * 84, y: ty + Math.sin(a) * 84,
                 ang: a + Math.PI, r: 84,
-                t: 0, wait: 18, life: 42,
-                damage: 1.6, hit: new Set()
+                t: 0, wait: 16, life: 40,
+                damage: 1.7, hit: new Set()
             });
         }
         vergilLabel('STORM BLADES');
@@ -109765,7 +109803,7 @@ function vgFireMirageBlade(n, v, forceMode = null) {
         return;
     }
 
-    // [3] HEAVY RAIN BLADES: 7 thanh kiếm treo lơ lửng trên đầu mục tiêu rồi cắm xuống khóa cứng!
+    // [3] HEAVY RAIN BLADES: Mưa kiếm từ trên cao (Có ghim ngắn nhưng chịu khóa 2 giây `ccKey: 'rain'`)
     if (mode === 3) {
         if (v.conc < 30 && v.sdt <= 0) { vergilLabel('NEED CONCENTRATION!'); return; }
         if (v.sdt <= 0) vgAddConc(v, -30);
@@ -109786,7 +109824,7 @@ function vgFireMirageBlade(n, v, forceMode = null) {
 }
 
 // =============================================================================
-// HỆ THỐNG CHIẾN ĐẤU YAMATO & JUST JUDGEMENT CUT
+// HỆ THỐNG CHIẾN ĐẤU YAMATO & MIRAGE EDGE (J / K & O + J / K)
 // =============================================================================
 function ymtStart(id, extra = {}) {
     const n = dino, v = n.vergil, m = YMT_MOVES[id];
@@ -109802,90 +109840,102 @@ function ymtStart(id, extra = {}) {
         sheathed: false
     };
     v.slashTrail = [];
+    v.mirageTrail = [];
     v.justWindow = 0;
 
-    if (id === 'upper2' || id === 'rstar' || id === 'airb1') {
-        n.dy = id === 'rstar' ? -10.8 : -9.8;
+    if (id === 'upper2' || id === 'rstar' || id === 'airb1' || id === 'm_high') {
+        n.dy = id === 'rstar' ? -10.5 : -9.5;
         n.grounded = false;
-        v.airSlow = 85;
+        v.airSlow = 70;
     }
     if (id === 'air1' || id === 'air2' || id === 'jcut' || id === 'pjcut') {
         if (!n.grounded) {
-            n.dy = Math.min(n.dy, 0.2);
-            v.airSlow = Math.max(v.airSlow, 40);
+            n.dy = Math.min(n.dy, 0.25);
+            v.airSlow = Math.max(v.airSlow, 35);
         }
     }
-    if (id === 'rapid' || id === 'rstar') {
-        if (typeof dashVx !== 'undefined') dashVx = dir * (id === 'rapid' ? 19 : 13);
+    if (id === 'rapid' || id === 'rstar' || id === 'm_stinger') {
+        if (typeof dashVx !== 'undefined') dashVx = dir * (id === 'm_stinger' ? 21 : (id === 'rapid' ? 19 : 13));
     }
 
-    // Nếu là Judgement Cut / Perfect Judgement Cut -> Tạo quả cầu cắt không gian ngay tại mục tiêu!
+    // Nếu là đòn ném kiếm xoay Mirage Edge Round Trip (O + S + K)
+    if (m.spawnRoundTrip) {
+        const target = vgFindTarget(n, dir, 600);
+        v.roundSword = {
+            x: n.x + n.w / 2 + dir * 32,
+            y: n.y + 24,
+            tx: target ? (target.x + (target.w || 40) / 2) : (n.x + n.w / 2 + dir * 165),
+            ty: target ? (target.y + (target.h || 50) / 2) : (n.y + 26),
+            target,
+            t: 0, life: 135, hitCd: new Map()
+        };
+    }
+
+    // Nếu là Judgement Cut / Perfect Judgement Cut -> Quả cầu không gian tại mục tiêu (Trong suốt, chỉ gây sát thương)
     if (m.isJCut) {
         const lv = vgConcLevel(v);
         const target = vgFindTarget(n, dir, 760);
         const jx = target ? (target.x + (target.w || 40) / 2) : (n.x + n.w / 2 + dir * 185);
         const jy = target ? (target.y + (target.h || 50) / 2) : (n.y + n.h / 2 - 6);
-        const rad = (m.perfect ? 76 : 56) + lv * 10;
+        const rad = (m.perfect ? 72 : 54) + lv * 8;
 
         v.cuts.push({
             x: jx, y: jy, r: rad,
             t: m.perfect ? 7 : 12,
             warn: m.perfect ? 7 : 12,
-            boom: 0, maxBoom: 18,
+            boom: 0, maxBoom: 16,
             perfect: m.perfect,
-            damage: m.damage,
-            slashes: m.perfect ? (3 + lv) : 2
+            damage: m.damage
         });
 
-        // Nếu đang ở Concentration Lv2 hoặc Sin Devil Trigger và tung Perfect Judgement Cut -> Nổ thêm 2 quả cầu vệ tinh!
         if (m.perfect && (lv >= 2 || v.sdt > 0)) {
             for (const s of [-1, 1]) {
                 v.cuts.push({
-                    x: jx + s * 64, y: jy - 14, r: rad * 0.72,
+                    x: jx + s * 62, y: jy - 12, r: rad * 0.68,
                     t: 11 + (s > 0 ? 4 : 0), warn: 12,
-                    boom: 0, maxBoom: 16,
+                    boom: 0, maxBoom: 14,
                     perfect: true,
-                    damage: m.damage * 0.45,
-                    slashes: 3
+                    damage: m.damage * 0.42
                 });
             }
         }
         if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(m.perfect ? 1950 : 1550, 0.09, 'sine', 0.14, 520);
     }
 
-    if (!['a1', 'a2', 'air1', 'air2'].includes(id)) {
+    if (!['a1', 'a2', 'air1', 'air2', 'm_combo1'].includes(id)) {
         vergilLabel(m.name);
     }
 
-    // Ghi lịch sử để phân thân Doppelganger chém nhại theo sau 12 frame
+    // Ghi lịch sử cho Doppelganger (trễ 16 frame để nhịp đánh tách bạch với người chơi)
     if (v.dop) {
-        v.dopHist.push({ frame: frames + 12, type: 'move', id, dir, x: n.x, y: n.y });
+        v.dopHist.push({ frame: frames + 16, type: 'move', id, dir });
     }
 }
 
-// Tính toán Pose thanh Katana Yamato & Vỏ kiếm Saya chuẩn phong cách Iaijutsu
 function ymtPose(n, v, a, age) {
     const dir = a ? a.dir : (n.isFacingLeft ? -1 : 1);
     const ox = n.x + n.w / 2, oy = n.y;
-    // Tay trái luôn nắm vỏ kiếm Saya bên hông trái
     let sayaX = -10, sayaY = 28, sayaAng = -0.38;
-    // Tay phải nắm chuôi Yamato
-    let hx = -6, hy = 25, angle = -0.38, len = 82, flat = 1, drawn = false, iaiFlash = 0;
+    let hx = -6, hy = 25, angle = -0.38, len = 82, flat = 1, drawn = false, mirageBlade = false;
+    // Tọa độ tay trái cầm Mirage Edge khi kích hoạt O + J/K
+    let mhx = -12, mhy = 22, mAngle = 0.55;
 
     if (!a) {
-        // Tư thế đứng tĩnh cầm vỏ kiếm Yamato chuẩn Vergil (kiếm tra trong vỏ)
         const breath = Math.sin(frames * 0.06) * 1.0;
         sayaY += breath; hy += breath;
         drawn = false;
+        mirageBlade = v.mirageStance > 0;
+        if (mirageBlade) { mhx = -14; mhy = 20 + breath; mAngle = 2.35; }
     } else {
         const pr = Math.max(0, Math.min(1, (age - a.wind) / Math.max(1, a.end - a.wind)));
         const ease = 1 - Math.pow(1 - pr, 3);
         drawn = age >= a.wind && !a.sheathed;
+        mirageBlade = !!a.mirageMelee || v.mirageStance > 0;
 
         switch (a.pose) {
-            case 'iaiSlash': // Rút kiếm chém chéo từ hông trái vọt ra trước
+            case 'iaiSlash':
                 if (age < a.wind) {
-                    drawn = false; hx = -8; hy = 26; iaiFlash = 0.8;
+                    drawn = false; hx = -8; hy = 26;
                 } else {
                     angle = 2.15 - 3.65 * ease;
                     hx = -4 + 22 * Math.sin(ease * Math.PI * 0.85);
@@ -109894,14 +109944,14 @@ function ymtPose(n, v, a, age) {
                 }
                 break;
 
-            case 'revSlash': // Chém vắt ngược từ phải qua trái
+            case 'revSlash':
                 angle = -1.65 + 3.45 * ease;
                 hx = 18 - 14 * ease;
                 hy = 20 + 8 * ease;
                 flat = 0.48;
                 break;
 
-            case 'sayaBash': // Đập đốc vỏ kiếm rồi xoay người rút kiếm chém ngang
+            case 'sayaBash':
                 if (age < 7) {
                     drawn = false; sayaX = 16; sayaY = 22; sayaAng = 0.15;
                 } else {
@@ -109911,37 +109961,37 @@ function ymtPose(n, v, a, age) {
                 }
                 break;
 
-            case 'wideIai': // Nhát kết xẻ đôi không gian rồi tra kiếm chậm rãi vào vỏ
+            case 'wideIai':
             case 'voidArc':
                 if (age < a.wind) {
-                    drawn = false; hx = -10; hy = 26; iaiFlash = 1.0;
+                    drawn = false; hx = -10; hy = 26;
                 } else if (age <= a.end) {
                     angle = 2.35 - 4.5 * ease;
                     hx = 20 * Math.sin(ease * Math.PI * 0.75);
                     hy = 22;
                     len = 96; flat = 0.38;
                 } else {
-                    // Động tác trượt lưỡi kiếm về vỏ bên hông trái
                     drawn = !a.sheathed;
                     angle = -0.38; hx = -6; hy = 25;
                 }
                 break;
 
-            case 'upperIai': // Chém vớt ngược từ mặt đất lên đỉnh đầu
+            case 'upperIai':
                 angle = 1.85 - 3.75 * ease;
                 hx = 14 * Math.sin(ease * Math.PI);
                 hy = 34 - 22 * ease;
                 len = 88;
+                if (mirageBlade) { mAngle = 2.1 - 3.9 * ease; mhx = 18 * Math.sin(ease * Math.PI); mhy = 30 - 20 * ease; }
                 break;
 
-            case 'downIai': // Chém bổ dọc trên không
+            case 'downIai':
             case 'helm':
                 angle = -2.35 + 3.55 * ease;
                 hx = 14; hy = 14 + 18 * ease;
                 len = 88;
                 break;
 
-            case 'flurry': { // Combo C: Múa kiếm tốc độ siêu thanh tạo lưới kiếm khí trước mặt
+            case 'flurry': {
                 const spd = age * 1.45;
                 angle = Math.sin(spd) * 1.35;
                 hx = 16 + Math.cos(spd * 1.3) * 8;
@@ -109950,42 +110000,81 @@ function ymtPose(n, v, a, age) {
                 break;
             }
 
-            case 'rapid': // Rapid Slash: Lao xuyên qua mục tiêu với những nhát rút kiếm liên hoàn
+            case 'rapid':
                 angle = Math.sin(age * 1.2) * 1.1;
                 hx = 18; hy = 24; len = 90; flat = 0.45;
                 break;
 
-            case 'spinUp': // Rising Star / Aerial B1: Xoay kiếm 360 độ cuốn mục tiêu lên trời
+            case 'spinUp':
                 angle = -2.2 + Math.PI * 2 * 2 * ease;
                 hx = 12 * Math.cos(angle);
                 hy = 20 + 6 * Math.sin(angle);
                 len = 86; flat = 0.45;
                 break;
 
-            case 'jcutPose': // Judgement Cut: Hầu như không nhìn thấy lưỡi kiếm, chỉ thấy tay lóe sáng ở chuôi kiếm!
+            case 'jcutPose':
                 drawn = age >= a.wind && age <= a.wind + 3;
                 angle = -0.25; hx = -4; hy = 24; len = 84;
-                iaiFlash = 1.0;
                 break;
+
+            // --- CÁC POSE SONG KIẾM YAMATO + MIRAGE EDGE (NHÁNH PHÍM O) ---
+            case 'mirage1':
+                angle = -2.2 + 3.8 * ease;
+                hx = 14 * Math.sin(ease * Math.PI); hy = 20;
+                mAngle = 2.2 - 3.8 * ease;
+                mhx = 18 * Math.sin(ease * Math.PI); mhy = 24;
+                flat = 0.48;
+                break;
+
+            case 'mirage2':
+                angle = -2.5 + Math.PI * 2 * ease;
+                mAngle = angle + Math.PI;
+                hx = 14 * Math.cos(angle); hy = 22;
+                mhx = 14 * Math.cos(mAngle); mhy = 24;
+                flat = 0.42;
+                break;
+
+            case 'mirageFin':
+                angle = -2.4 + 4.1 * ease;
+                mAngle = 2.4 - 4.1 * ease;
+                hx = 20 * Math.sin(ease * Math.PI); hy = 20;
+                mhx = 20 * Math.sin(ease * Math.PI); mhy = 26;
+                len = 92; flat = 0.40;
+                break;
+
+            case 'mStinger': { // Deep Stinger: 2 thanh kiếm chụm mũi xoay khoan về phía trước!
+                const spin = age * 0.95;
+                angle = Math.sin(spin) * 0.18;
+                mAngle = -Math.sin(spin) * 0.18;
+                hx = 22; hy = 22 + Math.cos(spin) * 4;
+                mhx = 24; mhy = 22 - Math.cos(spin) * 4;
+                len = 96; flat = 0.65;
+                break;
+            }
         }
     }
 
     const wx = ox + dir * hx, wy = oy + hy;
+    const mwx = ox + dir * mhx, mwy = oy + mhy;
     return {
         x: wx, y: wy,
         tx: wx + dir * Math.cos(angle) * len,
         ty: wy + Math.sin(angle) * len * flat,
+        mx: mwx, my: mwy,
+        mtx: mwx + dir * Math.cos(mAngle) * (len * 0.96),
+        mty: mwy + Math.sin(mAngle) * (len * 0.96) * flat,
+        mAngle,
         sayaX: ox + dir * sayaX, sayaY: oy + sayaY, sayaAng,
-        angle, len, flat, dir, drawn, iaiFlash
+        angle, len, flat, dir, drawn, mirageBlade
     };
 }
 
-// Xử lý va chạm của đường kiếm Yamato & Khống chế mục tiêu
+// Xử lý va chạm kiếm & Áp dụng Khóa Khống Chế 2 Giây (Anti-Infinite CC)
 function ymtStrike(n, v, a, pulse) {
     const lv = vgConcLevel(v);
     const cx = n.x + n.w / 2, cy = n.y + n.h / 2;
-    const reach = (a.pose === 'wideIai' || a.pose === 'voidArc' ? 116 : (a.pose === 'flurry' || a.pose === 'rapid' ? 102 : 94)) + lv * 10;
-    const isAround = a.pose === 'spinUp' || a.pose === 'rapid';
+    const reach = (a.pose === 'wideIai' || a.pose === 'voidArc' || a.pose === 'mStinger' ? 116 : (a.pose === 'flurry' || a.pose === 'rapid' || a.mirageMelee ? 104 : 94)) + lv * 10;
+    const isAround = a.pose === 'spinUp' || a.pose === 'rapid' || a.pose === 'mirage2';
 
     const box = {
         x: isAround ? (cx - reach * 0.85) : (a.dir < 0 ? n.x - reach + 8 : n.x + n.w - 8),
@@ -109994,11 +110083,10 @@ function ymtStrike(n, v, a, pulse) {
         h: n.h + (a.launch || a.launchWithMe || a.pose === 'upperIai' ? 60 : 28)
     };
 
-    // Nếu là Void Slash -> Tạo vết nứt không gian giữ chân và làm chậm kẻ địch phía trước
     if (a.slowBubble && pulse === 0) {
         v.voidZones.push({
             x: cx + a.dir * 68, y: cy - 4,
-            r: 62 + lv * 8, t: 95, max: 95
+            r: 58 + lv * 6, t: 75, max: 75
         });
         if (typeof SFX !== 'undefined' && SFX.bossSkill) SFX.bossSkill();
     }
@@ -110010,70 +110098,64 @@ function ymtStrike(n, v, a, pulse) {
         if (a.hit.get(root) === pulse) continue;
         if (!checkAABB(box, o)) continue;
 
-        const dealt = vgDealDamage(v, o, a.damage, 'yamato');
+        const dealt = vgDealDamage(v, o, a.damage, a.mirageMelee ? 'mirage_melee' : 'yamato');
         if (!dealt) continue;
         a.hit.set(root, pulse);
 
-        // Tự động găm dấu ấn lên mục tiêu vừa trúng kiếm để có thể bấm Shift (Grim Trick) đuổi theo ngay!
         v.markedTarget = root;
         v.markTimer = 240;
 
         const ox = o.x + (o.w || 40) / 2, oy = o.y + (o.h || 50) / 2;
-        // Tạo tia chém không gian màu xanh băng giá trên người mục tiêu
         for (let s = 0; s < 2; s++) {
             v.sparks.push({
                 x: ox + (Math.random() - 0.5) * 18,
                 y: oy + (Math.random() - 0.5) * 18,
                 ang: (Math.random() - 0.5) * 1.8,
-                len: 36 + Math.random() * 24,
-                t: 8, max: 8
+                len: 34 + Math.random() * 20,
+                t: 7, max: 7
             });
         }
 
-        // Áp dụng vật lý Juggle / Launch / Slam / PullIn (Tái sử dụng `dswControl` nếu có)
+        // CHỈ ÁP DỤNG KHỐNG CHẾ NẾU CHIÊU ĐÓ CÓ `ccKey` VÀ QUA ĐƯỢC BỘ KIỂM TRA KHÓA 2 GIÂY!
         if (typeof dswControl === 'function') {
-            if (a.launchWithMe) {
-                const ctrl = vgControl(o, { launch: true });
-                if (ctrl) {
-                    ctrl.targetY = Math.max(38, n.y - 12);
-                    ctrl.vy = -9.6;
-                    ctrl.stun = Math.max(ctrl.stun, 42);
+            if (a.ccKey && vgCanApplyCC(root, a.ccKey)) {
+                if (a.launchWithMe) {
+                    const ctrl = vgControl(o, { launch: true });
+                    if (ctrl) {
+                        ctrl.targetY = Math.max(38, n.y - 12);
+                        ctrl.vy = -9.4;
+                        ctrl.stun = Math.max(ctrl.stun, 32);
+                    }
+                } else if (a.pullIn) {
+                    const ctrl = vgControl(o, {});
+                    if (ctrl) { ctrl.stun = Math.max(ctrl.stun, 30); ctrl.vx = 0; }
+                    if(ctrl)o.x += ((cx + a.dir * 58 - (o.w || 40) / 2) - o.x) * 0.45;
+                } else if (a.stunOnly) {
+                    const ctrl = vgControl(o, {});
+                    if (ctrl) { ctrl.stun = Math.max(ctrl.stun, a.stunOnly); ctrl.vx = 0; }
+                } else {
+                    vgControl(o, {
+                        launch: a.launch,
+                        slam: a.slam
+                    });
                 }
-                if(ctrl)o.x += ((cx + a.dir * 48 - (o.w || 40) / 2) - o.x) * 0.45;
-            } else if (a.holdAir) {
-                const ctrl = vgControl(o, { hold: true });
-                if (ctrl) {
-                    ctrl.targetY = n.y + n.h / 2 - (o.h || 48) / 2 - 6;
-                    ctrl.stun = Math.max(ctrl.stun, 22);
-                }
-            } else if (a.pullIn) {
-                const ctrl = vgControl(o, {});
-                if (ctrl) { ctrl.stun = Math.max(ctrl.stun, 45); ctrl.vx = 0; }
-                if(ctrl)o.x += ((cx + a.dir * 56 - (o.w || 40) / 2) - o.x) * 0.55;
-            } else {
-                vgControl(o, {
-                    launch: a.launch,
-                    slam: a.slam,
-                    push: (a.push || 0) * a.dir,
-                    wall: a.wall
-                });
-                if (['a1', 'a2', 'a3', 'c_flurry'].includes(a.id) && root._dswControl) {
-                    root._dswControl.stun = Math.max(root._dswControl.stun, 20);
-                    o.x += ((cx + a.dir * 52 - (o.w || 40) / 2) - o.x) * 0.35;
-                }
+            }
+            // Nếu mục tiêu ĐANG ở sẵn trên không (do mới bị hất tung hợp lệ), cho phép Aerial Rave giữ nhẹ trên không tối đa 2 nhịp
+            else if (a.airJuggle && !root.grounded && root._dswControl && root._dswControl.air) {
+                root._dswControl.vy = Math.min(root._dswControl.vy, -0.6);
             }
         }
     }
-    if (typeof shakeTimer !== 'undefined') shakeTimer = Math.max(shakeTimer, a.damage >= 5 ? 12 : 4);
+    if (typeof shakeTimer !== 'undefined') shakeTimer = Math.max(shakeTimer, a.damage >= 5 ? 10 : 3);
 }
 
-// Điều phối lệnh nút bấm J & K của Yamato
+// Điều phối nút J & K (Tự động rẽ sang nhánh Song Kiếm Mirage Edge nếu `v.mirageStance > 0`!)
 function ymtDispatch(cmd) {
     const n = dino, v = n.vergil;
     if (v.jce || frames < v.guardUntil) return;
     const recent = frames - v.ended <= 38;
     const last = recent ? v.last : '';
-    const pauseBeat = recent && (frames - v.ended >= 11); // Nhịp dừng Delay Combo (Combo C / Aerial Rave B)
+    const pauseBeat = recent && (frames - v.ended >= 11);
 
     // 1. Nối chuỗi PERFECT JUDGEMENT CUT liên hoàn (tối đa 3 lần ở Concentration Lv2)
     if (cmd.key === 'J' && v.justWindow > 0 && v.jcutChain < (vgConcLevel(v) >= 2 || v.sdt > 0 ? 3 : 1)) {
@@ -110083,53 +110165,57 @@ function ymtDispatch(cmd) {
     }
     v.jcutChain = 0;
 
-    // 2. Nút K (Rapid Slash / Rising Star / Void Slash / Helm Breaker)
+    // =========================================================================
+    // 2. NẾU ĐANG BẬT THẾ MIRAGE BLADE STANCE (PHÍM O) -> DÙNG COMBO CẬN CHIẾN MIRAGE EDGE!
+    // =========================================================================
+    if (v.mirageStance > 0 || cmd.mirageForce) {
+        v.mirageStance = Math.max(v.mirageStance, 180); // Duy trì thế Song Kiếm thêm 3 giây khi đang đánh
+        if (cmd.key === 'K') {
+            if (!n.grounded) { ymtStart('helm'); return; }
+            if (cmd.down) { ymtStart('m_round'); return; }   // O -> S + K: Phóng kiếm xoay Round Trip
+            ymtStart('m_stinger');                           // O -> K: Khoan song kiếm Deep Stinger
+            return;
+        }
+        if (cmd.key === 'J') {
+            if (!n.grounded) {
+                ymtStart(last === 'air1' ? 'air2' : (last === 'air2' ? 'airb2' : 'air1'));
+                return;
+            }
+            if (cmd.down) { ymtStart('m_high'); return; }    // O -> S + J: Hất tung Spiral Launch
+            if (cmd.dash) { ymtStart('m_stinger'); return; }
+            if (last === 'm_combo1') { ymtStart('m_combo2'); return; }
+            if (last === 'm_combo2') { ymtStart('m_combo3'); return; }
+            ymtStart('m_combo1');
+            return;
+        }
+    }
+
+    // =========================================================================
+    // 3. NHÁNH THUẦN YAMATO MẶC ĐỊNH
+    // =========================================================================
     if (cmd.key === 'K') {
-        if (!n.grounded) {
-            ymtStart('helm');
-            return;
-        }
-        if (cmd.down) {
-            ymtStart('vslash');
-            return;
-        }
-        if (cmd.up || (cmd.charge && cmd.charge >= 18)) {
-            ymtStart('rstar');
-            return;
-        }
+        if (!n.grounded) { ymtStart('helm'); return; }
+        if (cmd.down) { ymtStart('vslash'); return; }
+        if (cmd.up || (cmd.charge && cmd.charge >= 18)) { ymtStart('rstar'); return; }
         ymtStart('rapid');
         return;
     }
 
-    // 3. Nút J (Chuỗi Yamato Combo A / Combo C / Upper Slash / Aerial Rave A & B)
     if (cmd.key === 'J') {
         if (!n.grounded) {
             if (last === 'air1') { ymtStart('air2'); return; }
-            if (last === 'air2') {
-                // Nếu ngừng 1 nhịp ngắn sau Air2 -> Rẽ nhánh sang Aerial Rave B (Chém xoáy vọt lên rồi bổ xuống)
-                ymtStart(pauseBeat ? 'airb1' : 'air3');
-                return;
-            }
+            if (last === 'air2') { ymtStart(pauseBeat ? 'airb1' : 'air3'); return; }
             if (last === 'airb1') { ymtStart('airb2'); return; }
             ymtStart('air1');
             return;
         }
-
         if (cmd.down) {
             ymtStart(last === 'upper1' ? 'upper2' : 'upper1');
             return;
         }
-        if (cmd.dash) {
-            ymtStart('rapid');
-            return;
-        }
-
+        if (cmd.dash) { ymtStart('rapid'); return; }
         if (last === 'a1') { ymtStart('a2'); return; }
-        if (last === 'a2') {
-            // Đợi 1 nhịp ngắn sau nhát thứ 2 (khi chuôi kiếm lóe sáng) -> Mở khóa YAMATO COMBO C (Chém bão táp!)
-            ymtStart(pauseBeat ? 'c_flurry' : 'a3');
-            return;
-        }
+        if (last === 'a2') { ymtStart(pauseBeat ? 'c_flurry' : 'a3'); return; }
         if (last === 'c_flurry') { ymtStart('c_finish'); return; }
         if (last === 'a3') { ymtStart('a4'); return; }
         ymtStart('a1');
@@ -110139,19 +110225,17 @@ function ymtDispatch(cmd) {
 function ymtCommand(cmd) {
     const n = dino, v = n.vergil, a = v.attack;
     if (a) {
-        // Đang lướt Rapid Slash mà giữ K hoặc bấm K lần nữa -> Vọt thẳng lên trời bằng RISING STAR!
         if (a.id === 'rapid' && cmd.key === 'K' && a.age >= 8 && vgConcLevel(v) >= 1) {
             v.queue = [];
             ymtStart('rstar', { lockDir: a.dir });
             return;
         }
-        // Đang chém Upper Slash 1 mà giữ/bấm J tiếp -> Bay lên theo mục tiêu bằng Upper Slash II!
         if (a.id === 'upper1' && cmd.key === 'J' && a.age >= 8) {
             v.queue = [];
             ymtStart('upper2', { lockDir: a.dir });
             return;
         }
-        // Đang ở cửa sổ Just Judgement Cut ngay sau khi tra kiếm -> Phóng Perfect Judgement Cut ngay lập tức!
+        // Đang chém Yamato thường mà bấm O rồi bấm J/K -> Nối mượt sang Song Kiếm Mirage Edge!
         if (cmd.key === 'J' && v.justWindow > 0 && v.jcutChain < (vgConcLevel(v) >= 2 || v.sdt > 0 ? 3 : 1)) {
             v.queue = [];
             v.jcutChain++;
@@ -110170,7 +110254,7 @@ function ymtCommand(cmd) {
 }
 
 // =============================================================================
-// TUYỆT KỸ TỐI THƯỢNG: JUDGEMENT CUT END (NGƯNG ĐỌNG THỜI GIAN & CHÉM TOÀN MÀN HÌNH)
+// FIX JUDGEMENT CUT END (HẠ TRỌNG TÂM CHUẨN XÁC VÀO MỤC TIÊU DƯỚI MẶT SÀN)
 // =============================================================================
 function vgTriggerJCE(n, v) {
     if (v.jce) return false;
@@ -110179,15 +110263,20 @@ function vgTriggerJCE(n, v) {
     v.conc = 0;
     if (typeof ultCharge !== 'undefined') ultCharge = 0;
 
+    // Đưa Vergil đáp chuẩn xuống mặt sàn trước khi rút kiếm mở lãnh địa JCE
+    const floorY = typeof dswFloor === 'function' ? dswFloor(n.x + n.w / 2, n.y + n.h) : 320;
+    n.y = floorY - n.h;
+    n.dy = 0;
+    n.grounded = true;
+
     v.jce = {
         age: 0,
         homeX: n.x, homeY: n.y,
-        grounded: n.grounded,
-        slashes: [],
-        dashes: []
+        floorY,
+        slashes: []
     };
-    vergilLabel('JUDGEMENT CUT END!', '#E040FB');
-    if (typeof shakeTimer !== 'undefined') shakeTimer = Math.max(shakeTimer, 35);
+    vergilLabel('JUDGEMENT CUT END!', '#80D8FF');
+    if (typeof shakeTimer !== 'undefined') shakeTimer = Math.max(shakeTimer, 28);
     if (typeof SFX !== 'undefined' && SFX.bossEntry) SFX.bossEntry();
     return true;
 }
@@ -110205,15 +110294,14 @@ function vergilTick() {
     if (v.justWindow > 0) v.justWindow--;
     if (v.sheatheSpark > 0) v.sheatheSpark--;
     if (v.airSlow > 0) v.airSlow--;
+    if (v.mirageStance > 0) v.mirageStance--;
     if (n.grounded && !v.attack) v.airSlow = 0;
 
-    // 1. CẬP NHẬT THANH CONCENTRATION (Tăng khi bình tĩnh đứng/đi bộ, giảm khi chạy loạn xạ)
     const movingFast = Math.abs(n.x - (v.lastX ?? n.x)) > 3.8 && !v.attack;
     if (!v.attack && !v.jce) {
-        if (!movingFast && n.grounded) vgAddConc(v, 0.42);
+        if (!movingFast && n.grounded) vgAddConc(v, 0.45);
     }
 
-    // 2. CẬP NHẬT SIN DEVIL TRIGGER & DOPPELGANGER
     if (v.sdt > 0 && !v.jce) {
         v.sdt--;
         if (typeof ultCharge !== 'undefined') ultCharge = 0;
@@ -110227,60 +110315,58 @@ function vergilTick() {
         }
     }
 
-    // 3. CẬP NHẬT TUYỆT KỸ TỐI THƯỢNG: JUDGEMENT CUT END
+    // CẬP NHẬT JUDGEMENT CUT END (Đường cắt bám chuẩn độ cao mặt đất & tâm mục tiêu!)
+    const targets = typeof sgTargets === 'function' ? sgTargets(n) : (typeof allTargets === 'function' ? allTargets() : bosses);
     if (v.jce) {
         const j = v.jce;
         j.age++;
         n.invincible = true; n.invTimer = Math.max(n.invTimer || 0, 4);
         n.dy = 0; if (typeof dashVx !== 'undefined') dashVx = 0;
+        n.x = j.homeX; n.y = j.homeY;
 
-        // Pha 1 (1 -> 24f): Thu kiếm vào vỏ bên hông, mặt không gian tối sầm lại
-        if (j.age < 24) {
-            n.x = j.homeX; n.y = j.homeY;
+        if (j.age < 20) {
             v.body.drawn = false;
             v.sheatheSpark = 6;
-        }
-        // Pha 2 (24 -> 96f): Vergil biến mất, các tia sáng xanh đan chéo khắp toàn bộ màn hình!
-        else if (j.age < 96) {
+        } else if (j.age < 88) {
             if (j.age % 3 === 0) {
-                const x1 = camX + Math.random() * canvas.width, y1 = camY + 40 + Math.random() * 280;
-                const ang = (Math.random() - 0.5) * Math.PI;
+                // Lấy tâm của các mục tiêu trên sân (hoặc vùng mặt đất quanh Vergil) để đường kiếm cắt chuẩn xác, KHÔNG bay chệch lên trời!
+                const alive = targets.filter(o => o && o.hp > 0);
+                const pick = alive.length ? alive[(j.age / 3 | 0) % alive.length] : null;
+                const cx = pick ? (pick.x + (pick.w || 40) / 2 + (Math.random() - 0.5) * 90) : (camX + 100 + Math.random() * (canvas.width - 200));
+                const cy = pick ? (pick.y + (pick.h || 50) / 2 + (Math.random() - 0.5) * 45) : (j.floorY - 45 + (Math.random() - 0.5) * 55);
+                const ang = (Math.random() - 0.5) * 1.35;
+                const span = 180 + Math.random() * 80;
                 j.slashes.push({
-                    x1: x1 - Math.cos(ang) * 280, y1: y1 - Math.sin(ang) * 280,
-                    x2: x1 + Math.cos(ang) * 280, y2: y1 + Math.sin(ang) * 280,
-                    t: 28, max: 28
+                    x1: cx - Math.cos(ang) * span, y1: cy - Math.sin(ang) * span,
+                    x2: cx + Math.cos(ang) * span, y2: cy + Math.sin(ang) * span,
+                    t: 20, max: 20
                 });
-                if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(1100 + (j.age % 7) * 120, 0.03, 'sine', 0.06, 600);
+                if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(1150 + (j.age % 7) * 110, 0.03, 'sine', 0.05, 600);
             }
-        }
-        // Pha 3 (Frame 96): Vergil hiện hình trở lại, tra thanh Yamato kịch vào vỏ -> KÍCH NỔ TOÀN MÀN HÌNH!
-        else if (j.age === 96) {
-            n.x = j.homeX; n.y = j.homeY;
-            v.sheatheSpark = 20;
-            const targets = typeof sgTargets === 'function' ? sgTargets(n) : (typeof allTargets === 'function' ? allTargets() : bosses);
+        } else if (j.age === 88) {
+            v.sheatheSpark = 18;
             for (const o of targets) {
                 if (o && o.hp > 0) {
                     vgDealDamage(v, o, 42, 'jce');
                     if (typeof visualEffects !== 'undefined') {
-                        visualEffects.push(new Effect(o.x + (o.w || 40) / 2, o.y + (o.h || 50) / 2, 'explosion', true, 54));
+                        visualEffects.push(new Effect(o.x + (o.w || 40) / 2, o.y + (o.h || 50) / 2, 'parry', false));
                     }
                 }
             }
-            if (typeof shakeTimer !== 'undefined') shakeTimer = Math.max(shakeTimer, 55);
+            if (typeof shakeTimer !== 'undefined') shakeTimer = Math.max(shakeTimer, 40);
             if (typeof SFX !== 'undefined' && SFX.bossExplode) SFX.bossExplode();
         }
         j.slashes = j.slashes.filter(s => --s.t > 0);
-        if (j.age >= 126) {
+        if (j.age >= 112) {
             v.jce = null;
             if(v.sdt<=0){v.dop=null;v.dopHist=[];}
         }
         return;
     }
 
-    // 4. NẠP KIẾM CHẾ ĐỘ GIỮ NÚT J / K (JUST JUDGEMENT CUT)
+    // Nạp giữ J -> Just Judgement Cut
     if (keys.KeyJ && !keys.KeyS && !keys.ArrowDown) {
         v.holdJ++;
-        // Ở frame 18-26: Chuôi kiếm Yamato lóe sáng băng giá báo hiệu đã nạp xong JUST JUDGEMENT CUT!
         if (v.holdJ === 18) {
             v.sheatheSpark = 12;
             if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(1750, 0.05, 'sine', 0.09, 1200);
@@ -110300,7 +110386,7 @@ function vergilTick() {
         if(v.holdK===18&&v.attack?.id==='rapid')ymtCommand({key:'K',charge:v.holdK,air:!n.grounded,down:false,up:true});
     }else v.holdK=0;
 
-    // Giữ nút I (35 frame) -> Phóng 6 thanh Blistering Blades đồng loạt!
+    // Giữ nút I (28 frame) -> Bắn 6 thanh Blistering Blades tầm xa
     if (keys.KeyI) {
         v.holdI++;
         if (v.holdI === 28) {
@@ -110324,7 +110410,7 @@ function vergilTick() {
         v.holdI = 0;
     }
 
-    // 5. CẬP NHẬT ĐÒN TẤN CÔNG YAMATO HIỆN TẠI
+    // CẬP NHẬT ĐÒN TẤN CÔNG HIỆN TẠI
     const a = v.attack;
     if (a) {
         const prevAge = a.age;
@@ -110337,44 +110423,37 @@ function vergilTick() {
             return;
         }
 
-        // Bước tiến mượt mà khi rút kiếm
         if (a.advance && a.age === a.wind + 1 && n.grounded) {
             if (typeof dashVx !== 'undefined') dashVx = a.dir * a.advance;
         }
-        // Rapid Slash lướt xuyên qua mục tiêu
-        if (a.id === 'rapid' && a.age >= a.wind && a.age <= a.end) {
+        if ((a.id === 'rapid' || a.id === 'm_stinger') && a.age >= a.wind && a.age <= a.end) {
             const minX = typeof worldL === 'function' ? worldL() + 8 : 12;
             const maxX = (typeof worldR === 'function' ? worldR() : canvas.width) - n.w - 8;
-            n.x = Math.max(minX, Math.min(maxX, n.x + a.dir * 7.5));
+            n.x = Math.max(minX, Math.min(maxX, n.x + a.dir * (a.id === 'm_stinger' ? 6.2 : 7.5)));
             if (a.age % 3 === 0) vgAddGhost(n, v);
         }
 
-        // Helm Breaker lao thẳng từ trên không xuống mặt sàn
         if (a.id === 'helm') {
             n.dy = 17;
             if (n.grounded && a.age > 3) {
                 ymtStrike(n, v, a, 0);
                 if (typeof visualEffects !== 'undefined') {
-                    visualEffects.push(new Effect(n.x + n.w / 2, n.y + n.h, 'explosion', true, 38));
+                    visualEffects.push(new Effect(n.x + n.w / 2, n.y + n.h, 'explosion', true, 36));
                 }
-                if (typeof shakeTimer !== 'undefined') shakeTimer = Math.max(shakeTimer, 16);
+                if (typeof shakeTimer !== 'undefined') shakeTimer = Math.max(shakeTimer, 14);
                 v.sheatheSpark = 10;
                 v.justWindow = 12;
                 v.last = a.id; v.ended = frames; v.attack = null;
                 return;
             }
-        }
-        // Đòn chém liên hoàn Combo C (`count`)
-        else if (a.count) {
+        } else if (a.count) {
             const k = Math.floor((a.age - a.wind - 1) * a.count / Math.max(1, a.end - a.wind));
             const oldK = Math.floor((prevAge - a.wind - 1) * a.count / Math.max(1, a.end - a.wind));
             if (k >= 0 && k < a.count && k !== oldK) {
                 ymtStrike(n, v, a, k);
                 if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(950 + (k % 4) * 90, 0.03, 'sine', 0.07, 500);
             }
-        }
-        // Các đòn chém theo mảng `hits`
-        else if (a.hits) {
+        } else if (a.hits) {
             const idx = a.hits.indexOf(a.age);
             if (idx >= 0) {
                 ymtStrike(n, v, a, idx);
@@ -110382,9 +110461,6 @@ function vergilTick() {
             }
         }
 
-        // KHOẢNH KHẮC TRA KIẾM VÀO VỎ (IAIJUTSU SHEATHE MECHANIC):
-        // Khi đạt tới frame `sheatheAt`, chuôi kiếm Yamato chạm kịch vào miệng vỏ kiếm Saya -> Lóe sáng xanh lam
-        // Mở ra cửa sổ `justWindow` (11 frame) để người chơi bấm J nối tiếp PERFECT JUDGEMENT CUT!
         if (a.sheatheAt && a.age === a.sheatheAt) {
             a.sheathed = true;
             v.sheatheSpark = 12;
@@ -110396,14 +110472,17 @@ function vergilTick() {
             if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(1820, 0.05, 'sine', 0.08, 1400);
         }
 
-        // Lưu vệt lụa katana xanh lam khi lưỡi kiếm đang rút ra khỏi vỏ
         const pose = ymtPose(n, v, a, a.age);
         if (pose.drawn && !a.isJCut && a.age >= a.wind && a.age <= a.end) {
             for (let s = 1; s <= 3; s++) {
                 const subPose = ymtPose(n, v, a, a.age - 1 + s / 3);
-                v.slashTrail.push({ ...subPose, t: 8, max: 8 });
+                v.slashTrail.push({ ...subPose, t: 7, max: 7 });
+                if (a.mirageMelee) {
+                    v.mirageTrail.push({ x: subPose.mx, y: subPose.my, tx: subPose.mtx, ty: subPose.mty, t: 7, max: 7 });
+                }
             }
-            if (v.slashTrail.length > 24) v.slashTrail.splice(0, v.slashTrail.length - 24);
+            if (v.slashTrail.length > 22) v.slashTrail.splice(0, v.slashTrail.length - 22);
+            if (v.mirageTrail.length > 22) v.mirageTrail.splice(0, v.mirageTrail.length - 22);
         }
 
         if (a.age >= a.T) {
@@ -110412,8 +110491,29 @@ function vergilTick() {
         }
     }
 
-    // 6. CẬP NHẬT QUẢ CẦU KHÔNG GIAN JUDGEMENT CUT
-    const targets = typeof sgTargets === 'function' ? sgTargets(n) : (typeof allTargets === 'function' ? allTargets() : bosses);
+    // CẬP NHẬT ĐẠI KIẾM XOAY MIRAGE EDGE ROUND TRIP (O + S + K)
+    if (v.roundSword) {
+        const rs = v.roundSword;
+        rs.t++; rs.life--;
+        if (rs.target && rs.target.hp > 0) {
+            rs.tx = rs.target.x + (rs.target.w || 40) / 2;
+            rs.ty = rs.target.y + (rs.target.h || 50) / 2;
+        }
+        rs.x += (rs.tx - rs.x) * 0.18;
+        rs.y += (rs.ty - rs.y) * 0.18;
+        for (const o of targets) {
+            if (!o || o.hp <= 0) continue;
+            const root = o.__goc || o;
+            if ((rs.hitCd.get(root) || 0) > frames) continue;
+            if (checkAABB({ x: rs.x - 42, y: rs.y - 42, w: 84, h: 84 }, o)) {
+                rs.hitCd.set(root, frames + 16);
+                vgDealDamage(v, o, 1.4, 'mirage_melee');
+            }
+        }
+        if (rs.life <= 0) v.roundSword = null;
+    }
+
+    // CẬP NHẬT QUẢ CẦU KHÔNG GIAN JUDGEMENT CUT (BỎ STUN VÔ HẠN, CHỈ SÁT THƯƠNG THUẦN!)
     for (let i = v.cuts.length - 1; i >= 0; i--) {
         const c = v.cuts[i];
         if (c.t > 0) {
@@ -110425,13 +110525,9 @@ function vergilTick() {
                     const ox = o.x + (o.w || 40) / 2, oy = o.y + (o.h || 50) / 2;
                     if (Math.hypot(ox - c.x, oy - c.y) <= c.r + (o.w || 40) * 0.45) {
                         vgDealDamage(v, o, c.damage, c.perfect ? 'pjcut' : 'jcut');
-                        if (typeof dswControl === 'function') {
-                            const ctrl = vgControl(o, { launch: c.perfect ? 'prop' : false });
-                            if (ctrl) ctrl.stun = Math.max(ctrl.stun, 24);
-                        }
                     }
                 }
-                if (typeof shakeTimer !== 'undefined') shakeTimer = Math.max(shakeTimer, c.perfect ? 18 : 10);
+                if (typeof shakeTimer !== 'undefined') shakeTimer = Math.max(shakeTimer, c.perfect ? 14 : 8);
                 if (typeof SFX !== 'undefined' && SFX.bossSkill) SFX.bossSkill();
             }
         } else {
@@ -110440,7 +110536,7 @@ function vergilTick() {
         }
     }
 
-    // 7. CẬP NHẬT VẾT NỨT NGƯNG ĐỌNG KHÔNG GIAN (VOID SLASH)
+    // CẬP NHẬT VẾT NỨT VOID SLASH (Chỉ làm giảm nhẹ vận tốc di chuyển của địch thay vì khóa cứng AI!)
     for (let i = v.voidZones.length - 1; i >= 0; i--) {
         const vz = v.voidZones[i];
         vz.t--;
@@ -110448,16 +110544,13 @@ function vergilTick() {
             if (!o || o.hp <= 0) continue;
             const ox = o.x + (o.w || 40) / 2, oy = o.y + (o.h || 50) / 2;
             if (Math.hypot(ox - vz.x, oy - vz.y) <= vz.r) {
-                if (typeof dswControl === 'function') {
-                    const ctrl = vgControl(o, {});
-                    if (ctrl) { ctrl.stun = Math.max(ctrl.stun, 6); ctrl.vx *= 0.5; }
-                }
+                if (typeof o.dashV === 'number') o.dashV *= 0.7;
             }
         }
         if (vz.t <= 0) v.voidZones.splice(i, 1);
     }
 
-    // 8. CẬP NHẬT 4 HỆ MIRAGE BLADES
+    // CẬP NHẬT KIẾM ẢO ẢNH PHÍM I (Chỉ Heavy Rain mới có ghim và chịu khóa 2 giây `vgCanApplyCC`)
     for (let i = v.swords.length - 1; i >= 0; i--) {
         const s = v.swords[i];
         s.t++; s.life--;
@@ -110496,12 +110589,10 @@ function vergilTick() {
                     if (!s.hit.has(root) && checkAABB({ x: s.x - 16, y: s.y - 16, w: 32, h: 32 }, o)) {
                         s.hit.add(root);
                         vgDealDamage(v, o, s.damage, 'mirage');
-                        if (typeof dswControl === 'function') vgControl(o, { launch: 'prop' });
                     }
                 }
             }
         } else {
-            // 'shoot' & 'rain'
             if (s.t >= (s.wait || 0)) {
                 s.x += s.vx; s.y += s.vy;
                 for (const o of targets) {
@@ -110513,9 +110604,10 @@ function vergilTick() {
                             v.markedTarget = root;
                             v.markTimer = 300;
                         }
-                        if (s.pinTarget && typeof dswControl === 'function') {
+                        // Heavy Rain chỉ ghim mục tiêu nếu chưa bị khóa 2 giây!
+                        if (s.pinTarget && typeof dswControl === 'function' && vgCanApplyCC(root, 'rain')) {
                             const ctrl = vgControl(o, {});
-                            if (ctrl) { ctrl.stun = Math.max(ctrl.stun, 32); ctrl.vy = Math.max(ctrl.vy, 6); }
+                            if (ctrl) { ctrl.stun = Math.max(ctrl.stun, 26); ctrl.vx = 0; }
                         }
                         s.life = 0;
                         break;
@@ -110526,14 +110618,30 @@ function vergilTick() {
         if (s.life <= 0) v.swords.splice(i, 1);
     }
 
-    // 9. CẬP NHẬT PHÂN THÂN DOPPELGANGER (Chém bồi theo mọi đòn Yamato của Vergil sau 12 frame!)
+    // FIX VỊ TRÍ DOPPELGANGER: Đứng tách xa hẳn khỏi người chơi (cách 82px phía sau, hoặc kẹp sườn bên kia mục tiêu!)
     if (v.dop) {
         const dir = n.isFacingLeft ? -1 : 1;
-        const targetX = n.x - dir * 34;
-        const targetY = n.y - 4;
-        v.dop.x += (targetX - v.dop.x) * 0.28;
-        v.dop.y += (targetY - v.dop.y) * 0.28;
-        v.dop.facingLeft = n.isFacingLeft;
+        const nearEnemy = vgFindTarget(n, dir, 260, true);
+        let wantX, wantY;
+        if (nearEnemy && v.dop.attack) {
+            // Khi đang chém phụ họa và có mục tiêu gần -> Phân thân lướt ra phía đối diện mục tiêu để đánh gọng kìm!
+            const ecx = nearEnemy.x + (nearEnemy.w || 40) / 2;
+            const playerOnLeft = (n.x + n.w / 2) < ecx;
+            wantX = ecx + (playerOnLeft ? 64 : -64 - n.w);
+            wantY = nearEnemy.y + (nearEnemy.h || 50) - n.h - 6;
+            v.dop.facingLeft = playerOnLeft;
+        } else {
+            // Khi di chuyển bình thường -> Đứng lùi hẳn về sau 82px và lơ lửng cao hơn 16px, tuyệt đối không đè lên người chơi!
+            wantX = n.x - dir * 82;
+            wantY = n.y - 16 + Math.sin(frames * 0.08) * 4;
+            v.dop.facingLeft = n.isFacingLeft;
+        }
+        const minX = typeof worldL === 'function' ? worldL() + 8 : 12;
+        const maxX = (typeof worldR === 'function' ? worldR() : canvas.width) - n.w - 8;
+        wantX = Math.max(minX, Math.min(maxX, wantX));
+
+        v.dop.x += (wantX - v.dop.x) * 0.18;
+        v.dop.y += (wantY - v.dop.y) * 0.18;
 
         for (let i = v.dopHist.length - 1; i >= 0; i--) {
             const ev = v.dopHist[i];
@@ -110541,15 +110649,16 @@ function vergilTick() {
                 v.dopHist.splice(i, 1);
                 const m = YMT_MOVES[ev.id];
                 if (m) {
-                    v.dop.attack = { ...m, id: ev.id, dir: ev.dir, age: 0 };
-                    const reach = 98;
+                    v.dop.attack = { ...m, id: ev.id, dir: v.dop.facingLeft ? -1 : 1, age: 0 };
+                    const dDir = v.dop.facingLeft ? -1 : 1;
+                    const reach = 104;
                     const box = {
-                        x: ev.dir < 0 ? v.dop.x - reach : v.dop.x + n.w,
-                        y: v.dop.y - 16, w: reach, h: n.h + 32
+                        x: dDir < 0 ? v.dop.x - reach : v.dop.x + n.w,
+                        y: v.dop.y - 20, w: reach, h: n.h + 36
                     };
                     for (const o of targets) {
                         if (o && o.hp > 0 && checkAABB(box, o)) {
-                            vgDealDamage(v, o, m.damage * 0.45, 'doppelganger');
+                            vgDealDamage(v, o, m.damage * 0.42, 'doppelganger');
                         }
                     }
                 }
@@ -110561,8 +110670,8 @@ function vergilTick() {
         }
     }
 
-    // 10. ĐỒNG BỘ TƯ THẾ CƠ THỂ VERGIL
     v.slashTrail = v.slashTrail.filter(st => --st.t > 0);
+    v.mirageTrail = v.mirageTrail.filter(mt => --mt.t > 0);
     v.sparks = v.sparks.filter(sp => --sp.t > 0);
     v.ghosts = v.ghosts.filter(g => --g.t > 0);
 
@@ -110570,19 +110679,19 @@ function vergilTick() {
     v.body.facingLeft = n.isFacingLeft;
     v.body.stage = v.sdt > 0 ? 3 : 1;
     v.body.drawn = curPose.drawn;
+    v.body.mirageWep = false;
     v.body.armR = curPose.drawn ? (curPose.angle - 0.5) : 0.15;
-    v.body.armL = frames < v.guardUntil ? -1.1 : -0.25;
+    v.body.armL = frames < v.guardUntil ? -1.1 : (curPose.mirageBlade ? (curPose.mAngle - 0.4) : -0.25);
     v.body.dashV = typeof dashVx !== 'undefined' ? dashVx : 0;
     v.lastX = n.x;
 }
 
 // =============================================================================
-// BẮT PHÍM ĐIỀU KHIỂN CHUYÊN SÂU CỦA VERGIL (KEY HANDLERS)
+// BẮT PHÍM ĐIỀU KHIỂN: TÁCH BIỆT RÕ I (BẮN XA) VÀ O (SONG KIẾM CẬN CHIẾN)
 // =============================================================================
 if (typeof danteKey === 'function') {
     const vgKeyBase = danteKey;
     danteKey = function(code, repeat) {
-        // Phím tắt V trong Menu Customize để bật nhanh Form Vergil!
         if (code === 'KeyV' && !repeat && typeof gameState !== 'undefined' && gameState === 'custom_menu' && runePicker===null && !battuMa && !runeXem && !ammoPicker && !cusNCPicker && ammoXem===null) {
             xDatForm(vergilForm?9:VG_FORM_IDX);resetPreview();
             return true;
@@ -110602,39 +110711,48 @@ if (typeof danteKey === 'function') {
         const isUp = !!(keys.KeyW || keys.ArrowUp);
         const isDash = frames - v.lastDash <= 20;
 
-        // 1. Phím J: Thuật rút kiếm Yamato & Just Judgement Cut
+        // 1. Phím J: Nếu đang giữ O hoặc đang bật Mirage Stance -> Đánh chuỗi Song Kiếm Mirage Edge!
         if (code === 'KeyJ') {
             v.holdJ = 1;
-            ymtCommand({ key: 'J', down: isDown, up: isUp, air: !n.grounded, dash: isDash });
+            ymtCommand({ key: 'J', down: isDown, up: isUp, air: !n.grounded, dash: isDash, mirageForce: !!keys.KeyO });
             return true;
         }
 
-        // 2. Phím K: Kỹ năng Yamato (Rapid Slash / Rising Star / Void Slash / Helm Breaker)
+        // 2. Phím K: Nếu đang giữ O hoặc đang bật Mirage Stance -> Đâm Deep Stinger / Round Trip!
         if (code === 'KeyK') {
             v.holdK=1;
-            ymtCommand({ key: 'K', down: isDown, up: isUp, air: !n.grounded, dash: isDash });
+            ymtCommand({ key: 'K', down: isDown, up: isUp, air: !n.grounded, dash: isDash, mirageForce: !!keys.KeyO });
             return true;
         }
 
-        // 3. Phím Q / E: Đổi 4 đội hình Mirage Blades (Shooting / Spiral / Storm / Heavy Rain)
+        // 3. Phím Q / E: Đổi 4 đội hình Mirage Blades tầm xa cho phím I
         if (code === 'KeyQ' || code === 'KeyE') {
             v.mirageMode = (v.mirageMode + (code === 'KeyE' ? 1 : 3)) % 4;
-            vergilLabel(VG_MIRAGE_MODES[v.mirageMode].n);
+            vergilLabel('I-MODE: ' + VG_MIRAGE_MODES[v.mirageMode].n);
             return true;
         }
 
-        // 4. Phím I / O: Phóng Mirage Blades độc lập (I: theo chế độ đã chọn, O: kích hoạt nhanh Spiral/Storm)
+        // 4. Phím I: CHUYÊN BẮN KIẾM ẢO ẢNH TẦM XA (Shooting / Spiral / Storm / Heavy Rain)
         if (code === 'KeyI') {
             v.holdI = 1;
-            vgFireMirageBlade(n, v, v.mirageMode);
-            return true;
-        }
-        if (code === 'KeyO') {
-            vgFireMirageBlade(n, v, v.mirageMode === 0 ? 2 : v.mirageMode);
+            vgFireRangedMirage(n, v, v.mirageMode);
             return true;
         }
 
-        // 5. Phím L: Đỡ đòn bằng vỏ kiếm Yamato (Yamato Sheathe Deflect & Perfect Counter)
+        // 5. Phím O: CHUYÊN BẬT/TẮT THẾ CẬN CHIẾN MIRAGE BLADE (Kết hợp cùng J hoặc K để múa Song Kiếm!)
+        if (code === 'KeyO') {
+            if (v.mirageStance > 0) {
+                v.mirageStance = 0;
+                vergilLabel('PURE YAMATO STANCE');
+            } else {
+                v.mirageStance = 360; // Duy trì thế Song Kiếm 6 giây (tự động gia hạn khi đánh J/K)
+                vergilLabel('MIRAGE BLADE MELEE ON! (BẤM J / K)', '#00E5FF');
+                if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(1280, 0.06, 'sine', 0.10, 640);
+            }
+            return true;
+        }
+
+        // 6. Phím L: Đỡ đòn bằng vỏ kiếm Yamato
         if (code === 'KeyL') {
             if (frames >= v.guardReady) {
                 v.attack = null; v.queue = [];
@@ -110648,7 +110766,7 @@ if (typeof danteKey === 'function') {
             return true;
         }
 
-        // 6. Phím U: Hóa SIN DEVIL TRIGGER + DOPPELGANGER (Bấm U lần 2 khi đang SDT -> JUDGEMENT CUT END!)
+        // 7. Phím U: Hóa SIN DEVIL TRIGGER + DOPPELGANGER / JUDGEMENT CUT END
         if (code === 'KeyU') {
             if (v.sdt > 0) {
                 if (vgConcLevel(v) >= 1 || v.sdt >= 180) {
@@ -110662,13 +110780,14 @@ if (typeof danteKey === 'function') {
                 ultCharge = 0;
                 v.sdt = VG_SDT_MAX;
                 v.conc = VG_CONC_MAX;
-                v.dop = { x: n.x - (n.isFacingLeft ? -34 : 34), y: n.y, facingLeft: n.isFacingLeft, attack: null };
+                const dir = n.isFacingLeft ? -1 : 1;
+                v.dop = { x: n.x - dir * 82, y: n.y - 16, facingLeft: n.isFacingLeft, attack: null };
                 v.dopHist = [];
                 vergilLabel('SIN DEVIL TRIGGER & DOPPELGANGER!');
                 if (typeof visualEffects !== 'undefined') {
-                    visualEffects.push(new Effect(n.x + n.w / 2, n.y + n.h / 2, 'explosion', true, 72));
+                    visualEffects.push(new Effect(n.x + n.w / 2, n.y + n.h / 2, 'parry', false));
                 }
-                if (typeof shakeTimer !== 'undefined') shakeTimer = Math.max(shakeTimer, 24);
+                if (typeof shakeTimer !== 'undefined') shakeTimer = Math.max(shakeTimer, 20);
                 if (typeof SFX !== 'undefined' && SFX.bossEntry) SFX.bossEntry();
             }
             return true;
@@ -110678,7 +110797,6 @@ if (typeof danteKey === 'function') {
     };
 }
 
-// Chặn lướt thường và chuyển thành DARK SLAYER TRICK (Grim Trick / Trick Up / Trick Down)
 if (typeof doDash === 'function') {
     const vgDashBase = doDash;
     doDash = function(...args) {
@@ -110696,7 +110814,6 @@ if (typeof doDash === 'function') {
     };
 }
 
-// Móc nối vòng lặp cập nhật và vật lý giữ lơ lửng trên không khi múa kiếm Yamato
 if (typeof danteTick === 'function') {
     const vgTickWrap = danteTick;
     danteTick = function() {
@@ -110731,7 +110848,6 @@ if (typeof Player !== 'undefined') {
         if (vergilActive(this) && this === dino && this.vergil) {
             if(this.invincible || !(amount>0))return vgTakeDamageBase.call(this,amount,...args);
             const v = this.vergil;
-            // Nếu đang dựng Vỏ Kiếm Yamato Đỡ Đòn (Phím L)
             if (frames < v.guardUntil) {
                 const perfect = frames < v.perfectUntil;
                 vgAddConc(v, perfect ? 65 : 25);
@@ -110742,7 +110858,7 @@ if (typeof Player !== 'undefined') {
                 if (perfect) {
                     v.guardReady = frames;
                     this.shieldCd = 0;
-                    v.justWindow = 16; // Đỡ hoàn hảo mở ngay cửa sổ bấm J phản đòn bằng Perfect Judgement Cut!
+                    v.justWindow = 16;
                     vergilLabel('PERFECT SHEATHE DEFLECT!');
                 } else {
                     vergilLabel('YAMATO GUARD');
@@ -110758,7 +110874,7 @@ if (typeof Player !== 'undefined') {
 }
 
 // =============================================================================
-// HỆ THỐNG RENDER VẼ NHÂN VẬT VERGIL, THANH YAMATO, QUẢ CẦU KHÔNG GIAN & UI
+// HỆ THỐNG RENDER: TRONG SUỐT CÁC VÙNG TÍM, VẼ SONG KIẾM YAMATO + MIRAGE EDGE
 // =============================================================================
 function vgDrawKatana(x, y, angle, len = 84, flat = 1, isSdt = false) {
     ctx.save();
@@ -110766,7 +110882,6 @@ function vgDrawKatana(x, y, angle, len = 84, flat = 1, isSdt = false) {
     ctx.scale(1, flat);
     ctx.rotate(angle);
 
-    // 1. Chuôi kiếm Yamato trắng quấn dây đen hình quả trám + Tsuba vàng chạm khắc
     ctx.fillStyle = '#ECEFF1';
     ctx.fillRect(-15, -2.2, 14, 4.4);
     ctx.fillStyle = '#263238';
@@ -110774,9 +110889,8 @@ function vgDrawKatana(x, y, angle, len = 84, flat = 1, isSdt = false) {
     ctx.fillStyle = '#FFD54F';
     ctx.fillRect(-2, -6.5, 3, 13);
 
-    // 2. Lưỡi kiếm Katana hơi cong sắc lẹm với vân thép Hamon xanh băng giá
     ctx.shadowColor = isSdt ? '#B388FF' : '#00E5FF';
-    ctx.shadowBlur = isSdt ? 20 : 14;
+    ctx.shadowBlur = isSdt ? 18 : 12;
     const grad = ctx.createLinearGradient(0, 0, len, 0);
     grad.addColorStop(0, '#FFFFFF');
     grad.addColorStop(0.55, isSdt ? '#D1C4E9' : '#B3E5FC');
@@ -110790,9 +110904,8 @@ function vgDrawKatana(x, y, angle, len = 84, flat = 1, isSdt = false) {
     ctx.closePath();
     ctx.fill();
 
-    // Sống kiếm sáng trắng tinh khiết
     ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 1.6;
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(2, -1.2);
     ctx.quadraticCurveTo(len * 0.55, -2.8, len - 2, -0.8);
@@ -110801,11 +110914,43 @@ function vgDrawKatana(x, y, angle, len = 84, flat = 1, isSdt = false) {
     ctx.restore();
 }
 
+// Vẽ thanh Đại Kiếm Linh Hồn MIRAGE EDGE trên tay trái khi bật phím O
+function vgDrawMirageEdgeBlade(x, y, angle, len = 80, flat = 1) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(1, flat);
+    ctx.rotate(angle);
+    ctx.globalAlpha = 0.85;
+    ctx.shadowColor = '#00E5FF';
+    ctx.shadowBlur = 14;
+
+    ctx.fillStyle = '#00E5FF';
+    ctx.beginPath();
+    ctx.moveTo(-10, -2.5);
+    ctx.lineTo(4, -8);
+    ctx.lineTo(len * 0.72, -5.5);
+    ctx.lineTo(len, 0);
+    ctx.lineTo(len * 0.72, 5.5);
+    ctx.lineTo(4, 8);
+    ctx.lineTo(-10, 2.5);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#E0F7FA';
+    ctx.beginPath();
+    ctx.moveTo(4, -2.2);
+    ctx.lineTo(len - 6, 0);
+    ctx.lineTo(4, 2.2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+}
+
 function vgDrawMirageSword(s, col = '#40C4FF') {
     ctx.save();
     ctx.translate(s.x, s.y);
     ctx.rotate(s.ang);
-    ctx.shadowColor = col; ctx.shadowBlur = 12;
+    ctx.shadowColor = col; ctx.shadowBlur = 10;
     ctx.fillStyle = col;
     ctx.beginPath();
     ctx.moveTo(19, 0); ctx.lineTo(3, -4.5); ctx.lineTo(-4, -2);
@@ -110830,56 +110975,52 @@ function vergilDraw(n) {
 
     ctx.save();
 
-    // 1. Vẽ nền không gian tối sầm và hàng chục đường cắt sáng rực khi dùng JUDGEMENT CUT END!
+    // 1. JUDGEMENT CUT END: Lớp phủ cực nhẹ (alpha 0.14) để luôn nhìn rõ hoàn toàn sân đấu & mục tiêu!
     if (v.jce) {
         const j = v.jce;
         ctx.save();
-        ctx.fillStyle = j.age >= 96 ? 'rgba(225, 245, 254, 0.35)' : 'rgba(6, 10, 28, 0.68)';
+        ctx.fillStyle = j.age >= 88 ? 'rgba(225, 245, 254, 0.16)' : 'rgba(8, 14, 34, 0.14)';
         ctx.fillRect(camX, camY-20, canvas.width, canvas.height+40);
         for (const sl of j.slashes) {
             const k = sl.t / sl.max;
-            ctx.globalAlpha = k;
-            ctx.shadowColor = '#00E5FF'; ctx.shadowBlur = 18;
-            ctx.strokeStyle = '#80D8FF'; ctx.lineWidth = 4.5 * k;
+            ctx.globalAlpha = k * 0.72;
+            ctx.strokeStyle = '#40C4FF'; ctx.lineWidth = 2.6 * k;
             ctx.beginPath(); ctx.moveTo(sl.x1, sl.y1); ctx.lineTo(sl.x2, sl.y2); ctx.stroke();
-            ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 1.8 * k;
+            ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 1.1 * k;
             ctx.stroke();
         }
         ctx.restore();
     }
 
-    // 2. Vẽ Vết Nứt Không Gian VOID SLASH
+    // 2. VẾT NỨT KHÔNG GIAN VOID SLASH: Trong suốt (alpha nền 0.08, viền nét đứt mảnh) không che mục tiêu!
     for (const vz of v.voidZones) {
         const k = vz.t / vz.max;
         ctx.save();
         ctx.translate(vz.x, vz.y);
-        ctx.globalAlpha = Math.min(0.85, k * 1.2);
-        ctx.fillStyle = 'rgba(14, 8, 36, 0.72)';
-        ctx.beginPath(); ctx.ellipse(0, 0, vz.r * 0.85, vz.r * 0.62, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 2.8;
-        ctx.beginPath(); ctx.ellipse(0, 0, vz.r * 0.85, vz.r * 0.62, 0, 0, Math.PI * 2); ctx.stroke();
-        ctx.strokeStyle = '#E1F5FE'; ctx.lineWidth = 1.5;
-        for (let i = 0; i < 6; i++) {
-            const a = i * 1.04 + frames * 0.02;
-            ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a) * vz.r * 0.8, Math.sin(a) * vz.r * 0.55); ctx.stroke();
-        }
+        ctx.globalAlpha = k * 0.45;
+        ctx.fillStyle = 'rgba(0, 176, 255, 0.08)';
+        ctx.beginPath(); ctx.ellipse(0, 0, vz.r * 0.85, vz.r * 0.58, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 1.6;
+        ctx.setLineDash([6, 5]);
+        ctx.beginPath(); ctx.ellipse(0, 0, vz.r * 0.85, vz.r * 0.58, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.setLineDash([]);
         ctx.restore();
     }
 
-    // 3. Vẽ Tàn Ảnh Dịch Chuyển Dark Slayer
+    // 3. Tàn Ảnh Dịch Chuyển
     for (const g of v.ghosts) {
         ctx.save();
-        ctx.globalAlpha = (g.t / g.max) * 0.42;
+        ctx.globalAlpha = (g.t / g.max) * 0.30;
         const gm = { facingLeft: g.left, stage: g.sdt ? 3 : 1, drawn: g.drawn, armR: g.armR, armL: g.armL, wing: v.body.wing, isDop: true };
         if (g.sdt && typeof drawSinVergil === 'function') drawSinVergil(gm, g.x - 13, g.y - 28);
         else if (typeof drawVergilBody === 'function') drawVergilBody(gm, g.x, g.y);
         ctx.restore();
     }
 
-    // 4. Vẽ Phân Thân DOPPELGANGER (Màu lam linh hồn rực sáng)
-    if (v.dop && (!v.jce || v.jce.age < 24 || v.jce.age >= 96)) {
+    // 4. PHÂN THÂN DOPPELGANGER: Đứng tách xa hẳn khỏi người chơi + độ trong suốt 0.46 thanh thoát
+    if (v.dop && (!v.jce || v.jce.age < 20 || v.jce.age >= 88)) {
         ctx.save();
-        ctx.globalAlpha = 0.68;
+        ctx.globalAlpha = 0.46;
         const dm = {
             facingLeft: v.dop.facingLeft, stage: 3,
             drawn: !!v.dop.attack,
@@ -110890,17 +111031,27 @@ function vergilDraw(n) {
         ctx.restore();
     }
 
-    // 5. Vẽ Cơ Thể VERGIL (ẩn đi khi đang lướt siêu tốc trong Judgement Cut End)
-    if (!v.jce || v.jce.age < 24 || v.jce.age >= 96) {
-        // Hào quang Concentration Level 2 dưới chân Vergil
+    // 5. Vẽ Cơ Thể VERGIL + Thanh Katana Yamato + Thanh Mirage Edge (nếu bật O)
+    if (!v.jce || v.jce.age < 20 || v.jce.age >= 88) {
         if (lv >= 2) {
             ctx.save();
-            ctx.globalAlpha = 0.28 + 0.12 * Math.sin(frames * 0.15);
-            const cg = ctx.createRadialGradient(cx, n.y + n.h - 4, 4, cx, n.y + n.h - 4, 44);
+            ctx.globalAlpha = 0.22 + 0.10 * Math.sin(frames * 0.15);
+            const cg = ctx.createRadialGradient(cx, n.y + n.h - 4, 4, cx, n.y + n.h - 4, 42);
             cg.addColorStop(0, '#00E5FF');
             cg.addColorStop(1, 'rgba(0, 229, 255, 0)');
             ctx.fillStyle = cg;
-            ctx.beginPath(); ctx.ellipse(cx, n.y + n.h - 4, 44, 11, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(cx, n.y + n.h - 4, 42, 10, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+        }
+
+        const pose = ymtPose(n, v, v.attack, v.attack ? v.attack.age : 0);
+
+        // Nếu đang bật Mirage Blade Stance (Phím O) -> Vẽ thanh Mirage Edge xanh ngọc bên tay trái
+        if (pose.mirageBlade && !v.roundSword) {
+            ctx.save();
+            ctx.translate(pose.mx, pose.my);
+            ctx.scale(pose.dir, 1);
+            vgDrawMirageEdgeBlade(0, 0, pose.mAngle, pose.len * 0.94, pose.flat);
             ctx.restore();
         }
 
@@ -110913,8 +111064,6 @@ function vergilDraw(n) {
         }
         ctx.restore();
 
-        // Vẽ Thanh Katana Yamato khi rút kiếm & Hiệu ứng Lóe Sáng Tra Kiếm (Sheathe Spark)
-        const pose = ymtPose(n, v, v.attack, v.attack ? v.attack.age : 0);
         if (pose.drawn) {
             ctx.save();
             ctx.translate(pose.x, pose.y);
@@ -110923,87 +111072,104 @@ function vergilDraw(n) {
             ctx.restore();
         }
 
-        // Ngôi sao 4 cánh lóe sáng màu lam ở miệng vỏ kiếm Saya khi tra kiếm / nạp xong Just Judgement Cut!
         if (v.sheatheSpark > 0 || v.justWindow > 0 || (v.holdJ >= 17 && v.holdJ <= 27)) {
             const sx = pose.sayaX, sy = pose.sayaY - 6;
             const pulse = v.justWindow > 0 ? 1.25 : 1.0;
             ctx.save();
             ctx.translate(sx, sy);
             ctx.rotate(frames * 0.25);
-            ctx.shadowColor = '#00E5FF'; ctx.shadowBlur = 18;
+            ctx.shadowColor = '#00E5FF'; ctx.shadowBlur = 16;
             ctx.fillStyle = '#00E5FF';
             for (let k = 0; k < 2; k++) {
                 ctx.rotate(Math.PI / 2);
                 ctx.beginPath();
-                ctx.moveTo(-18 * pulse, 0); ctx.lineTo(0, -3.5 * pulse);
-                ctx.lineTo(18 * pulse, 0);  ctx.lineTo(0, 3.5 * pulse);
+                ctx.moveTo(-16 * pulse, 0); ctx.lineTo(0, -3.2 * pulse);
+                ctx.lineTo(16 * pulse, 0);  ctx.lineTo(0, 3.2 * pulse);
                 ctx.closePath(); ctx.fill();
             }
             ctx.fillStyle = '#FFFFFF';
-            ctx.beginPath(); ctx.arc(0, 0, 4.5 * pulse, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(0, 0, 4 * pulse, 0, Math.PI * 2); ctx.fill();
             ctx.restore();
         }
     }
 
-    // 6. Vẽ Dải Lụa Kiếm Khí Yamato (Iaijutsu Ribbon Trail)
+    // 6. Vẽ Dải Lụa Kiếm Khí Yamato & Mirage Edge (Trong suốt thanh mảnh)
     for (let i = 1; i < v.slashTrail.length; i++) {
         const u = v.slashTrail[i - 1], w = v.slashTrail[i];
-        const alpha = (w.t / w.max) * 0.52;
+        const alpha = (w.t / w.max) * 0.36;
         ctx.globalAlpha = alpha;
-        ctx.fillStyle = isSdt ? '#7C4DFF' : '#00B0FF';
+        ctx.fillStyle = '#00B0FF';
         ctx.beginPath();
-        ctx.moveTo(u.x + (u.tx - u.x) * 0.4, u.y + (u.ty - u.y) * 0.4);
-        ctx.lineTo(u.tx, u.ty);
-        ctx.lineTo(w.tx, w.ty);
-        ctx.lineTo(w.x + (w.tx - w.x) * 0.4, w.y + (w.ty - w.y) * 0.4);
+        ctx.moveTo(u.x + (u.tx - u.x) * 0.45, u.y + (u.ty - u.y) * 0.45);
+        ctx.lineTo(u.tx, u.ty); ctx.lineTo(w.tx, w.ty);
+        ctx.lineTo(w.x + (w.tx - w.x) * 0.45, w.y + (w.ty - w.y) * 0.45);
         ctx.closePath(); ctx.fill();
 
-        ctx.globalAlpha = alpha * 1.4;
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 2.4;
+        ctx.globalAlpha = alpha * 1.5;
+        ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2.0;
         ctx.beginPath(); ctx.moveTo(u.tx, u.ty); ctx.lineTo(w.tx, w.ty); ctx.stroke();
+    }
+    for (let i = 1; i < v.mirageTrail.length; i++) {
+        const u = v.mirageTrail[i - 1], w = v.mirageTrail[i];
+        const alpha = (w.t / w.max) * 0.34;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#00E5FF';
+        ctx.beginPath();
+        ctx.moveTo(u.x + (u.tx - u.x) * 0.45, u.y + (u.ty - u.y) * 0.45);
+        ctx.lineTo(u.tx, u.ty); ctx.lineTo(w.tx, w.ty);
+        ctx.lineTo(w.x + (w.tx - w.x) * 0.45, w.y + (w.ty - w.y) * 0.45);
+        ctx.closePath(); ctx.fill();
     }
     ctx.globalAlpha = 1;
 
-    // 7. Vẽ Quả Cầu Cắt Không Gian JUDGEMENT CUT & PERFECT JUDGEMENT CUT
+    // 7. Vẽ Đại Kiếm Xoay MIRAGE EDGE ROUND TRIP (O + S + K)
+    if (v.roundSword) {
+        const rs = v.roundSword;
+        ctx.save();
+        ctx.translate(rs.x, rs.y);
+        ctx.globalAlpha = 0.45;
+        ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(0, 0, 42, rs.t * 0.45, rs.t * 0.45 + 4.2); ctx.stroke();
+        vgDrawMirageEdgeBlade(0, 0, rs.t * 0.55, 64, 1);
+        ctx.restore();
+    }
+
+    // 8. QUẢ CẦU KHÔNG GIAN JUDGEMENT CUT: Làm trong suốt (alpha nền chỉ 0.06, nét cắt thanh mảnh) để nhìn rõ Boss bên trong!
     for (const c of v.cuts) {
         ctx.save();
         if (c.t > 0) {
             const k = 1 - c.t / c.warn;
-            ctx.globalAlpha = 0.35 + 0.55 * k;
-            ctx.strokeStyle = c.perfect ? '#E040FB' : '#00E5FF';
-            ctx.lineWidth = c.perfect ? 3.5 : 2.5;
-            ctx.beginPath(); ctx.arc(c.x, c.y, c.r * (1.25 - 0.25 * k), 0, Math.PI * 2); ctx.stroke();
-            ctx.fillStyle = c.perfect ? 'rgba(124, 77, 255, 0.18)' : 'rgba(0, 229, 255, 0.14)';
-            ctx.beginPath(); ctx.arc(c.x, c.y, c.r * k, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = 0.25 + 0.35 * k;
+            ctx.strokeStyle = '#00E5FF';
+            ctx.lineWidth = 1.8;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath(); ctx.arc(c.x, c.y, c.r * (1.2 - 0.2 * k), 0, Math.PI * 2); ctx.stroke();
+            ctx.setLineDash([]);
         } else {
             const k = c.boom / c.maxBoom;
-            ctx.globalAlpha = k;
-            ctx.shadowColor = c.perfect ? '#E040FB' : '#00E5FF';
-            ctx.shadowBlur = 20;
-            // Quả cầu không gian tối bên trong
-            ctx.fillStyle = c.perfect ? 'rgba(49, 27, 146, 0.42)' : 'rgba(1, 87, 155, 0.36)';
-            ctx.beginPath(); ctx.arc(c.x, c.y, c.r * (1.08 - 0.08 * k), 0, Math.PI * 2); ctx.fill();
-            // Hàng chục đường kiếm không gian chém đan chéo bên trong quả cầu!
-            for (let i = 0; i < 8; i++) {
-                const a = (i / 8) * Math.PI + c.boom * 0.22;
-                const R = c.r * (1.18 - 0.12 * k);
-                ctx.strokeStyle = i % 2 === 0 ? '#FFFFFF' : (c.perfect ? '#EA80FC' : '#80D8FF');
-                ctx.lineWidth = i % 2 === 0 ? 3.2 * k : 5.0 * k;
+            ctx.globalAlpha = k * 0.78;
+            // Nền quả cầu cực kỳ trong suốt (0.06) để không che mục tiêu
+            ctx.fillStyle = 'rgba(0, 176, 255, 0.06)';
+            ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2); ctx.fill();
+            for (let i = 0; i < 6; i++) {
+                const a = (i / 6) * Math.PI + c.boom * 0.22;
+                const R = c.r * (1.12 - 0.1 * k);
+                ctx.strokeStyle = i % 2 === 0 ? '#FFFFFF' : '#80D8FF';
+                ctx.lineWidth = i % 2 === 0 ? 1.8 * k : 2.8 * k;
                 ctx.beginPath();
                 ctx.moveTo(c.x - Math.cos(a) * R, c.y - Math.sin(a) * R);
                 ctx.lineTo(c.x + Math.cos(a) * R, c.y + Math.sin(a) * R);
                 ctx.stroke();
             }
-            ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2.5 * k;
+            ctx.strokeStyle = '#80D8FF'; ctx.lineWidth = 1.6 * k;
             ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2); ctx.stroke();
         }
         ctx.restore();
     }
 
-    // 8. Vẽ các thanh MIRAGE BLADES và Dấu Ấn Grim Trick trên mục tiêu
+    // 9. Vẽ các thanh MIRAGE BLADES tầm xa (Phím I)
     for (const s of v.swords) {
-        vgDrawMirageSword(s, isSdt ? '#B388FF' : '#40C4FF');
+        vgDrawMirageSword(s, '#40C4FF');
     }
     if (v_markedValid(v)) {
         const mt = v.markedTarget;
@@ -111011,30 +111177,29 @@ function vergilDraw(n) {
         ctx.save();
         ctx.translate(mx, my);
         ctx.rotate(frames * 0.08);
-        ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(0, 0, 22, 0, Math.PI * 2); ctx.stroke();
+        ctx.globalAlpha = 0.55;
+        ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI * 2); ctx.stroke();
         ctx.restore();
     }
 
-    // 9. Vẽ Khiên Vỏ Kiếm Yamato (Yamato Guard) khi bấm L
     if (frames < v.guardUntil) {
         ctx.save();
         ctx.strokeStyle = frames < v.perfectUntil ? '#00E5FF' : '#90CAF9';
-        ctx.fillStyle = 'rgba(0, 229, 255, 0.14)';
-        ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.ellipse(cx + dir * 10, cy, n.w * 0.75, n.h * 0.62, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 229, 255, 0.10)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.ellipse(cx + dir * 10, cy, n.w * 0.72, n.h * 0.60, 0, 0, Math.PI * 2);
         ctx.fill(); ctx.stroke();
         ctx.restore();
     }
 
-    // 10. Vẽ các tia chém không gian nhỏ trên mục tiêu
     for (const sp of v.sparks) {
         const k = sp.t / sp.max;
         ctx.save();
-        ctx.globalAlpha = k;
+        ctx.globalAlpha = k * 0.8;
         ctx.translate(sp.x, sp.y);
         ctx.rotate(sp.ang);
-        ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2.8 * k;
+        ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2.2 * k;
         ctx.beginPath(); ctx.moveTo(-sp.len / 2, 0); ctx.lineTo(sp.len / 2, 0); ctx.stroke();
         ctx.restore();
     }
@@ -111054,7 +111219,7 @@ if (typeof Player !== 'undefined') {
 }
 
 // =============================================================================
-// GIAO DIỆN HUD CỦA VERGIL (THANH CONCENTRATION 3 CẤP, MIRAGE BLADES, SDT & MENU)
+// GIAO DIỆN HUD & CUSTOM MENU CẬP NHẬT RÕ I (BẮN XA) & O (CẬN CHIẾN SONG KIẾM)
 // =============================================================================
 if (typeof drawUI === 'function') {
     const vgUIBase = drawUI;
@@ -111068,31 +111233,29 @@ if (typeof drawUI === 'function') {
         ctx.save();
         if (typeof dojoMode !== 'undefined' && dojoMode) ctx.translate(0, 15);
 
-        // Khung nền HUD Dark Slayer xanh đen viền băng
         ctx.fillStyle = '#0B1326';
-        ctx.fillRect(10, 45, 294, 154);
-        ctx.strokeStyle = lv >= 2 ? '#00E5FF' : '#29B6F6';
+        ctx.fillRect(10, 45, 298, 156);
+        ctx.strokeStyle = v.mirageStance > 0 ? '#00E5FF' : (lv >= 2 ? '#40C4FF' : '#29B6F6');
         ctx.lineWidth = 2;
-        ctx.strokeRect(10, 45, 294, 154);
+        ctx.strokeRect(10, 45, 298, 156);
 
         ctx.textAlign = 'left';
         ctx.font = 'bold 13px Consolas, monospace';
-        ctx.fillStyle = v.sdt > 0 ? '#B388FF' : '#40C4FF';
-        ctx.fillText(v.sdt > 0 ? 'VERGIL · SIN DEVIL TRIGGER' : 'VERGIL · THE ALPHA AND THE OMEGA', 20, 64);
+        ctx.fillStyle = v.sdt > 0 ? '#80D8FF' : '#40C4FF';
+        ctx.fillText(v.sdt > 0 ? 'VERGIL · SIN DEVIL TRIGGER' : (v.mirageStance > 0 ? 'VERGIL · YAMATO + MIRAGE EDGE' : 'VERGIL · PURE YAMATO'), 20, 64);
 
         ctx.font = '11px Consolas, monospace';
         ctx.fillStyle = '#E1F5FE';
-        ctx.fillText('YAMATO · Q/E MIRAGE: ' + modeInfo.n, 20, 82);
+        ctx.fillText('I: ' + modeInfo.n + ' · O: ' + (v.mirageStance > 0 ? 'ON' : 'OFF'), 20, 82);
         ctx.fillStyle = v.justWindow > 0 ? '#00E5FF' : '#B3E5FC';
         ctx.fillText(
             v.jce ? '>>> JUDGEMENT CUT END! <<<' :
             v.justWindow > 0 ? '★ BẤM J NGAY: PERFECT JUDGEMENT CUT! ★' :
             v.attack ? v.attack.name :
-            'J: YAMATO · GIỮ/NHẢ J: JUDGEMENT CUT',
+            (v.mirageStance > 0 ? 'O+J: SONG KIẾM · O+K: DEEP STINGER' : 'J: YAMATO · GIỮ/NHẢ J: JUDGEMENT CUT'),
             20, 100
         );
 
-        // Thanh CONCENTRATION 3 Nấc (Lv0 / Lv1 / Lv2)
         ctx.fillStyle = '#90CAF9';
         ctx.fillText('CONCENTRATION LV.' + lv + (lv >= 2 ? ' (MAX · JCE READY)' : ''), 20, 118);
         for (let k = 0; k < 3; k++) {
@@ -111104,10 +111267,9 @@ if (typeof drawUI === 'function') {
             ctx.fillRect(bx, 123, 84 * fill, 7);
         }
 
-        // Thanh SIN DEVIL TRIGGER / ULTIMATE
         ctx.fillStyle = '#1A1438';
         ctx.fillRect(20, 148, 264, 8);
-        ctx.fillStyle = v.sdt > 0 ? '#B388FF' : '#00B0FF';
+        ctx.fillStyle = v.sdt > 0 ? '#80D8FF' : '#00B0FF';
         const ultRatio = v.sdt > 0 ? (v.sdt / VG_SDT_MAX) : (Math.min(100, typeof ultCharge !== 'undefined' ? ultCharge : 0) / 100);
         ctx.fillRect(20, 148, 264 * ultRatio, 8);
 
@@ -111117,9 +111279,9 @@ if (typeof drawUI === 'function') {
             ('U: SIN DEVIL TRIGGER ' + Math.floor(typeof ultCharge !== 'undefined' ? ultCharge : 0) + '%'),
             20, 143
         );
-        ctx.fillText('HP ' + Math.ceil(dino.hp) + ' / ' + dino.maxHp + ' · SHIFT: TRICK · I/O: MIRAGE', 20, 172);
+        ctx.fillText('HP ' + Math.ceil(dino.hp) + '/' + dino.maxHp + ' · SHIFT: TRICK · Q/E: MODE', 20, 172);
         ctx.fillStyle = '#80D8FF';
-        ctx.fillText('K: RAPID · GIỮ K: RISING · S+K: VOID', 20, 189);
+        ctx.fillText('I: BẮN XA · O + J/K: SONG KIẾM', 20, 189);
         ctx.restore();
     };
 }
@@ -111129,7 +111291,6 @@ if (typeof drawCustomMenu === 'function') {
     drawCustomMenu = function() {
         vgMenuBase();
         if(runePicker!==null||battuMa||runeXem||ammoPicker||cusNCPicker||ammoXem!==null)return;
-        // Phím tắt chọn Dante / Vergil trong Customize, dưới phần xem trước Form.
         ctx.save();
         ctx.fillStyle = vergilOn() ? '#00E5FF' : '#90CAF9';
         ctx.font = 'bold 11px Consolas, monospace';
@@ -111150,25 +111311,27 @@ if (typeof drawCustomMenu === 'function') {
         ctx.fillStyle = '#40C4FF';
         ctx.font = 'bold 21px Consolas, monospace';
         ctx.fillText('VERGIL · 10 HP', 38, 108);
-        ctx.fillText('YAMATO MASTER', 716, 111);
+        ctx.fillText('YAMATO & MIRAGE', 716, 111);
 
         ctx.font = '11px Consolas, monospace';
         ctx.fillStyle = '#E1F5FE';
         if (typeof apexWrap === 'function') {
             apexWrap(
-                'TẬP TRUNG TUYỆT ĐỐI VÀO YAMATO\n\n' +
-                '• CONCENTRATION (3 CẤP):\n' +
-                'Đứng tĩnh, né Trick, đỡ đòn & chém trúng giúp tăng thanh Tập Trung.\n' +
-                'Ở Lv.2: Tăng tầm kiếm, tăng sát thương & nối 3x Perfect Judgement Cut!\n\n' +
-                '• MIRAGE BLADES ĐỘC LẬP:\n' +
-                'Q / E: Đổi 4 đội hình kiếm\n' +
-                'I / O: Phóng kiếm hỗ trợ ngay trong lúc đang chém Yamato!\n\n' +
-                '• SHIFT (DARK SLAYER TRICK):\n' +
-                'Shift: Dịch chuyển áp sát địch\n' +
-                'W+Shift: Trick Up lên không\n' +
-                'S+Shift: Trick Down lùi né đòn\n\n' +
-                '• U: SIN DEVIL TRIGGER + PHÂN THÂN\n' +
-                '• U lần 2: JUDGEMENT CUT END!',
+                'PHÂN TÁCH RÕ PHÍM I (BẮN XA) & O (CẬN CHIẾN)\n\n' +
+                '• PHÍM I (MIRAGE BLADES TẦM XA):\n' +
+                'Bấm Q / E để đổi 4 chế độ kiếm:\n' +
+                'Shooting / Spiral / Storm / Heavy Rain.\n' +
+                'Bấm I để bắn độc lập không ngắt đòn!\n\n' +
+                '• PHÍM O (MIRAGE EDGE CẬN CHIẾN):\n' +
+                'Bấm O để triệu hồi thanh Mirage Edge\n' +
+                'cầm tay trái kết hợp cùng J hoặc K:\n' +
+                '  + O → J-J-J: Song Kiếm Combo B\n' +
+                '  + O → K: Deep Stinger (Khoan kép)\n' +
+                '  + O → S+K: Ném kiếm xoay Round Trip\n' +
+                '  + O → S+J: Hất tung Spiral Launch\n\n' +
+                '• CHỐNG SPAM KHỐNG CHẾ (2 GIÂY):\n' +
+                'Cùng 1 chiêu khống chế bị khóa 2s,\n' +
+                'kết hợp bắn xa & đổi chiêu linh hoạt!',
                 38, 140, 248, 16
             );
             apexWrap(
@@ -111176,17 +111339,16 @@ if (typeof drawCustomMenu === 'function') {
                 '• J-J-J-J: Yamato Combo A\n' +
                 '• J-J → (đợi nhịp) → J liên tục:\n' +
                 '  YAMATO COMBO C (Chém bão táp)\n' +
-                '• S + J (nhấp 2 lần): Upper Slash I & II (bay lên cùng địch)\n' +
-                '• Trên không J-J-J: Aerial Rave A\n' +
-                '• Trên không J-J → (đợi) → J-J:\n' +
-                '  Aerial Rave B (Xoáy kiếm bổ xuống)\n\n' +
-                '• GIỮ J rồi NHẢ ĐÚNG NHỊP LÓE SÁNG\n' +
-                '  ở vỏ kiếm (hoặc bấm J ngay khi tra kiếm): PERFECT JUDGEMENT CUT!\n\n' +
+                '• S + J (2 lần): Upper Slash I & II\n' +
+                '• Trên không J-J-J: Aerial Rave A/B\n\n' +
+                '• GIỮ J rồi NHẢ ĐÚNG NHỊP LÓE SÁNG:\n' +
+                '  PERFECT JUDGEMENT CUT!\n\n' +
                 '• K: Rapid Slash (lướt xuyên qua)\n' +
                 '• Giữ K / W+K: Rising Star\n' +
-                '• S + K: Void Slash (ngưng đọng)\n' +
+                '• S + K: Void Slash (hút & làm chậm)\n' +
                 '• Trên không K: Helm Breaker\n' +
-                '• L: Đỡ đòn bằng vỏ kiếm Saya',
+                '• U: SDT + Doppelganger (đứng tách xa)\n' +
+                '• U lần 2: JUDGEMENT CUT END!',
                 716, 140, 248, 16
             );
         }

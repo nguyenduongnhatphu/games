@@ -48,7 +48,7 @@ with sync_playwright() as p:
         const labels=[],fill=ctx.fillText;
         ctx.fillText=function(t,...args){labels.push(t);return fill.call(this,t,...args);};
         drawCustomMenu();ctx.fillText=fill;
-        check(labels.includes('VERGIL')&&labels.some(t=>t.includes('YAMATO MASTER')),'Vergil menu missing');
+        check(labels.includes('VERGIL')&&labels.some(t=>t.includes('YAMATO & MIRAGE')),'Vergil menu missing');
         vgTestTap('KeyV');check(xFormIdx()===9,'V does not leave Vergil');
         vgTestTap('KeyV');check(xFormIdx()===10,'V does not select Vergil');
         xDatForm(0);currentPower=1;currentAmmoType=3;phuKien=1;combatStance=2;
@@ -136,14 +136,87 @@ with sync_playwright() as p:
     }'''))
     print(page.evaluate('''() => {
         function check(ok,why){if(!ok)throw Error(why);}
+        let v=vgTestReset(),target=vgTestTarget();
+        vgTestTap('KeyO');check(v.mirageStance>0&&!v.swords.length,'O still fires ranged swords');
+        for(const id of ['m_combo1','m_combo2','m_combo3']){
+            vgTestTap('KeyJ');check(v.attack?.id===id,'O J combo '+id);
+            dino.draw();vgTestStep(YMT_MOVES[id].T);
+        }
+        check(target.hp<10000&&!target._dswControl,'Mirage combo damage / unwanted stun');
+        v=vgTestReset();target=vgTestTarget(470);vgTestTap('KeyO');vgTestTap('KeyK');
+        check(v.attack?.id==='m_stinger','O K Deep Stinger');vgTestStep(6);dino.draw();
+        check(target.hp<10000&&target._dswControl,'Deep Stinger hit/control');
+        v=vgTestReset();target=vgTestTarget(460);vgTestTap('KeyO');vgTestKey('KeyS');vgTestTap('KeyK');vgTestKey('KeyS',false);
+        check(v.attack?.id==='m_round'&&v.roundSword,'O Down K Round Trip');vgTestStep(60);dino.draw();
+        check(target.hp<10000&&!target._dswControl,'Round Trip damage / unwanted stun');
+        vgTestStep(80);check(!v.roundSword,'Round Trip never expires');
+        v=vgTestReset();target=vgTestTarget();vgTestTap('KeyO');vgTestKey('KeyS');vgTestTap('KeyJ');vgTestKey('KeyS',false);
+        check(v.attack?.id==='m_high'&&!dino.grounded,'O Down J launcher');vgTestStep(7);
+        check(target.hp<10000&&target._dswControl,'Mirage launcher missed');
+        v=vgTestReset();vgTestTap('KeyJ');const attack=v.attack;
+        vgTestTap('KeyO');check(v.attack===attack&&v.mirageStance>0,'O interrupts current Yamato attack');
+        vgTestTap('KeyI');check(v.attack===attack&&v.swords.length,'I not independent of O/melee');
+        vgTestTap('KeyO');check(!v.mirageStance,'O does not toggle off');
+        v=vgTestReset();vgTestTap('KeyO');vgTestStep(360);check(!v.mirageStance,'Mirage stance never expires');
+        // Ordinary sword strings and ranged cuts cause damage without adding a CC wrapper.
+        for(const id of ['a1','a2','a3','a4','c_flurry','c_finish','rapid','m_combo1','m_combo2','m_combo3','m_round']){
+            v=vgTestReset();target=vgTestTarget();ymtStart(id);ymtStrike(dino,v,v.attack,0);
+            check(target.hp<10000&&!target._dswControl&&!vgTargetCcMap.has(target),'ordinary move controls target '+id);
+        }
+        for(const id of ['jcut','pjcut']){
+            v=vgTestReset();target=vgTestTarget(460);ymtStart(id);vgTestStep(18);
+            check(target.hp<10000&&!target._dswControl,'Judgement Cut still stuns '+id);
+        }
+        // Both Upper Slash stages and Mirage's launcher share one two-second lockout.
+        v=vgTestReset();target=vgTestTarget();ymtStart('upper1');ymtStrike(dino,v,v.attack,0);
+        check(target._dswControl,'first Upper Slash rejected');const first=frames,record=vgTargetCcMap.get(target);
+        check(record.keys.upper===first+120,'wrong same-move cooldown');target._dswControl.release();
+        function strike(id){dino.x=240;dino.y=262;dino.grounded=true;target.x=300;target.y=262;target.grounded=true;ymtStart(id);ymtStrike(dino,v,v.attack,0);}
+        frames=first+43;const hp=target.hp;strike('upper2');
+        check(target.hp<hp&&!target._dswControl,'Upper Slash repeat bypassed lockout / lost damage');
+        frames=first+119;strike('m_high');check(!target._dswControl,'Mirage launcher bypassed shared group');
+        frames=first+120;strike('upper1');check(target._dswControl,'CC did not recover after two seconds');
+        // Different CC groups still need the short global recovery interval.
+        v=vgTestReset();target=vgTestTarget();
+        check(vgCanApplyCC(target,'upper')&&!vgCanApplyCC(target,'rain'),'CC groups ignore shared recovery');
+        frames+=42;check(vgCanApplyCC(target,'rain')&&!vgCanApplyCC(target,'rain'),'Heavy Rain repeats within lockout');
+        return 'PASS separate I/O inputs, Mirage combos/launcher/drill/Round Trip, no ordinary stun and two-second CC lockouts';
+    }'''))
+    print(page.evaluate('''() => {
+        function check(ok,why){if(!ok)throw Error(why);}
+        let v=vgTestReset(),target=vgTestTarget();ultCharge=100;vgTestTap('KeyU');
+        const damage=[],base=vgDealDamage;
+        vgDealDamage=function(...args){const dealt=base(...args);damage.push([args[3],dealt]);return dealt;};
+        try{vgTestTap('KeyJ');vgTestStep(31);}finally{vgDealDamage=base;}
+        check(damage.some(([tag,d])=>tag==='doppelganger'&&d>0),'separated Doppelganger never hits');
+        check(v.dop.x>target.x+target.w/2&&v.dop.facingLeft,'Doppelganger does not flank');
+        v=vgTestReset();dino.x=1600;dino.y=110;dino.grounded=false;dino.dy=-4;camX=1250;
+        target=vgTestTarget(1740);ultCharge=100;vgTestTap('KeyU');vgTestTap('KeyU');
+        check(v.jce.floorY===320&&v.jce.homeY===320-dino.h&&dino.y+dino.h===320&&dino.grounded,'airborne JCE did not land');
+        vgTestStep(24);check(v.jce.slashes.length,'JCE produced no slashes');
+        for(const slash of v.jce.slashes){
+            check(Math.abs((slash.x1+slash.x2)/2-target.x-target.w/2)<=45,'JCE misses target horizontally');
+            check(Math.abs((slash.y1+slash.y2)/2-target.y-target.h/2)<=22.5,'JCE slashes still above target');
+        }
+        const covers=[],fill=ctx.fillRect;
+        ctx.fillRect=function(x,y,w,h){if(w===canvas.width)covers.push([x,y,this.fillStyle]);return fill.call(this,x,y,w,h);};
+        try{dino.draw();}finally{ctx.fillRect=fill;}
+        check(covers.some(([x,y,color])=>x===camX&&y===camY-20&&color.includes('0.14')),'JCE overlay too opaque / detached from camera');
+        enemies.length=0;vgTestStep(3);const last=v.jce.slashes.at(-1),cx=(last.x1+last.x2)/2;
+        check(cx>=camX+100&&cx<=camX+canvas.width-100,'empty JCE fallback ignores camera');
+        return 'PASS separated/flanking Doppelganger damage, grounded JCE, target-centered cuts and transparent camera overlay';
+    }'''))
+    print(page.evaluate('''() => {
+        function check(ok,why){if(!ok)throw Error(why);}
         let v=vgTestReset(),target=vgTestTarget();ultCharge=100;vgTestTap('KeyU');
         check(v.sdt===VG_SDT_MAX&&v.dop&&ultCharge===0&&dojoUltBusy(dino),'SDT/Doppelganger entry');
-        vgTestTap('KeyJ');vgTestStep(13);check(v.dop.attack&&target.hp<10000,'Doppelganger did not follow');
+        check(Math.abs(v.dop.x-dino.x)>=78&&v.dop.y<dino.y,'Doppelganger still overlaps player');
+        vgTestTap('KeyJ');vgTestStep(17);check(v.dop.attack&&target.hp<10000,'Doppelganger did not follow');
         dino.draw();drawUI();vgTestTap('KeyU');check(v.jce,'JCE input');const hp=target.hp;
-        vgTestStep(96);check(target.hp<hp&&v.sheatheSpark,'JCE finish');dino.draw();
-        vgTestStep(31);check(!v.jce,'JCE stuck');
+        vgTestStep(88);check(target.hp<hp&&v.sheatheSpark,'JCE finish');dino.draw();
+        vgTestStep(25);check(!v.jce,'JCE stuck');
         v=vgTestReset();ultCharge=100;vgTestTap('KeyU');v.sdt=120;vgTestTap('KeyU');
-        vgTestStep(127);check(!v.sdt&&!v.dop&&!v.dopHist.length,'JCE left a permanent Doppelganger');
+        vgTestStep(113);check(!v.sdt&&!v.dop&&!v.dopHist.length,'JCE left a permanent Doppelganger');
         v=vgTestReset();ultCharge=100;vgTestTap('KeyU');vgTestStep(VG_SDT_MAX);
         check(!v.sdt&&!v.dop&&!dojoUltBusy(dino),'SDT/Doppelganger expiry');
         // Shared juggle physics must keep this controller alive, then release it normally.
@@ -156,6 +229,7 @@ with sync_playwright() as p:
         boss.state='idle';const opening=vgControl(boss,{launch:true});check(opening,'boss opening rejected');
         const window=danteBossWindows.get(boss);frames=window.until;boss.update();
         check(!boss._dswControl&&!vgControl(boss,{launch:true}),'Vergil permanently controlled boss');
+        check(!vgCanApplyCC(boss,'upper'),'CC lockout ignored boss resistance');
         // Virtual clash contacts accept Vergil damage without granting resources or Trick marks.
         for(const kind of ['godzilla','fire']){
             v=vgTestReset();const b=kind==='godzilla'?new GodzillaBoss(1):new FireCloneBoss(1);
