@@ -7905,6 +7905,7 @@
                 this.suTickPhu();
                 if (this.sdtUltTick()) return;      // @@HE-SDTULT
                 this.tickRoyal();
+                if (this.state === 'sd_drill' || (this._sdtDrill && this.state === 'recovery')) { this.runSinDrill(); return; }
                 this.wing += 0.07;
                 if (this.state === 'sdt_wake'){
                     this.subTimer++;
@@ -7942,8 +7943,10 @@
                     this.actionTimer--;
                     if (this.actionTimer <= 0){
                         if (chongKhong(this, ['sd_launch','sd_dance'], 190, 170)) return;   // @@HE-CHONGKHONG
-                        this.state = pickFromBag(this, ['sd_dance','sd_trick','sd_launch','sd_rush','sd_trick','sd_rush',
+                        this.state = pickFromBag(this, ['sd_dance','sd_trick','sd_launch','sd_drill','sd_trick','sd_rush',
                                                         'sd_quad','sd_beam','sd_meteor','sd_luce','sd_swords','sd_royal']);
+                        if (!this._sinDrillSeen) this.state = 'sd_drill';
+                        else if (this.state === 'sd_drill' && frames < (this._sinDrillReady || 0)) this.state = 'sd_dance';
                         this.subTimer = 0; this.faceP();
                     }
                     return;
@@ -25073,6 +25076,8 @@ class DilophosBoss {
 
         // ===== SIN DEVIL TRIGGER (Pha 2) — Quy Vuong DMC5: 4 canh nang luong, giap vay dung nham, DSD thuc tinh =====
         function drawSdtDante(b, x, y){
+            if (b._sdtDrill?.phase === 'dash') { danteDrawSinDrill(x + 33, y + 44, b._sdtDrill.dir, b._sdtDrill.age); return; }
+            if (b._sdtDrill?.phase === 'gap') return;
             let dr = b.facingLeft ? -1 : 1, W = 66, H = 88, cxb = x + W/2;
             const DEN = "#110507", THAN = "#24080C", DO = "#5E0F16", DO2 = "#9A1B21", NHAM = "#FF6D00", VANG = "#FFC400", TOC = "#EEF1F4";
             let wf = Math.sin(b.wing || 0), nh = 0.65 + 0.35 * Math.sin(frames * 0.16);
@@ -85690,8 +85695,8 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
            non quanh truc bay, moi canh la mot la dai cong tu goc toi mui. Xoay: moi canh co pha
            phi = t*0.95 + i*2pi/6; do lech doc = sin(phi), do sau = cos(phi) — canh o mat sau ve
            toi va truoc, canh mat truoc sang va sau. Quay theo HUONG BAY (goc), khong chi trai/phai. */
-        function veCanhKhoan(cx, cy, goc, t){
-            let P = (typeof dtPalNow === 'function') ? dtPalNow() : { bd:"#2A0710", dk:"#150309", lt:"#7A1420", out:"#FF5722", rim:"#FFAB40", eye:"#FFE0B2", pup:"#FF3D00" };
+        function veCanhKhoan(cx, cy, goc, t, palette){
+            let P = palette || ((typeof dtPalNow === 'function') ? dtPalNow() : { bd:"#2A0710", dk:"#150309", lt:"#7A1420", out:"#FF5722", rim:"#FFAB40", eye:"#FFE0B2", pup:"#FF3D00" });
             const L = 150, R = 48, N = 6;
             ctx.save(); ctx.translate(cx, cy); ctx.rotate(goc);
             // quang + vet toc do
@@ -104665,7 +104670,7 @@ function dswDraw(n){
  }
 
  // 4. Vẽ Thanh Kiếm & Cánh Tay IK + Mũi Giáo Năng Lượng Đỏ của STINGER / POWER THRUST
- if(p.arm===0){
+ if(p.arm===0&&!a?.sinDrill){
   const sx=n.x+n.w/2+v.dir*9+(p.body._swordLunge||0)*v.dir*0.5;
   const sy=n.y+21;
   if(!s.round){
@@ -108180,6 +108185,12 @@ for(const [name,arm] of [['dswTick',0],['blrTick',1],['cavTick',2],['kcbTick',3]
 <script>
 // Playable Sin Devil Trigger. Boss renderers are reused only for drawing, never AI/damage.
 const DANTE_SIN_MAX=900,DANTE_SIN_PARTICLES=200;
+const DANTE_SIN_DRILL={length:150,radius:48,rear:27,palette:{bd:'#24080c',dk:'#110507',lt:'#9a1b21',out:'#ff5722',rim:'#ffc400',eye:'#ffe0b2'}};
+function danteDrawSinDrill(cx,cy,dir,age){veCanhKhoan(cx,cy,dir<0?Math.PI:0,age,DANTE_SIN_DRILL.palette);}
+function danteSinDrillBox(fromX,toX,cy,dir){
+ const {length,radius,rear}=DANTE_SIN_DRILL;
+ return {x:Math.min(fromX,toX)-(dir<0?length:rear),y:cy-radius,w:Math.abs(toX-fromX)+length+rear,h:radius*2};
+}
 function danteSin(p=dino?.dante){return !!(p&&(p.sinTime>0||p.judgement));}
 function danteSinCharge(p=dino?.dante){return p?.sinCharge||0;}
 function danteSinClean(p){
@@ -108303,8 +108314,14 @@ function danteSinTick(){
  const a=p.attack;p.body._sinDrill=!!a?.sinDrill;
  if(a?.sinDrill){
   a.age++;const old=n.x;n.x=Math.max(worldL(),Math.min(worldR()-n.w,n.x+a.dir*14));if(mapTheme==='tetris')resolveTetrisWalls(n,n.x-old);else resolveSolidPillars(n);n.isFacingLeft=a.dir<0;n.invincible=true;n.invTimer=Math.max(n.invTimer,3);n.dy=0;
+  const drillBox=danteSinDrillBox(old+n.w/2,n.x+n.w/2,n.y+n.h/2,a.dir);
+  let blinkBox=null;
   if(!a.crossed&&danteSinBlink()){a.crossed=true;a.dir=n.isFacingLeft?-1:1;}
-  for(const o of sgTargets(n))if(checkAABB({x:Math.min(old,n.x)-30,y:n.y-12,w:Math.abs(n.x-old)+n.w+60,h:n.h+24},o)&&a.age-(a.hit.get(o.__goc||o)??-20)>=10){sgDamage(n,o,8,'sin-drill');a.hit.set(o.__goc||o,a.age);}
+  p.body.facingLeft=n.isFacingLeft;
+  if(a.crossed)blinkBox=danteSinDrillBox(n.x+n.w/2,n.x+n.w/2,n.y+n.h/2,a.dir);
+  // Crossing behind a target changes direction by teleport: sweep each side
+  // separately so the teleport itself never creates damage across the map.
+  for(const o of sgTargets(n))if((checkAABB(drillBox,o)||(blinkBox&&checkAABB(blinkBox,o)))&&a.age-(a.hit.get(o.__goc||o)??-20)>=10){sgDamage(n,o,8,'sin-drill');a.hit.set(o.__goc||o,a.age);}
   if(a.age>=a.duration){p.attack=null;p.cd=0;p.body._sinDrill=false;}
  }
  const sinTargets=sgTargets(n);
@@ -108370,9 +108387,7 @@ danteTick=function(){sinTickBase();danteSinTick();};
 const sinBodyBase=drawDantePlayerBody;
 drawDantePlayerBody=function(b,x,y){if(!b._sin)return sinBodyBase(b,x,y);
  if(b._sinDrill){
-  ctx.save();ctx.translate(x+20,y+30);ctx.scale(b.facingLeft?-1:1,1);ctx.fillStyle='#24080c';ctx.strokeStyle='#ff5722';ctx.lineWidth=2;
-  for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(-42,side*27);ctx.lineTo(48,0);ctx.lineTo(-20,side*8);ctx.closePath();ctx.fill();ctx.stroke();}
-  ctx.fillStyle='#9a1b21';ctx.beginPath();ctx.ellipse(0,0,28,12,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#ffc400';ctx.beginPath();ctx.moveTo(-22,0);ctx.lineTo(38,0);ctx.stroke();ctx.restore();return;
+  danteDrawSinDrill(x+20,y+30,b.facingLeft?-1:1,frames);return;
  }
  drawSdtDante({...b,drawn:false},x-13,y-28);};
 const sinDrawBase=danteDraw;
@@ -108383,7 +108398,6 @@ danteDraw=function(n){
   for(let i=1;i<q.trail.length;i++){ctx.globalAlpha=i/q.trail.length*.65;ctx.strokeStyle=q.converged?'#fff2bb':'#ff864f';ctx.lineWidth=1+i/q.trail.length*2;ctx.beginPath();ctx.moveTo(q.trail[i-1].x,q.trail[i-1].y);ctx.lineTo(q.trail[i].x,q.trail[i].y);ctx.stroke();}
   ctx.globalAlpha=1;ctx.fillStyle='#fff6cc';ctx.beginPath();ctx.arc(q.x,q.y,3,0,Math.PI*2);ctx.fill();ctx.restore();
  }
- if(p.attack?.sinDrill)for(let i=0;i<6;i++){const b={move:{kind:'drill'},stroke:Math.min(14,p.attack.age),i,count:6,dir:p.attack.dir,origin:{x:n.x+n.w/2,y:n.y},alpha:1,age:p.attack.age,phase:'slash',trail:[]};Object.assign(b,danteSwordPose(n,b));danteDrawSword(b);}
  if(p.judgement)danteDrawJudgement(p.judgement);
 
 };
@@ -108477,6 +108491,80 @@ const DANTE_BOSS_MELEE = {
 
 DanteBoss.prototype.meleePriority = true;
 
+// SDT folds the same six large wings as Dragon Trigger and crosses the arena
+// twice. Each pass locks its lane before moving; the wrap between passes has
+// no collision, and normal hurtP keeps guard, parry and dash immunity intact.
+DanteBoss.prototype.startSinDrill = function() {
+    if (this.phase !== 2 || this.suSt || this.hp <= 0) return false;
+    this.cancelCloseCombo(); this.cancelSinDrill(); this.faceP();
+    const lane = Math.max(90, Math.min(dkNenY() - DANTE_SIN_DRILL.radius, dino.y + dino.h / 2));
+    this._sdtDrill = {phase:'wind',tick:0,age:0,dir:this.dir(),lane,pass:0,hit:false,trail:[]};
+    this._sinDrillSeen = true; this._sinDrillReady = frames + 480;
+    this.state = 'sd_drill'; this.subTimer = 0; this.dashV = this.dy = this.fly = 0;
+    this.beam = this.bike = this.slash = this.tel = this.hat = null;
+    this.rg = 0; this.swords.length = 0; this._dayLui = 0;
+    floatingTexts.push(new FloatingText(this.cx() - 65, this.y - 42, 'SIN DRILL · 2 PASSES'));
+    if (SFX.tone) SFX.tone(160,.3,'sawtooth',.1,700);
+    return true;
+};
+DanteBoss.prototype.cancelSinDrill = function() {
+    if (!this._sdtDrill) return;
+    this._sdtDrill = null;
+    this.x = Math.max(worldL() + 8, Math.min(worldR() - this.w - 8, this.x));
+    this.y = Math.min(this.baseY, this.y);
+};
+DanteBoss.prototype.runSinDrill = function() {
+    if (!this._sdtDrill && !this.startSinDrill()) return;
+    const f = this._sdtDrill; f.tick++; f.age++; this.subTimer++;
+    const {length,rear}=DANTE_SIN_DRILL;
+    const entry = f.dir > 0 ? worldL()-length-24 : worldR()+length+24;
+    const exit = f.dir > 0 ? worldR()+rear+24 : worldL()-rear-24;
+    f.trail=f.trail.filter(g=>--g.t>0);
+    if (f.phase === 'wind' || f.phase === 'gap') {
+        if (f.phase === 'wind') {this.y+=(f.lane-this.h/2-this.y)*.2;this.dy=0;}
+        if (f.tick >= (f.phase === 'wind' ? 28 : 18)) {
+            this.x=entry-this.w/2;this.y=f.lane-this.h/2;
+            f.phase='dash';f.tick=0;f.hit=false;f.trail=[];
+            if (SFX.tone) SFX.tone(100,.2,'sawtooth',.12,950);
+        }
+        return;
+    }
+    if (f.phase === 'dash') {
+        const old=this.cx(),next=f.dir>0?Math.min(exit,old+26):Math.max(exit,old-26);
+        this.x=next-this.w/2;this.y=f.lane-this.h/2;this.dy=this.dashV=0;this.facingLeft=f.dir<0;
+        if (f.tick%2===0) f.trail.push({x:old,y:f.lane,t:8,dir:f.dir});
+        if (!f.hit && checkAABB(dino,danteSinDrillBox(old,next,f.lane,f.dir))) {f.hit=true;this._dayLui=0;this.hurtP(1);}
+        if (next === exit) {
+            f.pass++;f.tick=0;
+            if (f.pass < 2) f.phase='gap';
+            else {
+                f.phase='recover';this.state='recovery';f.trail=[];
+                this.x=f.dir>0?worldR()-this.w-24:worldL()+24;
+                this.y=this.baseY;this.dy=0;this.grounded=true;
+            }
+        }
+        return;
+    }
+    if (f.phase === 'recover' && f.tick >= 36) {this.cancelSinDrill();this.toIdle(28);}
+};
+const bossDrillClearBase = DanteBoss.prototype.suDon;
+DanteBoss.prototype.suDon = function(...args) {this.cancelSinDrill();return bossDrillClearBase.apply(this,args);};
+
+function danteDrawBossSinDrill(boss) {
+    const f=boss._sdtDrill;if(!f)return;
+    ctx.save();
+    if (f.phase === 'wind' || f.phase === 'gap') {
+        const duration=f.phase==='wind'?28:18,k=f.tick/duration;
+        ctx.fillStyle='rgba(255,87,34,'+(.06+.12*k)+')';
+        ctx.fillRect(worldL(),f.lane-48,worldR()-worldL(),96);
+        ctx.lineWidth=2;ctx.strokeStyle='#ffb74d';ctx.setLineDash([10,9]);
+        ctx.beginPath();ctx.moveTo(worldL(),f.lane);ctx.lineTo(worldR(),f.lane);ctx.stroke();ctx.setLineDash([]);
+        for(let x=worldL()+30;x<worldR();x+=100){ctx.beginPath();ctx.moveTo(x-f.dir*10,f.lane-10);ctx.lineTo(x+f.dir*10,f.lane);ctx.lineTo(x-f.dir*10,f.lane+10);ctx.stroke();}
+    }
+    for(const g of f.trail){ctx.globalAlpha=g.t/8*.2;ctx.fillStyle='#ff5722';ctx.beginPath();ctx.moveTo(g.x-g.dir*27,g.y-42);ctx.lineTo(g.x+g.dir*150,g.y);ctx.lineTo(g.x-g.dir*27,g.y+42);ctx.closePath();ctx.fill();}
+    ctx.restore();
+}
+
 function danteBossLookupMove(table, id) {
     if (table === 'DSW' && typeof DSW_MOVES !== 'undefined') return DSW_MOVES[id];
     if (table === 'BLR' && typeof BLR_MOVES !== 'undefined') return BLR_MOVES[id];
@@ -108531,6 +108619,7 @@ function danteBossEnsureFx(boss) {
 
 // Triệu hồi Kiếm Ảo Ảnh (Swordmaster) hỗ trợ Boss khi đang tung đòn cận chiến
 function danteBossSpawnPhantomSwords(boss, f, m) {
+    if (boss.suYeu > 0) return;
     if (boss.dtStage < 2 && boss.hang() < 2) return;
     const fx = danteBossEnsureFx(boss);
     const count = boss.dtStage >= 2 ? 3 : 2;
@@ -108587,7 +108676,7 @@ DanteBoss.prototype.startCloseCombo = function(id, trick = true) {
         const m = danteBossGetStepMove(this._closeCombo, i);
         return sum + (i < pattern.moves.length - 1 ? m.cancel : m.T);
     }, 0) + approachEnd + 60;
-    this.switchT = Math.max(this.switchT, planned);
+    this.switchT = Math.max(this.switchT, Math.ceil(planned / (this.suYeu > 0 ? this.spd() : 1)));
     this.hpAtSwitch = this.hp;
     this.drawn = true;
     this._swordCustom = true;
@@ -108759,6 +108848,10 @@ function danteBossExecuteHit(boss, f, m, hitIndex) {
 DanteBoss.prototype.runCloseCombo = function() {
     const f = this._closeCombo;
     if (!f) return;
+    const rate = this.suYeu > 0 ? this.spd() : 1;
+    f.clock = (f.clock || 0) + rate;
+    if (f.clock < 1) return;
+    f.clock--;
     const fx = danteBossEnsureFx(this);
     fx.spin += 0.62;
     this.subTimer++;
@@ -108788,7 +108881,7 @@ DanteBoss.prototype.runCloseCombo = function() {
         this._swordCustom = false;
         if (f.tick === 1) {
             this.styleFx = 14;
-            this.warn(96, 12, 10);
+            this.warn(96, 12, Math.ceil(10/rate));
             if (SFX.tone) SFX.tone(1250, 0.05, 'sine', 0.08, 500);
         }
         if (f.tick >= 8 && f.tick <= f.approachEnd - 2) {
@@ -108817,7 +108910,7 @@ DanteBoss.prototype.runCloseCombo = function() {
         f.tick++;
         if (f.tick === 1) {
             this.faceP(); f.dir = this.dir();
-            this.warn(this.arms === 3 ? 150 : 110, 20, 12);
+            this.warn(this.arms === 3 ? 150 : 110, 20, Math.ceil(12/rate));
         }
         if (f.tick >= 12) { this.tel = null; f.phase = 'step'; f.tick = 0; }
         return;
@@ -108855,7 +108948,7 @@ DanteBoss.prototype.runCloseCombo = function() {
         this.drawn = true;
         this._swordCustom = true;
         this._dayLui = 0;
-        this.warn(m.whipGround ? 185 : 110, m.launch ? 38 : 14, m.wind);
+        this.warn(m.whipGround ? 185 : 110, m.launch ? 38 : 14, Math.ceil(m.wind/rate));
         danteBossSpawnPhantomSwords(this, f, m);
     }
 
@@ -108865,7 +108958,7 @@ DanteBoss.prototype.runCloseCombo = function() {
     if (f.tick === m.wind + 1 && this.grounded) {
         const gap = Math.abs(this.gap());
         const stepVel = gap > 46 ? m.advance : m.advance * 0.35;
-        this.dashV = f.dir * stepVel;
+        this.dashV = f.dir * stepVel * rate;
     }
     // Duy trì trượt tiến cho các đòn lướt xe / xoay côn / đấm rush
     if ((m.id === 'k1_rush' || m.id === 'dashsaw' || m.id === 'revolver' || m.id === 'pole' || m.id === 'pyro1') && f.tick >= m.wind && f.tick <= m.end) {
@@ -109005,7 +109098,7 @@ DanteBoss.prototype.runCloseCombo = function() {
 // =============================================================================
 const bossClosePickBase = DanteBoss.prototype.pickSkill;
 DanteBoss.prototype.pickSkill = function(noiChuoi) {
-    if (this.phase !== 1 || this.suSt || this.suYeu || this.hp <= 0 || !this.grounded) {
+    if (this.phase !== 1 || this.suSt || this.hp <= 0 || !this.grounded) {
         return bossClosePickBase.call(this, noiChuoi);
     }
     if (this.chuoi?.[0]?.startsWith('close:')) {
@@ -109085,10 +109178,12 @@ DanteBoss.prototype.dmcNoi = function(...args) {
 
 const bossCloseUpdateBase = DanteBoss.prototype.update;
 DanteBoss.prototype.update = function(...args) {
+    if (this._sdtDrill && (this.phase !== 2 || this.hp <= 0 || this.suSt || !['sd_drill','recovery'].includes(this.state))) this.cancelSinDrill();
     if (this._closeCombo && (this.phase !== 1 || this.hp <= 0 || this.suSt || ![this._closeCombo.state, 'recovery'].includes(this.state))) {
         this.cancelCloseCombo();
     }
     const result = bossCloseUpdateBase.apply(this, args);
+    if (this._sdtDrill && (this.phase !== 2 || this.hp <= 0 || this.suSt || !['sd_drill','recovery'].includes(this.state))) this.cancelSinDrill();
     if (this._closeCombo && (this.phase !== 1 || this.hp <= 0 || this.suSt || ![this._closeCombo.state, 'recovery'].includes(this.state))) {
         this.cancelCloseCombo();
     }
@@ -109099,6 +109194,7 @@ DanteBoss.prototype.update = function(...args) {
 const bossCloseDrawBase = DanteBoss.prototype.draw;
 DanteBoss.prototype.draw = function() {
     bossCloseDrawBase.call(this);
+    danteDrawBossSinDrill(this);
     const f = this._closeCombo, v = this._closePose, m = this._closeMove, fx = this._comboFx;
     // Redline keeps travelling during recovery: its damaging bike stays visible.
     if (f && fx?.thrownBike) cavPaintFullBike(fx.thrownBike.x, fx.thrownBike.y, fx.thrownBike.dir, fx.spin * 1.4, -0.1, 1);
