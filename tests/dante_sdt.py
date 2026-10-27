@@ -12,7 +12,9 @@ with sync_playwright() as p:
  function near(a,b){return Math.abs(a-b)<1e-6;}
  reset();const p=dino.dante,o=target();ultCharge=99;danteHit(p,o,10);if(danteSinCharge(p)!==0||ultCharge!==100)throw Error('SDT charged before DT full');
  danteHit(p,o,10);if(!near(danteSinCharge(p),3.5))throw Error('SDT overflow charge');o.invulnAll=true;danteHit(p,o,100);if(!near(danteSinCharge(p),3.5))throw Error('blocked hit charged SDT');o.invulnAll=false;
- danteKey('KeyU',false);danteKey('KeyU',false);if(!p.dt||danteSin(p))throw Error('SDT entered without charge');danteHit(p,o,10);if(!near(danteSinCharge(p),3.5))throw Error('SDT charged during DT');
+ danteKey('KeyU',false);danteHit(p,o,10);if(!near(danteSinCharge(p),3.5))throw Error('SDT charged during DT');danteKey('KeyU',false);if(p.sinTime!==32||p.sinCharge!==0)throw Error('partial SDT entry');
+ for(const charge of [1,25,60,99]){reset();dino.dante.sinCharge=charge;ultCharge=0;danteKey('KeyU',false);if(dino.dante.sinTime!==Math.round(900*charge/100)||dino.dante.sinCharge!==0)throw Error('partial direct entry '+charge);}
+ reset();if(danteSinEnter())throw Error('empty SDT created free energy');
  reset();dino.dante.arm=5;danteSetStyle(2);enter();const sin=dino.dante;
  for(const key of ['KeyQ','KeyE','KeyI','KeyO'])danteKey(key,false);
  danteSwapWeapon(1);danteSetStyle(3);if(sin.arm!==0||sin.style!==0||ultCharge!==0||sin.dt)throw Error('SDT loadout lock');
@@ -28,22 +30,42 @@ with sync_playwright() as p:
  doDash(-1);if(dashCd!==0)throw Error('continuous dash cooldown');danteKey('KeyK',false);keys.KeyK=false;
  if(!dino.dante.attack?.sinDrill)throw Error('Dash K drill');tick(28);if(drillTarget.hp>=2000||dino.dante.attack)throw Error('drill hit / recovery');
  reset();enter();dswStart('stinger');if(!dino.dante.attack?.sinDrill)throw Error('Stinger did not become drill');
+ // Curves launch behind Dante, fan out while far away and converge only nearby.
+ reset();enter();const distant=target(850);danteSinFire();const rays=dino.dante.sinBullets.slice();
+ if(rays.length!==10||rays.some(q=>q.x>=dino.x+dino.w/2))throw Error('energy did not launch behind');
+ const startX=rays[0].x;tick(4);if(rays[0].x>=startX)throw Error('energy did not arc behind the wings');tick(12);
+ if(Math.max(...rays.map(q=>q.y))-Math.min(...rays.map(q=>q.y))<300||rays.some(q=>q.converged))throw Error('distant energy collapsed too early');
+ let convergences=0;
+ for(let f=0;f<95;f++){
+  const before=rays.map(q=>({converged:q.converged,d:Math.hypot(distant.x+distant.w/2-q.x,distant.y+distant.h/2-q.y)}));tick(1);
+  rays.forEach((q,i)=>{if(!before[i].converged&&q.converged){if(before[i].d>=210)throw Error('energy homed before approaching enemy');convergences++;}});
+ }
+ if(convergences<8||distant.hp>=2000)throw Error('spread did not converge onto distant target');
  for(const resource of [900,450,1]){
   reset();enter();const victim=target(),far=target(1500);dino.dante.sinTime=resource;danteKey('KeyU',false);
   const j=dino.dante.judgement,total=50+450*resource/900;
   if(!near(j.total,total)||dino.dante.sinTime||ultCharge||danteSinCharge())throw Error('Judgement resource snapshot');
-  danteKey('KeyU',false);if(dino.dante.judgement!==j)throw Error('Judgement repeat');tick(11);if(victim.hp!==2000)throw Error('premature damage');
-  for(let i=0;i<4;i++){tick(i?18:1);if(!near(victim.hp,2000-total*.15*(i+1)))throw Error('four slash subtotal '+i);danteDraw(dino);}
-  tick(52);if(!near(victim.hp,2000-total)||far.hp!==2000)throw Error('Judgement total / range '+[victim.hp,total]);
-  danteDraw(dino);tick(22);if(danteSin()||dino.dante.judgement||dino.dante.body._sin)throw Error('Judgement never ended');
+  danteKey('KeyU',false);if(dino.dante.judgement!==j)throw Error('Judgement repeat');tick(19);if(victim.hp!==2000)throw Error('premature damage');
+  for(let i=0;i<4;i++){
+   tick(i?38:1);if(!near(victim.hp,2000-total*.15*(i+1)))throw Error('four slash subtotal '+i);danteDraw(dino);
+   if(!j.swords.length||!j.swords.some(s=>s.delay>0))throw Error('missing delayed support cuts');
+  }
+  const cx=j.homeX+dino.w/2,cy=j.landY+dino.h/2;
+  const profile=[];for(const d of [0,150,300,360,400])for(const dir of [-1,1])profile.push({o:target(dir>0?cx+d:cx-d-2,cy-1,2,2),distance:d});
+  tick(78);if(j.fx.kiem.length<60||j.fx.kiem.some(k=>k.scale<1.7))throw Error('final sword forest too small');
+  tick(32);
+  if(!near(victim.hp,2000-total)||far.hp!==2000)throw Error('Judgement total / range '+[victim.hp,total]);
+  if(j.blast.x!==dino.x+dino.w/2||j.blast.y!==dino.y+dino.h/2)throw Error('blast not centered on player');
+  for(const {o,distance} of profile){const factor=Math.max(0,Math.min(1,(360-distance)/290));if(!near(o.hp,2000-total*.4*factor))throw Error('radial damage falloff '+[distance,o.hp]);}
+  danteDraw(dino);tick(40);if(danteSin()||dino.dante.judgement||dino.dante.body._sin)throw Error('Judgement never ended');
  }
  reset();enter();danteKey('KeyK',false);startGame('normal');if(danteSin()||danteSinCharge()||dino.dante.sinBullets?.length)throw Error('SDT leaked after restart');
- return 'PASS SDT charge gate, DT entry, locked loadout, sword AoE, 200 particles x 2, rapid drain, dash/drill, exact 50-500 Judgement and cleanup';
+ return 'PASS partial SDT entry, curved fan and close convergence, 200x2 damage, slow support echoes, 60+ swords, player-centered falloff and cleanup';
  }'''))
  # Exercise native keyboard events and capture the actual SDT rig.
  pg.evaluate("()=>{for(const k of Object.keys(keys))delete keys[k];xDatForm(9);startGame('normal');ultCharge=100;dino.dante.sinCharge=100;spawnTimerCactus=spawnTimerEnemy=99999;}")
  pg.keyboard.press('u');pg.keyboard.press('u');pg.wait_for_timeout(60);assert pg.evaluate('danteSin()&&dino.dante.arm===0')
  pg.screenshot(path='/tmp/dante-sdt-live.png')
- pg.keyboard.press('u');pg.wait_for_timeout(1700);pg.screenshot(path='/tmp/dante-judgement-live.png');pg.wait_for_timeout(1000);assert pg.evaluate('!danteSin()')
+ pg.keyboard.press('u');pg.wait_for_timeout(3550);pg.screenshot(path='/tmp/dante-judgement-live.png');pg.wait_for_timeout(1500);assert pg.evaluate('!danteSin()')
  assert not errors,errors
  b.close()
