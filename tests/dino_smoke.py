@@ -330,7 +330,24 @@ with sync_playwright() as p:
  # Old Devil Arms still start and draw their own attacks.
  for arm in [0,1,2,3,5]:
   pg.evaluate(f"()=>{{startGame('normal');paused=true;dino.dante.arm={arm};danteKey('KeyJ',false);for(let i=0;i<35;i++){{danteTick();danteDraw(dino);}}}}")
+ # Tyrant Rex must spawn through the real encounter loop, including retries and Dante.
+ # Missing BCR_W/BCR_H used to throw before the boss could enter the arena.
+ for form in [0,9]:
+  for retry in range(2):
+   pg.evaluate(f"()=>{{xDatForm({form});testBossSelection=64;startGame('test_boss');paused=false;bossWaitTimer=0;dino.invincible=true;dino.invTimer=99999;}}")
+   pg.wait_for_function("bosses.length===1&&bosses[0] instanceof TyrantRexBoss&&bosses[0].state!=='entering'",timeout=8000)
+   assert pg.evaluate("bosses[0].w===168&&bosses[0].h===132&&bosses[0].baseY===188&&_loiKhung.size===0")
+ pg.screenshot(path='/tmp/tyrant-rex-fixed.png')
+ print('Tyrant Rex',pg.evaluate("""()=>{
+  paused=true;const b=bosses[0];
+  for(const phase of [1,2])for(const skill of ['gam','can','giam','quet','huc','nhay']){
+   b.phase=phase;b.hp=b.maxHp=190;b.state=skill;b.subTimer=0;b.hit=false;b.x=600;b.y=b.baseY;b.dy=0;b.grounded=true;b.hung=0;
+   for(let i=0;i<180;i++){frames++;b.update();b.draw();if(![b.x,b.y,b.w,b.h].every(Number.isFinite))throw Error('invalid Tyrant geometry '+skill);}
+  }
+  return 'spawn/retry with Dino and Dante; both phases and all six attacks passed';
+ }"""))
  # Mode/retry and switching regressions.
+ pg.evaluate('xDatForm(9)')
  for mode in ['normal','boss_rush','test_boss']:
   pg.evaluate(f"startGame('{mode}')");assert pg.evaluate('!!dino.dante && dino.maxHp===10')
  pg.evaluate("startGame('pvp')");assert pg.evaluate('!danteOn()&&!dino.dante')
