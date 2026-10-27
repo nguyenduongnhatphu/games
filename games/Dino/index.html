@@ -2066,6 +2066,7 @@
             }
             getDmg() { return 1; }
             clashWin(tag) {
+                doChieuDong(this);
                 this.hp -= 20; shakeTimer = 44;   // theo ti le be mau moi (250)
                 visualEffects.push(new Effect(this.x + 10, this.y + 80, 'explosion', true, 62));
                 visualEffects.push(new Effect(this.x + this.w/2, this.y + this.h/2, 'explosion', true, 48));
@@ -2500,7 +2501,7 @@
                         this.clashY = 288; this.clashX = this.x + 10;
                         this.clashDist = Math.max(120, this.clashX - (dino.x + dino.w/2));
                         this.clashSpeed = this.clashDist / 90;                      // toi nguoi choi trong 1.5s
-                        this.starHits = 0; this.starHold = 0; this.clashHits = 0; shakeTimer = 22; if (SFX.bossSkill) SFX.bossSkill();
+                        this.starHits = 0; this.starHold = 0; this.clashHits = 0; doChieuBatDau(this); shakeTimer = 22; if (SFX.bossSkill) SFX.bossSkill();
                     }
                 } else if (this.state === 'clash_go') {
                     this.subStateTimer--;
@@ -2515,8 +2516,9 @@
                             floatingTexts.push(new FloatingText(st.x, st.y - 24, "SAO VO!")); }
                         if (dino.pulsarStar === st) for (let i = projectiles.length - 1; i >= 0; i--) {   // sao vua vo o tren thi khong con do dan
                             let p = projectiles[i];
+                            if (p.owner !== undefined && p.owner !== 1) continue;
                             if (Math.abs((p.x + p.w/2) - st.x) < 50 && Math.abs((p.y + p.h/2) - st.y) < 50) {
-                                this.starHits++; projectiles.splice(i, 1);
+                                doChieuNative(this); this.starHits++; projectiles.splice(i, 1);
                                 visualEffects.push(new Effect(st.x, st.y, 'explosion', true, 22));
                                 floatingTexts.push(new FloatingText(st.x, st.y - 24, "SAO " + this.starHits + "/2"));
                                 if (this.starHits >= 2) { dino.pulsarStar = null; this.clashWin("PULSAR"); return; }
@@ -2531,7 +2533,7 @@
                         let head = { x: this.clashX - 34, y: this.clashY - 34, w: 68, h: 68 };
                         if (dino.fireChannel || checkAABB(br, head)) {
                             let dist = Math.abs((dino.x + dino.w/2) - (this.x + this.w/2));
-                            this.clashX += this.clashSpeed * 1.25 + dist / 260;      // cang xa day cang manh
+                            doChieuNative(this); this.clashX += this.clashSpeed * 1.25 + dist / 260;      // cang xa day cang manh
                             if (frames % 12 === 0) { this.clashHits++; floatingTexts.push(new FloatingText(this.clashX, this.clashY - 30, "DO " + this.clashHits + "/3")); }
                             if (frames % 4 === 0) visualEffects.push(new Effect(this.clashX, this.clashY, 'explosion', true, 16));
                             if (this.clashHits >= 3) { this.clashWin("INFERNO"); return; }
@@ -2542,7 +2544,7 @@
                     if (dino.clawStrikeTimer > 0 && dino.clawStrikeRect && (this._clawCd || 0) <= 0) {
                         let _mr = dino.clawStrikeRect;
                         if (checkAABB(_mr, { x: this.clashX - 40, y: this.clashY - 40, w: 80, h: 80 })) {
-                            this._clawCd = 14;
+                            this._clawCd = 14; doChieuNative(this);
                             this.clashX += this.clashDist * 0.62;
                             this.clashHits = (this.clashHits || 0) + 3;      // cham mat tia = rui ro cao -> an tron
                             visualEffects.push(new Effect(this.clashX, this.clashY, 'explosion', true, 34));
@@ -2552,7 +2554,8 @@
                     }
                     for (let i = projectiles.length - 1; i >= 0; i--) {
                         let p = projectiles[i];
-                        if (p._gzClash) continue;
+                        if (p.owner !== undefined && p.owner !== 1) continue;
+                        if (p._gzClash === beamClashRecord(this)) continue;
                         if (Math.abs((p.x + p.w/2) - this.clashX) < 66 && Math.abs((p.y + p.h/2) - this.clashY) < 64) {
                             if (ammo === 4 && (p.dmg || 1) >= 2) { projectiles.splice(i, 1); this.clashWin("VOLT SAC"); return; }
                             let _pierce = (p.pierceCount || 0) > 0;
@@ -2561,7 +2564,7 @@
                             if (_pierce) _mul = Math.max(_mul, 1.4 + (p.dmg || 1) * 0.35);   // XUYEN: cang manh cang day xa
                             this.clashX += (this.clashDist * 0.50 + (p.dmg || 1) * 12) * _mul;
                             visualEffects.push(new Effect(this.clashX, this.clashY, 'explosion', true, _pierce ? 24 : 13));
-                            if (_pierce) p._gzClash = true; else projectiles.splice(i, 1);
+                            if (_pierce) p._gzClash = beamClashRecord(this); else projectiles.splice(i, 1);
                             // Diem do tinh theo SAT THUONG cho moi vien (truoc day chi dan xuyen): mot phat
                             // CHARGE nang thi phai dang gia hon mot vien thuong, khong phai cung 1/3.
                             let _gain = Math.max(1, Math.round((p.dmg || 1) / 2));
@@ -2571,13 +2574,13 @@
                         }
                     }
                     // @@HE-DOCHIEU: moi vu khi khong phai vien dan (can chien, laser, railgun, boomerang...)
-                    doChieuMo(this.clashX - 66, this.clashY - 64, 132, 128);
-                    for (let _d of doChieuLay()){
+                    doChieuMo(this.clashX - 66, this.clashY - 64, 132, 128, this);
+                    for (let _d of doChieuLay(this)){
                         this.clashX += this.clashDist * 0.50 + _d * 12;
                         this.clashHits = (this.clashHits || 0) + Math.max(1, Math.round(_d / 2));
                         visualEffects.push(new Effect(this.clashX, this.clashY, 'explosion', true, 16));
                         floatingTexts.push(new FloatingText(this.clashX, this.clashY - 30, "DO " + Math.min(3, this.clashHits) + "/3"));
-                        if (this.clashHits >= 3){ doChieuDong(); this.clashWin("DAY BAT"); return; }
+                        if (this.clashHits >= 3){ doChieuDong(this); this.clashWin("DAY BAT"); return; }
                     }
                     if (!blocked) this.clashX -= this.clashSpeed;
                     if (this.clashX > this.x + 10) this.clashX = this.x + 10;   // khong cho vuot qua mom: thang/thua tinh bang so diem do
@@ -22550,7 +22553,7 @@
                         this.beamDir = this.facingLeft ? -1 : 1;
                         this.beamMouthX = this.facingLeft ? this.x + 6 : this.x + this.w - 6;
                         this.beamMouthY = Math.max(40, Math.min(306, dino.y + dino.h/2));   // NHAM theo do cao nguoi choi -> dung tren buc cao van do suc / van bi trung
-                        this.beamClashX = this.beamMouthX + this.beamDir * 44;
+                        this.beamClashX = this.beamMouthX + this.beamDir * 44; doChieuBatDau(this);
                         shakeTimer = 18;
                     }
                 }
@@ -22560,16 +22563,18 @@
                     this.beamClashX += dir * (this.ignited ? 2.8 : 2.2);
                     for (let i = projectiles.length - 1; i >= 0; i--) {
                         let p = projectiles[i];
+                        if (p.owner !== undefined && p.owner !== 1) continue;
                         if (Math.abs((p.x + p.w/2) - this.beamClashX) < 64 && Math.abs((p.y + p.h/2) - mouthY) < 60) {
-                            this.beamClashX -= dir * (34 + (p.dmg || 1) * 3);
+                            // Use the same pressure as non-projectile attacks below.
+                            this.beamClashX -= dir * (34 + (p.dmg || 1) * 3) * 3;
                             visualEffects.push(new Effect(this.beamClashX, mouthY, 'explosion', true, 10));
                             projectiles.splice(i, 1);
                         }
                     }
                     {   // @@HE-DOCHIEU: vu khi khong phai vien dan cung day duoc
-                        doChieuMo(this.beamClashX - 64, mouthY - 60, 128, 120);
-                        for (let _d of doChieuLay()){
-                            // don can chien / laser / cua... ra don THUA hon dan nen moi cu day manh gap 3
+                        doChieuMo(this.beamClashX - 64, mouthY - 60, 128, 120, this);
+                        for (let _d of doChieuLay(this)){
+                            // Cung quy tac luc day cho dan, can chien, laser va cua.
                             this.beamClashX -= dir * (34 + _d * 3) * 3;
                             visualEffects.push(new Effect(this.beamClashX, mouthY, 'explosion', true, 12));
                         }
@@ -29585,7 +29590,7 @@ class MegaManXBoss {
     cham(o, box){
         if (o.hit) return false;
         if (this.laChoi){
-            let ds = [];
+            let ds = this.laChoi ? beamClashTargets() : [];
             if (typeof bosses !== 'undefined') for (let b of bosses) ds.push(b);
             if (typeof enemies !== 'undefined') for (let e of enemies) ds.push(e);
             // XUYEN: tia, cot set, khoi bang, ban sao, xoay loc / lua / gai, orb plasma, vien co o.xuyen -> trung MOI muc tieu (khong bi xoa khi trung)
@@ -29605,7 +29610,7 @@ class MegaManXBoss {
                 } else o.hit = 1;
                 let dmg = (typeof xDmgDan === 'function') ? xDmgDan(o) : 2;
                 if (typeof dealDamage === 'function') dealDamage(t, dmg, 'flat'); else t.hp -= dmg;
-                if (typeof xCong === 'function') xCong(1);
+                if (!t._beamClashPoint && typeof xCong === 'function') xCong(1);
                 if (!multi) return true;
             }
             return false;
@@ -29671,7 +29676,7 @@ class MegaManXBoss {
     tamX(){ return this.laChoi ? this.mucTieu().x : dino.x + dino.w / 2; }
     tamY(){ return this.laChoi ? this.mucTieu().y : dino.y + dino.h / 2; }
     mucTieu(){
-        let best = null, bd = 1e9, ds = [];
+        let best = null, bd = 1e9, ds = this.laChoi ? beamClashTargets() : [];
         if (typeof bosses !== 'undefined') for (let b of bosses) ds.push(b);
         if (typeof enemies !== 'undefined') for (let e of enemies) ds.push(e);
         for (let o of ds){
@@ -29701,7 +29706,7 @@ class MegaManXBoss {
     }
     // n toa do x de roi cot / khoi bang: dung vi tri ke dich that (gan nhat truoc), thieu thi rai quanh muc tieu
     xsMt(n){
-        let cx = this.cx(), ds = [], xs = [], all = [];
+        let cx = this.cx(), ds = [], xs = [], all = this.laChoi ? beamClashTargets() : [];
         if (typeof bosses !== 'undefined') for (let b of bosses) all.push(b);
         if (typeof enemies !== 'undefined') for (let e of enemies) all.push(e);
         for (let o of all){
@@ -30421,7 +30426,7 @@ class MegaManXBoss {
             let kk = 'kh' + Math.floor(K.t / 30);
             if (!this.hit.has(kk)){
                 if (this.laChoi){
-                    let ds = [];
+                    let ds = this.laChoi ? beamClashTargets() : [];
                     if (typeof bosses !== 'undefined') for (let b of bosses) ds.push(b);
                     if (typeof enemies !== 'undefined') for (let e of enemies) ds.push(e);
                     for (let t of ds){
@@ -30431,7 +30436,7 @@ class MegaManXBoss {
                             this.hit.add(kk);
                             let dmg = 3;
                             if (typeof dealDamage === 'function') dealDamage(t, dmg, 'flat'); else t.hp -= dmg;
-                            if (typeof xCong === 'function') xCong(1);
+                            if (!t._beamClashPoint && typeof xCong === 'function') xCong(1);
                             break;
                         }
                     }
@@ -30448,7 +30453,7 @@ class MegaManXBoss {
             if (D.t === 36){
                 D.da = 1; shakeTimer = Math.max(shakeTimer, 10);
                 if (this.laChoi){
-                    let ds = [];
+                    let ds = this.laChoi ? beamClashTargets() : [];
                     if (typeof bosses !== 'undefined') for (let b of bosses) ds.push(b);
                     if (typeof enemies !== 'undefined') for (let e of enemies) ds.push(e);
                     for (let t of ds){
@@ -30480,7 +30485,7 @@ class MegaManXBoss {
             let kk = 'cau' + Math.floor(C.t / 40);
             if (C.t > 20 && (this.laChoi || !this.hit.has(kk))){
                 if (this.laChoi){
-                    let ds = [];
+                    let ds = this.laChoi ? beamClashTargets() : [];
                     if (typeof bosses !== 'undefined') for (let b of bosses) ds.push(b);
                     if (typeof enemies !== 'undefined') for (let e of enemies) ds.push(e);
                     // cu 8 khung mot nhip, moi ke dich trong cau bi tru 9 (11 nhip = ~100 sat thuong). Nang luong chi +1 cho lan trung dau cua tung ke dich.
@@ -30491,7 +30496,7 @@ class MegaManXBoss {
                             let nx = Math.max(t.x, Math.min(C.x, t.x + (t.w || 20))), ny = Math.max(t.y, Math.min(C.y, t.y + (t.h || 20)));
                             if (Math.hypot(nx - C.x, ny - C.y) < C.r * 0.85){
                                 if (typeof dealDamage === 'function') dealDamage(t, 9, 'flat'); else t.hp -= 9;
-                                if (!C.hs.has(t)){ C.hs.add(t); if (typeof xCong === 'function') xCong(1); }
+                                if (!C.hs.has(t)){ C.hs.add(t); if (!t._beamClashPoint && typeof xCong === 'function') xCong(1); }
                             }
                         }
                     }
@@ -44674,7 +44679,7 @@ class PulsarCloneBoss {
             /* HINH NOM KHONG AN FIRST STRIKE. Mau cua no la so gia (999.999) va no tu nap
                day lai moi khung, nen 20% mau toi da ra 200.000 — con so do khong co y nghia
                gi ma con lam hong ca bang DPS / DINH / TONG cua chinh cai ban do. */
-            if (b.name === "TRAINING DUMMY") return;
+            if (b.name === "TRAINING DUMMY" || b._beamClashPoint) return;
             b._firstStrikeHooked = true;
             if (typeof b.maxHp !== 'number' || b.maxHp <= 0) b.maxHp = b.hp;
             let _hp = b.hp;
@@ -44712,6 +44717,11 @@ class PulsarCloneBoss {
            ================================================================== */
         function dealDamage(o, amount, kieu, proj, multiplier){
             if (!o || o.invulnAll) return false;
+            if (o._beamClashPoint) {
+                if (proj?.owner !== undefined && proj.owner !== 1) return false;
+                const power=kieu==='prism'&&proj?prismDmg(proj,o)*(multiplier??1):amount;
+                return beamClashReceive(o,power);
+            }
             // Boss co the DO don: tra ve true = don bi do. Dung cho cac boss co guard pha duoc.
             if (typeof o.anDon === 'function' && o.anDon()) return false;
             if (typeof installFirstStrikeHook === 'function') installFirstStrikeHook(o);
@@ -87231,6 +87241,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
         });
 
         function startGame(mode) {
+            doChieuDong();
             if (typeof ttMoi === 'function') ttMoi();          // @@HE-KYLUC: thong ke tran moi
             if (typeof styReset === 'function') styReset();    // @@HE-STYLISH
             if (typeof quetRuneBatHopPhap === 'function') quetRuneBatHopPhap(false);
@@ -91536,21 +91547,78 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
            Phi Tieu va cac don can chien. Boss mo mot HOP DO moi khung; cac vu khi tu bao
            "don nay cham hop do" qua doChieuThu(). Boss doc lai bang doChieuLay().
            nguon = object (moi vat chi tinh MOT lan) hoac chuoi (don lien tuc, moi `nhip` khung 1 lan). */
-        let doChieu = null;
-        function doChieuMo(x, y, w, h){
-            if (!doChieu || doChieu.t < frames - 2) doChieu = { da: new WeakSet(), cd: new Map(), don: [] };
-            doChieu.x = x; doChieu.y = y; doChieu.w = w; doChieu.h = h; doChieu.t = frames;
+        // Clash points are attack targets, not enemies with health. This makes
+        // every attack using allTargets/sgTargets see the same moving contact.
+        let doChieu = null, beamClashRecords = new WeakMap();
+        function beamClashActive(b){
+            return gameState !== 'pvp' && b && b.hp > 0 && bosses.includes(b)
+                && ((b instanceof GodzillaBoss && b.state === 'clash_go')
+                    || (b instanceof FireCloneBoss && b.state === 'beam_clash'));
         }
-        function doChieuCo(){ return !!doChieu && doChieu.t >= frames - 2 && gameState !== 'pvp'; }
-        function doChieuDong(){ doChieu = null; }
-        function doChieuThu(nguon, r, dmg, nhip){
-            if (!doChieuCo() || !r || !checkAABB(r, doChieu)) return false;
-            if (typeof nguon === 'object' && nguon){ if (doChieu.da.has(nguon)) return false; doChieu.da.add(nguon); }
-            else { let c = doChieu.cd.get(nguon); if (c !== undefined && frames - c < (nhip || 12)) return false; doChieu.cd.set(nguon, frames); }
-            doChieu.don.push(Math.max(1, dmg || 1));
-            return true;
+        function beamClashRecord(b){
+            let r=beamClashRecords.get(b);if(r)return r;
+            r={owner:b,seen:new WeakSet(),cooldowns:new Map(),pending:new Map(),native:new Set()};
+            const t={_beamClashPoint:true,name:'BEAM CLASH',ownerBoss:b,maxHp:1,invulnAll:false,
+                grounded:false,dy:0,state:'beam',update(){},draw(){},
+                takeDamage(d){return beamClashReceive(this,d);},cx(){return this.x+this.w/2;},cy(){return this.y+this.h/2;}};
+            Object.defineProperties(t,{
+                dead:{get(){return false;},set(_){}},
+                dying:{get(){return false;},set(_){}},
+                invulnAll:{get(){return false;},set(_){}},
+                x:{get(){return (b instanceof GodzillaBoss?b.clashX:b.beamClashX)-this.w/2;},set(_){}},
+                y:{get(){return (b instanceof GodzillaBoss?b.clashY:b.beamMouthY)-this.h/2;},set(_){}},
+                w:{get(){return b instanceof GodzillaBoss?132:128;},set(_){}},
+                h:{get(){return b instanceof GodzillaBoss?128:120;},set(_){}},
+                hp:{get(){return beamClashActive(b)&&beamClashRecords.get(b)===r?1:0;},set(v){if(Number.isFinite(v)&&v<1)beamClashReceive(this,1-v);}}
+            });
+            r.target=t;beamClashRecords.set(b,r);return r;
         }
-        function doChieuLay(){ if (!doChieuCo()) return []; let d = doChieu.don; doChieu.don = []; return d; }
+        function beamClashTargets(){
+            if(gameState==='pvp')return [];
+            return bosses.filter(beamClashActive).map(b=>beamClashRecord(b).target)
+                .filter(t=>Number.isFinite(t.x)&&Number.isFinite(t.y));
+        }
+        function doChieuBatDau(b){beamClashRecords.delete(b);return beamClashRecord(b);}
+        function beamClashReceive(t,d){
+            if(!t?.hp||!(d>0)||!Number.isFinite(d))return false;
+            const r=beamClashRecord(t.ownerBoss);
+            // Some legacy weapons report a box and also damage targets in it.
+            // Keep one impulse per attack frame, using the strongest report.
+            r.pending.set(frames,Math.max(r.pending.get(frames)||0,d));return true;
+        }
+        function doChieuMo(x,y,w,h,b){
+            doChieu=b&&beamClashActive(b)?beamClashRecord(b).target:beamClashTargets()[0]||null;
+        }
+        function doChieuCo(){doChieu=beamClashTargets()[0]||null;return !!doChieu;}
+        function doChieuDong(b){
+            if(b)beamClashRecords.delete(b);else beamClashRecords=new WeakMap();
+            doChieu=null;
+        }
+        function doChieuThu(source,box,dmg,nhip){
+            if(!box||!(dmg>0)||!Number.isFinite(dmg))return false;
+            let accepted=false;
+            for(const t of beamClashTargets()){
+                if(!checkAABB(box,t))continue;
+                const r=beamClashRecord(t.ownerBoss);
+                if(source&&typeof source==='object'){
+                    if(r.seen.has(source))continue;r.seen.add(source);
+                }else{
+                    const last=r.cooldowns.get(source);
+                    if(last!==undefined&&frames-last<(nhip||12))continue;r.cooldowns.set(source,frames);
+                }
+                accepted=beamClashReceive(t,dmg)||accepted;
+            }
+            return accepted;
+        }
+        function doChieuNative(b){beamClashRecord(b).native.add(frames);}
+        function doChieuLay(b){
+            const r=b?beamClashRecords.get(b):doChieu?beamClashRecords.get(doChieu.ownerBoss):null;
+            if(!r||!beamClashActive(r.owner))return [];
+            const out=[];
+            for(const [f,d] of r.pending)if(!r.native.has(f))out.push(d);
+            r.pending.clear();for(const f of r.native)if(f<frames-2)r.native.delete(f);
+            return out;
+        }
         // ===== TUI CHIEU: dung HET moi chieu roi moi lap lai (thay cho random co the ping-pong 2 chieu) =====
         // slot = ten o nho tui rut. Mac dinh dung chung mot tui; truyen slot rieng khi boss
         // can HAI tui song song (vi du Dante: mot tui chieu vu khi, mot tui chieu the) —
@@ -94242,7 +94310,7 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         let pvpKeDanh = null;
 
         function allTargets(){
-            let out = [];
+            let out = beamClashTargets();
             // Trong PvP thi THEM nguoi choi ben kia vao danh sach, chu khong THAY THE.
             // Ban dau toi cho no thay the han, va tu kiem tu 34/34 tut xuong 28/34: 35 phep
             // thu trong game deu tha boss gia ra roi do sat thuong, ma o PvP chung bong dung
@@ -97533,6 +97601,7 @@ function sgAction(n,kind,duration,dir){
 function sgVaultTarget(n,dir){
     const cx=n.x+n.w/2;
     return sgTargets(n).filter(o=>{
+        if(o._beamClashPoint)return false;
         const dx=(o.x+o.w/2-cx)*dir;
         return dx>=-o.w/2&&dx<=340&&o.y+o.h>n.y;
     }).sort((a,b)=>Math.abs(a.x+a.w/2-cx)-Math.abs(b.x+b.w/2-cx))[0]||null;
@@ -97753,6 +97822,7 @@ function sgHitDone(snap){
 // deliberately passes 'cannon', which never contributes to either loading stage.
 function sgDamage(n,o,amount,origin){
     if(!o || o.invulnAll || !(o.hp>0) || !(amount>0))return 0;
+    if(o._beamClashPoint)return n?.id===1&&beamClashReceive(o,amount)?amount:0;
     const before=Math.max(0,o.hp);
     const opponent=gameState==='pvp'?pvpDich(n):null;
     if(opponent&&(o===opponent||o===opponent._vo))cusPvpDanh(n,opponent,amount);
@@ -98632,7 +98702,7 @@ function apexInput(){return keys;}
 function apexInputEvent(code,down){if(dino.apex&&!paused)dino.apex.events.push({code,down});}
 function apexNativePlatforms(){return platforms;}
 function apexLaunch(target){
- const o=target.__goc||target;if(!o||o.hp<=0||o.invulnAll)return;
+ const o=target.__goc||target;if(!o||o.hp<=0||o.invulnAll||o._beamClashPoint)return;
  if(o._apexLift){o._apexLift.vy=-9;o._apexLift.t=0;return;}
  if(typeof o.update!=='function'){o.dy=-9;if('grounded' in o)o.grounded=false;return;}
  const old=o.update,lift={floor:o.y,vy:-9,t:0,grounded:o.grounded};o._apexLift=lift;
@@ -98709,7 +98779,7 @@ drawLeafPlatform=apexLeafDrawBase;
 
 // Short control effects pause the target's actual update, including bosses without a stun field.
 function apexControl(target,ticks,push=0){
- const o=target.__goc||target;if(!o||o.hp<=0||o.invulnAll)return;
+ const o=target.__goc||target;if(!o||o.hp<=0||o.invulnAll||o._beamClashPoint)return;
  if(o._apexControl){o._apexControl.t=Math.max(o._apexControl.t,ticks);o._apexControl.push=push||o._apexControl.push;return;}
  if(typeof o.update!=='function')return;
  const old=o.update,c={t:ticks,push};o._apexControl=c;
@@ -103601,7 +103671,7 @@ function danteAttack(special,charge){
  p.attack={name,arm,dir,reach,dmg:dmg+bonus,wind,duration,pulses,interval,kind,lift,age:0,hit:new Set(),special,full};p.cd=duration;
  if(special)danteLabel(name);
 }
-function danteHit(p,o,damage,arm=p.damageArm??p.arm){const scale=arm===1?.8:arm===2?.75:arm===3?.8:arm===5?.8:1;const dealt=sgDamage(dino,o,damage*scale,'dante');if(dealt>0&&!p.dt&&!p.sinTime&&!p.judgement)ultCharge=Math.min(100,ultCharge+dealt*.7);return dealt;}
+function danteHit(p,o,damage,arm=p.damageArm??p.arm){const scale=arm===1?.8:arm===2?.75:arm===3?.8:arm===5?.8:1;const dealt=sgDamage(dino,o,damage*scale,'dante');if(dealt>0&&!o._beamClashPoint&&!p.dt&&!p.sinTime&&!p.judgement)ultCharge=Math.min(100,ultCharge+dealt*.7);return dealt;}
 function dantePulse(n,p,a){
  const cx=n.x+n.w/2,cy=n.y+n.h/2;
  function round(x,y,vx,vy,r,kind,damage,life=65){p.rounds.push({arm:a.arm,x,y,vx,vy,r,kind,damage,life,age:0,hit:new Set(),dir:a.dir});}
@@ -103710,7 +103780,7 @@ function dswFloor(x,feet){
 // =============================================================================
 function dswControl(o,opt={}){
  o=o.__goc||o;
- if(!o||o.invulnAll||o.hp<=0)return;
+ if(!o||o.invulnAll||o.hp<=0||o._beamClashPoint)return;
  if(!danteControlAllowed(o))return null;
  const p=dino.dante,s=dswState(p);
  let c=o._dswControl;
@@ -107499,7 +107569,7 @@ const styleInitBase=danteInit;
 danteInit=function(n){styleInitBase(n);n.dante.style=1;danteStyleState(n.dante);combatStance=0;};
 function danteRoyalShield(){return danteStyleLive()&&danteStyle()===2&&frames<danteStyleState(dino.dante).guardUntil;}
 function dantePerfectGuard(){return danteRoyalShield()&&frames<danteStyleState(dino.dante).perfectUntil;}
-function danteGuardSource(){return sgTargets(dino).sort((a,b)=>Math.hypot(a.x-dino.x,a.y-dino.y)-Math.hypot(b.x-dino.x,b.y-dino.y))[0]||null;}
+function danteGuardSource(){return sgTargets(dino).filter(o=>!o._beamClashPoint).sort((a,b)=>Math.hypot(a.x-dino.x,a.y-dino.y)-Math.hypot(b.x-dino.x,b.y-dino.y))[0]||null;}
 function danteGuardContact(amount=1,source=null){
  if(!danteRoyalShield())return false;
  const n=dino,p=n.dante,s=danteStyleState(p),perfect=dantePerfectGuard();
@@ -107551,7 +107621,7 @@ function danteGhost(n){
 }
 function danteTeleport(target,behind){
  const n=dino,p=n.dante,s=danteStyleState(p);
- if(!target||![target.x,target.y,target.w,target.h].every(Number.isFinite))return false;
+ if(!target||target._beamClashPoint||![target.x,target.y,target.w,target.h].every(Number.isFinite))return false;
  const side=target.isFacingLeft??target.facingLeft??(target.x>n.x);
  let x=behind?(side?target.x+target.w+18:target.x-n.w-18):(side?target.x-n.w-18:target.x+target.w+18);
  const y=Math.max(-CAM_TROI+10,target.y+target.h-n.h),before={x:n.x,y:n.y};
@@ -107580,7 +107650,7 @@ danteKey=function(code,repeat){
   }
   if(!paused&&!repeat&&danteStyle()===3&&['KeyS','ArrowDown'].includes(code))s.crouchArmed=true;
   if(!paused&&!repeat&&danteStyle()===3&&['Space','KeyW'].includes(code)&&(s.crouchArmed||keys.KeyS||keys.ArrowDown)){
-   const target=sgTargets(dino).filter(o=>Math.hypot(o.x-dino.x,o.y-dino.y)<600).sort((a,b)=>Math.hypot(a.x-dino.x,a.y-dino.y)-Math.hypot(b.x-dino.x,b.y-dino.y))[0];
+   const target=sgTargets(dino).filter(o=>!o._beamClashPoint&&Math.hypot(o.x-dino.x,o.y-dino.y)<600).sort((a,b)=>Math.hypot(a.x-dino.x,a.y-dino.y)-Math.hypot(b.x-dino.x,b.y-dino.y))[0];
    const grounded=dino.grounded,jumps=dino.jumpCount||0;s.crouchArmed=false;
    if(frames>=s.teleReady&&target&&danteTeleport(target,false)){
     dino.dy=dino.jumpPower*(grounded?1:.85);dino.grounded=false;dino.canDoubleJump=grounded;dino.jumpCount=grounded?1:Math.min(2,jumps+1);dino.hoverArmed=false;
@@ -107819,7 +107889,7 @@ function danteStylesTick(){
  if(danteStyle()===3&&!s.crossed&&frames-s.lastDash<14){
   if(frames%2===0)danteGhost(n);
   if(frames>=s.teleReady){
-   const target=sgTargets(n).filter(o=>{const gap=s.dashDir>0?o.x-(n.x+n.w):n.x-(o.x+o.w);return gap>=0&&gap<2*CM&&n.y<o.y+o.h&&n.y+n.h>o.y;}).sort((a,b)=>Math.abs(a.x-n.x)-Math.abs(b.x-n.x))[0];
+   const target=sgTargets(n).filter(o=>{if(o._beamClashPoint)return false;const gap=s.dashDir>0?o.x-(n.x+n.w):n.x-(o.x+o.w);return gap>=0&&gap<2*CM&&n.y<o.y+o.h&&n.y+n.h>o.y;}).sort((a,b)=>Math.abs(a.x-n.x)-Math.abs(b.x-n.x))[0];
    if(target)danteTeleport(target,true);
   }
  }
@@ -108024,7 +108094,7 @@ const danteBossWindows=new WeakMap();
 function danteIsBoss(o){return bosses.includes(o.__goc||o);}
 function danteBossOpening(o){return /^(idle|rest|recover|recovery|stunned|stun|open|opening|dizzy|tired|vulnerable)$/.test(o.state||'');}
 function danteControlAllowed(target){
- const o=target.__goc||target;if(!danteIsBoss(o))return true;
+ const o=target.__goc||target;if(o._beamClashPoint)return false;if(!danteIsBoss(o))return true;
  const window=danteBossWindows.get(o);
  if(window&&frames<window.until)return true;
  if(window&&frames<window.ready)return false;
@@ -108081,7 +108151,7 @@ function danteSinExit(){
 }
 const sinHitBase=danteHit;
 danteHit=function(p,o,damage,...args){
- const full=ultCharge>=100&&!p.dt&&!danteSin(p),dealt=sinHitBase(p,o,damage,...args);
+ const full=!o._beamClashPoint&&ultCharge>=100&&!p.dt&&!danteSin(p),dealt=sinHitBase(p,o,damage,...args);
  if(full&&dealt>0)p.sinCharge=Math.min(100,danteSinCharge(p)+dealt*.35);
  return dealt;
 };
@@ -108096,7 +108166,7 @@ const sinPoseBase=dswPose;
 dswPose=function(...args){const v=sinPoseBase(...args);if(args[0]?.dante&&danteSin(args[0].dante)){v.len*=1.35;v.tx=v.x+v.dir*Math.cos(v.angle)*v.len;v.ty=v.y+Math.sin(v.angle)*v.len*v.flat;v.red=true;}return v;};
 function danteSinBlink(){
  const n=dino,dir=n.isFacingLeft?-1:1;
- const target=sgTargets(n).filter(o=>{const gap=dir>0?o.x-n.x-n.w:n.x-o.x-o.w;return gap>=0&&gap<2*CM&&n.y<o.y+o.h&&n.y+n.h>o.y;}).sort((a,b)=>Math.abs(a.x-n.x)-Math.abs(b.x-n.x))[0];
+ const target=sgTargets(n).filter(o=>{if(o._beamClashPoint)return false;const gap=dir>0?o.x-n.x-n.w:n.x-o.x-o.w;return gap>=0&&gap<2*CM&&n.y<o.y+o.h&&n.y+n.h>o.y;}).sort((a,b)=>Math.abs(a.x-n.x)-Math.abs(b.x-n.x))[0];
  return target?danteTeleport(target,true):false;
 }
 const sinDashBase=doDash;
