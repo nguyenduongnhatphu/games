@@ -46661,8 +46661,7 @@ class PulsarCloneBoss {
                             if (cuu) { this.vitHo = frames + 600; floatingTexts.push(new FloatingText(this.x, this.y - 16, "VỊT!")); }
                             else { if (!this.invincible) this.takeDamage(fallDmg); floatingTexts.push(new FloatingText(this.x, this.y - 16, "-" + fallDmg + "!")); if (SFX.hit) SFX.hit(); }
                         }
-                        this.dy = -16; this.canDoubleJump = true; this.y = 344 - this.h;   // nay MANH hon cu nhay thuong (-12.5) de thoat han khoi ho
-                        visualEffects.push(new Effect(this.x + this.w/2, 340, 'explosion', true, 14));
+                        launchFromPit(this);
                     } }
                     if (this.tank && mapTheme !== 'tetris' && mapTheme !== 'ocean') this.tankLeoHo();
                     // ==== VA CHAM CANH: cot dung nham la vat the dac, khong di xuyen ====
@@ -93605,6 +93604,44 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         // Nguoi choi co dap chan len buc duoc hay khong: xet map NAY co buc that hay khong,
         // thay cho danh sach trang ten map (lam phong War/Death co buc ma khong dung len duoc).
         let _bucCache = { n: -1, co: false };
+        // One world-space pit recovery for every playable form, including custom physics adapters.
+        function launchFromPit(n,gravity=n.gravity){
+            const left=Math.max(worldL(),camX||0),right=Math.min(worldR(),left+canvas.width),cx=n.x+n.w/2;
+            const candidates=[];
+            for(const p of platforms){
+                if(p.solid===false||p.wall||!Number.isFinite(p.top)||!Number.isFinite(p.x)||p.w<24||p.top>Math.max(344,dkNenY()+24))continue;
+                if(p.isLeaf&&(p.leafTimer||0)>35)continue;
+                const lo=Math.max(left+8,p.x+8),hi=Math.min(right-8,p.x+p.w-8);
+                if(hi-lo<Math.min(n.w,24))continue;
+                const x=Math.max(lo+Math.min(n.w/2,(hi-lo)/2),Math.min(hi-Math.min(n.w/2,(hi-lo)/2),cx));
+                const scrolling=gameState==='normal'&&['forest','volcano','dinhnui','slashcave'].includes(mapTheme)&&!bosses.length;
+                const leaving=scrolling&&p.x+p.w-left<Math.max(0,gameSpeed)*75;
+                const score=Math.abs(x-cx)+Math.max(0,320-p.top)*.25+(p.isLeaf?180:0)+(leaving?800:0);
+                candidates.push({p,x,score});
+            }
+            candidates.sort((a,b)=>a.score-b.score);
+            const safe=candidates[0],floor=safe?safe.p.top:dkNenY();
+            n.x=Math.max(left+4,Math.min(right-n.w-4,(safe?safe.x:cx)-n.w/2));
+            n.y=floor-n.h-12;n.grounded=false;n.canDoubleJump=true;n.jumpCount=0;
+            n.dropTimer=0;n.dropFromTop=0;n.bodySlamArmed=n.bodySlamActive=false;n.hoverTimer=0;n.hoverArmed=false;n.mayBay=0;n.webTimer=0;
+            if(n.id===1)dashVx=0;
+            // Downward attacks / position-locked beams must not immediately undo the rebound.
+            if(n.dante){if(typeof dswCancel==='function')dswCancel(n.dante);n.dante.attack=null;n.dante.k=null;n.dante.judgement=null;for(const state of [n.dante.sword,n.dante.balrog,n.dante.cavaliere,n.dante.cerberus])if(state){state.queue=[];state.airSlow=0;}}
+            if(n.vergil){n.vergil.attack=null;n.vergil.queue=[];n.vergil.airSlow=0;n.vergil.holdJ=n.vergil.holdK=0;n.vergil.jce=null;}
+            if(n.sg){n.sg.action=null;n.sg.beam=null;n.sg.swordBrake=0;}
+            if(n.id===1&&typeof xChoi!=='undefined'&&xChoi&&typeof xBat==='function'&&xBat()){xChoi.dac=null;xChoi.bien=null;xChoi.aS='khong';xChoi.khoaDi=0;xChoi.vy=0;}
+            n.dy=-Math.sqrt(2*Math.max(.1,gravity||.65)*280);
+            n._fallRecovery={platform:safe?.p||null,lastX:safe?.p.x||0,until:frames+180};
+            n.invincible=true;n.invTimer=Math.max(n.invTimer||0,45);
+            visualEffects.push(new Effect(n.x+n.w/2,floor,'explosion',true,18));
+            return n._fallRecovery;
+        }
+        function followFallRecovery(n){
+            const r=n._fallRecovery;if(!r)return;
+            if(n.grounded||n.ultActive||frames>r.until||!r.platform||!platforms.includes(r.platform)||r.platform.solid===false){n._fallRecovery=null;return;}
+            // Inherit the platform's scrolling motion; A/D remains fully available in the air.
+            n.x=Math.max(worldL(),Math.min(worldR()-n.w,n.x+r.platform.x-r.lastX));r.lastX=r.platform.x;
+        }
         function coBuc(){
             if (mapTheme === 'ocean') return true;   // @@HE-BIEN: bien luon dung vat ly nen/be (co khi khong co be nao tren man)
             /* Tetris: day ho nam o tetris.groundY (400) va moi khoi deu thap hon 318 luc dau. Truoc day nhanh duoi coi
@@ -103976,7 +104013,12 @@ function apexCreate(owner){
   dino.x=Math.max((worldL()+owner.w/2)/SCALE,Math.min((worldR()-owner.w/2)/SCALE,dino.x));
   if(wasRoll){for(const t of targets){const last=dino.rollHits.get(t.o);if(last!==undefined&&frames-last<15)continue;if(sgSegmentBox(px*SCALE,(py-48)*SCALE,dino.x*SCALE,(dino.y-48)*SCALE,t.o,apexColor===1?34*magmaReach():28)!==null){const dealt=hitTarget(t,apexColor===1?5:4);if(dealt>0&&apexColor===2)apexControl(t.o,6);dino.rollHits.set(t.o,frames);}}}
   if(wasDash){for(const t of targets){if(dashHits.has(t.o))continue;const box=t.o;if(sgSegmentBox(px*SCALE,(py-48)*SCALE,dino.x*SCALE,(dino.y-48)*SCALE,box,apexColor===1?26.4*magmaReach():22)!==null){hitTarget(t,apexColor===3?5:apexColor===1?4:3);dashHits.add(t.o);}}}
-  if(mapTheme!=='ocean'&&dino.y*SCALE>600){dino.guardTimer=0;owner.takeDamage(2);dino.x=(worldL()+90)/SCALE;dino.y=(dkNenY()-80)/SCALE;dino.vy=0;dino.activePlatform=null;dino.isGrounded=false;}
+  if(mapTheme!=='ocean'&&dino.y*SCALE>(mapTheme==='tetris'?Math.max(600,dkNenY()+100):344)){
+   owner.x=dino.x*SCALE-owner.w/2;owner.y=dino.y*SCALE-owner.h;owner.takeDamage(2);launchFromPit(owner,dino.gravity*SCALE);
+   dino.x=(owner.x+owner.w/2)/SCALE;dino.y=(owner.y+owner.h)/SCALE;dino.vy=owner.dy/SCALE;dino.vx=0;
+   dino.guardTimer=0;dino.activePlatform=dino.ledgePlatform=null;dino.isGrounded=dino.isWallSliding=dino.isLedgeGrabbing=dino.isLedgeClimbing=false;
+   dino.meleeState='none';dino.meleeHolding=dino.meleeQueuedNext=false;dino.meleeTimer=0;dino.jumpsLeft=dino.maxJumps;dino.ledgeIgnoreTimer=12;
+  }
   owner.x=dino.x*SCALE-owner.w/2;owner.y=dino.y*SCALE-owner.h;owner.dy=dino.vy*SCALE;owner.grounded=dino.isGrounded;owner.isCrouching=dino.isCrouching;owner.isFacingLeft=dino.facing<0;owner.jumpCount=2-dino.jumpsLeft;
   owner.canDoubleJump=dino.jumpsLeft>0;owner.chargeProgress=Math.min(1,dino.rangedChargeSec/2);owner.aKeyHeldTime=0;
   dashCd=dino.dashCooldown;dashVx=0;if(magmaTime>0)ultCharge=0;finishMagmaFrame();
@@ -113497,6 +113539,11 @@ VergilBoss.prototype.syncAttackerDoppelganger=function(){
     this.dop.y=this.y-12;this.dop.left=this.facingLeft;
 };
 
+</script>
+
+<script>
+const fallRecoveryUpdateBase=Player.prototype.update;
+Player.prototype.update=function(...args){followFallRecovery(this);return fallRecoveryUpdateBase.apply(this,args);};
 </script>
 </body>
 </html>
