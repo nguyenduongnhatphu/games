@@ -31,7 +31,13 @@ with sync_playwright() as p:
         }
         const checked=[];
         for(const weapon of Object.keys(starters))for(const route of PLAYER_FINISH_ROUTES[weapon]){
-            const p=reset(weapon),start=starters[weapon];
+            const p=reset(weapon),start=id=>{
+                if(weapon==='balrog'&&route[0]==='a1'){
+                    if(['a1','a2','retreat_round'].includes(id)){p.arm=0;dswStart(id);}
+                    else if(id==='flydragon1')danteBalrogRelay();
+                    else blrStart(id);
+                }else starters[weapon](id);
+            };
             // Use the real attack controllers and clocks for all preceding moves.
             for(const id of route.slice(0,-1)){
                 start(id);const a=p.attack;let timeout=240;
