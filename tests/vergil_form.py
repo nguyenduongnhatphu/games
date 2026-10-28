@@ -90,27 +90,27 @@ with sync_playwright() as p:
         const combo=[];
         for(const id of ['a1','a2','a3','a4']){
             vgTestTap('KeyJ');check(v.attack?.id===id,'Combo A '+id);combo.push(id);
-            vgTestStep(YMT_MOVES[id].T);
+            vgTestStep(Math.ceil(YMT_MOVES[id].T/VERGIL_ATTACK_RATE));
         }
         check(target.hp<10000&&projectiles.length===0,'no Yamato damage / default Dino bullet leaked');
-        v=vgTestReset();vgTestTap('KeyJ');vgTestStep(18);vgTestTap('KeyJ');vgTestStep(30);vgTestTap('KeyJ');
-        check(v.attack?.id==='c_flurry','delayed Combo C');vgTestStep(42);vgTestTap('KeyJ');check(v.attack?.id==='c_finish','Combo C finish');
+        v=vgTestReset();vgTestTap('KeyJ');vgTestStep(Math.ceil(YMT_MOVES.a1.T/VERGIL_ATTACK_RATE));vgTestTap('KeyJ');vgTestStep(Math.ceil(YMT_MOVES.a2.T/VERGIL_ATTACK_RATE)+12);vgTestTap('KeyJ');
+        check(v.attack?.id==='c_flurry','delayed Combo C');vgTestStep(Math.ceil(YMT_MOVES.c_flurry.T/VERGIL_ATTACK_RATE));vgTestTap('KeyJ');check(v.attack?.id==='c_finish','Combo C finish');
         for(const air of [false,true]){
             v=vgTestReset();dino.grounded=!air;if(air)dino.y=150;
             vgTestKey('KeyS');vgTestTap('KeyJ');vgTestKey('KeyS',false);
             check(v.attack?.id===(air?'air1':'upper1'),'crouch / aerial input');
-            vgTestStep(10);vgTestTap('KeyJ');
+            vgTestStep(14);vgTestTap('KeyJ');
             if(!air)check(v.attack?.id==='upper2'&&!dino.grounded,'Upper Slash follow-up');
         }
-        v=vgTestReset();vgTestTarget(470);vgTestKey('KeyJ');vgTestStep(19);vgTestKey('KeyJ',false);vgTestStep(1);
+        v=vgTestReset();vgTestTarget(470);vgTestKey('KeyJ');vgTestStep(28);vgTestKey('KeyJ',false);vgTestStep(1);
         check(v.attack?.id==='pjcut'&&v.cuts.length,'perfect release');vgTestStep(12);
         check(enemies[0].hp<10000,'Judgement Cut missed ranged target');
-        v=vgTestReset();vgTestKey('KeyJ');vgTestStep(34);vgTestKey('KeyJ',false);vgTestStep(1);
+        v=vgTestReset();vgTestKey('KeyJ');vgTestStep(45);vgTestKey('KeyJ',false);vgTestStep(1);
         check(v.attack?.id==='jcut','ordinary charged release');
         v=vgTestReset();vgTestKey('KeyK');check(v.attack?.id==='rapid','K Rapid Slash');vgTestStep(18);
         check(v.attack?.id==='rstar'&&!dino.grounded,'hold K Rising Star');vgTestKey('KeyK',false);
         v=vgTestReset();vgTestKey('KeyS');vgTestTap('KeyK');vgTestKey('KeyS',false);
-        check(v.attack?.id==='vslash','Void Slash input');vgTestStep(10);check(v.voidZones.length,'Void zone not created');
+        check(v.attack?.id==='vslash','Void Slash input');vgTestStep(16);check(v.voidZones.length,'Void zone not created');
         v=vgTestReset();dino.grounded=false;dino.y=150;vgTestTap('KeyK');check(v.attack?.id==='helm','air K Helm Breaker');
         vgTestStep(35);check(dino.grounded&&!v.attack,'Helm Breaker never lands');
         // Each independent sword formation must hit without replacing the active Yamato move.
@@ -140,18 +140,18 @@ with sync_playwright() as p:
         vgTestTap('KeyO');check(v.mirageStance>0&&!v.swords.length,'O still fires ranged swords');
         for(const id of ['m_combo1','m_combo2','m_combo3']){
             vgTestTap('KeyJ');check(v.attack?.id===id,'O J combo '+id);
-            dino.draw();vgTestStep(YMT_MOVES[id].T);
+            dino.draw();vgTestStep(Math.ceil(YMT_MOVES[id].T/VERGIL_ATTACK_RATE));
         }
         check(target.hp<10000&&!target._dswControl,'Mirage combo damage / unwanted stun');
         v=vgTestReset();target=vgTestTarget(470);vgTestTap('KeyO');vgTestTap('KeyK');
-        check(v.attack?.id==='m_stinger','O K Deep Stinger');vgTestStep(6);dino.draw();
+        check(v.attack?.id==='m_stinger','O K Deep Stinger');vgTestStep(10);dino.draw();
         check(target.hp<10000&&target._dswControl,'Deep Stinger hit/control');
         v=vgTestReset();target=vgTestTarget(460);vgTestTap('KeyO');vgTestKey('KeyS');vgTestTap('KeyK');vgTestKey('KeyS',false);
         check(v.attack?.id==='m_round'&&v.roundSword,'O Down K Round Trip');vgTestStep(60);dino.draw();
         check(target.hp<10000&&!target._dswControl,'Round Trip damage / unwanted stun');
         vgTestStep(80);check(!v.roundSword,'Round Trip never expires');
         v=vgTestReset();target=vgTestTarget();vgTestTap('KeyO');vgTestKey('KeyS');vgTestTap('KeyJ');vgTestKey('KeyS',false);
-        check(v.attack?.id==='m_high'&&!dino.grounded,'O Down J launcher');vgTestStep(7);
+        check(v.attack?.id==='m_high'&&!dino.grounded,'O Down J launcher');vgTestStep(11);
         check(target.hp<10000&&target._dswControl,'Mirage launcher missed');
         v=vgTestReset();vgTestTap('KeyJ');const attack=v.attack;
         vgTestTap('KeyO');check(v.attack===attack&&v.mirageStance>0,'O interrupts current Yamato attack');

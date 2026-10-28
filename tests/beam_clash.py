@@ -26,7 +26,7 @@ with sync_playwright() as p:
    for(;count<210&&!won&&boss.state!=='clash_lose';count++){
     const point=beamClashRecord(boss).target;
     // Walk up to the contact for melee weapons; the attack still uses its real hitbox.
-    if((mode==='arms'&&value<4)||(mode==='forms'&&value===8)||(mode==='ammo'&&[5,10,11,12,13,15,18,19].includes(value))){dino.x=Math.min(650,point.x-dino.w-8);}
+    if((mode==='arms'&&value<4)||(mode==='forms'&&[8,9].includes(value))||(mode==='ammo'&&[5,10,11,12,13,15,18,19].includes(value))){dino.x=Math.min(650,point.x-dino.w-8);}
     dino.y=320-dino.h;dino.grounded=true;dino.isFacingLeft=false;
     if(count%24===0)key('KeyJ',true);
     const beforeX=boss.beamClashX;loop();if(kind==='fire'&&boss.beamClashX>beforeX+3)pushes++;

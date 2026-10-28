@@ -105035,6 +105035,20 @@ class DantePlayerRig {
         }
 
 
+// Player-only attack clocks. Physics, defenses, projectiles and boss AI keep 60 Hz.
+const DANTE_ATTACK_RATE=.8, VERGIL_ATTACK_RATE=.65;
+function playerAttackStep(a,rate){
+ a._attackClock=(a._attackClock??1-rate)+rate;
+ if(a._attackClock<1-1e-9)return false;
+ a._attackClock-=1;return true;
+}
+function playerComboCancel(a){
+ const end=a.end??a.cancel??a.T??a.duration;
+ return Math.max(a.cancel??end,Math.min((a.T??a.duration)-1,end+3));
+}
+// Keep only the next intended command; tapping rapidly cannot bank a whole combo.
+function playerComboBuffer(queue,cmd){queue.splice(0,queue.length,cmd);}
+
 // Playable Dante: player physics and defenses, independent friendly combat controller.
 let danteForm=false,danteLoadout=null;
 try{danteForm=localStorage.getItem('dino_dante_form')==='1';}catch(e){}
@@ -105125,7 +105139,7 @@ function danteTick(){
  if(p.k!==null){if(keys.KeyK)p.k=Math.min(120,p.k+1);else danteRelease();}
  if(p.arm!==0&&p.arm!==1&&p.arm!==2&&p.arm!==3&&p.arm!==5&&keys.KeyJ&&!keys.KeyK&&!p.attack&&p.cd<=0)danteAttack(false,0);
  if(p.dt>0){p.dt--;ultCharge=0;if(++p.regen>=120){p.regen=0;n.hp=Math.min(n.maxHp,n.hp+1);}}
- if(p.attack&&!p.attack.sword&&!p.attack.balrog&&!p.attack.cavaliere&&!p.attack.cerberus&&!p.attack.ebony&&!p.attack.faust&&!p.attack.royal){const a=p.attack;a.age++;
+ if(p.attack&&!p.attack.sword&&!p.attack.balrog&&!p.attack.cavaliere&&!p.attack.cerberus&&!p.attack.ebony&&!p.attack.faust&&!p.attack.royal&&playerAttackStep(p.attack,DANTE_ATTACK_RATE)){const a=p.attack;a.age++;
   if(a.kind==='slam'&&!n.grounded){a.age=Math.min(a.age,a.wind);n.dy=Math.max(n.dy,9);}
   if(a.age>=a.wind+1&&(a.age-a.wind-1)%a.interval===0&&a.pulses>0){dantePulse(n,p,a);a.pulses--;}
   if(a.kind==='slam'&&!n.grounded)n.dy=Math.max(n.dy,9);
@@ -105376,7 +105390,7 @@ function dswCommand(cmd){
   if(cmd.key==='J'&&pendingDash){pendingDash.extensions=Math.min(4,(pendingDash.extensions||0)+1);return;}
   if(cmd.key==='J'&&a.id==='million'){a.extensions=Math.min(4,(a.extensions||0)+1);return;}
   if(cmd.key==='K'&&DSW_DANCE.includes(a.id)){a.continue=Math.min(8,(a.continue||0)+1);return;}
-  if(s.queue.length<4)s.queue.push(cmd);
+  playerComboBuffer(s.queue,cmd);
   return;
  }
  dswDispatch(cmd);
@@ -105715,7 +105729,7 @@ function dswTick(n,p){
  if(n.grounded&&!p.attack)s.airSlow=0;
 
  const a=p.attack;
- if(a&&a.sword){
+ if(a&&a.sword&&playerAttackStep(a,DANTE_ATTACK_RATE)){
   const prev=a.age;a.age++;
   if(a.advance&&a.age===a.wind+1&&n.grounded){
    dashVx=a.dir*a.advance;
@@ -106280,12 +106294,12 @@ function blrCommand(cmd){
    a.continue = Math.min(4, (a.continue || 0) + 1);
    return;
   }
-  if(a.age >= (a.cancel || a.end)){
+  if(a.age >= playerComboCancel(a)){
    b.last = a.id; b.ended = frames; p.attack = null;
    blrDispatch(cmd);
    return;
   }
-  if(b.queue.length < 3) b.queue.push(cmd);
+  playerComboBuffer(b.queue,cmd);
   return;
  }
  blrDispatch(cmd);
@@ -106509,7 +106523,7 @@ function blrTick(n, p){
  }
 
  const a = p.attack;
- if(a && a.balrog){
+ if(a&&a.balrog&&playerAttackStep(a,DANTE_ATTACK_RATE)){
   // Nếu đang có Hitstop (khựng lực đấm 1-2 frame khi trúng thịt) -> Giữ nguyên frame đấm cho có lực!
   if(b.hitstop > 0){
    b.hitstop--;
@@ -106517,8 +106531,8 @@ function blrTick(n, p){
   }
   const prev = a.age; a.age++;
 
-  // NGẮT CHIÊU SỚM (EARLY COMBO CANCEL): Nối nhịp J -> J -> J -> J không có độ trễ
-  if(b.queue.length > 0 && a.age >= (a.cancel || a.end) && a.id !== 'rjab'){
+  // Nối đòn sau nhịp thu tay, không cắt mất phần kết của cú đánh.
+  if(b.queue.length > 0 && a.age >= playerComboCancel(a) && a.id !== 'rjab'){
    const nextCmd = b.queue.shift();
    b.last = a.id; b.ended = frames; p.attack = null;
    blrDispatch(nextCmd);
@@ -107053,12 +107067,12 @@ function cavCommand(cmd){
    return;
   }
   // Ngắt chiêu sớm khi tới cửa sổ Gearshift (`cancel`)
-  if(a.age >= (a.cancel || a.end)){
+  if(a.age >= playerComboCancel(a)){
    c.last = a.id; c.ended = frames; p.attack = null;
    cavDispatch(cmd);
    return;
   }
-  if(c.queue.length < 3) c.queue.push(cmd);
+  playerComboBuffer(c.queue,cmd);
   return;
  }
  cavDispatch(cmd);
@@ -107240,12 +107254,12 @@ function cavTick(n, p){
  if(n.grounded && !p.attack) c.airSlow = 0;
 
  const a = p.attack;
- if(a && a.cavaliere){
+ if(a&&a.cavaliere&&playerAttackStep(a,DANTE_ATTACK_RATE)){
   a.age++;
   // Báo hiệu tia điện xanh khi vào cửa sổ Gearshift (có thể bấm J hoặc K nối chiêu ngay)
-  c.gearSpark = (a.age >= (a.cancel || a.end) - 2 && a.age <= a.end + 2) ? 6 : Math.max(0, c.gearSpark - 1);
+  c.gearSpark = (a.age >= playerComboCancel(a) - 2 && a.age <= playerComboCancel(a) + 2) ? 6 : Math.max(0, c.gearSpark - 1);
 
-  if(c.queue.length > 0 && a.age >= (a.cancel || a.end)){
+  if(c.queue.length > 0 && a.age >= playerComboCancel(a)){
    const nextCmd = c.queue.shift();
    c.last = a.id; c.ended = frames; p.attack = null;
    cavDispatch(nextCmd);
@@ -107693,12 +107707,12 @@ function kcbCommand(cmd){
    kcbStart('airdance', { lockDir: a.dir });
    return;
   }
-  if(a.age >= (a.cancel || a.end)){
+  if(a.age >= playerComboCancel(a)){
    c.last = a.id; c.ended = frames; p.attack = null;
    kcbDispatch(cmd);
    return;
   }
-  if(c.queue.length < 3) c.queue.push(cmd);
+  playerComboBuffer(c.queue,cmd);
   return;
  }
  kcbDispatch(cmd);
@@ -107957,9 +107971,9 @@ function kcbTick(n, p){
  }
 
  const a = p.attack;
- if(a && a.cerberus){
+ if(a&&a.cerberus&&playerAttackStep(a,DANTE_ATTACK_RATE)){
   a.age++;
-  if(c.queue.length > 0 && a.age >= (a.cancel || a.end)){
+  if(c.queue.length > 0 && a.age >= playerComboCancel(a)){
    const nextCmd = c.queue.shift();
    c.last = a.id; c.ended = frames; p.attack = null;
    kcbDispatch(nextCmd);
@@ -108575,7 +108589,7 @@ function eiTick(){
  p.body._gunRoll=a?.id==='slide'&&a.age<18?Math.PI*2*a.age/18:0;
  e.flash=e.flash.filter(f=>--f.t>0);
  if(n.grounded)e.rainUsed=false;
- if(!a||!a.ebony)return;
+ if(!a||!a.ebony||!playerAttackStep(a,DANTE_ATTACK_RATE))return;
  const m=EI_MOVES[a.id];a.age++;
  if(eiDashMove(n,p,a,m))return;
  if(m.shots.includes(a.age)){
@@ -108852,7 +108866,8 @@ function faustTick(){
  else if(shooting&&!a&&p.cd<=0)faustCommand(false);
  if(!shooting)f.ringHits.clear();
  faustHatTick(n,p,f);
- if(a?.faust){
+ // Throw/recall keep their original timing so the returning hat can still be recalled.
+ if(a?.faust&&playerAttackStep(a,['throw','trick'].includes(a.id)?1:DANTE_ATTACK_RATE)){
   a.age++;
   if(a.id==='shot'&&a.age===1)faustRound(n,p,eiAim(n,a.dir),2);
   if(a.id==='throw'&&a.age===6&&!f.hat)f.hat={x:n.x+n.w/2,y:n.y+18,vx:a.dir*11,vy:0,age:0,damage:danteRangedBase(p,4,true),returning:false,out:new Set(),back:new Set()};
@@ -109678,7 +109693,8 @@ function danteSinTick(){
   if(j.age>=284)danteSinExit();return;
  }
  p.sinTime--;
- if(frames%2===0&&Math.abs(dashVx)>2){danteGhost(n);danteSinBlink();}
+ // Only an intentional Dash crosses behind: a sword's small advance is not a Dash.
+ if(frames%2===0&&frames-(p.sinDash??-1000)<=24&&Math.abs(dashVx)>2){danteGhost(n);danteSinBlink();}
  if(keys.KeyK)danteSinFire();
  const a=p.attack;p.body._sinDrill=!!a?.sinDrill;
  if(a?.sinDrill){
@@ -111667,12 +111683,12 @@ function ymtCommand(cmd) {
             ymtStart('pjcut', { lockDir: a.dir });
             return;
         }
-        if (a.age >= (a.cancel || a.end)) {
+        if (a.age >= playerComboCancel(a)) {
             v.last = a.id; v.ended = frames; v.attack = null;
             ymtDispatch(cmd);
             return;
         }
-        if (v.queue.length < 3) v.queue.push(cmd);
+        playerComboBuffer(v.queue,cmd);
         return;
     }
     ymtDispatch(cmd);
@@ -111792,15 +111808,15 @@ function vergilTick() {
     // Nạp giữ J -> Just Judgement Cut
     if (keys.KeyJ && !keys.KeyS && !keys.ArrowDown) {
         v.holdJ++;
-        if (v.holdJ === 18) {
+        if (v.holdJ === 26) {
             v.sheatheSpark = 12;
             if (typeof SFX !== 'undefined' && SFX.tone) SFX.tone(1750, 0.05, 'sine', 0.09, 1200);
         }
     } else if (v.holdJ > 0) {
         const held = v.holdJ;
         v.holdJ = 0;
-        if (held >= 14) {
-            const isPerfect = held >= 17 && held <= 27;
+        if (held >= 22) {
+            const isPerfect = held >= 24 && held <= 38;
             v.attack = null; v.queue = [];
             ymtStart(isPerfect ? 'pjcut' : 'jcut');
         }
@@ -111837,11 +111853,11 @@ function vergilTick() {
 
     // CẬP NHẬT ĐÒN TẤN CÔNG HIỆN TẠI
     const a = v.attack;
-    if (a) {
+    if (a && playerAttackStep(a,VERGIL_ATTACK_RATE)) {
         const prevAge = a.age;
         a.age++;
 
-        if (v.queue.length > 0 && a.age >= (a.cancel || a.end)) {
+        if (v.queue.length > 0 && a.age >= playerComboCancel(a)) {
             const nextCmd = v.queue.shift();
             v.last = a.id; v.ended = frames; v.attack = null;
             ymtDispatch(nextCmd);
@@ -112090,7 +112106,7 @@ function vergilTick() {
             }
         }
         if (v.dop.attack) {
-            v.dop.attack.age++;
+            if(playerAttackStep(v.dop.attack,VERGIL_ATTACK_RATE))v.dop.attack.age++;
             if (v.dop.attack.age >= v.dop.attack.T) v.dop.attack = null;
         }
     }
@@ -112497,7 +112513,7 @@ function vergilDraw(n) {
             ctx.restore();
         }
 
-        if (v.sheatheSpark > 0 || v.justWindow > 0 || (v.holdJ >= 17 && v.holdJ <= 27)) {
+        if (v.sheatheSpark > 0 || v.justWindow > 0 || (v.holdJ >= 24 && v.holdJ <= 38)) {
             const sx = pose.sayaX, sy = pose.sayaY - 6;
             const pulse = v.justWindow > 0 ? 1.25 : 1.0;
             ctx.save();

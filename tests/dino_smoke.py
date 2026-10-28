@@ -29,7 +29,7 @@ with sync_playwright() as p:
  # Test each contextual branch without RAF advancing between assertions.
  result=pg.evaluate('''()=>{
  paused=true;const results=[];const reset=()=>{for(const k of Object.keys(keys))delete keys[k];dino.dante.attack=null;dino.dante.swapReady=0;dino.dante.nextSwap=0;dino.dante.cd=0;dino.dante.rounds=[];dino.dante.arm=4;dino.grounded=true;dino.dante.style=1;combatStance=0;};
- function run(special,charge,expected){eiCommand(special,charge);const a=dino.dante.attack;if(!a||a.id!==expected)throw Error('expected '+expected);for(let i=0;i<EI_MOVES[expected].T;i++)eiTick();const q=dino.dante.rounds;if(!q.length)throw Error('no shots');results.push([expected,q.length,q.every(r=>Number.isFinite(r.vx)&&Number.isFinite(r.vy))]);return q;}
+ function run(special,charge,expected){eiCommand(special,charge);const a=dino.dante.attack;if(!a||a.id!==expected)throw Error('expected '+expected);for(let i=0;i<Math.ceil(EI_MOVES[expected].T/DANTE_ATTACK_RATE);i++)eiTick();const q=dino.dante.rounds;if(!q.length)throw Error('no shots');results.push([expected,q.length,q.every(r=>Number.isFinite(r.vx)&&Number.isFinite(r.vy))]);return q;}
  reset();run(false,0,'shot');reset();let q=run(true,0,'twosome');if(!(q.some(r=>r.vx>0)&&q.some(r=>r.vx<0)))throw Error('both directions');
  reset();keys.KeyS=true;run(true,0,'honeycomb');reset();dino.grounded=false;dino.dante.ebony.rainUsed=false;q=run(true,0,'rain');if(!q.every(r=>r.vy>0))throw Error('rain must shoot down');
  dino.dante.cd=0;dino.dante.attack=null;eiCommand(true,0);if(dino.dante.attack.id==='rain')throw Error('infinite hover');
@@ -88,7 +88,7 @@ with sync_playwright() as p:
   if(!sent||fan.length!==12||!fan.every(q=>Number.isFinite(q.vx)&&Number.isFinite(q.vy)))throw Error('vault fan');
   step(48);results.push(['vault',left]);
  }
- reset();enemies.length=0;danteKey('KeyK',false);doDash(1);keys.KeyK=false;step(48);
+ reset();enemies.length=0;danteKey('KeyK',false);doDash(1);keys.KeyK=false;step(Math.ceil(EI_MOVES.vault.T/DANTE_ATTACK_RATE));
  if(dino.dante.attack||!Number.isFinite(dino.y))throw Error('no-target vault');
  reset();dashCd=20;danteKey('KeyK',false);doDash(1);
  if(dino.dante.attack?.id==='vault'||dino.dante.k===null)throw Error('failed dash consumed charge');
@@ -118,19 +118,19 @@ with sync_playwright() as p:
  const h=faustState(dino.dante).hat,burstTarget=target(h.x-8,h.y-8);K();if(dino.dante.attack?.id!=='trick')throw Error('hat recall');step(6);
  if(burstTarget.hp>=200||!faustState(dino.dante).hat?.returning)throw Error('Hat Trick burst');step(100);if(faustState(dino.dante).hat)throw Error('hat stuck');
  reset();const melee=target(450,270);keys.KeyS=true;
- for(const id of ['slash','slash','upper']){K();if(dino.dante.attack?.id!==id)throw Error('down K combo');step(FAUST_MOVES[id].T);}
+ for(const id of ['slash','slash','upper']){K();if(dino.dante.attack?.id!==id)throw Error('down K combo');step(Math.ceil(FAUST_MOVES[id].T/DANTE_ATTACK_RATE));}
  if(Math.abs(melee.hp-186.4)>1e-6||!melee._dswControl?.air)throw Error('melee cadence / launch '+melee.hp);
  reset();dino.grounded=false;K();if(dino.dante.attack?.id!=='air')throw Error('air K');step(30);
  reset();doDash(1);K();if(dino.dante.attack?.id!=='dash')throw Error('dash K');step(30);
- reset();danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();if(dino.dante.attack?.id!=='meteor')throw Error('charged K');step(40);
+ reset();danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();if(dino.dante.attack?.id!=='meteor')throw Error('charged K');step(50);
  if(faustState(dino.dante).meteors.length!==3)throw Error('Red Hot Night must create 3 meteors');
- reset();const meteorTarget=target(520,265);danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();step(95);
+ reset();const meteorTarget=target(520,265);danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();step(120);
  if(Math.abs(meteorTarget.hp-164.8)>1e-6)throw Error('meteors must actually hit '+meteorTarget.hp);
  // Each growing meteor blast hits once; targets outside the radius remain safe.
  reset();const epicentre=target(520,265),edge=target(610,275,10,10),outside=target(730,275);
- danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();step(95);
+ danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();step(120);
  if(Math.abs(epicentre.hp-164.8)>1e-6||Math.abs(edge.hp-179.2)>1e-6||outside.hp!==200)throw Error('meteor AoE radii / repeated damage '+[epicentre.hp,edge.hp,outside.hp]);
- reset();const moving=target(520,265);danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();moving.x+=300;step(95);
+ reset();const moving=target(520,265);danteKey('KeyK',false);step(60);keys.KeyK=false;danteRelease();moving.x+=300;step(120);
  if(moving.hp!==200)throw Error('meteor target position must stay locked');
  // Red Shot is a finite, piercing, aimed ranged attack with three charge tiers.
  for(const left of [false,true])for(const charge of [30,60,90]){
@@ -200,16 +200,16 @@ with sync_playwright() as p:
  danteKey('KeyL',false);tick(1);if(danteStyleState(dino.dante).swords.length)throw Error('guard-cancelled melee left damaging swords');
  reset(0);dino.dante.arm=0;dswStart('a1');danteSwordStart();const forming=danteStyleState(dino.dante).swords[0];
  const formingX=forming.x;dino.x+=50;tick(1);if(Math.abs(forming.x-formingX-50)>.001||forming.origin)throw Error('rear formation failed to follow before launch');
- tick(4);const outOfReach=enemy(700);dino.x+=400;tick(8);if(outOfReach.hp!==1000)throw Error('released blades swept across the world after owner moved');
+ tick(4);if(!forming.launched)throw Error('support sword not released');dino.dante.attack=null;const outOfReach=enemy(700);dino.x+=400;tick(8);if(outOfReach.hp!==1000)throw Error('released blades swept across the world after owner moved');
  // A long, repeated stab action still adds only one damage event per support sword.
  const stabHp=[];
  for(const style of [2,0]){reset(style);dino.dante.arm=0;styleRankIdx=6;const o=enemy(490,150);o.h=250;dswStart('million');tick(29);stabHp.push(o.hp);}
  if(stabHp[0]-stabHp[1]!==4)throw Error('multi-hit action multiplied or lost support damage '+stabHp);
  reset(0);dino.dante.arm=0;styleRankIdx=6;danteKey('KeyJ',false);keys.KeyJ=false;
- const group=danteStyleState(dino.dante).swords.slice();tick(4);
+ const group=danteStyleState(dino.dante).swords.slice();while(dino.dante.attack.age<4)tick(1);
  if(group[0].stroke!==1||group.slice(1).some(b=>b.launched))throw Error('first cut must precede delayed swords');
- tick(3);if(group[1].stroke!==1||group[0].stroke!==4||group[2].launched)throw Error('cuts not sequenced three frames apart');
- tick(14);if(dino.dante.attack||!danteStyleState(dino.dante).swords.includes(group[3])||group[3].stroke!==9)throw Error('last support cut truncated at end of main attack');
+ while(dino.dante.attack.age<7)tick(1);if(group[1].stroke!==1||group[0].stroke!==5||group[2].launched)throw Error('cuts not sequenced three frames apart');
+ while(dino.dante.attack)tick(1);if(!danteStyleState(dino.dante).swords.includes(group[3])||group[3].stroke<1||group[3].stroke>=16)throw Error('last support cut truncated at end of main attack');
  tick(12);if(danteStyleState(dino.dante).swords.length)throw Error('delayed cuts never expired');
  // Fast combo input preserves the pending cuts of the previous group.
  reset(0);dino.dante.arm=0;styleRankIdx=6;dswStart('a1');danteSwordStart();tick(10);const previousGroup=danteStyleState(dino.dante).swords.slice();
@@ -222,7 +222,7 @@ with sync_playwright() as p:
  reset(0);dino.dante.arm=0;dswStart('a1');danteSwordStart();dino.dante.arm=4;tick(1);if(danteStyleState(dino.dante).swords.length)throw Error('swords leaked across weapons');
  // Drill heads converge, all swords launch together and stay with Stinger's movement.
  for(const dir of [1,-1]){
-  reset(0);dino.dante.arm=0;styleRankIdx=6;dino.isFacingLeft=dir<0;dswStart('stinger');danteSwordStart();tick(7);
+  reset(0);dino.dante.arm=0;styleRankIdx=6;dino.isFacingLeft=dir<0;dswStart('stinger');danteSwordStart();tick(8);
   const drill=danteStyleState(dino.dante).swords;
   if(drill.length!==4||drill.some(b=>!b.isDrill||b.stroke!==3))throw Error('Stinger drill not simultaneous');
   if(Math.max(...drill.map(b=>b.tx))-Math.min(...drill.map(b=>b.tx))>.001)throw Error('drill tips do not converge');
@@ -234,7 +234,7 @@ with sync_playwright() as p:
   if(danteSwordMove(move).kind!==expected)throw Error('shared weapon ID misclassified '+move.name);
  }
  reset(0);dino.dante.arm=0;styleRankIdx=6;dswStart('million');danteSwordStart();const fan=danteStyleState(dino.dante).swords.slice();tick(1);
- if(fan[0].stroke!==1||fan.slice(1).some(b=>b.launched))throw Error('fan start timing');tick(2);if(fan[1].stroke!==1)throw Error('fan two-frame delay');
+ if(fan[0].stroke!==1||fan.slice(1).some(b=>b.launched))throw Error('fan start timing');while(dino.dante.attack.age<3)tick(1);if(fan[1].stroke!==1)throw Error('fan two-frame delay');
  danteSetStyle(1);if(danteStyleState(dino.dante).swords.length)throw Error('phantoms survived style change');
  for(const [arm,start] of [[1,()=>blrStart('j1')],[2,()=>cavStart('j1')],[3,()=>kcbStart('j1')],[5,()=>{keys.KeyS=true;faustCommand(true,0);}]]){
   reset(0);dino.dante.arm=arm;start();tick(1);if(danteStyleState(dino.dante).swords.length!==1)throw Error('missing melee phantom for arm '+arm);
@@ -248,8 +248,8 @@ with sync_playwright() as p:
   if(r.damage!==(style===1?2:1)||r.color!==danteBulletColor(dino.dante))throw Error('Faust base/GS output');
  }
  for(const style of [1,2]){
-  reset(style);dino.dante.arm=5;faustCommand(true,60);tick(49);
-  if(faustState(dino.dante).meteors.length!==(style===1?4:3))throw Error('Gunslinger extra meteor');
+  reset(style);dino.dante.arm=5;faustCommand(true,60);tick(61);
+  const f=faustState(dino.dante);if(f.meteors.length+f.impacts.filter(i=>i.meteor).length!==(style===1?4:3))throw Error('Gunslinger extra meteor');
  }
  result.push('ranged base 1 / red GS 2 / extra meteor');
  reset(2);const boss=enemy(344);enemies.length=0;bosses.push(boss);boss.state='charging';danteKey('KeyL',false);
