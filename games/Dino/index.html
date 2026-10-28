@@ -14679,22 +14679,44 @@
 
         class ArtoriasBoss {
             constructor(level){
-                this.name = "ARTORIAS"; this.hp = 190; this.maxHp = 190;
+                this.name = "KNIGHT ARTORIAS"; this.hp = 190; this.maxHp = 190;
                 this.w = ART_W; this.h = ART_H; this.baseY = 320 - this.h;
                 this.x = canvas.width - 220; this.y = this.baseY; this.dy = 0; this.grounded = true;
                 this.state = 'entering'; this.subTimer = 0; this.actionTimer = 44; this.facingLeft = true;
                 this.retState = 'idle'; this.lastSkill = ''; this.atkBag = []; this.invulnAll = false;
                 this.burnTimer = 0; this.lastMeleeHit = -1; this.phase = 2; this._bag = null;
-                this.armR = 0; this.dashV = 0; this.walk = 0;
+                this.armR = 0.25; this.swordAngle = -1.05;
+                this.crouch = 0; this.lean = 0.14; this.flipAngle = 0;
+                this.dashV = 0; this.walk = 0;
                 this.slash = null; this.tel = null; this.ghosts = []; this.cd = {};
                 this.buffed = false; this.buffTries = 0; this.buffHp = 0; this.buffT = 0;
                 this.somer = 0; this.burst = null; this._hb = false; this.stagger = 0;
+                this.wisps = [];       // Đạn linh hồn Vực Thẳm bay chậm truy kích (Nightreign Homing Wisps)
+                this.sludgePools = []; // Vũng bùn Vực Thẳm ngắn hạn trên mặt đất
+                this.howlWaves = [];   // Vòng sóng âm khi Artorias hú vang
             }
-            spd(){ return this.buffed ? 1.45 : 1.12; }   // ca hai dang deu nhanh tay hon
-            toIdle(t){ this.state = 'idle'; this.subTimer = 0;
-                       this.actionTimer = Math.max(8, Math.round(t * ART_TEMPO / this.spd())); this.armR = 0; }
-            ghost(){ if (this.ghosts.length >= 5) this.ghosts.shift();
-                     this.ghosts.push({ x: this.x, y: this.y, left: this.facingLeft, armR: this.armR, buffed: this.buffed, t: 13 }); }
+            spd(){ return this.buffed ? 1.38 : 1.10; }
+            resetPose(){
+                this.armR = 0.25;
+                this.swordAngle = -1.05;
+                this.crouch = 0;
+                this.lean = 0.14;
+                this.flipAngle = 0;
+            }
+            toIdle(t){
+                this.state = 'idle'; this.subTimer = 0;
+                this.actionTimer = Math.max(10, Math.round(t * ART_TEMPO / this.spd()));
+                this.resetPose();
+            }
+            ghost(){
+                if (this.ghosts.length >= 6) this.ghosts.shift();
+                this.ghosts.push({
+                    x: this.x, y: this.y, left: this.facingLeft,
+                    armR: this.armR, swordAngle: this.swordAngle,
+                    crouch: this.crouch, lean: this.lean, flipAngle: this.flipAngle,
+                    buffed: this.buffed, t: 13
+                });
+            }
             physics(){
                 this.dy += 0.7; this.y += this.dy;
                 let land = 320;
@@ -14709,9 +14731,10 @@
                 this.x = Math.max(8, Math.min(canvas.width - this.w - 8, this.x));
             }
             warn(reach, up, t){ this.tel = { dir: this.dir(), reach: reach, up: up, t: t, max: t }; }
-            // Buff chi cho TOC DO + MO THEM CHIEU, khong cong sat thuong moi nhat
-            // (cong ca hai thi don buff nao cung 2-3 dmg, do ra 100+ dmg/phut).
-            doSlash(reach, up, life, dmg){ let _k=aaHeSo(this); reach*=_k; up=aaUp(this,up); this.slash = { t: life, dir: this.dir(), reach: reach, up: up, hit: false, dmg: dmg || 1 }; }
+            doSlash(reach, up, life, dmg){
+                let _k = aaHeSo(this); reach *= _k; up = aaUp(this, up);
+                this.slash = { t: life, dir: this.dir(), reach: reach, up: up, hit: false, dmg: dmg || 1 };
+            }
             slashRect(){
                 let a = this.slash; if (!a) return { x:0,y:0,w:0,h:0 };
                 return a.dir < 0 ? { x: this.x - a.reach, y: this.y + 4 - a.up, w: a.reach, h: this.h + a.up - 4 }
@@ -14726,8 +14749,58 @@
                 this.lastSkill = c; if (ART_CD[c]) this.cd[c] = ART_CD[c];
                 return c;
             }
-            // ---- vong no Vuc Tham lan ra ----
-            // --- VONG VUC THAM: vanh lan ra, cham vao vanh thi an 1 dmg ---
+            // Triệu hồi các đốm linh hồn Vực Thẳm bay chậm truy kích (Đặc trưng của Artorias trong Nightreign)
+            spawnAbyssWisps(count){
+                for (let k = 0; k < count; k++){
+                    let ang = -Math.PI * 0.85 + (k / Math.max(1, count - 1)) * Math.PI * 0.7;
+                    this.wisps.push({
+                        x: this.cx() + Math.cos(ang) * 28,
+                        y: this.cy() - 18 + Math.sin(ang) * 22,
+                        vx: Math.cos(ang) * 3.5,
+                        vy: Math.sin(ang) * 3.5 - 1.5,
+                        t: 0, life: 175
+                    });
+                }
+            }
+            tickWisps(){
+                for (let i = this.wisps.length - 1; i >= 0; i--){
+                    let w = this.wisps[i]; w.t++; w.life--;
+                    // Sau 18 frame bay tỏa ra, đốm lửa đen từ từ uốn hướng về phía người chơi (tốc độ vừa phải để dễ né hoặc bắn vỡ)
+                    if (w.t > 18 && w.t < 120){
+                        let tx = dino.x + dino.w/2, ty = dino.y + dino.h/2;
+                        let dx = tx - w.x, dy = ty - w.y, d = Math.hypot(dx, dy) || 1;
+                        w.vx += (dx / d) * 0.22; w.vy += (dy / d) * 0.22;
+                        let sp = Math.hypot(w.vx, w.vy);
+                        if (sp > 4.6){ w.vx = (w.vx / sp) * 4.6; w.vy = (w.vy / sp) * 4.6; }
+                    }
+                    w.x += w.vx; w.y += w.vy;
+                    // Người chơi có thể bắn đạn phá vỡ đốm lửa Vực Thẳm
+                    let box = { x: w.x - 10, y: w.y - 10, w: 20, h: 20 };
+                    let broken = false;
+                    if (typeof projectiles !== 'undefined'){
+                        for (let pi = projectiles.length - 1; pi >= 0; pi--){
+                            let pr = projectiles[pi]; if (!pr || pr.owner !== 1) continue;
+                            if (checkAABB(pr, box)){
+                                broken = true;
+                                visualEffects.push(new Effect(w.x, w.y, 'explosion', true, 12));
+                                if (!(pr.type === 2 || (pr.pierceCount||0) > 0)) projectiles.splice(pi, 1);
+                                break;
+                            }
+                        }
+                    }
+                    if (!broken && checkAABB(dino, box)){
+                        broken = true; this.hurtP(1);
+                        visualEffects.push(new Effect(w.x, w.y, 'explosion', true, 14));
+                    }
+                    if (broken || w.life <= 0 || w.y > 325 || w.x < -40 || w.x > canvas.width + 40){
+                        this.wisps.splice(i, 1);
+                    }
+                }
+                for (let i = this.howlWaves.length - 1; i >= 0; i--){
+                    let hw = this.howlWaves[i]; hw.r += 9; hw.t--;
+                    if (hw.t <= 0) this.howlWaves.splice(i, 1);
+                }
+            }
             tickVong(){
                 let v = this.vong; if (!v) return;
                 v.r += v.sp;
@@ -14736,7 +14809,6 @@
                 if (!v.hit && Math.abs(d - v.r) < ART_VONG_DAY/2){ v.hit = true; this.hurtP(1); }
                 if (v.r > v.max) this.vong = null;
             }
-            // --- DAU VUC THAM: dem nguoc roi no thanh mot cot toi tai cho ---
             tickDau(){
                 if (!this.dau || !this.dau.length) return;
                 for (let i = this.dau.length - 1; i >= 0; i--){
@@ -14757,11 +14829,11 @@
                 let v = this.vong;
                 if (v){
                     ctx.save();
-                    ctx.globalAlpha = 0.55 * Math.max(0, 1 - v.r / v.max);
+                    ctx.globalAlpha = 0.50 * Math.max(0, 1 - v.r / v.max);
                     ctx.strokeStyle = this.buffed ? "#B388FF" : "#7E57C2";
-                    ctx.lineWidth = ART_VONG_DAY * 0.5;
+                    ctx.lineWidth = ART_VONG_DAY * 0.45;
                     ctx.beginPath(); ctx.ellipse(v.x, v.y, v.r, v.r * 0.34, 0, Math.PI, 0); ctx.stroke();
-                    ctx.globalAlpha = 0.9; ctx.strokeStyle = "#EDE7F6"; ctx.lineWidth = 2;
+                    ctx.globalAlpha = 0.85; ctx.strokeStyle = "#EDE7F6"; ctx.lineWidth = 2;
                     ctx.beginPath(); ctx.ellipse(v.x, v.y, v.r, v.r * 0.34, 0, Math.PI, 0); ctx.stroke();
                     ctx.restore(); ctx.globalAlpha = 1;
                 }
@@ -14769,20 +14841,39 @@
                     ctx.save();
                     if (m.no > 0){
                         let u = m.no / 20;
-                        ctx.globalAlpha = 0.85 * u;
+                        ctx.globalAlpha = 0.78 * u;
                         let g = ctx.createLinearGradient(0, 320 - 190, 0, 320);
-                        g.addColorStop(0, "rgba(179,136,255,0)"); g.addColorStop(0.5, "rgba(126,87,194,0.9)");
+                        g.addColorStop(0, "rgba(179,136,255,0)"); g.addColorStop(0.5, "rgba(126,87,194,0.85)");
                         g.addColorStop(1, "rgba(237,231,246,0.95)");
                         ctx.fillStyle = g; ctx.fillRect(m.x - 46, 320 - 190, 92, 190);
                     } else {
                         let u = 1 - m.t / ART_DAU_CHO;
-                        ctx.globalAlpha = 0.30 + 0.5 * u;
-                        ctx.strokeStyle = "#B388FF"; ctx.lineWidth = 3;
+                        ctx.globalAlpha = 0.28 + 0.45 * u;
+                        ctx.strokeStyle = "#B388FF"; ctx.lineWidth = 2.5;
                         ctx.beginPath(); ctx.ellipse(m.x, 318, 46 * (0.4 + 0.6 * u), 13, 0, 0, 6.28); ctx.stroke();
-                        ctx.fillStyle = "rgba(126,87,194,0.35)";
+                        ctx.fillStyle = "rgba(126,87,194,0.25)";
                         ctx.beginPath(); ctx.ellipse(m.x, 318, 46 * (0.4 + 0.6 * u), 13, 0, 0, 6.28); ctx.fill();
                     }
                     ctx.restore(); ctx.globalAlpha = 1;
+                }
+                // Vẽ sóng âm tiếng hú sói (Wolf Howl Rings)
+                for (let hw of this.howlWaves){
+                    ctx.save();
+                    ctx.globalAlpha = (hw.t / 18) * 0.65;
+                    ctx.strokeStyle = "#B388FF"; ctx.lineWidth = 2.5;
+                    ctx.beginPath(); ctx.arc(hw.x, hw.y, hw.r, 0, 6.28); ctx.stroke();
+                    ctx.restore();
+                }
+                // Vẽ đốm linh hồn Vực Thẳm (Homing Abyss Wisps)
+                for (let w of this.wisps){
+                    ctx.save();
+                    ctx.fillStyle = "#311B92";
+                    ctx.beginPath(); ctx.arc(w.x, w.y, 8, 0, 6.28); ctx.fill();
+                    ctx.strokeStyle = "#B388FF"; ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.fillStyle = "#EDE7F6";
+                    ctx.beginPath(); ctx.arc(w.x - w.vx * 0.4, w.y - w.vy * 0.4, 3, 0, 6.28); ctx.fill();
+                    ctx.restore();
                 }
             }
             tickBurst(){
@@ -14794,30 +14885,44 @@
                 if (b.r > b.max) this.burst = null;
             }
             update(){
-                if (this.state === 'entering'){ this.physics(); this.x -= 4; if (this.x < canvas.width - 250) this.toIdle(34); return; }
+                if (this.state === 'entering'){
+                    this.physics(); this.x -= 4; this.walk += 4;
+                    if (this.x < canvas.width - 250) this.toIdle(34);
+                    return;
+                }
                 for (let i = this.ghosts.length - 1; i >= 0; i--){ this.ghosts[i].t--; if (this.ghosts[i].t <= 0) this.ghosts.splice(i, 1); }
                 if (this.tel){ this.tel.t--; if (this.tel.t <= 0) this.tel = null; }
                 if (this.slash){ this.slash.t--; if (this.slash.t <= 0) this.slash = null; }
                 for (let k in this.cd) if (this.cd[k] > 0) this.cd[k]--;
-                if (this.stagger > 0){ this.stagger--; this.physics(); if (this.stagger === 0) this.toIdle(20); return; }
-                this.tickBurst(); this.tickVong(); this.tickDau();
+                if (this.stagger > 0){
+                    this.stagger--;
+                    this.crouch = 12; this.lean = 0.35; this.armR = 0.8; this.swordAngle = 0.4; // Tư thế quỳ gối chống kiếm khi bị choáng!
+                    this.physics();
+                    if (this.stagger === 0) this.toIdle(22);
+                    return;
+                }
+                this.tickBurst(); this.tickVong(); this.tickDau(); this.tickWisps();
                 this.physics();
                 if (this.slash){
                     let r = this.slashRect();
                     if (!this.slash.hit && checkAABB(dino, r)){ this.slash.hit = true; this.hurtP(this.slash.dmg); }
                 }
-                // ---- CU BUFF VUC THAM: thu toi da 2 lan ----
+                // ---- CÚ BUFF VỰC THẲM (WRATH OF THE ABYSS): Thử tối đa 2 lần ở 75% và 40% máu ----
                 if (!this.buffed && this.state === 'idle' &&
                     ((this.buffTries === 0 && this.hp <= this.maxHp * 0.75) ||
                      (this.buffTries === 1 && this.hp <= this.maxHp * 0.40))){
                     this.buffTries++; this.state = 'a_buff'; this.subTimer = 0;
                     this.buffHp = this.hp; this.buffT = 0;
+                    // Nhảy lùi nhẹ về khoảng cách an toàn trước khi tụ lực chuẩn Dark Souls
+                    let away = -this.dir();
+                    this.dashV = away * 12;
                     return;
                 }
                 if (this.state === 'idle'){
                     this.faceP();
+                    this.resetPose();
                     let g = this.gap(), ad = Math.abs(g);
-                    if (ad > 96){ let sp = ad > 280 ? 3.4 : 2.4; this.x += Math.sign(g) * sp * this.spd(); this.walk += sp; }
+                    if (ad > 96){ let sp = ad > 280 ? 3.2 : 2.3; this.x += Math.sign(g) * sp * this.spd(); this.walk += sp; }
                     else if (ad < 54){ this.x -= Math.sign(g) * 1.3; this.walk += 1.3; }
                     this.actionTimer--;
                     if (this.actionTimer <= 0) this.pickSkill();
@@ -14826,87 +14931,199 @@
                 this.runSkill();
             }
             pickSkill(){
-                let ad = Math.abs(this.gap()), near = ad < 170;
-                // OM QUA SAT hắn -> an don Abyss Sludge (don phat nguoi choi dinh sat lung)
-                // (truoc day doi 'dung sau lung', nhung hắn quay mat lien tuc nen khong bao gio kich hoat)
-                if (ad < 95 && this.canUse('a_sludge')){
+                let ad = Math.abs(this.gap()), near = ad < 175;
+                if (ad < 90 && this.canUse('a_sludge')){
                     this.state = 'a_sludge'; this.subTimer = 0; this.cd['a_sludge'] = ART_CD['a_sludge']; return;
                 }
-                // Cai lam nen Artorias ban Nightreign khong phai la them chieu dien AoE, ma la
-                // han co RAT NHIEU DUONG TIEP CAN: nhay bo, luot sat dat, doi ben. Nguoi choi
-                // khong con giu duoc cu ly bang cach lui ra nua.
-                let poolN = ['a_combo','a_sweep','a_smash','a_roll','a_spin','a_dau','a_vuot'];
-                let poolF = ['a_lunge','a_lunge','a_bay','a_truot','a_vuot','a_roll','a_smash','a_vong','a_dau'];
+                let poolN = ['a_combo','a_sweep','a_smash','a_howl','a_spin','a_vuot','a_dau'];
+                let poolF = ['a_lunge','a_lunge','a_howl','a_bay','a_truot','a_vuot','a_flip','a_vong','a_dau'];
                 if (this.buffed){
-                    poolN.push('a_flip','a_burstk','a_vong','a_bay');
-                    poolF.push('a_dash','a_dash','a_flip','a_burstk','a_bay','a_truot','a_vuot');
+                    poolN.push('a_flip','a_burstk','a_dash','a_vong');
+                    poolF.push('a_dash','a_dash','a_flip','a_burstk','a_bay','a_truot');
                 }
-                this.state = this.pickFrom(nhipXa(this, near) ? poolF : poolN, 'a_combo');   // @@HE-NHIPXA
+                this.state = this.pickFrom(nhipXa(this, near) ? poolF : poolN, 'a_combo');
                 this.subTimer = 0; this.faceP();
             }
             runSkill(){
                 let st = this.state, sp = this.spd(); this.subTimer += sp;
                 let T = (n) => this.subTimer >= n && this.subTimer - sp < n;
-                // ============ CU BUFF VUC THAM — NGAT DUOC ============
+
+                // =========================================================================
+                // 1. WRATH OF THE ABYSS (TỤ BÓNG TỐI — NGẮT DỄ DÀNG VỚI 30 SÁT THƯƠNG!)
+                // Tư thế: Cắm mũi đại kiếm xuống đất trước mặt, khom lưng rút năng lượng Vực Thẳm
+                // =========================================================================
                 if (st === 'a_buff'){
                     this.buffT++;
-                    if (T(1)) floatingTexts.push(new FloatingText(this.cx() - 96, 130, "BẮN GẤP ĐỂ NGẮT!"));
-                    // an du ART_BUFF_HP dmg trong luc tu -> NGAT
+                    this.crouch = 8;
+                    this.lean = 0.22 + Math.sin(this.subTimer * 0.25) * 0.04;
+                    this.armR = 0.55;
+                    this.swordAngle = 0.38; // Mũi kiếm cắm chéo xuống đất
+
+                    if (T(1)){
+                        floatingTexts.push(new FloatingText(this.cx() - 96, 130, "TỤ VỰC THẲM — TẤN CÔNG ĐỂ NGẮT!"));
+                        if (SFX.tone) SFX.tone(180, 0.35, 'sawtooth', 0.16, 90);
+                    }
+                    // Chỉ cần gây đủ 30 sát thương trong 3.1 giây -> PHÁ VỠ THẾ TỤ LỰC & GÂY CHOÁNG LỚN!
                     if (this.buffHp - this.hp >= ART_BUFF_HP){
-                        this.stagger = 90; this.state = 'staggered';
-                        floatingTexts.push(new FloatingText(this.cx() - 60, this.y - 34, "BỊ NGẮT! CHOÁNG"));
+                        this.stagger = 110; // Choáng gần 2 giây để người chơi thoải mái dồn sát thương
+                        this.state = 'staggered';
+                        floatingTexts.push(new FloatingText(this.cx() - 74, this.y - 36, "PHÁ VỠ VỰC THẲM! CHOÁNG!"));
                         visualEffects.push(new Effect(this.cx(), this.cy(), 'parry', this.facingLeft));
-                        shakeTimer = 26;
+                        shakeTimer = 28;
                         return;
                     }
+                    // Nếu người chơi không ngắt -> Nổ vòm Vực Thẳm + Phóng 3 đốm lửa truy kích chậm (Nightreign)
                     if (this.subTimer > ART_BUFF_T){
                         this.buffed = true;
-                        this.burst = { x: this.cx(), y: this.cy(), r: 20, sp: 13, max: 300, hit: false, dmg: 1 };
-                        floatingTexts.push(new FloatingText(this.cx() - 84, 132, "SỨC MẠNH VỰC THẲM"));
-                        shakeTimer = 76; if (SFX.bossEntry) SFX.bossEntry();
-                        this.toIdle(30);
+                        this.name = "ARTORIAS THE ABYSSWALKER";
+                        this.burst = { x: this.cx(), y: this.cy(), r: 20, sp: 12, max: 280, hit: false, dmg: 1 };
+                        this.spawnAbyssWisps(3);
+                        floatingTexts.push(new FloatingText(this.cx() - 88, 132, "WRATH OF THE ABYSS!"));
+                        shakeTimer = 64; if (SFX.bossEntry) SFX.bossEntry();
+                        this.toIdle(32);
                     }
                     return;
                 }
-                // ============ COMBO 3 NHAT ============
-                if (st === 'a_combo'){
-                    let warns = [6, 30, 56], hits = [16, 40, 74];
-                    if (this.subTimer < 78 && Math.floor(this.subTimer) % 2 === 0){
-                        let g = this.gap(); if (Math.abs(g) > 82) this.x += Math.sign(g) * 3.0;
+
+                // =========================================================================
+                // 2. [MỚI - CHUẨN NIGHTREIGN] WOLF HOWL SLASH / SPIN (`a_howl`)
+                // Artorias ngửa đầu hú vang như sói (Howl telegraph), sau đó:
+                // - Nếu ở xa: Lao chớp nhoáng tới chém ngang 1 nhát cực rộng.
+                // - Nếu ở gần: Xoay vung đại kiếm 2 vòng quanh thân rồi khựng lại 1 giây!
+                // =========================================================================
+                if (st === 'a_howl'){
+                    if (T(1)){
+                        this.faceP();
+                        this._howlMode = Math.abs(this.gap()) > 155 ? 'dash' : 'spin';
+                        floatingTexts.push(new FloatingText(this.cx() - 64, this.y - 36, "TIẾNG HÚ VỰC THẲM!"));
+                        if (SFX.tone) SFX.tone(240, 0.35, 'sawtooth', 0.18, 420);
                     }
-                    for (let k = 0; k < 3; k++){
-                        if (T(warns[k])){ this.faceP(); this.warn(k===2?142:104, k===2?36:20, hits[k]-warns[k]); }
-                        if (T(hits[k])){
-                            this.faceP(); let big = k === 2;
-                            this.armR = big ? -2.2 : ((k%2) ? -0.4 : -1.7);
-                            this.doSlash(big ? 142 : 104, big ? 36 : 20, big ? 15 : 10, 1);
-                            this.dashV = this.dir() * (big ? 9 : 5);
-                            if (big) shakeTimer = 24;
-                            else if (SFX.tone) SFX.tone(420 - k*50, 0.06, 'square', 0.11, 220);
+                    // Pha 1 (1 -> 28f): Ngửa đầu hú vang, phát ra các vòng sóng âm tím cảnh báo rõ ràng
+                    if (this.subTimer < 28){
+                        this.crouch = 6;
+                        this.lean = -0.22; // Ngửa đầu và ngực lên trời hú
+                        this.armR = 0.85;
+                        this.swordAngle = 0.15;
+                        if (Math.floor(this.subTimer) % 8 === 0){
+                            this.howlWaves.push({ x: this.cx(), y: this.y + 12, r: 16, t: 18 });
+                        }
+                        if (T(16)){
+                            this.warn(this._howlMode === 'dash' ? 190 : 148, 30, 12);
+                        }
+                        return;
+                    }
+                    // Pha 2A: Lao vọt tới chém ngang (Dash Horizontal Slash)
+                    if (this._howlMode === 'dash'){
+                        if (T(28)){
+                            this.faceP();
+                            this.crouch = 4; this.lean = 0.32;
+                            this.armR = -1.8; this.swordAngle = -0.35;
+                            this.dashV = this.dir() * (this.buffed ? 29 : 25);
+                        }
+                        if (T(36)){
+                            this.armR = 0.65; this.swordAngle = -1.2;
+                            this.doSlash(154, 28, 16, 1);
+                            for (let k = 0; k < 4; k++) this.ghost();
+                            shakeTimer = Math.max(shakeTimer, 20);
+                            if (SFX.bossSkill) SFX.bossSkill();
+                        }
+                        if (this.subTimer > 66) this.toIdle(32);
+                        return;
+                    }
+                    // Pha 2B: Xoay đại kiếm quanh người rồi đứng khựng 1 giây mở sơ hở (Spinning Slash + Recovery)
+                    if (this.subTimer >= 28 && this.subTimer < 64){
+                        this.lean = 0.18;
+                        this.armR = (this.subTimer - 28) * 0.52;
+                        this.swordAngle = -0.2;
+                        this.x += this.dir() * 2.4;
+                        if (Math.floor(this.subTimer) % 8 === 0){
+                            this.doSlash(145, 32, 7, 1);
+                            visualEffects.push(new Effect(this.cx() + this.dir() * 60, this.cy(), 'explosion', true, 16));
+                            if (SFX.tone) SFX.tone(360, 0.05, 'square', 0.11, 200);
                         }
                     }
-                    if (this.subTimer > 92) this.toIdle(30);
+                    if (this.subTimer >= 64){
+                        // Nhịp khựng 1 giây sau khi xoay đúng theo cơ chế Nightreign
+                        this.crouch = 8; this.lean = 0.28; this.armR = 0.5;
+                    }
+                    if (this.subTimer > 88) this.toIdle(34);
                     return;
                 }
-                // ============ QUET NGANG RONG ============
+
+                // =========================================================================
+                // 3. COMBO 3 NHÁT ĐẠI KIẾM (Vung 1 tay nặng nề, nhịp vung kiếm khớp 100% với hitbox)
+                // =========================================================================
+                if (st === 'a_combo'){
+                    let warns = [6, 30, 56], hits = [16, 40, 74];
+                    if (this.subTimer < 74 && Math.floor(this.subTimer) % 2 === 0){
+                        let g = this.gap(); if (Math.abs(g) > 84) this.x += Math.sign(g) * 2.8;
+                    }
+                    // Diễn hoạt cánh tay vung kiếm liên tục giữa lúc lấy đà và lúc bổ xuống
+                    if (this.subTimer < 16){
+                        this.armR = -2.1; this.swordAngle = -0.6; this.lean = 0.05;
+                    } else if (this.subTimer < 30){
+                        this.armR = 0.55; this.swordAngle = -1.1; this.lean = 0.26;
+                    } else if (this.subTimer < 40){
+                        this.armR = 1.1; this.swordAngle = -0.4; this.lean = 0.12;
+                    } else if (this.subTimer < 56){
+                        this.armR = -1.85; this.swordAngle = -0.8; this.lean = 0.22;
+                    } else if (this.subTimer < 74){
+                        this.armR = -2.55; this.swordAngle = -0.5; this.lean = -0.08; this.crouch = 4;
+                    } else {
+                        this.armR = 0.65; this.swordAngle = -1.25; this.lean = 0.34; this.crouch = 6;
+                    }
+                    for (let k = 0; k < 3; k++){
+                        if (T(warns[k])){ this.faceP(); this.warn(k===2?142:106, k===2?36:22, hits[k]-warns[k]); }
+                        if (T(hits[k])){
+                            this.faceP(); let big = k === 2;
+                            this.doSlash(big ? 142 : 106, big ? 36 : 22, big ? 15 : 10, 1);
+                            this.dashV = this.dir() * (big ? 9 : 5);
+                            if (big){
+                                shakeTimer = 24;
+                                visualEffects.push(new Effect(this.cx() + this.dir() * 64, this.y + this.h, 'explosion', true, 26));
+                            } else if (SFX.tone) SFX.tone(420 - k*50, 0.06, 'square', 0.11, 220);
+                        }
+                    }
+                    if (this.subTimer > 94) this.toIdle(30);
+                    return;
+                }
+
+                // =========================================================================
+                // 4. QUÉT NGANG RỘNG (WIDE GREATSWORD SWEEP)
+                // =========================================================================
                 if (st === 'a_sweep'){
-                    if (T(10)){ this.faceP(); this.armR = -2.4; this.warn(158, 30, 24); }
-                    if (T(34)){
-                        this.armR = 0.5;
+                    if (T(8)){
+                        this.faceP();
+                        this.crouch = 6; this.lean = -0.05;
+                        this.armR = -2.35; this.swordAngle = -0.55;
+                        this.warn(158, 30, 24);
+                    }
+                    if (T(32)){
+                        this.lean = 0.34; this.crouch = 4;
+                        this.armR = 0.68; this.swordAngle = -1.2;
                         this.doSlash(158, 30, 18, 1);
-                        this.dashV = this.dir() * 7; shakeTimer = 22;
+                        this.dashV = this.dir() * 8; shakeTimer = 22;
                         if (SFX.bossSkill) SFX.bossSkill();
                     }
                     if (this.subTimer > 62) this.toIdle(30);
                     return;
                 }
-                // ============ BO THANG XUONG + SONG XUNG KICH ============
+
+                // =========================================================================
+                // 5. BỔ THẲNG XUỐNG + SÓNG XUNG KÍCH VỰC THẲM (OVERHEAD ABYSSAL SMASH)
+                // =========================================================================
                 if (st === 'a_smash'){
-                    if (T(8)){ this.faceP(); this.armR = -2.6; this.warn(120, 46, 26); }
-                    if (T(34)){
-                        this.armR = 0.4; shakeTimer = 38;
-                        this.doSlash(120, 46, 16, 1);
-                        visualEffects.push(new Effect(this.cx() + this.dir()*50, this.y + this.h, 'explosion', true, 60));
+                    if (T(6)){
+                        this.faceP();
+                        this.lean = -0.15; this.armR = -2.65; this.swordAngle = -0.45;
+                        this.warn(124, 46, 26);
+                    }
+                    if (T(32)){
+                        this.lean = 0.36; this.crouch = 8;
+                        this.armR = 0.55; this.swordAngle = -1.3;
+                        shakeTimer = 38;
+                        this.doSlash(124, 46, 16, 1);
+                        visualEffects.push(new Effect(this.cx() + this.dir()*54, this.y + this.h, 'explosion', true, 56));
                         for (let s2 = -1; s2 <= 1; s2 += 2){
                             let w = new BossProjectile(this.cx() + s2*26, 322 - 66, s2 * 9, 0, true, 1);
                             w.w = 40; w.h = 66; w.color = this.buffed ? "#B388FF" : "#9AA6C4";
@@ -14917,167 +15134,284 @@
                     if (this.subTimer > 68) this.toIdle(34);
                     return;
                 }
-                // ============ LAO DAM THANG ============
+
+                // =========================================================================
+                // 6. [CHUẨN NIGHTREIGN] CROUCHING STINGER LUNGE (`a_lunge`)
+                // Trước khi lao đâm, Artorias hạ rạp người xuống sát đất như sói rình mồi
+                // và chĩa thẳng mũi đại kiếm ngang về phía người chơi!
+                // =========================================================================
                 if (st === 'a_lunge'){
-                    if (T(10)){ this.faceP(); this.armR = -1.5; this.warn(190, 12, 26); }
-                    if (T(36)){
-                        this.dashV = this.dir() * 27; this.armR = -1.2;
-                        this.doSlash(190, 12, 22, 1);
+                    if (T(6)){
+                        this.faceP();
+                        this.warn(190, 14, 26);
+                    }
+                    if (this.subTimer < 32){
+                        // Tư thế ngồi rạp xuống đất lấy đà (Crouch Telegraph)
+                        let p = Math.min(1, this.subTimer / 26);
+                        this.crouch = 15 * p;
+                        this.lean = 0.38 * p;
+                        this.armR = -1.45;
+                        this.swordAngle = -0.05; // Mũi kiếm chĩa ngang thẳng về phía trước!
+                        return;
+                    }
+                    if (T(32)){
+                        this.crouch = 6; this.lean = 0.42;
+                        this.dashV = this.dir() * 28;
+                        this.armR = -1.52; this.swordAngle = 0.0; // Duỗi thẳng tay và kiếm thành 1 đường thẳng đâm xuyên!
+                        this.doSlash(190, 14, 22, 1);
                         for (let k = 0; k < 4; k++) this.ghost();
                         if (SFX.bossSkill) SFX.bossSkill();
                     }
-                    if (this.subTimer > 38 && this.subTimer < 60 && Math.floor(this.subTimer) % 3 === 0) this.ghost();
+                    if (this.subTimer > 34 && this.subTimer < 58 && Math.floor(this.subTimer) % 3 === 0) this.ghost();
                     if (this.subTimer > 72) this.toIdle(32);
                     return;
                 }
-                // ============ LAN NE (vua doi cho vua tranh dan) ============
+
+                // =========================================================================
+                // 7. LĂN NÉ / NHẢY LÙI SÓI (WOLF BACKSTEP / ROLL)
+                // =========================================================================
                 if (st === 'a_roll'){
-                    if (T(6)){
+                    if (T(4)){
                         this.faceP();
                         let away = -Math.sign(this.gap()) || 1;
-                        if (Math.abs(this.gap()) > 220) away = Math.sign(this.gap());   // qua xa thi lan TOI
+                        if (Math.abs(this.gap()) > 220) away = Math.sign(this.gap());
                         this.dashV = away * 19;
+                        this.crouch = 12;
                         for (let k = 0; k < 4; k++) this.ghost();
                     }
-                    if (this.subTimer > 6 && this.subTimer < 26 && Math.floor(this.subTimer) % 3 === 0) this.ghost();
-                    if (this.subTimer > 34) this.toIdle(12);
-                    return;
-                }
-                // ============ ABYSS SLUDGE: don sau lung ============
-                if (st === 'a_sludge'){
-                    if (T(8)) this.facingLeft = (dino.x + dino.w/2) > this.cx();   // quay NGUOC lai
-                    if (T(22)){
-                        let d = this.dir();
-                        this.armR = -0.8;
-                        for (let k = 0; k < 5; k++){
-                            let a = Math.PI * (0.15 + k * 0.175);
-                            let bp = new BossProjectile(this.cx(), this.y + this.h - 14, Math.cos(a)*d*7, -Math.abs(Math.sin(a))*6, false, 1);
-                            bp.w = 20; bp.h = 20; bp.color = "#4527A0"; bp.rock = true; bossProjectiles.push(bp);
-                        }
-                        visualEffects.push(new Effect(this.cx(), this.y + this.h, 'explosion', true, 40));
-                        floatingTexts.push(new FloatingText(this.x - 20, this.y - 30, "ABYSS SLUDGE"));
+                    if (this.subTimer > 4 && this.subTimer < 26){
+                        this.flipAngle = (this.subTimer - 4) / 22 * Math.PI * 2 * (this.dashV * this.dir() > 0 ? 1 : -1);
+                        if (Math.floor(this.subTimer) % 3 === 0) this.ghost();
                     }
-                    if (this.subTimer > 52) this.toIdle(28);
+                    if (this.subTimer > 32) this.toIdle(12);
                     return;
                 }
-                // ============ SOMERSAULT SLAM: lat nguoi bo xuong, LAP TOI 3 LAN ============
-                if (st === 'a_flip'){
-                    if (T(4)){ this.somer = 0; this.faceP(); }
-                    let cyc = 46, n = Math.floor(this.subTimer / cyc), k2 = this.subTimer % cyc;
-                    if (n < 3){
-                        if (k2 >= 5 && k2 - sp < 5){
-                            this.faceP(); this.dy = -13.5; this.grounded = false;
-                            this.dashV = this.dir() * 9; this.armR = -2.8;
-                            this.warn(126, 52, 18);
+
+                // =========================================================================
+                // 8. ABYSS SLUDGE: Vung tay hất bùn đen Vực Thẳm khi người chơi áp quá sát
+                // =========================================================================
+                if (st === 'a_sludge'){
+                    if (T(6)){
+                        this.faceP();
+                        this.crouch = 8; this.lean = -0.12; this.armR = 0.8;
+                    }
+                    if (T(20)){
+                        let d = this.dir();
+                        this.lean = 0.28; this.armR = -1.6;
+                        for (let k = 0; k < 5; k++){
+                            let a = Math.PI * (0.15 + k * 0.16);
+                            let bp = new BossProjectile(this.cx(), this.y + this.h - 18, Math.cos(a)*d*7.5, -Math.abs(Math.sin(a))*6.5, false, 1);
+                            bp.w = 18; bp.h = 18; bp.color = "#4527A0"; bp.rock = true; bossProjectiles.push(bp);
                         }
-                        if (k2 >= 24 && k2 - sp < 24){
-                            this.dy = 15; this.armR = 0.2;
-                            this.doSlash(126, 52, 16, 1);
+                        visualEffects.push(new Effect(this.cx(), this.y + this.h - 10, 'explosion', true, 36));
+                        floatingTexts.push(new FloatingText(this.x - 20, this.y - 30, "ABYSS SLUDGE!"));
+                    }
+                    if (this.subTimer > 48) this.toIdle(26);
+                    return;
+                }
+
+                // =========================================================================
+                // 9. [ĐẶC TRƯNG NHẤT CỦA ARTORIAS] SOMERSAULT LION'S CLAW SLAM (`a_flip`)
+                // Nhảy vọt lên không, xoay lộn nhào toàn bộ cơ thể 360 độ (`flipAngle`)
+                // rồi đập sầm đại kiếm xuống vị trí người chơi (Lặp 2 lần ở Phase 1, 3 lần khi đã Buff!)
+                // =========================================================================
+                if (st === 'a_flip'){
+                    let maxFlips = this.buffed ? 3 : 2;
+                    let cyc = 46, n = Math.floor(this.subTimer / cyc), k2 = this.subTimer % cyc;
+                    if (n < maxFlips){
+                        // Nhịp 1 (0 -> 6f): Ngồi rạp lấy đà chuẩn bị bật nhảy
+                        if (k2 < 6){
+                            this.faceP();
+                            this.crouch = 12; this.lean = 0.25; this.flipAngle = 0;
+                            this.armR = -2.4; this.swordAngle = -0.5;
+                        }
+                        // Nhịp 2 (Frame 6): Bật nhảy lên cao và bắt đầu lộn vòng trên không!
+                        if (k2 >= 6 && k2 - sp < 6){
+                            this.faceP();
+                            this.crouch = 0;
+                            this.dy = -14.2; this.grounded = false;
+                            let g = this.gap();
+                            this.dashV = this.dir() * Math.min(13, Math.max(6, Math.abs(g) * 0.055));
+                            this.warn(128, 52, 18);
+                        }
+                        // Trong khi đang ở trên không (6 -> 25f): Xoay lộn nhào cả cơ thể 1 vòng 360 độ!
+                        if (k2 >= 6 && k2 < 25){
+                            let spinProg = (k2 - 6) / 19;
+                            this.flipAngle = spinProg * Math.PI * 2;
+                            this.armR = -2.2; this.swordAngle = -0.3;
+                            if (Math.floor(k2) % 3 === 0) this.ghost();
+                        }
+                        // Nhịp 3 (Frame 25): Đập thẳng đại kiếm xuống mặt sàn tạo chấn động!
+                        if (k2 >= 25 && k2 - sp < 25){
+                            this.flipAngle = 0;
+                            this.crouch = 8; this.lean = 0.38;
+                            this.dy = 17;
+                            this.armR = 0.55; this.swordAngle = -1.25;
+                            this.doSlash(128, 52, 16, 1);
                             shakeTimer = 26;
-                            visualEffects.push(new Effect(this.cx(), this.y + this.h, 'explosion', true, 44));
+                            visualEffects.push(new Effect(this.cx() + this.dir() * 52, this.y + this.h, 'explosion', true, 44));
                             if (SFX.bossSkill) SFX.bossSkill();
                         }
                     }
-                    if (this.subTimer > cyc * 3 + 14) this.toIdle(38);
+                    if (this.subTimer > cyc * maxFlips + 14) this.toIdle(38);
                     return;
                 }
-                // ============ XOAY TRON MOT VONG ============
-                // XOAY TRON: dang thuong xoay MOT vong, dang buff xoay BA vong lien tiep
+
+                // =========================================================================
+                // 10. XOAY KIẾM QUÉT VÒNG TRÒN (WHIRLWIND SPIN SLASH)
+                // =========================================================================
                 if (st === 'a_spin'){
-                    let reps = this.buffed ? 3 : 1, cyc = 62;
-                    if (T(10)){ this.faceP(); this.warn(150, 34, 22); }
-                    let n = Math.floor(Math.max(0, this.subTimer - 32) / cyc), k2 = (this.subTimer - 32) % cyc;
-                    if (this.subTimer > 32 && n < reps){
-                        if (k2 < 44){
-                            this.armR = this.subTimer * 0.42;
-                            this.x += this.dir() * 1.6;
+                    let reps = this.buffed ? 2 : 1, cyc = 56;
+                    if (T(8)){
+                        this.faceP();
+                        this.crouch = 6; this.armR = -2.2;
+                        this.warn(150, 34, 20);
+                    }
+                    let n = Math.floor(Math.max(0, this.subTimer - 28) / cyc), k2 = (this.subTimer - 28) % cyc;
+                    if (this.subTimer > 28 && n < reps){
+                        if (k2 < 40){
+                            this.armR = (this.subTimer - 28) * 0.46;
+                            this.swordAngle = -0.25;
+                            this.x += this.dir() * 2.0;
                             if (Math.floor(this.subTimer) % 9 === 0){
                                 let dx = ((dino.x + dino.w/2) - this.cx()) / 150;
                                 let dy = ((dino.y + dino.h/2) - this.cy()) / 58;
                                 if (dx*dx + dy*dy < 1) this.hurtP(1);
-                                visualEffects.push(new Effect(this.cx() + Math.cos(this.subTimer*0.42)*120, this.cy() + Math.sin(this.subTimer*0.42)*46, 'explosion', true, 16));
+                                visualEffects.push(new Effect(this.cx() + Math.cos(this.armR)*110, this.cy() + Math.sin(this.armR)*42, 'explosion', true, 16));
                             }
-                        } else if (k2 < 46) this.faceP();      // ngoi nhip giua hai vong
+                        } else if (k2 < 44) this.faceP();
                     }
-                    if (this.subTimer > 32 + cyc * reps + 16) this.toIdle(36);
+                    if (this.subTimer > 28 + cyc * reps + 16) this.toIdle(34);
                     return;
                 }
-                // ============ NO VUC THAM ============
-                // ============ BA DUONG TIEP CAN (Nightreign) ============
-                // NHAY BO: bat len cao roi cam kiem cam thang xuong dau nguoi choi. Diem roi
-                // chot ngay luc bat nhay nen nguoi choi doc duoc va di ra khoi do.
+
+                // =========================================================================
+                // 11. SKYWARD ABYSSAL LEAP (`a_bay` — Nhảy vọt lên trời cao rồi cắm thẳng kiếm xuống)
+                // =========================================================================
                 if (st === 'a_bay'){
-                    if (T(1)){ this.faceP(); this.bayDich = dino.x + dino.w/2; }
-                    if (T(12)){ this.dy = -15.5; this.grounded = false; this.armR = -2.2;
-                                if (SFX.bossSkill) SFX.bossSkill(); }
+                    if (T(1)){
+                        this.faceP();
+                        this.crouch = 14; this.lean = 0.28;
+                        this.bayDich = dino.x + dino.w/2;
+                    }
+                    if (T(12)){
+                        this.crouch = 0; this.lean = -0.15;
+                        this.dy = -16.2; this.grounded = false;
+                        this.armR = -2.5; this.swordAngle = -0.4;
+                        if (SFX.bossSkill) SFX.bossSkill();
+                    }
                     if (this.subTimer > 12 && !this.grounded){
-                        // bay theo hinh cung ve dung diem da chot
                         let dx = this.bayDich - this.cx();
                         this.x += Math.max(-13, Math.min(13, dx * 0.16));
                         this.ghost();
-                        if (this.dy > 2) this.dy = Math.min(this.dy, 15);
+                        if (this.dy > 0){
+                            this.lean = 0.35;
+                            this.armR = 0.25; this.swordAngle = -1.35; // Chĩa mũi kiếm xuống đất khi lao xuống!
+                            this.dy = Math.min(this.dy + 0.5, 17);
+                        }
                     }
                     if (this.subTimer > 20 && this.grounded){
-                        this.armR = -0.4;
-                        this.doSlash(120, 34, 24, 1);
-                        visualEffects.push(new Effect(this.cx(), this.y + this.h, 'explosion', true, 28));
-                        shakeTimer = Math.max(shakeTimer, 24);
+                        this.crouch = 10; this.lean = 0.38;
+                        this.armR = 0.55; this.swordAngle = -1.25;
+                        this.doSlash(124, 38, 22, 1);
+                        visualEffects.push(new Effect(this.cx() + this.dir() * 42, this.y + this.h, 'explosion', true, 42));
+                        shakeTimer = Math.max(shakeTimer, 26);
                         if (SFX.bossExplode) SFX.bossExplode();
-                        this.toIdle(this.buffed ? 22 : 30); return;
+                        this.toIdle(this.buffed ? 24 : 32); return;
                     }
                     if (this.subTimer > 120) this.toIdle(26);
                     return;
                 }
-                // TRUOT SAT DAT: rut ngan cu ly rat nhanh, luoi kiem le sat mat dat.
+
+                // =========================================================================
+                // 12. DRAGGING UPPERCUT SLIDE (`a_truot` — Kéo lê đại kiếm cày mặt đất rồi vớt ngược lên!)
+                // =========================================================================
                 if (st === 'a_truot'){
-                    if (T(1)) this.faceP();
-                    if (T(14)){ this.dashV = this.dir() * (this.buffed ? 30 : 25); this.armR = 0.9;
-                                if (SFX.bossSkill) SFX.bossSkill(); }
-                    if (this.subTimer > 14 && this.subTimer < 44){
+                    if (T(1)){
+                        this.faceP();
+                        this.crouch = 10; this.lean = 0.32;
+                        this.armR = 0.95; this.swordAngle = 0.25; // Hạ mũi kiếm kéo lê phía sau lưng trên mặt đất!
+                    }
+                    if (T(13)){
+                        this.dashV = this.dir() * (this.buffed ? 29 : 24);
+                        this._truotHit = false;
+                        if (SFX.bossSkill) SFX.bossSkill();
+                    }
+                    if (this.subTimer > 13 && this.subTimer < 36){
                         this.ghost();
-                        let r = { x: this.cx() - 34, y: this.y + this.h - 40, w: 68, h: 40 };
+                        if (Math.floor(this.subTimer) % 3 === 0){
+                            visualEffects.push(new Effect(this.cx() - this.dir() * 32, this.y + this.h - 4, 'explosion', true, 12));
+                        }
+                        let r = { x: this.cx() - 42, y: this.y + this.h - 44, w: 84, h: 44 };
                         if (!this._truotHit && checkAABB(dino, r)){ this._truotHit = true; this.hurtP(1); }
                     }
-                    if (T(15)) this._truotHit = false;
-                    if (this.subTimer > 52) this.toIdle(this.buffed ? 18 : 26);
+                    // Nhịp kết (Frame 36): Hất vớt đại kiếm từ dưới đất lên trời!
+                    if (T(36)){
+                        this.crouch = 0; this.lean = -0.12;
+                        this.armR = -2.25; this.swordAngle = -0.65;
+                        this.doSlash(118, 56, 14, 1);
+                        if (SFX.tone) SFX.tone(520, 0.07, 'sawtooth', 0.12, 280);
+                    }
+                    if (this.subTimer > 54) this.toIdle(this.buffed ? 20 : 28);
                     return;
                 }
-                // VUOT QUA: lao XUYEN qua nguoi choi roi quay lai chem — chieu doi ben, khien
-                // viec lui ra sau lung han khong con la cho an toan.
+
+                // =========================================================================
+                // 13. CROSS-UP SLASH (`a_vuot` — Lướt vượt qua lưng người chơi rồi quay ngoắt lại chém)
+                // =========================================================================
                 if (st === 'a_vuot'){
-                    if (T(1)) this.faceP();
-                    if (T(16)){ this.dashV = this.dir() * 27; this._vuotHit = false;
-                                if (SFX.bossSkill) SFX.bossSkill(); }
-                    if (this.subTimer > 16 && this.subTimer < 42){
+                    if (T(1)){
+                        this.faceP();
+                        this.crouch = 10; this.lean = 0.34;
+                        this.armR = 0.7; this.swordAngle = 0.1;
+                    }
+                    if (T(15)){
+                        this.dashV = this.dir() * 27; this._vuotHit = false;
+                        if (SFX.bossSkill) SFX.bossSkill();
+                    }
+                    if (this.subTimer > 15 && this.subTimer < 40){
                         this.ghost();
                         let r = { x: this.x - 10, y: this.y, w: this.w + 20, h: this.h };
                         if (!this._vuotHit && checkAABB(dino, r)){ this._vuotHit = true; this.hurtP(1); }
                     }
-                    if (T(46)){ this.faceP(); this.dashV = 0; this.armR = -1.9; }
-                    if (T(60)){ this.armR = -0.3; this.doSlash(132, 30, 26, 1); shakeTimer = Math.max(shakeTimer, 16); }
-                    if (this.subTimer > 76) this.toIdle(this.buffed ? 20 : 28);
+                    if (T(44)){
+                        this.faceP(); this.dashV = 0;
+                        this.crouch = 4; this.lean = -0.05;
+                        this.armR = -2.1; this.swordAngle = -0.5;
+                        this.warn(136, 30, 14);
+                    }
+                    if (T(58)){
+                        this.lean = 0.32;
+                        this.armR = 0.55; this.swordAngle = -1.2;
+                        this.doSlash(136, 30, 18, 1);
+                        shakeTimer = Math.max(shakeTimer, 18);
+                    }
+                    if (this.subTimer > 76) this.toIdle(this.buffed ? 22 : 28);
                     return;
                 }
-                // ============ VONG VUC THAM (Nightreign) ============
-                // Mot vanh toi lan ra tu chan hắn. Khac 'burst' o cho no CHAM va DAY, va
-                // dieu ma nguoi choi phai lam la CHAY THEO no chu khong phai nhay tranh mot
-                // lan — dung tinh than vong dem cua Nightreign: khong gian an toan bi ep dan.
+
+                // =========================================================================
+                // 14. VÒNG VỰC THẲM & DẤU VỰC THẲM (NIGHTREIGN ARENA CONTROL)
+                // =========================================================================
                 if (st === 'a_vong'){
-                    if (T(1)) floatingTexts.push(new FloatingText(this.cx() - 70, 132, "VÒNG VỰC THẲM"));
-                    if (T(30)){
-                        this.vong = { x: this.cx(), y: 320, r: 30, sp: this.buffed ? 4.6 : 3.6,
+                    if (T(1)){
+                        this.faceP();
+                        this.crouch = 8; this.armR = -2.2;
+                        floatingTexts.push(new FloatingText(this.cx() - 70, 132, "VÒNG VỰC THẲM"));
+                    }
+                    if (T(28)){
+                        this.armR = 0.55; this.swordAngle = -1.25;
+                        this.vong = { x: this.cx(), y: 320, r: 30, sp: this.buffed ? 4.5 : 3.6,
                                       max: this.buffed ? 620 : 480, hit: false };
                         shakeTimer = 24; if (SFX.bossSkill) SFX.bossSkill();
                     }
-                    if (this.subTimer > 62) this.toIdle(this.buffed ? 24 : 34);
+                    if (this.subTimer > 60) this.toIdle(this.buffed ? 24 : 34);
                     return;
                 }
-                // ============ DAU VUC THAM (Nightreign) ============
-                // Danh dau dung cho nguoi choi DANG dung, doi ART_DAU_CHO khung roi moi no.
-                // Nguoi choi doc dau ma tranh — don nay khong duoi theo. Dang buff thi dat
-                // BA dau lien tiep, moi cai bat mot nhip.
                 if (st === 'a_dau'){
                     if (T(1)){
+                        this.faceP();
+                        this.armR = -1.9;
                         this.dau = this.dau || [];
                         let so = this.buffed ? 3 : 1;
                         for (let k = 0; k < so; k++)
@@ -15088,123 +15422,152 @@
                     if (this.subTimer > (this.buffed ? 40 : 48)) this.toIdle(this.buffed ? 22 : 30);
                     return;
                 }
+
+                // =========================================================================
+                // 15. NỔ VỰC THẲM KÈM LINH HỒN TRUY KÍCH (`a_burstk`)
+                // =========================================================================
                 if (st === 'a_burstk'){
-                    if (T(18)) floatingTexts.push(new FloatingText(this.x - 26, this.y - 34, "VỰC THẲM"));
-                    if (T(40)){
+                    this.crouch = 8; this.lean = 0.25; this.armR = 0.5; this.swordAngle = 0.35;
+                    if (T(14)) floatingTexts.push(new FloatingText(this.x - 26, this.y - 34, "Hắc Ám Bùng Nổ!"));
+                    if (T(38)){
+                        this.lean = -0.15; this.armR = -2.1;
                         this.burst = { x: this.cx(), y: this.cy(), r: 18, sp: 11, max: 250, hit: false, dmg: 1 };
+                        this.spawnAbyssWisps(2);
                         shakeTimer = 34; if (SFX.bossExplode) SFX.bossExplode();
                     }
-                    if (this.subTimer > 76) this.toIdle(38);
+                    if (this.subTimer > 74) this.toIdle(36);
                     return;
                 }
-                // ============ LAO CHEM DAI (sau buff) ============
+
+                // =========================================================================
+                // 16. [CHUẨN PHASE 2 NIGHTREIGN] ABYSSAL DASH FLURRY (`a_dash`)
+                // Lướt nhanh và tung liên tiếp 3 nhát chém đại kiếm tốc độ cao,
+                // sau đó ĐỨNG KHỰNG THỞ 1 GIÂY (Immobilized Recovery Window) để người chơi phản công!
+                // =========================================================================
                 if (st === 'a_dash'){
-                    if (T(10)){ this.faceP(); this.armR = -2.4; this.warn(300, 26, 28); }
-                    if (T(38)){
-                        this.dashV = this.dir() * 32; this.armR = -0.6;
-                        this.doSlash(150, 30, 26, 1);
-                        for (let k = 0; k < 6; k++) this.ghost();
-                        shakeTimer = 30; if (SFX.bossExplode) SFX.bossExplode();
+                    if (T(6)){
+                        this.faceP();
+                        this.crouch = 12; this.lean = 0.35;
+                        this.armR = -2.2; this.warn(220, 28, 20);
+                        floatingTexts.push(new FloatingText(this.cx() - 68, this.y - 36, "LIÊN TRẢM VỰC THẲM!"));
                     }
-                    if (this.subTimer > 40 && this.subTimer < 70 && Math.floor(this.subTimer) % 3 === 0) this.ghost();
-                    if (this.subTimer > 84) this.toIdle(38);
+                    let slashes = [26, 42, 58];
+                    for (let k = 0; k < 3; k++){
+                        if (T(slashes[k])){
+                            this.faceP();
+                            this.crouch = 4; this.lean = 0.34;
+                            this.armR = (k % 2 === 0) ? 0.65 : -2.1;
+                            this.swordAngle = (k % 2 === 0) ? -1.2 : -0.5;
+                            this.dashV = this.dir() * (k === 0 ? 26 : 16);
+                            this.doSlash(148, 30, 12, 1);
+                            for (let g = 0; g < 3; g++) this.ghost();
+                            if (SFX.bossSkill) SFX.bossSkill();
+                        }
+                    }
+                    // Từ frame 68 đến 104: Artorias chống kiếm đứng khựng 1 giây (Opening cho người chơi phạt!)
+                    if (this.subTimer >= 68){
+                        this.crouch = 10; this.lean = 0.32;
+                        this.armR = 0.6; this.swordAngle = 0.35;
+                    }
+                    if (this.subTimer > 104) this.toIdle(38);
                     return;
                 }
+
                 this.toIdle(32);
             }
             draw(){
-                this.veVongDau();   // @@HE-ARTORIAS-NIGHT: vong + dau ve TRUOC than
-                // --- vong no Vuc Tham ---
+                this.veVongDau();
+                // --- vòng nổ Vực Thẳm ---
                 if (this.burst){
                     let b = this.burst, k = 1 - b.r / b.max;
                     ctx.save();
-                    ctx.globalAlpha = 0.30 * k + 0.10;
-                    ctx.strokeStyle = "#7C4DFF"; ctx.lineWidth = 22;
+                    ctx.globalAlpha = 0.26 * k + 0.08;
+                    ctx.strokeStyle = "#7C4DFF"; ctx.lineWidth = 20;
                     ctx.beginPath(); ctx.arc(b.x, b.y, Math.max(1, b.r), 0, 6.28); ctx.stroke();
-                    ctx.globalAlpha = 0.85 * k;
-                    ctx.strokeStyle = "#EDE7F6"; ctx.lineWidth = 5;
+                    ctx.globalAlpha = 0.82 * k;
+                    ctx.strokeStyle = "#EDE7F6"; ctx.lineWidth = 4;
                     ctx.beginPath(); ctx.arc(b.x, b.y, Math.max(1, b.r), 0, 6.28); ctx.stroke();
                     ctx.restore();
                 }
-                // --- anh mo ---
+                // --- tàn ảnh khi lướt / lộn vòng ---
                 for (let g of this.ghosts){
-                    ctx.save(); ctx.globalAlpha = (g.t/13) * 0.38;
-                    drawArtoriasBody({ facingLeft: g.left, armR: g.armR, buffed: g.buffed }, g.x, g.y);
+                    ctx.save(); ctx.globalAlpha = (g.t / 13) * 0.34;
+                    drawArtoriasBody({
+                        facingLeft: g.left, armR: g.armR, swordAngle: g.swordAngle,
+                        crouch: g.crouch, lean: g.lean, flipAngle: g.flipAngle,
+                        buffed: g.buffed
+                    }, g.x, g.y);
                     ctx.restore();
                 }
-                // --- dang tu bong toi ---
+                // --- hiệu ứng đang tụ bóng tối (WRATH OF THE ABYSS) ---
                 if (this.state === 'a_buff'){
                     let k = Math.min(1, this.subTimer / ART_BUFF_T);
                     ctx.save();
-                    ctx.globalAlpha = 0.20 + 0.35 * k;
+                    ctx.globalAlpha = 0.16 + 0.26 * k;
                     ctx.fillStyle = "#311B92";
-                    ctx.beginPath(); ctx.ellipse(this.cx(), this.cy(), 40 + 70*k, 52 + 74*k, 0, 0, 6.28); ctx.fill();
+                    ctx.beginPath(); ctx.ellipse(this.cx(), this.cy(), 38 + 62*k, 48 + 64*k, 0, 0, 6.28); ctx.fill();
                     ctx.globalAlpha = 0.85;
-                    ctx.strokeStyle = "#B388FF"; ctx.lineWidth = 3;
+                    ctx.strokeStyle = "#B388FF"; ctx.lineWidth = 2.8;
                     for (let q = 0; q < 7; q++){
-                        let a = frames*0.05 + q*0.9, r = (100 + 60*k) * (1 - ((frames*0.012 + q*0.14) % 1));
+                        let a = frames*0.05 + q*0.9, r = (95 + 55*k) * (1 - ((frames*0.012 + q*0.14) % 1));
                         ctx.beginPath();
                         ctx.moveTo(this.cx() + Math.cos(a)*r, this.cy() + Math.sin(a)*r*0.9);
                         ctx.lineTo(this.cx() + Math.cos(a)*r*0.55, this.cy() + Math.sin(a)*r*0.5); ctx.stroke();
                     }
                     ctx.restore();
-                    // thanh tien do NGAT
+                    // Thanh tiến độ NGẮT (Hiển thị rõ ràng phần trăm sát thương đã gây ra / 30 HP)
                     let W = 200, x0 = this.cx() - W/2, prog = Math.min(1, (this.buffHp - this.hp) / ART_BUFF_HP);
-                    ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.fillRect(x0, this.y - 40, W, 9);
-                    ctx.fillStyle = "#FF5252"; ctx.fillRect(x0, this.y - 40, W * (this.subTimer / ART_BUFF_T), 9);
-                    ctx.fillStyle = "#FFEB3B"; ctx.fillRect(x0, this.y - 40, W * prog, 4);
+                    ctx.fillStyle = "rgba(0,0,0,0.75)"; ctx.fillRect(x0, this.y - 42, W, 10);
+                    ctx.fillStyle = "#7C4DFF"; ctx.fillRect(x0, this.y - 42, W * (this.subTimer / ART_BUFF_T), 10);
+                    ctx.fillStyle = "#00E676"; ctx.fillRect(x0, this.y - 42, W * prog, 5);
                     ctx.fillStyle = "#FFEB3B"; ctx.font = "bold 10px Consolas, monospace"; ctx.textAlign = "center";
-                    ctx.fillText("NGẮT: " + Math.round(prog*100) + "%", this.cx(), this.y - 44); ctx.textAlign = "left";
+                    ctx.fillText("NGẮT: " + Math.min(ART_BUFF_HP, Math.floor(Math.max(0, this.buffHp-this.hp))) + "/" + ART_BUFF_HP + " · " + Math.round(prog*100) + "%", this.cx(), this.y - 46);
+                    ctx.textAlign = "left";
                 }
                 if (this.stagger > 0){
-                    ctx.fillStyle = "#FFEB3B"; ctx.font = "bold 11px Consolas, monospace"; ctx.textAlign = "center";
-                    ctx.fillText("CHOÁNG — ĐÁNH ĐI!", this.cx(), this.y - 30); ctx.textAlign = "left";
+                    ctx.fillStyle = "#00E676"; ctx.font = "bold 11px Consolas, monospace"; ctx.textAlign = "center";
+                    ctx.fillText("VỠ THẾ VỰC THẲM — TẤN CÔNG NGAY!", this.cx(), this.y - 30);
+                    ctx.textAlign = "left";
                 }
-                // --- bao nhat chem ---
+                // --- báo nhát chém (Telegraph Arc) ---
                 if (this.tel){
                     let t = this.tel, k = 1 - t.t/t.max;
                     let cxT = t.dir < 0 ? this.x : this.x + this.w, cyT = this.y + this.h/2;
                     ctx.save();
-                    ctx.globalAlpha = 0.30 + 0.45*k;
-                    ctx.strokeStyle = this.buffed ? "#B388FF" : "#FF5252"; ctx.lineWidth = 3; ctx.lineCap = "round";
+                    ctx.globalAlpha = 0.26 + 0.42*k;
+                    ctx.strokeStyle = this.buffed ? "#B388FF" : "#FF5252"; ctx.lineWidth = 2.8; ctx.lineCap = "round";
                     ctx.setLineDash([8, 7]); ctx.lineDashOffset = -frames*0.8;
                     ctx.beginPath(); ctx.arc(cxT, cyT, t.reach, t.dir<0 ? Math.PI-0.95 : -0.95, t.dir<0 ? Math.PI+0.95 : 0.95, false); ctx.stroke();
                     ctx.setLineDash([]);
-                    ctx.globalAlpha = 0.85; ctx.strokeStyle = "#EDE7F6"; ctx.lineWidth = 5;
+                    ctx.globalAlpha = 0.85; ctx.strokeStyle = "#EDE7F6"; ctx.lineWidth = 4.5;
                     let a0 = t.dir<0 ? Math.PI-0.95 : -0.95, a1 = t.dir<0 ? Math.PI+0.95 : 0.95;
                     ctx.beginPath(); ctx.arc(cxT, cyT, t.reach, a0, a0+(a1-a0)*k, false); ctx.stroke();
                     ctx.restore();
                 }
-                // --- than ---
+                // --- thân Knight Artorias ---
                 drawArtoriasBody(this, this.x, this.y);
-                // --- vet chem ---
+                // --- vệt chém Đại Kiếm Sói & Hắc Ám Vực Thẳm ---
                 if (this.slash){
                     let a = this.slash, cxS = a.dir < 0 ? this.x : this.x + this.w;
                     ctx.save(); ctx.globalAlpha = Math.min(1, a.t/9);
-                    ctx.strokeStyle = "#EDE7F6"; ctx.lineWidth = 7; ctx.lineCap = "round";
+                    ctx.strokeStyle = this.buffed ? "#D1C4E9" : "#ECEFF1"; ctx.lineWidth = 7; ctx.lineCap = "round";
                     for (let k = 0; k < 3; k++){
                         ctx.beginPath();
                         ctx.arc(cxS, this.y + this.h/2, Math.max(10, a.reach - k*18), a.dir<0 ? Math.PI-0.95 : -0.95, a.dir<0 ? Math.PI+0.95 : 0.95, false);
                         ctx.stroke();
                     }
-                    if (this.buffed){
-                        ctx.strokeStyle = "#B388FF"; ctx.lineWidth = 2;
-                        ctx.beginPath();
-                        ctx.arc(cxS, this.y + this.h/2, Math.max(12, a.reach + 5), a.dir<0 ? Math.PI-0.95 : -0.95, a.dir<0 ? Math.PI+0.95 : 0.95, false);
-                        ctx.stroke();
-                    }
+                    ctx.strokeStyle = this.buffed ? "#7C4DFF" : "#546E7A"; ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(cxS, this.y + this.h/2, Math.max(12, a.reach + 5), a.dir<0 ? Math.PI-0.95 : -0.95, a.dir<0 ? Math.PI+0.95 : 0.95, false);
+                    ctx.stroke();
                     ctx.restore();
                 }
-                // --- thanh mau ---
-                let bx = this.x - 12, bw = this.w + 24;
-                // ctx.fillStyle = "black"; ctx.fillRect(bx, this.y - 14, bw, 7);   // @@HE-HUDBAR: khung den RONG tren dau (thanh mau da chuyen len HUD)
-                ctx.fillStyle = this.buffed ? "#B388FF" : "#B0BEC5";
-                // ctx.fillRect(bx+1, this.y-13, (bw-2)*Math.max(0, this.hp/this.maxHp), 5);
+                // --- tên & thanh máu HUD ---
                 ctx.fillStyle = this.buffed ? "#B388FF" : "#CFD8DC"; ctx.font = "bold 9px Consolas, monospace"; ctx.textAlign = "center";
-                ctx.fillText(this.buffed ? "ABYSSWALKER" : "KNIGHT ARTORIAS", this.cx(), this.y - 18);
+                ctx.fillText(this.buffed ? "ABYSSWALKER ARTORIAS" : "KNIGHT ARTORIAS", this.cx(), this.y - 18);
                 ctx.textAlign = "left";
-                drawTopBossBar(this, this.buffed ? "#B388FF" : "#90A4AE",
-                               this.buffed ? "ARTORIAS — SỨC MẠNH VỰC THẲM" : "ARTORIAS THE ABYSSWALKER");
+                drawTopBossBar(this, this.buffed ? "#7C4DFF" : "#78909C",
+                               this.buffed ? "KNIGHT ARTORIAS — WRATH OF THE ABYSS" : "KNIGHT ARTORIAS (THE FORSAKEN HOLLOWS)");
             }
         }
 
@@ -26254,47 +26617,51 @@ class DilophosBoss {
         }
 
         // ============================== @@HE-ARTORIAS ==============================
-        // ARTORIAS THE ABYSSWALKER (Dark Souls). Boss cua nhanh DARK SOULS.
-        // TRIET LI: don nang, bao truoc RO nhung RAT NHANH khi da vao. Mot thanh mau duy nhat.
-        // DIEM DAC TRUNG:
-        //   - Tay TRAI GAY, buong thong; moi don deu vung mot tay bang thanh dai kiem.
-        //   - CU BUFF VUC THAM: dung im tu bong toi. NGUOI CHOI BAN DU DAU thi NGAT duoc,
-        //     khong ngat kip thi hắn no mot vong AoE va manh len han (nhanh hon, mo them 4 chieu).
-        //   - Somersault Slam co the lap toi BA lan lien tiep.
-        //   - Dung sau lung hắn thi an don Abyss Sludge.
-        const ART_W = 52, ART_H = 82;
-        // Nguong NGAT ha tu 90 xuong 55: cua so tu chi keo ART_BUFF_T khung, doi hoi 90 dmg
-        // trong khoang do la qua nang voi phan lon loai dan. Bu lai CA HAI DANG deu manh len
-        // bang hai chieu moi ben duoi va nhip ra don nhanh hon.
-        const ART_BUFF_HP = 55;
-        // === @@HE-ARTORIAS-NIGHT — hai chieu kieu Nightreign ===
-        // Deu gay DUNG 1 sat thuong: luat boss so 7 khong cho vuot qua 1 neu khong duoc phep.
-        const ART_VONG_DAY = 52;     // be day vanh vong vuc tham
-        const ART_DAU_CHO = 66;      // so khung tu luc danh dau den luc cot vuc tham no
-        const ART_BUFF_T  = 150;     // 2,5 giay tu bong toi
-        const ART_TEMPO = 2.35;      // NUT CHINH NHIP: cang lon, Artorias ra don cang thua
-        const ART_CD = { a_combo:70, a_sweep:120, a_smash:150, a_lunge:140, a_roll:90, a_sludge:260,
-                         a_flip:230, a_spin:200, a_burstk:280, a_dash:210, a_vong:230, a_dau:190,
-                         a_bay:170, a_truot:130, a_vuot:150 };
+        const ART_W = 52, ART_H = 84;
+        // NGƯỠNG NGẮT ABYSS HÓA: 30 SÁT THƯƠNG. THỜI GIAN TỤ: 185 NHỊP.
+        // Giúp mọi loại vũ khí/đạn của người chơi đều có thể ngắt kịp nếu phản ứng đúng lúc!
+        const ART_BUFF_HP = 30;
+        const ART_BUFF_T  = 185;
+        const ART_VONG_DAY = 52;
+        const ART_DAU_CHO  = 66;
+        const ART_TEMPO    = 2.15;
+        const ART_CD = {
+            a_combo: 70, a_sweep: 115, a_smash: 145, a_lunge: 135, a_roll: 85, a_sludge: 240,
+            a_flip: 210, a_spin: 185, a_burstk: 260, a_dash: 200, a_vong: 220, a_dau: 180,
+            a_bay: 165, a_truot: 125, a_vuot: 145, a_howl: 175
+        };
+
         let artFog = [];
+        let artAbyssMotes = [];
+
         function drawArtoriasEnv(){
             let g = ctx.createLinearGradient(0, -CAM_TROI - 20, 0, 320);
-            g.addColorStop(0, "#070910"); g.addColorStop(0.55, "#101522"); g.addColorStop(1, "#1A2030");
+            g.addColorStop(0, "#05070E"); g.addColorStop(0.55, "#0C1120"); g.addColorStop(1, "#161E32");
             ctx.fillStyle = g; ctx.fillRect(0, -CAM_TROI - 20, canvas.width, canvas.height + CAM_TROI + 20);
-            // trang lanh
-            ctx.save(); ctx.globalAlpha = 0.16; ctx.fillStyle = "#CFD8FF";
-            ctx.beginPath(); ctx.arc(canvas.width * 0.24, 70, 40, 0, 6.28); ctx.fill(); ctx.restore();
-            // tia trang xuyen tan cay
-            ctx.save(); ctx.globalAlpha = 0.05; ctx.fillStyle = "#9FB4FF";
+
+            // Trăng khuyết lạnh lẽo của Nightreign Limveld / Royal Wood
+            ctx.save();
+            let mg = ctx.createRadialGradient(canvas.width * 0.24, 68, 8, canvas.width * 0.24, 68, 92);
+            mg.addColorStop(0, "rgba(207, 216, 255, 0.32)");
+            mg.addColorStop(0.45, "rgba(100, 120, 220, 0.12)");
+            mg.addColorStop(1, "rgba(10, 14, 26, 0)");
+            ctx.fillStyle = mg; ctx.beginPath(); ctx.arc(canvas.width * 0.24, 68, 92, 0, 6.28); ctx.fill();
+            ctx.fillStyle = "rgba(220, 230, 255, 0.22)";
+            ctx.beginPath(); ctx.arc(canvas.width * 0.24, 68, 36, 0, 6.28); ctx.fill();
+            ctx.restore();
+
+            // Tia sáng bạc xuyên qua tán rừng chết
+            ctx.save(); ctx.globalAlpha = 0.045; ctx.fillStyle = "#9FB4FF";
             for (let i = 0; i < 5; i++){
                 ctx.beginPath();
                 ctx.moveTo(140 + i*180, 0); ctx.lineTo(200 + i*180, 0);
                 ctx.lineTo(120 + i*180, 320); ctx.lineTo(30 + i*180, 320); ctx.closePath(); ctx.fill();
             }
             ctx.restore();
-            // RUNG CAY CHET
+
+            // RỪNG CÂY CHẾT & TÀN TÍCH ĐẤU TRƯỜNG OOLACILE / FORSAKEN HOLLOWS
             for (let lay = 0; lay < 2; lay++){
-                ctx.fillStyle = lay === 0 ? "#0B0F18" : "#141A26";
+                ctx.fillStyle = lay === 0 ? "#080B14" : "#101624";
                 for (let i = 0; i < 6; i++){
                     let tx = 40 + i*180 + lay*70, tw = 16 + lay*8, th = 190 + ((i*53)%80) + lay*30;
                     ctx.fillRect(tx, 320 - th, tw, th);
@@ -26306,7 +26673,8 @@ class DilophosBoss {
                     }
                 }
             }
-            // SUONG bay ngang
+
+            // Hạt sương đêm & tàn tro Vực Thẳm bay lơ lửng
             if (artFog.length === 0) for (let i = 0; i < 16; i++)
                 artFog.push({ x: Math.random()*canvas.width, y: 170 + Math.random()*150, v: 0.16 + Math.random()*0.42, r: 60 + Math.random()*90 });
             ctx.save();
@@ -26316,17 +26684,27 @@ class DilophosBoss {
                 ctx.fillStyle = "#B0C4E8";
                 ctx.beginPath(); ctx.ellipse(f.x, f.y, f.r, f.r*0.26, 0, 0, 6.28); ctx.fill();
             }
+            if (artAbyssMotes.length === 0) for (let i = 0; i < 36; i++)
+                artAbyssMotes.push({ x: Math.random()*canvas.width, y: Math.random()*320, v: 0.4 + Math.random()*1.1, r: 1.2 + Math.random()*2.2, w: Math.random()*6.28 });
+            for (let m of artAbyssMotes){
+                m.y -= m.v; m.w += 0.05;
+                if (m.y < -10){ m.y = 325; m.x = Math.random()*canvas.width; }
+                ctx.globalAlpha = 0.35 + 0.25 * Math.sin(m.w);
+                ctx.fillStyle = m.r > 2.2 ? "#B388FF" : "#5E35B1";
+                ctx.beginPath(); ctx.arc(m.x + Math.sin(m.w)*5, m.y, m.r, 0, 6.28); ctx.fill();
+            }
             ctx.restore();
-            // SAN da + re cay
+
+            // SÀN ĐÁ CỔ & RỄ CÂY VỰC THẲM
             platforms.forEach(pf => {
                 let ground = pf.top >= 320;
                 let ph = ground ? 80 : Math.max(pf.h, 16);
-                ctx.fillStyle = ground ? "#1C2230" : "#2A3242";
+                ctx.fillStyle = ground ? "#161B28" : "#242C3D";
                 ctx.fillRect(pf.x, pf.top, pf.w, ph);
-                ctx.fillStyle = "#37415A"; ctx.fillRect(pf.x, pf.top, pf.w, 6);
-                ctx.fillStyle = "#4A5878"; ctx.fillRect(pf.x, pf.top, pf.w, 2);
+                ctx.fillStyle = "#2F3952"; ctx.fillRect(pf.x, pf.top, pf.w, 6);
+                ctx.fillStyle = "#485678"; ctx.fillRect(pf.x, pf.top, pf.w, 2);
                 if (ground){
-                    ctx.strokeStyle = "#131826"; ctx.lineWidth = 7; ctx.lineCap = "round";
+                    ctx.strokeStyle = "#0E121D"; ctx.lineWidth = 7; ctx.lineCap = "round";
                     for (let i = 0; i < 6; i++){
                         let rx = i*180 - 20;
                         ctx.beginPath(); ctx.moveTo(rx, 332);
@@ -26335,97 +26713,284 @@ class DilophosBoss {
                 }
             });
         }
-        // ---- HINH ARTORIAS: giap xam lam, ao choang rach, TAY TRAI BUONG THONG, dai kiem ----
+
+        // =============================================================================
+        // HÌNH ARTORIAS CHUẨN DARK SOULS & ELDEN RING NIGHTREIGN:
+        // - Mũ trụ mỏ chim sắc nhọn + Bờm lông sói xanh biển (Blue Wolf Plume) dài rủ sau đầu
+        // - Khăn choàng & Áo choàng xanh hoàng gia rách nát (Tattered Royal Blue Mantle)
+        // - Giáp bạc đen khắc hoa văn hiệp sĩ Gwyn, tỷ lệ chân thon dài, dáng đứng khom sói
+        // - Tay trái bị gãy xương vai buông thõng đung đưa tự do
+        // - Đại Kiếm Sói Artorias (Greatsword of Artorias) chuẩn thiết kế hộ thủ số 8
+        // =============================================================================
         function drawArtoriasBody(b, x, y){
             let dr = b.facingLeft ? -1 : 1, cxb = x + ART_W/2, buff = !!b.buffed;
+            let crouch = b.crouch || 0;               // Độ hạ thấp trọng tâm khi ngồi rạp chuẩn bị Lunge / Leap
+            let lean = b.lean || 0.14;                // Độ chồm người về phía trước kiểu sói săn mồi
+            let flipAngle = b.flipAngle || 0;         // Góc xoay lộn nhào toàn thân trên không (Somersault)
+            let walkCycle = Math.sin((b.walk || 0) * 0.18) * 4.5;
+            let sway = Math.sin(frames * 0.06) * 2.2 + (b.dashV ? -Math.abs(b.dashV) * 0.35 : 0);
+
             ctx.save();
-            ctx.translate(cxb, y); ctx.scale(dr, 1); ctx.translate(-cxb, -y);
-            let sway = Math.sin(frames * 0.05) * 1.8;
-            // hao quang Vuc Tham khi da buff (2 lop fill, khong dung shadowBlur)
-            if (buff){
-                for (let lay = 0; lay < 2; lay++){
-                    ctx.globalAlpha = lay === 0 ? 0.13 : 0.24;
-                    ctx.fillStyle = lay === 0 ? "#7C4DFF" : "#311B92";
-                    let e = lay === 0 ? 16 : 5;
-                    ctx.beginPath(); ctx.ellipse(cxb, y + ART_H*0.5, ART_W*0.62 + e, ART_H*0.56 + e, 0, 0, 6.28); ctx.fill();
+            // Dịch tâm xoay vào giữa thân để hỗ trợ xoay lộn vòng Somersault 360 độ mượt mà!
+            ctx.translate(cxb, y + ART_H * 0.48 + crouch * 0.5);
+            ctx.scale(dr, 1);
+            ctx.rotate(lean + flipAngle);
+            ctx.translate(-cxb, -(y + ART_H * 0.48));
+
+            // 1. HÀO QUANG LỬA ĐEN VỰC THẲM (ABYSSAL DARKFLAME AURA) KHI ĐÃ BUFF HOẶC ĐANG GỒNG
+            if (buff || b.state === 'a_buff'){
+                let pu = 0.5 + 0.5 * Math.sin(frames * 0.16);
+                ctx.save();
+                ctx.globalAlpha = buff ? (0.22 + 0.10 * pu) : 0.16;
+                ctx.fillStyle = "#1A0933";
+                ctx.beginPath(); ctx.ellipse(cxb, y + 42, 34 + pu * 6, 46 + pu * 6, 0, 0, 6.28); ctx.fill();
+                // Các lưỡi lửa đen-tím bốc lên từ vai và lưng
+                for (let k = 0; k < 5; k++){
+                    let fx = cxb - 18 + k * 9 + Math.sin(frames * 0.14 + k) * 4;
+                    let fh = 18 + ((k * 13) % 16) + pu * 10;
+                    ctx.fillStyle = k % 2 === 0 ? "rgba(124, 77, 255, 0.38)" : "rgba(49, 27, 146, 0.52)";
+                    ctx.beginPath();
+                    ctx.moveTo(fx - 6, y + 48);
+                    ctx.quadraticCurveTo(fx, y + 48 - fh, fx + 4, y + 48 - fh - 8);
+                    ctx.lineTo(fx + 6, y + 48);
+                    ctx.closePath(); ctx.fill();
                 }
-                ctx.globalAlpha = 1;
+                ctx.restore();
             }
-            // ao choang rach sau lung
-            ctx.fillStyle = buff ? "#241540" : "#25304A";
+
+            // 2. TÀ ÁO CHOÀNG XANH HOÀNG GIA RÁCH TẢ TƠI (TATTERED ROYAL BLUE CAPE)
+            // Phần trên màu xanh chàm đậm của hiệp sĩ Artorias, phần đuôi rách nát nhuốm bùn đen Vực Thẳm
+            let capeGrad = ctx.createLinearGradient(cxb - 10, y + 18, cxb - 36, y + ART_H);
+            capeGrad.addColorStop(0, buff ? "#1A237E" : "#1E3A5F");
+            capeGrad.addColorStop(0.6, buff ? "#121036" : "#152642");
+            capeGrad.addColorStop(1, "#080912");
+            ctx.fillStyle = capeGrad;
             ctx.beginPath();
-            ctx.moveTo(cxb - 12, y + 20);
-            ctx.quadraticCurveTo(cxb - 34 - sway*2, y + 48, cxb - 26 - sway*3, y + ART_H - 2);
-            ctx.lineTo(cxb + 2, y + ART_H - 8); ctx.lineTo(cxb + 2, y + 20);
+            ctx.moveTo(cxb - 10, y + 18);
+            ctx.quadraticCurveTo(cxb - 34 - sway * 1.8, y + 42, cxb - 38 - sway * 2.8, y + ART_H - 4);
+            // Các tua rách nham nhở ở gấu áo choàng
+            ctx.lineTo(cxb - 28 - sway * 2.2, y + ART_H - 18);
+            ctx.lineTo(cxb - 22 - sway * 2.0, y + ART_H - 2);
+            ctx.lineTo(cxb - 14 - sway * 1.5, y + ART_H - 16);
+            ctx.lineTo(cxb - 8 - sway * 1.0, y + ART_H - 3);
+            ctx.lineTo(cxb - 2, y + ART_H - 14);
+            ctx.lineTo(cxb + 2, y + 22);
             ctx.closePath(); ctx.fill();
-            ctx.fillStyle = buff ? "#1A0F30" : "#1A2338";
+            // Viền bạc mờ dọc mép áo choàng
+            ctx.strokeStyle = buff ? "#7C4DFF" : "#4A6984"; ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(cxb - 10, y + 19);
+            ctx.quadraticCurveTo(cxb - 32 - sway * 1.8, y + 42, cxb - 36 - sway * 2.6, y + ART_H - 6);
+            ctx.stroke();
+
+            // 3. ĐÔI CHÂN GIÁP THON DÀI (LEGGINGS OF ARTORIAS — Thon mảnh đúng thiết kế gốc)
+            let lLeg = (!b.grounded) ? -4 : walkCycle;
+            let rLeg = (!b.grounded) ? 3 : -walkCycle;
+            // Chân sau (trái)
+            ctx.fillStyle = "#232A3B";
+            ctx.beginPath();
+            ctx.moveTo(cxb - 11, y + 48); ctx.lineTo(cxb - 3, y + 48);
+            ctx.lineTo(cxb - 5 + lLeg * 0.5, y + ART_H - 6 - crouch * 0.4);
+            ctx.lineTo(cxb - 12 + lLeg * 0.5, y + ART_H - 6 - crouch * 0.4);
+            ctx.closePath(); ctx.fill();
+            // Chân trước (phải)
+            ctx.fillStyle = "#323C52";
+            ctx.beginPath();
+            ctx.moveTo(cxb + 2, y + 48); ctx.lineTo(cxb + 11, y + 48);
+            ctx.lineTo(cxb + 13 + rLeg * 0.5, y + ART_H - 6 - crouch * 0.4);
+            ctx.lineTo(cxb + 5 + rLeg * 0.5, y + ART_H - 6 - crouch * 0.4);
+            ctx.closePath(); ctx.fill();
+            // Giáp đầu gối sắc nhọn (Pointed Knee Poleyn)
+            ctx.fillStyle = "#687796";
+            ctx.beginPath(); ctx.moveTo(cxb - 11, y + 60); ctx.lineTo(cxb - 5, y + 57); ctx.lineTo(cxb - 7, y + 65); ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(cxb + 4, y + 60); ctx.lineTo(cxb + 13, y + 57); ctx.lineTo(cxb + 10, y + 65); ctx.closePath(); ctx.fill();
+            // Bàn chân giáp mũi nhọn (Sabatons)
+            ctx.fillStyle = "#1A202C";
+            ctx.beginPath(); ctx.moveTo(cxb - 13 + lLeg * 0.5, y + ART_H - 7 - crouch * 0.4); ctx.lineTo(cxb - 1 + lLeg * 0.5, y + ART_H - 2 - crouch * 0.4); ctx.lineTo(cxb - 13 + lLeg * 0.5, y + ART_H - 1 - crouch * 0.4); ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(cxb + 4 + rLeg * 0.5, y + ART_H - 7 - crouch * 0.4); ctx.lineTo(cxb + 18 + rLeg * 0.5, y + ART_H - 2 - crouch * 0.4); ctx.lineTo(cxb + 4 + rLeg * 0.5, y + ART_H - 1 - crouch * 0.4); ctx.closePath(); ctx.fill();
+
+            // 4. VÁY GIÁP HÔNG & DẢI VẢI XANH RÁCH QUẤN EO (FAULD & WAIST CLOTH)
+            ctx.fillStyle = "#1B2E4B";
+            ctx.beginPath();
+            ctx.moveTo(cxb - 13, y + 43); ctx.lineTo(cxb + 13, y + 43);
+            ctx.lineTo(cxb + 15, y + 58); ctx.lineTo(cxb + 4, y + 52);
+            ctx.lineTo(cxb - 2, y + 60); ctx.lineTo(cxb - 15, y + 55);
+            ctx.closePath(); ctx.fill();
+            // Thắt lưng kim loại chạm bạc
+            ctx.fillStyle = "#4A5670"; ctx.fillRect(cxb - 14, y + 41, 28, 4);
+            ctx.fillStyle = "#8C9EFF"; ctx.fillRect(cxb - 3, y + 40, 6, 6);
+
+            // 5. THÂN GIÁP NGỰC HIỆP SĨ SÓI (SILVER-DARK CUIRASS & BLUE MANTLE)
+            let torsoGrad = ctx.createLinearGradient(cxb - 15, y + 18, cxb + 15, y + 44);
+            torsoGrad.addColorStop(0, "#6E7F9E");
+            torsoGrad.addColorStop(0.5, "#3E4A63");
+            torsoGrad.addColorStop(1, "#1F2637");
+            ctx.fillStyle = torsoGrad;
+            ctx.beginPath();
+            ctx.moveTo(cxb - 15, y + 18); ctx.lineTo(cxb + 16, y + 18);
+            ctx.lineTo(cxb + 13, y + 42); ctx.lineTo(cxb - 13, y + 42);
+            ctx.closePath(); ctx.fill();
+            // Các đường gân giáp xương sườn bạc sáng
+            ctx.strokeStyle = "#8FA0BF"; ctx.lineWidth = 1.3;
             for (let k = 0; k < 3; k++){
-                ctx.beginPath(); ctx.moveTo(cxb - 26 - k*2, y + ART_H - 2);
-                ctx.lineTo(cxb - 19 - k*4, y + ART_H - 22); ctx.lineTo(cxb - 12 - k*3, y + ART_H - 2); ctx.closePath(); ctx.fill();
-            }
-            // chan giap
-            ctx.fillStyle = "#39435C"; ctx.fillRect(cxb - 15, y + 52, 12, 30); ctx.fillRect(cxb + 3, y + 52, 12, 30);
-            ctx.fillStyle = "#1B2130"; ctx.fillRect(cxb - 18, y + ART_H - 6, 16, 6); ctx.fillRect(cxb + 2, y + ART_H - 6, 16, 6);
-            ctx.fillStyle = "#4E5B78"; ctx.fillRect(cxb - 16, y + 54, 14, 6); ctx.fillRect(cxb + 2, y + 54, 14, 6);
-            // than giap
-            let bg = ctx.createLinearGradient(0, y + 16, 0, y + 56);
-            bg.addColorStop(0, "#5A6786"); bg.addColorStop(1, "#333C52");
-            ctx.fillStyle = bg;
-            ctx.beginPath();
-            ctx.moveTo(cxb - 16, y + 18); ctx.lineTo(cxb + 16, y + 18);
-            ctx.lineTo(cxb + 18, y + 56); ctx.lineTo(cxb - 18, y + 56); ctx.closePath(); ctx.fill();
-            ctx.fillStyle = "#232B3C"; ctx.fillRect(cxb - 18, y + 42, 36, 6);
-            ctx.strokeStyle = "#6E7C9E"; ctx.lineWidth = 1.4;
-            for (let k = 0; k < 3; k++){ ctx.beginPath(); ctx.moveTo(cxb - 12, y + 24 + k*7); ctx.lineTo(cxb + 12, y + 24 + k*7); ctx.stroke(); }
-            // vai giap
-            ctx.fillStyle = "#647293";
-            for (let s2 = -1; s2 <= 1; s2 += 2){
                 ctx.beginPath();
-                ctx.moveTo(cxb + s2*15, y + 13); ctx.lineTo(cxb + s2*32, y + 8);
-                ctx.lineTo(cxb + s2*26, y + 32); ctx.lineTo(cxb + s2*15, y + 30); ctx.closePath(); ctx.fill();
+                ctx.moveTo(cxb - 11, y + 25 + k * 5);
+                ctx.lineTo(cxb + 2, y + 28 + k * 5);
+                ctx.lineTo(cxb + 12, y + 24 + k * 5);
+                ctx.stroke();
             }
-            // ==== TAY TRAI GAY: buong thong, quan bang ====
-            ctx.save(); ctx.translate(cxb - 20, y + 28); ctx.rotate(0.34 + Math.sin(frames*0.05)*0.05);
-            ctx.fillStyle = "#39435C"; ctx.fillRect(-4, 0, 8, 22);
-            ctx.fillStyle = "#8D8470";                      // bang quan
-            for (let k = 0; k < 4; k++) ctx.fillRect(-5, 4 + k*6, 10, 4);
-            ctx.fillStyle = "#5A6786"; ctx.fillRect(-4, 22, 8, 8);
-            ctx.restore();
-            // tay phai cam kiem
-            let ar = b.armR || 0;
-            ctx.save(); ctx.translate(cxb + 18, y + 26); ctx.rotate(ar);
-            ctx.fillStyle = "#39435C"; ctx.fillRect(-5, 0, 10, 24);
-            ctx.fillStyle = "#5A6786"; ctx.fillRect(-6, 22, 12, 9);
-            ctx.restore();
-            // mu tru: khe mat ngang, mao nhon
-            ctx.fillStyle = "#5A6786";
+            // Khăn choàng xanh trùm qua vai và ngực (Iconic Blue Hooded Mantle Scarf)
+            ctx.fillStyle = buff ? "#283593" : "#1E4678";
             ctx.beginPath();
-            ctx.moveTo(cxb - 11, y + 20); ctx.lineTo(cxb + 11, y + 20);
-            ctx.lineTo(cxb + 9, y + 1); ctx.lineTo(cxb - 9, y + 1); ctx.closePath(); ctx.fill();
-            ctx.fillStyle = "#39435C"; ctx.fillRect(cxb - 11, y + 16, 22, 5);
-            ctx.fillStyle = "#7C88A8";
-            ctx.beginPath(); ctx.moveTo(cxb - 3, y + 1); ctx.lineTo(cxb + 3, y + 1); ctx.lineTo(cxb + 1, y - 14); ctx.closePath(); ctx.fill();
-            ctx.fillStyle = "#0A0C12"; ctx.fillRect(cxb - 8, y + 9, 16, 3);
-            if (buff){ ctx.fillStyle = "#B388FF"; ctx.fillRect(cxb - 7, y + 9.5, 5, 2); ctx.fillRect(cxb + 2, y + 9.5, 5, 2); }
-            // ==== DAI KIEM ARTORIAS ====
-            ctx.save();
-            ctx.translate(cxb + 18 + Math.sin(ar)*30, y + 26 + Math.cos(ar)*30); ctx.rotate(ar - 0.9);
-            ctx.fillStyle = "#2A3242"; ctx.fillRect(-3, -10, 6, 16);
-            ctx.fillStyle = "#4E5B78"; ctx.fillRect(-15, -14, 30, 6);
-            let sg = ctx.createLinearGradient(0, -14, 0, -92);
-            if (buff){ sg.addColorStop(0, "#EDE7F6"); sg.addColorStop(0.5, "#B388FF"); sg.addColorStop(1, "#4527A0"); }
-            else { sg.addColorStop(0, "#DDE3EC"); sg.addColorStop(0.55, "#9AA6C4"); sg.addColorStop(1, "#6E7C9E"); }
-            ctx.fillStyle = sg;
-            ctx.beginPath();
-            ctx.moveTo(-8, -14); ctx.lineTo(8, -14); ctx.lineTo(7, -82); ctx.lineTo(0, -96); ctx.lineTo(-7, -82);
+            ctx.moveTo(cxb - 16, y + 15); ctx.lineTo(cxb + 16, y + 15);
+            ctx.lineTo(cxb + 12, y + 27); ctx.lineTo(cxb + 2, y + 31);
+            ctx.lineTo(cxb - 14, y + 25);
             ctx.closePath(); ctx.fill();
-            ctx.fillStyle = buff ? "#7C4DFF" : "#5A6786"; ctx.fillRect(-2, -80, 4, 62);
+
+            // 6. CÁNH TAY TRÁI BỊ GÃY TRẬT KHỚP VAI (SHATTERED LEFT ARM — Đung đưa vô lực!)
+            // Vai trái bị sụp thấp hơn vai phải, cánh tay buông thõng lắc lư theo quán tính
+            let limpSwing = 0.22 + Math.sin(frames * 0.08) * 0.08 - (b.dashV || 0) * 0.025;
+            ctx.save();
+            ctx.translate(cxb - 14, y + 22);
+            ctx.rotate(limpSwing);
+            // Giáp vai trái bị vỡ nứt
+            ctx.fillStyle = "#4A5670";
+            ctx.beginPath(); ctx.moveTo(-7, -4); ctx.lineTo(5, -2); ctx.lineTo(4, 7); ctx.lineTo(-8, 6); ctx.closePath(); ctx.fill();
+            // Bắp tay & cẳng tay trái gãy buông thõng dài xuống ngang đùi
+            ctx.fillStyle = "#2A3244"; ctx.fillRect(-3.5, 4, 7, 16);
+            ctx.fillStyle = "#3E4A63"; ctx.fillRect(-3, 19, 6, 15);
+            // Các dải vải liệm/băng quấn quanh cánh tay gãy
+            ctx.fillStyle = "#7E8C9F";
+            for (let k = 0; k < 3; k++) ctx.fillRect(-3.8, 8 + k * 7, 7.6, 2.5);
+            // Bàn tay sắt trái rủ xuống vô lực + Khói đen Vực Thẳm rỉ ra từ vết gãy
+            ctx.fillStyle = "#4A5670";
+            ctx.beginPath(); ctx.moveTo(-3, 34); ctx.lineTo(3, 34); ctx.lineTo(1, 41); ctx.lineTo(-2, 40); ctx.closePath(); ctx.fill();
             ctx.restore();
+
+            // 7. MŨ TRỤ MỎ CHIM SÓI ARTORIAS & BỜM LÔNG XANH DƯƠNG ĐẬM (WOLF HELM & BLUE PLUME)
+            // Bờm lông xanh dương khổng lồ (Iconic Flowing Blue Wolf Mane) tung bay từ đỉnh mũ trụ!
+            let plumeGrad = ctx.createLinearGradient(cxb, y - 8, cxb - 36, y + 18);
+            plumeGrad.addColorStop(0, buff ? "#536DFE" : "#2962FF");
+            plumeGrad.addColorStop(0.55, buff ? "#311B92" : "#1565C0");
+            plumeGrad.addColorStop(1, "#090D1A");
+            ctx.fillStyle = plumeGrad;
+            ctx.beginPath();
+            ctx.moveTo(cxb + 2, y - 5);
+            ctx.quadraticCurveTo(cxb - 18 - sway * 1.5, y - 14, cxb - 36 - sway * 2.5, y + 6);
+            ctx.lineTo(cxb - 26 - sway * 2.0, y + 9);
+            ctx.lineTo(cxb - 34 - sway * 2.2, y + 18);
+            ctx.lineTo(cxb - 20 - sway * 1.5, y + 16);
+            ctx.lineTo(cxb - 24 - sway * 1.2, y + 24);
+            ctx.quadraticCurveTo(cxb - 10, y + 18, cxb - 4, y + 6);
+            ctx.closePath(); ctx.fill();
+
+            // Thân mũ trụ bạc góc cạnh có chóp đỉnh nhọn và tấm che mặt vát nhọn như mỏ chim/mõm sói
+            ctx.fillStyle = "#6E7F9E";
+            ctx.beginPath();
+            ctx.moveTo(cxb - 8, y + 16);
+            ctx.lineTo(cxb - 9, y + 4);
+            ctx.lineTo(cxb + 1, y - 6);   // Đỉnh mũ nhọn uốn về trước
+            ctx.lineTo(cxb + 8, y + 2);
+            ctx.lineTo(cxb + 14, y + 11); // Phần mũi mũ nhọn vươn ra trước (Beaked Visor)
+            ctx.lineTo(cxb + 5, y + 18);
+            ctx.closePath(); ctx.fill();
+
+            // Hốc mắt tối đen sâu thẳm của Artorias (Bị Vực Thẳm nuốt chửng)
+            ctx.fillStyle = "#06070C";
+            ctx.beginPath();
+            ctx.moveTo(cxb - 3, y + 7); ctx.lineTo(cxb + 11, y + 9);
+            ctx.lineTo(cxb + 6, y + 13); ctx.lineTo(cxb - 4, y + 11);
+            ctx.closePath(); ctx.fill();
+            // Ánh sáng tím/đỏ của Vực Thẳm lóe lên từ trong khe mũ trụ khi Buff hoặc Hú
+            if (buff || b.state === 'a_howl' || b.state === 'a_buff'){
+                ctx.fillStyle = b.state === 'a_howl' ? "#E040FB" : "#B388FF";
+                ctx.fillRect(cxb + 2, y + 9, 6, 2.2);
+            }
+            // Gờ sống mũi bạc sáng trên mũ trụ
+            ctx.strokeStyle = "#B0BEC5"; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(cxb + 1, y - 5); ctx.lineTo(cxb + 13, y + 11); ctx.stroke();
+
+            // 8. CÁNH TAY PHẢI CẦM ĐẠI KIẾM SÓI (GREATSWORD OF ARTORIAS — 1 TAY UY LỰC)
+            let ar = b.armR || 0;
+            ctx.save();
+            ctx.translate(cxb + 11, y + 22);
+            ctx.rotate(ar);
+
+            // Giáp vai phải lớn xếp lớp (Pauldron)
+            ctx.fillStyle = "#5C6B8A";
+            ctx.beginPath();
+            ctx.moveTo(-7, -6); ctx.lineTo(10, -4); ctx.lineTo(12, 8); ctx.lineTo(-6, 7);
+            ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = "#90A4AE"; ctx.lineWidth = 1.2; ctx.stroke();
+
+            // Bắp tay & Găng sắt phải nắm chuôi kiếm
+            ctx.fillStyle = "#323C52"; ctx.fillRect(-4, 4, 8, 16);
+            ctx.fillStyle = "#6E7F9E"; ctx.fillRect(-4.5, 18, 9, 8);
+
+            // ==== THANH ĐẠI KIẾM CỦA ARTORIAS (WOLF KNIGHT'S GREATSWORD) ====
+            ctx.save();
+            ctx.translate(0, 23);
+            ctx.rotate((b.swordAngle !== undefined) ? b.swordAngle : -1.05);
+
+            // Chuôi kiếm dài & Quả đấm đuôi kiếm (Pommel) hình thoi bạc
+            ctx.fillStyle = "#263238"; ctx.fillRect(-2.5, 0, 5, 15);
+            ctx.fillStyle = "#78909C";
+            ctx.beginPath(); ctx.moveTo(0, 21); ctx.lineTo(-5, 16); ctx.lineTo(0, 12); ctx.lineTo(5, 16); ctx.closePath(); ctx.fill();
+
+            // Hộ thủ (Crossguard) dày có 2 vòng khuyết đối xứng hình số 8 đặc trưng của Greatsword of Artorias!
+            ctx.fillStyle = "#546E7A";
+            ctx.beginPath();
+            ctx.moveTo(-16, -2); ctx.lineTo(-13, -8); ctx.lineTo(13, -8); ctx.lineTo(16, -2);
+            ctx.lineTo(11, 1); ctx.lineTo(-11, 1);
+            ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = "#B0BEC5"; ctx.lineWidth = 1.3; ctx.stroke();
+            // Hai lỗ khuyết tròn trên hộ thủ
+            ctx.fillStyle = "#101522";
+            ctx.beginPath(); ctx.arc(-7, -4, 2.2, 0, 6.28); ctx.arc(7, -4, 2.2, 0, 6.28); ctx.fill();
+
+            // Phần gốc lưỡi kiếm to bản (Ricasso) có hoa văn khắc chìm
+            ctx.fillStyle = "#455A64";
+            ctx.fillRect(-7.5, -24, 15, 16);
+            ctx.strokeStyle = "#90A4AE"; ctx.lineWidth = 1.1;
+            ctx.strokeRect(-5.5, -22, 11, 12);
+
+            // Lưỡi Đại Kiếm dài to bản bị Vực Thẳm ăn mòn (Cursed Greatsword Blade)
+            let bladeGrad = ctx.createLinearGradient(0, -24, 0, -108);
+            if (buff){
+                bladeGrad.addColorStop(0, "#D1C4E9");
+                bladeGrad.addColorStop(0.5, "#7E57C2");
+                bladeGrad.addColorStop(1, "#311B92");
+            } else {
+                bladeGrad.addColorStop(0, "#CFD8DC");
+                bladeGrad.addColorStop(0.55, "#78909C");
+                bladeGrad.addColorStop(1, "#37474F");
+            }
+            ctx.fillStyle = bladeGrad;
+            ctx.beginPath();
+            ctx.moveTo(-7, -24);
+            ctx.lineTo(-6.2, -88);
+            ctx.lineTo(0, -108); // Mũi đại kiếm vươn dài uy lực
+            ctx.lineTo(6.2, -88);
+            ctx.lineTo(7, -24);
+            ctx.closePath(); ctx.fill();
+
+            // Viền lưỡi kiếm sắc sáng
+            ctx.strokeStyle = buff ? "#EDE7F6" : "#ECEFF1";
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+
+            // Rãnh máu đen / Vết ăn mòn Vực Thẳm dọc giữa thân kiếm
+            ctx.fillStyle = buff ? "#1A0933" : "#1C2430";
+            ctx.fillRect(-2.2, -92, 4.4, 68);
+            if (buff){
+                ctx.fillStyle = "#B388FF";
+                ctx.fillRect(-0.8, -88, 1.6, 60);
+            }
+            ctx.restore();
+            ctx.restore();
+
             ctx.restore();
         }
-
-
-
 
         // AP LUC THEO KHU cua ARCANA REX
         const ARC_ZONE_WARN = 34;    // bao truoc bao nhieu frame roi moi no
