@@ -99656,7 +99656,7 @@ window.addEventListener('keydown',e=>{
 let apexColor=0,apexLoadout=null;
 try{apexColor=Math.max(0,Math.min(4,+localStorage.getItem('dino_apex_color')||0));}catch(e){}
 const APEX_ROLES=[["ĐÁNH XA: cầu nhỏ +1; tối đa 5 tia phụ; cầu xoáy tổng 18.", "RANGED: small orbs +1; up to 5 subshots; spiral total 18."], ["CẬN CHIẾN: +1 sát thương, +20% tầm; cầu tạo bãi dung nham 1/s, 3s.", "MELEE: +1 damage, +20% reach; orbs leave lava 1/s for 3s."], ["KHỐNG CHẾ: xoay gây choáng 0,1s/hit; hất tung 0,2s; kết nổ đẩy lùi.", "CONTROL: spins stun 0.1s/hit; launch 0.2s; finale knocks back."], ["ĐỘT KÍCH: Dash +2 sát thương, xa +25%; khiên tím chắn đạn phía trước.", "ASSAULT: dash +2 damage, +25% distance; forward projectile shield."]],APEX_ULT_TEXT=[["U: tụ 1,5s, tia 100 sát thương/1s, đẩy sát tường. Kết liễu hóa tro.", "U: charge 1.5s, beam 100 damage/1s; wall push, ash finisher."], ["U: 10s. +2/hit, tầm x1,5; hào quang 5/s, dải dung nham 3/s.", "U: 10s. +2/hit, reach x1.5; aura 5/s, lava trail 3/s."], ["U: hố đen hút địch; 7 nhát x10, bổ cuối 30. Kết liễu chẻ đôi.", "U: black hole pull; 7 cuts x10, final cleave 30. Split finisher."], ["U: biến mất, cắt xuyên toàn màn hình: 100 sát thương. Kết liễu vỡ mảnh.", "U: vanish, screen-wide cuts: 100 damage. Shatter finisher."]];
-APEX_ROLES.push(['OBELITH: hai khối chờ leo 5s; bước lên bắt đầu 5s sử dụng, sau đó hồi 10s. Leo lên, đứng 1s để nạp K; giữ vị trí để chưởng 20 sát thương / 2s.','OBELITH: two high shrines wait 5s for a landing; first landing starts 5s of use, then 10s cooldown. Climb up and stand for 1s to empower K; stay atop to channel 20 damage over 2s.']);
+APEX_ROLES.push(['OBELITH: hai khối chờ leo 5s; bước lên bắt đầu 5s sử dụng, sau đó hồi 10s. Leo lên, đứng 1s để nạp K; K quét ba góc trong 2s, mỗi kẻ địch trúng tia nhận 20 sát thương.','OBELITH: two high shrines wait 5s for a landing; first landing starts 5s of use, then 10s cooldown. Climb up and stand for 1s to empower K; K sweeps three corners over 2s, dealing 20 damage once to each enemy touched.']);
 APEX_ULT_TEXT.push(['U: trụ lớn nâng lên, tụ 1,5s rồi xoáy cong lên, bổ thiên thạch vào Boss: 150 sát thương. Không Boss: nảy 3s, 25/lần xuyên (tối đa 150/mục tiêu), bay cong về chân trụ. Kết liễu chẻ đôi.','U: rise on a great pillar, charge for 1.5s, then arc upward and meteor-dive into a boss for 150 damage. Without a boss: ricochet for 3s, 25/pass (150 max per target), arc back to the pillar base. Split finisher.']);
 function apexRoleText(){return LT(...APEX_ROLES[apexColor]);}
 function apexUltText(){return LT(...APEX_ULT_TEXT[apexColor]);}
@@ -99702,8 +99702,8 @@ drawUI=function(){const active=apexOn()&&dino.apex&&['normal','boss_rush','test_
 }};
 vkDangKy(21,{ten:'CLAWS',theLuc:1,khongHoiDan:true,khongSac(){return true;},banJ(){},batUltRieng(){if(dino.apex)dino.apex.ultStart();}});
 AMMO_NAMES.push('CLAWS');ammoColors.push('#4ade80');AMMO_NHOM.push(-1);UNITY_PAL_SRC.push({c:'#4ade80',d:'#14532d'});STY_DPS.push(8);PVP_HS.push(1);PVP_SAN.push(0);AI_HOSO.push({dai:[30,100],ep:true,sac:1,xa:false,moc:[30]});CHARGE_TIERS.push([[30,'#4ade80'],[90,'#e879f9'],[120,'#fff']]);
-AMMO_CHITIET_VI.push(['#CLAWS — DÀNH RIÊNG CHO APEX','-Chọn DẠNG APEX để dùng. 8 HP, khóa Power, Rune và phụ kiện; mục phụ kiện chuyển thành năm biến thể có vai trò và chiêu cuối riêng.','-J: cào 2/2/2/6. J → Nhảy: xoay đuôi ngược lên, 4 sát thương một lần và hất tung; Nhảy → J: chém không trung 2. Giữ J: cắn 6; trên không cưa lưng 4 mỗi 0.25s. Cúi J: kẹp 4 rồi cắn 6.','-Dash (Shift hoặc nhấn đôi A/D): 3 mỗi mục tiêu. Dash → J: xoay hai vòng 5 + 7. J → Dash: xoay tử thần ngay, 4 khi xuyên qua, lặp sau 0,25s. Nhảy kết xoay đuôi hất tung; bấm J trong lúc xoay để kết nổ 6; không tự nổ khi hết đòn.','-K: nhấp dưới 0,25s gây 1; đạn charge nhỏ gây 2. Từ 1,5s: cầu xoáy chạm gây 5, bám gây 1 mỗi 0,2s, tổng tối đa 15. Từ 2s: Laser 1 mỗi 10 frame (6/s), kéo dài 2s. Tia phụ 2 mỗi viên.','-Xanh: cầu nhỏ +1, 5 tia phụ tối đa; cầu xoáy 6 + 2 mỗi nhịp, tối đa 18. Các màu khác tối đa 3 tia phụ.','-Magma: cận chiến +1 sát thương, tầm +20%; cầu năng lượng để lại dung nham 1/s trong 3s. Cyber: xoay khống chế 0,1s mỗi hit; hất tung 0,2s; kết nổ đẩy lùi. Nebula: Dash +2 sát thương, xa +25%, khiên tím chắn đạn phía trước.','-Obelith: hai trụ chờ leo tối đa 5s; lần đầu bước lên bắt đầu 5s sử dụng, rồi hồi 10s; nghỉ bám tường 3s hồi 1s bám. Đứng trên trụ 1s, K chưởng 20 sát thương/2s; rời trụ sẽ mất nạp. U: trụ nâng lên, tụ 1,5s, có Boss thì xoáy lên và bổ thiên thạch gây 150; không Boss thì nảy giữa các cạnh 3s, 25/lần xuyên (cách 0,4s, tối đa 150/mục tiêu), bay cong về chân trụ; kết liễu chẻ đôi.','-U (100%): Xanh tụ 1,5s rồi tia 10 mỗi 0,1s trong 1s (100). Magma cường hóa 10s: +2 mỗi hit, tầm x1,5, hào quang 5/s, đường dung nham 3/s. Stalker: 7 x 10 + chém cuối 30. Nebula: cắt toàn màn hình 100. Ba dạng Xanh/Stalker/Nebula khóa hành động trong cinematic.']);
-AMMO_CHITIET_EN.push(['#CLAWS — APEX ONLY','-Select APEX form. 8 HP. Power, Runes and accessories locked; colors select distinct combat specialties.','-J claws 2/2/2/6; J → Jump: reverse tail somersault, 4 damage and launch; Jump → J: aerial slash 2; hold bite 6 or air saw 4 per .25s. Crouch J clamp 4 then bite 6.','-Dash 3 per target; Dash J 5+7; J Dash starts death roll immediately, 4 per crossing (0.25s rehit); Jump launches with a tail spin; press J during the roll for a 6-damage finale. No automatic finale.','-Obelith: shrines wait up to 5s for a landing, then allow 5s of use from the first landing. After use or no landing, cooldown is 10s. Rest from climbing for 3s to restore 1s of wall grip. Stand atop for 1s; K channels 20 damage/2s. Leaving loses charge. U rises on a great pillar, charges for 1.5s and arcs upward then meteor-dives for 150 damage against a boss. Without a boss, ricochets for 3s, dealing 25 per pass (0.4s rehit, 150 max per target), then arcs back to the retracted pillar. Lethal hits split enemies.','-K tap under 0.25s: 1; charged small shot: 2. 1.5s orb: impact 5, sticks for 1 per 0.2s up to 15 total. 2s laser: 1 per 10 frames (6/s) for 2s. Subshots 2 each. U: Emerald 1.5s charge + 100 beam damage over 1s; Magma 10s buff (+2/hit, +50% reach, aura 5/s, ground trail 3/s); Stalker 7x10+30; Nebula screen-wide 100. The three non-Magma ultimates are cinematics.']);
+AMMO_CHITIET_VI.push(['#CLAWS — DÀNH RIÊNG CHO APEX','-Chọn DẠNG APEX để dùng. 8 HP, khóa Power, Rune và phụ kiện; mục phụ kiện chuyển thành năm biến thể có vai trò và chiêu cuối riêng.','-J: cào 2/2/2/6. J → Nhảy: xoay đuôi ngược lên, 4 sát thương một lần và hất tung; Nhảy → J: chém không trung 2. Giữ J: cắn 6; trên không cưa lưng 4 mỗi 0.25s. Cúi J: kẹp 4 rồi cắn 6.','-Dash (Shift hoặc nhấn đôi A/D): 3 mỗi mục tiêu. Dash → J: xoay hai vòng 5 + 7. J → Dash: xoay tử thần ngay, 4 khi xuyên qua, lặp sau 0,25s. Nhảy kết xoay đuôi hất tung; bấm J trong lúc xoay để kết nổ 6; không tự nổ khi hết đòn.','-K: nhấp dưới 0,25s gây 1; đạn charge nhỏ gây 2. Từ 1,5s: cầu xoáy chạm gây 5, bám gây 1 mỗi 0,2s, tổng tối đa 15. Từ 2s: Laser 1 mỗi 10 frame (6/s), kéo dài 2s. Tia phụ 2 mỗi viên.','-Xanh: cầu nhỏ +1, 5 tia phụ tối đa; cầu xoáy 6 + 2 mỗi nhịp, tối đa 18. Các màu khác tối đa 3 tia phụ.','-Magma: cận chiến +1 sát thương, tầm +20%; cầu năng lượng để lại dung nham 1/s trong 3s. Cyber: xoay khống chế 0,1s mỗi hit; hất tung 0,2s; kết nổ đẩy lùi. Nebula: Dash +2 sát thương, xa +25%, khiên tím chắn đạn phía trước.','-Obelith: hai trụ chờ leo tối đa 5s; lần đầu bước lên bắt đầu 5s sử dụng, rồi hồi 10s; nghỉ bám tường 3s hồi 1s bám. Đứng trên trụ 1s, K quét từ góc dưới cùng phía trụ qua góc dưới đối diện lên góc trên đối diện trong 2s, gây 20 sát thương/mục tiêu; rời trụ sẽ mất nạp. U: trụ nâng lên, tụ 1,5s, có Boss thì xoáy lên và bổ thiên thạch gây 150; không Boss thì nảy giữa các cạnh 3s, 25/lần xuyên (cách 0,4s, tối đa 150/mục tiêu), bay cong về chân trụ; kết liễu chẻ đôi.','-U (100%): Xanh tụ 1,5s rồi tia 10 mỗi 0,1s trong 1s (100). Magma cường hóa 10s: +2 mỗi hit, tầm x1,5, hào quang 5/s, đường dung nham 3/s. Stalker: 7 x 10 + chém cuối 30. Nebula: cắt toàn màn hình 100. Ba dạng Xanh/Stalker/Nebula khóa hành động trong cinematic.']);
+AMMO_CHITIET_EN.push(['#CLAWS — APEX ONLY','-Select APEX form. 8 HP. Power, Runes and accessories locked; colors select distinct combat specialties.','-J claws 2/2/2/6; J → Jump: reverse tail somersault, 4 damage and launch; Jump → J: aerial slash 2; hold bite 6 or air saw 4 per .25s. Crouch J clamp 4 then bite 6.','-Dash 3 per target; Dash J 5+7; J Dash starts death roll immediately, 4 per crossing (0.25s rehit); Jump launches with a tail spin; press J during the roll for a 6-damage finale. No automatic finale.','-Obelith: shrines wait up to 5s for a landing, then allow 5s of use from the first landing. After use or no landing, cooldown is 10s. Rest from climbing for 3s to restore 1s of wall grip. Stand atop for 1s; K sweeps from the near lower corner through the far lower corner to the far upper corner in 2s, dealing 20 damage once per target. Leaving loses charge. U rises on a great pillar, charges for 1.5s and arcs upward then meteor-dives for 150 damage against a boss. Without a boss, ricochets for 3s, dealing 25 per pass (0.4s rehit, 150 max per target), then arcs back to the retracted pillar. Lethal hits split enemies.','-K tap under 0.25s: 1; charged small shot: 2. 1.5s orb: impact 5, sticks for 1 per 0.2s up to 15 total. 2s laser: 1 per 10 frames (6/s) for 2s. Subshots 2 each. U: Emerald 1.5s charge + 100 beam damage over 1s; Magma 10s buff (+2/hit, +50% reach, aura 5/s, ground trail 3/s); Stalker 7x10+30; Nebula screen-wide 100. The three non-Magma ultimates are cinematics.']);
 // Restore saved Apex after all registrations exist, without overwriting other saved loadouts.
 if(apexOn())apexSync();
 function apexInput(){return keys;}
@@ -103561,13 +103561,48 @@ function apexCreate(owner){
   }
  }
  function fireObelithBeam(){
-  if(apexColor!==4||!obelith.ready||!obelithPad()||obelith.beam)return false;
-  const target=obelithTarget(true);
-  if(!target){comboBadge.textContent='OBELITH · NO TARGET';return true;}
-  obelith.ready=false;obelith.charge=0;obelith.beam={target,age:0,hits:0};
+  const pad=obelithPad();
+  if(apexColor!==4||!obelith.ready||!pad||obelith.beam)return false;
+  const left=Math.max(worldL(),camX||0),right=Math.min(worldR(),left+canvas.width);
+  const top=(camY||0)-(mapTheme==='ocean'?oceanCamY||0:0)-(mapTheme==='tetris'?tetrisCamY||0:0);
+  const floor=mapTheme==='ocean'?bienDayHT():coBuc()?top+canvas.height:dkNenY();
+  const bottom=Math.min(top+canvas.height,Math.max(owner.y+owner.h+60,floor));
+  const fromLeft=pad.x+pad.w/2<(left+right)/2/SCALE,near=fromLeft?left:right,far=fromLeft?right:left;
+  obelith.ready=false;obelith.charge=0;
+  obelith.beam={age:0,hits:0,hit:new Set(),clashTicks:new Map(),view:{left,right,top,bottom},corners:[{x:near,y:bottom},{x:far,y:bottom},{x:far,y:top}],ray:null};
   dino.rangedCharging=false;dino.rangedChargeSec=0;dino.laserActiveSec=0;
   if(SFX.tone)SFX.tone(260,.2,'sawtooth',.1,900);
   return true;
+ }
+ function tickObelithBeam(beam){
+  beam.age++;
+  // Sweep the boundary in order: near lower corner -> far lower -> far upper.
+  const stage=beam.age<=60?0:1,q=stage===0?(beam.age-1)/59:(beam.age-60)/60;
+  const a=beam.corners[stage],b=beam.corners[stage+1],tx=a.x+(b.x-a.x)*q,ty=a.y+(b.y-a.y)*q;
+  dino.facing=tx>=dino.x*SCALE?1:-1;dino.visualScaleX=dino.facing;
+  dino.headPitch=Math.max(-1.25,Math.min(1.25,Math.atan2(ty-(dino.y-75)*SCALE,Math.abs(tx-dino.x*SCALE))));
+  dino.jawOpen=1.1;dino.fireGlowTimer=4;dino.chargePulse=1;
+  const r=computeSkeletalRig(dino.crouchBlend,dino.dashBlend,dino.walkCycle,dino.breathCycle,dino.recoilOffset,dino.headPitch,dino.vy,dino.isGrounded);
+  const c=Math.cos(r.headRotation),sn=Math.sin(r.headRotation);
+  const ray={x0:(dino.x+dino.facing*(r.headX+42*c-4*sn))*SCALE,y0:(dino.y+r.headY+42*sn+4*c)*SCALE,x1:tx,y1:ty};
+  const last=beam.ray||ray;beam.ray=ray;
+  const travel=Math.max(Math.hypot(ray.x0-last.x0,ray.y0-last.y0),Math.hypot(ray.x1-last.x1,ray.y1-last.y1));
+  const steps=Math.max(1,Math.ceil(travel/12)),view=beam.view;
+  for(const o of sgTargets(owner)){
+   if(!(o.hp>0)||o.invulnAll||o.x+o.w<view.left||o.x>view.right||o.y+o.h<view.top||o.y>view.bottom)continue;
+   const root=o.__goc||o;
+   if(!o._beamClashPoint&&beam.hit.has(root))continue;
+   if(o._beamClashPoint&&beam.age-(beam.clashTicks.get(o.ownerBoss)??-999)<12)continue;
+   // Interpolate between consecutive rays to cover even tiny enemies during fast turns.
+   for(let i=0;i<=steps;i++){
+    const f=i/steps,x0=last.x0+(ray.x0-last.x0)*f,y0=last.y0+(ray.y0-last.y0)*f,x1=last.x1+(ray.x1-last.x1)*f,y1=last.y1+(ray.y1-last.y1)*f;
+    if(sgSegmentBox(x0,y0,x1,y1,o,21)===null)continue;
+    if(o._beamClashPoint){beam.clashTicks.set(o.ownerBoss,beam.age);sgDamage(owner,o,20,'apex');}
+    else{beam.hit.add(root);beam.hits++;sgDamage(owner,o,20,'apex');}
+    break;
+   }
+  }
+  if(beam.age>=120)obelith.beam=null;
  }
  function hideObelithBlocks(){
   const old=obelith.blocks;
@@ -103586,13 +103621,7 @@ function apexCreate(owner){
   const pad=obelithPad();
   if(!pad){obelith.charge=0;obelith.ready=false;obelith.beam=null;obelith.form=Math.max(0,obelith.form-1/30);return;}
   if(obelith.beam){
-   const beam=obelith.beam,o=beam.target;
-   if(!(o.hp>0)||!sgTargets(owner).some(t=>(t.__goc||t)===(o.__goc||o))){obelith.beam=null;return;}
-   beam.age++;dino.facing=o.x+o.w/2>dino.x*SCALE?1:-1;dino.visualScaleX=dino.facing;
-   dino.headPitch=Math.max(-.9,Math.min(.7,Math.atan2(o.y+o.h/2-(dino.y-70)*SCALE,Math.abs(o.x+o.w/2-dino.x*SCALE))));
-   dino.jawOpen=1.1;dino.fireGlowTimer=4;dino.chargePulse=1;
-   if(beam.age%12===0){sgDamage(owner,o,2,'apex');beam.hits++;}
-   if(beam.age>=120)obelith.beam=null;
+   tickObelithBeam(obelith.beam);
   }else if(!obelith.ready){
    obelith.charge=Math.min(60,obelith.charge+1);
    if(obelith.charge===60){obelith.ready=true;if(SFX.tone)SFX.tone(1200,.12,'sine',.08,1700);}
@@ -103612,8 +103641,8 @@ function apexCreate(owner){
    }
    ctx.restore();
   }
-  if(obelith.beam){
-   const b=obelith.beam,o=b.target,tx=(o.x+o.w/2)/SCALE,ty=(o.y+o.h/2)/SCALE,m=getMouthWorldPositionAndAngle(tx,ty);
+  if(obelith.beam?.ray){
+   const b=obelith.beam,ray=b.ray,tx=ray.x1/SCALE,ty=ray.y1/SCALE,m={spawnX:ray.x0/SCALE,spawnY:ray.y0/SCALE};
    const pulse=1+Math.sin(b.age*.8)*.07,dx=tx-m.spawnX,dy=ty-m.spawnY,len=Math.hypot(dx,dy)||1;
    ctx.save();ctx.translate(m.spawnX,m.spawnY);ctx.rotate(Math.atan2(dy,dx));ctx.lineCap='round';
    for(const [width,color,blur] of [[116,'rgba(40,117,255,.2)',24],[76,'rgba(52,156,255,.8)',12],[42,'#8bcaff',5],[19,'#effaff',0]]){

@@ -1,4 +1,4 @@
-"""Obelith Apex: traversal shrines, exact beam timing and single-target saw ultimate."""
+"""Obelith Apex: traversal shrines, sweeping beam and two-mode saw ultimate."""
 import os
 from playwright.sync_api import sync_playwright
 
@@ -64,8 +64,8 @@ with sync_playwright() as p:
         check(a.obelith().ready&&a.obelith().form===1,'standing atop does not transform/charge');
         obKey('KeyK');obStep(1);obKey('KeyK',false);
         check(a.obelith().beam&&!a.shots.length,'empowered K still fires normal ammo');
-        obStep(118);check(target.hp===982,'beam timing before final tick');obStep();
-        check(target.hp===980&&!a.obelith().beam,'beam is not exactly 20 damage over 120 frames');
+        const sweep=a.obelith().beam;obStep(118);check(target.hp===980&&sweep.age===119,'beam does not deal 20 on contact');obStep();
+        check(target.hp===980&&!a.obelith().beam,'beam is not exactly 20 per target over a 120-frame sweep');
         obStep(60);check(a.obelith().ready,'shrine does not recharge');
         a.state.isGrounded=false;a.state.activePlatform=null;dino.y+=15;obStep();
         check(!a.obelith().ready&&a.obelith().charge===0,'charge carried away from shrine');
@@ -74,7 +74,40 @@ with sync_playwright() as p:
         check(!a.obelith().beam&&cancelTarget.hp===before,'beam continues after leaving shrine');
         mapTheme='forest';obStep();check(!a.obelith().blocks.length&&!a.obelith().ready,'shrines leaked into a new arena');
         for(let i=0;i<4;i++){a=obReset(i);obStep(605);check(!a.obelith().blocks.length,'other variant gains Obelith shrines');}
-        return 'PASS five variants, 5s landing deadline / fresh 5s use / 10s cooldown, no hop refresh, safe expiry, gradual transformation, 1-second charge, 20 damage/2s, cancellation and arena/variant isolation';
+        return 'PASS five variants, 5s landing deadline / fresh 5s use / 10s cooldown, no hop refresh, safe expiry, gradual transformation, 1-second charge, 20 per target / 2s sweep, cancellation and arena/variant isolation';
+    }'''))
+    print(page.evaluate('''() => {
+        function check(ok,why){if(!ok)throw Error(why);}
+        for(const side of [0,1]){
+            let a=obReset();obStep(600);obStand(a,a.obelith().blocks[side]);obStep(60);
+            const mirror=x=>side?1000-x:x,foes=[];
+            for(const [x,y] of [[450,260],[700,260],[800,80],[40,280]]){
+                const o=obTarget(mirror(x));o.y=y;o.w=o.h=10;foes.push(o);
+            }
+            const missed=obTarget(mirror(20));missed.y=0;missed.w=missed.h=10;
+            const outside=obTarget(side?-200:1200),mover=obTarget(-200);mover.w=mover.h=4;
+            obKey('KeyK');obStep();obKey('KeyK',false);const beam=a.obelith().beam;
+            check(beam.ray.x1===(side?1000:0)&&beam.ray.y1===320,'sweep does not begin at near lower corner '+side);
+            // Move an initially offscreen foe into the fan while it is sweeping.
+            obStep(9);mover.x=mirror(500);mover.y=280;
+            obStep(50);check(beam.age===60&&beam.ray.x1===(side?0:1000)&&beam.ray.y1===320,'sweep misses far lower corner '+side);
+            obStep(60);check(!a.obelith().beam&&beam.ray.x1===(side?0:1000)&&beam.ray.y1===0,'sweep does not finish at far upper corner '+side);
+            check(foes.every(o=>o.hp===980),'not 20 exactly once to every touched enemy '+side+' '+JSON.stringify(foes.map(o=>[o.x,o.y,o.hp])));
+            check(mover.hp===980&&beam.hit.size===5,'moving tiny foe falls through the sweep '+side);
+            check(missed.hp===1000&&outside.hp===1000,'sweep damages enemies outside its path or viewport '+side);
+            // No target lock: killing the first foe must not interrupt the map sweep.
+            a=obReset();obStep(600);obStand(a,a.obelith().blocks[side]);obStep(60);
+            const first=obTarget(mirror(80),10);first.y=280;first.w=first.h=10;
+            const later=obTarget(mirror(850));later.y=80;later.w=later.h=10;
+            obKey('KeyK');obStep();obKey('KeyK',false);const cast=a.obelith().beam;obStep(119);
+            check(first.hp<=0&&later.hp===980&&cast.age===120,'first kill interrupts sweeping into later enemies '+side);
+        }
+        // A sweep needs no target, and snapshots world-space corners in a scrolling arena.
+        let a=obReset();WORLD_W=2400;camX=1000;dino.x=1180;obStep(600);obStand(a,a.obelith().blocks[0]);obStep(60);
+        obKey('KeyK');obStep();obKey('KeyK',false);let beam=a.obelith().beam;
+        check(beam&&beam.corners[0].x===1000&&beam.corners[1].x===2000,'empty/scrolling arena prevents sweep or uses wrong corners');
+        obStep(119);check(!a.obelith().beam&&beam.ray.x1===2000&&beam.ray.y1===0,'empty sweep ends early');
+        return 'PASS mirrored three-corner sweeps, exact 20 per enemy, small moving targets, no duplicate hits, path/viewport exclusion, kill continuation, empty and scrolling arenas';
     }'''))
     print(page.evaluate('''() => {
         function check(ok,why){if(!ok)throw Error(why);}
@@ -121,7 +154,7 @@ with sync_playwright() as p:
             b.state=kind==='godzilla'?'clash_go':'beam_clash';b.clashX=430;b.clashY=288;b.clashDist=300;b.clashSpeed=.01;b.clashHits=0;b.subStateTimer=300;
             b.beamClashX=430;b.beamMouthX=810;b.beamMouthY=288;b.beamDir=-1;b.subTimer=0;bosses.push(b);doChieuBatDau(b);
             obKey('KeyK');obStep();obKey('KeyK',false);
-            check(a.obelith().beam?.target._beamClashPoint,'Obelith beam ignores '+kind+' contact');
+            check(a.obelith().beam?.ray,'Obelith sweep did not start against '+kind);
             for(let i=0;i<130&&beamClashActive(b);i++){obStep();b.update();}
             check(!beamClashActive(b),'Obelith cannot win '+kind+' clash');
         }
