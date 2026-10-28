@@ -35,13 +35,17 @@ with sync_playwright() as p:
         let a=obReset();obStep(599);check(!a.obelith().blocks.length,'shrines spawn before 10 seconds');
         obStep();const pads=a.obelith().blocks;
         check(pads.length===2&&pads[0].y===pads[1].y,'not two corner shrines');
-        check(pads[0].x*.55<50&&(pads[1].x+pads[1].w)*.55>950,'shrines not in opposite corners');
-        check(320-pads[0].y*.55>=280,'shrines too low');
-        const generation=a.obelith().generation;obStep(600);
-        check(a.obelith().blocks.length===2&&a.obelith().generation===generation+1,'periodic shrines accumulate / fail to refresh');
-        const target=obTarget();obStand(a,pads[0]);obStep(59);
-        check(!a.obelith().ready&&a.obelith().charge===59,'charge before 1 second');obStep();
-        check(a.obelith().ready,'standing atop does not charge');
+        check(pads[0].x*.55>=100&&(pads[1].x+pads[1].w)*.55<=900,'no wall-jump corridors outside the shrines');
+        check(320-pads[0].y*.55>=240,'shrines too low');
+        const generation=a.obelith().generation;
+        obStand(a,pads[0]);obStep(299);check(a.obelith().blocks.length===2,'shrines disappear before 5s');
+        obStep();check(!a.obelith().blocks.length&&!a.state.activePlatform&&!a.state.isGrounded&&!a.obelith().ready,'expired shrine still supports player/charge');
+        obStep(599);check(!a.obelith().blocks.length,'shrine returns before 10s absence');obStep();
+        check(a.obelith().blocks.length===2&&a.obelith().generation===generation+1,'shrine fails to return after 10s absence');
+        a=obReset();obStep(600);const fresh=a.obelith().blocks;
+        const target=obTarget();obStand(a,fresh[0]);obStep(59);
+        check(!a.obelith().ready&&a.obelith().charge===59&&a.obelith().form>0&&a.obelith().form<1,'charge/form before 1 second');obStep();
+        check(a.obelith().ready&&a.obelith().form===1,'standing atop does not transform/charge');
         obKey('KeyK');obStep(1);obKey('KeyK',false);
         check(a.obelith().beam&&!a.shots.length,'empowered K still fires normal ammo');
         obStep(118);check(target.hp===982,'beam timing before final tick');obStep();
@@ -49,12 +53,12 @@ with sync_playwright() as p:
         obStep(60);check(a.obelith().ready,'shrine does not recharge');
         a.state.isGrounded=false;a.state.activePlatform=null;dino.y+=15;obStep();
         check(!a.obelith().ready&&a.obelith().charge===0,'charge carried away from shrine');
-        obStand(a,pads[0]);obStep(60);obKey('KeyK');obStep(12);obKey('KeyK',false);
-        const before=target.hp;a.state.isGrounded=false;a.state.activePlatform=null;dino.y+=15;obStep(125);
-        check(!a.obelith().beam&&target.hp===before,'beam continues after leaving shrine');
+        a=obReset();obStep(600);const cancelTarget=obTarget();obStand(a,a.obelith().blocks[0]);obStep(60);obKey('KeyK');obStep(12);obKey('KeyK',false);
+        const before=cancelTarget.hp;a.state.isGrounded=false;a.state.activePlatform=null;dino.y+=15;obStep(125);
+        check(!a.obelith().beam&&cancelTarget.hp===before,'beam continues after leaving shrine');
         mapTheme='forest';obStep();check(!a.obelith().blocks.length&&!a.obelith().ready,'shrines leaked into a new arena');
         for(let i=0;i<4;i++){a=obReset(i);obStep(605);check(!a.obelith().blocks.length,'other variant gains Obelith shrines');}
-        return 'PASS five variants, 10-second two-shrine cycle, 1-second charge, 20 damage/2s, cancellation and arena/variant isolation';
+        return 'PASS five variants, 5-second presence / 10-second absence, safe expiry, gradual transformation, 1-second charge, 20 damage/2s, cancellation and arena/variant isolation';
     }'''))
     print(page.evaluate('''() => {
         function check(ok,why){if(!ok)throw Error(why);}
@@ -63,10 +67,10 @@ with sync_playwright() as p:
             // Start on the floor beside the inner edge; every move after this uses real key events.
             dino.x=(side?p.x-28:p.x+p.w+28)*.55-dino.w/2;dino.y=320-dino.h;s.vx=s.vy=0;
             obTap('Space');obStep(24);obTap('Space');obStep(20);
-            check(dino.y+dino.h>p.y*.55+50&&s.activePlatform!==p,'double jump reaches the high shrine directly');
+            check(dino.y+dino.h>p.y*.55+20&&s.activePlatform!==p,'double jump reaches the high shrine directly');
             const toward=side?'KeyD':'KeyA';obKey(toward);
-            for(let i=0;i<8&&!s.isWallSliding;i++)obStep();
-            check(s.isWallSliding,'cannot grip the shrine wall');obTap('Space');
+            for(let i=0;i<8&&!s.isWallSliding&&!s.isLedgeGrabbing;i++)obStep();
+            check(s.isWallSliding||s.isLedgeGrabbing,'cannot grip the shrine wall/ledge');obTap('Space');
             let climbed=false;
             for(let i=0;i<70;i++){
                 obStep();if(s.isLedgeGrabbing)obTap('Space');
@@ -75,7 +79,23 @@ with sync_playwright() as p:
             obKey(toward,false);check(climbed,'wall kick/climb never reaches shrine '+side);
             obStep(60);check(a.obelith().ready,'climbing does not earn charge');
         }
-        return 'PASS both high shrines require and support real wall traversal';
+        for(const side of [0,1]){
+            const a=obReset();obStep(600);const p=a.obelith().blocks[side],s=a.state;
+            dino.x=side?worldR()-dino.w:worldL();dino.y=320-dino.h;s.isGrounded=true;s.activePlatform=null;s.vx=s.vy=0;
+            const wall=side?'KeyD':'KeyA',inward=side?'KeyA':'KeyD';let crossing=false,landed=false;
+            obKey(wall);obTap('Space');
+            for(let i=0;i<180;i++){
+                obStep();
+                if(s.isWallSliding){obTap('Space');if(dino.y+dino.h<p.y*.55+60){obKey(wall,false);obKey(inward);crossing=true;}}
+                const center=(p.x+p.w/2)*.55;
+                if(crossing&&(side?dino.x+dino.w/2<=center:dino.x+dino.w/2>=center))obKey(inward,false);
+                if(s.isLedgeGrabbing)obTap('Space');
+                if(s.activePlatform===p){landed=true;break;}
+            }
+            obKey(wall,false);obKey(inward,false);check(landed,'outer wall corridor cannot reach shrine '+side);
+            obStep(60);check(a.obelith().ready,'outer wall climb does not finish charging in time');
+        }
+        return 'PASS double jumps cannot reach shrines; real traversal from inner faces and both outer boundary walls';
     }'''))
     print(page.evaluate('''() => {
         function check(ok,why){if(!ok)throw Error(why);}
@@ -92,9 +112,35 @@ with sync_playwright() as p:
         const a=obReset();WORLD_W=2400;camX=1000;dino.x=1180;obStep(600);
         const pads=a.obelith().blocks;check(pads[0].x*.55>1000&&(pads[1].x+pads[1].w)*.55<2000,'shrines ignore scrolling viewport');
         a.state.ledgePlatform=pads[0];a.state.isLedgeGrabbing=a.state.isLedgeClimbing=false;a.state.activePlatform=null;
-        camX=1200;dino.x=1380;obStep(600);
-        check(pads[0].x*.55>1200,'old ledge pointer pins an abandoned shrine offscreen');
+        camX=1200;dino.x=1380;obStep(900);
+        check(a.obelith().blocks[0].x*.55>1200,'old ledge pointer pins an abandoned shrine offscreen');
         return 'PASS Obelith beam on both boss clashes and shrine placement in a scrolling arena';
+    }'''))
+    print(page.evaluate('''() => {
+        function check(ok,why){if(!ok)throw Error(why);}
+        let a=obReset();obStep(600);const foe=obTarget();obStand(a,a.obelith().blocks[0]);obStep(230);
+        obKey('KeyK');obStep();obKey('KeyK',false);obStep(69);
+        check(!a.obelith().blocks.length&&!a.obelith().beam&&!a.state.activePlatform,'expiry leaves beam or invisible floor');
+        const hp=foe.hp;obStep(120);check(foe.hp===hp&&a.obelith().form===0,'expired beam keeps damaging / transformed body persists');
+        a=obReset();obStep(600);const pad=a.obelith().blocks[0];
+        a.state.ledgePlatform=pad;a.state.isLedgeClimbing=true;a.state.climbStartX=a.state.x;a.state.climbStartY=a.state.y;
+        a.state.climbTargetX=pad.x+30;a.state.climbTargetY=pad.y;
+        a.obelith().clock=299;obStep();check(!a.state.isLedgeClimbing&&!a.state.ledgePlatform,'expired ledge keeps climbing');
+        for(const side of [-1,1]){
+            a=obReset();const s=a.state;
+            dino.x=side<0?worldL():worldR()-dino.w;dino.y=60-dino.h;s.vy=0;s.isGrounded=false;s.activePlatform=null;
+            const toward=side<0?'KeyA':'KeyD';obKey(toward);obStep(30);
+            check(s.isWallSliding&&s.wallBudget<120,'wall grip does not drain '+side);
+            const budget=s.wallBudget;obKey(toward,false);obStep(179);
+            check(s.wallBudget===budget,'wall regenerates before 3s rest');obStep();
+            check(s.wallBudget===Math.min(120,budget+60),'3s rest does not restore 1s grip');
+            a=obReset();const b=a.state;dino.x=side<0?worldL():worldR()-dino.w;dino.y=35-dino.h;b.vy=0;b.isGrounded=false;
+            obKey(toward);obStep(120);check(b.wallBudget===0&&b.wallCooldown>0,'wall never exhausts');
+            obKey(toward,false);const remaining=b.wallCooldown;obStep(remaining-1);
+            check(b.wallBudget===0,'exhausted wall returns too soon');obStep();
+            check(b.wallBudget===60&&b.wallCooldown===0,'exhausted wall not restored after 3s');
+        }
+        return 'PASS beam/ledge expiration and both walls restore 1s grip per 3s rest, including exhaustion';
     }'''))
     page.evaluate("apexSetColor(4);xDatForm(8);")
     page.reload()
@@ -115,6 +161,7 @@ with sync_playwright() as p:
         for(let i=0;i<90;i++)a.cinematicFrame();check(target.hp===1000&&u.t===138,'damage during 1.5-second charge');
         for(let i=0;i<86;i++)a.cinematicFrame();
         check(!a.isCinematic()&&!dino.ultActive&&target.hp===850&&other.hp===1000,'ultimate not exactly 150 to one target');
+        check(u.impact&&u.impact.at===180&&u.impact.y===u.floor,'meteor has no ground explosion');
         check(dino.x>=worldL()&&dino.x+dino.w<=worldR()&&Number.isFinite(dino.y),'ultimate leaves player out of bounds');
         obStep(5);check(!a.state.isLedgeClimbing&&a.state.meleeState==='none','ultimate never releases controls');
         a=obReset();target=obTarget(450,100);other=obTarget(470);ultCharge=100;a.ultStart();u=a.ultimate();
@@ -137,6 +184,12 @@ with sync_playwright() as p:
             ultCharge=100;a.ultStart();u=a.ultimate();for(let i=0;i<181;i++)a.cinematicFrame();
             check((u.aim.deadAt!==null)===final,'finisher disagrees with SDT/exhausted boss lifecycle');
             for(let i=181;i<224;i++)a.cinematicFrame();
+        }
+        for(const x of [5,450,950]){
+            a=obReset();target=obTarget(x);target.y=25;ultCharge=100;a.ultStart();u=a.ultimate();
+            for(let i=0;i<224;i++)a.cinematicFrame();
+            check(target.hp===850&&u.impact&&u.impact.y===320,'meteor misses an elevated/edge target or explodes in midair');
+            check(dino.x+dino.w/2>=78&&dino.x+dino.w/2<=922,'meteor landing clips the saw outside arena');
         }
         a=obReset();ultCharge=100;check(!a.ultStart()&&ultCharge===100,'empty ultimate consumes meter');
         xDatForm(0);startGame('normal');check(!dino.apex,'Obelith state leaks into Dino');

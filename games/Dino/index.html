@@ -99656,8 +99656,8 @@ window.addEventListener('keydown',e=>{
 let apexColor=0,apexLoadout=null;
 try{apexColor=Math.max(0,Math.min(4,+localStorage.getItem('dino_apex_color')||0));}catch(e){}
 const APEX_ROLES=[["ĐÁNH XA: cầu nhỏ +1; tối đa 5 tia phụ; cầu xoáy tổng 18.", "RANGED: small orbs +1; up to 5 subshots; spiral total 18."], ["CẬN CHIẾN: +1 sát thương, +20% tầm; cầu tạo bãi dung nham 1/s, 3s.", "MELEE: +1 damage, +20% reach; orbs leave lava 1/s for 3s."], ["KHỐNG CHẾ: xoay gây choáng 0,1s/hit; hất tung 0,2s; kết nổ đẩy lùi.", "CONTROL: spins stun 0.1s/hit; launch 0.2s; finale knocks back."], ["ĐỘT KÍCH: Dash +2 sát thương, xa +25%; khiên tím chắn đạn phía trước.", "ASSAULT: dash +2 damage, +25% distance; forward projectile shield."]],APEX_ULT_TEXT=[["U: tụ 1,5s, tia 100 sát thương/1s, đẩy sát tường. Kết liễu hóa tro.", "U: charge 1.5s, beam 100 damage/1s; wall push, ash finisher."], ["U: 10s. +2/hit, tầm x1,5; hào quang 5/s, dải dung nham 3/s.", "U: 10s. +2/hit, reach x1.5; aura 5/s, lava trail 3/s."], ["U: hố đen hút địch; 7 nhát x10, bổ cuối 30. Kết liễu chẻ đôi.", "U: black hole pull; 7 cuts x10, final cleave 30. Split finisher."], ["U: biến mất, cắt xuyên toàn màn hình: 100 sát thương. Kết liễu vỡ mảnh.", "U: vanish, screen-wide cuts: 100 damage. Shatter finisher."]];
-APEX_ROLES.push(['OBELITH: hai khối trên cao mỗi 10s. Leo lên, đứng 1s để nạp K; giữ vị trí để chưởng 20 sát thương / 2s.','OBELITH: two high shrines every 10s. Climb up and stand for 1s to empower K; stay atop to channel 20 damage over 2s.']);
-APEX_ULT_TEXT.push(['U: trụ lớn nâng lên, tụ 1,5s rồi hóa cưa năng lượng lao xuyên một mục tiêu: 150 sát thương. Kết liễu chẻ đôi.','U: rise on a great pillar, charge for 1.5s, then dive as an energy saw through one target for 150 damage. Split finisher.']);
+APEX_ROLES.push(['OBELITH: hai khối cao hiện 5s, ẩn 10s. Leo lên, đứng 1s để nạp K; giữ vị trí để chưởng 20 sát thương / 2s.','OBELITH: two high shrines: visible 5s, absent 10s. Climb up and stand for 1s to empower K; stay atop to channel 20 damage over 2s.']);
+APEX_ULT_TEXT.push(['U: trụ lớn nâng lên, tụ 1,5s rồi lao như thiên thạch, cưa xuyên một mục tiêu: 150 sát thương và nổ khi đáp. Kết liễu chẻ đôi.','U: rise on a great pillar, charge for 1.5s, then meteor-dive through one target for 150 damage and explode on landing. Split finisher.']);
 function apexRoleText(){return LT(...APEX_ROLES[apexColor]);}
 function apexUltText(){return LT(...APEX_ULT_TEXT[apexColor]);}
 function apexSetColor(v){const n=APEX_ROLES.length;apexColor=((v%n)+n)%n;localStorage.setItem('dino_apex_color',apexColor);}
@@ -99702,8 +99702,8 @@ drawUI=function(){const active=apexOn()&&dino.apex&&['normal','boss_rush','test_
 }};
 vkDangKy(21,{ten:'CLAWS',theLuc:1,khongHoiDan:true,khongSac(){return true;},banJ(){},batUltRieng(){if(dino.apex)dino.apex.ultStart();}});
 AMMO_NAMES.push('CLAWS');ammoColors.push('#4ade80');AMMO_NHOM.push(-1);UNITY_PAL_SRC.push({c:'#4ade80',d:'#14532d'});STY_DPS.push(8);PVP_HS.push(1);PVP_SAN.push(0);AI_HOSO.push({dai:[30,100],ep:true,sac:1,xa:false,moc:[30]});CHARGE_TIERS.push([[30,'#4ade80'],[90,'#e879f9'],[120,'#fff']]);
-AMMO_CHITIET_VI.push(['#CLAWS — DÀNH RIÊNG CHO APEX','-Chọn DẠNG APEX để dùng. 8 HP, khóa Power, Rune và phụ kiện; mục phụ kiện chuyển thành năm biến thể có vai trò và chiêu cuối riêng.','-J: cào 2/2/2/6. J → Nhảy: xoay đuôi ngược lên, 4 sát thương một lần và hất tung; Nhảy → J: chém không trung 2. Giữ J: cắn 6; trên không cưa lưng 4 mỗi 0.25s. Cúi J: kẹp 4 rồi cắn 6.','-Dash (Shift hoặc nhấn đôi A/D): 3 mỗi mục tiêu. Dash → J: xoay hai vòng 5 + 7. J → Dash: xoay tử thần ngay, 4 khi xuyên qua, lặp sau 0,25s. Nhảy kết xoay đuôi hất tung; bấm J trong lúc xoay để kết nổ 6; không tự nổ khi hết đòn.','-K: nhấp dưới 0,25s gây 1; đạn charge nhỏ gây 2. Từ 1,5s: cầu xoáy chạm gây 5, bám gây 1 mỗi 0,2s, tổng tối đa 15. Từ 2s: Laser 1 mỗi 10 frame (6/s), kéo dài 2s. Tia phụ 2 mỗi viên.','-Xanh: cầu nhỏ +1, 5 tia phụ tối đa; cầu xoáy 6 + 2 mỗi nhịp, tối đa 18. Các màu khác tối đa 3 tia phụ.','-Magma: cận chiến +1 sát thương, tầm +20%; cầu năng lượng để lại dung nham 1/s trong 3s. Cyber: xoay khống chế 0,1s mỗi hit; hất tung 0,2s; kết nổ đẩy lùi. Nebula: Dash +2 sát thương, xa +25%, khiên tím chắn đạn phía trước.','-Obelith: mỗi 10s có hai trụ cao để leo. Đứng trên trụ 1s, K chưởng 20 sát thương/2s; rời trụ sẽ mất nạp. U: trụ nâng lên, tụ 1,5s, cưa năng lượng xuyên một mục tiêu gây 150, kết liễu chẻ đôi.','-U (100%): Xanh tụ 1,5s rồi tia 10 mỗi 0,1s trong 1s (100). Magma cường hóa 10s: +2 mỗi hit, tầm x1,5, hào quang 5/s, đường dung nham 3/s. Stalker: 7 x 10 + chém cuối 30. Nebula: cắt toàn màn hình 100. Ba dạng Xanh/Stalker/Nebula khóa hành động trong cinematic.']);
-AMMO_CHITIET_EN.push(['#CLAWS — APEX ONLY','-Select APEX form. 8 HP. Power, Runes and accessories locked; colors select distinct combat specialties.','-J claws 2/2/2/6; J → Jump: reverse tail somersault, 4 damage and launch; Jump → J: aerial slash 2; hold bite 6 or air saw 4 per .25s. Crouch J clamp 4 then bite 6.','-Dash 3 per target; Dash J 5+7; J Dash starts death roll immediately, 4 per crossing (0.25s rehit); Jump launches with a tail spin; press J during the roll for a 6-damage finale. No automatic finale.','-Obelith: high climbable shrines every 10s. Stand atop for 1s; K channels 20 damage/2s. Leaving loses charge. U rises on a great pillar, charges for 1.5s and saws through one target for 150 damage, splitting a killed enemy.','-K tap under 0.25s: 1; charged small shot: 2. 1.5s orb: impact 5, sticks for 1 per 0.2s up to 15 total. 2s laser: 1 per 10 frames (6/s) for 2s. Subshots 2 each. U: Emerald 1.5s charge + 100 beam damage over 1s; Magma 10s buff (+2/hit, +50% reach, aura 5/s, ground trail 3/s); Stalker 7x10+30; Nebula screen-wide 100. The three non-Magma ultimates are cinematics.']);
+AMMO_CHITIET_VI.push(['#CLAWS — DÀNH RIÊNG CHO APEX','-Chọn DẠNG APEX để dùng. 8 HP, khóa Power, Rune và phụ kiện; mục phụ kiện chuyển thành năm biến thể có vai trò và chiêu cuối riêng.','-J: cào 2/2/2/6. J → Nhảy: xoay đuôi ngược lên, 4 sát thương một lần và hất tung; Nhảy → J: chém không trung 2. Giữ J: cắn 6; trên không cưa lưng 4 mỗi 0.25s. Cúi J: kẹp 4 rồi cắn 6.','-Dash (Shift hoặc nhấn đôi A/D): 3 mỗi mục tiêu. Dash → J: xoay hai vòng 5 + 7. J → Dash: xoay tử thần ngay, 4 khi xuyên qua, lặp sau 0,25s. Nhảy kết xoay đuôi hất tung; bấm J trong lúc xoay để kết nổ 6; không tự nổ khi hết đòn.','-K: nhấp dưới 0,25s gây 1; đạn charge nhỏ gây 2. Từ 1,5s: cầu xoáy chạm gây 5, bám gây 1 mỗi 0,2s, tổng tối đa 15. Từ 2s: Laser 1 mỗi 10 frame (6/s), kéo dài 2s. Tia phụ 2 mỗi viên.','-Xanh: cầu nhỏ +1, 5 tia phụ tối đa; cầu xoáy 6 + 2 mỗi nhịp, tối đa 18. Các màu khác tối đa 3 tia phụ.','-Magma: cận chiến +1 sát thương, tầm +20%; cầu năng lượng để lại dung nham 1/s trong 3s. Cyber: xoay khống chế 0,1s mỗi hit; hất tung 0,2s; kết nổ đẩy lùi. Nebula: Dash +2 sát thương, xa +25%, khiên tím chắn đạn phía trước.','-Obelith: hai trụ cao hiện 5s rồi ẩn 10s; nghỉ bám tường 3s hồi 1s bám. Đứng trên trụ 1s, K chưởng 20 sát thương/2s; rời trụ sẽ mất nạp. U: trụ nâng lên, tụ 1,5s, lao xuống như thiên thạch, cưa xuyên một mục tiêu gây 150 và nổ khi đáp; kết liễu chẻ đôi.','-U (100%): Xanh tụ 1,5s rồi tia 10 mỗi 0,1s trong 1s (100). Magma cường hóa 10s: +2 mỗi hit, tầm x1,5, hào quang 5/s, đường dung nham 3/s. Stalker: 7 x 10 + chém cuối 30. Nebula: cắt toàn màn hình 100. Ba dạng Xanh/Stalker/Nebula khóa hành động trong cinematic.']);
+AMMO_CHITIET_EN.push(['#CLAWS — APEX ONLY','-Select APEX form. 8 HP. Power, Runes and accessories locked; colors select distinct combat specialties.','-J claws 2/2/2/6; J → Jump: reverse tail somersault, 4 damage and launch; Jump → J: aerial slash 2; hold bite 6 or air saw 4 per .25s. Crouch J clamp 4 then bite 6.','-Dash 3 per target; Dash J 5+7; J Dash starts death roll immediately, 4 per crossing (0.25s rehit); Jump launches with a tail spin; press J during the roll for a 6-damage finale. No automatic finale.','-Obelith: high shrines appear for 5s, then disappear for 10s. Rest from climbing for 3s to restore 1s of wall grip. Stand atop for 1s; K channels 20 damage/2s. Leaving loses charge. U rises on a great pillar, charges for 1.5s and dives as a meteor-saw through one target for 150 damage, exploding on landing and splitting a killed enemy.','-K tap under 0.25s: 1; charged small shot: 2. 1.5s orb: impact 5, sticks for 1 per 0.2s up to 15 total. 2s laser: 1 per 10 frames (6/s) for 2s. Subshots 2 each. U: Emerald 1.5s charge + 100 beam damage over 1s; Magma 10s buff (+2/hit, +50% reach, aura 5/s, ground trail 3/s); Stalker 7x10+30; Nebula screen-wide 100. The three non-Magma ultimates are cinematics.']);
 // Restore saved Apex after all registrations exist, without overwriting other saved loadouts.
 if(apexOn())apexSync();
 function apexInput(){return keys;}
@@ -102062,7 +102062,7 @@ function apexCreate(owner){
             ctx.rotate(angle);
 
             const ratio = spineIdx / Math.max(1, totalSpines - 1);
-            const chargeLevel = Math.max(magmaTime>0?1:0,dino.chargePulse, dino.rangedCharging ? Math.min(1, dino.rangedChargeSec / 1.5) : 0);
+            const chargeLevel = Math.max(obelithPower(),magmaTime>0?1:0,dino.chargePulse, dino.rangedCharging ? Math.min(1, dino.rangedChargeSec / 1.5) : 0);
             const isLit = chargeLevel > 0.05 && ratio <= chargeLevel * (ultimate&&ultimate.kind===0?1:1.15);
 
             ctx.fillStyle = isLit ? currentSkin.energyGlow : currentSkin.armor;
@@ -102292,6 +102292,7 @@ function apexCreate(owner){
                 ctx.stroke();
             }
 
+            if(!isBackLeg)drawObelithTrace([[hipX+3,hipY-4],[kneeX,kneeY],[ankleX,ankleY],[footX+8,footY-4]],3);
             if (showHitbox) {
                 ctx.strokeStyle = '#38bdf8';
                 ctx.lineWidth = 2;
@@ -102805,6 +102806,8 @@ function apexCreate(owner){
             // LỚP 6: CHÂN TRƯỚC & TAY TRƯỚC
             drawArticulatedLeg(hipX + 4, hipY, dino.walkCycle, false, c, d);
             drawArticulatedArm(chestX - 2, chestY + 8, false, c, d, lookAwayFactor);
+
+            drawObelithRunes(rig);
 
             // LỚP 7: NÓN SÓNG ÂM KHI DASH
             if (d > 0.25) {
@@ -103489,6 +103492,7 @@ function apexCreate(owner){
    for(let i=0;i<12;i++){const x=(i%4)*canvas.width/4,y=Math.floor(i/4)*canvas.height/3,w=canvas.width/4,h=canvas.height/3;ctx.save();ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.lineTo(x+(i%2?w:0),y+h);ctx.closePath();ctx.clip();ctx.globalAlpha=Math.max(0,.65-age/80);ctx.drawImage(u.backdrop,Math.sin(i*9)*age*.9,Math.cos(i*5)*age*.5);ctx.restore();}ctx.restore();
   }
   for(const v of u.victims)drawUltVictim(v,u);
+  if(u.kind===4)drawObelithImpact(u);
   for(const cut of u.cuts){const age=t-cut.t,life=u.kind===3?100:24;if(age>life)continue;const alpha=Math.max(0,1-age/life);if(!cut.final)ultDashGhost(cut,age);ctx.globalAlpha=alpha;const reach=Math.min(1,(age+1)/4)*cut.len;ultLine(cut.x,cut.y,cut.a,reach,cut.final?24:7,u.kind===2?'#717cff':'#a855f7');ultLine(cut.x,cut.y,cut.a,reach,cut.final?9:2,'#f7eeff');if(cut.final){ultLine(cut.x+12,cut.y,cut.a,reach,2,'#e3caff');}}
   ctx.globalAlpha=1;
   if(u.kind===3&&t>=110){const fade=Math.max(0,1-(t-110)/18);ctx.fillStyle='rgba(235,218,255,'+fade*.8+')';ctx.fillRect(u.left,u.top,canvas.width,canvas.height);}
@@ -103497,7 +103501,9 @@ function apexCreate(owner){
  }
  function cinematicFrame(){
   if(!ultimate)return;const u=ultimate;if(!u.captured){for(const v of u.victims)ultCapture(v);u.captured=true;}
-  frames++;ultTick();ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);ctx.translate(-u.left,-u.top);drawEnvironment();
+  frames++;ultTick();ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);ctx.translate(-u.left,-u.top);
+  if(u.kind===4&&u.impact){const kick=Math.max(0,1-(u.t-u.impact.at)/18)*6;ctx.translate(Math.sin(u.t*2.3)*kick,Math.cos(u.t*2.9)*kick*.7);}
+  drawEnvironment();
   if(u.kind===3&&!u.backdrop){u.backdrop=document.createElement('canvas');u.backdrop.width=canvas.width;u.backdrop.height=canvas.height;u.backdrop.getContext('2d').drawImage(canvas,0,0);}
   const targetsInFilm=new Set(u.victims.map(v=>v.o.__goc||v.o));for(const o of [...obstacles,...enemies,...bosses,...bossProjectiles])if(!targetsInFilm.has(o)&&typeof o.draw==='function')o.draw();
   if(ultimate)drawUltimate();else{for(const v of u.victims)if(v.o.hp>0&&typeof v.o.draw==='function')v.o.draw();draw();}ctx.restore();
@@ -103522,8 +103528,9 @@ function apexCreate(owner){
  }
 
  // Obelith rewards climbing: one stored shot, available only while atop a shrine.
- const obelith={clock:0,blocks:[],charge:0,ready:false,beam:null,generation:0};
- function resetObelith(){obelith.clock=0;obelith.blocks=[];obelith.charge=0;obelith.ready=false;obelith.beam=null;}
+ const obelith={clock:0,blocks:[],charge:0,ready:false,beam:null,generation:0,form:0};
+ let obelithPreview=false;
+ function resetObelith(){obelith.clock=0;obelith.blocks=[];obelith.charge=0;obelith.ready=false;obelith.beam=null;obelith.form=0;}
  function obelithPad(){return dino.isGrounded&&obelith.blocks.includes(dino.activePlatform)&&!dino.isLedgeClimbing?dino.activePlatform:null;}
  function obelithTarget(clash=false){
   const left=camX||0,top=(camY||0)-(mapTheme==='ocean'?oceanCamY||0:0)-(mapTheme==='tetris'?tetrisCamY||0:0);
@@ -103535,8 +103542,10 @@ function apexCreate(owner){
  }
  function spawnObelithBlocks(){
   const left=Math.max(worldL(),camX||0),right=Math.min(worldR(),left+canvas.width),w=124/SCALE,h=32/SCALE;
-  const floor=(mapTheme==='ocean'?bienDayHT():dkNenY()),top=(floor-280)/SCALE;
-  const xs=[(left+18)/SCALE,(right-18)/SCALE-w];
+  const floor=(mapTheme==='ocean'?bienDayHT():dkNenY()),top=(floor-240)/SCALE;
+  // Leave a full wall-jump corridor outside each shrine.
+  const inset=Math.min(112,Math.max(40,(right-left-2*w*SCALE)/4));
+  const xs=[(left+inset)/SCALE,(right-inset)/SCALE-w];
   obelith.generation++;
   for(let i=0;i<2;i++){
    let p=obelith.blocks[i];
@@ -103556,12 +103565,20 @@ function apexCreate(owner){
   if(SFX.tone)SFX.tone(260,.2,'sawtooth',.1,900);
   return true;
  }
+ function hideObelithBlocks(){
+  const old=obelith.blocks;
+  if(dino.isWallSliding&&old.some(p=>dino.y>p.y&&dino.y-96<p.y+p.h&&Math.min(Math.abs(dino.x+28-p.x),Math.abs(dino.x-28-p.x-p.w))<8)){dino.isWallSliding=false;dino.wallDir=0;}
+  if(old.includes(dino.activePlatform)){dino.activePlatform=null;dino.isGrounded=false;dino.vy=Math.max(1,dino.vy);}
+  if(old.includes(dino.ledgePlatform)){dino.ledgePlatform=null;dino.isLedgeGrabbing=dino.isLedgeClimbing=false;dino.ledgeIgnoreTimer=12;}
+  for(let i=platforms.length-1;i>=0;i--)if(old.includes(platforms[i]))platforms.splice(i,1);
+  obelith.blocks=[];obelith.charge=0;obelith.ready=false;obelith.beam=null;
+ }
  function tickObelith(){
   if(apexColor!==4||owner.hp<=0){resetObelith();return;}
-  if(++obelith.clock>=600){obelith.clock=0;spawnObelithBlocks();}
+  if(++obelith.clock>=(obelith.blocks.length?300:600)){obelith.clock=0;if(obelith.blocks.length)hideObelithBlocks();else spawnObelithBlocks();}
   for(const p of obelith.blocks)if(p.pulse>0)p.pulse--;
   const pad=obelithPad();
-  if(!pad){obelith.charge=0;obelith.ready=false;obelith.beam=null;return;}
+  if(!pad){obelith.charge=0;obelith.ready=false;obelith.beam=null;obelith.form=Math.max(0,obelith.form-1/30);return;}
   if(obelith.beam){
    const beam=obelith.beam,o=beam.target;
    if(!(o.hp>0)||!sgTargets(owner).some(t=>(t.__goc||t)===(o.__goc||o))){obelith.beam=null;return;}
@@ -103574,35 +103591,76 @@ function apexCreate(owner){
    obelith.charge=Math.min(60,obelith.charge+1);
    if(obelith.charge===60){obelith.ready=true;if(SFX.tone)SFX.tone(1200,.12,'sine',.08,1700);}
   }
+  obelith.form=Math.max(obelith.form,obelith.beam||obelith.ready?1:obelith.charge/60);
+  dino.chargePulse=Math.max(dino.chargePulse,obelith.form);
  }
  function drawObelithSites(){
   if(apexColor!==4)return;
   for(const p of obelith.blocks){
-   apexDrawObelith(p.x,p.y,p.w,p.h,null,currentSkin.energyGlow);
-   ctx.save();ctx.strokeStyle=currentSkin.energyGlow;ctx.lineWidth=2;
+   apexDrawObelith(p.x,p.y,p.w,p.h,null,APEX_SKINS[4].energyGlow);
+   ctx.save();ctx.strokeStyle=APEX_SKINS[4].energyGlow;ctx.lineWidth=2;
    ctx.globalAlpha=.25+(p.pulse||0)/100;
    for(let i=0;i<3;i++){const a=frames*.025+i*Math.PI*2/3;ctx.beginPath();ctx.moveTo(p.x+p.w/2+Math.cos(a)*30,p.y-26+Math.sin(a)*8);ctx.lineTo(p.x+p.w/2+Math.cos(a+.5)*30,p.y-26+Math.sin(a+.5)*8);ctx.stroke();}
    if(dino.activePlatform===p){
-    ctx.globalAlpha=.9;ctx.strokeStyle=obelith.ready?'#fff4ce':currentSkin.energyGlow;ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(p.x+p.w/2,p.y-3,p.w*.45,10,0,-Math.PI/2,-Math.PI/2+Math.PI*2*obelith.charge/60);ctx.stroke();
+    ctx.globalAlpha=.9;ctx.strokeStyle=obelith.ready?'#fff4ce':APEX_SKINS[4].energyGlow;ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(p.x+p.w/2,p.y-3,p.w*.45,10,0,-Math.PI/2,-Math.PI/2+Math.PI*2*obelith.charge/60);ctx.stroke();
    }
    ctx.restore();
   }
   if(obelith.beam){
    const b=obelith.beam,o=b.target,tx=(o.x+o.w/2)/SCALE,ty=(o.y+o.h/2)/SCALE,m=getMouthWorldPositionAndAngle(tx,ty);
-   ctx.save();ctx.lineCap='round';
-   for(const [width,color] of [[25,'rgba(255,195,78,.2)'],[12,currentSkin.energyGlow],[4,'#fff9dd']]){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(m.spawnX,m.spawnY);ctx.lineTo(tx,ty);ctx.stroke();}
-   ctx.strokeStyle=currentSkin.energyGlow;ctx.lineWidth=2;ctx.beginPath();ctx.arc(tx,ty,14+Math.sin(b.age*.7)*4,0,Math.PI*2);ctx.stroke();ctx.restore();
+   const pulse=1+Math.sin(b.age*.8)*.07,dx=tx-m.spawnX,dy=ty-m.spawnY,len=Math.hypot(dx,dy)||1;
+   ctx.save();ctx.translate(m.spawnX,m.spawnY);ctx.rotate(Math.atan2(dy,dx));ctx.lineCap='round';
+   for(const [width,color,blur] of [[116,'rgba(255,183,48,.2)',24],[76,'rgba(255,198,78,.8)',12],[42,'#ffe49c',5],[19,'#fffdf0',0]]){
+    ctx.strokeStyle=color;ctx.shadowColor='#ffd56c';ctx.shadowBlur=blur;ctx.lineWidth=width*pulse;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(len,0);ctx.stroke();
+   }
+   ctx.shadowBlur=0;ctx.strokeStyle='#fff8d4';ctx.lineWidth=2;
+   for(let i=0;i<2;i++){ctx.beginPath();for(let x=0;x<=len;x+=10){const y=Math.sin(x*.055-b.age*.4+i*Math.PI)*28*pulse;if(x)ctx.lineTo(x,y);else ctx.moveTo(x,y);}ctx.stroke();}
+   ctx.restore();ctx.save();ctx.strokeStyle='#fff4c1';ctx.lineWidth=3;
+   ctx.beginPath();ctx.ellipse(tx,ty,22,44+Math.sin(b.age*.7)*5,Math.atan2(dy,dx),0,Math.PI*2);ctx.stroke();ctx.restore();
   }
  }
+ function obelithSkin(){
+  if(apexColor!==4)return APEX_SKINS[apexColor];
+  const q=obelithPreview||ultimate?.kind===4?1:obelith.form,skin={...APEX_SKINS[4]};
+  const dormant={primary:'#697879',secondary:'#303b40',armor:'#202a32',belly:'#a5b5ac',eye:'#bfdad0',energyCore:'#d9eee7',energyGlow:'#8ec0b9',energyArc:'#4a938d'};
+  for(const k of Object.keys(dormant)){
+   const a=parseInt(dormant[k].slice(1),16),b=parseInt(skin[k].slice(1),16);
+   skin[k]='#'+[16,8,0].map(shift=>Math.round(((a>>shift)&255)*(1-q)+((b>>shift)&255)*q).toString(16).padStart(2,'0')).join('');
+  }return skin;
+ }
+ function obelithPower(){return apexColor===4?(obelithPreview||ultimate?.kind===4?1:obelith.form):0;}
+ function drawObelithTrace(points,phase=0,glyphs=true){
+  const power=obelithPower();if(power<=.01)return;
+  ctx.save();ctx.lineCap=ctx.lineJoin='round';ctx.globalAlpha=power*.75;
+  ctx.strokeStyle='#ffd56c';ctx.shadowColor='#ffcf69';ctx.shadowBlur=9*power;ctx.lineWidth=2;
+  ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();
+  // A travelling highlight follows the same articulated seam instead of flying off the body.
+  const q=((frames*.025+phase)%(points.length-1)),j=Math.floor(q),f=q-j;
+  const x=points[j][0]+(points[j+1][0]-points[j][0])*f,y=points[j][1]+(points[j+1][1]-points[j][1])*f;
+  ctx.fillStyle='#fffbe2';ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fill();
+  if(glyphs)for(let i=0;i<points.length-1;i++){
+   const a=points[i],b=points[i+1],x=(a[0]+b[0])/2,y=(a[1]+b[1])/2;
+   ctx.save();ctx.translate(x,y);ctx.rotate(Math.atan2(b[1]-a[1],b[0]-a[0]));ctx.globalAlpha=power*(.5+.4*Math.sin(frames*.09-i+phase));
+   ctx.strokeStyle='#fff2b5';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-4,0);ctx.lineTo(0,-5);ctx.lineTo(4,0);ctx.lineTo(0,5);ctx.closePath();ctx.moveTo(0,-7);ctx.lineTo(0,7);ctx.moveTo(0,0);ctx.lineTo(6,-4);ctx.stroke();ctx.restore();
+  }ctx.restore();
+ }
+ function drawObelithRunes(r){
+  const q=obelithPower();if(q<=.01)return;
+  ctx.save();const g=ctx.createRadialGradient(r.torsoCenterX,r.torsoCenterY,4,r.torsoCenterX,r.torsoCenterY,85);
+  g.addColorStop(0,'rgba(255,233,163,'+(q*.28)+')');g.addColorStop(1,'rgba(255,207,80,0)');ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(r.torsoCenterX,r.torsoCenterY,85,62,r.spineAngle,0,Math.PI*2);ctx.fill();ctx.restore();
+  drawObelithTrace(r.tailNodes.slice().reverse().map(n=>[n.x,n.y]).concat([[r.hipX,r.hipY],[r.torsoCenterX,r.torsoCenterY],[r.chestX,r.chestY],[r.neckMidX,r.neckMidY],[r.headX-8,r.headY]]));
+  drawObelithTrace([[r.hipX-15,r.hipY-13],[r.torsoCenterX,r.torsoCenterY-17],[r.chestX,r.chestY-10]],2,false);
+  ctx.save();ctx.translate(r.headX,r.headY);ctx.rotate(r.headRotation);drawObelithTrace([[-8,-17],[17,-18],[34,-11]],1);ctx.restore();
+ }
  function startObelithUltimate(u){
-  obelith.beam=null;obelith.ready=false;obelith.charge=0;
+  obelith.beam=null;obelith.ready=false;obelith.charge=0;obelith.form=1;currentSkin=APEX_SKINS[4];
   dino.activePlatform=dino.ledgePlatform=null;dino.isLedgeGrabbing=dino.isLedgeClimbing=dino.isWallSliding=false;
   u.floor=mapTheme==='ocean'?bienDayHT():dkNenY();
   for(const p of apexNativePlatforms())if(p.x<=owner.x+owner.w&&p.x+p.w>=owner.x&&p.top>=owner.y+owner.h-2&&p.top<u.floor&&!p.wall)u.floor=p.top;
   u.floor=Math.min(u.floor,u.top+canvas.height-12);
   u.pillarX=dino.x*SCALE;u.pillarW=132;u.liftFrom=dino.y*SCALE;
   u.summit=Math.min(u.liftFrom,Math.max(u.top+40,Math.min(u.floor-250,u.liftFrom-100)));u.pillarTop=u.floor;
-  u.hit=false;u.radius=78;u.trail=[];
+  u.hit=false;u.radius=78;u.trail=[];u.impact=null;
  }
  function tickObelithUltimate(u){
   const t=u.t;
@@ -103618,17 +103676,25 @@ function apexCreate(owner){
    if(t===151){
     const o=u.aim.o;u.from={x:dino.x*SCALE,y:(dino.y-48)*SCALE};
     const tx=o.x+o.w/2,ty=o.y+o.h/2,dx=tx-u.from.x,dy=ty-u.from.y,len=Math.hypot(dx,dy)||1;
-    u.to={x:Math.max(worldL()+40,Math.min(worldR()-40,tx+dx/len*120)),y:ty+dy/len*100};
+    u.through={x:tx,y:ty};
+    const margin=u.radius+18;
+    u.to={x:Math.max(worldL()+margin,Math.min(worldR()-margin,tx+dx/len*120)),y:0};
+    u.landingFloor=mapTheme==='ocean'?bienDayHT():dkNenY();
+    for(const p of apexNativePlatforms())if(!p.wall&&p.x<=u.to.x&&p.x+p.w>=u.to.x&&p.top>=ty&&p.top<u.landingFloor)u.landingFloor=p.top;
+    u.to.y=u.landingFloor-8;
     u.last={...u.from};if(SFX.tone)SFX.tone(110,.45,'sawtooth',.13,850);
    }
-   const q=(t-150)/30,x=u.from.x+(u.to.x-u.from.x)*q,y=u.from.y+(u.to.y-u.from.y)*q;
+   // Accelerate into the dive; finish at the ground after cutting through the target.
+   const q=Math.pow((t-150)/30,1.65),a=q<.72?u.from:u.through,b=q<.72?u.through:u.to,f=q<.72?q/.72:(q-.72)/.28;
+   const x=a.x+(b.x-a.x)*f,y=a.y+(b.y-a.y)*f;
    dino.x=x/SCALE;dino.y=y/SCALE+48;dino.sawSpinAngle=t*.65;dino.scaleX=dino.scaleY=1.25;
    if(!u.hit&&sgSegmentBox(u.last.x,u.last.y,x,y,u.aim.o,u.radius)!==null){u.hit=true;ultHit(u.aim,150);}
-   u.trail.push({x,y});if(u.trail.length>9)u.trail.shift();u.last={x,y};
+   u.trail.push({x,y});if(u.trail.length>12)u.trail.shift();u.last={x,y};
+   if(t===180){u.impact={x,y:u.landingFloor,at:t};if(SFX.tone){SFX.tone(65,.35,'sawtooth',.16,24);SFX.tone(180,.2,'triangle',.1,35);}}
   }else{
    dino.meleeState='none';dino.scaleX=dino.scaleY=1;dino.sawSpinAngle=0;
    dino.facing=u.aim.o.x+u.aim.o.w/2<dino.x*SCALE?-1:1;dino.visualScaleX=dino.facing;dino.headPitch=0;
-   dino.y=Math.min(u.floor/SCALE,dino.y);dino.isGrounded=Math.abs(dino.y-u.floor/SCALE)<1;
+   dino.y=Math.min(u.landingFloor/SCALE,dino.y);dino.isGrounded=Math.abs(dino.y-u.landingFloor/SCALE)<1;
    u.pillarTop+=(u.floor-u.pillarTop)*.12;
   }
   dino.vx=dino.vy=0;owner.x=dino.x*SCALE-owner.w/2;owner.y=dino.y*SCALE-owner.h;owner.dy=0;owner.grounded=dino.isGrounded;
@@ -103643,6 +103709,12 @@ function apexCreate(owner){
     for(let i=0;i<12;i++){const a=i*Math.PI/6+t*.04,r=22+(1-q)*75;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);ctx.lineTo(cx+Math.cos(a)*(r+10),cy+Math.sin(a)*(r+10));ctx.stroke();}ctx.restore();}
   }else if(t<=180){
    const cx=dino.x*SCALE,cy=(dino.y-48)*SCALE;
+   // A broad, tapered comet tail streams opposite the dive, with a visible saw at its core.
+   const tail=u.trail[0]||u.from,angle=Math.atan2(cy-tail.y,cx-tail.x);
+   ctx.save();ctx.translate(cx,cy);ctx.rotate(angle);
+   const flame=ctx.createLinearGradient(-330,0,85,0);flame.addColorStop(0,'rgba(255,117,24,0)');flame.addColorStop(.4,'rgba(255,131,28,.25)');flame.addColorStop(.8,'rgba(255,211,91,.8)');flame.addColorStop(1,'rgba(255,251,215,.9)');
+   ctx.fillStyle=flame;ctx.beginPath();ctx.moveTo(70,0);ctx.quadraticCurveTo(40,-110,-100,-65);ctx.lineTo(-330,-18);ctx.lineTo(-235,0);ctx.lineTo(-355,30);ctx.quadraticCurveTo(-70,100,70,0);ctx.fill();
+   for(let i=0;i<14;i++){const age=(t*9+i*27)%280;ctx.globalAlpha=(1-age/280)*.7;ctx.fillStyle=i%2?'#fff6c4':'#ffb846';ctx.beginPath();ctx.ellipse(-age,Math.sin(i*4+age*.035)*(12+age*.16),3+age*.015,2,0,0,Math.PI*2);ctx.fill();}ctx.restore();
    ctx.save();ctx.lineCap='round';for(let i=1;i<u.trail.length;i++){ctx.globalAlpha=i/u.trail.length*.45;ctx.strokeStyle=currentSkin.energyGlow;ctx.lineWidth=u.radius*1.5;ctx.beginPath();ctx.moveTo(u.trail[i-1].x,u.trail[i-1].y);ctx.lineTo(u.trail[i].x,u.trail[i].y);ctx.stroke();}ctx.restore();
    ctx.save();ctx.scale(SCALE,SCALE);drawDinosaur();ctx.restore();
    ctx.save();ctx.translate(cx,cy);ctx.rotate(t*.65);ctx.shadowColor=currentSkin.energyGlow;ctx.shadowBlur=18;ctx.strokeStyle=currentSkin.energyCore;ctx.lineWidth=4;
@@ -103651,7 +103723,22 @@ function apexCreate(owner){
   }else{ctx.save();ctx.scale(SCALE,SCALE);drawDinosaur();ctx.restore();}
  }
 
- let wallBudget=120,wallCooldown=0;
+ function drawObelithImpact(u){
+  if(!u.impact)return;
+  const age=u.t-u.impact.at,q=Math.min(1,age/44),x=u.impact.x,y=u.impact.y;
+  ctx.save();ctx.translate(x,y);
+  const radius=45+Math.pow(q,.55)*150,g=ctx.createRadialGradient(0,-12,1,0,-12,radius);
+  g.addColorStop(0,'rgba(255,250,215,'+Math.max(0,1-q*2)+')');g.addColorStop(.3,'rgba(255,191,53,'+(.65*(1-q))+')');g.addColorStop(1,'rgba(255,124,20,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,-12,radius,0,Math.PI*2);ctx.fill();
+  for(let i=0;i<3;i++){ctx.globalAlpha=Math.max(0,1-q-i*.12);ctx.strokeStyle=i%2?'#ffca68':'#fff1b5';ctx.lineWidth=5-i;ctx.beginPath();ctx.ellipse(0,0,30+q*(220-i*35),8+q*(43-i*5),0,0,Math.PI*2);ctx.stroke();}
+  for(let i=0;i<34;i++){
+   const a=Math.PI+i*Math.PI/33,v=2.5+(i*7%13)*.45,xx=Math.cos(a)*age*v,yy=Math.sin(a)*age*v+age*age*.085;
+   ctx.globalAlpha=Math.max(0,1-q);ctx.fillStyle=i%3?'#9a8051':'#ffe4a0';ctx.save();ctx.translate(xx,yy);ctx.rotate(i+age*.13);ctx.fillRect(-3,-4,4+i%5,5+i%7);ctx.restore();
+  }ctx.restore();
+  if(age<6){ctx.save();ctx.fillStyle='rgba(255,244,205,'+(.28*(1-age/6))+')';ctx.fillRect(u.left,u.top,canvas.width,canvas.height);ctx.restore();}
+ }
+
+ let wallBudget=120,wallCooldown=0,wallRest=0,wallBreakAge=40;
  let previous={},dashHits=new Set(),leafClock=0,leafStage='',leafs=[],nativeMap=new Map();
  dino.x=(owner.x+owner.w/2)/SCALE;dino.y=(owner.y+owner.h)/SCALE;
  function hitTarget(t,amount){return t.o?sgDamage(owner,t.o,amount+magmaBonus(),'apex'):0;}
@@ -103722,8 +103809,8 @@ function apexCreate(owner){
  function input(){inputFrame++;for(const e of inputEvents){eventKeys[e.code]=e.down;applyInput(eventKeys);}inputEvents.length=0;Object.assign(eventKeys,apexInput());applyInput(eventKeys);}
  function tick(){
   if(ultimate)return;
-  if(wallCooldown>0&&--wallCooldown===0)wallBudget=120;
-  currentSkin=APEX_SKINS[apexColor];apexSync();owner.ammoType=21;owner.maxHp=8;owner.hp=Math.min(owner.hp,8);owner.maxAmmo=owner.ammo=1;
+  if(wallBreakAge<40)wallBreakAge++;
+  currentSkin=obelithSkin();apexSync();owner.ammoType=21;owner.maxHp=8;owner.hp=Math.min(owner.hp,8);owner.maxAmmo=owner.ammo=1;
   if(owner.invTimer>0){owner.invTimer--;if(owner.invTimer<=0)owner.invincible=false;}
   // Reconcile external boss knockback and stage transitions before our own physics.
   dino.x=(owner.x+owner.w/2)/SCALE;dino.y=(owner.y+owner.h)/SCALE;
@@ -103735,14 +103822,19 @@ function apexCreate(owner){
   syncPlatforms();syncTargets();input();if(ultimate)return;tickMagma();const px=dino.x,py=dino.y,wasDash=dino.dashTimer>0,wasRoll=dino.meleeState==='death_roll'&&!dino.apexRollFinish;
   tickSpecialties(wasDash);update(1/60);tickTailRise();contactLeaves();tickObelith();
   if(wallCooldown<=0&&(dino.isWallSliding||dino.isLedgeGrabbing)){
-   if(--wallBudget<=0){wallBudget=0;wallCooldown=600;
+   wallRest=0;
+   if(--wallBudget<=0){wallBudget=0;wallCooldown=180;wallBreakAge=0;
     const side=dino.wallDir||dino.ledgeSide||dino.facing;
     spawnParticles(dino.x+side*28,dino.y-48,24,{spreadVx:7,spreadVy:7,color:currentSkin.energyGlow,glow:true,shape:'shard',gravity:.2,decay:.025});
     shockwaves.push({x:dino.x+side*28,y:dino.y-48,rx:8,ry:36,maxRx:65,alpha:1,color:currentSkin.energyCore,lineWidth:3});
     dino.isWallSliding=dino.isLedgeGrabbing=false;dino.ledgePlatform=null;dino.wallDir=0;dino.ledgeIgnoreTimer=20;dino.vy=Math.max(dino.vy,2);
    }
   }
-  dino.wallBudget=wallBudget;dino.wallCooldown=wallCooldown;
+  if(!dino.isWallSliding&&!dino.isLedgeGrabbing&&!dino.isLedgeClimbing&&wallBudget<120){
+   if(++wallRest>=180){wallBudget=Math.min(120,wallBudget+60);wallRest=0;}
+  }else if(dino.isWallSliding||dino.isLedgeGrabbing||dino.isLedgeClimbing)wallRest=0;
+  wallCooldown=wallBudget===0?180-wallRest:0;
+  dino.wallBudget=wallBudget;dino.wallCooldown=wallCooldown;dino.wallRest=wallRest;
   dino.x=Math.max((worldL()+owner.w/2)/SCALE,Math.min((worldR()-owner.w/2)/SCALE,dino.x));
   if(wasRoll){for(const t of targets){const last=dino.rollHits.get(t.o);if(last!==undefined&&frames-last<15)continue;if(sgSegmentBox(px*SCALE,(py-48)*SCALE,dino.x*SCALE,(dino.y-48)*SCALE,t.o,apexColor===1?34*magmaReach():28)!==null){const dealt=hitTarget(t,apexColor===1?5:4);if(dealt>0&&apexColor===2)apexControl(t.o,6);dino.rollHits.set(t.o,frames);}}}
   if(wasDash){for(const t of targets){if(dashHits.has(t.o))continue;const box=t.o;if(sgSegmentBox(px*SCALE,(py-48)*SCALE,dino.x*SCALE,(dino.y-48)*SCALE,box,apexColor===1?26.4*magmaReach():22)!==null){hitTarget(t,apexColor===3?5:apexColor===1?4:3);dashHits.add(t.o);}}}
@@ -103756,7 +103848,7 @@ function apexCreate(owner){
   ctx.save();
   const top=(mapTheme==='ocean'?oceanCamY:0)/SCALE-50,bottom=(mapTheme==='ocean'?bienDayHT()+100:600)/SCALE;
   for(const side of [-1,1]){const edge=(side<0?worldL():worldR())/SCALE;
-   if(wallCooldown>0){const age=600-wallCooldown;if(age<40){for(let i=0;i<10;i++){ctx.globalAlpha=1-age/40;ctx.fillStyle=i%2?'#826044':'#49352b';ctx.fillRect(edge+side*(-5-i%3*3)-side*age*(.3+i*.1),(owner.y/SCALE)+i*7+age*age*.12,7,15);}}continue;}
+   if(wallCooldown>0){const age=wallBreakAge;if(age<40){for(let i=0;i<10;i++){ctx.globalAlpha=1-age/40;ctx.fillStyle=i%2?'#826044':'#49352b';ctx.fillRect(edge+side*(-5-i%3*3)-side*age*(.3+i*.1),(owner.y/SCALE)+i*7+age*age*.12,7,15);}}continue;}
    ctx.fillStyle='#3a302b';ctx.fillRect(edge-(side<0?10:7),top,17,bottom-top);ctx.fillStyle='#70513b';ctx.fillRect(edge-(side<0?4:7),top,5,bottom-top);
    ctx.strokeStyle='#ad8253';ctx.lineWidth=1.1;for(let y=top;y<bottom;y+=28){ctx.beginPath();ctx.moveTo(edge-3,y);ctx.lineTo(edge+2,y+9);ctx.lineTo(edge-2,y+23);ctx.stroke();}
    if(wallBudget<60){ctx.strokeStyle='#e6bf7c';ctx.beginPath();ctx.moveTo(edge,owner.y/SCALE-30);ctx.lineTo(edge+5,owner.y/SCALE);ctx.lineTo(edge-4,owner.y/SCALE+25);ctx.stroke();}
@@ -103972,9 +104064,9 @@ function apexCreate(owner){
         }
  function drawGuard(){drawHexShieldLayer(true);}
 
- function draw(){currentSkin=APEX_SKINS[apexColor];ctx.save();ctx.scale(SCALE,SCALE);drawWallTrees();drawLeaves();drawSpecialties();drawMagmaAura();drawDashAfterimages();drawTailTrail();drawHexShieldLayer(false);if(!owner.invincible||Math.floor(frames/4)%2===0)drawDinosaur();drawCombatEffects();drawNebulaDashShield();drawProjectiles();drawParticlesAndEffects();drawGuard();drawObelithSites();ctx.restore();}
- function preview(x,y){currentSkin=APEX_SKINS[apexColor];dino.x=(x+20)/SCALE;dino.y=(y+44)/SCALE;dino.breathCycle=frames*.035;groundY=dino.y;ctx.save();ctx.scale(SCALE,SCALE);drawDinosaur();ctx.restore();}
- return {tick,draw,preview,shieldImpact,ultStart,cinematicFrame,isCinematic:()=>!!ultimate,ultimate:()=>ultimate,magmaRemaining:()=>magmaTime,state:dino,events:inputEvents,leafs:()=>leafs,obelith:()=>obelith,shots:projectiles,label:()=>apexColor===4?(obelith.beam?'K · OBELITH '+((120-obelith.beam.age)/60).toFixed(1)+'s':obelith.ready?'K · OBELITH READY':obelithPad()?'OBELITH · '+Math.floor(obelith.charge/60*100)+'%':'OBELITH · '+Math.ceil((600-obelith.clock)/60)+'s'):comboBadge.textContent||'J: CLAWS · K: CHARGE',test:{lavaPools,magmaSwings,tickSpecialties,addLava,jumpAttack,damageTargetsInArea,executeClawComboStep,executeChargedBite,executeAirBuzzsaw,executeDashTailSpin,executeCrocodileDeathRoll,releaseRangedCharge,triggerDash,triggerJump,syncTargets}};
+ function draw(){currentSkin=obelithSkin();ctx.save();ctx.scale(SCALE,SCALE);drawWallTrees();drawLeaves();drawSpecialties();drawMagmaAura();drawDashAfterimages();drawTailTrail();drawHexShieldLayer(false);if(!owner.invincible||Math.floor(frames/4)%2===0)drawDinosaur();drawCombatEffects();drawNebulaDashShield();drawProjectiles();drawParticlesAndEffects();drawGuard();drawObelithSites();ctx.restore();}
+ function preview(x,y){obelithPreview=true;currentSkin=obelithSkin();dino.x=(x+20)/SCALE;dino.y=(y+44)/SCALE;dino.breathCycle=frames*.035;groundY=dino.y;ctx.save();ctx.scale(SCALE,SCALE);drawDinosaur();ctx.restore();obelithPreview=false;}
+ return {tick,draw,preview,shieldImpact,ultStart,cinematicFrame,isCinematic:()=>!!ultimate,ultimate:()=>ultimate,magmaRemaining:()=>magmaTime,state:dino,events:inputEvents,leafs:()=>leafs,obelith:()=>obelith,shots:projectiles,label:()=>apexColor===4?(obelith.beam?'K · OBELITH '+((120-obelith.beam.age)/60).toFixed(1)+'s':obelith.ready?'K · OBELITH READY':obelithPad()?'OBELITH · '+Math.floor(obelith.charge/60*100)+'%':'OBELITH · '+(obelith.blocks.length?'FADE ':'NEXT ')+Math.ceil(((obelith.blocks.length?300:600)-obelith.clock)/60)+'s'):comboBadge.textContent||'J: CLAWS · K: CHARGE',test:{lavaPools,magmaSwings,tickSpecialties,addLava,jumpAttack,damageTargetsInArea,executeClawComboStep,executeChargedBite,executeAirBuzzsaw,executeDashTailSpin,executeCrocodileDeathRoll,releaseRangedCharge,triggerDash,triggerJump,syncTargets}};
 
 }
 
