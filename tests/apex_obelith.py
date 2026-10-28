@@ -42,6 +42,22 @@ with sync_playwright() as p:
         obStep();check(!a.obelith().blocks.length&&!a.state.activePlatform&&!a.state.isGrounded&&!a.obelith().ready,'expired shrine still supports player/charge');
         obStep(599);check(!a.obelith().blocks.length,'shrine returns before 10s absence');obStep();
         check(a.obelith().blocks.length===2&&a.obelith().generation===generation+1,'shrine fails to return after 10s absence');
+        // A late landing earns the full use window; unclaimed shrines only wait five seconds.
+        a=obReset();obStep(600);obStep(299);
+        check(a.obelith().blocks.length===2&&!a.obelith().activated,'unclaimed shrine expired early');
+        obStand(a,a.obelith().blocks[0]);obStep();
+        check(a.obelith().activated&&a.obelith().clock===1,'last-moment landing does not start a fresh five-second window');
+        obStep(90);a.state.activePlatform=null;a.state.isGrounded=false;dino.y+=15;obStep(20);
+        obStand(a,a.obelith().blocks[1]);obStep();
+        check(a.obelith().clock===112,'switching/re-entering shrine renews the use timer');
+        obStep(187);check(a.obelith().blocks.length===2,'used shrines expired before five seconds after landing');
+        obStep();check(!a.obelith().blocks.length,'used shrine never expires');
+        obStep(599);check(!a.obelith().blocks.length,'used shrine cooldown too short');obStep();
+        check(a.obelith().blocks.length===2&&!a.obelith().activated,'next cycle keeps old activation');
+        obStep(299);check(a.obelith().blocks.length===2,'unused shrine expires too early');obStep();
+        check(!a.obelith().blocks.length&&!a.obelith().activated,'unused shrine does not enter cooldown after five seconds');
+        obStep(599);check(!a.obelith().blocks.length,'unused cooldown shorter than ten seconds');obStep();
+        check(a.obelith().blocks.length===2,'unused shrine does not return after cooldown');
         a=obReset();obStep(600);const fresh=a.obelith().blocks;
         const target=obTarget();obStand(a,fresh[0]);obStep(59);
         check(!a.obelith().ready&&a.obelith().charge===59&&a.obelith().form>0&&a.obelith().form<1,'charge/form before 1 second');obStep();
@@ -58,7 +74,7 @@ with sync_playwright() as p:
         check(!a.obelith().beam&&cancelTarget.hp===before,'beam continues after leaving shrine');
         mapTheme='forest';obStep();check(!a.obelith().blocks.length&&!a.obelith().ready,'shrines leaked into a new arena');
         for(let i=0;i<4;i++){a=obReset(i);obStep(605);check(!a.obelith().blocks.length,'other variant gains Obelith shrines');}
-        return 'PASS five variants, 5-second presence / 10-second absence, safe expiry, gradual transformation, 1-second charge, 20 damage/2s, cancellation and arena/variant isolation';
+        return 'PASS five variants, 5s landing deadline / fresh 5s use / 10s cooldown, no hop refresh, safe expiry, gradual transformation, 1-second charge, 20 damage/2s, cancellation and arena/variant isolation';
     }'''))
     print(page.evaluate('''() => {
         function check(ok,why){if(!ok)throw Error(why);}
