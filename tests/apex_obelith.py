@@ -249,7 +249,7 @@ with sync_playwright() as p:
             check(target.hp===850&&u.impact&&u.impact.y===320,'meteor misses an elevated/edge target or explodes in midair');
             check(dino.x+dino.w/2>=78&&dino.x+dino.w/2<=922,'meteor landing clips the saw outside arena');
         }
-        a=obReset();ultCharge=100;check(!a.ultStart()&&ultCharge===100,'empty ultimate consumes meter');
+        a=obReset();ultCharge=100;check(a.ultStart()&&a.isLiveUltimate()&&ultCharge===0,'empty map cannot start a roaming ultimate for incoming enemies');obStep(390);
         xDatForm(0);startGame('normal');check(!dino.apex,'Obelith state leaks into Dino');
         xDatForm(8);startGame('pvp');check(!apexOn()&&!dino.apex,'Obelith leaks into PvP');
         check(_loiKhung.size===0,'caught frame errors');
@@ -260,11 +260,11 @@ with sync_playwright() as p:
         let a=obReset(),target=obTarget(280),other=obTarget(680),offscreen=obTarget(1400),miss=obTarget(450);
         target.y=other.y=0;target.h=other.h=320;target.w=400;other.w=120;miss.y=600;
         ultCharge=100;check(a.ultStart(),'roaming ultimate rejected');let u=a.ultimate();
-        check(u.mode==='ricochet'&&u.victims.length===2,'roaming mode does not capture the visible crowd');
-        for(let i=0;i<138;i++)a.cinematicFrame();check(target.hp===1000&&other.hp===1000,'roaming damages during charge');
+        check(u.mode==='ricochet'&&a.isLiveUltimate()&&!a.isCinematic()&&u.victims.length===0,'roaming mode still captures/freezes the visible crowd');
+        for(let i=0;i<138;i++)obStep();check(target.hp===1000&&other.hp===1000,'roaming damages during charge');
         const hitFrames=[];let hp=target.hp,xBounces=0,yBounces=0,lastVx=0,lastVy=0;
         for(let i=0;i<180;i++){
-            a.cinematicFrame();const ball=u.ball,b=u.bounds;
+            obStep();const ball=u.ball,b=u.bounds;
             check(ball.x>=b.left-.01&&ball.x<=b.right+.01&&ball.y>=b.top-.01&&ball.y<=b.bottom+.01,'ricochet leaves its camera bounds');
             if(lastVx&&Math.sign(ball.vx)!==Math.sign(lastVx))xBounces++;
             if(lastVy&&Math.sign(ball.vy)!==Math.sign(lastVy))yBounces++;lastVx=ball.vx;lastVy=ball.vy;
@@ -274,23 +274,65 @@ with sync_playwright() as p:
         check(target.hp===850&&other.hp<1000&&offscreen.hp===1000&&miss.hp===1000,'multi-target cap, camera isolation or physical contact failed');
         check(hitFrames.every((t,i)=>!i||t-hitFrames[i-1]>=24),'ricochet can rehit continuously');
         const damage=other.hp;
-        for(let i=0;i<24;i++)a.cinematicFrame();
+        for(let i=0;i<24;i++)obStep();
         check(u.bounceFrames===180&&other.hp===damage&&(a.state.y-48)*.55<Math.min(u.returnFrom.y,u.returnTo.y),'return does not follow an upward arc / still damages');
-        for(let i=0;i<24;i++)a.cinematicFrame();
+        for(let i=0;i<24;i++)obStep();
         check(Math.abs(dino.x+dino.w/2-u.pillarX)<.01&&Math.abs(dino.y+dino.h-u.floor)<.01&&u.pillarTop===u.floor,'roaming does not land at the retracted pillar');
-        for(let i=0;i<24;i++)a.cinematicFrame();
+        for(let i=0;i<24;i++)obStep();
         check(!a.isCinematic()&&!dino.ultActive&&other.hp===damage,'roaming ultimate does not release controls');
         a=obReset();target=obTarget(280,20);target.y=0;target.w=400;target.h=320;ultCharge=100;a.ultStart();u=a.ultimate();
-        for(let i=0;i<318;i++)a.cinematicFrame();
-        check(target.hp<=0&&u.victims[0].deadAt!==null,'roaming lethal pass lacks split finisher');
-        for(let i=318;i<390;i++)a.cinematicFrame();
+        ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#123456';ctx.fillRect(0,0,canvas.width,canvas.height);
+        for(let i=0;i<139;i++)obStep();
+        const pixel=ctx.getImageData(350*DPR,100*DPR,1,1).data;
+        check(pixel[0]===18&&pixel[1]===52&&pixel[2]===86,'split capture clears or tints the running map');
+        check(target.hp<=0&&u.victims[0].deadAt!==null&&u.victims[0].sprite,'roaming lethal pass lacks split finisher');
+        for(let i=139;i<390;i++)obStep();
         // Scrolled arenas use the visible screen edges and the actual player position.
         a=obReset();WORLD_W=2400;camX=1000;dino.x=1180;target=obTarget(1450);ultCharge=100;a.ultStart();u=a.ultimate();
-        for(let i=0;i<318;i++)a.cinematicFrame();
+        for(let i=0;i<318;i++)obStep();
         check(u.bounds.left>1000&&u.bounds.right<2000&&Math.abs(u.pillarX-1195.4)<.01,'ricochet ignores scrolling viewport or player origin');
-        for(let i=318;i<390;i++)a.cinematicFrame();
+        for(let i=318;i<390;i++)obStep();
         check(Math.abs(dino.x+dino.w/2-u.pillarX)<.01,'scrolled return misses original pillar');
         return 'PASS roaming 180-frame ricochet, reflected collision, 25/pass with 0.4s rehit and 150/target cap, split, curved harmless return and scrolling';
+    }'''))
+    print(page.evaluate('''() => {
+        function check(ok,why){if(!ok)throw Error(why);}
+        const a=obReset();spawnTimerEnemy=1;spawnTimerCactus=99999;nextBossScore=99999999;
+        const oldSpawn=spawnEntities;let spawnCalls=0,spawned=0;
+        spawnEntities=function(){const before=new Set(enemies);spawnCalls++;oldSpawn();for(const o of enemies)if(!before.has(o))spawned++;};
+        try{
+            const runner=new ForestShooter(820,272);runner.hp=runner.maxHp=1000;enemies.push(runner);
+            const bullet=new BossProjectile(900,30,-1,0,false,1);bossProjectiles.push(bullet);
+            dino.apex.state.rangedCharging=true;dino.apex.state.rangedChargeSec=.1;dino.apex.test.releaseRangedCharge();const shot=a.shots[0],shotLife=shot.life;
+            ultCharge=100;window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyU'}));window.dispatchEvent(new KeyboardEvent('keyup',{code:'KeyU'}));loopAnToan();
+            const u=a.ultimate();check(u&&a.isLiveUltimate()&&!a.isCinematic(),'map ultimate still enters the cinematic loop');
+            const startT=u.t,startX=runner.x,startBullet=bullet.x,startFrames=frames;
+            for(let i=0;i<120;i++)loopAnToan();
+            check(u.t===startT+120&&frames===startFrames+120,'live ultimate is skipped or ticks twice in a world frame');
+            check(runner.x<startX-100&&bullet.x<startBullet-50,'enemies or projectiles freeze during pillar/charge');
+            check(spawnCalls>=120&&spawned>=1,'map stops spawning during the ultimate');
+            check(shot.life<shotLife,'Apex shots freeze during the live ultimate');
+            const hp=dino.hp;dino.invincible=false;dino.invTimer=0;dino.takeDamage(99);check(dino.hp===hp,'live ultimate loses its invulnerability');
+            while(u.t<160)loopAnToan();
+            // This enemy did not exist when U was pressed; it enters the current saw path.
+            const late=new ForestShooter(u.ball.x-18,u.ball.y-24);late.hp=late.maxHp=20;enemies.push(late);
+            const scoreBefore=score;loopAnToan();
+            check(late.hp<=0&&u.victims.some(v=>v.deadAt===u.t&&v.sprite),'newly arrived enemy is not cut / split');
+            loopAnToan();check(!enemies.includes(late)&&score>=scoreBefore+25,'live kills do not reach normal cleanup/scoring');
+            const pausedT=u.t,pausedX=runner.x,pausedCalls=spawnCalls;paused=true;
+            for(let i=0;i<12;i++)loopAnToan();
+            check(u.t===pausedT&&runner.x===pausedX&&spawnCalls===pausedCalls,'pause does not stop both world and ability');paused=false;
+            while(a.isLiveUltimate())loopAnToan();
+            check(u.t===390&&u.bounceFrames===180&&spawnCalls>=390&&spawned>=2,'spawns/three-second bounce stop before the ultimate ends');
+            check(!dino.ultActive&&Math.abs(dino.x+dino.w/2-u.pillarX)<.01,'live ultimate fails to return/release controls');
+            check(_loiKhung.size===0,'live world frame errors');
+        }finally{spawnEntities=oldSpawn;paused=false;}
+        // Boss finishers still use their isolated cinematic path.
+        const bossApex=obReset(),boss=obTarget(600);bosses.push(boss);let moves=0;boss.update=()=>{moves++;};ultCharge=100;
+        check(bossApex.ultStart()&&bossApex.isCinematic()&&!bossApex.isLiveUltimate(),'boss ultimate no longer uses cinematic path');
+        for(let i=0;i<20;i++)loopAnToan();check(moves===0&&bossApex.ultimate().t===20,'boss ultimate unexpectedly advances the live world');
+        for(let i=20;i<266;i++)loopAnToan();
+        return 'PASS real game loop: moving enemies/projectiles, ongoing spawns, late enemy hits/splits/scoring, pause, immunity, exact timing, control release and boss cinematic isolation';
     }'''))
     print(page.evaluate('''() => {
         function check(ok,why){if(!ok)throw Error(why);}
