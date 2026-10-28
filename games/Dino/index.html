@@ -105038,6 +105038,7 @@ class DantePlayerRig {
 // Player-only attack clocks. Physics, defenses, projectiles and boss AI keep 60 Hz.
 const DANTE_ATTACK_RATE=.8, VERGIL_ATTACK_RATE=.65;
 function playerAttackStep(a,rate){
+ a._lastCombatTick=frames;
  a._attackClock=(a._attackClock??1-rate)+rate;
  if(a._attackClock<1-1e-9)return false;
  a._attackClock-=1;return true;
@@ -105048,6 +105049,42 @@ function playerComboCancel(a){
 }
 // Keep only the next intended command; tapping rapidly cannot bank a whole combo.
 function playerComboBuffer(queue,cmd){queue.splice(0,queue.length,cmd);}
+
+// Only a completed route earns a finishing blow; a standalone move cannot bypass CC resistance.
+const PLAYER_FINISH_ROUTES={
+ dsd:[['a1','a2','a3'],['a1','bspin','bstab','thrust'],['air1','air2','air3','air4'],['dhit','ddown','dup','dcross','dspin','dstab','dwave1','dwave2','dfinish']],
+ balrog:[['j1','j2','j3','j4'],['k1','k2','k3'],['pyro1','pyro2','pyro3'],['airj1','airj2','airj3']],
+ cavaliere:[['j1','j2','j3'],['k1_rush','k2_drift','k3_redline']],
+ cerberus:[['j1','j2','j3','j4'],['k1','k2','k3']],
+ faust:[['slash','slash','upper']],
+ vergil:[['a1','a2','a3','a4'],['a1','a2','c_flurry','c_finish'],['air1','air2','air3'],['air1','air2','airb1','airb2'],['m_combo1','m_combo2','m_combo3']]
+};
+function playerComboTrack(p,a,weapon){
+ const prev=p._comboMove,T=prev?.T??prev?.duration,cancel=prev?.faust?16:(prev?.cancel??prev?.end??T);
+ const linked=prev&&prev._comboWeapon===weapon&&frames-(prev._lastCombatTick??-1000)<=45&&prev.age>=Math.min(cancel,T-1);
+ a._comboWeapon=weapon;a._comboPath=[...(linked?prev._comboPath:[]),a.id].slice(-10);
+ a._comboFinish=PLAYER_FINISH_ROUTES[weapon].some(route=>route.length<=a._comboPath.length&&route.every((id,i)=>a._comboPath[a._comboPath.length-route.length+i]===id));
+ p._comboMove=a;
+}
+function playerFinisherControl(n,p,a,target,opt={}){
+ const o=target?.__goc||target;
+ if(!a?._comboFinish||!o||o.hp<=0||o.invulnAll||o._beamClashPoint)return false;
+ if(a.hits&&opt.pulse!==undefined&&opt.pulse!==a.hits.length-1)return false;
+ if(a._finishHits?.has(o))return true; // Never renew the impulse/stun on later contacts.
+ const boss=danteIsBoss(o),window=boss?danteBossWindows.get(o):null;
+ if(boss&&frames<(window?.finishReady??-1000))return false;
+ (a._finishHits||(a._finishHits=new WeakSet())).add(o);
+ if(boss)danteBossWindows.set(o,{...window,until:frames+12,ready:Math.max(window?.ready||0,frames+132),finishReady:frames+60});
+ const push=Math.max(24,Math.abs(opt.push||a.push||0))*(a.dir||1)*(boss?0.6:1);
+ const launch=!boss&&(opt.launch??a.launch),slam=!boss&&(opt.slam??a.slam);
+ const c=dswControl(o,{push,wall:!!(opt.wall||a.wall),launch,slam},p);
+ if(!c)return false;
+ c.hold=false;if(!launch)c.targetY=null;
+ if(boss){c.air=false;c.slam=false;c.vy=0;c.stun=12;}
+ visualEffects.push(new Effect(o.x+(o.w||40)/2,o.y+(o.h||48)/2,'explosion',push<0,42));
+ shakeTimer=Math.max(shakeTimer,12);
+ return true;
+}
 
 // Playable Dante: player physics and defenses, independent friendly combat controller.
 let danteForm=false,danteLoadout=null;
@@ -105228,7 +105265,7 @@ function dswControl(o,opt={},p=dino.dante){
  if(!c){
   const own=Object.prototype.hasOwnProperty.call(o,'update'),old=o.update;
   c={stun:0,vx:0,vy:0,air:false,hold:false,slam:false,targetY:null,life:300,wall:false,own,old,owner:dino,arm:p.damageArm??p.arm,vergil:p===dino.vergil};
-  if(danteIsBoss(o)){const b=danteBossWindows.get(o);if(!b||frames>=b.until){const duration=danteBossOpening(o)?36:6;danteBossWindows.set(o,{until:frames+duration,ready:frames+duration+120});}c.bossOrigin={y:o.y,grounded:o.grounded};}
+  if(danteIsBoss(o)){const b=danteBossWindows.get(o);if(!b||frames>=b.until){const duration=danteBossOpening(o)?36:6;danteBossWindows.set(o,{...b,until:frames+duration,ready:frames+duration+120});}c.bossOrigin={y:o.y,grounded:o.grounded};}
   o._dswControl=c;s.controls.add(o);
   const release=()=>{
    if(o.update===c.wrap){if(own)o.update=old;else delete o.update;}
@@ -105371,6 +105408,7 @@ function dswStart(id,extra={}){
  if(s.round&&!['drive','overdrive','round'].includes(id)){s.round.returning=true;}
  p.k=null;p.cd=0;
  p.attack={...m,...extra,id,sword:true,age:0,dir:n.isFacingLeft?-1:1,hit:new Map(),name:m.name,duration:m.T};
+ playerComboTrack(p,p.attack,'dsd');
  s.trail=[];
  if(id==='million'||id==='bstab'||id==='dstab')dashVx=0;
  if(id==='high')s.airSlow=100;
@@ -105662,6 +105700,7 @@ function dswStrike(n,p,a,pulse,prevAge){
   if(!dealt)continue;
   a.hit.set(root,pulse);
 
+  if(playerFinisherControl(n,p,a,o,{pulse}))continue;
   if(!danteControlAllowed(root))continue;
   const held=root._dswControl;
   dswControl(o,{
@@ -106262,6 +106301,7 @@ function blrStart(id, extra = {}){
    subStep: 0,
   hit: new Map(), name: m.name, duration: m.T
  };
+ playerComboTrack(p,p.attack,'balrog');
  if(id === 'rjab') dashVx = 0;
  if(id === 'updraft'){
   b.airSlow = 95;
@@ -106445,6 +106485,7 @@ function blrStrike(n, p, b, a, pulse, customDmg = null, customOpt = {}){
   const ox = o.x + (o.w||40)/2, oy = o.y + (o.h||50)/2;
   visualEffects.push(new Effect(ox, oy, (b.ignite > 0 || a.fire) ? 'explosion' : 'parry', a.dir < 0, a.pose === 'magmaFin' || a.id === 'rimpact' ? 38 : 20));
 
+  if(playerFinisherControl(n,p,a,o,{pulse}))continue;
   if(!danteControlAllowed(root))continue;
   const held = root._dswControl;
   if(a.stunOnly){
@@ -107037,6 +107078,7 @@ function cavStart(id, extra = {}){
   dir: dir,
   hit: new Map(), name: m.name, duration: m.T
  };
+ playerComboTrack(p,p.attack,'cavaliere');
  if(id === 'wheelie'){
   c.airSlow = 95;
   n.dy = -10.5; n.grounded = false; n.canDoubleJump = true; n.jumpCount = 1;
@@ -107195,6 +107237,7 @@ function cavStrike(n, p, c, a, pulse){
    });
   }
 
+  if(!a.launchBike&&playerFinisherControl(n,p,a,o,{pulse}))continue;
   if(!danteControlAllowed(root))continue;
   // 1. WHEELIE JUMP: Cuốn kẻ địch bay lên trời cùng độ cao với chiếc xe của Dante!
   if(a.launchWithMe){
@@ -107293,6 +107336,7 @@ function cavTick(n, p){
   else if(a.launchBike && a.age === a.wind + 2){
    cavStrike(n, p, c, a, 0);
    c.thrownBike = {
+    attack:a,
     x: n.x + n.w/2 + a.dir * 36,
     y: n.y + n.h,
     dir: a.dir,
@@ -107329,7 +107373,7 @@ function cavTick(n, p){
    if(!tb.hit.has(id) && checkAABB(box, o)){
     tb.hit.add(id);
     danteHit(p, o, tb.damage);
-    dswControl(o, { push: tb.dir * 22, wall: true });
+    if(!playerFinisherControl(n,p,tb.attack,o,{push:tb.dir*22,wall:true}))dswControl(o, { push: tb.dir * 22, wall: true });
     visualEffects.push(new Effect(tb.x, tb.y - 24, 'explosion', true, 46));
     shakeTimer = Math.max(shakeTimer, 20);
    }
@@ -107664,6 +107708,7 @@ function kcbStart(id, extra = {}){
   subIdx: 0,
   hit: new Map(), name: m.name, duration: m.T
  };
+ playerComboTrack(p,p.attack,'cerberus');
  if(id === 'Kautilya'){
   c.airSlow = 90;
   // Khi bấm Nhảy nối vào Chọc Gậy thì bay theo, còn nếu ấn S+J (Cúi + J) có thể đứng chọc hất lên rồi nhảy sau!
@@ -107901,6 +107946,7 @@ function kcbStrike(n, p, c, a, pulse){
    });
   }
 
+  if(playerFinisherControl(n,p,a,o,{pulse}))continue;
   if(!danteControlAllowed(root))continue;
   if(a.holdAir){
    const ctrl = dswControl(o, { hold: true });
@@ -108728,6 +108774,7 @@ function faustCommand(special,charge=0){
   }else id='throw';
  }
  p.attack={faust:true,id,name:FAUST_MOVES[id].name,duration:FAUST_MOVES[id].T,age:0,dir:n.isFacingLeft?-1:1,hit:new Set(),combo:f.combo,charge};p.cd=p.attack.duration;
+ playerComboTrack(p,p.attack,'faust');
  if(id==='beam'){const a=p.attack;a.angle=faustAim(n,a.dir);a.power=charge>=90?8:charge>=60?6:4;}
  if(id==='meteor'){p.attack.gunslinger=danteStyle(p)===1;const point=faustLock(n,p.attack.dir);f.lock={...point,t:90};p.attack.lock={...point};}
  if(special)danteLabel(p.attack.name);
@@ -108767,7 +108814,7 @@ function faustStrike(n,p,a){
   if(a.hit.has(root)||sgSegmentBox(prev.x,prev.y,current.x,current.y,o,19)===null)continue;
   a.hit.add(root);
   if(danteHit(p,o,(a.id==='upper'?7:5)+(p.dt?2:0))>0){
-   if(a.id==='upper')dswControl(o,{launch:true});
+   if(!playerFinisherControl(n,p,a,o,{launch:a.id==='upper'})&&a.id==='upper')dswControl(o,{launch:true});
    const x=Math.max(o.x,Math.min(current.x,o.x+o.w)),y=Math.max(o.y,Math.min(current.y,o.y+o.h));
    faustParticles(f,x,y);f.impacts.push({x,y,t:10,max:10,r:30});shakeTimer=Math.max(shakeTimer,3);
   }
@@ -111280,6 +111327,7 @@ function ymtStart(id, extra = {}) {
         hit: new Map(),
         sheathed: false
     };
+    playerComboTrack(v,v.attack,'vergil');
     v.slashTrail = [];
     v.mirageTrail = [];
     v.justWindow = 0;
@@ -111556,6 +111604,8 @@ function ymtStrike(n, v, a, pulse) {
                 t: 7, max: 7
             });
         }
+
+        if(playerFinisherControl(n,v,a,o,{pulse}))continue;
 
         // CHỈ ÁP DỤNG KHỐNG CHẾ NẾU CHIÊU ĐÓ CÓ `ccKey` VÀ QUA ĐƯỢC BỘ KIỂM TRA KHÓA 2 GIÂY!
         if (typeof dswControl === 'function') {
