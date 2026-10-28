@@ -13,7 +13,7 @@ with sync_playwright() as p:
         function check(ok,why){if(!ok)throw Error(why);}
         window.obReset=function(color=4){
             for(const k of Object.keys(keys))delete keys[k];
-            mapTheme='desert';camX=camY=0;apexSetColor(color);xDatForm(8);startGame('normal');paused=false;
+            mapTheme='desert';camX=camY=0;apexSetColor(color);xDatForm(8);startGame('normal');paused=false;mapTheme='desert';camX=camY=oceanCamY=tetrisCamY=0;
             dino.x=180;dino.y=320-dino.h;dino.grounded=true;dino.invincible=true;dino.invTimer=999999;
             spawnTimerEnemy=spawnTimerCactus=999999;nextBossScore=99999999;
             return dino.apex;
@@ -163,47 +163,56 @@ with sync_playwright() as p:
     assert page.evaluate("()=>{startGame('normal');return apexColor===4&&apexOn()&&!!dino.apex;}")
     # Reinstall helpers after checking persisted selection.
     page.evaluate('''() => {
-        window.obReset=function(color=4){for(const k of Object.keys(keys))delete keys[k];mapTheme='desert';camX=camY=0;apexSetColor(color);xDatForm(8);startGame('normal');paused=false;dino.x=180;dino.y=320-dino.h;dino.invincible=true;dino.invTimer=999999;return dino.apex;};
+        window.obReset=function(color=4){for(const k of Object.keys(keys))delete keys[k];mapTheme='desert';camX=camY=0;apexSetColor(color);xDatForm(8);startGame('normal');paused=false;mapTheme='desert';camX=camY=oceanCamY=tetrisCamY=0;dino.x=180;dino.y=320-dino.h;dino.invincible=true;dino.invTimer=999999;return dino.apex;};
         window.obStep=function(n=1){for(let i=0;i<n;i++){frames++;dino.update();}};
         window.obTarget=function(x=450,hp=1000){const o={x,y:260,w:42,h:60,hp,maxHp:hp,update(){},draw(){ctx.fillStyle='#acb8c2';ctx.fillRect(this.x,this.y,this.w,this.h);},takeDamage(d){this.hp-=d;}};enemies.push(o);return o;};
     }''')
     print(page.evaluate('''() => {
         function check(ok,why){if(!ok)throw Error(why);}
-        let a=obReset(),target=obTarget(),other=obTarget(470);ultCharge=100;
+        window.obBossTarget=(x=450,hp=1000)=>{const o=obTarget(x,hp);bosses.push(o);return o;};
+        let a=obReset(),target=obBossTarget(),other=obTarget(470);ultCharge=100;
         check(a.ultStart()&&a.isCinematic(),'Obelith ultimate entry');
-        let u=a.ultimate();check(u.kind===4&&u.victims.length===1&&u.aim.o===target,'ultimate targets an area');
+        let u=a.ultimate();check(u.kind===4&&u.mode==='boss'&&u.victims.length===1&&u.aim.o===target,'ultimate targets an area');
         for(let i=0;i<48;i++)a.cinematicFrame();
-        check(u.pillarTop===u.summit&&dino.y+dino.h<100&&target.hp===1000,'pillar does not rise harmlessly');
+        check(u.pillarTop===u.summit&&dino.y+dino.h<220&&target.hp===1000,'pillar does not rise harmlessly');
         for(let i=0;i<90;i++)a.cinematicFrame();check(target.hp===1000&&u.t===138,'damage during 1.5-second charge');
-        for(let i=0;i<86;i++)a.cinematicFrame();
+        let highest=Infinity;
+        for(let i=0;i<48;i++){a.cinematicFrame();highest=Math.min(highest,(a.state.y-48)*.55);}
+        check(u.t===186&&target.hp===1000&&!u.meteorActive&&highest<Math.min(u.arcFrom.y,u.arcTo.y)-10,'boss ascent does not arc upwards harmlessly '+JSON.stringify({t:u.t,hp:target.hp,meteor:u.meteorActive,highest,from:u.arcFrom,to:u.arcTo,control:u.arcControl}));
+        for(let i=0;i<80;i++)a.cinematicFrame();
         check(!a.isCinematic()&&!dino.ultActive&&target.hp===850&&other.hp===1000,'ultimate not exactly 150 to one target');
-        check(u.impact&&u.impact.at===180&&u.impact.y===u.floor,'meteor has no ground explosion');
+        check(u.impact&&u.impact.at===222&&u.impact.y===u.floor,'meteor has no ground explosion');
         check(dino.x>=worldL()&&dino.x+dino.w<=worldR()&&Number.isFinite(dino.y),'ultimate leaves player out of bounds');
         obStep(5);check(!a.state.isLedgeClimbing&&a.state.meleeState==='none','ultimate never releases controls');
-        a=obReset();target=obTarget(450,100);other=obTarget(470);ultCharge=100;a.ultStart();u=a.ultimate();
-        for(let i=0;i<181;i++)a.cinematicFrame();
+        a=obReset();target=obBossTarget(450,100);other=obTarget(470);ultCharge=100;a.ultStart();u=a.ultimate();
+        for(let i=0;i<223;i++)a.cinematicFrame();
         check(target.hp<=0&&u.aim.deadAt!==null&&other.hp===1000,'killed target lacks split finisher / nearby target damaged');
-        for(let i=181;i<224;i++)a.cinematicFrame();
+        for(let i=223;i<266;i++)a.cinematicFrame();
         a=obReset();obStep(600);const p=a.obelith().blocks[0];
         dino.x=(p.x+p.w/2)*.55-dino.w/2;dino.y=p.y*.55-dino.h;
         a.state.isGrounded=true;a.state.activePlatform=p;a.state.vx=a.state.vy=0;obStep();
-        target=obTarget();ultCharge=100;a.ultStart();u=a.ultimate();const from=dino.y+dino.h;
+        target=obBossTarget();ultCharge=100;a.ultStart();u=a.ultimate();const from=dino.y+dino.h;
         for(let i=0;i<48;i++){a.cinematicFrame();check(dino.y+dino.h<=from+.01,'ultimate teleports shrine player down to the floor');}
         check(u.floor===320&&u.pillarTop<=from,'ultimate pillar did not rise from actual ground');
-        for(let i=48;i<224;i++)a.cinematicFrame();
-        a=obReset();target=obTarget(450,100);target.phase=1;target.startPhase2=function(){};ultCharge=100;a.ultStart();u=a.ultimate();
-        for(let i=0;i<181;i++)a.cinematicFrame();check(target.hp<=0&&u.aim.deadAt===null,'split finisher falsely kills a boss with another phase');
-        for(let i=181;i<224;i++)a.cinematicFrame();
+        for(let i=48;i<266;i++)a.cinematicFrame();
+        a=obReset();target=obBossTarget(450,100);target.phase=1;target.startPhase2=function(){};ultCharge=100;a.ultStart();u=a.ultimate();
+        for(let i=0;i<223;i++)a.cinematicFrame();check(target.hp<=0&&u.aim.deadAt===null,'split finisher falsely kills a boss with another phase');
+        for(let i=223;i<266;i++)a.cinematicFrame();
         for(const final of [false,true]){
-            a=obReset();target=obTarget(450,100);target.phase=final?1:2;
+            a=obReset();target=obBossTarget(450,100);target.phase=final?1:2;
             target.startPhase2=function(){};target.suBatDau=function(){};target.sdtUltXong=final;
-            ultCharge=100;a.ultStart();u=a.ultimate();for(let i=0;i<181;i++)a.cinematicFrame();
+            ultCharge=100;a.ultStart();u=a.ultimate();for(let i=0;i<223;i++)a.cinematicFrame();
             check((u.aim.deadAt!==null)===final,'finisher disagrees with SDT/exhausted boss lifecycle');
-            for(let i=181;i<224;i++)a.cinematicFrame();
+            for(let i=223;i<266;i++)a.cinematicFrame();
         }
         for(const x of [5,450,950]){
-            a=obReset();target=obTarget(x);target.y=25;ultCharge=100;a.ultStart();u=a.ultimate();
-            for(let i=0;i<224;i++)a.cinematicFrame();
+            a=obReset();target=obBossTarget(x);target.y=25;ultCharge=100;a.ultStart();u=a.ultimate();
+            let previousY=-Infinity;
+            for(let i=0;i<266;i++){
+                a.cinematicFrame();
+                if(u.meteorActive){const y=(a.state.y-48)*.55;check(y>=previousY,'meteor flies upward at an elevated boss');previousY=y;}
+            }
+            check(u.through.y-u.arcTo.y>=120,'boss dive starts below the target');
             check(target.hp===850&&u.impact&&u.impact.y===320,'meteor misses an elevated/edge target or explodes in midair');
             check(dino.x+dino.w/2>=78&&dino.x+dino.w/2<=922,'meteor landing clips the saw outside arena');
         }
@@ -212,6 +221,43 @@ with sync_playwright() as p:
         xDatForm(8);startGame('pvp');check(!apexOn()&&!dino.apex,'Obelith leaks into PvP');
         check(_loiKhung.size===0,'caught frame errors');
         return 'PASS pillar rise, 90-frame charge, 150 single-target damage, lethal split, clean controls, meter and PvP/restart';
+    }'''))
+    print(page.evaluate('''() => {
+        function check(ok,why){if(!ok)throw Error(why);}
+        let a=obReset(),target=obTarget(280),other=obTarget(680),offscreen=obTarget(1400),miss=obTarget(450);
+        target.y=other.y=0;target.h=other.h=320;target.w=400;other.w=120;miss.y=600;
+        ultCharge=100;check(a.ultStart(),'roaming ultimate rejected');let u=a.ultimate();
+        check(u.mode==='ricochet'&&u.victims.length===2,'roaming mode does not capture the visible crowd');
+        for(let i=0;i<138;i++)a.cinematicFrame();check(target.hp===1000&&other.hp===1000,'roaming damages during charge');
+        const hitFrames=[];let hp=target.hp,xBounces=0,yBounces=0,lastVx=0,lastVy=0;
+        for(let i=0;i<180;i++){
+            a.cinematicFrame();const ball=u.ball,b=u.bounds;
+            check(ball.x>=b.left-.01&&ball.x<=b.right+.01&&ball.y>=b.top-.01&&ball.y<=b.bottom+.01,'ricochet leaves its camera bounds');
+            if(lastVx&&Math.sign(ball.vx)!==Math.sign(lastVx))xBounces++;
+            if(lastVy&&Math.sign(ball.vy)!==Math.sign(lastVy))yBounces++;lastVx=ball.vx;lastVy=ball.vy;
+            if(target.hp<hp){check(hp-target.hp===25,'ricochet does not deal 25 per crossing');hitFrames.push(u.t);hp=target.hp;}
+        }
+        check(u.bounceFrames===180&&u.t===318&&xBounces>=3&&yBounces>=4,'ricochet is not three seconds of real boundary reflections');
+        check(target.hp===850&&other.hp<1000&&offscreen.hp===1000&&miss.hp===1000,'multi-target cap, camera isolation or physical contact failed');
+        check(hitFrames.every((t,i)=>!i||t-hitFrames[i-1]>=24),'ricochet can rehit continuously');
+        const damage=other.hp;
+        for(let i=0;i<24;i++)a.cinematicFrame();
+        check(u.bounceFrames===180&&other.hp===damage&&(a.state.y-48)*.55<Math.min(u.returnFrom.y,u.returnTo.y),'return does not follow an upward arc / still damages');
+        for(let i=0;i<24;i++)a.cinematicFrame();
+        check(Math.abs(dino.x+dino.w/2-u.pillarX)<.01&&Math.abs(dino.y+dino.h-u.floor)<.01&&u.pillarTop===u.floor,'roaming does not land at the retracted pillar');
+        for(let i=0;i<24;i++)a.cinematicFrame();
+        check(!a.isCinematic()&&!dino.ultActive&&other.hp===damage,'roaming ultimate does not release controls');
+        a=obReset();target=obTarget(280,20);target.y=0;target.w=400;target.h=320;ultCharge=100;a.ultStart();u=a.ultimate();
+        for(let i=0;i<318;i++)a.cinematicFrame();
+        check(target.hp<=0&&u.victims[0].deadAt!==null,'roaming lethal pass lacks split finisher');
+        for(let i=318;i<390;i++)a.cinematicFrame();
+        // Scrolled arenas use the visible screen edges and the actual player position.
+        a=obReset();WORLD_W=2400;camX=1000;dino.x=1180;target=obTarget(1450);ultCharge=100;a.ultStart();u=a.ultimate();
+        for(let i=0;i<318;i++)a.cinematicFrame();
+        check(u.bounds.left>1000&&u.bounds.right<2000&&Math.abs(u.pillarX-1195.4)<.01,'ricochet ignores scrolling viewport or player origin');
+        for(let i=318;i<390;i++)a.cinematicFrame();
+        check(Math.abs(dino.x+dino.w/2-u.pillarX)<.01,'scrolled return misses original pillar');
+        return 'PASS roaming 180-frame ricochet, reflected collision, 25/pass with 0.4s rehit and 150/target cap, split, curved harmless return and scrolling';
     }'''))
     print(page.evaluate('''() => {
         function check(ok,why){if(!ok)throw Error(why);}
