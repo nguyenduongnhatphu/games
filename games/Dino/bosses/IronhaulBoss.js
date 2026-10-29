@@ -1,5 +1,5 @@
 // BOSS_FILE: IronhaulBoss
-// BOSS_SNAPSHOT: 3cf4652cd737d36361a15b25712b9a3ff21a9a13bbe8337913bcf233f06c6a1d
+// BOSS_SNAPSHOT: beba2bbb918dbf33475490c993ed1556c7f85c4568f316c2be580c4161e1acfd
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -81,15 +81,46 @@ const IRONHAUL_MOVES = {
     ih_barrage:{name:'SONG PHÁO XUNG',end:109},
     ih_skyfall:{name:'BOOSTER · THIÊN GIÁNG',end:177},
     ih_morph:{name:'CHUYỂN DẠNG · THIẾT XA',end:320},
-    ih_silvercombo:{name:'KIẾM → KHIÊN → KIẾM → XUNG KÍCH',end:151},
+    ih_cleaver:{name:'KIẾM HAI TAY · BỔ NẶNG → ĐÂM → BẮN',end:160},
+    ih_flank:{name:'BOOSTER · VƯỢT ĐẦU → QUAY KIẾM',end:140},
+    ih_silvercombo:{name:'KIẾM → XOAY KHIÊN → CHÉM HẤT → HÚC',end:180},
     ih_aegis:{name:'PHI KHIÊN → ĐÂM KIẾM',end:124},
     ih_parry:{name:'THẾ ĐỠ · CHỜ PHẢN ĐÒN',end:80},
     ih_riposte:{name:'PARRY · PHẢN KÍCH',end:105},
-    ih_cross:{name:'KHIÊN CHẤN → SONG TRẢM',end:130}
+    ih_cross:{name:'ĐẬP KHIÊN → CHÉM HẤT → BỔ KIẾM',end:148},
+    ih_shieldrush:{name:'KHIÊN TIÊN PHONG → KIẾM → XOAY KHIÊN',end:163},
+    ih_reversal:{name:'XOAY NGƯỢC KHIÊN → ĐÂM → HẤT KHIÊN',end:164}
 };
 // BOSS_PART_END s1.IRONHAUL_MOVES.1
 
-// Nguồn: index.html:34251 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34256 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.IRONHAUL_SWORD_BEATS.1 EDITABLE
+const IRONHAUL_SWORD_BEATS={
+    ih_advance:[[52,'cut',112,14],[78,'rise',112,14]],
+    ih_combo:[[26,'cut',112,14],[54,'rise',112,14],[86,'thrust',112,14]],
+    ih_gunblade:[[82,'cut',125,14]],ih_upper:[[30,'rise',120,14],[54,'cut',120,13],[83,'cut',125,15]],
+    ih_cleaver:[[34,'cut',128,18],[86,'thrust',130,15]],ih_flank:[[72,'cut',120,15],[99,'thrust',120,15]],
+    ih_silvercombo:[[24,'cut',120,15],[91,'rise',120,15]],ih_aegis:[[70,'thrust',132,15]],
+    ih_riposte:[[61,'cut',135,15]],ih_cross:[[72,'rise',126,15],[106,'cut',126,15]],
+    ih_shieldrush:[[68,'cut',119,15]],ih_reversal:[[84,'thrust',128,15]]
+};
+// BOSS_PART_END s1.IRONHAUL_SWORD_BEATS.1
+
+// Nguồn: index.html:34265 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulSwordBeats.1 EDITABLE
+function ironhaulSwordBeats(b){const beats=IRONHAUL_SWORD_BEATS[b.state]||[];return b.silver&&b.state==='ih_advance'?beats.slice(0,1):beats;}
+// BOSS_PART_END s1.ironhaulSwordBeats.1
+
+// Nguồn: index.html:34266 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.IRONHAUL_SHIELD_BEATS.1 EDITABLE
+const IRONHAUL_SHIELD_BEATS={
+    ih_advance:[[78,'spin',24]],
+    ih_silvercombo:[[50,'spin',28],[125,'bash',18]],ih_riposte:[[28,'bash',18]],
+    ih_cross:[[30,'slam',18]],ih_shieldrush:[[29,'bash',21],[101,'spin',30]],ih_reversal:[[29,'spin',32],[119,'upper',18]]
+};
+// BOSS_PART_END s1.IRONHAUL_SHIELD_BEATS.1
+
+// Nguồn: index.html:34271 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.setupIronhaulArena.1 EDITABLE
 function setupIronhaulArena(){
     mapTheme='ironcity';camReset();freeMove=true;
@@ -100,7 +131,7 @@ function setupIronhaulArena(){
 }
 // BOSS_PART_END s1.setupIronhaulArena.1
 
-// Nguồn: index.html:34258 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34278 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.drawIronhaulCity.1 EDITABLE
 function drawIronhaulCity(){
     ctx.save();
@@ -136,14 +167,14 @@ function drawIronhaulCity(){
 }
 // BOSS_PART_END s1.drawIronhaulCity.1
 
-// Nguồn: index.html:34290 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34310 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulPolygon.1 EDITABLE
 function ironhaulPolygon(points,fill,edge='#152633'){
     ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(edge){ctx.strokeStyle=edge;ctx.lineWidth=2;ctx.stroke();}
 }
 // BOSS_PART_END s1.ironhaulPolygon.1
 
-// Nguồn: index.html:34293 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34313 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulWheel.1 EDITABLE
 function ironhaulWheel(x,y,r,angle){
     ctx.fillStyle='#101a23';ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.strokeStyle='#465662';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#a0afb6';ctx.beginPath();ctx.arc(x,y,r*.53,0,7);ctx.fill();ctx.strokeStyle='#354651';ctx.lineWidth=2;
@@ -151,7 +182,7 @@ function ironhaulWheel(x,y,r,angle){
 }
 // BOSS_PART_END s1.ironhaulWheel.1
 
-// Nguồn: index.html:34297 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34317 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulTruck.1 EDITABLE
 function ironhaulTruck(b,split=0){
     ctx.save();ctx.translate(b.cx(),b.y+b.h);ctx.scale(b.facingLeft?-1:1,1);
@@ -181,69 +212,227 @@ function ironhaulTruck(b,split=0){
 }
 // BOSS_PART_END s1.ironhaulTruck.1
 
-// Nguồn: index.html:34323 · Dùng bởi: IronhaulBoss
-// BOSS_PART_BEGIN s1.ironhaulArm.1 EDITABLE
-function ironhaulArm(x,y,elbow,hand,col){
-    ctx.strokeStyle='#162a35';ctx.lineWidth=24;ctx.lineJoin='bevel';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(...elbow);ctx.lineTo(...hand);ctx.stroke();ctx.strokeStyle=col;ctx.lineWidth=18;ctx.stroke();
-    ctx.fillStyle='#a2b4bc';ctx.beginPath();ctx.arc(...elbow,8,0,7);ctx.fill();ctx.fillStyle='#324651';ctx.fillRect(hand[0]-9,hand[1]-7,18,16);
-}
-// BOSS_PART_END s1.ironhaulArm.1
+// Nguồn: index.html:34344 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulMix.1 EDITABLE
+function ironhaulMix(a,b,t){return a+(b-a)*Math.max(0,Math.min(1,t));}
+// BOSS_PART_END s1.ironhaulMix.1
 
-// Nguồn: index.html:34327 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34345 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulEase.1 EDITABLE
+function ironhaulEase(t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);}
+// BOSS_PART_END s1.ironhaulEase.1
+
+// Nguồn: index.html:34346 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulAngleMix.1 EDITABLE
+function ironhaulAngleMix(a,b,t){return a+Math.atan2(Math.sin(b-a),Math.cos(b-a))*Math.max(0,Math.min(1,t));}
+// BOSS_PART_END s1.ironhaulAngleMix.1
+
+// Nguồn: index.html:34347 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulRot.1 EDITABLE
+function ironhaulRot(p,a,origin={x:0,y:0}){return {x:origin.x+p.x*Math.cos(a)-p.y*Math.sin(a),y:origin.y+p.x*Math.sin(a)+p.y*Math.cos(a)};}
+// BOSS_PART_END s1.ironhaulRot.1
+
+// Nguồn: index.html:34348 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulIK.1 EDITABLE
+function ironhaulIK(root,target,upper,lower,bend=1){
+    const dx=target.x-root.x,dy=target.y-root.y,L=Math.hypot(dx,dy)||1;
+    const d=Math.max(Math.abs(upper-lower)+.01,Math.min(upper+lower-.01,L)),ux=dx/L,uy=dy/L;
+    const along=(upper*upper-lower*lower+d*d)/(2*d),h=Math.sqrt(Math.max(0,upper*upper-along*along));
+    return {root:{...root},joint:{x:root.x+ux*along-uy*h*bend,y:root.y+uy*along+ux*h*bend},end:{x:root.x+ux*d,y:root.y+uy*d}};
+}
+// BOSS_PART_END s1.ironhaulIK.1
+
+// Nguồn: index.html:34354 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulRig.1 EDITABLE
+function ironhaulRig(b){
+    const t=b.subTimer||0,st=b.state||'idle',s=b.slash,q=b.shieldStrike;
+    const recent=Math.exp(-Math.max(0,frames-(b.animAt??-1000))*.24),speed=Math.min(1,Math.abs(b.animSpeed||0)/6)*recent;
+    const gait=b.gait||0,air=!b.grounded,silver=!!b.silver;
+    const gunWindow=(a,b,c,d)=>ironhaulEase((t-a)/(b-a))*(1-ironhaulEase((t-c)/(d-c)));
+    const gunBlend=st==='ih_barrage'?gunWindow(8,25,86,109):st==='ih_gunblade'?gunWindow(18,29,55,73):st==='ih_cleaver'?gunWindow(103,114,131,159):b.pose==='gun'?1:0;
+    let turn=0,lean=speed*.13,crouch=0,swordTarget={x:54,y:-96},offTarget={x:-40,y:-105},blade=.95,shieldAngle=-.1;
+    const nextSword=ironhaulSwordBeats(b).find(k=>t<=k[0]&&t>=k[0]-18);
+    const wind=nextSword?ironhaulEase((t-nextSword[0]+18)/18):0;
+    if(st==='ih_advance'&&t>=20&&t<50){swordTarget={x:5,y:-125};blade=-2.7;offTarget={x:30,y:-115};lean=.22;crouch=.25;}
+    if(st==='ih_flank'&&t>=20&&t<68){turn=Math.sin(Math.max(0,Math.min(1,(t-43)/20))*Math.PI)*.25;lean=-.2;swordTarget={x:18,y:-151};blade=-1.8;}
+    if(st==='ih_skyfall'&&t<=24){const u=ironhaulEase(t/24);swordTarget={x:ironhaulMix(54,27,u),y:ironhaulMix(-96,-149,u)};blade=ironhaulAngleMix(.95,-1.8,u);crouch=u*.65;}
+    if(st==='ih_skyfall'&&b.landT&&t>=b.landT)crouch=Math.max(crouch,Math.sin(Math.min(1,(t-b.landT)/14)*Math.PI)*.75);
+    if(st==='ih_parry'||(st==='ih_riposte'&&t<=28)){offTarget={x:52,y:-113};shieldAngle=.12;swordTarget={x:22,y:-97};blade=.65;crouch=.2;}
+    if((st==='ih_aegis'&&t<31)){const a=ironhaulEase(t/30);offTarget={x:ironhaulMix(-31,68,a),y:ironhaulMix(-136,-108,a)};shieldAngle=ironhaulMix(-.75,.3,a);lean=-.13+.3*a;}
+    if(gunBlend&&!silver){offTarget={x:ironhaulMix(-40,57-(b.muzzle||0)*1.2,gunBlend),y:ironhaulMix(-105,-111,gunBlend)};lean=(-.07-(b.muzzle||0)*.012)*gunBlend;}
+    if(wind&&!q){
+        const kind=nextSword[1],goal=kind==='rise'?{x:40,y:-73}:kind==='thrust'?(st==='ih_cleaver'?{x:14,y:-111}:{x:22,y:-103}):st==='ih_cleaver'?{x:14,y:-160}:{x:29,y:-153};
+        swordTarget={x:ironhaulMix(swordTarget.x,goal.x,wind),y:ironhaulMix(swordTarget.y,goal.y,wind)};
+        blade=ironhaulAngleMix(blade,kind==='rise'?1.25:kind==='thrust'?-.12:-2.2,wind);
+        lean=ironhaulMix(lean,kind==='rise'?.19:kind==='thrust'?0:-.16,wind);
+    }
+    const nextShield=silver?(IRONHAUL_SHIELD_BEATS[st]||[]).find(k=>t<=k[0]&&t>=k[0]-18):undefined;
+    if(nextShield&&!s&&!q){
+        const u=ironhaulEase((t-nextShield[0]+18)/18),kind=nextShield[1],goal=kind==='spin'?{x:73,y:-101}:kind==='slam'?{x:28,y:-157}:kind==='upper'?{x:46,y:-64}:{x:22,y:-102};
+        offTarget={x:ironhaulMix(offTarget.x,goal.x,u),y:ironhaulMix(offTarget.y,goal.y,u)};
+        shieldAngle=ironhaulAngleMix(shieldAngle,kind==='slam'?-1.4:kind==='upper'?.8:kind==='spin'?.15:-.25,u);
+    }
+    if(s){
+        const u=ironhaulEase(s.age/s.life);blade=s.angle;
+        if(s.kind==='thrust'){swordTarget={x:ironhaulMix(22,91,Math.sin(u*Math.PI*.75)),y:-103};lean=.18*Math.sin(u*Math.PI);}
+        else if(s.kind==='rise'){swordTarget={x:40+Math.sin(u*Math.PI)*36,y:ironhaulMix(-73,-157,u)};lean=ironhaulMix(.19,-.15,u);}
+        else{swordTarget={x:29+Math.sin(u*Math.PI)*47,y:ironhaulMix(-153,-80,u)};lean=ironhaulMix(-.16,.2,u);}
+        if(st==='ih_cleaver'){swordTarget=s.kind==='thrust'?{x:14+Math.sin(u*Math.PI*.75)*21,y:-111}:{x:14+Math.sin(u*Math.PI)*16,y:ironhaulMix(-160,-89,u)};offTarget={x:swordTarget.x-13,y:swordTarget.y+5};crouch=Math.sin(u*Math.PI)*.38;}
+    }
+    if(st==='ih_cleaver'&&wind&&!s){offTarget={x:swordTarget.x-13,y:swordTarget.y+5};}
+    if(q){
+        const u=ironhaulEase(q.age/q.life),power=Math.sin(u*Math.PI);
+        if(q.kind==='spin'){
+            turn=u;offTarget={x:Math.cos(u*Math.PI*2)*73,y:-101+Math.sin(u*Math.PI*2)*14};shieldAngle=u*Math.PI*2+.15;
+            swordTarget={x:-18+Math.cos(u*Math.PI*2+.8)*37,y:-143};blade=-1.7+u*Math.PI*2;lean=Math.sin(u*Math.PI*2)*.12;crouch=.18;
+        }else if(q.kind==='slam'){
+            offTarget={x:ironhaulMix(28,60,u),y:ironhaulMix(-157,-55,u)};shieldAngle=ironhaulMix(-1.4,.9,u);crouch=u*.9;lean=u*.26;swordTarget={x:3,y:-136};blade=-2.4;
+        }else if(q.kind==='upper'){
+            offTarget={x:46+power*25,y:ironhaulMix(-64,-142,u)};shieldAngle=ironhaulMix(.8,-.8,u);lean=ironhaulMix(.25,-.15,u);
+        }else{
+            offTarget={x:ironhaulMix(22,87,power),y:-102};shieldAngle=ironhaulMix(-.25,.25,power);lean=.25*power;crouch=.3*power;swordTarget={x:9,y:-144};blade=-2.2;
+        }
+    }
+    if(air){crouch=Math.max(crouch,.35);if(!s&&!q){swordTarget={x:27,y:-149};blade=-1.8;}}
+    const fold=st==='ih_morph'?ironhaulEase(t/28):st==='ih_unfold'?1-ironhaulEase((t-22)/36):st==='ih_shift'?1-ironhaulEase((t-44)/45):0;
+    if(fold&&!silver){swordTarget={x:ironhaulMix(swordTarget.x,9,fold),y:ironhaulMix(swordTarget.y,-105,fold)};offTarget={x:ironhaulMix(offTarget.x,-9,fold),y:ironhaulMix(offTarget.y,-113,fold)};crouch=Math.max(crouch,fold);lean=ironhaulMix(lean,.3,fold);blade=ironhaulAngleMix(blade,-2.8,fold);}
+    const follow=b.followPose;
+    if(follow&&!s&&!q){
+        const u=ironhaulEase((frames-follow.at)/(follow.duration||12)),old=follow.targets;
+        swordTarget={x:ironhaulMix(old.swordTarget.x,swordTarget.x,u),y:ironhaulMix(old.swordTarget.y,swordTarget.y,u)};
+        offTarget={x:ironhaulMix(old.offTarget.x,offTarget.x,u),y:ironhaulMix(old.offTarget.y,offTarget.y,u)};
+        blade=ironhaulAngleMix(old.blade,blade,u);shieldAngle=ironhaulAngleMix(old.shieldAngle,shieldAngle,u);
+        lean=ironhaulMix(old.lean,lean,u);crouch=ironhaulMix(old.crouch,crouch,u);turn=ironhaulAngleMix(old.turn*Math.PI*2,turn*Math.PI*2,u)/(Math.PI*2);
+    }
+    const targets={swordTarget:{...swordTarget},offTarget:{...offTarget},blade,shieldAngle,lean,crouch,turn};
+    const yaw=Math.cos(turn*Math.PI*2),width=Math.max(.2,Math.abs(yaw)),bob=air?0:Math.sin(gait*2)*speed*2+Math.sin(frames*.055)*.7;
+    const pelvis={x:Math.sin(turn*Math.PI*2)*5,y:-70+crouch*15+bob};
+    const chest=ironhaulRot({x:0,y:-55},lean,pelvis),neck=ironhaulRot({x:0,y:-28},lean,chest);
+    const shoulderFront=ironhaulRot({x:34*yaw,y:-5},lean,chest),shoulderBack=ironhaulRot({x:-34*yaw,y:-5},lean,chest);
+    const sword=ironhaulIK(shoulderFront,swordTarget,34,35,-1),off=ironhaulIK(shoulderBack,offTarget,34,35,1);
+    sword.angle=blade;sword.hand={x:sword.end.x+Math.cos(blade)*11,y:sword.end.y+Math.sin(blade)*11};
+    off.angle=(q||nextShield||(st==='ih_aegis'&&t<=30)||(follow&&silver))?shieldAngle:st==='ih_cleaver'&&(s||wind||(follow&&t<103))?blade:silver?-.1:0;
+    if(gunBlend&&!silver&&!s){
+        const localDX=((b.lockX??b.cx()+b.dir()*200)-b.cx())*b.dir()-off.end.x;
+        const localDY=(b.lockY??b.cy())-(b.y+b.h)-off.end.y;
+        off.angle=Math.max(-.85,Math.min(.85,Math.atan2(localDY,Math.max(30,localDX))))*gunBlend;
+    }
+    off.hand={x:off.end.x+Math.cos(off.angle)*11,y:off.end.y+Math.sin(off.angle)*11};
+    const legs=[];
+    for(const side of [-1,1]){
+        const phase=gait+(side<0?Math.PI:0),stride=Math.sin(phase)*19*speed;
+        const ankle={x:side*23+stride+(air?side*8:0),y:-9-Math.max(0,Math.cos(phase))*14*speed-(air?side<0?18:5:0)};
+        const hip={x:pelvis.x+side*17*width,y:pelvis.y+3};
+        const leg=ironhaulIK(hip,ankle,31,36,-1);
+        legs.push({hip:leg.root,knee:leg.joint,ankle:leg.end,angle:air?.3:-.09*Math.sin(phase)*speed+Math.sin(turn*Math.PI*2)*side*.16});
+    }
+    return {targets,fold,pelvis,chest,neck,head:{x:neck.x,y:neck.y-9},lean,width,yaw,turn,crouch,legs,sword,off,shieldFace:q?.kind==='spin'?Math.max(.18,Math.abs(Math.cos(turn*Math.PI*2))):1,offBehind:q?.kind==='spin'&&Math.sin(turn*Math.PI*2)<-.1};
+}
+// BOSS_PART_END s1.ironhaulRig.1
+
+// Nguồn: index.html:34438 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulWorldPoint.1 EDITABLE
+function ironhaulWorldPoint(b,p){return {x:b.cx()+b.dir()*p.x,y:b.y+b.h+p.y};}
+// BOSS_PART_END s1.ironhaulWorldPoint.1
+
+// Nguồn: index.html:34439 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulWeapons.1 EDITABLE
+function ironhaulWeapons(b){
+    const r=b.rigPose||ironhaulRig(b),grip=ironhaulWorldPoint(b,r.sword.hand),reach=(b.slash?.reach||112)*(1-r.fold*.65);
+    const tip=ironhaulWorldPoint(b,{x:r.sword.hand.x+Math.cos(r.sword.angle)*reach,y:r.sword.hand.y+Math.sin(r.sword.angle)*reach});
+    const shield=ironhaulWorldPoint(b,r.off.hand),points=[[-27,-35],[19,-37],[32,-16],[25,29],[0,43],[-28,22],[-33,-13]].map(([x,y])=>ironhaulWorldPoint(b,ironhaulRot({x:x*r.shieldFace,y},r.off.angle,r.off.hand)));
+    const gun=ironhaulWorldPoint(b,{x:r.off.hand.x+Math.cos(r.off.angle)*48,y:r.off.hand.y+Math.sin(r.off.angle)*48});
+    const loX=Math.min(...points.map(p=>p.x)),loY=Math.min(...points.map(p=>p.y));
+    return {rig:r,grip,tip,shield,shieldPoints:points,shieldBox:{x:loX,y:loY,w:Math.max(...points.map(p=>p.x))-loX,h:Math.max(...points.map(p=>p.y))-loY},gun,gunAngle:Math.atan2(gun.y-shield.y,gun.x-shield.x)};
+}
+// BOSS_PART_END s1.ironhaulWeapons.1
+
+// Nguồn: index.html:34447 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulJoint.1 EDITABLE
+function ironhaulJoint(p,r,col){
+    ctx.fillStyle='#152934';ctx.beginPath();ctx.arc(p.x,p.y,r+2,0,7);ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,r,0,7);ctx.stroke();ctx.fillStyle='#a0b5bf';ctx.fillRect(p.x-2,p.y-2,4,4);
+}
+// BOSS_PART_END s1.ironhaulJoint.1
+
+// Nguồn: index.html:34450 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulBone.1 EDITABLE
+function ironhaulBone(a,b,w,col,hi,forearm=false){
+    ctx.save();ctx.translate(a.x,a.y);ctx.rotate(Math.atan2(b.y-a.y,b.x-a.x));const L=Math.hypot(b.x-a.x,b.y-a.y);
+    ctx.fillStyle='#18303b';ctx.fillRect(2,-w*.4,L-4,w*.8);
+    ctx.strokeStyle='#bdcbd0';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(3,-w*.48);ctx.lineTo(L-4,-w*.42);ctx.stroke();
+    ironhaulPolygon([[5,-w*.55],[L-8,-w*.43],[L-2,0],[L-7,w*.5],[7,w*.55],[2,0]],col);
+    ctx.fillStyle=hi;ctx.fillRect(8,-w*.42,Math.max(5,L-18),3);ctx.fillStyle='#28424e';ctx.fillRect(L*.4,-2,Math.max(5,L*.3),4);
+    if(forearm){ctx.fillStyle=hi;ctx.fillRect(L-11,-w*.62,6,w*1.2);ctx.strokeStyle='#93adb6';ctx.lineWidth=1;for(let x=12;x<L-11;x+=5){ctx.beginPath();ctx.moveTo(x,3);ctx.lineTo(x,w*.42);ctx.stroke();}}
+    ctx.restore();
+}
+// BOSS_PART_END s1.ironhaulBone.1
+
+// Nguồn: index.html:34459 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulHand.1 EDITABLE
+function ironhaulHand(arm,col,hi){
+    ctx.save();ctx.translate(arm.end.x,arm.end.y);ctx.rotate(arm.angle);
+    ironhaulPolygon([[-4,-8],[11,-9],[17,-4],[17,6],[1,8],[-5,3]],col);ctx.fillStyle=hi;
+    for(let i=0;i<3;i++){ctx.fillRect(7+i*3,-7,2,12);ctx.fillStyle=i%2?'#728e9b':hi;}
+    ctx.fillStyle='#263e4b';ctx.fillRect(0,6,10,5);ctx.restore();
+}
+// BOSS_PART_END s1.ironhaulHand.1
+
+// Nguồn: index.html:34465 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulRobot.1 EDITABLE
 function ironhaulRobot(b,alpha=1){
-    ctx.save();ctx.globalAlpha*=alpha;ctx.translate(b.cx(),b.y+b.h);ctx.scale(b.facingLeft?-1:1,1);
-    const silver=b.silver,col=silver?'#dce7ee':'#53798c',hi=silver?'#ffffff':'#86a8b7',dark='#203541',energy=silver?'#9de9f2':'#ffbe68';
-    const active=b.slash,lean=b.pose==='thrust'?10:b.pose==='shield'?13:Math.sin(b.subTimer*.06)*1.5;
-    const walk=b.state==='idle'?Math.sin(frames*.15)*4:b.pose==='dash'?16:0;
-    // Container panels fold into the backpack; wheel assemblies stay visible on the new form.
-    ironhaulPolygon([[-39,-142],[-62,-147],[-56,-64],[-37,-58]],dark);ironhaulPolygon([[36,-143],[57,-153],[63,-66],[38,-54]],col);
-    ctx.strokeStyle=hi;ctx.lineWidth=2;for(let y=-137;y<-66;y+=12){ctx.beginPath();ctx.moveTo(43,y);ctx.lineTo(57,y-3);ctx.stroke();}
-    for(const side of [-1,1]){
-        const hip=side*18,knee=side*(22+walk*.25),foot=side*(27+walk*.35);
-        ironhaulPolygon([[hip-14,-66],[hip+14,-66],[knee+12,-34],[knee-11,-28]],col);
-        ironhaulPolygon([[knee-11,-33],[knee+12,-33],[foot+14,-7],[foot-14,-7]],hi);
-        ironhaulPolygon([[foot-17,-15],[foot+13,-15],[foot+23,-3],[foot+22,0],[foot-19,0]],col);
-        ctx.fillStyle=dark;ctx.fillRect(knee-8,-36,16,8);ctx.fillRect(foot-11,-23,22,4);ironhaulWheel(side*32,-54,11,0);
-    }
-    ctx.save();ctx.translate(lean,-2);
-    ironhaulPolygon([[-42,-137],[-25,-148],[24,-148],[43,-134],[31,-81],[16,-65],[-20,-65],[-34,-86]],col);
-    ironhaulPolygon([[-30,-135],[0,-129],[30,-135],[25,-107],[0,-99],[-26,-108]],silver?'#edf5fa':'#a95842');
-    ironhaulPolygon([[-26,-132],[-3,-127],[-3,-114],[-25,-118]],'#153949',hi);ironhaulPolygon([[4,-127],[26,-132],[24,-118],[4,-113]],'#153949',hi);
-    ctx.fillStyle=dark;for(let y=-102;y<-78;y+=6)ctx.fillRect(-19,y,38,3);
-    ctx.fillStyle=energy;ctx.beginPath();ctx.arc(0,-107,silver?7:4,0,7);ctx.fill();
-    ironhaulPolygon([[-16,-169],[-10,-180],[12,-180],[19,-165],[12,-149],[-12,-149]],col);ctx.fillStyle=dark;ctx.fillRect(-14,-166,29,8);ctx.fillStyle=energy;ctx.fillRect(-11,-165,23,3);ctx.fillStyle=hi;ctx.fillRect(-7,-155,15,5);
-    for(const side of [-1,1]){ctx.fillStyle=col;ctx.fillRect(side<0?-56:31,-145,26,28);ctx.fillStyle=hi;ctx.fillRect(side<0?-57:30,-145,28,5);ironhaulWheel(side*48,-130,12,0);}
-    const swordHand=[51+(b.pose==='thrust'?15:0),b.pose==='overhead'?-133:-88];
-    const shieldHand=[b.pose==='gun'?45:-46+(b.pose==='shield'?75:0),b.pose==='shield'?-86:-101];
-    ironhaulArm(-41,-126,[-56,-99],shieldHand,col);
-    ironhaulArm(40,-126,[51,-110],swordHand,col);
-    if(silver&&b.shieldOut<=0){
-        ctx.save();ctx.translate(...shieldHand);if(b.pose==='shield')ctx.scale(1.1,1);
-        ironhaulPolygon([[-27,-35],[19,-37],[32,-16],[25,29],[0,45],[-28,22],[-33,-13]],'#9dafbe',hi);
-        ironhaulPolygon([[-19,-26],[13,-29],[23,-13],[16,22],[0,34],[-20,17],[-23,-9]],'#eaf3f8');
-        ironhaulPolygon([[0,-24],[12,0],[0,26],[-12,0]],'#365665',energy);
-        ctx.strokeStyle=energy;ctx.lineWidth=b.state==='ih_parry'?4:2;ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(0,25);ctx.stroke();ctx.restore();
-    }else if(!silver){ctx.fillStyle=dark;ctx.fillRect(shieldHand[0]-6,shieldHand[1]-5,48,14);ctx.fillStyle=hi;ctx.fillRect(shieldHand[0]+31,shieldHand[1]-4,13,12);if(b.muzzle>0){ctx.fillStyle='#ffe7a2';ctx.fillRect(shieldHand[0]+44,shieldHand[1]-9,23,18);}}
-    const angle=active?active.angle:b.pose==='overhead'?-2.3:b.pose==='thrust'?0:.9;
-    ctx.save();ctx.translate(...swordHand);ctx.rotate(angle);
-    ironhaulPolygon([[0,-5],[90,-5],[112,0],[90,5],[0,5]],silver?'#eefaff':'#c2d0d4',energy);ctx.fillStyle=energy;ctx.fillRect(12,-4,77,2);ctx.fillStyle=dark;ctx.fillRect(-13,-5,18,10);ctx.fillStyle=hi;ctx.fillRect(-1,-12,5,24);ctx.restore();
+    const w=ironhaulWeapons(b),r=w.rig,silver=b.silver,col=silver?'#cfdee8':'#4c748a',hi=silver?'#f6fdff':'#8aaebf',dark='#203b4a',energy=silver?'#93edfa':'#ffbf70';
+    ctx.save();ctx.globalAlpha*=alpha;ctx.translate(b.cx(),b.y+b.h);ctx.scale(b.dir(),1);
+    const limb=(a,armed)=>{
+        ironhaulBone(a.root,a.joint,19,col,hi);ironhaulJoint(a.root,9,hi);ironhaulJoint(a.joint,7,energy);ironhaulBone(a.joint,a.end,22,col,hi,true);ironhaulJoint(a.end,5,hi);ironhaulHand(a,col,hi);
+        if(armed==='shield'&&silver&&b.shieldOut<=0){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);ctx.scale(r.shieldFace,1);
+            ironhaulPolygon([[-27,-35],[19,-37],[32,-16],[25,29],[0,43],[-28,22],[-33,-13]],'#7d98ab',hi);
+            ironhaulPolygon([[-21,-28],[15,-30],[24,-13],[18,23],[0,33],[-21,17],[-25,-10]],'#eaf7ff');
+            ironhaulPolygon([[0,-23],[12,0],[0,25],[-12,0]],'#315c71',energy);ctx.strokeStyle=energy;ctx.lineWidth=b.state==='ih_parry'?4:2;ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(0,23);ctx.stroke();
+            for(const [x,y] of [[-18,-23],[15,-22],[-18,16],[15,19]]){ctx.fillStyle='#607f92';ctx.fillRect(x-2,y-2,4,4);}ctx.restore();
+        }else if(armed==='gun'&&!silver&&!(b.state==='ih_cleaver'&&b.subTimer<103)){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);ironhaulPolygon([[-5,-8],[30,-9],[36,-5],[49,-5],[49,5],[8,9],[-5,3]],dark,hi);ctx.fillStyle=hi;ctx.fillRect(32,-4,17,8);ctx.fillStyle=energy;ctx.fillRect(8,-7,16,2);
+            if(b.muzzle>0){ctx.fillStyle='#ffedb7';ironhaulPolygon([[49,-7],[70,0],[49,7],[55,0]],ctx.fillStyle,null);}ctx.restore();}
+        else if(armed==='sword'){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);const L=(b.slash?.reach||112)*(1-r.fold*.65);
+            ironhaulPolygon([[0,-5],[L-20,-5],[L,0],[L-20,5],[0,5]],silver?'#f0fcff':'#bbcdd7',energy);ctx.fillStyle=energy;ctx.fillRect(11,-4,L-34,2);ctx.fillStyle=dark;ctx.fillRect(-10,-5,15,10);ctx.fillStyle=hi;ctx.fillRect(-2,-12,5,24);ctx.restore();}
+    };
+    const leg=l=>{
+        ironhaulJoint(l.hip,9,hi);ironhaulBone(l.hip,l.knee,24,col,hi);ironhaulJoint(l.knee,8,energy);ironhaulBone(l.knee,l.ankle,25,col,hi,true);
+        ctx.save();ctx.translate(l.ankle.x,l.ankle.y);ctx.rotate(l.angle);ironhaulPolygon([[-15,-6],[12,-7],[25,3],[25,9],[-17,9]],col);ctx.fillStyle=hi;ctx.fillRect(-11,-5,20,3);ctx.fillStyle=dark;ctx.fillRect(-15,6,37,4);ctx.restore();
+    };
+    leg(r.legs[0]);if(r.offBehind)limb(r.off,silver?'shield':'gun');
+    // Container hinges / backpack, pelvis yaw bearing, independent spine and chest rotation.
+    ctx.save();ctx.translate(r.chest.x,r.chest.y);ctx.rotate(r.lean);ctx.scale(r.width,1);
+    for(const side of [-1,1]){ctx.save();ctx.translate(side*38,-4);ctx.rotate(side*(-.2+r.turn*.28));ironhaulPolygon([[-10,-23],[12,-22],[17,54],[-11,58]],'#274655',hi);ctx.strokeStyle='#64889b';for(let y=-10;y<45;y+=11){ctx.beginPath();ctx.moveTo(-7,y);ctx.lineTo(12,y-2);ctx.stroke();}ctx.restore();}ctx.restore();
+    ironhaulBone(r.pelvis,r.chest,29,dark,hi);ironhaulJoint(r.pelvis,13,energy);
+    ctx.save();ctx.translate(r.pelvis.x,r.pelvis.y);ctx.scale(r.width,1);ironhaulPolygon([[-32,-8],[27,-8],[32,13],[12,21],[-22,18],[-35,6]],col);ctx.fillStyle=hi;ctx.fillRect(-18,-5,35,4);ctx.restore();
+    ctx.save();ctx.translate(r.chest.x,r.chest.y);ctx.rotate(r.lean);ctx.scale(r.width,1);
+    ironhaulPolygon([[-37,-19],[-23,-25],[24,-25],[38,-14],[30,25],[7,36],[-24,27],[-35,7]],col);
+    if(r.yaw>=0){ironhaulPolygon([[-29,-14],[0,-7],[29,-14],[24,8],[0,16],[-26,7]],silver?'#eff9ff':'#a75943');
+        for(const side of [-1,1])ironhaulPolygon([[side*3,-6],[side*25,-11],[side*23,3],[side*3,9]],'#14384a',hi);
+        ctx.fillStyle=energy;ctx.beginPath();ctx.arc(0,16,silver?6:4,0,7);ctx.fill();
+    }else{ctx.fillStyle=dark;ctx.fillRect(-22,-15,44,37);ctx.fillStyle=hi;for(let y=-9;y<20;y+=8)ctx.fillRect(-17,y,34,3);}
     ctx.restore();
-    if(b.pose==='dash'||!b.grounded){ctx.fillStyle=energy;for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(side*40,-108);ctx.lineTo(side*41-20,-97);ctx.lineTo(side*40-50-Math.sin(frames*2)*14,-99);ctx.closePath();ctx.fill();}}
+    leg(r.legs[1]);
+    for(const arm of [r.off,r.sword]){ctx.save();ctx.translate(arm.root.x,arm.root.y);ctx.rotate(Math.atan2(arm.joint.y-arm.root.y,arm.joint.x-arm.root.x)*.2);ironhaulPolygon([[-14,-15],[13,-16],[18,-2],[11,16],[-16,12]],col);ctx.fillStyle=hi;ctx.fillRect(-12,-14,24,4);ironhaulWheel(0,0,10,0);ctx.restore();}
+    ctx.strokeStyle=hi;ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(r.chest.x,r.chest.y-19);ctx.lineTo(r.neck.x,r.neck.y);ctx.lineTo(r.head.x,r.head.y+4);ctx.stroke();
+    ironhaulJoint(r.neck,6,hi);ctx.save();ctx.translate(r.head.x,r.head.y);ctx.rotate(-r.lean*.4);ctx.scale(Math.max(.35,r.width),1);
+    ironhaulPolygon([[-15,-12],[-8,-21],[10,-21],[18,-9],[12,9],[-12,9]],col);ctx.fillStyle=dark;ctx.fillRect(-13,-8,28,8);if(r.yaw>=0){ctx.fillStyle=energy;ctx.fillRect(-10,-7,22,3);}else{ctx.fillStyle=hi;for(let x=-9;x<=9;x+=6)ctx.fillRect(x,-8,2,12);}ctx.fillStyle=hi;ctx.fillRect(-7,3,15,4);ctx.restore();
+    limb(r.sword,'sword');if(!r.offBehind)limb(r.off,silver?'shield':'gun');
+    if(b.pose==='dash'||!b.grounded){ctx.fillStyle=energy;for(const side of [-1,1]){const p=r.chest;ironhaulPolygon([[p.x+side*34,p.y+5],[p.x+side*34-18,p.y+17],[p.x+side*34-48-Math.sin(frames*2)*8,p.y+12]],energy,null);}}
     ctx.restore();
 }
 // BOSS_PART_END s1.ironhaulRobot.1
 
-// Nguồn: index.html:34368 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34506 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulRound.1 EDITABLE
 function ironhaulRound(b,x,y,vx,vy,kind='bullet',targetX=null){
     const p=new BossProjectile(x,y,vx,vy,false,1);p._ironhaulOwner=b;p.ihKind=kind;p.age=0;p.color=b.silver?'#b4f7ff':'#ffc788';p.frail=kind==='bullet';
     p.w=kind==='shell'?18:kind==='shield'?48:kind==='wave'?34:12;p.h=kind==='shell'?18:kind==='shield'?48:kind==='wave'?40:7;
+    if(kind==='shield'){p.x-=24;p.y-=24;}
     p.update=function(){
         this.age++;const ox=this.x;
         if(this.ihKind==='shell')this.vy+=.22;
         if(this.ihKind==='shield'){
-            if(this.age>25){const dx=b.cx()-this.x,dy=b.cy()-this.y,L=Math.hypot(dx,dy)||1;this.vx=dx/L*11;this.vy=dy/L*11;if(L<22)this.x=worldR()+9999;}
+            if(this.age>25){const hand=ironhaulWeapons(b).shield,dx=hand.x-this.x-this.w/2,dy=hand.y-this.y-this.h/2,L=Math.hypot(dx,dy)||1;this.vx=dx/L*11;this.vy=dy/L*11;if(L<22){this.x=worldR()+9999;b.shieldOut=0;}}
             else this.vy=Math.sin(this.age*.13)*.7;
         }
         this.x+=this.vx;this.y+=this.vy;
@@ -268,7 +457,7 @@ function ironhaulRound(b,x,y,vx,vy,kind='bullet',targetX=null){
 }
 // BOSS_PART_END s1.ironhaulRound.1
 
-// Nguồn: index.html:34398 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34537 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.IronhaulBoss.1 EDITABLE
 class IronhaulBoss{
     static setupArena(){setupIronhaulArena();}
@@ -280,7 +469,7 @@ class IronhaulBoss{
         Object.defineProperty(this,'hp',{enumerable:true,configurable:true,get:()=>this._hp,set:v=>this.setHealth(v)});
         this.state='entering';this.subTimer=0;this.actionTimer=45;this.facingLeft=true;this.invulnAll=true;this.burnTimer=0;
         this.pose='idle';this.vehicle=true;this.parryCd=0;this.parryLock=0;this.shieldOut=0;this.muzzle=0;
-        this.slash=null;this.hitKeys=new Set();this.reticles=[];this.ghosts=[];this.lastAttack='';this.driveDir=-1;this.ram=null;
+        this.slash=null;this.shieldStrike=null;this.gait=0;this.animSpeed=0;this.animAt=-1000;this.hitKeys=new Set();this.reticles=[];this.ghosts=[];this.lastAttack='';this.driveDir=-1;this.ram=null;
     }
     cx(){return this.x+this.w/2;}
     cy(){return this.y+this.h/2;}
@@ -298,11 +487,13 @@ class IronhaulBoss{
         this._hp=Math.max(0,v);
     }
     resizeVehicle(vehicle){
+        if(vehicle&&this.silver)return false;
         const cx=this.cx(),feet=this.y+this.h;this.vehicle=vehicle;this.w=vehicle?286:104;this.h=vehicle?104:180;
         this.x=Math.max(8,Math.min(canvas.width-this.w-8,cx-this.w/2));this.y=feet-this.h;this.baseY=320-this.h;
     }
     clearAttack(){
-        this.slash=null;this.hitKeys.clear();this.ram=null;this.pose='idle';this.dy=0;this.shieldOut=0;this.reticles=[];this.landT=0;
+        if(!this.vehicle&&(this.slash||this.shieldStrike))this.followPose={at:frames,targets:ironhaulRig(this).targets,duration:12};
+        this.slash=null;this.shieldStrike=null;this.hitKeys.clear();this.ram=null;this.pose='idle';this.dy=0;this.shieldOut=0;this.reticles=[];this.landT=0;
         const c=this._dswControl;if(c?.release)c.release();
     }
     startPhase2(){
@@ -330,18 +521,20 @@ class IronhaulBoss{
         this.clearAttack();if(this.phase===2&&this.vehicle)this.resizeVehicle(false);
         this.state='idle';this.subTimer=0;this.actionTimer=wait;this.invulnAll=false;
     }
-    legalMoves(){return this.phase===1?['ih_ram','ih_cannon','ih_gatling']:this.silver?['ih_advance','ih_silvercombo','ih_aegis','ih_parry','ih_cross','ih_morph']:['ih_advance','ih_combo','ih_gunblade','ih_upper','ih_barrage','ih_skyfall','ih_morph'];}
+    legalMoves(){return this.phase===1?['ih_ram','ih_cannon','ih_gatling']:this.silver?['ih_advance','ih_silvercombo','ih_aegis','ih_parry','ih_cross','ih_shieldrush','ih_reversal']:['ih_advance','ih_combo','ih_gunblade','ih_upper','ih_barrage','ih_skyfall','ih_morph','ih_cleaver','ih_flank'];}
     chooseAttack(){
         this.faceP();const gap=Math.abs(dino.x+dino.w/2-this.cx());let pool;
         if(this.phase===1)pool=this.legalMoves();
-        else if(this.silver){pool=gap>260?['ih_advance','ih_aegis','ih_morph']:['ih_silvercombo','ih_cross','ih_aegis','ih_parry'];if(this.parryCd>0)pool=pool.filter(x=>x!=='ih_parry');}
-        else pool=gap>290?['ih_advance','ih_morph','ih_advance','ih_barrage']:!dino.grounded?['ih_upper','ih_gunblade','ih_skyfall']:['ih_combo','ih_advance','ih_gunblade','ih_upper','ih_skyfall'];
+        else if(this.silver){pool=gap>260?['ih_shieldrush','ih_advance','ih_aegis']:['ih_silvercombo','ih_cross','ih_reversal','ih_shieldrush','ih_aegis','ih_parry'];if(this.parryCd>0)pool=pool.filter(x=>x!=='ih_parry');}
+        else pool=gap>290?['ih_advance','ih_morph','ih_flank','ih_barrage']:!dino.grounded?['ih_upper','ih_gunblade','ih_skyfall','ih_flank']:['ih_combo','ih_advance','ih_cleaver','ih_gunblade','ih_upper','ih_flank'];
+        if(gap>420)pool=pool.filter(x=>x!=='ih_flank');
         const next=pool.filter(x=>x!==this.lastAttack);this.begin(next[Math.floor(Math.random()*next.length)]||pool[0]);
     }
     begin(state){
         if(!this.legalMoves().includes(state)&&state!=='ih_riposte')return false;
         this.clearAttack();this.state=state;this.lastAttack=state;this.subTimer=0;this.faceP();this.attackDir=this.dir();
         this.lockX=Math.max(70,Math.min(canvas.width-70,dino.x+dino.w/2));this.lockY=dino.y+dino.h/2;
+        if(state==='ih_flank')this.flankTo=Math.max(8,Math.min(canvas.width-this.w-8,this.lockX+this.attackDir*85-this.w/2));
         if(state==='ih_parry')this.parryCd=300;
         if(state==='ih_ram')this.ram={leg:0,stage:'warn',t:0,dir:this.ramDirection(),hit:false};
         return true;
@@ -352,7 +545,7 @@ class IronhaulBoss{
         if(!this.silver||this.state!=='ih_parry'||this.subTimer<26||this.subTimer>34)return false;
         const source=context?.proj,px=source?source.x+(source.w||8)/2:dino.x+dino.w/2;
         if((px-this.cx())*this.dir()<-8)return false;
-        this._damageChecked=false;this.state='ih_riposte';this.subTimer=0;this.slash=null;this.hitKeys.clear();this.parryLock=8;this.invulnAll=true;
+        this._damageChecked=false;this.state='ih_riposte';this.subTimer=0;this.slash=this.shieldStrike=null;this.hitKeys.clear();this.parryLock=8;this.invulnAll=true;
         visualEffects.push(new Effect(this.cx()+this.dir()*45,this.cy(),'parry'));floatingTexts.push(new FloatingText(this.cx()-40,this.y-24,'PARRY!'));
         shakeTimer=Math.max(shakeTimer,7);return true;
     }
@@ -373,21 +566,41 @@ class IronhaulBoss{
         const angles=kind==='rise'?[1.25,-1.9]:kind==='thrust'?[-.12,.08]:[-2.2,1.25];
         this.slash={age:0,life,kind,reach,dir:this.attackDir,a0:angles[0],a1:angles[1],angle:angles[0],hit:false};
         this.pose=kind==='thrust'?'thrust':kind==='rise'?'overhead':'cut';
+        this.slash.previous=ironhaulWeapons(this);
         SFX.tone(400,.08,'sawtooth',.06,130);
     }
     tickSlash(){
         const s=this.slash;if(!s)return;
-        const prev=s.angle;s.angle=s.a0+(s.a1-s.a0)*Math.min(1,++s.age/s.life);
-        const x=this.cx()+s.dir*(s.kind==='thrust'?66:51),y=this.y+this.h-(s.kind==='rise'?135:90);
+        const prev=s.previous||ironhaulWeapons(this);
+        s.angle=s.a0+(s.a1-s.a0)*ironhaulEase(Math.min(1,++s.age/s.life));
+        const next=ironhaulWeapons(this);
         if(!s.hit)for(let k=0;k<=8;k++){
-            const a=prev+(s.angle-prev)*k/8;
-            if(sgSegmentBox(x,y,x+s.dir*Math.cos(a)*s.reach,y+Math.sin(a)*s.reach,dino,12)!==null){s.hit=true;this.hurtBox({x:dino.x,y:dino.y,w:dino.w,h:dino.h},'sword:'+this.subTimer);break;}
+            const u=k/8,x=ironhaulMix(prev.grip.x,next.grip.x,u),y=ironhaulMix(prev.grip.y,next.grip.y,u),tx=ironhaulMix(prev.tip.x,next.tip.x,u),ty=ironhaulMix(prev.tip.y,next.tip.y,u);
+            if(sgSegmentBox(x,y,tx,ty,dino,11)!==null){s.hit=true;this.hurtBox({x:dino.x,y:dino.y,w:dino.w,h:dino.h},'sword:'+this.subTimer);break;}
         }
-        if(s.age>=s.life)this.slash=null;
+        s.previous=next;if(s.age>=s.life){this.followPose={at:frames,targets:next.rig.targets,duration:12};this.slash=null;}
+    }
+    shieldSwing(kind='bash',life=18){
+        if(!this.silver||this.shieldOut>0)return false;
+        this.shieldStrike={kind,age:0,life,hit:false};this.pose='shield';
+        this.shieldStrike.previous=ironhaulWeapons(this);
+        SFX.tone(210,.11,'sawtooth',.08,75);return true;
+    }
+    tickShield(){
+        const q=this.shieldStrike;if(!q)return;
+        const old=q.previous||ironhaulWeapons(this);q.age++;
+        const next=ironhaulWeapons(this),active=q.age>=Math.ceil(q.life*.2)&&q.age<=Math.ceil(q.life*.9);
+        if(!q.hit&&active&&(checkAABB(next.shieldBox,dino)||sgSegmentBox(old.shield.x,old.shield.y,next.shield.x,next.shield.y,dino,23)!==null)){
+            q.hit=true;this.hurtBox({x:dino.x,y:dino.y,w:dino.w,h:dino.h},'shield:'+this.subTimer);
+        }
+        q.previous=next;if(q.age>=q.life){this.followPose={at:frames,targets:next.rig.targets,duration:12};this.shieldStrike=null;}
     }
     shoot(count=1,spread=.08){
-        const x=this.cx()+this.attackDir*(this.vehicle?78:95),y=this.vehicle?this.y+this.h-111:this.cy()-7,angle=Math.atan2(this.lockY-y,this.lockX-x);
-        if(!this.vehicle)this.pose='gun';
+        let x,y,angle;
+        if(this.vehicle){x=this.cx()+this.attackDir*78;y=this.y+this.h-111;angle=Math.atan2(this.lockY-y,this.lockX-x);}
+        else{
+            this.pose='gun';const g=ironhaulWeapons(this);x=g.gun.x;y=g.gun.y;angle=g.gunAngle;
+        }
         for(let i=0;i<count;i++){
             const a=angle+(i-(count-1)/2)*spread;
             ironhaulRound(this,x,y,Math.cos(a)*8,Math.sin(a)*8);
@@ -396,10 +609,11 @@ class IronhaulBoss{
     }
     move(dx){
         const old=this.x;this.x=Math.max(8,Math.min(canvas.width-this.w-8,this.x+dx));
+        this.animSpeed=this.x-old;this.animAt=frames;this.gait+=Math.abs(this.animSpeed)*.065;
         if(Math.abs(dx)>7&&frames%4===0){
             const g=Object.create(IronhaulBoss.prototype);
             for(const k of ['y','w','h','facingLeft','pose','silver','state','subTimer','shieldOut','grounded','vehicle','driveDir'])g[k]=this[k];
-            Object.assign(g,{x:old,t:12,slash:null,muzzle:0});this.ghosts.push(g);
+            Object.assign(g,{x:old,t:12,slash:this.slash?{...this.slash}:null,muzzle:0,rigPose:ironhaulRig(this)});this.ghosts.push(g);
         }
     }
     physics(){
@@ -425,6 +639,7 @@ class IronhaulBoss{
     update(){
         if(this.dying)return;
         this.combatTick();if(this.hp<=0)return;
+        if(this.silver&&(this.vehicle||['ih_morph','ih_unfold','ih_ram'].includes(this.state))){this.resizeVehicle(false);this.idle(45);}
         for(const g of this.ghosts)g.t--;this.ghosts=this.ghosts.filter(g=>g.t>0).slice(-8);
         for(const r of this.reticles)r.t--;this.reticles=this.reticles.filter(r=>r.t>0);
         if(this.parryCd>0)this.parryCd--;if(this.shieldOut>0)this.shieldOut--;if(this.muzzle>0)this.muzzle--;
@@ -436,8 +651,10 @@ class IronhaulBoss{
             if(t>=100)this.idle(48);return;
         }
         if(st==='ih_silver'){if(t===46)visualEffects.push(new Effect(this.cx(),this.cy(),'body_slam_shockwave',true,110));if(t>=100)this.idle(48);return;}
-        this.physics();this.tickSlash();
-        if(this.phase===2&&t<=23&&['ih_combo','ih_upper','ih_skyfall','ih_silvercombo','ih_cross'].includes(st))this.pose='overhead';
+        this.physics();this.tickSlash();this.tickShield();
+        for(const beat of ironhaulSwordBeats(this))if(t===beat[0])this.swing(beat[1],beat[2],beat[3]);
+        for(const beat of IRONHAUL_SHIELD_BEATS[st]||[])if(t===beat[0])this.shieldSwing(beat[1],beat[2]);
+        if(this.phase===2&&t<=23&&['ih_combo','ih_upper','ih_skyfall','ih_cleaver','ih_silvercombo','ih_cross'].includes(st))this.pose='overhead';
         if(['returning','returning_place','stunned','vulnerable'].includes(st)){if(t>45||--this.actionTimer<=0)this.idle(45);return;}
         if(st==='idle'){
             this.faceP();if(this.phase===2){const gap=dino.x+dino.w/2-this.cx();if(Math.abs(gap)>155)this.move(Math.sign(gap)*2.1);}
@@ -460,20 +677,16 @@ class IronhaulBoss{
             if(t>=36&&t<=113&&(t-36)%7===0)this.shoot();
         }else if(st==='ih_advance'){
             if(t>=25&&t<45){this.pose='dash';if(Math.abs(dino.x+dino.w/2-this.cx())>110)this.move(this.attackDir*10);}
-            if(t===52||t===78)this.swing(t===52?'cut':'rise');
         }else if(st==='ih_combo'){
-            if([26,54,86].includes(t)){this.move(this.attackDir*16);this.swing(t===54?'rise':t===86?'thrust':'cut');}
+            if([26,54,86].includes(t))this.move(this.attackDir*16);
         }else if(st==='ih_gunblade'){
             if(t===20){this.dy=-8;this.pose='dash';}
             if(t>=20&&t<45)this.move(-this.attackDir*3.6);
             if([30,40,50].includes(t))this.shoot();
             if(t>=58&&t<74)this.move(this.attackDir*6);
-            if(t===82)this.swing('cut',125);
         }else if(st==='ih_upper'){
-            if(t===30){this.swing('rise',120);this.dy=-10;}
+            if(t===30)this.dy=-10;
             if(t>=30&&t<48)this.move(this.attackDir*2.8);
-            if(t===54)this.swing('cut',120);
-            if(t===83)this.swing('cut',125);
         }else if(st==='ih_barrage'){
             if(t===20){this.lockX=dino.x+dino.w/2;this.lockY=dino.y+dino.h/2;}
             if([30,38,46,66,74,82].includes(t))this.shoot(1);
@@ -488,22 +701,30 @@ class IronhaulBoss{
                 for(const dir of [-1,1])ironhaulRound(this,this.cx(),280,dir*5,0,'wave');
             }
             if(this.landT&&t>this.landT+38){this.landT=0;this.idle(35);return;}
+        }else if(st==='ih_cleaver'){
+            if(t>=68&&t<82)this.move(this.attackDir*3.5);
+            if(t===115||t===125)this.shoot();
+        }else if(st==='ih_flank'){
+            if(t===20){this.dy=-11;this.pose='dash';}
+            if(t>=21&&t<51)this.move(Math.max(-16,Math.min(16,(this.flankTo-this.x)/Math.max(1,51-t))));
+            if(t===53){this.faceP();this.attackDir=this.dir();}
         }else if(st==='ih_silvercombo'){
-            if(t===24||t===79)this.swing(t===24?'cut':'rise',120);
-            if(t>=44&&t<=52){this.pose='shield';this.move(this.attackDir*3.2);this.hurtBox({x:this.cx()+this.attackDir*48-(this.attackDir<0?65:0),y:this.y+60,w:65,h:105},'shield-bash');}
-            if(t===108){this.pose='shield';ironhaulRound(this,this.cx()+this.attackDir*60,279,this.attackDir*6.4,0,'wave');}
+            if(t>=52&&t<69)this.move(this.attackDir*1.6);
+            if(t>=127&&t<137)this.move(this.attackDir*3.2);
         }else if(st==='ih_aegis'){
-            if(t===30){ironhaulRound(this,this.cx()+this.attackDir*35,this.cy()-8,this.attackDir*9,0,'shield');this.shieldOut=70;}
+            if(t===30){const g=ironhaulWeapons(this);ironhaulRound(this,g.shield.x,g.shield.y,this.attackDir*9,0,'shield');this.followPose={at:frames,targets:g.rig.targets,duration:14};this.shieldOut=70;}
             if(t>=56&&t<69)this.move(this.attackDir*5);
-            if(t===70)this.swing('thrust',132);
         }else if(st==='ih_parry'){
             this.pose='shield';
         }else if(st==='ih_riposte'){
-            if(t>=28&&t<37){this.pose='shield';this.move(this.attackDir*5);this.hurtBox({x:this.cx()+this.attackDir*45-(this.attackDir<0?80:0),y:this.y+58,w:80,h:108},'riposte-shield');}
-            if(t===59)this.swing('cut',135);
+            if(t>=29&&t<39)this.move(this.attackDir*4);
         }else if(st==='ih_cross'){
-            if(t===30){this.pose='shield';for(const dir of [-1,1])ironhaulRound(this,this.cx(),279,dir*5.2,0,'wave');}
-            if(t===64||t===91){this.move(this.attackDir*20);this.swing(t===64?'rise':'cut',126);}
+            if(t===46){for(const dir of [-1,1])ironhaulRound(this,this.cx(),279,dir*5.2,0,'wave');shakeTimer=Math.max(shakeTimer,7);}
+            if(t===72||t===106)this.move(this.attackDir*18);
+        }else if(st==='ih_shieldrush'){
+            if(t>=21&&t<45){this.pose='shield';if(Math.abs(dino.x+dino.w/2-this.cx())>75)this.move(this.attackDir*6);}
+        }else if(st==='ih_reversal'){
+            if(t>=33&&t<50)this.move(this.attackDir*1.4);
         }else{this.idle(45);return;}
         if(t>=(IRONHAUL_MOVES[st]?.end||150))this.idle(st==='ih_parry'?55:42);
     }
@@ -527,10 +748,13 @@ class IronhaulBoss{
             for(let i=0;i<8;i++){const a=i*Math.PI/4+t*.04,R=20+t*1.5;ctx.beginPath();ctx.moveTo(this.cx()+Math.cos(a)*R,this.cy()+Math.sin(a)*R);ctx.lineTo(this.cx()+Math.cos(a)*(R+22),this.cy()+Math.sin(a)*(R+22));ctx.stroke();}
         }
         if(this.slash){
-            const s=this.slash,x=this.cx()+s.dir*51,y=this.y+this.h-(s.kind==='rise'?135:90);
-            ctx.save();ctx.translate(x,y);ctx.scale(s.dir,1);ctx.strokeStyle=this.silver?'#bdfaff':'#ffc987';ctx.lineWidth=9;ctx.globalAlpha=.45;
-            const old=s.angle-(s.a1-s.a0)*.22;
-            ctx.beginPath();ctx.arc(0,0,s.reach*.78,Math.min(old,s.angle),Math.max(old,s.angle));ctx.stroke();ctx.globalAlpha=.9;ctx.lineWidth=2;ctx.stroke();ctx.restore();
+            const s=this.slash,g=ironhaulWeapons(this),prev=s.previous;
+            if(prev){ctx.strokeStyle=this.silver?'#c7faff':'#ffcf96';ctx.lineWidth=3;ctx.globalAlpha=.65;ctx.beginPath();ctx.moveTo(g.grip.x,g.grip.y);ctx.lineTo(g.tip.x,g.tip.y);ctx.stroke();ctx.globalAlpha=1;}
+        }
+        if(this.shieldStrike){
+            const g=ironhaulWeapons(this),q=this.shieldStrike;
+            ctx.save();ctx.globalAlpha=.18;ctx.strokeStyle='#bdfaff';ctx.lineWidth=4;
+            ctx.beginPath();g.shieldPoints.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.stroke();ctx.restore();
         }
         const wind=this.ram?.stage==='warn'||this.state==='ih_parry'&&this.subTimer<=34;
         if(wind){ctx.strokeStyle=this.state==='ih_parry'?'#bdfaff':'#ffbc6e';ctx.lineWidth=3;ctx.beginPath();ctx.arc(this.cx()+this.dir()*(this.vehicle?123:52),this.cy(),this.state==='ih_parry'?29:19,0,7);ctx.stroke();}
@@ -542,17 +766,17 @@ class IronhaulBoss{
 }
 // BOSS_PART_END s1.IronhaulBoss.1
 
-// Nguồn: index.html:34717 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34891 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.lavaGeysers.1 READ_ONLY
 let lavaGeysers = [];
 // BOSS_PART_END s1.lavaGeysers.1
 
-// Nguồn: index.html:34718 · Dùng bởi: IndominusBoss, IronhaulBoss
+// Nguồn: index.html:34892 · Dùng bởi: IndominusBoss, IronhaulBoss
 // BOSS_PART_BEGIN s1.grassField.1 READ_ONLY
 let grassField = [];
 // BOSS_PART_END s1.grassField.1
 
-// Nguồn: index.html:34719 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34893 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.forestScene.1 READ_ONLY
 let forestScene = null;
 // BOSS_PART_END s1.forestScene.1

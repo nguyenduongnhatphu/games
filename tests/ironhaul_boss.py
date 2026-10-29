@@ -48,14 +48,15 @@ with sync_playwright() as p:
                     shots+=Math.max(0,bossProjectiles.length-lastN);lastN=bossProjectiles.length;
                     if(b.state==='idle'){returned=true;break;}
                 }
-                check(returned,stage+' '+move+' never recovers');check(!b.slash&&!b.ram,'stale hitboxes '+move);
+                check(returned,stage+' '+move+' never recovers');check(!b.slash&&!b.shieldStrike&&!b.ram,'stale hitboxes '+move);
                 check(stage===1?b.vehicle:!b.vehicle,'wrong final form '+move);
                 if(move==='ih_ram'||move==='ih_morph')check(flipped&&vehicle,'missing two vehicle passes '+move);
+                if(stage===3)check(!vehicle&&!b.legalMoves().includes('ih_morph'),'silver turns into truck');
                 if(['ih_cannon','ih_gatling','ih_barrage','ih_aegis'].includes(move))check(shots>0,'no projectiles '+move);
                 results.push([stage,left,move]);
             }
         }
-        for(const stage of [1,2,3])for(const side of [-1,1]){
+        for(const stage of [1,2])for(const side of [-1,1]){
             const b=ihSetup(stage);b.x=side<0?8:canvas.width-b.w-8;dino.x=side<0?0:canvas.width-dino.w;
             b.begin(stage===1?'ih_ram':'ih_morph');const distance=[0,0];
             for(let i=0;i<430&&b.state!=='idle';i++){
