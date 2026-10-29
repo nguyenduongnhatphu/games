@@ -1,5 +1,5 @@
 // BOSS_FILE: DanteBoss
-// BOSS_SNAPSHOT: c46ab032a6cbf762cde49e8ab251e6d69cdda9d15fe744f89765bcb84b9046a7
+// BOSS_SNAPSHOT: 9124d003c3ce72e4e4fcae863db4e13cdfe06607527a4558945ab0774010859b
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -1722,17 +1722,17 @@ Object.assign(DanteBoss.prototype, {
         });
 // BOSS_PART_END s0.Object.assign.DanteBoss.prototype.1
 
-// Nguồn: index.html:24178 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GaelBoss, GiantSpiderBoss, GreatSerpentBoss, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PoisonMothBoss, PontiffBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, VoltCloneBoss, WarBoss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:24461 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GaelBoss, GiantSpiderBoss, GreatSerpentBoss, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PoisonMothBoss, PontiffBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, VoltCloneBoss, WarBoss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s0._tbbKhung.1 READ_ONLY
 let _tbbKhung = -1, _tbbSo = 0;
 // BOSS_PART_END s0._tbbKhung.1
 
-// Nguồn: index.html:24189 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GaelBoss, GiantSpiderBoss, GreatSerpentBoss, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PoisonMothBoss, PontiffBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, VoltCloneBoss, WarBoss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:24472 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GaelBoss, GiantSpiderBoss, GreatSerpentBoss, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PoisonMothBoss, PontiffBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, VoltCloneBoss, WarBoss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s0._tbbDaVe.1 READ_ONLY
 let _tbbDaVe = new Set(), _tbbDaVeKhung = -1;
 // BOSS_PART_END s0._tbbDaVe.1
 
-// Nguồn: index.html:24206 · Dùng bởi: ArtoriasBoss, CorruptionBoss, DanteBoss, DeathBoss, GaelBoss, HelicoprionBoss, HoGacBoss, MegaManXBoss, MegalodonBoss, NeroBoss, OctopusBoss, PontiffBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, WarBoss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:24489 · Dùng bởi: ArtoriasBoss, CorruptionBoss, DanteBoss, DeathBoss, GaelBoss, HelicoprionBoss, HoGacBoss, MegaManXBoss, MegalodonBoss, NeroBoss, OctopusBoss, PontiffBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, WarBoss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s0.drawTopBossBar.1 READ_ONLY
 function drawTopBossBar(b, col, label, sub, hang){
             /* Khong truyen `hang` (boss TU ve thanh mau) ma trong cung mot khung co hai con
@@ -1770,7 +1770,7 @@ function drawTopBossBar(b, col, label, sub, hang){
         }
 // BOSS_PART_END s0.drawTopBossBar.1
 
-// Nguồn: index.html:24689 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:24972 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s0.drawSinVergil.1 READ_ONLY
 function drawSinVergil(b, x, y){
             let dr = b.facingLeft ? -1 : 1, W = 64, H = 86, cxb = x + W/2;
@@ -1923,12 +1923,12 @@ function drawSinVergil(b, x, y){
         }
 // BOSS_PART_END s0.drawSinVergil.1
 
-// Nguồn: index.html:24843 · Dùng bởi: DanteBoss
+// Nguồn: index.html:25126 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s0.DT_W.1 READ_ONLY
 const DT_W = 40, DT_H = 60;
 // BOSS_PART_END s0.DT_W.1
 
-// Nguồn: index.html:24844 · Dùng bởi: DanteBoss
+// Nguồn: index.html:25127 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s0.DT_ARMS.1 READ_ONLY
 const DT_ARMS = [
             { n: 'DEVIL SWORD DANTE', c: '#E53935', d: '#7F0000' },
@@ -1940,12 +1940,12 @@ const DT_ARMS = [
         ];
 // BOSS_PART_END s0.DT_ARMS.1
 
-// Nguồn: index.html:24852 · Dùng bởi: DanteBoss
+// Nguồn: index.html:25135 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s0.DT_SWITCH.1 READ_ONLY
 const DT_SWITCH = 460;
 // BOSS_PART_END s0.DT_SWITCH.1
 
-// Nguồn: index.html:24855 · Dùng bởi: DanteBoss
+// Nguồn: index.html:25138 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s0.DT_ARM_OF.1 EDITABLE
 const DT_ARM_OF = {
             d_stinger:0, d_launch:0, d_million:0, d_shred:0, d_helm:0, d_round:0, d_dash:0, d_back:0, d_drive:0, d_bike:2,
@@ -1958,7 +1958,7 @@ const DT_ARM_OF = {
         };
 // BOSS_PART_END s0.DT_ARM_OF.1
 
-// Nguồn: index.html:24866 · Dùng bởi: DanteBoss
+// Nguồn: index.html:25149 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s0.DT_COMBO_KHONG.1 EDITABLE
 const DT_COMBO_KHONG = [
             ['d_hightime','d_gun'],
@@ -1971,7 +1971,7 @@ const DT_COMBO_KHONG = [
         ];
 // BOSS_PART_END s0.DT_COMBO_KHONG.1
 
-// Nguồn: index.html:24877 · Dùng bởi: DanteBoss
+// Nguồn: index.html:25160 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s0.DT_COMBO_GAN.1 EDITABLE
 const DT_COMBO_GAN = [
             // @@HE-DANTE-DMC — combo REBELLION/DSD + Style Switch
@@ -2008,7 +2008,7 @@ const DT_COMBO_GAN = [
         ];
 // BOSS_PART_END s0.DT_COMBO_GAN.1
 
-// Nguồn: index.html:24912 · Dùng bởi: DanteBoss
+// Nguồn: index.html:25195 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s0.DT_COMBO_XA.1 EDITABLE
 const DT_COMBO_XA = [
             ['g_ei','g_coyote'],
@@ -2034,28 +2034,28 @@ const DT_COMBO_XA = [
         ];
 // BOSS_PART_END s0.DT_COMBO_XA.1
 
-// Nguồn: index.html:24935 · Dùng bởi: DanteBoss
+// Nguồn: index.html:25218 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s0.DT_STANCE.1 EDITABLE
 const DT_STANCE = ['d_jab','d_trick','d_phantom'];
 // BOSS_PART_END s0.DT_STANCE.1
 
-// Nguồn: index.html:24937 · Dùng bởi: DanteBoss
+// Nguồn: index.html:25220 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s0.DT_TIEPCAN.1 EDITABLE
 const DT_TIEPCAN = ['d_bike','d_dash','d_stinger','b_rush','k_revolver'];
 // BOSS_PART_END s0.DT_TIEPCAN.1
 
-// Nguồn: index.html:24938 · Dùng bởi: DanteBoss
+// Nguồn: index.html:25221 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s0.DT_CAN.1 EDITABLE
 const DT_CAN     = ['d_million','d_shred','d_round','b_kick','b_ignite','b_realimpact',
                             'c_charge','c_wheel','k_ice','k_bolt','k_fire','k_revolver','d_jab','d_comboA'];
 // BOSS_PART_END s0.DT_CAN.1
 
-// Nguồn: index.html:24940 · Dùng bởi: DanteBoss
+// Nguồn: index.html:25223 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s0.DT_XA.1 EDITABLE
 const DT_XA      = ['g_ei','g_coyote','g_rain','g_twosome','f_hat','f_orb','f_redhot','d_drive'];
 // BOSS_PART_END s0.DT_XA.1
 
-// Nguồn: index.html:25015 · Dùng bởi: DanteBoss
+// Nguồn: index.html:25298 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s0.drawDanteBody.1 EDITABLE
 function drawDanteBody(b, x, y){
             let dr = b.facingLeft ? -1 : 1, cxb = x + DT_W/2;
@@ -2341,7 +2341,7 @@ function drawDanteBody(b, x, y){
         }
 // BOSS_PART_END s0.drawDanteBody.1
 
-// Nguồn: index.html:25299 · Dùng bởi: DanteBoss
+// Nguồn: index.html:25582 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s0.drawDtOverlay.1 EDITABLE
 function drawDtOverlay(b, x, y){
             let dr = b.facingLeft ? -1 : 1, W = 52, H = 76, cxb = x + W/2;
@@ -2392,7 +2392,7 @@ function drawDtOverlay(b, x, y){
         }
 // BOSS_PART_END s0.drawDtOverlay.1
 
-// Nguồn: index.html:25348 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:25631 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s0.drawSdtDante.1 READ_ONLY
 function drawSdtDante(b, x, y){
             if (b._sdtDrill?.phase === 'dash') { danteDrawSinDrill(x + 33, y + 44, b._sdtDrill.dir, b._sdtDrill.age); return; }
@@ -2547,7 +2547,7 @@ function drawSdtDante(b, x, y){
         }
 // BOSS_PART_END s0.drawSdtDante.1
 
-// Nguồn: index.html:34405 · Dùng bởi: DanteBoss
+// Nguồn: index.html:34688 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s1.resolveSolidPillars.1 READ_ONLY
 function resolveSolidPillars(ent) {
             if (mapTheme !== 'volcano' && mapTheme !== 'tetris') return;
@@ -2564,7 +2564,7 @@ function resolveSolidPillars(ent) {
         }
 // BOSS_PART_END s1.resolveSolidPillars.1
 
-// Nguồn: index.html:34419 · Dùng bởi: DanteBoss
+// Nguồn: index.html:34702 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s1.resolveTetrisWalls.1 READ_ONLY
 function resolveTetrisWalls(ent, dx){
             if (mapTheme !== 'tetris' || !tetris) return; let T=tetris;
@@ -2577,17 +2577,17 @@ function resolveTetrisWalls(ent, dx){
         }
 // BOSS_PART_END s1.resolveTetrisWalls.1
 
-// Nguồn: index.html:34430 · Dùng bởi: DanteBoss, TetrisBoss
+// Nguồn: index.html:34713 · Dùng bởi: DanteBoss, TetrisBoss
 // BOSS_PART_BEGIN s1.tetris.1 READ_ONLY
 let tetris = null, tetrisCamY = 0;
 // BOSS_PART_END s1.tetris.1
 
-// Nguồn: index.html:97370 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:97653 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.SDTU_DON.1 READ_ONLY
 const SDTU_DON = 70, SDTU_TUNG = 340, SDTU_CAN = 70, SDTU_YEU = 380;
 // BOSS_PART_END s6.SDTU_DON.1
 
-// Nguồn: index.html:97371 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:97654 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.SDT_ULT.1 READ_ONLY
 const SDT_ULT = {
             sdtUltNen(){ return !this.sdtUltXong && this.hp <= this.maxHp * 0.25; },
@@ -3149,7 +3149,7 @@ const SDT_ULT = {
         };
 // BOSS_PART_END s6.SDT_ULT.1
 
-// Nguồn: index.html:97929 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:98212 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.capSdtUlt.1 READ_ONLY
 (function capSdtUlt(){
             for (const C of [typeof VergilBoss !== 'undefined' ? VergilBoss : null,
@@ -3160,7 +3160,7 @@ const SDT_ULT = {
         })();
 // BOSS_PART_END s6.capSdtUlt.1
 
-// Nguồn: index.html:98512 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:98795 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.BOSS_CHUNG.1 READ_ONLY
 const BOSS_CHUNG = {
             cx(){ return this.x + this.w / 2; },
@@ -3175,7 +3175,7 @@ const BOSS_CHUNG = {
         };
 // BOSS_PART_END s6.BOSS_CHUNG.1
 
-// Nguồn: index.html:98523 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:98806 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.capBoHamChung.1 READ_ONLY
 (function capBoHamChung(){
             const DS = [
@@ -3205,7 +3205,7 @@ const BOSS_CHUNG = {
         })();
 // BOSS_PART_END s6.capBoHamChung.1
 
-// Nguồn: index.html:105232 · Ngữ cảnh người chơi
+// Nguồn: index.html:105515 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s12.DSW_MOVES.1 READ_ONLY
 const DSW_MOVES={
  a1:{name:'COMBO A · DOWN',T:20,wind:4,end:13,damage:3,pose:'down',advance:5},
@@ -3240,7 +3240,7 @@ const DSW_MOVES={
 };
 // BOSS_PART_END s12.DSW_MOVES.1
 
-// Nguồn: index.html:105571 · Ngữ cảnh người chơi
+// Nguồn: index.html:105854 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s12.dswPose.1 READ_ONLY
 function dswPose(n,a,age){
  const dir=a?a.dir:(n.isFacingLeft?-1:1),m=a||{};
@@ -3355,7 +3355,7 @@ function dswPose(n,a,age){
 }
 // BOSS_PART_END s12.dswPose.1
 
-// Nguồn: index.html:105951 · Ngữ cảnh người chơi
+// Nguồn: index.html:106234 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s12.dswPaintBlade.1 READ_ONLY
 function dswPaintBlade(x,y,angle,len=78,red=false,flat=1){
  ctx.save();
@@ -3426,7 +3426,7 @@ function dswPaintBlade(x,y,angle,len=78,red=false,flat=1){
 }
 // BOSS_PART_END s12.dswPaintBlade.1
 
-// Nguồn: index.html:106029 · Ngữ cảnh người chơi
+// Nguồn: index.html:106312 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s12.dswPaintArmIK.1 READ_ONLY
 function dswPaintArmIK(sx,sy,wx,wy,dir){
  const dx=wx-sx, dy=wy-sy;
@@ -3455,7 +3455,7 @@ function dswPaintArmIK(sx,sy,wx,wy,dir){
 }
 // BOSS_PART_END s12.dswPaintArmIK.1
 
-// Nguồn: index.html:106199 · Ngữ cảnh người chơi
+// Nguồn: index.html:106482 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s12.BLR_MOVES.1 READ_ONLY
 const BLR_MOVES = {
  flydragon1:{name:'FLY DRAGON · RUSH PUNCH',T:28,wind:5,cancel:20,end:18,damage:4,pose:'magmaFin',hits:[8],heat:1,fire:true},
@@ -3500,7 +3500,7 @@ const BLR_MOVES = {
 };
 // BOSS_PART_END s12.BLR_MOVES.1
 
-// Nguồn: index.html:106775 · Ngữ cảnh người chơi
+// Nguồn: index.html:107058 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s12.blrPaintFistArm.1 READ_ONLY
 function blrPaintFistArm(sx, sy, fx, fy, dir, ignited, isPunching = false){
  const dx = fx - sx, dy = fy - sy;
@@ -3524,7 +3524,7 @@ function blrPaintFistArm(sx, sy, fx, fy, dir, ignited, isPunching = false){
 }
 // BOSS_PART_END s12.blrPaintFistArm.1
 
-// Nguồn: index.html:107075 · Ngữ cảnh người chơi
+// Nguồn: index.html:107358 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s12.CAV_MOVES.1 READ_ONLY
 const CAV_MOVES = {
  // 1. COMBO A (J -> J -> J): Nghiền cưa đa nhịp gom mục tiêu (có thể rẽ nhánh sang K bất kỳ lúc nào)
@@ -3548,7 +3548,7 @@ const CAV_MOVES = {
 };
 // BOSS_PART_END s12.CAV_MOVES.1
 
-// Nguồn: index.html:107464 · Ngữ cảnh người chơi
+// Nguồn: index.html:107747 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s12.cavPaintGiantSaw.1 READ_ONLY
 function cavPaintGiantSaw(x, y, angle, spin, dir, sparkGlow = false){
  ctx.save();
@@ -3616,7 +3616,7 @@ function cavPaintGiantSaw(x, y, angle, spin, dir, sparkGlow = false){
 }
 // BOSS_PART_END s12.cavPaintGiantSaw.1
 
-// Nguồn: index.html:107530 · Ngữ cảnh người chơi
+// Nguồn: index.html:107813 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s12.cavPaintFullBike.1 READ_ONLY
 function cavPaintFullBike(bx, by, dir, spin, tilt = 0, driftScale = 1){
  ctx.save();
@@ -3682,7 +3682,7 @@ function cavPaintFullBike(bx, by, dir, spin, tilt = 0, driftScale = 1){
 }
 // BOSS_PART_END s12.cavPaintFullBike.1
 
-// Nguồn: index.html:107692 · Ngữ cảnh người chơi
+// Nguồn: index.html:107975 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s12.KCB_MOVES.1 READ_ONLY
 const KCB_MOVES = {
  // 1. COMBO A (J -> J -> J -> J): Vụt chéo -> Quét ngang -> Chọc gậy lửa 3 phát -> Bổ đập nổ băng
@@ -3712,7 +3712,7 @@ const KCB_MOVES = {
 };
 // BOSS_PART_END s12.KCB_MOVES.1
 
-// Nguồn: index.html:108227 · Ngữ cảnh người chơi
+// Nguồn: index.html:108510 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s12.kcbPaintBoStaff.1 READ_ONLY
 function kcbPaintBoStaff(len, glowCol = '#FF6D00'){
  ctx.save();
@@ -3735,7 +3735,7 @@ function kcbPaintBoStaff(len, glowCol = '#FF6D00'){
 }
 // BOSS_PART_END s12.kcbPaintBoStaff.1
 
-// Nguồn: index.html:109226 · Ngữ cảnh người chơi
+// Nguồn: index.html:109509 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s15.danteSwordPose.1 READ_ONLY
 function danteSwordPose(n,sword,stroke=sword.stroke){
  const i=sword.i,count=sword.count;
@@ -3834,7 +3834,7 @@ function danteSwordPose(n,sword,stroke=sword.stroke){
 }
 // BOSS_PART_END s15.danteSwordPose.1
 
-// Nguồn: index.html:109451 · Ngữ cảnh người chơi
+// Nguồn: index.html:109734 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s15.danteDrawSword.1 READ_ONLY
 function danteDrawSword(sword){
  const alpha=sword.alpha;
@@ -3944,17 +3944,17 @@ function danteDrawSword(sword){
 }
 // BOSS_PART_END s15.danteDrawSword.1
 
-// Nguồn: index.html:109659 · Ngữ cảnh người chơi
+// Nguồn: index.html:109942 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s16.DANTE_SIN_DRILL.1 READ_ONLY
 const DANTE_SIN_DRILL={length:150,radius:48,rear:27,palette:{bd:'#24080c',dk:'#110507',lt:'#9a1b21',out:'#ff5722',rim:'#ffc400',eye:'#ffe0b2'}};
 // BOSS_PART_END s16.DANTE_SIN_DRILL.1
 
-// Nguồn: index.html:109660 · Ngữ cảnh người chơi
+// Nguồn: index.html:109943 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s16.danteDrawSinDrill.1 READ_ONLY
 function danteDrawSinDrill(cx,cy,dir,age){veCanhKhoan(cx,cy,dir<0?Math.PI:0,age,DANTE_SIN_DRILL.palette);}
 // BOSS_PART_END s16.danteDrawSinDrill.1
 
-// Nguồn: index.html:109661 · Ngữ cảnh người chơi
+// Nguồn: index.html:109944 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s16.danteSinDrillBox.1 READ_ONLY
 function danteSinDrillBox(fromX,toX,cy,dir){
  const {length,radius,rear}=DANTE_SIN_DRILL;
@@ -3962,7 +3962,7 @@ function danteSinDrillBox(fromX,toX,cy,dir){
 }
 // BOSS_PART_END s16.danteSinDrillBox.1
 
-// Nguồn: index.html:109898 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110181 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DANTE_BOSS_MELEE.1 EDITABLE
 const DANTE_BOSS_MELEE = {
     // 1. DEVIL SWORD DANTE (Arm 0)
@@ -4031,12 +4031,12 @@ const DANTE_BOSS_MELEE = {
 };
 // BOSS_PART_END s17.DANTE_BOSS_MELEE.1
 
-// Nguồn: index.html:109964 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110247 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.meleePriority.1 EDITABLE
 DanteBoss.prototype.meleePriority = true;
 // BOSS_PART_END s17.DanteBoss.prototype.meleePriority.1
 
-// Nguồn: index.html:109969 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110252 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.startSinDrill.1 EDITABLE
 DanteBoss.prototype.startSinDrill = function() {
     if (this.phase !== 2 || this.suSt || this.hp <= 0) return false;
@@ -4053,7 +4053,7 @@ DanteBoss.prototype.startSinDrill = function() {
 };
 // BOSS_PART_END s17.DanteBoss.prototype.startSinDrill.1
 
-// Nguồn: index.html:109982 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110265 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.cancelSinDrill.1 EDITABLE
 DanteBoss.prototype.cancelSinDrill = function() {
     if (!this._sdtDrill) return;
@@ -4063,7 +4063,7 @@ DanteBoss.prototype.cancelSinDrill = function() {
 };
 // BOSS_PART_END s17.DanteBoss.prototype.cancelSinDrill.1
 
-// Nguồn: index.html:109988 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110271 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.runSinDrill.1 EDITABLE
 DanteBoss.prototype.runSinDrill = function() {
     if (!this._sdtDrill && !this.startSinDrill()) return;
@@ -4101,17 +4101,17 @@ DanteBoss.prototype.runSinDrill = function() {
 };
 // BOSS_PART_END s17.DanteBoss.prototype.runSinDrill.1
 
-// Nguồn: index.html:110022 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110305 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.bossDrillClearBase.1 EDITABLE
 const bossDrillClearBase = DanteBoss.prototype.suDon;
 // BOSS_PART_END s17.bossDrillClearBase.1
 
-// Nguồn: index.html:110023 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110306 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.suDon.1 EDITABLE
 DanteBoss.prototype.suDon = function(...args) {this.cancelSinDrill();return bossDrillClearBase.apply(this,args);};
 // BOSS_PART_END s17.DanteBoss.prototype.suDon.1
 
-// Nguồn: index.html:110025 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110308 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.danteDrawBossSinDrill.1 EDITABLE
 function danteDrawBossSinDrill(boss) {
     const f=boss._sdtDrill;if(!f)return;
@@ -4129,7 +4129,7 @@ function danteDrawBossSinDrill(boss) {
 }
 // BOSS_PART_END s17.danteDrawBossSinDrill.1
 
-// Nguồn: index.html:110040 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110323 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.danteBossLookupMove.1 EDITABLE
 function danteBossLookupMove(table, id) {
     if (table === 'DSW' && typeof DSW_MOVES !== 'undefined') return DSW_MOVES[id];
@@ -4140,7 +4140,7 @@ function danteBossLookupMove(table, id) {
 }
 // BOSS_PART_END s17.danteBossLookupMove.1
 
-// Nguồn: index.html:110048 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110331 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.danteBossGetStepMove.1 EDITABLE
 function danteBossGetStepMove(f, idx = f.index) {
     const id = f.pattern.moves[idx];
@@ -4167,14 +4167,14 @@ function danteBossGetStepMove(f, idx = f.index) {
 }
 // BOSS_PART_END s17.danteBossGetStepMove.1
 
-// Nguồn: index.html:110072 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110355 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.danteBossMeleePool.1 EDITABLE
 function danteBossMeleePool(arm) {
     return Object.keys(DANTE_BOSS_MELEE).filter(id => DANTE_BOSS_MELEE[id].arm === arm);
 }
 // BOSS_PART_END s17.danteBossMeleePool.1
 
-// Nguồn: index.html:110077 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110360 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.danteBossEnsureFx.1 EDITABLE
 function danteBossEnsureFx(boss) {
     if (!boss._comboFx) {
@@ -4192,7 +4192,7 @@ function danteBossEnsureFx(boss) {
 }
 // BOSS_PART_END s17.danteBossEnsureFx.1
 
-// Nguồn: index.html:110093 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110376 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.danteBossSpawnPhantomSwords.1 EDITABLE
 function danteBossSpawnPhantomSwords(boss, f, m) {
     if (boss.suYeu > 0) return;
@@ -4216,7 +4216,7 @@ function danteBossSpawnPhantomSwords(boss, f, m) {
 }
 // BOSS_PART_END s17.danteBossSpawnPhantomSwords.1
 
-// Nguồn: index.html:110114 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110397 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.startCloseCombo.1 EDITABLE
 DanteBoss.prototype.startCloseCombo = function(id, trick = true) {
     const pattern = DANTE_BOSS_MELEE[id];
@@ -4266,7 +4266,7 @@ DanteBoss.prototype.startCloseCombo = function(id, trick = true) {
 };
 // BOSS_PART_END s17.DanteBoss.prototype.startCloseCombo.1
 
-// Nguồn: index.html:110161 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110444 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.cancelCloseCombo.1 EDITABLE
 DanteBoss.prototype.cancelCloseCombo = function() {
     if (this.slash?._closeCombo) this.slash = null;
@@ -4283,7 +4283,7 @@ DanteBoss.prototype.cancelCloseCombo = function() {
 };
 // BOSS_PART_END s17.DanteBoss.prototype.cancelCloseCombo.1
 
-// Nguồn: index.html:110175 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110458 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.closeComboRecover.1 EDITABLE
 DanteBoss.prototype.closeComboRecover = function() {
     const f = this._closeCombo;
@@ -4304,7 +4304,7 @@ DanteBoss.prototype.closeComboRecover = function() {
 };
 // BOSS_PART_END s17.DanteBoss.prototype.closeComboRecover.1
 
-// Nguồn: index.html:110194 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110477 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.danteBossExecuteHit.1 EDITABLE
 function danteBossExecuteHit(boss, f, m, hitIndex) {
     const fx = danteBossEnsureFx(boss);
@@ -4433,7 +4433,7 @@ function danteBossExecuteHit(boss, f, m, hitIndex) {
 }
 // BOSS_PART_END s17.danteBossExecuteHit.1
 
-// Nguồn: index.html:110320 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110603 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.runCloseCombo.1 EDITABLE
 DanteBoss.prototype.runCloseCombo = function() {
     const f = this._closeCombo;
@@ -4684,12 +4684,12 @@ DanteBoss.prototype.runCloseCombo = function() {
 };
 // BOSS_PART_END s17.DanteBoss.prototype.runCloseCombo.1
 
-// Nguồn: index.html:110571 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110854 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.bossClosePickBase.1 EDITABLE
 const bossClosePickBase = DanteBoss.prototype.pickSkill;
 // BOSS_PART_END s17.bossClosePickBase.1
 
-// Nguồn: index.html:110572 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110855 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.pickSkill.1 EDITABLE
 DanteBoss.prototype.pickSkill = function(noiChuoi) {
     if (this.phase !== 1 || this.suSt || this.hp <= 0 || !this.grounded) {
@@ -4735,12 +4735,12 @@ DanteBoss.prototype.pickSkill = function(noiChuoi) {
 };
 // BOSS_PART_END s17.DanteBoss.prototype.pickSkill.1
 
-// Nguồn: index.html:110615 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110898 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.bossCloseStartBase.1 EDITABLE
 const bossCloseStartBase = DanteBoss.prototype.raChieu;
 // BOSS_PART_END s17.bossCloseStartBase.1
 
-// Nguồn: index.html:110616 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110899 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.raChieu.1 EDITABLE
 DanteBoss.prototype.raChieu = function(id) {
     if (id === 'd_comboA' && this.phase === 1 && this.grounded) {
@@ -4755,12 +4755,12 @@ DanteBoss.prototype.raChieu = function(id) {
 };
 // BOSS_PART_END s17.DanteBoss.prototype.raChieu.1
 
-// Nguồn: index.html:110628 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110911 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.bossCloseEvadeBase.1 EDITABLE
 const bossCloseEvadeBase = DanteBoss.prototype.batNe;
 // BOSS_PART_END s17.bossCloseEvadeBase.1
 
-// Nguồn: index.html:110629 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110912 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.batNe.1 EDITABLE
 DanteBoss.prototype.batNe = function(direction, ...args) {
     bossCloseEvadeBase.call(this, direction, ...args);
@@ -4771,12 +4771,12 @@ DanteBoss.prototype.batNe = function(direction, ...args) {
 };
 // BOSS_PART_END s17.DanteBoss.prototype.batNe.1
 
-// Nguồn: index.html:110637 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110920 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.bossCloseRunBase.1 EDITABLE
 const bossCloseRunBase = DanteBoss.prototype.runSkill;
 // BOSS_PART_END s17.bossCloseRunBase.1
 
-// Nguồn: index.html:110638 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110921 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.runSkill.1 EDITABLE
 DanteBoss.prototype.runSkill = function() {
     if (this._closeCombo && (this.state === this._closeCombo.state || this.state === 'recovery')) {
@@ -4786,12 +4786,12 @@ DanteBoss.prototype.runSkill = function() {
 };
 // BOSS_PART_END s17.DanteBoss.prototype.runSkill.1
 
-// Nguồn: index.html:110645 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110928 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.bossCloseChainBase.1 EDITABLE
 const bossCloseChainBase = DanteBoss.prototype.dmcNoi;
 // BOSS_PART_END s17.bossCloseChainBase.1
 
-// Nguồn: index.html:110646 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110929 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.dmcNoi.1 EDITABLE
 DanteBoss.prototype.dmcNoi = function(...args) {
     if (this._closeCombo) return;
@@ -4799,12 +4799,12 @@ DanteBoss.prototype.dmcNoi = function(...args) {
 };
 // BOSS_PART_END s17.DanteBoss.prototype.dmcNoi.1
 
-// Nguồn: index.html:110651 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110934 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.bossCloseUpdateBase.1 EDITABLE
 const bossCloseUpdateBase = DanteBoss.prototype.update;
 // BOSS_PART_END s17.bossCloseUpdateBase.1
 
-// Nguồn: index.html:110652 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110935 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.update.1 EDITABLE
 DanteBoss.prototype.update = function(...args) {
     if (this._sdtDrill && (this.phase !== 2 || this.hp <= 0 || this.suSt || !['sd_drill','recovery'].includes(this.state))) this.cancelSinDrill();
@@ -4820,12 +4820,12 @@ DanteBoss.prototype.update = function(...args) {
 };
 // BOSS_PART_END s17.DanteBoss.prototype.update.1
 
-// Nguồn: index.html:110666 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110949 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.bossCloseDrawBase.1 EDITABLE
 const bossCloseDrawBase = DanteBoss.prototype.draw;
 // BOSS_PART_END s17.bossCloseDrawBase.1
 
-// Nguồn: index.html:110667 · Dùng bởi: DanteBoss
+// Nguồn: index.html:110950 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s17.DanteBoss.prototype.draw.1 EDITABLE
 DanteBoss.prototype.draw = function() {
     bossCloseDrawBase.call(this);

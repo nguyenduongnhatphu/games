@@ -23,7 +23,7 @@ Tải file `.js` cần sửa bằng **Download raw file** trên GitHub. Xem [hư
 | [FlameCoreBoss](FlameCoreBoss.js) | 815 | 55.3 KB |
 | [FlameLancerBoss](FlameLancerBoss.js) | 599 | 40.9 KB |
 | [ForestTitanBoss](ForestTitanBoss.js) | 689 | 53.0 KB |
-| [GaelBoss](GaelBoss.js) | 1912 | 114.7 KB |
+| [GaelBoss](GaelBoss.js) | 2196 | 131.3 KB |
 | [GiantSpiderBoss](GiantSpiderBoss.js) | 398 | 29.5 KB |
 | [GodzillaBoss](GodzillaBoss.js) | 725 | 57.1 KB |
 | [GreatApeBoss](GreatApeBoss.js) | 474 | 36.8 KB |

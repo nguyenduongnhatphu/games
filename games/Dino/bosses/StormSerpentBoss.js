@@ -1,5 +1,5 @@
 // BOSS_FILE: StormSerpentBoss
-// BOSS_SNAPSHOT: c46ab032a6cbf762cde49e8ab251e6d69cdda9d15fe744f89765bcb84b9046a7
+// BOSS_SNAPSHOT: 9124d003c3ce72e4e4fcae863db4e13cdfe06607527a4558945ab0774010859b
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -7,17 +7,17 @@
 // Nếu cần sửa phần dùng chung, gửi thêm shared/BossShared.js; xem README.md.
 // Thêm helper mới BÊN TRONG một vùng EDITABLE, không đặt ngoài các marker.
 // Global / tham chiếu ngoài file: DPR, Effect, FloatingText, Math, SFX, Set, aaDatNeo, canvas, checkAABB, ctx, dino, dojoMode, floatingTexts, frames, parry, platforms, shakeTimer, visualEffects
-// Nguồn: index.html:24178 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GaelBoss, GiantSpiderBoss, GreatSerpentBoss, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PoisonMothBoss, PontiffBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, VoltCloneBoss, WarBoss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:24461 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GaelBoss, GiantSpiderBoss, GreatSerpentBoss, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PoisonMothBoss, PontiffBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, VoltCloneBoss, WarBoss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s0._tbbKhung.1 READ_ONLY
 let _tbbKhung = -1, _tbbSo = 0;
 // BOSS_PART_END s0._tbbKhung.1
 
-// Nguồn: index.html:24189 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GaelBoss, GiantSpiderBoss, GreatSerpentBoss, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PoisonMothBoss, PontiffBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, VoltCloneBoss, WarBoss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:24472 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GaelBoss, GiantSpiderBoss, GreatSerpentBoss, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PoisonMothBoss, PontiffBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, VoltCloneBoss, WarBoss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s0._tbbDaVe.1 READ_ONLY
 let _tbbDaVe = new Set(), _tbbDaVeKhung = -1;
 // BOSS_PART_END s0._tbbDaVe.1
 
-// Nguồn: index.html:24197 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GiantSpiderBoss, GreatSerpentBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MosaBoss, MountainGodBoss, PoisonMothBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, VoltCloneBoss
+// Nguồn: index.html:24480 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GiantSpiderBoss, GreatSerpentBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MosaBoss, MountainGodBoss, PoisonMothBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, VoltCloneBoss
 // BOSS_PART_BEGIN s0.hudManHinh.1 READ_ONLY
 function hudManHinh(b){
             if (_tbbDaVeKhung !== frames){ _tbbDaVe.clear(); _tbbDaVeKhung = frames; }
@@ -30,7 +30,7 @@ function hudManHinh(b){
         }
 // BOSS_PART_END s0.hudManHinh.1
 
-// Nguồn: index.html:37515 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:37798 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.StormSerpentBoss.1 EDITABLE
 class StormSerpentBoss {
             constructor(level){
@@ -475,32 +475,32 @@ class StormSerpentBoss {
         }
 // BOSS_PART_END s1.StormSerpentBoss.1
 
-// Nguồn: index.html:42831 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:43114 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.PX_BAO_COT.1 EDITABLE
 const PX_BAO_COT = 44, PX_COT_SONG = 30, PX_COT_RONG = 46;
 // BOSS_PART_END s1.PX_BAO_COT.1
 
-// Nguồn: index.html:42832 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:43115 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.PX_BAO_QUET.1 EDITABLE
 const PX_BAO_QUET = 40, PX_QUET_TOC = 12;
 // BOSS_PART_END s1.PX_BAO_QUET.1
 
-// Nguồn: index.html:42835 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:43118 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.PX_LUOI_CD.1 EDITABLE
 const PX_LUOI_CD = 250, PX_LUOI_CD2 = 190;
 // BOSS_PART_END s1.PX_LUOI_CD.1
 
-// Nguồn: index.html:42836 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:43119 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.PX_NGHI.1 EDITABLE
 const PX_NGHI = 100, PX_NGHI2 = 74;
 // BOSS_PART_END s1.PX_NGHI.1
 
-// Nguồn: index.html:42837 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:43120 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.PX_EP_DAI.1 EDITABLE
 const PX_EP_DAI = 170, PX_BAO_DAI = 380;
 // BOSS_PART_END s1.PX_EP_DAI.1
 
-// Nguồn: index.html:42838 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:43121 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.PX_XOAY_DAI.1 EDITABLE
 const PX_XOAY_DAI = 300;
 // BOSS_PART_END s1.PX_XOAY_DAI.1

@@ -1,5 +1,5 @@
 // BOSS_FILE: GaelBoss
-// BOSS_SNAPSHOT: c46ab032a6cbf762cde49e8ab251e6d69cdda9d15fe744f89765bcb84b9046a7
+// BOSS_SNAPSHOT: 9124d003c3ce72e4e4fcae863db4e13cdfe06607527a4558945ab0774010859b
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -126,18 +126,18 @@ const GAE_CHUOI_MAX = 5;
 // BOSS_PART_BEGIN s0.GAE_NOI.1 EDITABLE
 const GAE_NOI = {
             // --- bo co ban: pha 1 noi vong quanh, tu pha 2 thi BAN GIAO cho chieu dac trung ---
-            g_combo:  { p: 0.80, ds:  ['g_quet','g_lao','g_quay'],
-                                 ds2: ['g_echo','g_vuot','g_no','g_corona','g_song','g_xung','g_bay'],
-                                 ds3: ['g_hon','g_set','g_loan','g_corona','g_echo','g_xoay','g_song'] },
-            g_quet:   { p: 0.85, ds:  ['g_combo','g_lao','g_keo'],
-                                 ds2: ['g_ao','g_echo','g_song','g_bay'],
-                                 ds3: ['g_loan','g_xoay','g_set','g_ao'] },
-            g_keo:    { p: 0.75, ds:  ['g_combo','g_nhay','g_quet'],
-                                 ds2: ['g_song','g_mau','g_bay'],
-                                 ds3: ['g_set','g_mau','g_loan'] },
-            g_lao:    { p: 0.85, ds:  ['g_combo','g_quet','g_quay'],
-                                 ds2: ['g_echo','g_ao','g_no','g_song'],
-                                 ds3: ['g_loan','g_hon','g_echo','g_xoay','g_bay'] },
+            g_combo:  { p: 0.82, ds:  ['g_vuot','g_quet','g_lao','g_quay'],
+                                 ds2: ['g_vuot','g_echo','g_no','g_corona','g_song','g_xung','g_bay'],
+                                 ds3: ['g_vuot','g_hon','g_set','g_loan','g_corona','g_echo','g_xoay'] },
+            g_quet:   { p: 0.85, ds:  ['g_vuot','g_combo','g_lao','g_keo'],
+                                 ds2: ['g_ao','g_vuot','g_echo','g_song'],
+                                 ds3: ['g_loan','g_xoay','g_vuot','g_ao'] },
+            g_keo:    { p: 0.78, ds:  ['g_vuot','g_combo','g_nhay','g_quet'],
+                                 ds2: ['g_song','g_vuot','g_mau','g_bay'],
+                                 ds3: ['g_set','g_vuot','g_mau','g_loan'] },
+            g_lao:    { p: 0.85, ds:  ['g_vuot','g_combo','g_quet','g_quay'],
+                                 ds2: ['g_vuot','g_echo','g_ao','g_no','g_song'],
+                                 ds3: ['g_vuot','g_loan','g_hon','g_echo','g_xoay'] },
             g_nhay:   { p: 0.75, ds:  ['g_combo','g_quet','g_lao'],
                                  ds2: ['g_ao','g_song','g_no'],
                                  ds3: ['g_xoay','g_loan','g_set'] },
@@ -145,85 +145,176 @@ const GAE_NOI = {
                                  ds2: ['g_echo','g_ao','g_corona'],
                                  ds3: ['g_hon','g_loan','g_corona'] },
             // --- chieu DE LAI THU TREN SAN -> noi sang don AP SAT (ne hai tang) ---
-            /* GONG KIM. Hans: "Gael su dung Teleport khi VUA DUNG XONG WOWC MA NO CHUA QUAY
-               LAI de tan cong nguoi choi hiem hoc voi tan 2 don." */
-            g_corona: { p: 0.95, ds: ['g_dich','g_dich','g_no'] },
-            /* Va `g_dich` LUON dong bang mot don CAN CHIEN. Neu de no noi sang mot chieu tam xa
-               nua thi cai bay tu huy: nguoi choi chi con phai ne mot tang. */
-            g_dich:   { p: 1.00, ds: ['g_combo','g_quay','g_vuot','g_keo'] },
-            g_hon:    { p: 0.90, ds: ['g_corona','g_dich','g_combo'] },
-            g_set:    { p: 0.85, ds: ['g_lao','g_corona','g_dich'] },
+            g_corona: { p: 0.95, ds: ['g_dich','g_dich','g_vuot'] },
+            g_dich:   { p: 1.00, ds: ['g_vuot','g_combo','g_quay','g_keo'] },
+            g_hon:    { p: 0.90, ds: ['g_corona','g_dich','g_vuot'] },
+            g_set:    { p: 0.85, ds: ['g_vuot','g_lao','g_corona','g_dich'] },
             g_no:     { p: 0.80, ds: ['g_lao','g_xung','g_vuot'] },
-            g_echo:   { p: 0.80, ds:  ['g_no','g_vuot','g_combo'],
-                                 ds2: ['g_no','g_vuot','g_corona'],
-                                 ds3: ['g_hon','g_corona','g_loan'] },
-            g_ao:     { p: 0.80, ds:  ['g_echo','g_corona','g_no'],
-                                 ds3: ['g_hon','g_loan','g_corona'] },
+            g_echo:   { p: 0.82, ds:  ['g_vuot','g_no','g_combo'],
+                                 ds2: ['g_vuot','g_no','g_corona'],
+                                 ds3: ['g_hon','g_vuot','g_corona','g_loan'] },
+            g_ao:     { p: 0.82, ds:  ['g_echo','g_vuot','g_corona','g_no'],
+                                 ds3: ['g_hon','g_loan','g_vuot','g_corona'] },
             g_song:   { p: 0.75, ds: ['g_lao','g_xung','g_corona'] },
             g_mau:    { p: 0.75, ds: ['g_corona','g_combo','g_set'] },
             g_xung:   { p: 0.80, ds: ['g_echo','g_quay','g_combo'] },
             g_bay:    { p: 0.75, ds: ['g_no','g_corona','g_lao'] },
             g_loan:   { p: 0.85, ds: ['g_echo','g_vuot','g_hon'] },
             g_xoay:   { p: 0.80, ds: ['g_combo','g_keo','g_set'] },
-            g_vuot:   { p: 0.85, ds: ['g_combo','g_lao','g_quay'] },
+            g_vuot:   { p: 0.88, ds: ['g_echo','g_ao','g_quay','g_combo'] },
             g_banlen: { p: 0.70, ds: ['g_lao','g_combo','g_xung'] }
         };
 // BOSS_PART_END s0.GAE_NOI.1
 
-// Nguồn: index.html:15742 · Dùng bởi: GaelBoss
+// Nguồn: index.html:15738 · Dùng bởi: GaelBoss
 // BOSS_PART_BEGIN s0.GAE_SET_SO.1 EDITABLE
 const GAE_SET_SO   = 5;
 // BOSS_PART_END s0.GAE_SET_SO.1
 
-// Nguồn: index.html:15743 · Dùng bởi: GaelBoss
+// Nguồn: index.html:15739 · Dùng bởi: GaelBoss
 // BOSS_PART_BEGIN s0.GAE_SET_CHO.1 EDITABLE
 const GAE_SET_CHO  = 74;
 // BOSS_PART_END s0.GAE_SET_CHO.1
 
-// Nguồn: index.html:15744 · Dùng bởi: GaelBoss
+// Nguồn: index.html:15740 · Dùng bởi: GaelBoss
 // BOSS_PART_BEGIN s0.GAE_SET_RONG.1 EDITABLE
 const GAE_SET_RONG = 42;
 // BOSS_PART_END s0.GAE_SET_RONG.1
 
-// Nguồn: index.html:15745 · Dùng bởi: GaelBoss
+// Nguồn: index.html:15741 · Dùng bởi: GaelBoss
 // BOSS_PART_BEGIN s0.GAE_MAU_CHO.1 EDITABLE
 const GAE_MAU_CHO  = 56;
 // BOSS_PART_END s0.GAE_MAU_CHO.1
 
-// Nguồn: index.html:15747 · Dùng bởi: GaelBoss
+// Nguồn: index.html:15743 · Dùng bởi: GaelBoss
 // BOSS_PART_BEGIN s0.gaeChop.1 READ_ONLY
 let gaeChop = 0;
 // BOSS_PART_END s0.gaeChop.1
 
-// Nguồn: index.html:15848 · Dùng bởi: GaelBoss
+// Nguồn: index.html:15846 · Dùng bởi: GaelBoss
+// BOSS_PART_BEGIN s0.gaeDrawCapeWhip.1 EDITABLE
+function gaeDrawCapeWhip(b, W, H, capH, do_, xoe){
+            let whip = b.capeWhip || 0;          // 0..1: độ quất roi theo nhát chém
+            let wAng = b.capeAngle !== undefined ? b.capeAngle : -0.35;
+            let wave = frames * 0.11 + (b.walk || 0) * 0.08;
+            let stageScale = b.stage >= 3 ? 1.34 : (b.stage >= 2 ? 1.18 : 1.0);
+            let activeReach = (42 + 122 * Math.max(xoe, whip)) * stageScale;
+
+            // 1. KHI ÁO CHOÀNG ĐANG THU HOẶC PHẤT PHƠ SAU LƯNG (Lớp nền rách tả tơi)
+            ctx.save();
+            let baseSway = Math.sin(wave) * 8 - (b.dashV || 0) * 1.4;
+            let gc = ctx.createLinearGradient(0, -capH, -W * 1.2, 0);
+            gc.addColorStop(0, do_ ? "#5C1014" : "#3E1F1C");
+            gc.addColorStop(0.55, do_ ? "#8E1B20" : "#542924");
+            gc.addColorStop(1, "#160A0B");
+            ctx.fillStyle = gc;
+            ctx.beginPath();
+            ctx.moveTo(-4, -capH * 0.94);
+            ctx.quadraticCurveTo(-W * 0.88 + baseSway * 0.5, -capH * 0.72, -W * 1.22 + baseSway, -capH * 0.16);
+            for (let i = 0; i <= 6; i++){
+                let u = i / 6;
+                let px = -W * 1.22 + baseSway + (W * 1.22 - baseSway + 8) * u;
+                let py = -capH * 0.16 + Math.sin(u * 8 + wave) * 5 + (i % 2 ? 13 : 2);
+                ctx.lineTo(px, py);
+            }
+            ctx.lineTo(8, -capH * 0.58);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = do_ ? "#B71C1C" : "#241210";
+            ctx.lineWidth = 1.8;
+            ctx.stroke();
+            ctx.restore();
+
+            // 2. KỸ THUẬT ROI ÁO CHOÀNG (WHIP-CAPE): Khi Gael vung kiếm hoặc quất áo (`xoe > 0.02` hoặc `whip > 0.02`)
+            // Hai dải cánh áo choàng hóa thành 2 chiếc roi khổng lồ uốn sóng hình chữ S phóng vọt ra phía trước
+            // theo đúng góc vung kiếm `wAng`, dẫn đầu bằng đầu roi sắc nhọn như lưỡi hái!
+            let power = Math.max(xoe, whip);
+            if (power > 0.02){
+                ctx.save();
+                for (let wing = 0; wing < 2; wing++){
+                    let len = activeReach * (wing === 0 ? 1.0 : 0.82);
+                    let ang = wAng + (wing === 0 ? -0.14 : 0.22) + Math.sin(wave + wing * 2) * 0.06;
+                    let sx = -2, sy = -capH * (wing === 0 ? 0.78 : 0.64);
+                    // Quỹ đạo uốn lượn như roi quất (S-curve whip)
+                    let midR = len * 0.54;
+                    let whipSnap = Math.sin(power * Math.PI) * 26 * (wing === 0 ? -1 : 1);
+                    let cx1 = sx + Math.cos(ang - 0.35) * midR;
+                    let cy1 = sy + Math.sin(ang - 0.35) * midR * 0.65 + whipSnap;
+                    let tx = sx + Math.cos(ang) * len;
+                    let ty = sy + Math.sin(ang) * len * 0.55;
+
+                    let wg = ctx.createLinearGradient(sx, sy, tx, ty);
+                    wg.addColorStop(0, do_ ? "#4A0B0E" : "#3A1D1A");
+                    wg.addColorStop(0.5, do_ ? "#B71C1C" : "#7B2D26");
+                    wg.addColorStop(0.88, do_ ? "#FF5252" : "#A14A3E");
+                    wg.addColorStop(1, "rgba(255, 82, 82, 0.15)");
+
+                    ctx.globalAlpha = (wing === 0 ? 0.88 : 0.68) * Math.min(1, power * 1.3);
+                    ctx.fillStyle = wg;
+                    ctx.beginPath();
+                    ctx.moveTo(sx, sy - 8);
+                    ctx.quadraticCurveTo(cx1, cy1 - 22 * power, tx, ty);
+                    // Mép dưới của dải roi áo choàng có gai vải rách sắc lẹm như lưỡi cưa
+                    for (let k = 4; k >= 1; k--){
+                        let u = k / 5;
+                        let bx = sx + (tx - sx) * u + (cx1 - (sx + tx) * 0.5) * 0.4 * (1 - Math.abs(u - 0.5) * 2);
+                        let by = sy + (ty - sy) * u + 16 * power + (k % 2 ? 12 : 3) * power;
+                        ctx.lineTo(bx, by);
+                    }
+                    ctx.lineTo(sx, sy + 10);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Đường gân roi huyết hồn sáng rực chạy dọc sống áo choàng (báo hiệu rõ quỹ đạo quất roi!)
+                    ctx.strokeStyle = do_ ? "#FF8A80" : "#E6CEB5";
+                    ctx.lineWidth = wing === 0 ? 2.8 : 1.8;
+                    ctx.beginPath();
+                    ctx.moveTo(sx, sy);
+                    ctx.quadraticCurveTo(cx1, cy1 - 10 * power, tx, ty);
+                    ctx.stroke();
+
+                    // Vệt xé gió hình bán nguyệt ở chóp roi áo choàng khi quất căngสุด (`power > 0.55`)
+                    if (power > 0.55 && wing === 0){
+                        ctx.strokeStyle = do_ ? "#FFCDD2" : "#FFF3E0";
+                        ctx.lineWidth = 3.2 * power;
+                        ctx.beginPath();
+                        ctx.arc(tx - 18, ty, 24 * power, ang - 0.85, ang + 0.85);
+                        ctx.stroke();
+                    }
+                }
+                ctx.restore();
+            }
+}
+// BOSS_PART_END s0.gaeDrawCapeWhip.1
+
+// Nguồn: index.html:15939 · Dùng bởi: GaelBoss
 // BOSS_PART_BEGIN s0.drawGaelBody.1 EDITABLE
 function drawGaelBody(b, x, y){
             let d = b.facingLeft ? -1 : 1;
             let W = b.w, H = b.h;
             let cx0 = x + W / 2, chan = y + H;
-            let khom = (b.stage === 1) ? 0.30 : 0.06;        // do gap nguoi ve truoc
-            let do_ = (b.stage >= 2);                          // da uong Hon Toi chua
+            let khom = b.crouchLean !== undefined ? b.crouchLean : ((b.stage === 1) ? 0.32 : 0.08);
+            let do_ = (b.stage >= 2);
+            let somer = b.flipAngle || 0; // Góc lộn nhào trên không (Acrobatic Somersault)
+
             ctx.save();
             ctx.translate(cx0, chan);
             ctx.scale(d, 1);
 
-            // ---- QUANG MAU duoi chan (pha 2-3) ----
-            if (do_){
+            // ---- QUẦNG MÁU HỒN TỐI DƯỚI CHÂN (Pha 2-3) ----
+            if (do_ && b.grounded !== false){
                 let nh = 0.30 + 0.18 * Math.sin(frames * 0.09);
-                let gq = ctx.createRadialGradient(0, -6, 2, 0, -6, 58);
-                gq.addColorStop(0, "rgba(183,28,28," + (0.45 * nh + 0.2).toFixed(2) + ")");
+                let gq = ctx.createRadialGradient(0, -6, 2, 0, -6, 62);
+                gq.addColorStop(0, "rgba(183,28,28," + (0.48 * nh + 0.2).toFixed(2) + ")");
                 gq.addColorStop(1, "rgba(183,28,28,0)");
                 ctx.fillStyle = gq;
-                ctx.beginPath(); ctx.ellipse(0, -6, 58, 20, 0, 0, 6.28); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(0, -6, 62, 20, 0, 0, 6.28); ctx.fill();
             }
-            // ---- BONG DO ----
+            // ---- BÓNG ĐỔ MẶT ĐẤT ----
             ctx.fillStyle = "rgba(0,0,0,0.42)";
             ctx.beginPath(); ctx.ellipse(0, -2, W * 0.62, 7, 0, 0, 6.28); ctx.fill();
-            /* ---- DON DAM XUONG: luoi kiem cam vao dat ----
-               Hop sat thuong cua don nay HEP va SAU (92 rong, cam xuong duoi chan han) chu
-               khong voi ra mot phia nhu moi don khac, nen phai ve ra dung cai hinh do: mot
-               net sang doc cam thang xuong + vet nut toa ra tu chan cam. Neu ve bang hieu ung
-               no tron thi nguoi choi doc nham thanh mot don lan ra xung quanh. */
+
+            // ---- ĐÒN ĐÂM THẲNG XUỐNG ĐẤT ----
             if (b.damXuong === 2){
                 ctx.save();
                 ctx.globalAlpha = 0.9;
@@ -245,34 +336,11 @@ function drawGaelBody(b, x, y){
                 }
                 ctx.restore();
             }
-            /* VIEN SANG. Ca bo trang phuc cua Gael la nau-do tham, ma nen dau truong cung
-               nau-do — khong co vien nay thi han la mot vet mo tren nen mo. Ve mot ban sao
-               phong to cua khoi than bang mau sang, dat ngay sau, de lo ra dung mot duong. */
-            ctx.save();
-            ctx.globalAlpha = 0.55;
-            ctx.fillStyle = do_ ? "#FF8A80" : "#E8D5C0";
-            ctx.beginPath();
-            ctx.moveTo(-W * 0.50, 0);
-            ctx.quadraticCurveTo(-W * 0.46, -H * 0.62, -6, -H * 0.98);
-            ctx.quadraticCurveTo(W * 0.30, -H * 1.02, W * 0.42, -H * 0.52);
-            ctx.lineTo(W * 0.44, 0);
-            ctx.closePath(); ctx.fill();
-            ctx.restore();
 
-            /* ---- AO CHOANG ----
-               Hans: "áo choàng của Gael thật sự là một món vũ khí mạnh chứ không phải chỉ
-               để cho đẹp". Nen ngoai bo dang thuong, no co mot trang thai XOE (`aoDai`
-               0..1): tam vai banh han ra thanh mot canh quat dai ve PHIA TRUOC, dung bang
-               tam cua hop sat thuong cua don quat. Luc do no khong con la phong nen nua —
-               no la cai dang danh. */
             let xoe = b.aoDai || 0;
-            let dao = Math.sin(frames * 0.07 + (b.walk || 0) * 0.05) * 7;
-            let capH = H * (0.86 - khom * 0.12);
+            let capH = H * (0.86 - khom * 0.10);
 
-            /* ---- BAO TRUOC CUA DON XOAY ----
-               Don xoay khong co huong nen khong the bao bang mot hop ve mot phia. Bao bang
-               MOT VONG TRON lon dan toi dung ban kinh that (GAE_QUAY_R) — nguoi choi doc duoc
-               "rong toi day" truoc khi no cham, va do la ca duong go (@@LUAT-BOSS L5). */
+            // ---- BÁO TRƯỚC CỦA ĐÒN XOAY TRÒN ----
             if (b.quayBao){
                 let u = Math.min(1, b.quayBao.t / b.quayBao.tong);
                 ctx.save();
@@ -281,181 +349,206 @@ function drawGaelBody(b, x, y){
                 ctx.setLineDash([16, 11]); ctx.lineDashOffset = -frames * 1.2;
                 ctx.beginPath(); ctx.ellipse(0, -H * 0.44, GAE_QUAY_R * u, GAE_QUAY_R * 0.46 * u, 0, 0, 6.28);
                 ctx.stroke(); ctx.setLineDash([]);
-                ctx.globalAlpha = 0.16 * u;
+                ctx.globalAlpha = 0.14 * u;
                 ctx.fillStyle = "#FF5252";
                 ctx.beginPath(); ctx.ellipse(0, -H * 0.44, GAE_QUAY_R * u, GAE_QUAY_R * 0.46 * u, 0, 0, 6.28);
                 ctx.fill();
                 ctx.restore();
             }
-            /* ---- AO CHOANG XOAY THANH MOT VONG ----
-               Hans: "ao choang cung xoay theo gay dmg vong tron". Nen luc xoay, tam vai khong
-               con la canh quat ve mot phia nua ma banh ra THANH VONG quanh than — do la thu
-               duy nhat noi cho nguoi choi biet don nay an ca hai ben. */
+
+            // ---- ÁO CHOÀNG XOAY THÀNH CƠN LỐC ĐỎ TRÒN QUANH THÂN ----
             if (b.quay){
                 ctx.save();
-                /* Ban dau ve R2 = 0.62..0.86 lan tam that — chup ra thi vong nhin nho hon han
-                   vung sat thuong, tuc la nguoi choi doc nham "con dung duoc o day". Vong ve
-                   phai bang DUNG tam that (GAE_QUAY_R), neu khong thi cai bao truoc la noi doi. */
                 let R2 = GAE_QUAY_R * (0.88 + 0.12 * Math.min(1, xoe));
                 for (let k = 0; k < 3; k++){
                     let a = b.quay * 1.0 + k * 2.09;
-                    ctx.globalAlpha = 0.34 - k * 0.07;
+                    ctx.globalAlpha = 0.36 - k * 0.07;
                     let gq2 = ctx.createRadialGradient(0, -H * 0.44, 10, 0, -H * 0.44, R2);
-                    gq2.addColorStop(0, do_ ? "rgba(183,28,28,0.75)" : "rgba(90,72,62,0.75)");
+                    gq2.addColorStop(0, do_ ? "rgba(183,28,28,0.80)" : "rgba(120,42,36,0.75)");
                     gq2.addColorStop(1, "rgba(120,20,24,0)");
                     ctx.fillStyle = gq2;
                     ctx.beginPath();
                     ctx.ellipse(0, -H * 0.44, R2, R2 * 0.46, a * 0.25, a % 6.28, (a % 6.28) + 2.4);
                     ctx.lineTo(0, -H * 0.44); ctx.closePath(); ctx.fill();
                 }
-                ctx.globalAlpha = 0.72;
-                ctx.strokeStyle = do_ ? "#FF8A80" : "#D7CCC8"; ctx.lineWidth = 3;
+                ctx.globalAlpha = 0.78;
+                ctx.strokeStyle = do_ ? "#FF8A80" : "#E6CEB5"; ctx.lineWidth = 3;
                 ctx.beginPath(); ctx.ellipse(0, -H * 0.44, R2, R2 * 0.46, 0, 0, 6.28); ctx.stroke();
                 ctx.restore();
             }
-            if (xoe > 0.02){
-                ctx.save();
-                ctx.globalAlpha = 0.55 + 0.4 * xoe;
-                let R = (40 + 118 * xoe) * (b.stage >= 3 ? 1.34 : (b.stage >= 2 ? 1.17 : 1));
-                let gq = ctx.createLinearGradient(0, -capH * 0.6, R, 0);
-                gq.addColorStop(0, do_ ? "#7F1418" : "#4A3A31");
-                gq.addColorStop(0.55, do_ ? "#B71C1C" : "#6B594D");
-                gq.addColorStop(1, "rgba(120,20,24,0)");
-                ctx.fillStyle = gq;
-                ctx.beginPath();
-                ctx.moveTo(0, -capH * 0.62);
-                ctx.quadraticCurveTo(R * 0.66, -capH * 0.92 - 18 * xoe, R, -capH * 0.30);
-                // mep duoi xe rang cua cua canh quat
-                for (let i = 6; i >= 0; i--){
-                    let u = i / 6;
-                    ctx.lineTo(R * u + 4, -capH * 0.30 * u + (i % 2 ? 16 : 4) * (0.4 + xoe));
-                }
-                ctx.closePath(); ctx.fill();
-                ctx.globalAlpha = 0.7 * xoe;
-                ctx.strokeStyle = do_ ? "#FF8A80" : "#D7CCC8"; ctx.lineWidth = 2;
-                ctx.stroke();
-                ctx.restore();
+
+            // ==== XOAY LỘN VÒNG TOÀN THÂN TRÊN KHÔNG (`somer`) ====
+            ctx.save();
+            if (somer !== 0){
+                ctx.translate(0, -H * 0.52);
+                ctx.rotate(somer);
+                ctx.translate(0, H * 0.52);
             }
+
+            // ---- VIỀN SÁNG NỔI BẬT TRÊN NỀN TỐI ----
+            ctx.save();
+            ctx.globalAlpha = 0.48;
+            ctx.fillStyle = do_ ? "#FF8A80" : "#E8D5C0";
             ctx.beginPath();
-            ctx.moveTo(-2, -capH);
-            ctx.quadraticCurveTo(-W * 0.95 - dao * 0.5, -capH * 0.72, -W * 1.15 - dao, -capH * 0.20);
-            // mep duoi xe rang cua
-            let rach = 6;
-            for (let i = 0; i <= rach; i++){
-                let u = i / rach;
-                let px = -W * 1.15 - dao + (W * 1.15 + dao + 10) * u;
-                let py = -capH * 0.20 + Math.sin(u * 9 + frames * 0.06) * 5 + (i % 2 ? 12 : 2);
-                ctx.lineTo(px, py);
-            }
-            ctx.lineTo(8, -capH * 0.55);
-            ctx.closePath();
-            let gc = ctx.createLinearGradient(0, -capH, 0, 0);
-            gc.addColorStop(0, do_ ? "#4E1416" : "#2E2320");
-            gc.addColorStop(0.6, do_ ? "#6B1B1E" : "#3E2F29");
-            gc.addColorStop(1, do_ ? "#2A0B0C" : "#1E1614");
-            ctx.fillStyle = gc; ctx.fill();
-            ctx.strokeStyle = "#160F0E"; ctx.lineWidth = 2; ctx.stroke();
+            ctx.moveTo(-W * 0.48, 0);
+            ctx.quadraticCurveTo(-W * 0.44, -H * 0.62, -6, -H * 0.98);
+            ctx.quadraticCurveTo(W * 0.30, -H * 1.02, W * 0.42, -H * 0.52);
+            ctx.lineTo(W * 0.44, 0);
+            ctx.closePath(); ctx.fill();
+            ctx.restore();
 
-            // ---- CHAN: quan bang vai rach ----
-            ctx.fillStyle = "#4A3A31";
-            let buoc = Math.sin((b.walk || 0) * 0.22) * 5;
-            ctx.fillRect(-13, -H * 0.40, 11, H * 0.40 - 1);
-            ctx.fillRect(3 + buoc * 0.4, -H * 0.40, 11, H * 0.40 - 1);
-            ctx.fillStyle = "#2C221D";
-            ctx.fillRect(-15, -7, 15, 7); ctx.fillRect(1 + buoc * 0.4, -7, 15, 7);
-            // day quan quanh ong chan
-            ctx.strokeStyle = "#6B594D"; ctx.lineWidth = 1.5;
-            for (let i = 0; i < 3; i++){
-                let yy = -H * 0.34 + i * 8;
-                ctx.beginPath(); ctx.moveTo(-14, yy); ctx.lineTo(-2, yy - 2); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(2 + buoc * 0.4, yy); ctx.lineTo(14 + buoc * 0.4, yy - 2); ctx.stroke();
-            }
+            // ---- VẼ ÁO CHOÀNG ROI HUYẾT HỒN (WHIP-CAPE) ----
+            gaeDrawCapeWhip(b, W, H, capH, do_, xoe);
 
-            // ---- THAN: gap ve truoc theo `khom` ----
+            // ---- ĐÔI CHÂN GIÁP XÀ CẠP SẮT & BĂNG QUẤN (SLAVE KNIGHT LEGGINGS) ----
+            let buoc = Math.sin((b.walk || 0) * 0.22) * 5.5;
+            let lOff = (b.grounded === false) ? -4 : -buoc * 0.4;
+            let rOff = (b.grounded === false) ? 4 : buoc * 0.4;
+            ctx.fillStyle = "#2B221E";
+            ctx.fillRect(-13 + lOff, -H * 0.40, 10, H * 0.40 - 1);
+            ctx.fillRect(3 + rOff, -H * 0.40, 10, H * 0.40 - 1);
+            // Giáp ống chân & đầu gối sắt rỉ sét
+            ctx.fillStyle = "#4E4641";
+            ctx.fillRect(-13.5 + lOff, -H * 0.28, 11, H * 0.20);
+            ctx.fillRect(2.5 + rOff, -H * 0.28, 11, H * 0.20);
+            ctx.fillStyle = "#736860";
+            ctx.beginPath(); ctx.moveTo(-13 + lOff, -H * 0.28); ctx.lineTo(-8 + lOff, -H * 0.34); ctx.lineTo(-3 + lOff, -H * 0.28); ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(3 + rOff, -H * 0.28); ctx.lineTo(8 + rOff, -H * 0.34); ctx.lineTo(13 + rOff, -H * 0.28); ctx.closePath(); ctx.fill();
+            // Giày sắt
+            ctx.fillStyle = "#1E1715";
+            ctx.fillRect(-15 + lOff, -7, 15, 7);
+            ctx.fillRect(1 + rOff, -7, 15, 7);
+
+            // ---- THÂN TRÊN: GIÁP HIỆP SĨ NÔ LỆ + LỖ HỔNG DARKSIGN RỈ MÁU GIỮA NGỰC ----
             ctx.save();
             ctx.translate(0, -H * 0.40);
             ctx.rotate(khom);
-            let tH = H * 0.42;
-            let gt = ctx.createLinearGradient(-14, -tH, 16, 0);
-            gt.addColorStop(0, "#3A2C25"); gt.addColorStop(0.5, "#57443A"); gt.addColorStop(1, "#2E231E");
+            let tH = H * 0.44;
+            // Khối giáp ngực thép tối màu bị ăn mòn
+            let gt = ctx.createLinearGradient(-16, -tH, 16, 0);
+            gt.addColorStop(0, "#5C524B"); gt.addColorStop(0.5, "#38302C"); gt.addColorStop(1, "#1D1816");
             ctx.fillStyle = gt;
             ctx.beginPath();
-            ctx.moveTo(-15, 0); ctx.lineTo(-13, -tH * 0.9);
-            ctx.quadraticCurveTo(0, -tH * 1.06, 14, -tH * 0.86);
+            ctx.moveTo(-15, 0); ctx.lineTo(-14, -tH * 0.92);
+            ctx.quadraticCurveTo(0, -tH * 1.08, 15, -tH * 0.88);
             ctx.lineTo(16, 0); ctx.closePath(); ctx.fill();
             ctx.strokeStyle = "#1A1210"; ctx.lineWidth = 2; ctx.stroke();
-            // day thung lung
-            ctx.fillStyle = "#6B594D"; ctx.fillRect(-15, -tH * 0.30, 31, 5);
-            ctx.fillStyle = "#8A7566"; ctx.fillRect(-4, -tH * 0.34, 8, 12);
 
-            // ---- DAU + MU TRUM: hoc toi, hai dom mat ----
+            // LỖ HỔNG HỒN TỐI GIỮA NGỰC (THE DARK SOUL / DARKSIGN CAVITY)
+            ctx.fillStyle = "#080405";
+            ctx.beginPath(); ctx.arc(3, -tH * 0.56, 6.5, 0, 6.28); ctx.fill();
+            ctx.strokeStyle = do_ ? "#FF1744" : "#8D6E63";
+            ctx.lineWidth = do_ ? 2.4 : 1.5;
+            ctx.beginPath(); ctx.arc(3, -tH * 0.56, 6.8 + (do_ ? Math.sin(frames * 0.2) * 1.2 : 0), 0, 6.28); ctx.stroke();
+
+            // Khăn quàng đỏ sẫm quấn quanh vai và cổ (Slave Knight Red Hooded Mantle)
+            ctx.fillStyle = do_ ? "#7F1418" : "#5D1D1E";
+            ctx.beginPath();
+            ctx.moveTo(-16, -tH * 0.94); ctx.lineTo(16, -tH * 0.90);
+            ctx.lineTo(14, -tH * 0.64); ctx.lineTo(-14, -tH * 0.68);
+            ctx.closePath(); ctx.fill();
+
+            // Đai lưng da & khóa sắt
+            ctx.fillStyle = "#4A3A31"; ctx.fillRect(-15, -tH * 0.26, 31, 5);
+            ctx.fillStyle = "#8A7566"; ctx.fillRect(-3, -tH * 0.30, 8, 10);
+
+            // ---- ĐẦU: MŨ TRÙM ĐỎ NHỌN (RED POINTED SLAVE HOOD) + BỘ RÂU BẠC DÀI CỦA LÃO GAEL ----
             ctx.save();
-            ctx.translate(2, -tH * 0.92);
-            ctx.fillStyle = do_ ? "#4A1517" : "#2B211D";
+            ctx.translate(3, -tH * 0.94);
+
+            // Bộ râu bạc dài rủ xuống trước ngực đặc trưng của Uncle Gael!
+            let beardSway = Math.sin(frames * 0.09) * 2.5;
+            ctx.fillStyle = "#CFD8DC";
+            ctx.beginPath();
+            ctx.moveTo(2, 2);
+            ctx.quadraticCurveTo(13, 8, 11 + beardSway, 22);
+            ctx.lineTo(5 + beardSway * 0.6, 18);
+            ctx.lineTo(1 + beardSway * 0.4, 23);
+            ctx.quadraticCurveTo(-3, 12, -2, 3);
+            ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = "#90A4AE"; ctx.lineWidth = 1; ctx.stroke();
+
+            // Mũ trùm đầu vải đỏ sẫm có chóp nhọn cong về phía sau
+            ctx.fillStyle = do_ ? "#8E1B20" : "#681E20";
             ctx.beginPath();
             ctx.moveTo(-13, 6);
-            ctx.quadraticCurveTo(-12, -15, 3, -16);
-            ctx.quadraticCurveTo(16, -14, 15, 4);
-            ctx.quadraticCurveTo(4, 11, -13, 6);
+            ctx.quadraticCurveTo(-16, -12, -22 - beardSway * 0.8, -19); // Chóp mũ nhọn dài của Slave Hood
+            ctx.quadraticCurveTo(-4, -18, 8, -14);
+            ctx.quadraticCurveTo(16, -10, 15, 4);
+            ctx.quadraticCurveTo(4, 9, -13, 6);
             ctx.closePath(); ctx.fill();
-            ctx.strokeStyle = "#150E0D"; ctx.lineWidth = 2; ctx.stroke();
+            ctx.strokeStyle = "#240B0C"; ctx.lineWidth = 1.8; ctx.stroke();
+
+            // Hốc mặt tối & Đôi mắt rực sáng của Gael
             ctx.fillStyle = "#0A0607";
-            ctx.beginPath(); ctx.ellipse(4, -2, 9, 6.5, 0, 0, 6.28); ctx.fill();
-            let sang = do_ ? "#FF5252" : "#FFCC80";
+            ctx.beginPath(); ctx.ellipse(5, -2, 8.5, 6, 0, 0, 6.28); ctx.fill();
+            let sang = do_ ? "#FF1744" : "#FFCC80";
             ctx.fillStyle = sang;
-            ctx.globalAlpha = 0.75 + 0.25 * Math.sin(frames * 0.16);
-            ctx.fillRect(2, -4, 3, 2.5); ctx.fillRect(8, -4, 3, 2.5);
+            ctx.globalAlpha = 0.8 + 0.2 * Math.sin(frames * 0.16);
+            ctx.fillRect(3, -4, 3.2, 2.5); ctx.fillRect(9, -4, 3.2, 2.5);
             ctx.globalAlpha = 1;
             ctx.restore();
             ctx.restore();
 
-            // ---- NO LIEN HOAN: chi hien khi dang dung ----
+            // ---- NỎ LIÊN THANH LẮP Ở CẲNG TAY TRÁI (REPEATING CROSSBOW) ----
+            // Hỗ trợ xoay góc bắn chúi xuống đất (`noGoc`) khi Gael đang lộn vòng trên đầu người chơi!
             if (b.noTay){
                 ctx.save();
                 ctx.translate(14, -H * 0.50);
-                ctx.fillStyle = "#3A2C25"; ctx.fillRect(-9, -6, 42, 12);          // than no
-                ctx.fillStyle = "#57443A"; ctx.fillRect(-9, -6, 42, 4);
-                ctx.strokeStyle = "#1A1210"; ctx.lineWidth = 2; ctx.strokeRect(-9, -6, 42, 12);
-                ctx.fillStyle = "#2B211D"; ctx.fillRect(-15, -5, 9, 10);          // bang sung
+                ctx.rotate(b.noGoc || 0);
+                // Hộp băng đạn gỗ-sắt phía trên nỏ (Repeating Magazine)
+                ctx.fillStyle = "#4A352B"; ctx.fillRect(-6, -11, 26, 6);
+                ctx.strokeStyle = "#8A7566"; ctx.lineWidth = 1.2; ctx.strokeRect(-6, -11, 26, 6);
+                // Thân nỏ sắt
+                ctx.fillStyle = "#3A2C25"; ctx.fillRect(-9, -5, 42, 10);
+                ctx.strokeStyle = "#1A1210"; ctx.lineWidth = 1.8; ctx.strokeRect(-9, -5, 42, 10);
+                // Cánh cung thép đôi
                 ctx.strokeStyle = "#B0A497"; ctx.lineWidth = 4; ctx.lineCap = 'round';
-                ctx.beginPath(); ctx.moveTo(24, -21); ctx.lineTo(24, 21); ctx.stroke();   // canh no
-                ctx.strokeStyle = "#ECE3D6"; ctx.lineWidth = 1.8;
-                ctx.beginPath(); ctx.moveTo(24, -21); ctx.lineTo(4, 0); ctx.lineTo(24, 21); ctx.stroke();
-                ctx.fillStyle = "#8A7566"; ctx.fillRect(30, -3, 18, 6);           // mui dang len no
+                ctx.beginPath(); ctx.moveTo(24, -20); ctx.lineTo(24, 20); ctx.stroke();
+                ctx.strokeStyle = "#ECE3D6"; ctx.lineWidth = 1.6;
+                ctx.beginPath(); ctx.moveTo(24, -20); ctx.lineTo(4, 0); ctx.lineTo(24, 20); ctx.stroke();
+                // Mũi tên lửa/máu đang nạp sẵn
                 ctx.fillStyle = "#FF5252";
-                ctx.beginPath(); ctx.arc(48, 0, 3.4, 0, 6.28); ctx.fill();        // dau mui do
+                ctx.beginPath(); ctx.arc(46, 0, 3.6, 0, 6.28); ctx.fill();
                 ctx.restore();
             }
-            // ---- DAI KIEM CHAP VA ----
+
+            // ---- THANH ĐẠI KIẾM HÀNH QUYẾT GÃY MẺ (GAEL'S GREATSWORD) ----
             ctx.save();
             ctx.translate(6, -H * 0.52);
-            ctx.rotate((b.armR || 0) + (b.quay || 0));   // `quay` cho luoi kiem quet tron
-            let L = 92, BW = 11;
-            // chuoi + day quan
+            ctx.rotate((b.armR || 0) + (b.quay || 0));
+            let L = 94, BW = 12;
+            // Chuôi kiếm dài quấn vải bạc màu
             ctx.fillStyle = "#2B211D"; ctx.fillRect(-16, -4, 20, 8);
-            ctx.strokeStyle = "#6B594D"; ctx.lineWidth = 2;
+            ctx.strokeStyle = "#8D7B6D"; ctx.lineWidth = 2;
             for (let i = 0; i < 4; i++){ ctx.beginPath(); ctx.moveTo(-14 + i * 5, -4); ctx.lineTo(-12 + i * 5, 4); ctx.stroke(); }
-            // chan kiem
-            ctx.fillStyle = "#8A7566"; ctx.fillRect(0, -9, 7, 18);
-            // luoi: sut me, hai ba vet khuyet
+            // Chắn kiếm chữ thập rỉ sét
+            ctx.fillStyle = "#8A7566"; ctx.fillRect(0, -10, 7, 20);
+            // Lưỡi đại kiếm hành quyết (Đầu kiếm bị gãy cụt phẳng lì, thân kiếm sứt mẻ nhiều chỗ)
             let gl = ctx.createLinearGradient(0, -BW/2, 0, BW/2);
-            gl.addColorStop(0, "#B9AFA4"); gl.addColorStop(0.45, "#E6E0D6"); gl.addColorStop(1, "#7A7166");
+            gl.addColorStop(0, "#B9AFA4"); gl.addColorStop(0.45, "#E6E0D6"); gl.addColorStop(1, "#6E655B");
             ctx.fillStyle = gl;
             ctx.beginPath();
             ctx.moveTo(7, -BW/2);
-            ctx.lineTo(L * 0.52, -BW/2 - 1); ctx.lineTo(L * 0.56, -BW/2 + 4);   // vet sut 1
-            ctx.lineTo(L * 0.78, -BW/2 + 1); ctx.lineTo(L, -2);
-            ctx.lineTo(L, 2); ctx.lineTo(L * 0.74, BW/2); ctx.lineTo(L * 0.60, BW/2 - 3);
-            ctx.lineTo(L * 0.40, BW/2); ctx.lineTo(7, BW/2);
+            ctx.lineTo(L * 0.42, -BW/2); ctx.lineTo(L * 0.46, -BW/2 + 3.5);     // Vết sứt mẻ sâu 1
+            ctx.lineTo(L * 0.50, -BW/2);
+            ctx.lineTo(L * 0.76, -BW/2); ctx.lineTo(L * 0.80, -BW/2 + 3);       // Vết sứt mẻ 2
+            ctx.lineTo(L * 0.96, -BW/2 + 0.5);
+            ctx.lineTo(L, -BW * 0.32);                                           // Đầu kiếm gãy cụt vát chéo đặc trưng của Executioner's Greatsword
+            ctx.lineTo(L - 3, BW * 0.38);
+            ctx.lineTo(L * 0.68, BW/2); ctx.lineTo(L * 0.63, BW/2 - 3.5);       // Vết mẻ mặt dưới
+            ctx.lineTo(L * 0.58, BW/2);
+            ctx.lineTo(7, BW/2);
             ctx.closePath(); ctx.fill();
-            ctx.strokeStyle = "#4A443D"; ctx.lineWidth = 1.6; ctx.stroke();
-            // song giua luoi
-            ctx.strokeStyle = "rgba(255,255,255,0.35)"; ctx.lineWidth = 1.4;
-            ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(L - 6, 0); ctx.stroke();
-            // PHA 3: set do chay doc luoi
+            ctx.strokeStyle = "#3E3832"; ctx.lineWidth = 1.6; ctx.stroke();
+            // Rãnh máu đen dọc thân kiếm
+            ctx.fillStyle = do_ ? "#5C1014" : "#3E3832";
+            ctx.fillRect(12, -2, L - 22, 4);
+
+            // PHA 3: Sét đỏ Hồn Tối chạy dọc lưỡi kiếm
             if (b.stage >= 3){
                 ctx.save();
-                ctx.globalAlpha = 0.55 + 0.45 * Math.sin(frames * 0.3);
+                ctx.globalAlpha = 0.6 + 0.4 * Math.sin(frames * 0.3);
                 ctx.strokeStyle = "#FF1744"; ctx.lineWidth = 2.4; ctx.lineCap = 'round';
                 for (let k = 0; k < 3; k++){
                     ctx.beginPath();
@@ -465,23 +558,24 @@ function drawGaelBody(b, x, y){
                         ctx.lineTo(x0 + i * 6, (i % 2 ? -1 : 1) * (4 + Math.random() * 4));
                     ctx.stroke();
                 }
-                ctx.globalAlpha = 0.30; ctx.strokeStyle = "#FFCDD2"; ctx.lineWidth = 6;
+                ctx.globalAlpha = 0.28; ctx.strokeStyle = "#FFCDD2"; ctx.lineWidth = 6;
                 ctx.beginPath(); ctx.moveTo(8, 0); ctx.lineTo(L - 4, 0); ctx.stroke();
                 ctx.restore();
             } else if (do_){
-                // PHA 2: mau ri doc luoi
                 ctx.save();
-                ctx.globalAlpha = 0.5;
+                ctx.globalAlpha = 0.55;
                 ctx.strokeStyle = "#B71C1C"; ctx.lineWidth = 3;
                 ctx.beginPath(); ctx.moveTo(10, 1); ctx.lineTo(L - 8, 1); ctx.stroke();
                 ctx.restore();
             }
             ctx.restore();
+
+            ctx.restore(); // end somer flip
             ctx.restore();
         }
 // BOSS_PART_END s0.drawGaelBody.1
 
-// Nguồn: index.html:16131 · Dùng bởi: GaelBoss
+// Nguồn: index.html:16224 · Dùng bởi: GaelBoss
 // BOSS_PART_BEGIN s0.GaelBoss.1 EDITABLE
 class GaelBoss {
             constructor(level){
@@ -510,6 +604,19 @@ class GaelBoss {
                 this.quay = 0;              // goc xoay cua don XOAY NGUOI CHEM
                 this.quayBao = null;        // vong bao truoc cua don xoay
                 this.treoT = 0;             // nguoi choi da o tren khong lien tuc bao lau
+                this.capeWhip = 0;          // 0..1: do quat roi cua ao choang theo nhat kiem
+                this.capeAngle = -0.35;     // goc phong cua roi ao choang
+                this.flipAngle = 0;         // goc xoay lon nhao tren khong (360 somersault)
+                this.noGoc = 0;             // goc chuc mui no xuong dat khi lon qua dau
+                this.crouchLean = undefined;// do gap nguoi linh hoat theo tung chieu
+                this.whipTrails = [];       // vet lua do cua roi ao choang tren khong trung
+            }
+            resetCapePose(){
+                this.capeWhip = 0; this.capeAngle = -0.35; this.flipAngle = 0;
+                this.noGoc = 0; this.crouchLean = undefined; this.aoDai = 0; this.noTay = 0;
+                this.damXuong = 0; this.quay = 0; this.quayBao = null;
+                this._daVuot = false; this._vuotLandT = 0;
+                this._daKet = false; this._ketT = 0; this._ketKieu = null; this._ketX = undefined;
             }
             spd(){ return this.stage === 1 ? 1.16 : (this.stage === 2 ? 1.34 : 1.62); }
             /* GIUA CHUOI thi gan nhu KHONG nghi: 5 khung roi vao don ke, tuc la nguoi choi
@@ -524,8 +631,7 @@ class GaelBoss {
                    may cai do tu dong khong noi — dung y: chuyen pha va don ket khong duoc noi. */
                 if (GAE_NOI[this.state]) this.datNoi(this.state);
                 this.state = 'idle'; this.subTimer = 0; this.armR = 0;
-                this.aoDai = 0; this.noTay = 0;
-                this.damXuong = 0; this.quay = 0; this.quayBao = null;
+                this.resetCapePose();
                 if (this.chuoi && this.chuoi.length){ this.actionTimer = Math.max(3, Math.round(5 / this.spd())); return; }
                 this.chuoiDem = 0;   // chuoi da het -> bo dem ve 0 cho luot sau
                 this.actionTimer = Math.max(6, Math.round(t * GAE_TEMPO / this.spd()));
@@ -544,6 +650,7 @@ class GaelBoss {
             }
             ghost(){ if (this.ghosts.length >= 6) this.ghosts.shift();
                      this.ghosts.push({ x: this.x, y: this.y, left: this.facingLeft, armR: this.armR,
+                                        flipAngle: this.flipAngle, capeWhip: this.capeWhip, capeAngle: this.capeAngle,
                                         stage: this.stage, w: this.w, h: this.h, walk: this.walk, t: 14 }); }
             physics(){
                 this.dy += 0.72; this.y += this.dy;
@@ -673,8 +780,12 @@ class GaelBoss {
                 let d = this.dir(), R = reach + this.aoThem(), U = up + 10;
                 let r = d < 0 ? { x: this.x - R, y: this.y + 4 - U, w: R, h: this.h + U - 4 }
                               : { x: this.x + this.w, y: this.y + 4 - U, w: R, h: this.h + U - 4 };
+                let wAng = (this.armR || 0) < -1.0 ? -0.45 : ((this.armR || 0) > 0.3 ? 0.28 : -0.15);
+                this.capeWhip = 1.0;
+                this.capeAngle = wAng;
                 this.hop.push({ x: r.x, y: r.y, w: r.w, h: r.h, cho: GAE_AO_TRE,
-                                t: life || 10, tong: life || 10, hit: false });
+                                t: life || 12, tong: life || 12, hit: false,
+                                dir: d, ox: this.cx(), oy: this.y + this.h * 0.44, reach: R, wAng: wAng });
             }
             tickHop(){
                 for (let i = this.hop.length - 1; i >= 0; i--){
@@ -801,7 +912,8 @@ class GaelBoss {
                 this.mau.length = 0; this.set.length = 0; this.vong = null;
                 this.chuoi.length = 0; this.echo = null; this.cor.length = 0;
                 this.hop.length = 0; this.hon.length = 0;
-                this.aoDai = 0; this.noTay = 0; this.an = 0;
+                this.resetCapePose(); this.an = 0;
+                this.y = this.baseY; this.dy = 0; this.dashV = 0; this.grounded = true;
                 bossProjectiles.length = 0;
                 floatingTexts.push(new FloatingText(this.cx() - 110, 128, "HỒN TỐI TRỖI DẬY"));
                 shakeTimer = 70; if (SFX.bossEntry) SFX.bossEntry();
@@ -816,7 +928,8 @@ class GaelBoss {
                 this.mau.length = 0; this.set.length = 0; this.vong = null;
                 this.chuoi.length = 0; this.echo = null; this.cor.length = 0;
                 this.hop.length = 0; this.hon.length = 0;
-                this.aoDai = 0; this.noTay = 0; this.an = 0;
+                this.resetCapePose(); this.an = 0;
+                this.y = this.baseY; this.dy = 0; this.dashV = 0; this.grounded = true;
                 bossProjectiles.length = 0;
                 floatingTexts.push(new FloatingText(this.cx() - 120, 128, "MÁU CỦA HỒN TỐI SÔI LÊN"));
                 shakeTimer = 90; gaeChop = 40; if (SFX.bossEntry) SFX.bossEntry();
@@ -834,6 +947,7 @@ class GaelBoss {
                 for (let k in this.cd) if (this.cd[k] > 0) this.cd[k]--;
                 this.tickMau(); this.tickSet(); this.tickVong(); this.tickVet();
                 this.tickEcho(); this.tickCorona(); this.tickHop(); this.tickHon();
+                if (this.capeWhip > 0) this.capeWhip = Math.max(0, this.capeWhip - 0.055);
                 if (this.stagger > 0){ this.stagger--; this.physics(); if (this.stagger === 0) this.toIdle(18); return; }
                 this.physics();
                 if (this.slash){
@@ -1052,29 +1166,71 @@ class GaelBoss {
                             shakeTimer = 34; if (SFX.bossExplode) SFX.bossExplode();
                         }
                     }
-                    // ======== KIEU 'vuot' — NHAY QUA DAU ROI BAN CHUC XUONG ========
+                    // ======== KIEU 'vuot' — LON VONG QUA DAU BAN NO XUONG + XOAY KIEM & ROI AO CHOANG ========
                     else if (kk === 'vuot'){
-                        if (T(108)){ this.faceP(); this.armR = 0.7; this.noTay = 1; this.warn(30, 16, 22); }
-                        if (T(118)){
-                            let g = this.gap();
-                            this.dy = -17.5; this.grounded = false;
-                            this.dashV = Math.sign(g || 1) * 14.5;      // bay VUOT QUA dau
+                        if (T(106)){
+                            this.faceP();
+                            this.crouchLean = 0.36;
+                            this.armR = 0.75;
+                            this.noTay = 1;
+                            this.noGoc = 0.65;
+                            this.warn(96, 22, 12);
                         }
-                        if (this.subTimer > 118 && !this.grounded){
+                        if (T(116)){
+                            this.faceP();
+                            let g = this.gap();
+                            this.dy = -17.8; this.grounded = false;
+                            this.dashV = Math.sign(g || 1) * 15.5;      // Bật vọt qua đầu người chơi
+                            this.capeWhip = 0.9;
+                            this.capeAngle = -0.55;
+                            if (SFX.bossSkill) SFX.bossSkill();
+                        }
+                        if (this.subTimer > 116 && !this.grounded){
+                            // Xoay lộn vòng 360 độ trên không trung + Hướng mũi nỏ chúi thẳng vào người chơi bên dưới!
+                            let airProg = Math.min(1, (this.subTimer - 116) / 34);
+                            this.flipAngle = airProg * Math.PI * 2;
+                            this.aoDai = 0.85;
+                            this.capeWhip = 0.95;
+                            this.capeAngle = -0.7 + Math.sin(airProg * Math.PI * 2) * 0.4;
+                            let dxP = (dino.x + dino.w/2) - this.cx(), dyP = (dino.y + dino.h/2) - this.cy();
+                            this.noGoc = Math.atan2(dyP, dxP * this.dir()) - this.flipAngle;
                             if (Math.floor(this.subTimer) % 3 === 0) this.ghost();
                             this.dashV *= 0.985;
                         }
-                        for (let q = 0; q < 3; q++){
-                            if (T(134 + q * 7) && !this.grounded){
-                                let px = dino.x + dino.w/2;
-                                let vx = Math.max(-3.4, Math.min(3.4, (px - this.cx()) * 0.05 + (q - 1) * 1.6));
-                                let pr = new BossProjectile(this.cx(), this.y + this.h * 0.6, vx, 7.6, false, 1);
+                        // Xả 4 mũi nỏ liên thanh từ trên đỉnh đầu xuống đất trong lúc đang lộn vòng!
+                        for (let q = 0; q < 4; q++){
+                            if (T(126 + q * 5) && !this.grounded){
+                                let px = dino.x + dino.w/2, py = dino.y + dino.h/2;
+                                let ox = this.cx(), oy = this.y + this.h * 0.55;
+                                let ang = Math.atan2(py - oy, px - ox) + (q - 1.5) * 0.14;
+                                let spdB = 9.2;
+                                let pr = new BossProjectile(ox, oy, Math.cos(ang) * spdB, Math.max(4.8, Math.sin(ang) * spdB), false, 1);
                                 pr.frail = true; bossProjectiles.push(pr);
-                                if (SFX.tone) SFX.tone(700 - q * 40, 0.04, 'square', 0.10, 380);
+                                visualEffects.push(new Effect(ox, oy, 'explosion', this.facingLeft, 9));
+                                if (SFX.tone) SFX.tone(740 - q * 35, 0.04, 'square', 0.10, 380);
                             }
                         }
-                        if (this.subTimer > 130 && this.grounded && !this._daKet){
-                            this._daKet = true; this._ketT = this.subTimer; this.noTay = 0;
+                        // Ngay khi chạm đất phía bên kia: Quay ngoắt lại XOAY NGƯỜI CHÉM + QUẤT ROI ÁO CHOÀNG 360 ĐỘ!
+                        if (this.subTimer > 128 && this.grounded && !this._daKet){
+                            this._daKet = true; this._ketT = this.subTimer;
+                            this.noTay = 0; this.noGoc = 0; this.flipAngle = 0;
+                            this.faceP();
+                            this.aoDai = 1.0; this.capeWhip = 1.0; this.capeAngle = 0.15;
+                            this.armR = 0.85;
+                            this.doSlash(144, 38, 16);
+                            this.themHopAo(144, 38, 16);
+                            this.hop.push({ x: this.cx() - 138, y: this.y - 20, w: 276, h: this.h + 28,
+                                            cho: 0, t: 10, tong: 10, hit: false,
+                                            dir: this.dir(), ox: this.cx(), oy: this.y + this.h * 0.44, reach: 138, wAng: 0.1 });
+                            this.honTheoAo();
+                            visualEffects.push(new Effect(this.cx(), 310, 'explosion', true, 28));
+                            shakeTimer = 28;
+                            if (SFX.bossExplode) SFX.bossExplode();
+                        }
+                        if (this._daKet && this.subTimer <= (this._ketT || 0) + 18){
+                            this.quay += 0.52 * sp;
+                        } else if (this._daKet){
+                            this.quay = 0;
                         }
                     }
                     // ======== KIEU 'ao' — QUAT AO CHOANG RONG, BUNG RA LINH HON (pha 2-3) ========
@@ -1103,7 +1259,7 @@ class GaelBoss {
                        combo tu ket thuc giua khong trung va hop sat thuong bi bo han (do ra 0 lan
                        cham). Moc la "doan ket xong roi + 26 khung"; moc thoi gian chi la luoi
                        an toan. */
-                    if ((this._daKet && this.subTimer > (this._ketT || 0) + 26) || this.subTimer > 220){
+                    if ((this._daKet && this.subTimer > (this._ketT || 0) + 26) || this.subTimer > 300){
                         this._daKet = false; this._ketX = undefined; this.damXuong = 0;
                         this.noTay = 0; this._ketKieu = null;
                         this.toIdle(30);
@@ -1194,32 +1350,112 @@ class GaelBoss {
                    choi ban no xuong)". Han vot len, bay VUOT QUA nguoi choi, va o dinh vong
                    cung thi ban ba mui CHUC XUONG. Dap dat o phia ben kia — doi ben han, va
                    nguoi choi mat cai lung vua quay. */
+                /* ============ COMBO DAC TRUNG: LUOT CHEM -> LON VONG QUA DAU BAN NO XUONG -> XOAY KIEM & ROI AO CHOANG ============
+                   1) Nhip 1 (Khung 1 -> 24): Gael ha thap trong tam LUOT VUT TOI CHEM NGANG + QUAT ROI AO CHOANG.
+                   2) Nhip 2 (Khung 25 -> 60): Dung da chem bat nhay LON VONG 360 DO QUA DAU nguoi choi,
+                      rut no lien thanh ban 4 mui CHUC THANG XUONG DAT ngay trong luc dang xoay tren khong!
+                   3) Nhip 3 (Khi cham dat -> Khung 96): Dap dat o phia sau lung nguoi choi, lap tuc XOAY TRON
+                      DAI KIEM ket hop ROI AO CHOANG quet rong ca hai ben! */
                 if (st === 'g_vuot'){
-                    if (T(4)){ this.faceP(); this.armR = 0.7; this.noTay = 1; }
-                    if (T(16)){
+                    // --- NHIP 1: LUOT CHEM MO MAN ---
+                    if (T(2)){
+                        this.faceP();
+                        this.crouchLean = 0.38;
+                        this.armR = -2.1;
+                        this.aoDai = 0.45;
+                        this.warn(132, 24, 12);
+                        let g = Math.abs(this.gap());
+                        this.dashV = this.dir() * Math.max(14, Math.min(26, (g - 40) / 4.5));
+                    }
+                    if (T(14)){
+                        this.faceP();
+                        this.armR = 0.65;
+                        this.capeWhip = 1.0; this.capeAngle = -0.25; this.aoDai = 0.85;
+                        this.doSlash(132, 24, 10);
+                        this.themHopAo(132, 24, 10);
+                        this.dashV = this.dir() * 10;
+                        if (SFX.bossSkill) SFX.bossSkill();
+                    }
+                    // --- NHIP 2: BAT NHAY XOAY LON VONG QUA DAU & BAN NO CHUC XUONG ---
+                    if (T(25)){
+                        this.faceP();
+                        this._daVuot = false;
+                        this.noTay = 1;
+                        this.noGoc = 0.65;
                         let g = this.gap();
-                        this.dy = -17.5; this.grounded = false;
-                        this.dashV = Math.sign(g || 1) * 14.5;      // bay VUOT QUA dau
+                        let jumpDir = Math.sign(g || this.dir());
+                        this.dy = -17.6; this.grounded = false;
+                        // Đảm bảo vận tốc ngang đủ lớn để lộn hẳn qua đầu người chơi sang phía bên kia!
+                        let distNeed = Math.max(145, Math.min(270, Math.abs(g) + 95));
+                        this.dashV = jumpDir * (distNeed / 10.5);
+                        if (SFX.tone) SFX.tone(320, 0.08, 'sawtooth', 0.12, 180);
                     }
-                    if (this.subTimer > 16 && !this.grounded){
+                    if (this.subTimer > 25 && !this.grounded){
+                        let airProg = Math.min(1, (this.subTimer - 25) / 34);
+                        this.flipAngle = airProg * Math.PI * 2;   // Xoay lộn vòng 360 độ trên không!
+                        this.aoDai = 0.9;
+                        this.capeWhip = 0.95;
+                        this.capeAngle = -0.65 + Math.sin(airProg * Math.PI * 2) * 0.45;
+                        let dxP = (dino.x + dino.w/2) - this.cx(), dyP = (dino.y + dino.h/2) - this.cy();
+                        this.noGoc = Math.atan2(dyP, dxP * this.dir()) - this.flipAngle;
                         if (Math.floor(this.subTimer) % 3 === 0) this.ghost();
-                        this.dashV *= 0.985;
+                        this.dashV *= 0.986;
                     }
-                    for (let k = 0; k < 3; k++){
-                        if (T(34 + k * 7) && !this.grounded){
-                            let px = dino.x + dino.w/2;
-                            let vx = Math.max(-3.4, Math.min(3.4, (px - this.cx()) * 0.05 + (k - 1) * 1.6));
-                            let p = new BossProjectile(this.cx(), this.y + this.h * 0.6, vx, 7.6, false, 1);
+                    // Bắn 4 mũi nỏ liên thanh chúi xuống đầu người chơi khi đang bay ngang qua đỉnh!
+                    for (let k = 0; k < 4; k++){
+                        if (T(34 + k * 5) && !this.grounded){
+                            let px = dino.x + dino.w/2, py = dino.y + dino.h/2;
+                            let ox = this.cx(), oy = this.y + this.h * 0.55;
+                            let ang = Math.atan2(py - oy, px - ox) + (k - 1.5) * 0.14;
+                            let spdB = 9.4;
+                            let p = new BossProjectile(ox, oy, Math.cos(ang) * spdB, Math.max(4.8, Math.sin(ang) * spdB), false, 1);
                             p.frail = true;
                             bossProjectiles.push(p);
-                            if (SFX.tone) SFX.tone(700 - k * 40, 0.04, 'square', 0.10, 380);
+                            visualEffects.push(new Effect(ox, oy, 'explosion', this.facingLeft, 9));
+                            if (SFX.tone) SFX.tone(740 - k * 35, 0.04, 'square', 0.10, 380);
                         }
                     }
-                    if (this.subTimer > 40 && this.grounded && !this._daVuot){
-                        this._daVuot = true; this.noTay = 0; this.faceP();
-                        shakeTimer = 14;
+                    // --- NHIP 3: DAP DAT XOAY TRON DAI KIEM & ROI AO CHOANG ---
+                    if (this.subTimer > 38 && this.grounded && !this._daVuot){
+                        this._daVuot = true;
+                        this._vuotLandT = this.subTimer;
+                        this.noTay = 0; this.noGoc = 0; this.flipAngle = 0;
+                        this.faceP();
+                        this.crouchLean = 0.28;
+                        this.aoDai = 1.0; this.capeWhip = 1.0; this.capeAngle = 0.12;
+                        this.armR = -2.2;
+                        this.dashV = this.dir() * 9;
+                        this.doSlash(142, 36, 16);
+                        this.themHopAo(142, 36, 16);
+                        // Quét vòng tròn bằng cả lưỡi kiếm lẫn roi áo choàng khi vừa chạm đất
+                        this.hop.push({ x: this.cx() - 138, y: this.y - 22, w: 276, h: this.h + 30,
+                                        cho: 0, t: 10, tong: 10, hit: false,
+                                        dir: this.dir(), ox: this.cx(), oy: this.y + this.h * 0.44, reach: 138, wAng: 0.1 });
+                        this.honTheoAo();
+                        visualEffects.push(new Effect(this.cx(), 310, 'explosion', true, 28));
+                        shakeTimer = 24;
+                        if (SFX.bossExplode) SFX.bossExplode();
                     }
-                    if (this.subTimer > 78){ this._daVuot = false; this.noTay = 0; this.toIdle(20); }
+                    if (this._daVuot){
+                        let dtLand = this.subTimer - (this._vuotLandT || this.subTimer);
+                        if (dtLand < 18){
+                            this.quay += 0.54 * sp;
+                            this.aoDai = 1.0;
+                        } else {
+                            this.quay = 0;
+                            this.aoDai = Math.max(0, this.aoDai - 0.08);
+                        }
+                        if (dtLand > 28){
+                            this._daVuot = false; this.noTay = 0; this.quay = 0;
+                            this.toIdle(20);
+                            return;
+                        }
+                    }
+                    // Safety timeout must include real airtime at the faster phase-3 clock.
+                    if (this.subTimer > 200){
+                        this._daVuot = false; this.noTay = 0; this.quay = 0;
+                        this.toIdle(20);
+                    }
                     return;
                 }
                 /* ============ TRIEU OAN HON ============ */
@@ -1661,36 +1897,83 @@ class GaelBoss {
                     ctx.beginPath(); ctx.ellipse(v.x, 316, v.r, v.r * 0.20, 0, Math.PI, 0); ctx.stroke();
                     ctx.restore();
                 }
-                // BONG cua DON VONG (Echo Attack)
+                // BONG cua DON VONG (Echo Attack) — Vết Dư Ảnh Roi Áo Choàng Huyết Hồn
                 if (this.echo){
                     let e = this.echo;
                     ctx.save();
+                    let ex = e.dir < 0 ? e.x + e.w : e.x;
+                    let ey = e.y + e.h * 0.55;
                     if (e.no > 0){
                         let u = e.no / 14;
-                        ctx.globalAlpha = 0.85 * u;
-                        ctx.fillStyle = "#B71C1C"; ctx.fillRect(e.x, e.y, e.w, e.h);
-                        ctx.globalAlpha = u; ctx.strokeStyle = "#FFCDD2"; ctx.lineWidth = 3;
-                        ctx.strokeRect(e.x, e.y, e.w, e.h);
+                        ctx.globalAlpha = 0.88 * u;
+                        let gEcho = ctx.createLinearGradient(e.x, e.y, e.x + e.w, e.y + e.h);
+                        gEcho.addColorStop(0, "rgba(183, 28, 28, 0.25)");
+                        gEcho.addColorStop(0.5, "rgba(229, 57, 53, 0.85)");
+                        gEcho.addColorStop(1, "rgba(183, 28, 28, 0.25)");
+                        ctx.fillStyle = gEcho;
+                        ctx.beginPath();
+                        ctx.moveTo(ex, ey - e.h * 0.45);
+                        ctx.quadraticCurveTo(ex + e.dir * e.w * 0.85, ey - e.h * 0.55, ex + e.dir * e.w, ey + e.h * 0.35);
+                        ctx.quadraticCurveTo(ex + e.dir * e.w * 0.45, ey + e.h * 0.48, ex, ey + e.h * 0.25);
+                        ctx.closePath(); ctx.fill();
+                        ctx.strokeStyle = "#FFCDD2"; ctx.lineWidth = 3.5 * u;
+                        ctx.stroke();
                     } else {
                         let u = 1 - e.t / e.tong;
-                        ctx.globalAlpha = 0.14 + 0.34 * u;
-                        ctx.fillStyle = "#4A0E12"; ctx.fillRect(e.x, e.y, e.w, e.h);
-                        ctx.globalAlpha = 0.30 + 0.55 * u;
-                        ctx.strokeStyle = "#FF5252"; ctx.lineWidth = 2; ctx.setLineDash([7, 6]);
-                        ctx.strokeRect(e.x, e.y, e.w, e.h); ctx.setLineDash([]);
+                        ctx.globalAlpha = 0.16 + 0.32 * u;
+                        ctx.fillStyle = "#4A0E12";
+                        ctx.beginPath();
+                        ctx.moveTo(ex, ey - e.h * 0.42);
+                        ctx.quadraticCurveTo(ex + e.dir * e.w * 0.8, ey - e.h * 0.5, ex + e.dir * e.w, ey + e.h * 0.35);
+                        ctx.quadraticCurveTo(ex + e.dir * e.w * 0.4, ey + e.h * 0.45, ex, ey + e.h * 0.25);
+                        ctx.closePath(); ctx.fill();
+                        ctx.globalAlpha = 0.35 + 0.55 * u;
+                        ctx.strokeStyle = "#FF5252"; ctx.lineWidth = 2.2; ctx.setLineDash([8, 6]);
+                        ctx.stroke(); ctx.setLineDash([]);
                     }
                     ctx.restore();
                 }
-                // HOP SAT THUONG PHU CUA AO CHOANG — ve mot vet vai mo, de nguoi choi doc
-                // duoc rang nhat kiem con keo theo mot lop thu hai roi ra xa hon.
+                // DẢI ROI ÁO CHOÀNG QUẤT BỒI THEO KIẾM (WHIP-CAPE AFTERSHOCK RIBBON)
+                // Thay vì vẽ một khung chữ nhật cứng nhắc, vẽ dải lụa roi huyết hồn uốn cong quất ra xa hơn lưỡi kiếm!
                 for (let h of this.hop){
                     if (h.cho > 0) continue;
+                    let u = h.t / h.tong;
                     ctx.save();
-                    ctx.globalAlpha = 0.32 * (h.t / h.tong);
-                    ctx.fillStyle = "#7F1418"; ctx.fillRect(h.x, h.y, h.w, h.h);
-                    ctx.globalAlpha = 0.55 * (h.t / h.tong);
-                    ctx.strokeStyle = "#FF8A80"; ctx.lineWidth = 2;
-                    ctx.strokeRect(h.x, h.y, h.w, h.h);
+                    if (h.dir){
+                        let ox = h.ox || (h.dir < 0 ? h.x + h.w : h.x);
+                        let oy = h.oy || (h.y + h.h * 0.5);
+                        let tx = h.dir < 0 ? h.x : h.x + h.w;
+                        let ty = h.y + h.h * 0.38;
+                        let mx = (ox + tx) * 0.5;
+                        let my = oy - 36 * Math.sin(u * Math.PI);
+
+                        let wg = ctx.createLinearGradient(ox, oy, tx, ty);
+                        wg.addColorStop(0, "rgba(74, 14, 18, 0)");
+                        wg.addColorStop(0.5, this.stage >= 2 ? "rgba(183, 28, 28, 0.72)" : "rgba(120, 48, 40, 0.68)");
+                        wg.addColorStop(0.9, this.stage >= 2 ? "rgba(255, 82, 82, 0.90)" : "rgba(215, 204, 200, 0.85)");
+                        wg.addColorStop(1, "rgba(255, 205, 210, 0)");
+
+                        ctx.globalAlpha = 0.78 * u;
+                        ctx.fillStyle = wg;
+                        ctx.beginPath();
+                        ctx.moveTo(ox, oy - 12);
+                        ctx.quadraticCurveTo(mx, my - 18, tx, ty);
+                        ctx.quadraticCurveTo(mx, my + 22, ox, oy + 16);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        // Sống roi sáng sắc lẹm
+                        ctx.globalAlpha = 0.92 * u;
+                        ctx.strokeStyle = this.stage >= 2 ? "#FF8A80" : "#EFEBE9";
+                        ctx.lineWidth = 3.2 * u;
+                        ctx.beginPath();
+                        ctx.moveTo(ox, oy);
+                        ctx.quadraticCurveTo(mx, my, tx, ty);
+                        ctx.stroke();
+                    } else {
+                        ctx.globalAlpha = 0.26 * u;
+                        ctx.fillStyle = "#7F1418"; ctx.fillRect(h.x, h.y, h.w, h.h);
+                    }
                     ctx.restore();
                 }
                 // OAN HON
@@ -1761,11 +2044,12 @@ class GaelBoss {
                     ctx.restore();
                 }
                 
-                // bong tan du
+                // bong tan du (truyen du goc xoay lon vong & roi ao choang)
                 for (let g of this.ghosts){
                     ctx.save();
                     ctx.globalAlpha = 0.24 * (g.t / 14);
                     drawGaelBody({ facingLeft: g.left, armR: g.armR, stage: g.stage,
+                                   flipAngle: g.flipAngle, capeWhip: g.capeWhip, capeAngle: g.capeAngle,
                                    w: g.w, h: g.h, walk: g.walk }, g.x, g.y);
                     ctx.restore();
                 }
@@ -1818,17 +2102,17 @@ class GaelBoss {
         }
 // BOSS_PART_END s0.GaelBoss.1
 
-// Nguồn: index.html:24178 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GaelBoss, GiantSpiderBoss, GreatSerpentBoss, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PoisonMothBoss, PontiffBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, VoltCloneBoss, WarBoss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:24461 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GaelBoss, GiantSpiderBoss, GreatSerpentBoss, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PoisonMothBoss, PontiffBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, VoltCloneBoss, WarBoss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s0._tbbKhung.1 READ_ONLY
 let _tbbKhung = -1, _tbbSo = 0;
 // BOSS_PART_END s0._tbbKhung.1
 
-// Nguồn: index.html:24189 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GaelBoss, GiantSpiderBoss, GreatSerpentBoss, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PoisonMothBoss, PontiffBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, VoltCloneBoss, WarBoss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:24472 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GaelBoss, GiantSpiderBoss, GreatSerpentBoss, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PoisonMothBoss, PontiffBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, VoltCloneBoss, WarBoss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s0._tbbDaVe.1 READ_ONLY
 let _tbbDaVe = new Set(), _tbbDaVeKhung = -1;
 // BOSS_PART_END s0._tbbDaVe.1
 
-// Nguồn: index.html:24206 · Dùng bởi: ArtoriasBoss, CorruptionBoss, DanteBoss, DeathBoss, GaelBoss, HelicoprionBoss, HoGacBoss, MegaManXBoss, MegalodonBoss, NeroBoss, OctopusBoss, PontiffBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, WarBoss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:24489 · Dùng bởi: ArtoriasBoss, CorruptionBoss, DanteBoss, DeathBoss, GaelBoss, HelicoprionBoss, HoGacBoss, MegaManXBoss, MegalodonBoss, NeroBoss, OctopusBoss, PontiffBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, WarBoss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s0.drawTopBossBar.1 READ_ONLY
 function drawTopBossBar(b, col, label, sub, hang){
             /* Khong truyen `hang` (boss TU ve thanh mau) ma trong cung mot khung co hai con
@@ -1866,7 +2150,7 @@ function drawTopBossBar(b, col, label, sub, hang){
         }
 // BOSS_PART_END s0.drawTopBossBar.1
 
-// Nguồn: index.html:98512 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:98795 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.BOSS_CHUNG.1 READ_ONLY
 const BOSS_CHUNG = {
             cx(){ return this.x + this.w / 2; },
@@ -1881,7 +2165,7 @@ const BOSS_CHUNG = {
         };
 // BOSS_PART_END s6.BOSS_CHUNG.1
 
-// Nguồn: index.html:98523 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:98806 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.capBoHamChung.1 READ_ONLY
 (function capBoHamChung(){
             const DS = [
