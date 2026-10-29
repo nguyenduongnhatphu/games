@@ -39,6 +39,8 @@ Game thiên về **khám phá cơ chế** và thử nghiệm build hơn là ch�
 
 ➡️ [Chơi Dino](https://nguyenduongnhatphu.github.io/games/play.html?id=dino)
 
+➡️ [Tải từng file JS của Boss để gửi AI chỉnh sửa](games/Dino/bosses/README.md)
+
 ### Hướng dẫn nhanh (Dino)
 
 | Mục | Phím / Cách dùng |

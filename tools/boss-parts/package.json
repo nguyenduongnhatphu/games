@@ -1,0 +1,13 @@
+{
+  "name": "dino-boss-parts",
+  "private": true,
+  "description": "Editable boss snapshots; Dino remains a standalone HTML game.",
+  "scripts": {
+    "export": "node index.cjs export",
+    "check": "node index.cjs check"
+  },
+  "dependencies": {
+    "acorn": "8.15.0",
+    "acorn-globals": "7.0.1"
+  }
+}
