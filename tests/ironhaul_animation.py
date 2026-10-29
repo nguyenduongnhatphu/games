@@ -22,7 +22,7 @@ with sync_playwright() as p:
                 check(near(distance(a.root,a.joint),34)&&near(distance(a.joint,a.end),35),'arm detaches or stretches');
                 check(near(distance(a.end,a.hand),11),'hand detaches from wrist');
             }
-            for(const l of r.legs)check(near(distance(l.hip,l.knee),31)&&near(distance(l.knee,l.ankle),36),'leg detaches or stretches');
+            for(const l of r.legs)check(near(distance(l.hip,l.knee),40)&&near(distance(l.knee,l.ankle),44),'leg detaches or stretches');
             check(near(g.grip.x,b.cx()+b.dir()*r.sword.hand.x)&&near(g.grip.y,b.y+b.h+r.sword.hand.y),'weapon leaves hand');
             check(near(distance(g.grip,g.tip),(b.slash?.reach||112)*(1-r.fold*.65)),'blade collider length differs from mesh');
             check(g.shieldPoints.every(p=>p.x>=g.shieldBox.x-.001&&p.x<=g.shieldBox.x+g.shieldBox.w+.001&&p.y>=g.shieldBox.y-.001&&p.y<=g.shieldBox.y+g.shieldBox.h+.001),'shield collider misses mesh');
@@ -65,7 +65,7 @@ with sync_playwright() as p:
     }'''))
     print(page.evaluate('''()=>{
         for(const left of [false,true]){
-            let b=rigSetup(false,left);b.begin('ih_combo');b.swing('cut',112,14);b.slash.age=4;b.slash.angle=-2.2+3.45*ironhaulEase(4/14);
+            let b=rigSetup(false,left);b.begin('ih_combo');b.swing('cut',112,14);b.slash.age=4;b.slash.angle=b.slash.a0+(b.slash.a1-b.slash.a0)*ironhaulEase(4/14);
             const g=ironhaulWeapons(b);dino.w=dino.h=8;dino.x=g.tip.x-4;dino.y=g.tip.y-4;
             let count=0;dino.takeDamage=()=>count++;dino.isShielding=()=>false;
             for(let i=0;i<18;i++){frames++;b.tickSlash();}
@@ -80,13 +80,13 @@ with sync_playwright() as p:
         check(near(bullet.x,g.gun.x)&&near(bullet.y,g.gun.y),'round does not start at barrel');
         check(near(Math.atan2(bullet.vy,bullet.vx),g.gunAngle),'barrel and shot aim differ');
         const c=rigSetup(true);c.begin('ih_aegis');c.subTimer=29;frames++;c.update();let shield=bossProjectiles.find(q=>q.ihKind==='shield');
-        const hand=ironhaulWeapons(c).shield;check(shield&&distance({x:shield.x+24,y:shield.y+24},hand)<1,'throw does not start at hand');
+        const hand=ironhaulWeapons(c).shield;check(shield&&distance({x:shield.x+shield.w/2,y:shield.y+shield.h/2},hand)<1,'throw does not start at hand');
         for(let i=0;i<100;i++){frames++;shield.update();if(shield.x>worldR()+1000)break;}
         check(c.shieldOut===0&&shield.x>worldR()+1000,'shield does not return to hand');
         return 'PASS real blade/shield sweeps hit exactly once; rounds follow barrel, shield releases and returns at the hand';
     }'''))
     print(page.evaluate('''()=>{
-        const b=rigSetup();b.begin('ih_combo');b.swing('cut',112,14);b.slash.age=13;b.slash.angle=-2.2+3.45*ironhaulEase(13/14);
+        const b=rigSetup();b.begin('ih_combo');b.swing('cut',112,14);b.slash.age=13;b.slash.angle=b.slash.a0+(b.slash.a1-b.slash.a0)*ironhaulEase(13/14);
         frames++;b.tickSlash();const end=ironhaulWeapons(b);frames++;const next=ironhaulWeapons(b);
         check(distance(end.grip,next.grip)<8&&distance(end.tip,next.tip)<16,'blade snaps back after swing');
         const c=rigSetup(true);c.begin('ih_reversal');c.shieldSwing('spin',32);c.shieldStrike.age=31;

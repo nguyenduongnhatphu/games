@@ -34231,6 +34231,7 @@ class GreatApeBoss {
            ============================================================================ */
 /* ===== js/maps.js ===== */
 // ===== IRONHAUL — container truck / gunblade robot / silver sword-and-shield armour =====
+const IRONHAUL_SHIELD_SCALE=1.25;
 const IRONHAUL_MOVES = {
     ih_ram:{name:'CÒI HƠI · TÔNG HAI LƯỢT',end:240},
     ih_cannon:{name:'TRIỂN KHAI PHÁO',end:137},
@@ -34250,10 +34251,13 @@ const IRONHAUL_MOVES = {
     ih_riposte:{name:'PARRY · PHẢN KÍCH',end:105},
     ih_cross:{name:'ĐẬP KHIÊN → CHÉM HẤT → BỔ KIẾM',end:148},
     ih_shieldrush:{name:'KHIÊN TIÊN PHONG → KIẾM → XOAY KHIÊN',end:163},
-    ih_reversal:{name:'XOAY NGƯỢC KHIÊN → ĐÂM → HẤT KHIÊN',end:164}
+    ih_reversal:{name:'XOAY NGƯỢC KHIÊN → ĐÂM → HẤT KHIÊN',end:164},
+    ih_overcharge:{name:'LÕI NĂNG LƯỢNG → CƯỜNG HÓA KIẾM',end:122},
+    ih_bladefan:{name:'TAM LIÊN KIẾM KHÍ',end:142}
 };
 // Shared beats: wind-up poses and live hit windows read the same attack schedule.
 const IRONHAUL_SWORD_BEATS={
+    ih_overcharge:[[88,'cut',124,16]],ih_bladefan:[[32,'rise',120,16],[64,'cut',124,16],[96,'thrust',130,16]],
     ih_advance:[[52,'cut',112,14],[78,'rise',112,14]],
     ih_combo:[[26,'cut',112,14],[54,'rise',112,14],[86,'thrust',112,14]],
     ih_gunblade:[[82,'cut',125,14]],ih_upper:[[30,'rise',120,14],[54,'cut',120,13],[83,'cut',125,15]],
@@ -34357,20 +34361,21 @@ function ironhaulRig(b){
     const gait=b.gait||0,air=!b.grounded,silver=!!b.silver;
     const gunWindow=(a,b,c,d)=>ironhaulEase((t-a)/(b-a))*(1-ironhaulEase((t-c)/(d-c)));
     const gunBlend=st==='ih_barrage'?gunWindow(8,25,86,109):st==='ih_gunblade'?gunWindow(18,29,55,73):st==='ih_cleaver'?gunWindow(103,114,131,159):b.pose==='gun'?1:0;
-    let turn=0,lean=speed*.13,crouch=0,swordTarget={x:54,y:-96},offTarget={x:-40,y:-105},blade=.95,shieldAngle=-.1;
+    let turn=0,lean=speed*.13,crouch=0,swordTarget={x:50,y:-88},offTarget={x:8,y:-94},blade=.72,shieldAngle=-.1;
     const nextSword=ironhaulSwordBeats(b).find(k=>t<=k[0]&&t>=k[0]-18);
     const wind=nextSword?ironhaulEase((t-nextSword[0]+18)/18):0;
     if(st==='ih_advance'&&t>=20&&t<50){swordTarget={x:5,y:-125};blade=-2.7;offTarget={x:30,y:-115};lean=.22;crouch=.25;}
     if(st==='ih_flank'&&t>=20&&t<68){turn=Math.sin(Math.max(0,Math.min(1,(t-43)/20))*Math.PI)*.25;lean=-.2;swordTarget={x:18,y:-151};blade=-1.8;}
     if(st==='ih_skyfall'&&t<=24){const u=ironhaulEase(t/24);swordTarget={x:ironhaulMix(54,27,u),y:ironhaulMix(-96,-149,u)};blade=ironhaulAngleMix(.95,-1.8,u);crouch=u*.65;}
     if(st==='ih_skyfall'&&b.landT&&t>=b.landT)crouch=Math.max(crouch,Math.sin(Math.min(1,(t-b.landT)/14)*Math.PI)*.75);
+    if(st==='ih_overcharge'&&t<=80){const u=ironhaulEase(t/25);swordTarget={x:ironhaulMix(50,43,u),y:ironhaulMix(-88,-109,u)};offTarget={x:8,y:ironhaulMix(-94,-114,u)};blade=ironhaulAngleMix(.72,-1.55,u);lean=-.04;crouch=.04;}
     if(st==='ih_parry'||(st==='ih_riposte'&&t<=28)){offTarget={x:52,y:-113};shieldAngle=.12;swordTarget={x:22,y:-97};blade=.65;crouch=.2;}
     if((st==='ih_aegis'&&t<31)){const a=ironhaulEase(t/30);offTarget={x:ironhaulMix(-31,68,a),y:ironhaulMix(-136,-108,a)};shieldAngle=ironhaulMix(-.75,.3,a);lean=-.13+.3*a;}
-    if(gunBlend&&!silver){offTarget={x:ironhaulMix(-40,57-(b.muzzle||0)*1.2,gunBlend),y:ironhaulMix(-105,-111,gunBlend)};lean=(-.07-(b.muzzle||0)*.012)*gunBlend;}
+    if(gunBlend&&!silver){offTarget={x:ironhaulMix(8,57-(b.muzzle||0)*1.2,gunBlend),y:ironhaulMix(-94,-111,gunBlend)};lean=(-.07-(b.muzzle||0)*.012)*gunBlend;}
     if(wind&&!q){
         const kind=nextSword[1],goal=kind==='rise'?{x:40,y:-73}:kind==='thrust'?(st==='ih_cleaver'?{x:14,y:-111}:{x:22,y:-103}):st==='ih_cleaver'?{x:14,y:-160}:{x:29,y:-153};
         swordTarget={x:ironhaulMix(swordTarget.x,goal.x,wind),y:ironhaulMix(swordTarget.y,goal.y,wind)};
-        blade=ironhaulAngleMix(blade,kind==='rise'?1.25:kind==='thrust'?-.12:-2.2,wind);
+        blade=ironhaulAngleMix(blade,kind==='rise'?.52:kind==='thrust'?-.12:-2.2,wind);
         lean=ironhaulMix(lean,kind==='rise'?.19:kind==='thrust'?0:-.16,wind);
     }
     const nextShield=silver?(IRONHAUL_SHIELD_BEATS[st]||[]).find(k=>t<=k[0]&&t>=k[0]-18):undefined;
@@ -34413,10 +34418,10 @@ function ironhaulRig(b){
     }
     const targets={swordTarget:{...swordTarget},offTarget:{...offTarget},blade,shieldAngle,lean,crouch,turn};
     const yaw=Math.cos(turn*Math.PI*2),width=Math.max(.2,Math.abs(yaw)),bob=air?0:Math.sin(gait*2)*speed*2+Math.sin(frames*.055)*.7;
-    const pelvis={x:Math.sin(turn*Math.PI*2)*5,y:-70+crouch*15+bob};
-    const chest=ironhaulRot({x:0,y:-55},lean,pelvis),neck=ironhaulRot({x:0,y:-28},lean,chest);
-    const shoulderFront=ironhaulRot({x:34*yaw,y:-5},lean,chest),shoulderBack=ironhaulRot({x:-34*yaw,y:-5},lean,chest);
-    const sword=ironhaulIK(shoulderFront,swordTarget,34,35,-1),off=ironhaulIK(shoulderBack,offTarget,34,35,1);
+    const pelvis={x:Math.sin(turn*Math.PI*2)*5,y:-94+crouch*15+bob};
+    const chest=ironhaulRot({x:0,y:-38},lean,pelvis),neck=ironhaulRot({x:0,y:-23},lean,chest);
+    const shoulderFront=ironhaulRot({x:31*yaw,y:-5},lean,chest),shoulderBack=ironhaulRot({x:-31*yaw,y:-5},lean,chest);
+    const sword=ironhaulIK(shoulderFront,swordTarget,34,35,1),off=ironhaulIK(shoulderBack,offTarget,34,35,1);
     sword.angle=blade;sword.hand={x:sword.end.x+Math.cos(blade)*11,y:sword.end.y+Math.sin(blade)*11};
     off.angle=(q||nextShield||(st==='ih_aegis'&&t<=30)||(follow&&silver))?shieldAngle:st==='ih_cleaver'&&(s||wind||(follow&&t<103))?blade:silver?-.1:0;
     if(gunBlend&&!silver&&!s){
@@ -34428,9 +34433,9 @@ function ironhaulRig(b){
     const legs=[];
     for(const side of [-1,1]){
         const phase=gait+(side<0?Math.PI:0),stride=Math.sin(phase)*19*speed;
-        const ankle={x:side*23+stride+(air?side*8:0),y:-9-Math.max(0,Math.cos(phase))*14*speed-(air?side<0?18:5:0)};
-        const hip={x:pelvis.x+side*17*width,y:pelvis.y+3};
-        const leg=ironhaulIK(hip,ankle,31,36,-1);
+        const ankle={x:side*20+stride+(air?side*8:0),y:-9-Math.max(0,Math.cos(phase))*14*speed-(air?side<0?18:5:0)};
+        const hip={x:pelvis.x+side*14*width,y:pelvis.y+3};
+        const leg=ironhaulIK(hip,ankle,40,44,-1);
         legs.push({hip:leg.root,knee:leg.joint,ankle:leg.end,angle:air?.3:-.09*Math.sin(phase)*speed+Math.sin(turn*Math.PI*2)*side*.16});
     }
     return {targets,fold,pelvis,chest,neck,head:{x:neck.x,y:neck.y-9},lean,width,yaw,turn,crouch,legs,sword,off,shieldFace:q?.kind==='spin'?Math.max(.18,Math.abs(Math.cos(turn*Math.PI*2))):1,offBehind:q?.kind==='spin'&&Math.sin(turn*Math.PI*2)<-.1};
@@ -34439,7 +34444,7 @@ function ironhaulWorldPoint(b,p){return {x:b.cx()+b.dir()*p.x,y:b.y+b.h+p.y};}
 function ironhaulWeapons(b){
     const r=b.rigPose||ironhaulRig(b),grip=ironhaulWorldPoint(b,r.sword.hand),reach=(b.slash?.reach||112)*(1-r.fold*.65);
     const tip=ironhaulWorldPoint(b,{x:r.sword.hand.x+Math.cos(r.sword.angle)*reach,y:r.sword.hand.y+Math.sin(r.sword.angle)*reach});
-    const shield=ironhaulWorldPoint(b,r.off.hand),points=[[-27,-35],[19,-37],[32,-16],[25,29],[0,43],[-28,22],[-33,-13]].map(([x,y])=>ironhaulWorldPoint(b,ironhaulRot({x:x*r.shieldFace,y},r.off.angle,r.off.hand)));
+    const shield=ironhaulWorldPoint(b,r.off.hand),points=[[-27,-35],[19,-37],[32,-16],[25,29],[0,43],[-28,22],[-33,-13]].map(([x,y])=>ironhaulWorldPoint(b,ironhaulRot({x:x*r.shieldFace*IRONHAUL_SHIELD_SCALE,y:y*IRONHAUL_SHIELD_SCALE},r.off.angle,r.off.hand)));
     const gun=ironhaulWorldPoint(b,{x:r.off.hand.x+Math.cos(r.off.angle)*48,y:r.off.hand.y+Math.sin(r.off.angle)*48});
     const loX=Math.min(...points.map(p=>p.x)),loY=Math.min(...points.map(p=>p.y));
     return {rig:r,grip,tip,shield,shieldPoints:points,shieldBox:{x:loX,y:loY,w:Math.max(...points.map(p=>p.x))-loX,h:Math.max(...points.map(p=>p.y))-loY},gun,gunAngle:Math.atan2(gun.y-shield.y,gun.x-shield.x)};
@@ -34467,12 +34472,12 @@ function ironhaulRobot(b,alpha=1){
     ctx.save();ctx.globalAlpha*=alpha;ctx.translate(b.cx(),b.y+b.h);ctx.scale(b.dir(),1);
     const limb=(a,armed)=>{
         ironhaulBone(a.root,a.joint,19,col,hi);ironhaulJoint(a.root,9,hi);ironhaulJoint(a.joint,7,energy);ironhaulBone(a.joint,a.end,22,col,hi,true);ironhaulJoint(a.end,5,hi);ironhaulHand(a,col,hi);
-        if(armed==='shield'&&silver&&b.shieldOut<=0){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);ctx.scale(r.shieldFace,1);
+        if(armed==='shield'&&silver&&b.shieldOut<=0){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);ctx.scale(r.shieldFace*IRONHAUL_SHIELD_SCALE,IRONHAUL_SHIELD_SCALE);
             ironhaulPolygon([[-27,-35],[19,-37],[32,-16],[25,29],[0,43],[-28,22],[-33,-13]],'#7d98ab',hi);
             ironhaulPolygon([[-21,-28],[15,-30],[24,-13],[18,23],[0,33],[-21,17],[-25,-10]],'#eaf7ff');
             ironhaulPolygon([[0,-23],[12,0],[0,25],[-12,0]],'#315c71',energy);ctx.strokeStyle=energy;ctx.lineWidth=b.state==='ih_parry'?4:2;ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(0,23);ctx.stroke();
             for(const [x,y] of [[-18,-23],[15,-22],[-18,16],[15,19]]){ctx.fillStyle='#607f92';ctx.fillRect(x-2,y-2,4,4);}ctx.restore();
-        }else if(armed==='gun'&&!silver&&!(b.state==='ih_cleaver'&&b.subTimer<103)){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);ironhaulPolygon([[-5,-8],[30,-9],[36,-5],[49,-5],[49,5],[8,9],[-5,3]],dark,hi);ctx.fillStyle=hi;ctx.fillRect(32,-4,17,8);ctx.fillStyle=energy;ctx.fillRect(8,-7,16,2);
+        }else if(armed==='gun'&&!silver&&!((b.state==='ih_cleaver'&&b.subTimer<103)||b.state==='ih_overcharge')){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);ironhaulPolygon([[-5,-8],[30,-9],[36,-5],[49,-5],[49,5],[8,9],[-5,3]],dark,hi);ctx.fillStyle=hi;ctx.fillRect(32,-4,17,8);ctx.fillStyle=energy;ctx.fillRect(8,-7,16,2);
             if(b.muzzle>0){ctx.fillStyle='#ffedb7';ironhaulPolygon([[49,-7],[70,0],[49,7],[55,0]],ctx.fillStyle,null);}ctx.restore();}
         else if(armed==='sword'){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);const L=(b.slash?.reach||112)*(1-r.fold*.65);
             ironhaulPolygon([[0,-5],[L-20,-5],[L,0],[L-20,5],[0,5]],silver?'#f0fcff':'#bbcdd7',energy);ctx.fillStyle=energy;ctx.fillRect(11,-4,L-34,2);ctx.fillStyle=dark;ctx.fillRect(-10,-5,15,10);ctx.fillStyle=hi;ctx.fillRect(-2,-12,5,24);ctx.restore();}
@@ -34488,7 +34493,7 @@ function ironhaulRobot(b,alpha=1){
     ironhaulBone(r.pelvis,r.chest,29,dark,hi);ironhaulJoint(r.pelvis,13,energy);
     ctx.save();ctx.translate(r.pelvis.x,r.pelvis.y);ctx.scale(r.width,1);ironhaulPolygon([[-32,-8],[27,-8],[32,13],[12,21],[-22,18],[-35,6]],col);ctx.fillStyle=hi;ctx.fillRect(-18,-5,35,4);ctx.restore();
     ctx.save();ctx.translate(r.chest.x,r.chest.y);ctx.rotate(r.lean);ctx.scale(r.width,1);
-    ironhaulPolygon([[-37,-19],[-23,-25],[24,-25],[38,-14],[30,25],[7,36],[-24,27],[-35,7]],col);
+    ironhaulPolygon([[-37,-19],[-23,-25],[24,-25],[38,-14],[30,21],[7,29],[-24,22],[-35,7]],col);
     if(r.yaw>=0){ironhaulPolygon([[-29,-14],[0,-7],[29,-14],[24,8],[0,16],[-26,7]],silver?'#eff9ff':'#a75943');
         for(const side of [-1,1])ironhaulPolygon([[side*3,-6],[side*25,-11],[side*23,3],[side*3,9]],'#14384a',hi);
         ctx.fillStyle=energy;ctx.beginPath();ctx.arc(0,16,silver?6:4,0,7);ctx.fill();
@@ -34503,10 +34508,50 @@ function ironhaulRobot(b,alpha=1){
     if(b.pose==='dash'||!b.grounded){ctx.fillStyle=energy;for(const side of [-1,1]){const p=r.chest;ironhaulPolygon([[p.x+side*34,p.y+5],[p.x+side*34-18,p.y+17],[p.x+side*34-48-Math.sin(frames*2)*8,p.y+12]],energy,null);}}
     ctx.restore();
 }
+// Crescents are authored facing +X. Both old waves and charged cuts rotate with their velocity.
+function ironhaulPaintCrescent(q){
+    const angle=Math.atan2(q.vy,q.vx),R=q.arcRadius||20,depth=q.arcDepth||28;
+    ctx.rotate(angle);ctx.beginPath();ctx.moveTo(-R*.7,-R);ctx.quadraticCurveTo(depth,0,-R*.7,R);ctx.quadraticCurveTo(depth*.2,0,-R*.7,-R);ctx.closePath();ctx.fill();
+    if(q.ihKind==='energy'){
+        ctx.strokeStyle='#efffff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-R*.65,-R*.86);ctx.quadraticCurveTo(depth*.84,0,-R*.65,R*.86);ctx.stroke();
+        ctx.globalAlpha*=.35;ctx.strokeStyle=q.color;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-R,-R*.7);ctx.lineTo(-R-20,-R*.4);ctx.moveTo(-R,R*.7);ctx.lineTo(-R-20,R*.4);ctx.stroke();
+    }
+}
+function ironhaulEnergySlash(b,origin,tilt=0){
+    const targetX=Number.isFinite(b.lockX)?b.lockX:dino.x+dino.w/2,targetY=Number.isFinite(b.lockY)?b.lockY:dino.y+dino.h/2;
+    const localAim=Math.max(-.5,Math.min(.5,Math.atan2(targetY-origin.y,Math.max(160,Math.abs(targetX-origin.x)))))+tilt;
+    const vx=(b.attackDir||b.dir())*Math.cos(localAim)*8,vy=Math.sin(localAim)*8,p=new BossProjectile(0,0,vx,vy,false,1);
+    p._ironhaulOwner=b;p.ihKind='energy';p.age=0;p.color=b.silver?'#acffff':'#78dfff';p.arcRadius=b.coreBuff>0?43:34;p.arcDepth=40;p.frail=false;
+    // A rotated, symmetric envelope contains the complete crescent for every aim direction.
+    const angle=Math.atan2(vy,vx),halfX=p.arcRadius,halfY=p.arcRadius;
+    p.w=2*(Math.abs(Math.cos(angle))*halfX+Math.abs(Math.sin(angle))*halfY);p.h=2*(Math.abs(Math.sin(angle))*halfX+Math.abs(Math.cos(angle))*halfY);
+    p.x=origin.x-p.w/2;p.y=origin.y-p.h/2;p.spawn={...origin};
+    p.update=function(){const cx=this.x+this.w/2+this.vx,cy=this.y+this.h/2+this.vy,a=Math.atan2(this.vy,this.vx);this.age++;this.w=this.h=2*this.arcRadius*(Math.abs(Math.cos(a))+Math.abs(Math.sin(a)));this.x=cx-this.w/2;this.y=cy-this.h/2;if(this.age>150||b.dying||b.hp<=0)this.x=worldR()+9999;};
+    p.veRieng=function(q){ctx.save();ctx.translate(q.x+q.w/2,q.y+q.h/2);ctx.fillStyle=q.color;ctx.globalAlpha=.85;ironhaulPaintCrescent(q);ctx.restore();};
+    bossProjectiles.push(p);return p;
+}
+function ironhaulCoreFx(b){
+    const charging=b.state==='ih_overcharge'&&b.subTimer<=74,charge=charging?ironhaulEase(b.subTimer/72):b.coreBuff>0?1:0;
+    if(!charge||b.vehicle)return;
+    const g=ironhaulWeapons(b),r=g.rig,core=ironhaulWorldPoint(b,ironhaulRot({x:0,y:16},r.lean,r.chest));
+    ctx.save();ctx.strokeStyle=b.silver?'#d1ffff':'#91eaff';ctx.fillStyle=ctx.strokeStyle;
+    ctx.globalAlpha=.2+charge*.45;ctx.lineWidth=1+charge*3;ctx.beginPath();ctx.arc(core.x,core.y,7+charge*5+Math.sin(frames*.2),0,Math.PI*2);ctx.stroke();
+    if(charging){
+        const control={x:(core.x+g.grip.x)/2,y:Math.min(core.y,g.grip.y)-22};
+        ctx.beginPath();ctx.moveTo(core.x,core.y);ctx.quadraticCurveTo(control.x,control.y,g.grip.x,g.grip.y);ctx.stroke();
+        for(let i=0;i<6;i++){
+            const u=(frames*.035+i/6)%1,v=1-u,x=v*v*core.x+2*v*u*control.x+u*u*g.grip.x,y=v*v*core.y+2*v*u*control.y+u*u*g.grip.y;
+            ctx.fillRect(x-2,y-2,4,4);
+        }
+    }
+    ctx.globalAlpha=charge*.4;ctx.lineWidth=5+charge*4;ctx.beginPath();ctx.moveTo(g.grip.x,g.grip.y);ctx.lineTo(g.tip.x,g.tip.y);ctx.stroke();
+    ctx.globalAlpha=charge*.85;ctx.lineWidth=2;const u=(frames*.025)%1;
+    const x=ironhaulMix(g.grip.x,g.tip.x,u),y=ironhaulMix(g.grip.y,g.tip.y,u);ctx.beginPath();ctx.arc(x,y,3,0,7);ctx.stroke();ctx.restore();
+}
 function ironhaulRound(b,x,y,vx,vy,kind='bullet',targetX=null){
     const p=new BossProjectile(x,y,vx,vy,false,1);p._ironhaulOwner=b;p.ihKind=kind;p.age=0;p.color=b.silver?'#b4f7ff':'#ffc788';p.frail=kind==='bullet';
-    p.w=kind==='shell'?18:kind==='shield'?48:kind==='wave'?34:12;p.h=kind==='shell'?18:kind==='shield'?48:kind==='wave'?40:7;
-    if(kind==='shield'){p.x-=24;p.y-=24;}
+    p.w=kind==='shell'?18:kind==='shield'?72:kind==='wave'?34:12;p.h=kind==='shell'?18:kind==='shield'?72:kind==='wave'?40:7;
+    if(kind==='shield'){p.x-=p.w/2;p.y-=p.h/2;}else if(kind==='wave')p.x-=p.w/2;
     p.update=function(){
         this.age++;const ox=this.x;
         if(this.ihKind==='shell')this.vy+=.22;
@@ -34525,9 +34570,9 @@ function ironhaulRound(b,x,y,vx,vy,kind='bullet',targetX=null){
     p.veRieng=function(q){
         ctx.save();ctx.translate(q.x+q.w/2,q.y+q.h/2);ctx.fillStyle=q.color;ctx.strokeStyle='#f1ffff';ctx.lineWidth=2;
         if(q.ihKind==='shield'){
-            ctx.rotate(q.age*.25);ironhaulPolygon([[-23,-16],[0,-27],[24,-15],[24,15],[0,27],[-23,15]],'#dce9f2',q.color);ctx.beginPath();ctx.arc(0,0,14,0,7);ctx.stroke();
+            ctx.rotate(q.age*.25);ctx.scale(IRONHAUL_SHIELD_SCALE,IRONHAUL_SHIELD_SCALE);ironhaulPolygon([[-23,-16],[0,-27],[24,-15],[24,15],[0,27],[-23,15]],'#dce9f2',q.color);ctx.beginPath();ctx.arc(0,0,14,0,7);ctx.stroke();
         }else if(q.ihKind==='shell'){ctx.beginPath();ctx.arc(0,0,9,0,7);ctx.fill();ctx.fillStyle='#fff8d5';ctx.fillRect(-3,-3,6,6);}
-        else if(q.ihKind==='wave'){ctx.beginPath();ctx.moveTo(-15,19);ctx.quadraticCurveTo(28,0,0,-21);ctx.quadraticCurveTo(10,0,-15,19);ctx.fill();}
+        else if(q.ihKind==='wave'){ironhaulPaintCrescent(q);}
         else{ctx.rotate(Math.atan2(q.vy,q.vx));ctx.fillRect(-8,-3,16,6);ctx.fillStyle='#fff3da';ctx.fillRect(1,-2,8,4);}
         ctx.restore();
     };
@@ -34543,7 +34588,7 @@ class IronhaulBoss{
         this._hp=30;this.maxHp=30;this.totalHp=180;this._firstStrikeHooked=true;
         Object.defineProperty(this,'hp',{enumerable:true,configurable:true,get:()=>this._hp,set:v=>this.setHealth(v)});
         this.state='entering';this.subTimer=0;this.actionTimer=45;this.facingLeft=true;this.invulnAll=true;this.burnTimer=0;
-        this.pose='idle';this.vehicle=true;this.parryCd=0;this.parryLock=0;this.shieldOut=0;this.muzzle=0;
+        this.pose='idle';this.vehicle=true;this.coreBuff=0;this.coreCd=0;this.arcCd=0;this.usedCoreInForm=false;this.parryCd=0;this.parryLock=0;this.shieldOut=0;this.muzzle=0;
         this.slash=null;this.shieldStrike=null;this.gait=0;this.animSpeed=0;this.animAt=-1000;this.hitKeys=new Set();this.reticles=[];this.ghosts=[];this.lastAttack='';this.driveDir=-1;this.ram=null;
     }
     cx(){return this.x+this.w/2;}
@@ -34573,7 +34618,7 @@ class IronhaulBoss{
     }
     startPhase2(){
         if(this.phase!==1)return;
-        this.clearAttack();this.phase=2;this._hp=this.maxHp=150;this.state='ih_shift';this.subTimer=0;this.invulnAll=true;
+        this.clearAttack();this.coreBuff=0;this.coreCd=0;this.usedCoreInForm=false;this.phase=2;this._hp=this.maxHp=150;this.state='ih_shift';this.subTimer=0;this.invulnAll=true;
         this.y=this.baseY;this.grounded=true;
         for(let i=bossProjectiles.length-1;i>=0;i--)if(bossProjectiles[i]._ironhaulOwner===this)bossProjectiles.splice(i,1);
         floatingTexts.push(new FloatingText(this.cx()-90,120,'IRONHAUL · CHUYỂN DẠNG'));shakeTimer=14;
@@ -34581,7 +34626,7 @@ class IronhaulBoss{
     }
     startSilver(){
         if(this.silver||this.phase!==2)return;
-        this.clearAttack();this.silver=true;this.resizeVehicle(false);this.y=this.baseY;this.grounded=true;
+        this.clearAttack();this.coreBuff=0;this.coreCd=0;this.usedCoreInForm=false;this.silver=true;this.resizeVehicle(false);this.y=this.baseY;this.grounded=true;
         this.state='ih_silver';this.subTimer=0;this.invulnAll=true;this.parryCd=80;
         for(let i=bossProjectiles.length-1;i>=0;i--)if(bossProjectiles[i]._ironhaulOwner===this)bossProjectiles.splice(i,1);
         floatingTexts.push(new FloatingText(this.cx()-85,100,'SILVER AEGIS · KIẾM & KHIÊN'));shakeTimer=20;
@@ -34596,19 +34641,26 @@ class IronhaulBoss{
         this.clearAttack();if(this.phase===2&&this.vehicle)this.resizeVehicle(false);
         this.state='idle';this.subTimer=0;this.actionTimer=wait;this.invulnAll=false;
     }
-    legalMoves(){return this.phase===1?['ih_ram','ih_cannon','ih_gatling']:this.silver?['ih_advance','ih_silvercombo','ih_aegis','ih_parry','ih_cross','ih_shieldrush','ih_reversal']:['ih_advance','ih_combo','ih_gunblade','ih_upper','ih_barrage','ih_skyfall','ih_morph','ih_cleaver','ih_flank'];}
+    legalMoves(){return this.phase===1?['ih_ram','ih_cannon','ih_gatling']:(this.silver?['ih_advance','ih_silvercombo','ih_aegis','ih_parry','ih_cross','ih_shieldrush','ih_reversal']:['ih_advance','ih_combo','ih_gunblade','ih_upper','ih_barrage','ih_skyfall','ih_morph','ih_cleaver','ih_flank']).concat('ih_overcharge','ih_bladefan');}
     chooseAttack(){
         this.faceP();const gap=Math.abs(dino.x+dino.w/2-this.cx());let pool;
+        if(this.phase===2&&!this.usedCoreInForm&&this.coreCd<=0){this.begin('ih_overcharge');return;}
         if(this.phase===1)pool=this.legalMoves();
         else if(this.silver){pool=gap>260?['ih_shieldrush','ih_advance','ih_aegis']:['ih_silvercombo','ih_cross','ih_reversal','ih_shieldrush','ih_aegis','ih_parry'];if(this.parryCd>0)pool=pool.filter(x=>x!=='ih_parry');}
         else pool=gap>290?['ih_advance','ih_morph','ih_flank','ih_barrage']:!dino.grounded?['ih_upper','ih_gunblade','ih_skyfall','ih_flank']:['ih_combo','ih_advance','ih_cleaver','ih_gunblade','ih_upper','ih_flank'];
         if(gap>420)pool=pool.filter(x=>x!=='ih_flank');
+        if(this.phase===2){
+            if(this.coreBuff>0){pool=pool.filter(x=>x!=='ih_morph');if(this.arcCd<=0&&gap>170)pool.push('ih_bladefan','ih_bladefan');}
+            else if(this.coreCd<=0)pool.push('ih_overcharge');
+        }
         const next=pool.filter(x=>x!==this.lastAttack);this.begin(next[Math.floor(Math.random()*next.length)]||pool[0]);
     }
     begin(state){
         if(!this.legalMoves().includes(state)&&state!=='ih_riposte')return false;
         this.clearAttack();this.state=state;this.lastAttack=state;this.subTimer=0;this.faceP();this.attackDir=this.dir();
         this.lockX=Math.max(70,Math.min(canvas.width-70,dino.x+dino.w/2));this.lockY=dino.y+dino.h/2;
+        if(state==='ih_overcharge'){this.usedCoreInForm=true;this.coreCd=540;}
+        if(state==='ih_bladefan')this.arcCd=300;
         if(state==='ih_flank')this.flankTo=Math.max(8,Math.min(canvas.width-this.w-8,this.lockX+this.attackDir*85-this.w/2));
         if(state==='ih_parry')this.parryCd=300;
         if(state==='ih_ram')this.ram={leg:0,stage:'warn',t:0,dir:this.ramDirection(),hit:false};
@@ -34624,22 +34676,22 @@ class IronhaulBoss{
         visualEffects.push(new Effect(this.cx()+this.dir()*45,this.cy(),'parry'));floatingTexts.push(new FloatingText(this.cx()-40,this.y-24,'PARRY!'));
         shakeTimer=Math.max(shakeTimer,7);return true;
     }
-    hurtBox(box,key){
+    hurtBox(box,key,damage=1){
         if(this.hitKeys.has(key)||!checkAABB(box,dino))return false;
         this.hitKeys.add(key);
         if(dino.isShielding()){
-            if(danteRoyalShield())danteGuardContact(1,this);
+            if(danteRoyalShield())danteGuardContact(damage,this);
             else{
                 const perfect=(dino.parryWindow>0||dino.meleeTimer>=(combatStance===2?38:23))&&perfectParryCd<=0&&!voidChanParry();
                 parry(dino.y+20);
                 if(perfect){dealDamage(this,parryDamage(this,true),'flat');perfectParryCd=30;parryGainUlt(true);shinGuardReset(true);if(!this.invulnAll)this.idle(55);}
             }
-        }else dino.takeDamage(1);
+        }else dino.takeDamage(damage);
         return true;
     }
     swing(kind='cut',reach=112,life=11){
-        const angles=kind==='rise'?[1.25,-1.9]:kind==='thrust'?[-.12,.08]:[-2.2,1.25];
-        this.slash={age:0,life,kind,reach,dir:this.attackDir,a0:angles[0],a1:angles[1],angle:angles[0],hit:false};
+        const angles=kind==='rise'?[.52,-1.9]:kind==='thrust'?[-.12,.08]:[-2.2,.65];
+        this.slash={age:0,life,kind,reach,dir:this.attackDir,a0:angles[0],a1:angles[1],angle:angles[0],hit:false,power:this.coreBuff>0?2:1};
         this.pose=kind==='thrust'?'thrust':kind==='rise'?'overhead':'cut';
         this.slash.previous=ironhaulWeapons(this);
         SFX.tone(400,.08,'sawtooth',.06,130);
@@ -34651,8 +34703,9 @@ class IronhaulBoss{
         const next=ironhaulWeapons(this);
         if(!s.hit)for(let k=0;k<=8;k++){
             const u=k/8,x=ironhaulMix(prev.grip.x,next.grip.x,u),y=ironhaulMix(prev.grip.y,next.grip.y,u),tx=ironhaulMix(prev.tip.x,next.tip.x,u),ty=ironhaulMix(prev.tip.y,next.tip.y,u);
-            if(sgSegmentBox(x,y,tx,ty,dino,11)!==null){s.hit=true;this.hurtBox({x:dino.x,y:dino.y,w:dino.w,h:dino.h},'sword:'+this.subTimer);break;}
+            if(sgSegmentBox(x,y,tx,ty,dino,11)!==null){s.hit=true;this.hurtBox({x:dino.x,y:dino.y,w:dino.w,h:dino.h},'sword:'+this.subTimer,s.power);break;}
         }
+        if(this.coreBuff>0&&s.age===8&&['ih_combo','ih_cleaver'].includes(this.state)&&s.kind==='thrust')this.releaseEnergy();
         s.previous=next;if(s.age>=s.life){this.followPose={at:frames,targets:next.rig.targets,duration:12};this.slash=null;}
     }
     shieldSwing(kind='bash',life=18){
@@ -34665,10 +34718,14 @@ class IronhaulBoss{
         const q=this.shieldStrike;if(!q)return;
         const old=q.previous||ironhaulWeapons(this);q.age++;
         const next=ironhaulWeapons(this),active=q.age>=Math.ceil(q.life*.2)&&q.age<=Math.ceil(q.life*.9);
-        if(!q.hit&&active&&(checkAABB(next.shieldBox,dino)||sgSegmentBox(old.shield.x,old.shield.y,next.shield.x,next.shield.y,dino,23)!==null)){
+        if(!q.hit&&active&&(checkAABB(next.shieldBox,dino)||sgSegmentBox(old.shield.x,old.shield.y,next.shield.x,next.shield.y,dino,23*IRONHAUL_SHIELD_SCALE)!==null)){
             q.hit=true;this.hurtBox({x:dino.x,y:dino.y,w:dino.w,h:dino.h},'shield:'+this.subTimer);
         }
         q.previous=next;if(q.age>=q.life){this.followPose={at:frames,targets:next.rig.targets,duration:12};this.shieldStrike=null;}
+    }
+    releaseEnergy(tilt=0){
+        const g=ironhaulWeapons(this),origin={x:ironhaulMix(g.grip.x,g.tip.x,.6),y:ironhaulMix(g.grip.y,g.tip.y,.6)};
+        ironhaulEnergySlash(this,origin,tilt);SFX.tone(450,.12,'sawtooth',.08,170);
     }
     shoot(count=1,spread=.08){
         let x,y,angle;
@@ -34717,6 +34774,7 @@ class IronhaulBoss{
         if(this.silver&&(this.vehicle||['ih_morph','ih_unfold','ih_ram'].includes(this.state))){this.resizeVehicle(false);this.idle(45);}
         for(const g of this.ghosts)g.t--;this.ghosts=this.ghosts.filter(g=>g.t>0).slice(-8);
         for(const r of this.reticles)r.t--;this.reticles=this.reticles.filter(r=>r.t>0);
+        if(this.coreBuff>0)this.coreBuff--;if(this.coreCd>0)this.coreCd--;if(this.arcCd>0)this.arcCd--;
         if(this.parryCd>0)this.parryCd--;if(this.shieldOut>0)this.shieldOut--;if(this.muzzle>0)this.muzzle--;
         if(this.parryLock>0){this.parryLock--;if(!this.parryLock)this.invulnAll=false;}
         this.subTimer++;const t=this.subTimer,st=this.state;
@@ -34800,6 +34858,11 @@ class IronhaulBoss{
             if(t>=21&&t<45){this.pose='shield';if(Math.abs(dino.x+dino.w/2-this.cx())>75)this.move(this.attackDir*6);}
         }else if(st==='ih_reversal'){
             if(t>=33&&t<50)this.move(this.attackDir*1.4);
+        }else if(st==='ih_overcharge'){
+            if(t===72){this.coreBuff=480;visualEffects.push(new Effect(this.cx(),this.cy(),'body_slam_shockwave',true,46));SFX.tone(250,.3,'triangle',.1,900);}
+            if(t===96)this.releaseEnergy();
+        }else if(st==='ih_bladefan'){
+            if(t===40||t===72||t===104)this.releaseEnergy(t===40?-.14:t===72?.14:0);
         }else{this.idle(45);return;}
         if(t>=(IRONHAUL_MOVES[st]?.end||150))this.idle(st==='ih_parry'?55:42);
     }
@@ -34816,6 +34879,7 @@ class IronhaulBoss{
         else if(this.state==='ih_unfold'){if(this.subTimer<22)ironhaulTruck(this,this.subTimer/30);else ironhaulRobot(this,Math.min(1,(this.subTimer-22)/20));}
         else if(this.vehicle)ironhaulTruck(this);
         else ironhaulRobot(this);
+        if(!this.vehicle)ironhaulCoreFx(this);
         if(this.state==='ih_silver'){
             const t=this.subTimer,q=Math.min(1,t/75);
             if(t<75)for(const side of [-1,1]){ctx.save();ctx.globalAlpha=1-q;ctx.translate(this.cx()+side*(20+q*100),this.y+70-q*35);ctx.rotate(side*q*.8);ironhaulPolygon([[-16,-37],[16,-33],[18,35],[-17,31]],'#53798c','#9cb4be');ctx.restore();}
@@ -34836,7 +34900,7 @@ class IronhaulBoss{
         ctx.restore();
         const label=this.phase===1?'CONTAINER · 30 HP':this.silver?'SILVER AEGIS · KIẾM & KHIÊN':'GUNBLADE · 150 HP';
         drawTopBossBar(this,this.silver?'#d9eff7':this.phase===1?'#f3b664':'#79b8d0','IRONHAUL · '+label);
-        ctx.save();hudManHinh(this);ctx.textAlign='center';ctx.font='bold 11px Consolas';ctx.fillStyle=this.silver?'#d9faff':'#f4cca0';ctx.fillText(IRONHAUL_MOVES[this.state]?.name||(['ih_shift','ih_silver'].includes(this.state)?'ĐANG CHUYỂN DẠNG…':'FREIGHT DISTRICT'),canvas.width/2,53);ctx.restore();
+        ctx.save();hudManHinh(this);ctx.textAlign='center';ctx.font='bold 11px Consolas';ctx.fillStyle=this.silver?'#d9faff':'#f4cca0';ctx.fillText((this.coreBuff>0?'⚡ KIẾM CƯỜNG HÓA · ':'')+(IRONHAUL_MOVES[this.state]?.name||(['ih_shift','ih_silver'].includes(this.state)?'ĐANG CHUYỂN DẠNG…':'FREIGHT DISTRICT')),canvas.width/2,53);ctx.restore();
     }
 }
 

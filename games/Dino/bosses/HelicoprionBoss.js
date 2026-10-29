@@ -1,5 +1,5 @@
 // BOSS_FILE: HelicoprionBoss
-// BOSS_SNAPSHOT: beba2bbb918dbf33475490c993ed1556c7f85c4568f316c2be580c4161e1acfd
+// BOSS_SNAPSHOT: 4863609839309ada6c7e852f99b544516428c61879b5acfd487872b6e4c14714
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -55,27 +55,27 @@ function drawTopBossBar(b, col, label, sub, hang){
         }
 // BOSS_PART_END s0.drawTopBossBar.1
 
-// Nguồn: index.html:40577 · Dùng bởi: HelicoprionBoss, MegalodonBoss, MosaBoss, ThalassaBoss
+// Nguồn: index.html:40641 · Dùng bởi: HelicoprionBoss, MegalodonBoss, MosaBoss, ThalassaBoss
 // BOSS_PART_BEGIN s1.OCEAN_SURF.1 READ_ONLY
 const OCEAN_SURF = 150;
 // BOSS_PART_END s1.OCEAN_SURF.1
 
-// Nguồn: index.html:40579 · Dùng bởi: HelicoprionBoss, MegalodonBoss, MosaBoss, ThalassaBoss
+// Nguồn: index.html:40643 · Dùng bởi: HelicoprionBoss, MegalodonBoss, MosaBoss, ThalassaBoss
 // BOSS_PART_BEGIN s1.oceanPads.1 READ_ONLY
 let oceanPads = [], oceanCamY = 0;
 // BOSS_PART_END s1.oceanPads.1
 
-// Nguồn: index.html:40639 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss
+// Nguồn: index.html:40703 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss
 // BOSS_PART_BEGIN s1.BIEN_DAY.1 READ_ONLY
 const BIEN_DAY = 760, BIEN_NONG = 330, BIEN_SAU = 470, BIEN_VUC = 560;
 // BOSS_PART_END s1.BIEN_DAY.1
 
-// Nguồn: index.html:40646 · Dùng bởi: HelicoprionBoss, MegalodonBoss
+// Nguồn: index.html:40710 · Dùng bởi: HelicoprionBoss, MegalodonBoss
 // BOSS_PART_BEGIN s1.bienVat.1 READ_ONLY
 let bienVat = [], bienCuoi = 0, bienLoaiTruoc = -1, bienX0 = null, bienTrongBun = 0, bienChon = false, bienDaDoan = 0;
 // BOSS_PART_END s1.bienVat.1
 
-// Nguồn: index.html:40648 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss
+// Nguồn: index.html:40712 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss
 // BOSS_PART_BEGIN s1.bienChay.1 READ_ONLY
 function bienChay(){
             return typeof gameState !== 'undefined' && gameState === 'normal' && mapChay === 'ocean' && mapTheme === 'ocean'
@@ -83,37 +83,37 @@ function bienChay(){
         }
 // BOSS_PART_END s1.bienChay.1
 
-// Nguồn: index.html:40653 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss
+// Nguồn: index.html:40717 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss
 // BOSS_PART_BEGIN s1.bienCoDiaHinh.1 READ_ONLY
 function bienCoDiaHinh(){ return bienChay() || (typeof bienDT !== 'undefined' && bienDT && mapTheme === 'ocean'); }
 // BOSS_PART_END s1.bienCoDiaHinh.1
 
-// Nguồn: index.html:41536 · Dùng bởi: HelicoprionBoss
+// Nguồn: index.html:41600 · Dùng bởi: HelicoprionBoss
 // BOSS_PART_BEGIN s1.HELI_HP.1 EDITABLE
 const HELI_HP = 180;
 // BOSS_PART_END s1.HELI_HP.1
 
-// Nguồn: index.html:41537 · Dùng bởi: HelicoprionBoss
+// Nguồn: index.html:41601 · Dùng bởi: HelicoprionBoss
 // BOSS_PART_BEGIN s1.HELI_XOAY_R.1 EDITABLE
 const HELI_XOAY_R = 85;
 // BOSS_PART_END s1.HELI_XOAY_R.1
 
-// Nguồn: index.html:41538 · Dùng bởi: HelicoprionBoss
+// Nguồn: index.html:41602 · Dùng bởi: HelicoprionBoss
 // BOSS_PART_BEGIN s1.HELI_TRANG.1 READ_ONLY
 const HELI_TRANG = { vao: 1, nghi: 1, xe: 1, rang: 1, xoay: 1, vo: 1, can: 1, bao: 1, gam: 1 };
 // BOSS_PART_END s1.HELI_TRANG.1
 
-// Nguồn: index.html:41539 · Dùng bởi: HelicoprionBoss
+// Nguồn: index.html:41603 · Dùng bởi: HelicoprionBoss
 // BOSS_PART_BEGIN s1.HELI_CD.1 EDITABLE
 const HELI_CD = { xe: 200, rang: 240, xoay: 420, vo: 380, can: 150, bao: 600 };
 // BOSS_PART_END s1.HELI_CD.1
 
-// Nguồn: index.html:41541 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss, ThalassaBoss
+// Nguồn: index.html:41605 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss, ThalassaBoss
 // BOSS_PART_BEGIN s1.bienDT.1 READ_ONLY
 let bienDT = false, bienToiY = 520;
 // BOSS_PART_END s1.bienDT.1
 
-// Nguồn: index.html:41557 · Dùng bởi: HelicoprionBoss, MegalodonBoss
+// Nguồn: index.html:41621 · Dùng bởi: HelicoprionBoss, MegalodonBoss
 // BOSS_PART_BEGIN s1.bienTickTinh.1 READ_ONLY
 function bienTickTinh(){
             for (let o of bienVat) o.t++;
@@ -122,7 +122,7 @@ function bienTickTinh(){
         }
 // BOSS_PART_END s1.bienTickTinh.1
 
-// Nguồn: index.html:41562 · Dùng bởi: HelicoprionBoss
+// Nguồn: index.html:41626 · Dùng bởi: HelicoprionBoss
 // BOSS_PART_BEGIN s1.HelicoprionBoss.1 EDITABLE
 class HelicoprionBoss {
             constructor(level){
