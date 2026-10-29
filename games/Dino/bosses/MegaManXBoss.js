@@ -1,12 +1,12 @@
 // BOSS_FILE: MegaManXBoss
-// BOSS_SNAPSHOT: 9124d003c3ce72e4e4fcae863db4e13cdfe06607527a4558945ab0774010859b
+// BOSS_SNAPSHOT: 727b7298f5725557e84ed20d1375204ce421ac8161e96654772477c0b6e53e0c
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
 // EDITABLE: được sửa. READ_ONLY: ngữ cảnh dùng chung, không sửa trong file Boss.
 // Nếu cần sửa phần dùng chung, gửi thêm shared/BossShared.js; xem README.md.
 // Thêm helper mới BÊN TRONG một vùng EDITABLE, không đặt ngoài các marker.
-// Global / tham chiếu ngoài file: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, BossProjectile, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DPR, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, Effect, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, FloatingText, ForestShooter, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, Heart, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaDino, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, Map, Math, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, Number, Object, Obstacle, OctopusBoss, PillarLordBoss, Player, PoisonMothBoss, PontiffBoss, Projectile, PteroBoss, PteroLordBoss, Pterodactyl, PulsarCloneBoss, QuetzalBoss, Raptor, SFX, ScarabLordBoss, Set, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitBat, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, WindBlade, Yasuo2Boss, YasuoBoss, ZeroBoss, beamClashTargets, bosses, canvas, checkAABB, ctx, cusAcThoiVat, dealDamage, defMode, dino, dojoMode, enemies, floatingTexts, frames, gameState, mapChay, mapTheme, parry, platforms, projectiles, shakeTimer, visualEffects, voidBat, voidPhanRa, xCong, xDmgDan
+// Global / tham chiếu ngoài file: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, BossProjectile, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DPR, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, Effect, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, FloatingText, ForestShooter, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, Heart, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaDino, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, Map, Math, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, Number, Object, Obstacle, OctopusBoss, PillarLordBoss, Player, PoisonMothBoss, PontiffBoss, Projectile, PteroBoss, PteroLordBoss, Pterodactyl, PulsarCloneBoss, QuetzalBoss, Raptor, SFX, ScarabLordBoss, Set, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitBat, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WILDS, WORLD_W, WarBoss, WindBlade, Yasuo2Boss, YasuoBoss, ZeroBoss, beamClashTargets, bosses, camX, canvas, checkAABB, ctx, cusAcThoiVat, dealDamage, defMode, dino, dojoMode, enemies, floatingTexts, frames, gameState, mapChay, mapTheme, parry, platforms, projectiles, shakeTimer, visualEffects, voidBat, voidPhanRa, wildernessOn, xCong, xDmgDan
 // Nguồn: index.html:24461 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, FireCloneBoss, GaelBoss, GiantSpiderBoss, GreatSerpentBoss, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PoisonMothBoss, PontiffBoss, PulsarCloneBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TetrisBoss, ThalassaBoss, TyrantRexBoss, UnityCloneBoss, VergilBoss, VoltCloneBoss, WarBoss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s0._tbbKhung.1 READ_ONLY
 let _tbbKhung = -1, _tbbSo = 0;
@@ -103,8 +103,8 @@ const MMX_SAN = 320;
 // BOSS_PART_BEGIN s0.MegaManXBoss.1 EDITABLE
 class MegaManXBoss {
     san(){
-        if(!this.laChoi||mapTheme!=='ocean')return MMX_SAN;
-        let floor=bienDayHT(),feet=this.y+this.h;
+        if(!this.laChoi||(mapTheme!=='ocean'&&!wildernessOn()))return MMX_SAN;
+        let floor=wildernessOn()?320:bienDayHT(),feet=this.y+this.h;
         for(const pf of platforms){if(pf.solid===false||!Number.isFinite(pf.top)||pf.top<feet-4)continue;if(this.x+this.w>pf.x&&this.x<pf.x+pf.w)floor=Math.min(floor,pf.top);}
         return floor;
     }
@@ -242,7 +242,7 @@ class MegaManXBoss {
             let d = Math.hypot(ox - this.cx(), (o.y + (o.h || 20) / 2) - this.cy());
             if (this.laChoi){
                 // BAN NGUOI CHOI: bo ke chua vao man hinh; ke o phia sau lung bi 'phat' khoang cach de uu tien ke phia truoc mat
-                if (ox < -20 || ox > canvas.width + 20) continue;
+                if (ox < (wildernessOn()?camX:0)-20 || ox > (wildernessOn()?camX:0)+canvas.width+20) continue;
                 if (this.facingLeft ? ox > this.cx() : ox < this.cx()) d *= 2.2;
             }
             if (d < bd){ bd = d; best = o; }
@@ -375,7 +375,7 @@ class MegaManXBoss {
         let D = this.dac; D.t++;
         if (D.ten === 'tuong'){
             // DA TUONG: luot toi mep man gan nhat, bam tuong leo len, da ra va ban cheo xuong
-            let trai = D.ben < 0, mep = trai ? 8 : canvas.width - this.w - 8;
+            let trai = D.ben < 0, mep = trai ? 8 : (this.laChoi&&wildernessOn()?WORLD_W:canvas.width) - this.w - 8;
             if (D.pha === 0){
                 this.vx = (mep - this.x) > 0 ? 9 : -9;
                 if (Math.abs(mep - this.x) < 12){ this.x = mep; D.pha = 1; D.t = 0; this.vy = -12; this.grounded = false; }
@@ -412,7 +412,7 @@ class MegaManXBoss {
                 if (this.laChoi){ D.rehit = 8; if (D.t % 8 === 0) D.hit = 0; }
                 this.vet.push({ x: this.x, y: this.y, t: 14 });
                 this.cham(D, { x: this.x - 10, y: this.y - 6, w: this.w + 20, h: this.h + 12 });
-                if ((this.x <= 8 && this.vx < 0) || (this.x >= canvas.width - this.w - 8 && this.vx > 0)) D.t = 52;
+                if ((this.x <= 8 && this.vx < 0) || (this.x >= (this.laChoi&&wildernessOn()?WORLD_W:canvas.width) - this.w - 8 && this.vx > 0)) D.t = 52;
                 return;
             }
             this.invulnAll = false; this.vx *= 0.5; this.dac = null; this.aNghi = 18;
@@ -436,7 +436,7 @@ class MegaManXBoss {
             this.vx = D.vx; this.vy = D.vy; this.invulnAll = true;
             this.vet.push({ x: this.x, y: this.y, t: 12, trang: 1 });
             this.cham(D, { x: this.x - 8, y: this.y, w: this.w + 16, h: this.h });
-            if (this.y >= this.baseY - 2 || D.t > 40 || this.x <= 8 || this.x >= canvas.width - this.w - 8){
+            if (this.y >= this.baseY - 2 || D.t > 40 || this.x <= 8 || this.x >= (this.laChoi&&wildernessOn()?WORLD_W:canvas.width) - this.w - 8){
                 this.invulnAll = false; this.dac = null; this.vy = Math.max(this.vy, 0); this.vx *= 0.3; this.aNghi = 16;
             }
             return;
@@ -829,7 +829,7 @@ class MegaManXBoss {
 
     // ======================= VAT THE =======================
     tickVatThe(){
-        const W = canvas.width;
+        const W = this.laChoi&&wildernessOn()?WORLD_W:canvas.width;
         // --- dan ---
         for (let i = this.dan.length - 1; i >= 0; i--){
             let b = this.dan[i]; b.t++;
@@ -935,7 +935,7 @@ class MegaManXBoss {
                 if (this.cham(b, { x: b.x - b.r, y: b.y - b.r, w: b.r * 2, h: b.r * 2 })) xoa = true;
                 if (b.di > (b.maxRange||190)) xoa = true;
             } else xoa = true;
-            if (b.t > (b.life || 260) || b.x < -120 || b.x > W + 120 || b.y > (this.laChoi&&mapTheme==='ocean'?bienDayHT()+100:420) || b.y < -260) xoa = true;
+            if (b.t > (b.life || 260) || b.x < -120 || b.x > W + 120 || b.y > (this.laChoi&&wildernessOn()?WILDS.bottom+100:this.laChoi&&mapTheme==='ocean'?bienDayHT()+100:420) || b.y < (this.laChoi&&wildernessOn()?WILDS.top-100:-260)) xoa = true;
             if (xoa || b._voidXoa) this.dan.splice(i, 1);
         }
         // --- cot (set roi / tia Falcon Giga) ---
@@ -1069,7 +1069,7 @@ class MegaManXBoss {
 
     update(){
         if (this.laChoi){
-            if(mapTheme==='ocean')this.baseY=this.san()-this.h;
+            if(mapTheme==='ocean'||wildernessOn())this.baseY=this.san()-this.h;
             this.toc++;
             if (this.tayBan > 0) this.tayBan--;
             if (this.mauT > 0 && --this.mauT === 0 && this.aS === 'khong' && (this.vkChon || 'buster') === 'buster') this.mau = 'thuong';
@@ -1782,7 +1782,7 @@ function bienDayHT(){ return bienCoDiaHinh() ? BIEN_DAY : OCEAN_FLOOR; }
 let bienDT = false, bienToiY = 520;
 // BOSS_PART_END s1.bienDT.1
 
-// Nguồn: index.html:98795 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:98807 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.BOSS_CHUNG.1 READ_ONLY
 const BOSS_CHUNG = {
             cx(){ return this.x + this.w / 2; },
@@ -1797,7 +1797,7 @@ const BOSS_CHUNG = {
         };
 // BOSS_PART_END s6.BOSS_CHUNG.1
 
-// Nguồn: index.html:98806 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:98818 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.capBoHamChung.1 READ_ONLY
 (function capBoHamChung(){
             const DS = [

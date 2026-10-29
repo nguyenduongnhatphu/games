@@ -1,5 +1,5 @@
 // BOSS_FILE: BossShared
-// BOSS_SNAPSHOT: 9124d003c3ce72e4e4fcae863db4e13cdfe06607527a4558945ab0774010859b
+// BOSS_SNAPSHOT: 727b7298f5725557e84ed20d1375204ce421ac8161e96654772477c0b6e53e0c
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -1371,7 +1371,7 @@ let spiderTree = { trunkX: 520, canopyBottom: 70 };
 // Nguồn: index.html:34688 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s1.resolveSolidPillars.1 EDITABLE
 function resolveSolidPillars(ent) {
-            if (mapTheme !== 'volcano' && mapTheme !== 'tetris') return;
+            if (mapTheme !== 'volcano' && mapTheme !== 'tetris' && !wildernessOn()) return;
             for (let pf of platforms) {
                 if (!pf.pillar) continue;
                 if (ent.x + ent.w <= pf.x || ent.x >= pf.x + pf.w) continue;
@@ -1381,7 +1381,7 @@ function resolveSolidPillars(ent) {
                 else ent.x = pf.x + pf.w;
             }
             if (ent.x < 0) ent.x = 0;
-            if (ent.x > canvas.width - ent.w) ent.x = canvas.width - ent.w;
+            if (ent.x > worldR() - ent.w) ent.x = worldR() - ent.w;
         }
 // BOSS_PART_END s1.resolveSolidPillars.1
 
@@ -1616,12 +1616,12 @@ let echoTrees = [];
 let sporeStacks = 0, sporePools = [], sporeFlash = 0;
 // BOSS_PART_END s1.sporeStacks.1
 
-// Nguồn: index.html:97653 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:97665 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.SDTU_DON.1 EDITABLE
 const SDTU_DON = 70, SDTU_TUNG = 340, SDTU_CAN = 70, SDTU_YEU = 380;
 // BOSS_PART_END s6.SDTU_DON.1
 
-// Nguồn: index.html:97654 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:97666 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.SDT_ULT.1 EDITABLE
 const SDT_ULT = {
             sdtUltNen(){ return !this.sdtUltXong && this.hp <= this.maxHp * 0.25; },
@@ -2183,7 +2183,7 @@ const SDT_ULT = {
         };
 // BOSS_PART_END s6.SDT_ULT.1
 
-// Nguồn: index.html:98212 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:98224 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.capSdtUlt.1 EDITABLE
 (function capSdtUlt(){
             for (const C of [typeof VergilBoss !== 'undefined' ? VergilBoss : null,
@@ -2194,7 +2194,7 @@ const SDT_ULT = {
         })();
 // BOSS_PART_END s6.capSdtUlt.1
 
-// Nguồn: index.html:98795 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:98807 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.BOSS_CHUNG.1 EDITABLE
 const BOSS_CHUNG = {
             cx(){ return this.x + this.w / 2; },
@@ -2209,7 +2209,7 @@ const BOSS_CHUNG = {
         };
 // BOSS_PART_END s6.BOSS_CHUNG.1
 
-// Nguồn: index.html:98806 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:98818 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.capBoHamChung.1 EDITABLE
 (function capBoHamChung(){
             const DS = [

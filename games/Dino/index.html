@@ -30395,8 +30395,8 @@ const MMX_SAN = 320;
 
 class MegaManXBoss {
     san(){
-        if(!this.laChoi||mapTheme!=='ocean')return MMX_SAN;
-        let floor=bienDayHT(),feet=this.y+this.h;
+        if(!this.laChoi||(mapTheme!=='ocean'&&!wildernessOn()))return MMX_SAN;
+        let floor=wildernessOn()?320:bienDayHT(),feet=this.y+this.h;
         for(const pf of platforms){if(pf.solid===false||!Number.isFinite(pf.top)||pf.top<feet-4)continue;if(this.x+this.w>pf.x&&this.x<pf.x+pf.w)floor=Math.min(floor,pf.top);}
         return floor;
     }
@@ -30534,7 +30534,7 @@ class MegaManXBoss {
             let d = Math.hypot(ox - this.cx(), (o.y + (o.h || 20) / 2) - this.cy());
             if (this.laChoi){
                 // BAN NGUOI CHOI: bo ke chua vao man hinh; ke o phia sau lung bi 'phat' khoang cach de uu tien ke phia truoc mat
-                if (ox < -20 || ox > canvas.width + 20) continue;
+                if (ox < (wildernessOn()?camX:0)-20 || ox > (wildernessOn()?camX:0)+canvas.width+20) continue;
                 if (this.facingLeft ? ox > this.cx() : ox < this.cx()) d *= 2.2;
             }
             if (d < bd){ bd = d; best = o; }
@@ -30667,7 +30667,7 @@ class MegaManXBoss {
         let D = this.dac; D.t++;
         if (D.ten === 'tuong'){
             // DA TUONG: luot toi mep man gan nhat, bam tuong leo len, da ra va ban cheo xuong
-            let trai = D.ben < 0, mep = trai ? 8 : canvas.width - this.w - 8;
+            let trai = D.ben < 0, mep = trai ? 8 : (this.laChoi&&wildernessOn()?WORLD_W:canvas.width) - this.w - 8;
             if (D.pha === 0){
                 this.vx = (mep - this.x) > 0 ? 9 : -9;
                 if (Math.abs(mep - this.x) < 12){ this.x = mep; D.pha = 1; D.t = 0; this.vy = -12; this.grounded = false; }
@@ -30704,7 +30704,7 @@ class MegaManXBoss {
                 if (this.laChoi){ D.rehit = 8; if (D.t % 8 === 0) D.hit = 0; }
                 this.vet.push({ x: this.x, y: this.y, t: 14 });
                 this.cham(D, { x: this.x - 10, y: this.y - 6, w: this.w + 20, h: this.h + 12 });
-                if ((this.x <= 8 && this.vx < 0) || (this.x >= canvas.width - this.w - 8 && this.vx > 0)) D.t = 52;
+                if ((this.x <= 8 && this.vx < 0) || (this.x >= (this.laChoi&&wildernessOn()?WORLD_W:canvas.width) - this.w - 8 && this.vx > 0)) D.t = 52;
                 return;
             }
             this.invulnAll = false; this.vx *= 0.5; this.dac = null; this.aNghi = 18;
@@ -30728,7 +30728,7 @@ class MegaManXBoss {
             this.vx = D.vx; this.vy = D.vy; this.invulnAll = true;
             this.vet.push({ x: this.x, y: this.y, t: 12, trang: 1 });
             this.cham(D, { x: this.x - 8, y: this.y, w: this.w + 16, h: this.h });
-            if (this.y >= this.baseY - 2 || D.t > 40 || this.x <= 8 || this.x >= canvas.width - this.w - 8){
+            if (this.y >= this.baseY - 2 || D.t > 40 || this.x <= 8 || this.x >= (this.laChoi&&wildernessOn()?WORLD_W:canvas.width) - this.w - 8){
                 this.invulnAll = false; this.dac = null; this.vy = Math.max(this.vy, 0); this.vx *= 0.3; this.aNghi = 16;
             }
             return;
@@ -31121,7 +31121,7 @@ class MegaManXBoss {
 
     // ======================= VAT THE =======================
     tickVatThe(){
-        const W = canvas.width;
+        const W = this.laChoi&&wildernessOn()?WORLD_W:canvas.width;
         // --- dan ---
         for (let i = this.dan.length - 1; i >= 0; i--){
             let b = this.dan[i]; b.t++;
@@ -31227,7 +31227,7 @@ class MegaManXBoss {
                 if (this.cham(b, { x: b.x - b.r, y: b.y - b.r, w: b.r * 2, h: b.r * 2 })) xoa = true;
                 if (b.di > (b.maxRange||190)) xoa = true;
             } else xoa = true;
-            if (b.t > (b.life || 260) || b.x < -120 || b.x > W + 120 || b.y > (this.laChoi&&mapTheme==='ocean'?bienDayHT()+100:420) || b.y < -260) xoa = true;
+            if (b.t > (b.life || 260) || b.x < -120 || b.x > W + 120 || b.y > (this.laChoi&&wildernessOn()?WILDS.bottom+100:this.laChoi&&mapTheme==='ocean'?bienDayHT()+100:420) || b.y < (this.laChoi&&wildernessOn()?WILDS.top-100:-260)) xoa = true;
             if (xoa || b._voidXoa) this.dan.splice(i, 1);
         }
         // --- cot (set roi / tia Falcon Giga) ---
@@ -31361,7 +31361,7 @@ class MegaManXBoss {
 
     update(){
         if (this.laChoi){
-            if(mapTheme==='ocean')this.baseY=this.san()-this.h;
+            if(mapTheme==='ocean'||wildernessOn())this.baseY=this.san()-this.h;
             this.toc++;
             if (this.tayBan > 0) this.tayBan--;
             if (this.mauT > 0 && --this.mauT === 0 && this.aS === 'khong' && (this.vkChon || 'buster') === 'buster') this.mau = 'thuong';
@@ -34686,7 +34686,7 @@ class GreatApeBoss {
         // ===== COT DAC: chan va cham 2 ben, khong the di xuyen qua =====
         // Neu chan chi thap hon noc <=30px thi de code tiep dat keo len noc (khong chan ngang).
         function resolveSolidPillars(ent) {
-            if (mapTheme !== 'volcano' && mapTheme !== 'tetris') return;
+            if (mapTheme !== 'volcano' && mapTheme !== 'tetris' && !wildernessOn()) return;
             for (let pf of platforms) {
                 if (!pf.pillar) continue;
                 if (ent.x + ent.w <= pf.x || ent.x >= pf.x + pf.w) continue;
@@ -34696,7 +34696,7 @@ class GreatApeBoss {
                 else ent.x = pf.x + pf.w;
             }
             if (ent.x < 0) ent.x = 0;
-            if (ent.x > canvas.width - ent.w) ent.x = canvas.width - ent.w;
+            if (ent.x > worldR() - ent.w) ent.x = worldR() - ent.w;
         }
         // Va cham TUONG LIEN KHOI cho Tetris (theo luoi + huong di chuyen, khong lot qua)
         function resolveTetrisWalls(ent, dx){
@@ -44485,6 +44485,7 @@ class PulsarCloneBoss {
             ctx.fillRect(X0, Y0, canvas.width + 160, canvas.height + 160);
         }
         function drawEnvironment() {
+            if (wildernessOn()) { drawWilderness(); return; }
             if (mapTheme === 'tetris') { veNenLot(); return; }
             veNenLot();
             bgAdvance();
@@ -46837,7 +46838,10 @@ class PulsarCloneBoss {
                             if (tb) { let dxb = (tb.x + tb.w / 2) - pcx; if (Math.abs(dxb) > 16) this.isFacingLeft = dxb < 0; }
                         } else {
                             // KHONG CO BOSS = dang chay map: moi thu den tu BEN PHAI -> luon quay mat phai
-                            this.isFacingLeft = false;
+                            if (wildernessOn()) {
+                                if (keys.KeyA || keys.ArrowLeft) this.isFacingLeft = true;
+                                else if (keys.KeyD || keys.ArrowRight) this.isFacingLeft = false;
+                            } else this.isFacingLeft = false;
                         }
                     }
                 }
@@ -78259,7 +78263,7 @@ class PulsarCloneBoss {
             let w = Math.floor((canvas.width - pad * (n + 1)) / n);
             let X = i => pad + i * (w + pad);
             return [
-                { x: X(0), y, w, h, c:"#2E7D32", hc:"#4CAF50", t: LANG[currentLang].play_normal, act:()=>{ dojoMode=false; gameState='map_select'; } },
+                { x: X(0), y, w, h, c:"#2E7D32", hc:"#4CAF50", t: LANG[currentLang].play_normal, act:()=>{ dojoMode=false; campaignTab=null; gameState='map_select'; } },
                 // Truoc day o day la BOSS RUSH. Boss Rush bay gio nam trong Route nen
                 // khong con ly do chiem mot o rieng o hang menu; man 'br_select' van
                 // giu nguyen trong file, chi la khong con nut vao thang tu day.
@@ -81297,8 +81301,8 @@ class PulsarCloneBoss {
                 { x:x0,          y:y0+H+GY,   w:W, h:H, id:'route', fill:"#4DD0E1", tc:"#00363A",
                   n:"LO TRINH", d1:"14 man · re nhanh lien tuc · chang EX",
                   d2: (typeof r14CoLuu === 'function' && r14CoLuu() && r14CoLuu().R) ? ("CO VAN DO: man " + (r14CoLuu().R.lop + 1) + " / 14") : "Thuong sau moi man · mau giu nguyen" },
-                { x:x0+W+GX,     y:y0+H+GY,   w:W, h:H, id:'trong', fill:"#37474F", tc:"#78909C",
-                  n:"— TRONG —", d1:"danh cho che do sau nay", d2:"" }
+                { x:x0+W+GX,     y:y0+H+GY,   w:W, h:H, id:'wilds', fill:"#80CBC4", tc:"#12352E",
+                  n:"ĐẠI CỔ THỤ", d1:"Platform tự do · bản thử di chuyển", d2:"Đầm lầy ← Cây khổng lồ → Núi" }
             ];
         }
         function campaignBam(mx,my){
@@ -84771,7 +84775,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                 if (dino.grounded) p.baseY = p.y;
                 p.vx = (keys['KeyA'] || keys['ArrowLeft']) ? -3 : (keys['KeyD'] || keys['ArrowRight']) ? 3 : 0;
                 if (p.giap === 'thuong' && p.aS === 'khong' && dino.grounded && Math.abs(typeof dashVx !== 'undefined' ? dashVx : 0) > 2
-                    && (dino.x < 18 || dino.x > canvas.width - dino.w - 18) && (p._tuongCd || 0) <= 0){
+                    && (!wildernessOn() && (dino.x < 18 || dino.x > canvas.width - dino.w - 18)) && (p._tuongCd || 0) <= 0){
                     p._tuongCd = 80;
                     p.batDac('tuong', { pha: 0, ben: dino.x < canvas.width / 2 ? -1 : 1 });
                     khoa = true;
@@ -88238,6 +88242,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
                     if (id === 'route'){ r14Bat(); return; }   // @@HE-ROUTE14
                     if (id === 'run'){ campaignTab = 'run'; return; }
                     if (id === 'def'){ startGame('normal'); setupDefenseArena(); return; }
+                    if (id === 'wilds'){ mapTheme='wilds'; startGame('normal'); return; }
                     if (mouseX >= CX-100 && mouseX <= CX+100 && mouseY >= 316 && mouseY <= 346) gameState = 'menu';
                     return;
                 }
@@ -88530,6 +88535,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
         });
 
         function startGame(mode) {
+            wilderness = null;
             doChieuDong();
             if (typeof ttMoi === 'function') ttMoi();          // @@HE-KYLUC: thong ke tran moi
             if (typeof styReset === 'function') styReset();    // @@HE-STYLISH
@@ -88616,7 +88622,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
             }
             
             if (mode === 'normal') { nextBossScore = 1000; bossLevel = 1; normalBossStage = 0; mapNen = 0;
-                if (MAP_CHUOI.indexOf(mapTheme) < 0 && !(mapTheme === 'ocean' && bienChon)) mapTheme = 'desert';
+                if (MAP_CHUOI.indexOf(mapTheme) < 0 && mapTheme !== 'wilds' && !(mapTheme === 'ocean' && bienChon)) mapTheme = 'desert';
                 bienChon = false;
                 mapChay = mapTheme; } 
             else { bossRushStage = 0; bossLevel = 1; }
@@ -88624,6 +88630,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
             if (mode === 'normal' && mapTheme === 'forest') { platforms.push({ x: -60, w: canvas.width + 160, top: 320, h: 80 }); forestNextChunk = false; }
             if (mode === 'normal' && mapTheme === 'volcano') { platforms.push({ x: -60, w: canvas.width + 160, top: 320, h: 80, volcano: true }); volcanoNextChunk = true; }
             if (mode === 'normal' && mapTheme === 'dinhnui') { platforms.push({ x: -60, w: canvas.width + 160, top: 320, h: 80, summit: true }); summitLastBand = 2; summitForkCd = 0; dino.y = 320 - dino.h; dino.dy = 0; dino.grounded = true; dino.invincible = true; dino.invTimer = 60; }
+            if (mode === 'normal' && mapTheme === 'wilds') setupWilderness();
             SFX.init(); SFX.resume();
             if (dojoMode) SFX.stopMusic(); else SFX.startMusic();   // SAN TAP: KHONG co nhac nen
         }
@@ -88992,6 +88999,7 @@ RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', c
         }
 
         function bossProjRaNgoai(bp){
+            if (wildernessOn()) return wildernessProjectileOutside(bp);
             /* @@HE-TROIXOA — Hans: "Dante chieu loi o phase 2. Co tao ra effect tren troi nhung bi KET o tren".
                Cac chieu mua tu troi (thien thach SDT Dante, Unity, Death...) sinh dan o troiSinh() = -190
                (dinh man that khi camera keo len). Nhung duong bien tren o day van la -110 cua thoi chua co
@@ -95328,6 +95336,7 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
             }
         }
         function projRaNgoai(p){
+            if (wildernessOn()) return wildernessProjectileOutside(p);
             return p.x > worldR() + 200 || p.x < worldL() - 200 || p.y < -90 || p.y > (mapTheme === 'ocean' ? Math.max(canvas.height, bienDayHT() + 60) : canvas.height) + 90;
         }
         /* ==================================================================
@@ -95694,6 +95703,7 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         }
 
         function spawnEntities() {
+            if (wildernessOn()) return; // Static, authored world: no runner chunks or campaign boss queue.
             // @@HE-CUSNK — dang chay doan phim bom nguyen tu thi khong tha them gi vao man.
             if (typeof cusNkPhim !== 'undefined' && cusNkPhim) return;
             // LO TRINH: o che do test_boss, he thong tu hoi sinh boss khi bosses rong. Phai bat
@@ -96902,6 +96912,7 @@ function checkPvPCollisions() {
                 if (midasHakiCham % 2 === 1){ midasVeHakiVien(); return; }
                 _chamKhung = true;
             } else _chamKhung = false;
+            if (wildernessOn()) wildernessTick();
             ctx.save();
             if (shakeTimer > 0) { ctx.translate((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8); shakeTimer--; }
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -97575,13 +97586,14 @@ function checkPvPCollisions() {
             ctx.restore();
             if (typeof cusNkVeMan === 'function') cusNkVeMan();   // @@HE-CUSNK: chop trang phu kin man
             drawUI();
+            if (wildernessOn()) drawWildernessHud();
             if (typeof bienVeHud === 'function') bienVeHud();   // @@HE-BIEN: dang o tang nao
             if (defMode) drawDefenseHud();
             if (reviveOverlay){ drawReviveOverlay(reviveOverlay); reviveOverlay.frame++; if (reviveOverlay.frame > reviveOverlay.total) reviveOverlay = null; }
 
             if (gameState !== 'pvp') {
                 gameSpeed = gameState === 'normal' ? baseSpeed : baseSpeed + 2;   // TAM DUNG tang toc theo thoi gian
-                if (defMode) gameSpeed = 0;   // Defense khong phai map chay tu dong
+                if (defMode || wildernessOn()) gameSpeed = 0;   // Defense khong phai map chay tu dong
                 // @@HE-CUSNK — doan phim BOM NGUYEN TU la mot canh phim: dung map lai.
                 // Neu de map chay tiep thi sau cu no man hinh van troi va con moi van bo
                 // vao giua dam khoi, nhin nhu game khong he dung lai de xem canh do.
@@ -97614,14 +97626,14 @@ function checkPvPCollisions() {
                         }
                     }
                 }
-                if (gameState === 'normal') {
+                if (gameState === 'normal' && !wildernessOn()) {
                     noDmgStreak++;                                     // choi cang lau khong dinh don...
                     let mult = diemNhan();
                     if (bosses.length === 0) score += 0.1 * mult;
                 }
                 
                 // BAT TU dang deo thi KHONG ghi ky luc — xem ghi chu o @@HE-BATTU
-                if (Math.floor(score) > highScore && gameState !== 'test_boss' && !battuBat()) {
+                if (Math.floor(score) > highScore && !wildernessOn() && gameState !== 'test_boss' && !battuBat()) {
                     highScore = Math.floor(score);
                     try { localStorage.setItem("dinoBossHighScore_v106", highScore); } catch(e) {}
                 }
@@ -101846,6 +101858,7 @@ function apexCreate(owner){
 
                 for (let i = 0; i < platforms.length; i++) {
                     const p = platforms[i];
+                    if(p.oneWay)continue;
                     const dinoTop = dino.y - bodyHeight;
                     const dinoBottom = dino.y - 8;
 
@@ -101990,6 +102003,7 @@ function apexCreate(owner){
                     if (dino.vy < 0) {
                         for (let i = 0; i < platforms.length; i++) {
                             const p = platforms[i];
+                            if(p.oneWay)continue;
                             if (dino.x + halfW > p.x + 8 && dino.x - halfW < p.x + p.w - 8) {
                                 const headTopPrev = prevY - bodyHeight;
                                 const headTopNow = dino.y - bodyHeight;
@@ -104218,7 +104232,7 @@ function apexCreate(owner){
 
   leafs.forEach((p,i)=>{if(!p.fallen){const prev=p.y;p.y=p.baseY+Math.sin(frames*.035)*3;p.vy=p.y-prev;if(dino.ledgePlatform===p)dino.ledgeCornerY=p.y;}});
   platforms.length=0;
-  for(const p of apexNativePlatforms()){if(!Number.isFinite(p.top)||p.solid===false||(owner.dropTimer>0&&p.top<=owner.dropFromTop+10))continue;let q=nativeMap.get(p);if(!q){q={runeColor:'#6cbca3',vy:0,source:p};nativeMap.set(p,q);}Object.assign(q,{x:p.x/SCALE,y:p.top/SCALE,w:p.w/SCALE,h:(p.h||18)/SCALE});platforms.push(q);}
+  for(const p of apexNativePlatforms()){if(!Number.isFinite(p.top)||p.solid===false||(owner.dropTimer>0&&p.top<=owner.dropFromTop+10))continue;let q=nativeMap.get(p);if(!q){q={runeColor:'#6cbca3',vy:0,source:p};nativeMap.set(p,q);}Object.assign(q,{x:p.x/SCALE,y:p.top/SCALE,w:p.w/SCALE,h:(p.h||18)/SCALE,oneWay:!!(p.wild&&!p.pillar)});platforms.push(q);}
   for(const [p] of nativeMap)if(!apexNativePlatforms().includes(p))nativeMap.delete(p);
   for(const p of leafs){if(p.fallen){p.fallen--;if(!p.fallen)p.ttl=null;continue;}if(p.ttl!==null&&--p.ttl<=0){p.fallen=240;if(dino.activePlatform===p||dino.ledgePlatform===p){dino.activePlatform=dino.ledgePlatform=null;dino.isGrounded=dino.isLedgeGrabbing=dino.isLedgeClimbing=dino.isWallSliding=false;dino.vy=2;}continue;}platforms.push(p);}
   if(apexColor===4)for(const p of obelith.blocks)platforms.push(p);
@@ -109438,7 +109452,7 @@ function danteTeleport(target,behind){
  if(!target||target._beamClashPoint||![target.x,target.y,target.w,target.h].every(Number.isFinite))return false;
  const side=target.isFacingLeft??target.facingLeft??(target.x>n.x);
  let x=behind?(side?target.x+target.w+18:target.x-n.w-18):(side?target.x-n.w-18:target.x+target.w+18);
- const y=Math.max(-CAM_TROI+10,target.y+target.h-n.h),before={x:n.x,y:n.y};
+ const y=Math.max(wildernessOn()?WILDS.top:-CAM_TROI+10,target.y+target.h-n.h),before={x:n.x,y:n.y};
  x=Math.max(worldL(),Math.min(worldR()-n.w,x));
  const proposed={x,y,w:n.w,h:n.h};
  // No teleport into a solid pillar or a Tetris cell. Keep the old position on failure.
@@ -111504,10 +111518,10 @@ function vgPerformTrick(n, v, mode) {
         if (target) {
             const side = (target.x + (target.w || 40) / 2 > n.x + n.w / 2) ? -1 : 1;
             nx = target.x + (target.w || 40) / 2 + side * 42 - n.w / 2;
-            ny = Math.max(36, target.y - 44);
+            ny = Math.max(wildernessOn() ? WILDS.top : 36, target.y - 44);
         } else {
             nx = n.x + dir * 48;
-            ny = Math.max(36, n.y - 105);
+            ny = Math.max(wildernessOn() ? WILDS.top : 36, n.y - 105);
         }
         n.dy = -3.5; n.grounded = false;
         v.airSlow = 45;
@@ -111519,7 +111533,7 @@ function vgPerformTrick(n, v, mode) {
             const crossBehind = gap < 110;
             const side = crossBehind ? (tcx >= n.x + n.w / 2 ? 1 : -1) : (tcx >= n.x + n.w / 2 ? -1 : 1);
             nx = tcx + side * 52 - n.w / 2;
-            ny = Math.max(36, (target.y + (target.h || 50)) - n.h);
+            ny = Math.max(wildernessOn() ? WILDS.top : 36, (target.y + (target.h || 50)) - n.h);
             if (!target.grounded) { n.dy = -2.5; n.grounded = false; v.airSlow = 45; }
         } else {
             nx = n.x + dir * 165;
@@ -111530,7 +111544,7 @@ function vgPerformTrick(n, v, mode) {
     const minX = typeof worldL === 'function' ? worldL() + 8 : 12;
     const maxX = (typeof worldR === 'function' ? worldR() : canvas.width) - n.w - 8;
     n.x = Math.max(minX, Math.min(maxX, nx));
-    n.y = Math.max(-100, ny);
+    n.y = Math.max(wildernessOn() ? WILDS.top : -100, ny);
     if (typeof dashVx !== 'undefined') dashVx = 0;
 
     if (target) {
@@ -113933,6 +113947,327 @@ VergilBoss.prototype.syncAttackerDoppelganger=function(){
 <script>
 const fallRecoveryUpdateBase=Player.prototype.update;
 Player.prototype.update=function(...args){followFallRecovery(this);return fallRecoveryUpdateBase.apply(this,args);};
+</script>
+<script>
+// ===== ĐẠI CỔ THỤ: a static world in world coordinates, shared by every player rig. =====
+const WILDS = Object.freeze({width:12000, top:-2500, bottom:650, spawnX:6000});
+let wilderness = null;
+function wildernessOn(){return gameState==='normal' && mapTheme==='wilds' && !!wilderness;}
+function wildernessProjectileOutside(p){
+    if(p._wildLife===undefined)p._wildLife=frames;
+    return frames-p._wildLife>360 || p.x< -200 || p.x>WILDS.width+200 || p.y<WILDS.top-160 || p.y>WILDS.bottom+120;
+}
+function wildernessPlatform(x,top,w,h=22,kind='root',extra={}){
+    const p={x,top,w,h,wild:true,kind,solid:true,...extra};platforms.push(p);return p;
+}
+function setupWilderness(){
+    wilderness={mapOpen:false,checkpoint:0,visited:new Set([0]),ladders:[],arenas:[],rests:[],signs:[]};
+    WORLD_W=WILDS.width;CAM_NEO=.5;freeMove=true;gameSpeed=0;
+    enemies.length=obstacles.length=bosses.length=bossProjectiles.length=platforms.length=0;
+    const ground=(x,w)=>wildernessPlatform(x,320,w,330,x<4400?'mud':'earth');
+    // Small gaps in the marsh have logs above them; the centre and mountain foot are walkable.
+    let edge=0;
+    for(const hole of [1350,2600,3620]){ground(edge,hole-edge);wildernessPlatform(hole-20,285,205,24,'log');edge=hole+170;}
+    ground(edge,WILDS.width-edge);
+    // Marsh: upper boardwalks, concealed pockets and broad future combat spaces.
+    for(let i=0;i<18;i++)wildernessPlatform(520+i*190,210-(i%3)*55,145,20,i%4===0?'stone':'log');
+    for(let i=0;i<8;i++)wildernessPlatform(900+i*300,-80-(i%2)*70,190,22,'root');
+    // Left spiral: comfortable jump distances; the upper half requires timed jumps.
+    for(let i=0;i<25;i++){
+        const x=5430+(i%2)*160,top=230-i*90;
+        wildernessPlatform(x,top,i<12?210:185,24,'branch');
+        if(i<8)wilderness.ladders.push({x:5610,top:top-90,bottom:top+4});
+        if(i%4===1){const dir=i%8===1?-1:1;wildernessPlatform(dir<0?x-260:x+205,top-25,210,24,'branch');}
+    }
+    // Narrow eastern route and thick trunks reward Apex's native wall kicks / ledge grabs.
+    for(let i=0;i<20;i++)wildernessPlatform(6400+(i%2)*150,180-i*105,105,26,'branch');
+    wildernessPlatform(5850,-1860,72,1800,'bark',{pillar:true});
+    wildernessPlatform(6190,-1740,72,1680,'bark',{pillar:true});
+    for(const [x,y] of [[5140,-1060],[6660,-1450]])wildernessPlatform(x,y,135,20,'leaf',{sway:true,baseX:x});
+    // Mountain ascent: 70 px rises along a continuous chain; no special power required.
+    for(let i=0;i<26;i++){
+        const x=7900+i*125,top=250-i*70;
+        wildernessPlatform(x,top,185,Math.max(50,320-top),'rock',{pillar:true});
+        if(i%5===2)wildernessPlatform(x-200,top-160,160,28,'stone');
+    }
+    // Side shafts and high shelves are optional climbing shortcuts, never required routes.
+    for(let i=0;i<5;i++){
+        const x=8500+i*570,top=-540-i*320;
+        wildernessPlatform(x,top,65,180,'rock',{pillar:true});
+        wildernessPlatform(x-210,top+100,140,24,'stone');
+    }
+    const arena=(name,x,top,w,kind)=>{const p=wildernessPlatform(x,top,w,60,kind);wilderness.arenas.push({name,x,top,w});return p;};
+    arena('VÒNG RỄ CỔ',5700,320,1200,'earth');
+    arena('LÒNG ĐẦM LẶNG',250,320,1000,'mud');
+    arena('VƯƠNG MIỆN CÂY',5280,-2020,1500,'branch');
+    arena('ĐỈNH ĐÁ GIÓ',11000,-1570,950,'stone');
+    const rest=(name,x,top)=>wilderness.rests.push({name,x,top});
+    rest('GỐC ĐẠI CỔ THỤ',6000,320);rest('BẾN ĐẦM LẦY',4100,320);
+    rest('TRẠM GIỮA CÂY',5500,-850);rest('CHÂN NÚI',7750,320);
+    rest('ĐỈNH ĐÁ GIÓ',11500,-1570);rest('VƯƠNG MIỆN CÂY',6000,-2020);
+    wilderness.signs=[
+        {x:5940,y:248,text:'← ĐẦM LẦY     ĐẠI CỔ THỤ ↑     NÚI →'},
+        {x:5550,y:175,text:'↑ W / ↑: thang dây · Space: nhảy'},
+        {x:7900,y:190,text:'ĐƯỜNG NÚI ↑ · bám vách: Apex'},
+        {x:4200,y:246,text:'← SƯƠNG LẦY · coi chừng bụi sậy'},
+        {x:5500,y:-1000,text:'↑ TÁN CAO · cành nhỏ, bước cẩn thận'}
+    ];
+    for(const [kind,x,top] of [
+        ['bruiser',4750,320],['bruiser',7280,320],['lurker',3060,320],['lurker',1850,320],['lurker',740,320],
+        ['bruiser',950,320],['pest',5210,-260],['pest',6510,-680],['pest',5510,-1350],
+        ['bruiser',8990,-310],['bruiser',10220,-1010],['pest',10830,-1240]
+    ])enemies.push(new WildernessEnemy(kind,x,top));
+    dino.x=WILDS.spawnX;dino.y=320-dino.h;dino.dy=0;dino.grounded=true;
+    dino.invincible=true;dino.invTimer=90;
+    camX=dino.x+dino.w/2-canvas.width/2;camY=320-canvas.height*.72;
+}
+function wildernessZone(x,y){return x<4400?'ĐẦM LẦY SƯƠNG':x>7800?'DÃY NÚI GIÓ':y< -950?'TÁN ĐẠI CỔ THỤ':'GỐC ĐẠI CỔ THỤ';}
+function wildernessTick(){
+    gameSpeed=0;freeMove=true;
+    for(const p of platforms){
+        if(!p.wild||!p.sway)continue;
+        const old=p.x;p.x=p.baseX+Math.sin(frames*.017+p.baseX)*45;
+        if(dino.grounded&&Math.abs(dino.y+dino.h-p.top)<5&&dino.x+dino.w>old&&dino.x<old+p.w)dino.x+=p.x-old;
+    }
+    const feet=dino.y+dino.h;
+    for(let i=0;i<wilderness.rests.length;i++){
+        const r=wilderness.rests[i];
+        if(dino.grounded&&Math.abs(dino.x+dino.w/2-r.x)<64&&Math.abs(feet-r.top)<12){
+            wilderness.checkpoint=i;
+            if(!wilderness.visited.has(i)){
+                wilderness.visited.add(i);dino.hp=Math.min(dino.maxHp,dino.hp+2);
+                floatingTexts.push(new FloatingText(r.x-60,r.top-90,'ĐIỂM NGHỈ · +2 HP'));
+            }
+        }
+    }
+    wildernessCamera();
+}
+function wildernessCamera(snap=false){
+    const x=Math.max(0,Math.min(WILDS.width-canvas.width,dino.x+dino.w/2-canvas.width*.5));
+    const y=Math.max(WILDS.top,Math.min(WILDS.bottom-canvas.height,dino.y+dino.h-canvas.height*.72));
+    camX+= (x-camX)*(snap?1:.16);camY+=(y-camY)*(snap?1:.16);
+    // Immediate correction keeps fast dashes and long falls inside the visible safe band.
+    camX=Math.max(dino.x-canvas.width+100,Math.min(dino.x-80,camX));
+    camY=Math.max(dino.y-canvas.height+100,Math.min(dino.y-90,camY));
+    camX=Math.max(0,Math.min(WILDS.width-canvas.width,camX));
+    camY=Math.max(WILDS.top,Math.min(WILDS.bottom-canvas.height,camY));
+}
+function wildernessReturn(){
+    if(!wildernessOn()||paused||gameOver||deathCineActive||dino.ultActive||dino.apex?.ultimate()||dino.dante?.judgement||dino.vergil?.jce)return;
+    const r=wilderness.rests[wilderness.checkpoint];
+    // Reuse the common recovery cleanup so a plunge / channel cannot pull us away again.
+    launchFromPit(dino);dino._fallRecovery=null;
+    dino.x=r.x-dino.w/2;dino.y=r.top-dino.h-12;dino.dy=-8;dino.grounded=false;
+    dino._wildLadder=null;bossProjectiles.length=0;
+    if(dino.apex){const a=dino.apex.state;a.x=(dino.x+dino.w/2)/.55;a.y=(dino.y+dino.h)/.55;a.vy=dino.dy/.55;a.vx=0;a.isGrounded=false;a.activePlatform=a.ledgePlatform=null;a.isLedgeGrabbing=a.isLedgeClimbing=a.isWallSliding=false;}
+    wildernessCamera(true);
+}
+// Thang dây is an accessible lower route. Upper branches still require jumps or native wall skills.
+const wildernessPlayerUpdateBase=Player.prototype.update;
+Player.prototype.update=function(...args){
+    if(!wildernessOn()||this!==dino)return wildernessPlayerUpdateBase.apply(this,args);
+    const up=!!(keys.KeyW||keys.ArrowUp),down=!!(keys.KeyS||keys.ArrowDown),cx=this.x+this.w/2,feet=this.y+this.h;
+    const fight=keys.KeyJ||keys.KeyK||keys.KeyL||this.ultActive||this.dante?.attack||this.vergil?.attack||this.apex?.ultimate();
+    let ladder=this._wildLadder;
+    if(!ladder&&up&&!fight)ladder=wilderness.ladders.find(l=>Math.abs(cx-l.x)<30&&feet>=l.top-2&&feet<=l.bottom+34);
+    if(keys.Space||keys.ShiftLeft||keys.ShiftRight||keys.KeyA||keys.KeyD||keys.ArrowLeft||keys.ArrowRight||fight)ladder=null;
+    let next=null;
+    if(ladder){
+        let dest=feet+(down?3.2:up?-3.2:0);
+        if(dest<ladder.top){
+            const chain=wilderness.ladders.find(l=>l!==ladder&&Math.abs(l.x-ladder.x)<8&&Math.abs(l.bottom-ladder.top)<8);
+            if(chain)ladder=chain;else{dest=ladder.top;ladder=null;}
+        }else if(dest>ladder.bottom+5){dest=ladder.bottom+5;ladder=null;}
+        next={x:(ladder?.x||cx)-this.w/2,feet:dest};
+    }
+    this._wildLadder=ladder;
+    const result=wildernessPlayerUpdateBase.apply(this,args);
+    if(next){
+        this.x=next.x;this.y=next.feet-this.h;this.dy=0;this.grounded=!ladder;this.jumpCount=0;this.canDoubleJump=true;
+        if(this.apex){const a=this.apex.state;a.x=(this.x+this.w/2)/.55;a.y=next.feet/.55;a.vx=a.vy=0;a.isGrounded=!ladder;a.activePlatform=a.ledgePlatform=null;a.isLedgeGrabbing=a.isLedgeClimbing=a.isWallSliding=false;}
+    }
+    if(this.y<WILDS.top+20){
+        this.y=WILDS.top+20;this.dy=Math.max(0,this.dy);
+        if(this.apex){this.apex.state.y=(this.y+this.h)/.55;this.apex.state.vy=Math.max(0,this.apex.state.vy);}
+    }
+    return result;
+};
+class WildernessEnemy{
+    constructor(kind,x,floor){
+        this.type='wild_'+kind;this.kind=kind;this.x=x;this.home=x;this.floor=floor;this.w=kind==='bruiser'?38:32;this.h=kind==='pest'?28:48;
+        this.y=floor-this.h;this.dy=0;this.hp=this.maxHp=kind==='bruiser'?12:kind==='lurker'?8:5;
+        this.burnTimer=0;this.lastMeleeHit=-1;this.grounded=kind!=='pest';this.state=kind==='lurker'?'hidden':'idle';this.t=0;this.cd=50;this.khongCham=true;
+    }
+    update(){
+        if(!wildernessOn()||this.hp<=0)return;
+        // Offscreen enemies stay in their region instead of accumulating around the spawn point.
+        if(Math.abs(this.x-dino.x)>1100||Math.abs(this.y-dino.y)>700)return;
+        const dx=dino.x+dino.w/2-(this.x+this.w/2),dy=dino.y-this.y;
+        this.facingLeft=dx<0;if(this.cd>0)this.cd--;
+        if(this.state==='hidden'){
+            if(Math.abs(dx)<200&&Math.abs(dy)<100){this.state='wake';this.t=0;}
+            return;
+        }
+        if(this.state==='wake'){if(++this.t>36){this.state='idle';this.cd=20;}return;}
+        if(this.state==='wind'){
+            if(++this.t===32){
+                if(this.kind==='pest'){
+                    const a=Math.atan2(dino.y+dino.h/2-this.y,dx),b=new BossProjectile(this.x,this.y,Math.cos(a)*4.2,Math.sin(a)*4.2,false,1);b.frail=true;b._wildLife=frames;bossProjectiles.push(b);
+                }else{
+                    const r={x:this.facingLeft?this.x-52:this.x+this.w,y:this.y-6,w:52,h:this.h+12};
+                    if(checkAABB(r,dino))dino.takeDamage(1);
+                }
+            }
+            if(this.t>46){this.state='idle';this.cd=this.kind==='pest'?145:85;}
+        }else if(this.cd<=0&&Math.abs(dy)<(this.kind==='pest'?300:75)&&Math.abs(dx)<(this.kind==='pest'?460:100)){
+            this.state='wind';this.t=0;
+        }else if(this.kind!=='pest'&&Math.abs(dy)<110&&Math.abs(dx)>65){
+            const dir=Math.sign(dx),nx=this.x+dir*(this.kind==='bruiser'?1.15:1.7);
+            // Edge-aware brawlers never walk off the ledge to chase a different elevation.
+            if(platforms.some(p=>p.solid!==false&&!p.wall&&Math.abs(p.top-(this.y+this.h))<8&&nx+this.w/2>p.x+8&&nx+this.w/2<p.x+p.w-8))this.x=nx;
+        }
+        if(this.kind==='pest'){
+            this.y=this.floor-this.h+Math.sin(frames*.035+this.home)*20;
+        }else{
+            const prev=this.y+this.h;this.dy+=.65;this.y+=this.dy;this.grounded=false;
+            for(const p of platforms)if(p.solid!==false&&!p.wall&&this.x+this.w>p.x+5&&this.x<p.x+p.w-5&&prev<=p.top+3&&this.y+this.h>=p.top&&this.dy>=0){this.y=p.top-this.h;this.dy=0;this.grounded=true;break;}
+            if(this.y>600){this.hp=0;}
+        }
+    }
+    draw(){
+        if(!wildernessOn()||this.x+this.w<camX-80||this.x>camX+canvas.width+80||this.y<camY-100||this.y>camY+canvas.height+80)return;
+        ctx.save();ctx.translate(this.x+this.w/2,this.y+this.h);ctx.scale(this.facingLeft?-1:1,1);
+        if(this.state==='hidden'){
+            ctx.fillStyle='#486654';ctx.fillRect(-24,-9,48,9);ctx.fillStyle='#d5dd75';ctx.fillRect(1,-7,3,2);ctx.fillRect(9,-7,3,2);ctx.restore();return;
+        }
+        if(this.state==='wake')ctx.globalAlpha=.4+.6*this.t/36;
+        const wind=this.state==='wind',col=this.kind==='lurker'?'#58784e':this.kind==='pest'?'#a484b8':'#8d7560';
+        if(this.kind==='pest'){
+            const flap=Math.sin(frames*.35)*13;ctx.fillStyle='#62576f';ctx.beginPath();ctx.moveTo(0,-16);ctx.lineTo(-34,-30+flap);ctx.lineTo(-25,-9);ctx.lineTo(0,-5);ctx.lineTo(25,-9);ctx.lineTo(34,-30+flap);ctx.closePath();ctx.fill();
+        }else{
+            ctx.fillStyle='#35493b';ctx.fillRect(-14,-15,10,15);ctx.fillRect(8,-15,10,15);
+            ctx.fillStyle='#71805a';ctx.fillRect(-17,-4,16,5);ctx.fillRect(8,-4,16,5);
+        }
+        ctx.fillStyle=col;ctx.fillRect(-15,-this.h+12,30,this.h-22);
+        ctx.fillStyle='#c0b694';ctx.fillRect(-18,-this.h+15,36,7);
+        ctx.fillStyle='#2a3435';ctx.fillRect(-10,-this.h,26,19);ctx.fillRect(10,-this.h+9,13,10);
+        ctx.fillStyle=wind?'#ffb35d':'#b9e3b0';ctx.fillRect(6,-this.h+5,6,3);
+        if(this.kind==='bruiser'){ctx.fillStyle='#514b49';ctx.fillRect(17,-37,9,30);ctx.fillStyle='#8b9690';ctx.fillRect(12,-43,22,14);}
+        if(wind){ctx.strokeStyle='#ffac68';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-this.h/2,38,0,Math.PI*2*this.t/32);ctx.stroke();}
+        ctx.restore();
+        if(this.hp<this.maxHp){ctx.fillStyle='#202d32';ctx.fillRect(this.x,this.y-9,this.w,4);ctx.fillStyle='#d7a26d';ctx.fillRect(this.x,this.y-9,this.w*Math.max(0,this.hp/this.maxHp),4);}
+    }
+}
+function wildVisible(x,y,w,h){return x+w>camX-120&&x<camX+canvas.width+120&&y+h>camY-100&&y<camY+canvas.height+100;}
+function wildPoly(points,fill,stroke){ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}}
+function drawWilderness(){
+    ctx.save();
+    const sky=ctx.createLinearGradient(0,camY,0,camY+canvas.height);sky.addColorStop(0,'#102b38');sky.addColorStop(.6,'#244e51');sky.addColorStop(1,'#487068');ctx.fillStyle=sky;ctx.fillRect(camX,camY,canvas.width,canvas.height);
+    // Parallax ridges, tall forest columns and light shafts give height a visible scale.
+    for(let layer=0;layer<3;layer++){
+        const spacing=layer===2?390:660,drift=camX*(.16+layer*.17);
+        for(let i=-2;i<5;i++){
+            const x=camX+i*spacing-drift%spacing;
+            if(dino.x>7600){wildPoly([[x,camY+canvas.height],[x+spacing*.5,camY+80+layer*55],[x+spacing,camY+canvas.height]],['#1a3946','#244650','#35575b'][layer]);}
+            else{ctx.fillStyle=['#1a3b42','#21494b','#2b5350'][layer];ctx.fillRect(x,camY-50,45+layer*20,canvas.height+100);ctx.beginPath();ctx.ellipse(x+25,camY+40+layer*60,170,90,0,0,7);ctx.fill();}
+        }
+    }
+    ctx.fillStyle='rgba(205,231,183,.035)';wildPoly([[camX+480,camY],[camX+610,camY],[camX+280,camY+canvas.height],[camX-40,camY+canvas.height]],ctx.fillStyle);
+    // The giant hollow tree, rendered behind traversable branches.
+    wildPoly([[5500,320],[5760,130],[5820,-520],[5770,-1330],[5850,-2050],[6040,-2310],[6210,-2070],[6290,-1250],[6240,-500],[6380,150],[6740,320]],'#403e30','#1e322f');
+    wildPoly([[5800,250],[5900,-800],[5920,-1950],[6010,-2140],[6100,-1650],[6070,-500],[6180,260]],'#53513b');
+    for(let i=0;i<16;i++){
+        const x=5780+i*28;
+        ctx.strokeStyle=i%3?'#666046':'#292f29';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x,200);ctx.bezierCurveTo(x-50,-600,x+50,-1400,x+110,-2050);ctx.stroke();
+    }
+    // Roots form a doorway at the central spawn rather than a solid wall.
+    ctx.fillStyle='#192d2b';ctx.beginPath();ctx.ellipse(6035,320,165,210,0,Math.PI,Math.PI*2);ctx.fill();
+    for(let i=0;i<10;i++){
+        const x=5290+i*155,y=-2060-(i%3)*90;
+        ctx.fillStyle=['#315b43','#39684a','#467552'][i%3];ctx.beginPath();ctx.ellipse(x,y,260,125,Math.sin(i)*.2,0,7);ctx.fill();
+        ctx.fillStyle='#668353';for(let k=0;k<8;k++)ctx.fillRect(x-140+k*38,y-70+Math.sin(k+i)*34,26,7);
+    }
+    // Small foliage clusters follow the actual branch routes, not a flat decorative canopy.
+    for(const p of platforms){
+        if(!p.wild||!wildVisible(p.x,p.top,p.w,p.h))continue;
+        if(p.kind==='branch'){
+            ctx.strokeStyle='#454936';ctx.lineWidth=18;ctx.beginPath();ctx.moveTo(p.x+p.w/2,p.top+16);ctx.lineTo(6040,p.top+120);ctx.stroke();
+            ctx.fillStyle='#365a40';for(let i=0;i<Math.min(8,p.w/25);i++)ctx.fillRect(p.x+i*31-8,p.top-13-(i%3)*5,37,12);
+        }
+        const rock=p.kind==='rock'||p.kind==='stone',mud=p.kind==='mud';
+        ctx.fillStyle=rock?'#404d57':mud?'#39473a':p.kind==='bark'?'#484737':'#514b36';ctx.fillRect(p.x,p.top,p.w,p.h);
+        ctx.fillStyle=rock?'#7a919a':mud?'#6c8053':'#789058';ctx.fillRect(p.x,p.top,p.w,5);
+        ctx.fillStyle=rock?'#546772':'#655b40';
+        for(let k=0;k<p.w;k+=55){ctx.fillRect(p.x+k+7,p.top+10,Math.min(32,p.w-k-8),4);if(p.h>70)ctx.fillRect(p.x+k+18,p.top+48,22,4);}
+        if(p.sway){ctx.fillStyle='#acdc91';ctx.fillRect(p.x+5,p.top-3,p.w-10,3);}
+    }
+    // Pools are visibly below the logs; reeds conceal the marsh ambushers.
+    if(camX<4500){
+        ctx.fillStyle='rgba(79,134,121,.65)';ctx.fillRect(camX,342,Math.min(4500-camX,canvas.width),55);
+        ctx.strokeStyle='#90ae87';ctx.lineWidth=1;for(let i=Math.floor(camX/100)*100;i<Math.min(4400,camX+canvas.width);i+=100){ctx.beginPath();ctx.moveTo(i,352);ctx.lineTo(i+55,352);ctx.stroke();}
+        for(let x=Math.floor(camX/115)*115;x<Math.min(4380,camX+canvas.width);x+=115){for(let k=0;k<4;k++){ctx.strokeStyle=k%2?'#718254':'#456846';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+k*9,320);ctx.lineTo(x+k*8-8,277-k%3*13);ctx.stroke();}}
+    }
+    for(const l of wilderness.ladders)if(wildVisible(l.x-15,l.top,30,l.bottom-l.top)){
+        ctx.strokeStyle='#b99a65';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(l.x-12,l.top);ctx.lineTo(l.x-12,l.bottom);ctx.moveTo(l.x+12,l.top);ctx.lineTo(l.x+12,l.bottom);ctx.stroke();
+        for(let y=l.top+8;y<l.bottom;y+=16){ctx.fillStyle='#d4bb7c';ctx.fillRect(l.x-13,y,26,4);}
+    }
+    for(const a of wilderness.arenas)if(wildVisible(a.x,a.top-65,a.w,70)){
+        ctx.strokeStyle='rgba(218,190,117,.4)';ctx.setLineDash([8,9]);ctx.strokeRect(a.x+18,a.top-4,a.w-36,4);ctx.setLineDash([]);
+        ctx.fillStyle='#d9c995';ctx.textAlign='center';ctx.font='11px Consolas';ctx.fillText(a.name+' · SÂN BOSS',a.x+a.w/2,a.top-38);
+    }
+    for(let i=0;i<wilderness.rests.length;i++){
+        const r=wilderness.rests[i];if(!wildVisible(r.x-35,r.top-70,70,75))continue;
+        ctx.fillStyle='#364343';ctx.fillRect(r.x-13,r.top-45,26,45);ctx.fillStyle=wilderness.visited.has(i)?'#98e1c0':'#7e968c';
+        ctx.beginPath();ctx.moveTo(r.x,r.top-62);ctx.lineTo(r.x+10,r.top-45);ctx.lineTo(r.x,r.top-26);ctx.lineTo(r.x-10,r.top-45);ctx.closePath();ctx.fill();
+        ctx.textAlign='center';ctx.font='10px Consolas';ctx.fillText('ĐIỂM NGHỈ',r.x,r.top-78);
+    }
+    for(const s of wilderness.signs)if(wildVisible(s.x-200,s.y-20,400,60)){
+        ctx.fillStyle='#8b8462';ctx.fillRect(s.x-2,s.y,4,48);ctx.fillStyle='#263d36';ctx.fillRect(s.x-205,s.y-21,410,29);ctx.strokeStyle='#8d9d6b';ctx.strokeRect(s.x-205,s.y-21,410,29);ctx.fillStyle='#d1e3b8';ctx.textAlign='center';ctx.font='12px Consolas';ctx.fillText(s.text,s.x,s.y-2);
+    }
+    // Local motes are bounded to the viewport, irrespective of the world size.
+    for(let i=0;i<24;i++){
+        const x=camX+((i*137+Math.sin(frames*.008+i)*30)%canvas.width),y=camY+((i*89-frames*.24)%canvas.height+canvas.height)%canvas.height;
+        ctx.globalAlpha=.2+.25*Math.sin(frames*.035+i)**2;ctx.fillStyle=dino.x<4400?'#cce498':'#d4eec8';ctx.fillRect(x,y,2,2);
+    }
+    ctx.restore();
+}
+function drawWildernessMap(x,y,w,h,large){
+    const X=v=>x+v/WILDS.width*w,Y=v=>y+(v-WILDS.top)/(WILDS.bottom-WILDS.top)*h;
+    ctx.fillStyle='rgba(9,23,29,.94)';ctx.fillRect(x-8,y-8,w+16,h+16);ctx.strokeStyle='#5b8b81';ctx.strokeRect(x-8,y-8,w+16,h+16);
+    for(const [a,b,col] of [[0,4400,'#456454'],[4400,7800,'#506542'],[7800,12000,'#637b8a']]){ctx.fillStyle=col;ctx.globalAlpha=.3;ctx.fillRect(X(a),y,X(b)-X(a),h);}ctx.globalAlpha=1;
+    ctx.fillStyle='#97bba1';for(const p of platforms)if(p.wild){const ph=Math.max(1,Math.min(p.h,90)/(WILDS.bottom-WILDS.top)*h);ctx.fillRect(X(p.x),Y(p.top),Math.max(1,p.w/WILDS.width*w),ph);}
+    for(let i=0;i<wilderness.rests.length;i++){const r=wilderness.rests[i];ctx.fillStyle=wilderness.visited.has(i)?'#8ff1c5':'#819394';ctx.fillRect(X(r.x)-2,Y(r.top)-4,4,4);}
+    ctx.strokeStyle='#f4ce8b';for(const a of wilderness.arenas)ctx.strokeRect(X(a.x),Y(a.top)-3,a.w/WILDS.width*w,4);
+    ctx.strokeStyle='rgba(206,235,230,.65)';ctx.strokeRect(X(camX),Y(camY),canvas.width/WILDS.width*w,canvas.height/(WILDS.bottom-WILDS.top)*h);
+    ctx.fillStyle='#ffe3a1';ctx.beginPath();ctx.arc(X(dino.x+dino.w/2),Y(dino.y+dino.h),large?5:3,0,7);ctx.fill();
+    if(large){ctx.font='bold 15px Consolas';ctx.textAlign='center';ctx.fillStyle='#d5e6d4';ctx.fillText('ĐẦM LẦY',X(2200),y+22);ctx.fillText('ĐẠI CỔ THỤ',X(6100),y+22);ctx.fillText('DÃY NÚI',X(9950),y+22);}
+}
+function drawWildernessHud(){
+    ctx.save();
+    drawWildernessMap(canvas.width-270,94,246,76,false);
+    ctx.textAlign='right';ctx.font='11px Consolas';ctx.fillStyle='#cee6d8';ctx.fillText('TAB: bản đồ · H: về điểm nghỉ',canvas.width-20,190);
+    ctx.textAlign='center';ctx.fillStyle='rgba(9,23,29,.85)';ctx.fillRect(canvas.width/2-215,canvas.height-53,430,44);
+    ctx.fillStyle='#cfdfb9';ctx.font='bold 13px Consolas';ctx.fillText(wildernessZone(dino.x,dino.y),canvas.width/2,canvas.height-34);
+    ctx.fillStyle='#a8c3b4';ctx.font='11px Consolas';ctx.fillText('A/D: di chuyển · Space: nhảy · W/↑: thang dây · S: xuống',canvas.width/2,canvas.height-16);
+    if(wilderness.mapOpen){
+        ctx.fillStyle='rgba(5,16,22,.83)';ctx.fillRect(60,125,canvas.width-120,canvas.height-155);
+        ctx.font='bold 20px Consolas';ctx.fillStyle='#e0e8c9';ctx.fillText('ĐẠI CỔ THỤ · BẢN THỬ DI CHUYỂN',canvas.width/2,159);
+        drawWildernessMap(90,190,canvas.width-180,canvas.height-270,true);
+        ctx.fillStyle='#c1d5c5';ctx.font='12px Consolas';ctx.fillText('● Bạn   ◆ Điểm nghỉ   ━ Sân boss (chưa triệu hồi) · TAB / chạm bản đồ để đóng',canvas.width/2,canvas.height-40);
+    }
+    ctx.restore();
+}
+window.addEventListener('keydown',e=>{
+    if(!wildernessOn()||paused||gameOver||gameVictory||xArmorMenu||battuMa||/INPUT|TEXTAREA/.test(e.target?.tagName||''))return;
+    if(e.code==='Tab'){e.preventDefault();if(!e.repeat)wilderness.mapOpen=!wilderness.mapOpen;}
+    if(e.code==='KeyH'&&!e.repeat){e.preventDefault();wildernessReturn();}
+},true);
+canvas.addEventListener('click',e=>{
+    if(!wildernessOn()||paused||gameOver)return;
+    const b=canvas.getBoundingClientRect(),x=(e.clientX-b.left)*canvas.width/b.width,y=(e.clientY-b.top)*canvas.height/b.height;
+    if(wilderness.mapOpen||(x>canvas.width-278&&y>86&&y<180)){wilderness.mapOpen=!wilderness.mapOpen;e.stopImmediatePropagation();}
+},true);
+
 </script>
 </body>
 </html>

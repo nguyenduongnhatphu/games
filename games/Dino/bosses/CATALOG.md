@@ -12,7 +12,7 @@ Tải file `.js` cần sửa bằng **Download raw file** trên GitHub. Xem [hư
 | [CliffGolemBoss](CliffGolemBoss.js) | 311 | 26.0 KB |
 | [CloneBoss](CloneBoss.js) | 242 | 19.8 KB |
 | [CorruptionBoss](CorruptionBoss.js) | 1966 | 114.6 KB |
-| [DanteBoss](DanteBoss.js) | 5074 | 285.9 KB |
+| [DanteBoss](DanteBoss.js) | 5074 | 286.0 KB |
 | [DeathBoss](DeathBoss.js) | 2524 | 155.2 KB |
 | [DilophosBoss](DilophosBoss.js) | 288 | 24.7 KB |
 | [DragonLordBoss](DragonLordBoss.js) | 762 | 59.6 KB |
@@ -36,7 +36,7 @@ Tải file `.js` cần sửa bằng **Download raw file** trên GitHub. Xem [hư
 | [LavaSerpentBoss](LavaSerpentBoss.js) | 246 | 24.2 KB |
 | [MagmaDragoonBoss](MagmaDragoonBoss.js) | 368 | 32.5 KB |
 | [MagmorBoss](MagmorBoss.js) | 315 | 26.7 KB |
-| [MegaManXBoss](MegaManXBoss.js) | 1828 | 110.0 KB |
+| [MegaManXBoss](MegaManXBoss.js) | 1828 | 110.3 KB |
 | [MegalodonBoss](MegalodonBoss.js) | 544 | 41.4 KB |
 | [MosaBoss](MosaBoss.js) | 400 | 35.6 KB |
 | [MountainGodBoss](MountainGodBoss.js) | 606 | 46.1 KB |

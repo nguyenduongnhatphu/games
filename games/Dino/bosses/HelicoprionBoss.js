@@ -1,5 +1,5 @@
 // BOSS_FILE: HelicoprionBoss
-// BOSS_SNAPSHOT: 9124d003c3ce72e4e4fcae863db4e13cdfe06607527a4558945ab0774010859b
+// BOSS_SNAPSHOT: 727b7298f5725557e84ed20d1375204ce421ac8161e96654772477c0b6e53e0c
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
