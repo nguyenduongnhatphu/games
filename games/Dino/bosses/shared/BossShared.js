@@ -1,5 +1,5 @@
 // BOSS_FILE: BossShared
-// BOSS_SNAPSHOT: 2b36ae4c51fabb54b8d0e06c3164b8f6c2ef05a8c767bbd93c893e9900521e3e
+// BOSS_SNAPSHOT: 90b44e51b8a8c0ad12fba495a59e199c399e173aab86fbee147786ba09666942
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -1358,27 +1358,27 @@ const MMX_GIAP_TEN = { thuong: 'MEGA MAN X', fourth: 'X — FOURTH ARMOR', falco
 const MMX_GIAP_MAU = { thuong: '#42A5F5', fourth: '#EF5350', falcon: '#E0E0E0', gaea: '#FF8F00', ultimate: '#B388FF' };
 // BOSS_PART_END s0.MMX_GIAP_MAU.1
 
-// Nguồn: index.html:35421 · Dùng bởi: IronhaulBoss, ZeusBoss
+// Nguồn: index.html:35472 · Dùng bởi: IronhaulBoss, ZeusBoss
 // BOSS_PART_BEGIN s1.lavaGeysers.1 EDITABLE
 let lavaGeysers = [];
 // BOSS_PART_END s1.lavaGeysers.1
 
-// Nguồn: index.html:35422 · Dùng bởi: IndominusBoss, IronhaulBoss, ZeusBoss
+// Nguồn: index.html:35473 · Dùng bởi: IndominusBoss, IronhaulBoss, ZeusBoss
 // BOSS_PART_BEGIN s1.grassField.1 EDITABLE
 let grassField = [];
 // BOSS_PART_END s1.grassField.1
 
-// Nguồn: index.html:35423 · Dùng bởi: IronhaulBoss, ZeusBoss
+// Nguồn: index.html:35474 · Dùng bởi: IronhaulBoss, ZeusBoss
 // BOSS_PART_BEGIN s1.forestScene.1 EDITABLE
 let forestScene = null;
 // BOSS_PART_END s1.forestScene.1
 
-// Nguồn: index.html:35424 · Dùng bởi: GiantSpiderBoss
+// Nguồn: index.html:35475 · Dùng bởi: GiantSpiderBoss
 // BOSS_PART_BEGIN s1.spiderTree.1 EDITABLE
 let spiderTree = { trunkX: 520, canopyBottom: 70 };
 // BOSS_PART_END s1.spiderTree.1
 
-// Nguồn: index.html:35829 · Dùng bởi: DanteBoss
+// Nguồn: index.html:35880 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s1.resolveSolidPillars.1 EDITABLE
 function resolveSolidPillars(ent) {
             if (mapTheme !== 'volcano' && mapTheme !== 'tetris' && !wildernessOn()) return;
@@ -1395,7 +1395,7 @@ function resolveSolidPillars(ent) {
         }
 // BOSS_PART_END s1.resolveSolidPillars.1
 
-// Nguồn: index.html:35843 · Dùng bởi: DanteBoss
+// Nguồn: index.html:35894 · Dùng bởi: DanteBoss
 // BOSS_PART_BEGIN s1.resolveTetrisWalls.1 EDITABLE
 function resolveTetrisWalls(ent, dx){
             if (mapTheme !== 'tetris' || !tetris) return; let T=tetris;
@@ -1408,57 +1408,57 @@ function resolveTetrisWalls(ent, dx){
         }
 // BOSS_PART_END s1.resolveTetrisWalls.1
 
-// Nguồn: index.html:35854 · Dùng bởi: DanteBoss, TetrisBoss
+// Nguồn: index.html:35905 · Dùng bởi: DanteBoss, TetrisBoss
 // BOSS_PART_BEGIN s1.tetris.1 EDITABLE
 let tetris = null, tetrisCamY = 0;
 // BOSS_PART_END s1.tetris.1
 
-// Nguồn: index.html:37594 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37645 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.PON_HP.1 EDITABLE
 const PON_HP   = [0, 90, 90];
 // BOSS_PART_END s1.PON_HP.1
 
-// Nguồn: index.html:37596 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37647 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.PON_TRE.1 EDITABLE
 const PON_TRE  = 42;
 // BOSS_PART_END s1.PON_TRE.1
 
-// Nguồn: index.html:37601 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37652 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.PON_PHA.1 EDITABLE
 const PON_PHA = { q_bung: 2, q_chu: 2, q_damkep: 2, q_combo: 2, q_trieu: 2 };
 // BOSS_PART_END s1.PON_PHA.1
 
-// Nguồn: index.html:37602 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37653 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.PON_LUA.1 EDITABLE
 const PON_LUA = "#FF7043", PON_PHEP = "#B388FF";
 // BOSS_PART_END s1.PON_LUA.1
 
-// Nguồn: index.html:41107 · Dùng bởi: HelicoprionBoss, MegalodonBoss, MosaBoss, ThalassaBoss
+// Nguồn: index.html:41158 · Dùng bởi: HelicoprionBoss, MegalodonBoss, MosaBoss, ThalassaBoss
 // BOSS_PART_BEGIN s1.OCEAN_SURF.1 EDITABLE
 const OCEAN_SURF = 150;
 // BOSS_PART_END s1.OCEAN_SURF.1
 
-// Nguồn: index.html:41108 · Dùng bởi: MegaManXBoss, MosaBoss, ThalassaBoss
+// Nguồn: index.html:41159 · Dùng bởi: MegaManXBoss, MosaBoss, ThalassaBoss
 // BOSS_PART_BEGIN s1.OCEAN_FLOOR.1 EDITABLE
 const OCEAN_FLOOR = 500;
 // BOSS_PART_END s1.OCEAN_FLOOR.1
 
-// Nguồn: index.html:41109 · Dùng bởi: HelicoprionBoss, MegalodonBoss, MosaBoss, ThalassaBoss
+// Nguồn: index.html:41160 · Dùng bởi: HelicoprionBoss, MegalodonBoss, MosaBoss, ThalassaBoss
 // BOSS_PART_BEGIN s1.oceanPads.1 EDITABLE
 let oceanPads = [], oceanCamY = 0;
 // BOSS_PART_END s1.oceanPads.1
 
-// Nguồn: index.html:41169 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss
+// Nguồn: index.html:41220 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss
 // BOSS_PART_BEGIN s1.BIEN_DAY.1 EDITABLE
 const BIEN_DAY = 760, BIEN_NONG = 330, BIEN_SAU = 470, BIEN_VUC = 560;
 // BOSS_PART_END s1.BIEN_DAY.1
 
-// Nguồn: index.html:41176 · Dùng bởi: HelicoprionBoss, MegalodonBoss
+// Nguồn: index.html:41227 · Dùng bởi: HelicoprionBoss, MegalodonBoss
 // BOSS_PART_BEGIN s1.bienVat.1 EDITABLE
 let bienVat = [], bienCuoi = 0, bienLoaiTruoc = -1, bienX0 = null, bienTrongBun = 0, bienChon = false, bienDaDoan = 0;
 // BOSS_PART_END s1.bienVat.1
 
-// Nguồn: index.html:41178 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss
+// Nguồn: index.html:41229 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss
 // BOSS_PART_BEGIN s1.bienChay.1 EDITABLE
 function bienChay(){
             return typeof gameState !== 'undefined' && gameState === 'normal' && mapChay === 'ocean' && mapTheme === 'ocean'
@@ -1466,27 +1466,27 @@ function bienChay(){
         }
 // BOSS_PART_END s1.bienChay.1
 
-// Nguồn: index.html:41183 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss
+// Nguồn: index.html:41234 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss
 // BOSS_PART_BEGIN s1.bienCoDiaHinh.1 EDITABLE
 function bienCoDiaHinh(){ return bienChay() || (typeof bienDT !== 'undefined' && bienDT && mapTheme === 'ocean'); }
 // BOSS_PART_END s1.bienCoDiaHinh.1
 
-// Nguồn: index.html:41184 · Dùng bởi: MegaManXBoss
+// Nguồn: index.html:41235 · Dùng bởi: MegaManXBoss
 // BOSS_PART_BEGIN s1.bienDayHT.1 EDITABLE
 function bienDayHT(){ return bienCoDiaHinh() ? BIEN_DAY : OCEAN_FLOOR; }
 // BOSS_PART_END s1.bienDayHT.1
 
-// Nguồn: index.html:42068 · Dùng bởi: HelicoprionBoss
+// Nguồn: index.html:42119 · Dùng bởi: HelicoprionBoss
 // BOSS_PART_BEGIN s1.HELI_TRANG.1 EDITABLE
 const HELI_TRANG = { vao: 1, nghi: 1, xe: 1, rang: 1, xoay: 1, vo: 1, can: 1, bao: 1, gam: 1 };
 // BOSS_PART_END s1.HELI_TRANG.1
 
-// Nguồn: index.html:42071 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss, ThalassaBoss
+// Nguồn: index.html:42122 · Dùng bởi: HelicoprionBoss, MegaManXBoss, MegalodonBoss, ThalassaBoss
 // BOSS_PART_BEGIN s1.bienDT.1 EDITABLE
 let bienDT = false, bienToiY = 520;
 // BOSS_PART_END s1.bienDT.1
 
-// Nguồn: index.html:42087 · Dùng bởi: HelicoprionBoss, MegalodonBoss
+// Nguồn: index.html:42138 · Dùng bởi: HelicoprionBoss, MegalodonBoss
 // BOSS_PART_BEGIN s1.bienTickTinh.1 EDITABLE
 function bienTickTinh(){
             for (let o of bienVat) o.t++;
@@ -1495,69 +1495,69 @@ function bienTickTinh(){
         }
 // BOSS_PART_END s1.bienTickTinh.1
 
-// Nguồn: index.html:42399 · Dùng bởi: MegalodonBoss
+// Nguồn: index.html:42450 · Dùng bởi: MegalodonBoss
 // BOSS_PART_BEGIN s1.MEG_HP.1 EDITABLE
 const MEG_HP = 200;
 // BOSS_PART_END s1.MEG_HP.1
 
-// Nguồn: index.html:42400 · Dùng bởi: MegalodonBoss
+// Nguồn: index.html:42451 · Dùng bởi: MegalodonBoss
 // BOSS_PART_BEGIN s1.MEG_TRANG.1 EDITABLE
 const MEG_TRANG = { vao: 1, lan: 1, chop: 1, vuc: 1, vay: 1, can: 1, duoi: 1, gam: 1 };
 // BOSS_PART_END s1.MEG_TRANG.1
 
-// Nguồn: index.html:42401 · Dùng bởi: MegalodonBoss
+// Nguồn: index.html:42452 · Dùng bởi: MegalodonBoss
 // BOSS_PART_BEGIN s1.MEG_CD.1 EDITABLE
 const MEG_CD = { chop: 150, vuc: 180, vay: 200, can: 140, duoi: 170 };
 // BOSS_PART_END s1.MEG_CD.1
 
-// Nguồn: index.html:42796 · Dùng bởi: ThalassaBoss
+// Nguồn: index.html:42847 · Dùng bởi: ThalassaBoss
 // BOSS_PART_BEGIN s1.CL_HP.1 EDITABLE
 const CL_HP = 240;
 // BOSS_PART_END s1.CL_HP.1
 
-// Nguồn: index.html:42797 · Dùng bởi: ThalassaBoss
+// Nguồn: index.html:42848 · Dùng bởi: ThalassaBoss
 // BOSS_PART_BEGIN s1.CL_TRANG.1 EDITABLE
 const CL_TRANG = { vao: 1, nghi: 1, combo: 1, thuong: 1, phun: 1, cot: 1, loc: 1, giang: 1, chan: 1, songthan: 1, ngap: 1,
                            luot: 1, chem: 1, trieu: 1, xoay: 1, long: 1 };
 // BOSS_PART_END s1.CL_TRANG.1
 
-// Nguồn: index.html:42799 · Dùng bởi: ThalassaBoss
+// Nguồn: index.html:42850 · Dùng bởi: ThalassaBoss
 // BOSS_PART_BEGIN s1.CL_CD.1 EDITABLE
 const CL_CD = { combo: 70, thuong: 110, phun: 150, cot: 230, loc: 330, giang: 280, chan: 200, songthan: 260,
                         luot: 190, chem: 150, trieu: 520, xoay: 380, long: 420 };
 // BOSS_PART_END s1.CL_CD.1
 
-// Nguồn: index.html:42802 · Dùng bởi: ThalassaBoss
+// Nguồn: index.html:42853 · Dùng bởi: ThalassaBoss
 // BOSS_PART_BEGIN s1.CL_GIAO_CACH.1 EDITABLE
 const CL_GIAO_CACH = 26;
 // BOSS_PART_END s1.CL_GIAO_CACH.1
 
-// Nguồn: index.html:42803 · Dùng bởi: ThalassaBoss
+// Nguồn: index.html:42854 · Dùng bởi: ThalassaBoss
 // BOSS_PART_BEGIN s1.bbNgap.1 EDITABLE
 let bbNgap = false, bbNuoc = 400;
 // BOSS_PART_END s1.bbNgap.1
 
-// Nguồn: index.html:44110 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:44161 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.HEAT_MAX.1 EDITABLE
 const HEAT_MAX = 100, HEAT_DECAY = 0.16, HEAT_BURNOUT = 170;
 // BOSS_PART_END s1.HEAT_MAX.1
 
-// Nguồn: index.html:44111 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:44162 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.heatInit.1 EDITABLE
 function heatInit(b, gain) { b.heat = 0; b.heatGain = gain; b.burnoutT = 0; b.dmgMul = 1; }
 // BOSS_PART_END s1.heatInit.1
 
-// Nguồn: index.html:44112 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:44163 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.heatTier.1 EDITABLE
 function heatTier(b) { return b.heat >= 75 ? 2 : (b.heat >= 40 ? 1 : 0); }
 // BOSS_PART_END s1.heatTier.1
 
-// Nguồn: index.html:44114 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:44165 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.heatRate.1 EDITABLE
 function heatRate(b) { return [1, 0.78, 0.58][heatTier(b)]; }
 // BOSS_PART_END s1.heatRate.1
 
-// Nguồn: index.html:44115 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:44166 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.heatAdd.1 EDITABLE
 function heatAdd(b, n) {
             if (b.burnoutT > 0) return;
@@ -1566,7 +1566,7 @@ function heatAdd(b, n) {
         }
 // BOSS_PART_END s1.heatAdd.1
 
-// Nguồn: index.html:44120 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:44171 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.heatBurnout.1 EDITABLE
 function heatBurnout(b) {
             b.heat = 0; b.burnoutT = HEAT_BURNOUT; b.dmgMul = 2;
@@ -1578,7 +1578,7 @@ function heatBurnout(b) {
         }
 // BOSS_PART_END s1.heatBurnout.1
 
-// Nguồn: index.html:44129 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:44180 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.heatTick.1 EDITABLE
 function heatTick(b) {
             if (b.burnoutT > 0) {
@@ -1595,7 +1595,7 @@ function heatTick(b) {
         }
 // BOSS_PART_END s1.heatTick.1
 
-// Nguồn: index.html:44142 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:44193 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.drawHeatBar.1 EDITABLE
 function drawHeatBar(b) {
             let w = 96, x = b.x + b.w / 2 - w / 2, y = b.y - 26;
@@ -1616,22 +1616,22 @@ function drawHeatBar(b) {
         }
 // BOSS_PART_END s1.drawHeatBar.1
 
-// Nguồn: index.html:44361 · Dùng bởi: EchoStalkerBoss
+// Nguồn: index.html:44412 · Dùng bởi: EchoStalkerBoss
 // BOSS_PART_BEGIN s1.echoTrees.1 EDITABLE
 let echoTrees = [];
 // BOSS_PART_END s1.echoTrees.1
 
-// Nguồn: index.html:44381 · Dùng bởi: SporeCrownBoss
+// Nguồn: index.html:44432 · Dùng bởi: SporeCrownBoss
 // BOSS_PART_BEGIN s1.sporeStacks.1 EDITABLE
 let sporeStacks = 0, sporePools = [], sporeFlash = 0;
 // BOSS_PART_END s1.sporeStacks.1
 
-// Nguồn: index.html:98816 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:98867 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.SDTU_DON.1 EDITABLE
 const SDTU_DON = 70, SDTU_TUNG = 340, SDTU_CAN = 70, SDTU_YEU = 380;
 // BOSS_PART_END s6.SDTU_DON.1
 
-// Nguồn: index.html:98817 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:98868 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.SDT_ULT.1 EDITABLE
 const SDT_ULT = {
             sdtUltNen(){ return !this.sdtUltXong && this.hp <= this.maxHp * 0.25; },
@@ -2193,7 +2193,7 @@ const SDT_ULT = {
         };
 // BOSS_PART_END s6.SDT_ULT.1
 
-// Nguồn: index.html:99375 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:99426 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.capSdtUlt.1 EDITABLE
 (function capSdtUlt(){
             for (const C of [typeof VergilBoss !== 'undefined' ? VergilBoss : null,
@@ -2204,7 +2204,7 @@ const SDT_ULT = {
         })();
 // BOSS_PART_END s6.capSdtUlt.1
 
-// Nguồn: index.html:99958 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:100009 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.BOSS_CHUNG.1 EDITABLE
 const BOSS_CHUNG = {
             cx(){ return this.x + this.w / 2; },
@@ -2219,7 +2219,7 @@ const BOSS_CHUNG = {
         };
 // BOSS_PART_END s6.BOSS_CHUNG.1
 
-// Nguồn: index.html:99969 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:100020 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.capBoHamChung.1 EDITABLE
 (function capBoHamChung(){
             const DS = [

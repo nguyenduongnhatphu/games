@@ -77,6 +77,6 @@ Tải file `.js` cần sửa bằng **Download raw file** trên GitHub. Xem [hư
 | [Yasuo2Boss](Yasuo2Boss.js) | 482 | 33.7 KB |
 | [YasuoBoss](YasuoBoss.js) | 549 | 36.6 KB |
 | [ZeroBoss](ZeroBoss.js) | 1264 | 69.8 KB |
-| [ZeusBoss](ZeusBoss.js) | 601 | 45.0 KB |
+| [ZeusBoss](ZeusBoss.js) | 668 | 50.4 KB |
 
 [Phần dùng chung](shared/BossShared.js) chỉ cần gửi thêm khi AI cần sửa một vùng READ_ONLY dùng chung.

@@ -1,5 +1,5 @@
 // BOSS_FILE: PontiffBoss
-// BOSS_SNAPSHOT: 2b36ae4c51fabb54b8d0e06c3164b8f6c2ef05a8c767bbd93c893e9900521e3e
+// BOSS_SNAPSHOT: 90b44e51b8a8c0ad12fba495a59e199c399e173aab86fbee147786ba09666942
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -55,53 +55,53 @@ function drawTopBossBar(b, col, label, sub, hang){
         }
 // BOSS_PART_END s0.drawTopBossBar.1
 
-// Nguồn: index.html:37594 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37645 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.PON_HP.1 READ_ONLY
 const PON_HP   = [0, 90, 90];
 // BOSS_PART_END s1.PON_HP.1
 
-// Nguồn: index.html:37595 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37646 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.PON_W.1 EDITABLE
 const PON_W    = 46, PON_H = 98;
 // BOSS_PART_END s1.PON_W.1
 
-// Nguồn: index.html:37596 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37647 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.PON_TRE.1 READ_ONLY
 const PON_TRE  = 42;
 // BOSS_PART_END s1.PON_TRE.1
 
-// Nguồn: index.html:37597 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37648 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.PON_MA_SONG.1 EDITABLE
 const PON_MA_SONG = 900;
 // BOSS_PART_END s1.PON_MA_SONG.1
 
-// Nguồn: index.html:37598 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37649 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.PON_MA_HOI.1 EDITABLE
 const PON_MA_HOI  = 420;
 // BOSS_PART_END s1.PON_MA_HOI.1
 
-// Nguồn: index.html:37599 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37650 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.PON_CD.1 EDITABLE
 const PON_CD = { p_bong: 110, p_phanxet: 200, p_hoa: 210, p_lui: 150, p_quay: 90,
                          q_bung: 300, q_chu: 250, q_damkep: 190, q_combo: 60 };
 // BOSS_PART_END s1.PON_CD.1
 
-// Nguồn: index.html:37601 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37652 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.PON_PHA.1 READ_ONLY
 const PON_PHA = { q_bung: 2, q_chu: 2, q_damkep: 2, q_combo: 2, q_trieu: 2 };
 // BOSS_PART_END s1.PON_PHA.1
 
-// Nguồn: index.html:37602 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37653 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.PON_LUA.1 READ_ONLY
 const PON_LUA = "#FF7043", PON_PHEP = "#B388FF";
 // BOSS_PART_END s1.PON_LUA.1
 
-// Nguồn: index.html:37603 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37654 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.ponChop.1 EDITABLE
 let ponChop = 0, ponBui = [];
 // BOSS_PART_END s1.ponChop.1
 
-// Nguồn: index.html:37684 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37735 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.drawPontiffBody.1 EDITABLE
 function drawPontiffBody(a, P, ma){
             let d = a.facingLeft ? -1 : 1, W = a.w, H = a.h;
@@ -169,7 +169,7 @@ function drawPontiffBody(a, P, ma){
         }
 // BOSS_PART_END s1.drawPontiffBody.1
 
-// Nguồn: index.html:37748 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37799 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.veTayKiemPon.1 EDITABLE
 function veTayKiemPon(sx, sy, goc, loai, sang, C, ma){
             ctx.save();
@@ -218,7 +218,7 @@ function veTayKiemPon(sx, sy, goc, loai, sang, C, ma){
         }
 // BOSS_PART_END s1.veTayKiemPon.1
 
-// Nguồn: index.html:37794 · Dùng bởi: PontiffBoss
+// Nguồn: index.html:37845 · Dùng bởi: PontiffBoss
 // BOSS_PART_BEGIN s1.PontiffBoss.1 EDITABLE
 class PontiffBoss {
             constructor(level){
@@ -668,7 +668,7 @@ class PontiffBoss {
         }
 // BOSS_PART_END s1.PontiffBoss.1
 
-// Nguồn: index.html:99958 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:100009 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.BOSS_CHUNG.1 READ_ONLY
 const BOSS_CHUNG = {
             cx(){ return this.x + this.w / 2; },
@@ -683,7 +683,7 @@ const BOSS_CHUNG = {
         };
 // BOSS_PART_END s6.BOSS_CHUNG.1
 
-// Nguồn: index.html:99969 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:100020 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.capBoHamChung.1 READ_ONLY
 (function capBoHamChung(){
             const DS = [

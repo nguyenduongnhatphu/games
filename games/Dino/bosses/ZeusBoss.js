@@ -1,5 +1,5 @@
 // BOSS_FILE: ZeusBoss
-// BOSS_SNAPSHOT: 2b36ae4c51fabb54b8d0e06c3164b8f6c2ef05a8c767bbd93c893e9900521e3e
+// BOSS_SNAPSHOT: 90b44e51b8a8c0ad12fba495a59e199c399e173aab86fbee147786ba09666942
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -58,15 +58,15 @@ function drawTopBossBar(b, col, label, sub, hang){
 // Nguồn: index.html:34909 · Dùng bởi: ZeusBoss
 // BOSS_PART_BEGIN s1.ZEUS_MOVES.1 EDITABLE
 const ZEUS_MOVES={
-    z_blink:{name:'LÔI BỘ · BA LẦN DỊCH CHUYỂN',end:244,air:false},
+    z_blink:{name:'LÔI BỘ · KHÓA ẢNH → TAM LIÊN ĐÂM',end:288,air:false},
     z_spear:{name:'LAO SÉT · SONG KÍCH',end:154,air:false},
     z_blade:{name:'THIỂM KIẾM · LAO CHÉM',end:154,air:false},
     z_smite:{name:'THIÊN CHÙY · SÉT ĐÁNH & SÓNG ĐIỆN',end:174,air:false},
-    z_hunt:{name:'LÔI ẢNH · DỊCH CHUYỂN → SONG TRẢM → THIÊN GIÁNG',end:354,air:false},
+    z_hunt:{name:'LÔI ẢNH · DỊCH CHUYỂN → SONG TRẢM → THIÊN GIÁNG',end:382,air:false},
     z_clap:{name:'BẠO LÔI VỖ TAY · RỜI KHỎI VÒNG ĐIỆN',cast:84,end:174,air:false},
     z_crown:{name:'THIÊN LUÂN · THẤT LÔI THƯƠNG',cast:120,end:298,air:true},
     z_tempest:{name:'PHONG BẠO · SONG LỐC',cast:110,end:328,air:true},
-    z_rain:{name:'THIÊN LÔI · TAM TRẬN MƯA SÉT',cast:100,end:306,air:true},
+    z_rain:{name:'THIÊN LÔI · TỨ TRẬN MƯA SÉT',cast:100,end:342,air:true},
     z_cataclysm:{name:'PHÁN QUYẾT BẦU TRỜI · VÀO VÙNG XANH',cast:150,end:310,air:true}
 };
 // BOSS_PART_END s1.ZEUS_MOVES.1
@@ -136,6 +136,59 @@ function zeusSpearShape(x,y,angle,size=1,alpha=1){
 // BOSS_PART_END s1.zeusSpearShape.1
 
 // Nguồn: index.html:34953 · Dùng bởi: ZeusBoss
+// BOSS_PART_BEGIN s1.zeusPatternAngles.1 EDITABLE
+function zeusPatternAngles(h){
+    if(h.mode==='cross')return(h.dense?[-.72,-.48,-.24,.24,.48,.72]:[-.48,-.24,.24,.48]).map(a=>h.aim+a);
+    // The omitted sector leaves a wide route for full-size side-scroller characters.
+    const angles=[];for(let i=0;i<19;i++){const a=.18+i*(Math.PI-.36)/18;if(Math.abs(a-h.aim)>.32)angles.push(a);}
+    return angles;
+}
+// BOSS_PART_END s1.zeusPatternAngles.1
+
+// Nguồn: index.html:34959 · Dùng bởi: ZeusBoss
+// BOSS_PART_BEGIN s1.zeusSpark.1 EDITABLE
+function zeusSpark(b,x,y,angle,speed,curve=0,life=210,color='#9cecff'){
+    if(bossProjectiles.filter(q=>q._zeusSpark&&q._zeusOwner===b).length>=180)return null;
+    const p=new BossProjectile(x-4,y-4,Math.cos(angle)*speed,Math.sin(angle)*speed,false,1);
+    p.w=p.h=8;p._zeusOwner=b;p._zeusSpark=true;p.age=0;p.curve=curve;p.life=life;p.color=color;p.frail=false;
+    p.update=function(){
+        if(++this.age<=36&&this.curve){const a=Math.atan2(this.vy,this.vx)+this.curve,v=Math.hypot(this.vx,this.vy);this.vx=Math.cos(a)*v;this.vy=Math.sin(a)*v;}
+        this.x+=this.vx;this.y+=this.vy;if(this.age>=this.life||this.vy>0&&this.y>=320||b.dying||b.hp<=0)this.x=worldR()+9999;
+    };
+    p.veRieng=function(q){ctx.save();ctx.translate(q.x+4,q.y+4);ctx.rotate(Math.atan2(q.vy,q.vx));ctx.fillStyle=q.color;ctx.globalAlpha=.22;ctx.beginPath();ctx.ellipse(-5,0,12,6,0,0,7);ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.ellipse(0,0,5,4,0,0,7);ctx.fill();ctx.fillStyle='#f4ffff';ctx.fillRect(-1,-2,3,4);ctx.restore();};
+    bossProjectiles.push(p);return p;
+}
+// BOSS_PART_END s1.zeusSpark.1
+
+// Nguồn: index.html:34970 · Dùng bởi: ZeusBoss
+// BOSS_PART_BEGIN s1.zeusDrawPattern.1 EDITABLE
+function zeusDrawPattern(h){
+    const live=h.age>=h.warn,u=Math.min(1,h.age/h.warn),R=16+u*11;
+    ctx.save();ctx.globalAlpha=live?Math.max(0,1-(h.age-h.warn)/14):.28+u*.5;
+    zeusSigil(h.x,h.y,R,-frames*.025,.8);ctx.strokeStyle=h.dense?'#d6adff':'#96e6ff';ctx.lineWidth=1.5;
+    for(const a of zeusPatternAngles(h)){ctx.beginPath();ctx.moveTo(h.x+Math.cos(a)*R,h.y+Math.sin(a)*R);ctx.lineTo(h.x+Math.cos(a)*(R+16),h.y+Math.sin(a)*(R+16));ctx.stroke();}
+    if(h.mode!=='cross'){ctx.strokeStyle='#f4d68b';ctx.setLineDash([3,5]);for(const a of [h.aim-.32,h.aim+.32]){ctx.beginPath();ctx.moveTo(h.x,h.y);ctx.lineTo(h.x+Math.cos(a)*125,h.y+Math.sin(a)*125);ctx.stroke();}ctx.setLineDash([]);}
+    ctx.restore();
+}
+// BOSS_PART_END s1.zeusDrawPattern.1
+
+// Nguồn: index.html:34978 · Dùng bởi: ZeusBoss
+// BOSS_PART_BEGIN s1.zeusDrawPortal.1 EDITABLE
+function zeusDrawPortal(b){
+    const p=b.portal;if(!p||p.age>=58)return;
+    const col=p.locked?'#ffb58c':'#e1c482',dir=p.dir||1,y=236;
+    ctx.save();ctx.strokeStyle=col;ctx.lineWidth=p.locked?3:2;ctx.globalAlpha=p.locked?.95:.55;
+    // A translucent thrust silhouette travels with the candidate destination, then freezes red.
+    const g=Object.create(b);Object.assign(g,{x:p.x-b.w/2,y:b.baseY,state:'idle',subTimer:0,airborne:false,slash:{kind:'thrust',age:9,life:18,a0:-.12,a1:.12},facingLeft:dir<0});
+    ctx.save();ctx.globalAlpha*=.28;zeusBody(g,true);ctx.restore();
+    ctx.setLineDash(p.locked?[]:[5,5]);ctx.beginPath();ctx.moveTo(p.x,y);ctx.lineTo(p.x+dir*145,y);ctx.stroke();ctx.setLineDash([]);
+    ctx.save();ctx.translate(p.x+dir*126,y);ctx.scale(dir,1);zeusPoly([[-16,-13],[7,0],[-16,13],[-8,0]],col,null);ctx.restore();
+    ctx.beginPath();ctx.ellipse(p.x,317,45,8,0,0,7);ctx.stroke();ctx.fillStyle=col;ctx.font='bold 10px Consolas';ctx.textAlign='center';ctx.fillText(p.locked?'ĐÃ KHÓA':'TRUY ẢNH',p.x,216);
+    ctx.restore();
+}
+// BOSS_PART_END s1.zeusDrawPortal.1
+
+// Nguồn: index.html:34990 · Dùng bởi: ZeusBoss
 // BOSS_PART_BEGIN s1.zeusStormFx.1 EDITABLE
 function zeusStormFx(b){
     const st=b.state,t=b.subTimer,m=ZEUS_MOVES[st];
@@ -169,7 +222,7 @@ function zeusStormFx(b){
 }
 // BOSS_PART_END s1.zeusStormFx.1
 
-// Nguồn: index.html:34983 · Dùng bởi: ZeusBoss
+// Nguồn: index.html:35020 · Dùng bởi: ZeusBoss
 // BOSS_PART_BEGIN s1.zeusDrawBursts.1 EDITABLE
 function zeusDrawBursts(b){
     ctx.save();
@@ -189,7 +242,7 @@ function zeusDrawBursts(b){
 }
 // BOSS_PART_END s1.zeusDrawBursts.1
 
-// Nguồn: index.html:34999 · Dùng bởi: ZeusBoss
+// Nguồn: index.html:35036 · Dùng bởi: ZeusBoss
 // BOSS_PART_BEGIN s1.setupZeusArena.1 EDITABLE
 function setupZeusArena(){
     mapTheme='olympus';camReset();freeMove=true;
@@ -202,7 +255,7 @@ function setupZeusArena(){
 }
 // BOSS_PART_END s1.setupZeusArena.1
 
-// Nguồn: index.html:35008 · Dùng bởi: ZeusBoss
+// Nguồn: index.html:35045 · Dùng bởi: ZeusBoss
 // BOSS_PART_BEGIN s1.drawZeusSky.1 EDITABLE
 function drawZeusSky(){
     ctx.save();const W=canvas.width;
@@ -237,7 +290,7 @@ function drawZeusSky(){
 }
 // BOSS_PART_END s1.drawZeusSky.1
 
-// Nguồn: index.html:35040 · Dùng bởi: ZeusBoss
+// Nguồn: index.html:35077 · Dùng bởi: ZeusBoss
 // BOSS_PART_BEGIN s1.zeusRig.1 EDITABLE
 function zeusRig(b){
     const t=b.subTimer,st=b.state,casting=ZEUS_MOVES[st]?.air,walk=b.state==='idle'?Math.sin(frames*.08)*2:0;
@@ -257,12 +310,13 @@ function zeusRig(b){
     if(st==='z_smite'){const q=t<86?zeusEase(t/35):1-zeusEase((t-86)/15);hand={x:25,y:-65-q*75};elbow={x:35,y:-90-q*25};angle=-1.4;}
     if(st==='z_blade'&&t<=58){const u=zeusEase(t/30);hand={x:zeusMix(39,2,u),y:zeusMix(-74,-115,u)};angle=zeusMix(.6,-2.1,u);elbow={x:18,y:-101};}
     if(b.slash){const s=b.slash,u=zeusEase(s.age/s.life);angle=zeusMix(s.a0,s.a1,u);hand={x:27+Math.cos(angle)*11,y:-88+Math.sin(angle)*10};elbow={x:18,y:-95};}
+    if(b.slash?.kind==='thrust'){const u=zeusEase(b.slash.age/b.slash.life);hand={x:34+Math.sin(u*Math.PI)*20,y:-84};elbow={x:18,y:-99};}
     const point=p=>({x:b.cx()+dir*p.x,y:feet+p.y});
     return {hand,elbow,off,angle,walk,lift,grip:point(hand),tip:point({x:hand.x+Math.cos(angle)*112,y:hand.y+Math.sin(angle)*112})};
 }
 // BOSS_PART_END s1.zeusRig.1
 
-// Nguồn: index.html:35061 · Dùng bởi: ZeusBoss
+// Nguồn: index.html:35099 · Dùng bởi: ZeusBoss
 // BOSS_PART_BEGIN s1.zeusBody.1 EDITABLE
 function zeusBody(b,ghost=false){
     const r=zeusRig(b),cast=ZEUS_MOVES[b.state]?.air,t=b.subTimer,charged=cast&&t<ZEUS_MOVES[b.state].cast;
@@ -306,7 +360,7 @@ function zeusBody(b,ghost=false){
 }
 // BOSS_PART_END s1.zeusBody.1
 
-// Nguồn: index.html:35101 · Dùng bởi: ZeusBoss
+// Nguồn: index.html:35139 · Dùng bởi: ZeusBoss
 // BOSS_PART_BEGIN s1.zeusSpear.1 EDITABLE
 function zeusSpear(b,source=null){
     const r=zeusRig(b),origin=source||r.grip,tx=source?source.tx:b.lockX,ty=source?source.ty:b.lockY,a=Math.atan2(ty-origin.y,tx-origin.x);
@@ -319,7 +373,7 @@ function zeusSpear(b,source=null){
 }
 // BOSS_PART_END s1.zeusSpear.1
 
-// Nguồn: index.html:35110 · Dùng bởi: ZeusBoss
+// Nguồn: index.html:35148 · Dùng bởi: ZeusBoss
 // BOSS_PART_BEGIN s1.ZeusBoss.1 EDITABLE
 class ZeusBoss{
     static setupArena(){setupZeusArena();}
@@ -361,7 +415,7 @@ class ZeusBoss{
     }
     begin(state){
         if(!this.legalMoves().includes(state))return false;
-        this.clearAttack();this.state=this.lastAttack=state;this.subTimer=0;this.faceP();this.attackDir=this.dir();this.serial++;
+        this.clearAttack(state==='z_cataclysm');this.state=this.lastAttack=state;this.subTimer=0;this.faceP();this.attackDir=this.dir();this.serial++;
         this.lockX=zeusClamp(dino.x+dino.w/2,40,canvas.width-40);this.lockY=dino.y+dino.h/2;
         if(this.airborne)this.airCount++;else this.groundCount++;
         if(state==='z_blink'||state==='z_hunt')this.planBlink(0);
@@ -380,10 +434,24 @@ class ZeusBoss{
         return true;
     }
     planBlink(leg){
-        // The destination locks BEFORE the flash; the arrival shock waits another 14 frames.
         const px=dino.x+dino.w/2,side=leg%2?1:-1,tx=zeusClamp(px+side*125,64,canvas.width-64);
-        this.portal={x:tx,y:320-this.h/2,leg};
-        this.addHazard('arrival',tx,320,43,18,{radius:43});
+        this.portal={x:tx,leg,side,age:0,locked:false,dir:Math.sign(px-tx)||1,targetX:px,targetY:dino.y+dino.h/2,hazard:this.addHazard('arrival',tx,320,56,18,{radius:43})};
+    }
+    tickPortal(){
+        const p=this.portal;if(!p)return;p.age++;
+        // Thirty tracking frames, twelve locked frames, then a fourteen-frame arrival grace period.
+        if(p.age<=30){p.targetX=dino.x+dino.w/2;p.targetY=dino.y+dino.h/2;p.x=zeusClamp(p.targetX+p.side*125,64,canvas.width-64);p.dir=Math.sign(p.targetX-p.x)||-p.side;p.hazard.x=p.x;}
+        if(p.age===30){p.locked=true;SFX.tone(1250,.045,'sine',.05,900);}
+        if(p.age===42){
+            this.ghosts.push({x:this.x,y:this.y,facingLeft:this.facingLeft,life:22});this.burst(this.cx(),this.y+65,60);
+            this.x=p.x-this.w/2;this.y=this.baseY;this.facingLeft=p.dir<0;this.attackDir=p.dir;this.burst(this.cx(),this.y+65,75);SFX.tone(880,.09,'sine',.08,120);
+        }
+        if(p.age===60&&this.state==='z_blink')this.swing(false,true);
+        if(p.age===66){const r=zeusRig(this);this.queuePattern(r.grip.x,r.grip.y,'cross',Math.atan2(p.targetY-r.grip.y,p.targetX-r.grip.x),16,p.side*.004);}
+        if(p.age>=78)this.portal=null;
+    }
+    queuePattern(x,y,mode='petals',aim=Math.PI/2,warn=30,curve=0){
+        return this.addHazard('petals',x,y,warn,14,{mode,aim,curve,dense:this.phase===2,speed:mode==='cross'?2.7:2.4,bulletLife:210});
     }
     addHazard(kind,x,y,warn,life,extra={}){
         const h={kind,x,y,warn,life,age:0,id:++this.serial,hit:false,...extra};this.hazards.push(h);return h;
@@ -408,8 +476,8 @@ class ZeusBoss{
         this.phase=this.hp<=this.maxHp/2?2:1;
         if(this.isCasting()&&this.castDamage>=12)this.breakCast();
     }
-    swing(rise=false){
-        this.slash={age:0,life:22,a0:rise?.65:-2.1,a1:rise?-1.7:.7,hit:false};this.slash.previous=zeusRig(this);
+    swing(rise=false,thrust=false){
+        this.slash={age:0,life:thrust?18:22,a0:thrust?-.12:rise?.65:-2.1,a1:thrust?.12:rise?-1.7:.7,kind:thrust?'thrust':'cut',hit:false};this.slash.previous=zeusRig(this);
         SFX.tone(440,.16,'sawtooth',.08,100);
     }
     tickSword(){
@@ -423,6 +491,7 @@ class ZeusBoss{
             if(!this.hazards.includes(h))break; // A perfect guard can cancel the remaining ritual fields.
             h.age++;if(h.age<h.warn||h.age>=h.warn+h.life)continue;const t=h.age-h.warn;
             if(t===0){SFX.tone(h.kind==='tornado'?90:60,.2,'sawtooth',.1,30);shakeTimer=Math.max(shakeTimer,h.kind==='judgement'?17:6);if(['bolt','arrival','judgement','pulse'].includes(h.kind))this.burst(h.kind==='judgement'?this.cx():h.x,h.kind==='pulse'?h.y:316,h.kind==='judgement'?170:h.kind==='pulse'?105:80,h.kind==='judgement'?'gold':'blue');}
+            if(t===0&&h.kind==='petals')for(const a of zeusPatternAngles(h))zeusSpark(this,h.x,h.y,a,h.speed,h.curve,h.bulletLife,h.dense?'#d5adff':'#9cecff');
             let boxes=[];
             if(h.kind==='bolt')boxes=[{x:h.x-h.radius,y:-190,w:h.radius*2,h:510}];
             if(h.kind==='arrival')boxes=[{x:h.x-h.radius,y:258,w:h.radius*2,h:62}];
@@ -445,6 +514,7 @@ class ZeusBoss{
     update(){
         this.combatTick();if(this.dying||this.hp<=0)return;
         this.subTimer++;const t=this.subTimer,st=this.state;
+        this.tickPortal();
         this.fx=this.fx.filter(f=>++f.age<f.life).slice(-64);
         this.ghosts=this.ghosts.filter(g=>--g.life>0);this.tickSword();this.tickHazards();
         // A perfect guard may have cancelled the attack during hazard/sword evaluation.
@@ -464,48 +534,44 @@ class ZeusBoss{
             if(--this.actionTimer<=0)this.chooseAttack();return;
         }
         if(st==='z_blink'){
-            const q=(t-1)%64,leg=Math.floor((t-1)/64);
-            if(leg<3){
-                if(q===0&&leg>0)this.planBlink(leg);
-                if(q===28){this.ghosts.push({x:this.x,y:this.y,facingLeft:this.facingLeft,life:22});this.burst(this.cx(),this.y+65,60);this.x=this.portal.x-this.w/2;this.y=this.baseY;this.faceP();this.burst(this.cx(),this.y+65,70);SFX.tone(880,.09,'sine',.08,120);}
-                if(q===52)this.portal=null;
-            }
+            if(t===80||t===160)this.planBlink(t/80);
         }else if(st==='z_spear'){
             if([36,74].includes(t)){this.lockX=dino.x+dino.w/2;this.lockY=dino.y+dino.h/2;this.faceP();}
             if([52,90].includes(t))zeusSpear(this);
+            if([64,102].includes(t)){const r=zeusRig(this);this.queuePattern(r.grip.x,r.grip.y,'cross',Math.atan2(this.lockY-r.grip.y,this.lockX-r.grip.x),20);}
         }else if(st==='z_blade'){
             if(t>=37&&t<=56){const old=this.x;this.x+=zeusClamp(this.dashTo-this.x,-10,10);if(t%4===0)this.ghosts.push({x:old,y:this.y,facingLeft:this.facingLeft,life:13});}
             if(t===58)this.swing();if(t===98)this.swing(true);
         }else if(st==='z_smite'){
             if(t===92)this.addHazard('ring',this.cx(),320,0,65,{radius:18});
         }else if(st==='z_hunt'){
-            if(t===92)this.planBlink(1);
-            if(t===29||t===120){
-                this.ghosts.push({x:this.x,y:this.y,facingLeft:this.facingLeft,life:22});this.burst(this.cx(),this.y+65,70);
-                this.x=this.portal.x-this.w/2;this.faceP();this.attackDir=this.dir();this.burst(this.cx(),this.y+65,80);SFX.tone(900,.1,'sine',.1,140);
-            }
-            if(t===52)this.swing();if(t===144)this.swing(true);
-            if(t===174){this.portal=null;this.addHazard('arrival',this.cx(),320,58,18,{radius:84});}
-            if(t>=174&&t<=232){this.y=this.baseY-Math.sin((t-174)/58*Math.PI)*94;this.grounded=t===232;}
-            if(t===216)this.swing();
-            if(t===232){this.y=this.baseY;this.grounded=true;this.burst(this.cx(),315,150,'gold');shakeTimer=Math.max(shakeTimer,13);}
-            if(t===236)this.addHazard('ring',this.cx(),320,20,55,{radius:18});
+            if(t===104)this.planBlink(1);
+            if(t===68)this.swing();if(t===172)this.swing(true);
+            if(t===202){this.portal=null;this.addHazard('arrival',this.cx(),320,58,18,{radius:84});}
+            if(t>=202&&t<=260){this.y=this.baseY-Math.sin((t-202)/58*Math.PI)*94;this.grounded=t===260;}
+            if(t===244)this.swing();
+            if(t===260){this.y=this.baseY;this.grounded=true;this.burst(this.cx(),315,150,'gold');shakeTimer=Math.max(shakeTimer,13);}
+            if(t===264)this.addHazard('ring',this.cx(),320,20,55,{radius:18});
         }else if(st==='z_clap'){
             if(t===84){this.burst(this.cx()+this.dir()*28,this.y+this.h-84,130,'gold');shakeTimer=Math.max(shakeTimer,12);SFX.tone(65,.28,'sawtooth',.12,25);}
         }else if(st==='z_crown'){
+            if([88,128,168].includes(t))this.queuePattern(this.cx(),this.y+50,'petals',Math.PI/2+((t-128)/40)*.22,32);
             for(const q of this.crown){
                 if(t===q.fire-24){q.tx=dino.x+dino.w/2;q.ty=dino.y+dino.h/2;q.locked=true;}
-                if(t===q.fire){q.sent=true;zeusSpear(this,q);this.burst(q.x,q.y,48);}
+                if(t===q.fire){q.sent=true;zeusSpear(this,q);this.burst(q.x,q.y,48);this.queuePattern(q.x,q.y,'cross',Math.atan2(q.ty-q.y,q.tx-q.x),18,(t%32?1:-1)*.006);}
             }
         }else if(st==='z_tempest'){
+            if([124,154,184,214].includes(t))for(const h of this.hazards.filter(h=>h.kind==='tornado'))this.queuePattern(h.x,142,'cross',h.dir>0?.8:Math.PI-.8,28,h.dir*.007);
             if(t===160){const cols=this.hazards.filter(h=>h.kind==='tornado').sort((a,b)=>a.x-b.x);if(cols.length===2)this.addHazard('bridge',cols[0].x,126,42,24,{toX:cols[1].x});}
         }else if(st==='z_cataclysm'){
             if(t===178){this.addHazard('ring',this.cx(),320,38,80,{radius:18});this.burst(this.cx(),316,180,'gold');}
+            if(t===178||t===226)this.queuePattern(this.cx(),this.y+50,'petals',Math.PI/2+(t===178?-.2:.2),30);
         }else if(st==='z_rain'){
-            if([100,148,196].includes(t)){
-                const group=(t-100)/48,step=canvas.width/9;
-                for(let lane=0;lane<9;lane++)if(lane%3===group)this.addHazard('bolt',(lane+.5)*step,0,45,18,{radius:23});
+            if([100,140,180,220].includes(t)){
+                const group=[0,2,1,0][(t-100)/40],step=canvas.width/12;
+                for(let lane=0;lane<12;lane++)if(lane%3===group)this.addHazard('bolt',(lane+.5)*step,0,45,18,{radius:20});
             }
+            if(t===116||t===196)this.queuePattern(this.cx(),this.y+50,'petals',Math.PI/2+(t===116?.2:-.2),30);
         }
         if(t>=(ZEUS_MOVES[st]?.end||180))this.idle(this.airborne?48:52);
     }
@@ -513,7 +579,8 @@ class ZeusBoss{
         for(const h of this.hazards){
             const live=h.age>=h.warn,u=h.warn?Math.min(1,h.age/h.warn):1,t=h.age-h.warn;
             ctx.save();ctx.strokeStyle=live?'#dbfbff':'#efc86e';ctx.lineWidth=2;
-            if(h.kind==='judgement'){
+            if(h.kind==='petals'){zeusDrawPattern(h);
+            }else if(h.kind==='judgement'){
                 const L=h.safeX-h.safeHalf,R=h.safeX+h.safeHalf;
                 ctx.fillStyle=live?'rgba(139,215,255,.34)':'rgba(224,164,71,.10)';ctx.fillRect(0,-190,L,510);ctx.fillRect(R,-190,canvas.width-R,510);
                 ctx.fillStyle='rgba(42,170,202,.13)';ctx.fillRect(L,-190,R-L,510);
@@ -559,7 +626,7 @@ class ZeusBoss{
         }
     }
     draw(){
-        ctx.save();zeusStormFx(this);this.drawHazards();
+        ctx.save();zeusStormFx(this);this.drawHazards();zeusDrawPortal(this);
         if(this.state==='z_blade'&&this.subTimer<37){ctx.strokeStyle='#f4d286';ctx.lineWidth=2;ctx.setLineDash([7,7]);ctx.beginPath();ctx.moveTo(this.cx(),304);ctx.lineTo(this.dashTo+this.w/2,304);ctx.stroke();ctx.setLineDash([]);}
         if(this.state==='z_spear'&&((this.subTimer>=36&&this.subTimer<52)||(this.subTimer>=74&&this.subTimer<90))){const r=zeusRig(this);ctx.strokeStyle='rgba(235,215,146,.55)';ctx.setLineDash([3,7]);ctx.beginPath();ctx.moveTo(r.grip.x,r.grip.y);ctx.lineTo(this.lockX,this.lockY);ctx.stroke();ctx.setLineDash([]);}
         ctx.fillStyle='rgba(19,24,44,.24)';ctx.beginPath();ctx.ellipse(this.cx(),320,this.airborne?46:33,7,0,0,7);ctx.fill();
@@ -585,17 +652,17 @@ class ZeusBoss{
 }
 // BOSS_PART_END s1.ZeusBoss.1
 
-// Nguồn: index.html:35421 · Dùng bởi: IronhaulBoss, ZeusBoss
+// Nguồn: index.html:35472 · Dùng bởi: IronhaulBoss, ZeusBoss
 // BOSS_PART_BEGIN s1.lavaGeysers.1 READ_ONLY
 let lavaGeysers = [];
 // BOSS_PART_END s1.lavaGeysers.1
 
-// Nguồn: index.html:35422 · Dùng bởi: IndominusBoss, IronhaulBoss, ZeusBoss
+// Nguồn: index.html:35473 · Dùng bởi: IndominusBoss, IronhaulBoss, ZeusBoss
 // BOSS_PART_BEGIN s1.grassField.1 READ_ONLY
 let grassField = [];
 // BOSS_PART_END s1.grassField.1
 
-// Nguồn: index.html:35423 · Dùng bởi: IronhaulBoss, ZeusBoss
+// Nguồn: index.html:35474 · Dùng bởi: IronhaulBoss, ZeusBoss
 // BOSS_PART_BEGIN s1.forestScene.1 READ_ONLY
 let forestScene = null;
 // BOSS_PART_END s1.forestScene.1

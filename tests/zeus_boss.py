@@ -41,23 +41,21 @@ with sync_playwright() as p:
     }'''))
     print(page.evaluate('''()=>{
         for(const left of [true,false]){
-            const b=zSetup(false,left);b.begin('z_blink');const target=b.portal.x,start=b.x;
-            let damage=0;const take=dino.takeDamage;dino.takeDamage=()=>damage++;dino.isShielding=()=>false;
-            dino.x=target-dino.w/2;
-            for(let i=0;i<28;i++)zTick(b);check(b.x===start&&!damage,'teleport warning too short');
-            zTick(b);check(Math.abs(b.cx()-target)<.001&&!damage,'arrival damages immediately');
-            for(let i=0;i<13;i++)zTick(b);check(!damage,'missing arrival delay');
-            zTick(b);check(damage===1,'missing small arrival shock');
-            for(let i=0;i<17;i++)zTick(b);check(damage===1,'shock repeats every frame');
-            dino.takeDamage=take;
+            const b=zSetup(false,left);b.begin('z_blink');const start=b.x,first=b.portal.x;
+            dino.x=left?600:300;for(let i=0;i<29;i++)zTick(b);
+            check(b.portal.x!==first&&!b.portal.locked&&b.x===start,'tracking marker does not follow before lock');
+            zTick(b);const x=b.portal.x,tx=b.portal.targetX;check(b.portal.locked&&b.portal.age===30,'not locked after half a second');
+            dino.x=left?180:780;for(let i=0;i<11;i++)zTick(b);check(b.x===start&&b.portal.x===x&&b.portal.targetX===tx,'locked destination follows player');
+            zTick(b);check(b.cx()===x,'teleport did not happen after locked warning');
+            let damage=0;const take=dino.takeDamage;dino.takeDamage=()=>damage++;dino.isShielding=()=>false;dino.x=x-dino.w/2;
+            for(let i=0;i<13;i++)zTick(b);check(!damage,'arrival causes immediate damage');zTick(b);check(damage===1,'arrival shock missing');
+            for(let i=0;i<3;i++)zTick(b);check(!b.slash,'teleport thrust starts too early');zTick(b);check(b.slash?.kind==='thrust','no telegraphed thrust');
+            dino.x=900;dino.takeDamage=take;
             const teleports=[];let prev=b.x;
-            for(let i=60;i<245;i++){zTick(b);if(Math.abs(b.x-prev)>20)teleports.push(b.x);prev=b.x;}
+            for(let i=60;i<288;i++){zTick(b);if(Math.abs(b.x-prev)>20)teleports.push(b.x);prev=b.x;}
             check(teleports.length===2,'missing second/third teleport');
         }
-        // Locked targets can be dodged; leaving the destination does not move it after the player.
-        const b=zSetup();b.begin('z_blink');const x=b.portal.x;dino.x=800;
-        for(let i=0;i<45;i++)zTick(b);check(b.cx()===x&&b.hazards[0].x===x,'teleport tracks through wind-up');
-        return 'PASS three teleports, 28-frame destination warning, 14-frame arrival delay, one hit and fixed dodgeable destination';
+        return 'PASS 30 tracking frames → 12 locked frames → teleport → 14-frame shock delay / 18-frame thrust delay, both sides';
     }'''))
     print(page.evaluate('''()=>{
         for(const move of ['z_tempest','z_rain','z_cataclysm']){
@@ -68,7 +66,7 @@ with sync_playwright() as p:
             for(let i=0;i<cast-1;i++)zTick(b);check(!damage,'ritual fires before channel finishes '+move);
             zTick(b);if(move!=='z_rain')check(damage===1,'ritual never releases '+move);
             if(move==='z_rain'){
-                check(b.hazards.length===3,'rain first row');dino.x=canvas.width/18-dino.w/2;
+                check(b.hazards.filter(h=>h.kind==='bolt').length===4,'rain first row');dino.x=canvas.width/24-dino.w/2;
                 for(let i=0;i<44;i++)zTick(b);check(!damage,'rain marks have no dodge window');
                 zTick(b);check(damage===1,'rain first row does not land');
             }
@@ -81,9 +79,9 @@ with sync_playwright() as p:
             for(let i=0;i<175;i++)zTick(b);dino.takeDamage=take;check(!hits,'safe corridor clips rig '+form);
         }
         const b=zSetup(true);b.begin('z_rain');let bolts=0,ages=[];
-        for(let i=0;i<306;i++){const before=b.hazards.length;zTick(b);if(b.hazards.length>before){bolts+=b.hazards.length-before;ages.push(i+1);}}
-        check(bolts===9&&ages.join(',')==='100,148,196','rain pattern / telegraphs wrong');
-        return 'PASS long ritual channels, staggered 45-frame rain markers, nine strikes, one hit per field and safe corridor for all rigs at both edges';
+        for(let i=0;i<342;i++){const before=new Set(b.hazards);zTick(b);const added=b.hazards.filter(h=>h.kind==='bolt'&&!before.has(h));if(added.length){bolts+=added.length;ages.push(i+1);}}
+        check(bolts===16&&ages.join(',')==='100,140,180,220','rain pattern / telegraphs wrong');
+        return 'PASS long ritual channels, staggered 45-frame rain markers, sixteen strikes, one hit per field and safe corridor for all rigs at both edges';
     }'''))
     print(page.evaluate('''()=>{
         for(const move of ['z_tempest','z_rain','z_cataclysm']){
@@ -114,18 +112,18 @@ with sync_playwright() as p:
     print(page.evaluate('''()=>{
         for(const left of [false,true]){
             const b=zSetup(false,left);b.begin('z_hunt');const poses=[],lands=[];let prevX=b.x,minY=b.y;
-            for(let i=1;i<=354;i++){
+            for(let i=1;i<=382;i++){
                 zTick(b);if(Math.abs(b.x-prevX)>30)lands.push(i);prevX=b.x;minY=Math.min(minY,b.y);
-                if([52,144,216].includes(i))check(!!b.slash,'missing thunder hunt sword '+i);
-                if(i===232)check(b.grounded&&b.y===b.baseY,'hunt does not land');
+                if([68,172,244].includes(i))check(!!b.slash,'missing thunder hunt sword '+i);
+                if(i===260)check(b.grounded&&b.y===b.baseY,'hunt does not land');
             }
-            check(lands.join(',')==='29,120','hunt teleport timings '+lands);check(minY<b.baseY-90,'hunt has no aerial finisher');
+            check(lands.join(',')==='42,146','hunt teleport timings '+lands);check(minY<b.baseY-90,'hunt has no aerial finisher');
             check(b.state==='idle'&&!b.hazards.length&&!b.slash,'hunt never recovers');
         }
         const b=zSetup(true);b.begin('z_crown');const sent=[],origins=[];
         for(let i=1;i<=298;i++){
             zTick(b);if(i===96){check(b.crown[0].locked&&!b.crown[1].locked,'lance does not lock 24 frames early');const q=b.crown[0];origins.push({x:q.x,y:q.y,tx:q.tx,ty:q.ty});dino.x=800;}
-            for(const q of bossProjectiles)if(!sent.includes(q)){sent.push(q);check([120,136,152,168,184,200,216].includes(i),'unexpected crown fire timing '+i);}
+            for(const q of bossProjectiles)if(!q._zeusSpark&&!sent.includes(q)){sent.push(q);check([120,136,152,168,184,200,216].includes(i),'unexpected crown fire timing '+i);}
         }
         check(sent.length===7,'missing crown lances '+sent.length);
         const q=sent[0],origin=origins[0],angle=Math.atan2(origin.ty-origin.y,origin.tx-origin.x);
@@ -150,6 +148,45 @@ with sync_playwright() as p:
         check(wave?.warn===38,'cataclysm has no warned aftershock');damage=0;dino.takeDamage=()=>damage++;dino.isShielding=()=>false;dino.w=dino.h=20;dino.x=b.cx()+140;dino.y=270;
         for(let i=0;i<125;i++)zTick(b);check(!damage,'jump cannot avoid the ground aftershock');
         return 'PASS delayed hollow clap pulse, 42-frame storm-bridge warning and jumpable final aftershock';
+    }'''))
+    print(page.evaluate('''()=>{
+        for(const form of [0,7,8,9,10])for(const aim of [Math.PI/2-.22,Math.PI/2,Math.PI/2+.22]){
+            const b=zSetup(true,true,form),x=500,y=96;
+            dino.x=x+(320-dino.h/2-y)/Math.tan(aim)-dino.w/2;dino.y=320-dino.h;
+            const h=b.queuePattern(x,y,'petals',aim,30);
+            for(let i=0;i<29;i++)zTick(b);check(!bossProjectiles.length,'petal fan fires before warning');
+            zTick(b);check(bossProjectiles.length>=14,'petal fan not dense');
+            for(let i=0;i<215;i++){
+                check(!bossProjectiles.some(q=>checkAABB(q,dino)),'announced petal gap clips full player body '+form+' '+aim);zTick(b,false);
+            }
+            check(!bossProjectiles.length,'sparks never expire');
+        }
+        const b=zSetup(true);b.begin('z_crown');const seen=new Set();let peak=0;
+        for(let i=0;i<298;i++){zTick(b);for(const q of bossProjectiles)if(q._zeusSpark)seen.add(q);peak=Math.max(peak,bossProjectiles.filter(q=>q._zeusSpark).length);}
+        check(seen.size>=65&&peak>=36,'crown still lacks overlapping projectile layers '+seen.size+' '+peak);
+        b.breakCast();check(!bossProjectiles.length&&!b.hazards.length&&!b.portal,'interrupt leaves extra bullet layers');
+        const foreign=new BossProjectile(700,200,0,0);bossProjectiles.push(foreign);
+        for(let i=0;i<250;i++)zeusSpark(b,500,96,Math.PI/2,2);
+        check(bossProjectiles.filter(q=>q._zeusSpark).length===180&&bossProjectiles.includes(foreign),'particle cap removes foreign bullets or fails');
+        b.breakCast();check(bossProjectiles.length===1&&bossProjectiles[0]===foreign,'cleanup removes other owners');
+        return 'PASS dense overlapping crown layers; full-size gaps for all five rigs / three angles, telegraph timing, finite particles, 180-particle cap and owned cleanup';
+    }'''))
+    print(page.evaluate('''()=>{
+        for(const form of [0,7,8,9,10]){
+            let b=zSetup(false,true,form);dino.invincible=false;dino.invTimer=0;dino.meleeTimer=0;const hp=dino.hp;
+            const q=zeusSpark(b,dino.x+dino.w/2,dino.y+dino.h/2,0,2);checkCollisions();
+            check(dino.hp===hp-1&&!bossProjectiles.includes(q),'new spark ignores native damage '+form);
+            b=zSetup(false,true,form);dino.invincible=false;dino.invTimer=0;dispatchEvent(new KeyboardEvent('keydown',{code:'KeyL'}));loopAnToan();dino.parryWindow=0;perfectParryCd=100;const guardHp=dino.hp;
+            const blocked=zeusSpark(b,dino.x+dino.w/2,dino.y+dino.h/2,0,2);checkCollisions();
+            dispatchEvent(new KeyboardEvent('keyup',{code:'KeyL'}));
+            check(dino.hp===guardHp&&!bossProjectiles.includes(blocked),'new spark bypasses native guard '+form);
+        }
+        const b=zSetup(true);const q=zeusSpark(b,500,150,1,2,.007);const vx=q.vx;
+        for(let i=0;i<36;i++)q.update();check(q.vx!==vx,'cross-current has no curve');const stable=[q.vx,q.vy];dino.x=900;
+        for(let i=0;i<20;i++)q.update();check(q.vx===stable[0]&&q.vy===stable[1],'spark keeps homing/turning after curve segment');
+        // The full-map verdict must start with a clear corridor, even after a prior barrage.
+        b.queuePattern(500,96);zeusSpark(b,500,96,1,2);b.begin('z_cataclysm');check(!bossProjectiles.length&&b.hazards.length===1,'verdict safe lane inherits an old barrage');
+        return 'PASS native 1-damage sparks and guard across all five rigs; finite curve without homing and clean verdict corridor';
     }'''))
     print(page.evaluate('''()=>{
         for(const move of ['z_crown','z_clap']){
