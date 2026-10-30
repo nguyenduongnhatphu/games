@@ -1,5 +1,5 @@
 // BOSS_FILE: IronhaulBoss
-// BOSS_SNAPSHOT: 90b44e51b8a8c0ad12fba495a59e199c399e173aab86fbee147786ba09666942
+// BOSS_SNAPSHOT: 39483d797c15c5e35e37a5b630ae4f295f939302db706fe13262c4e699541a28
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -176,7 +176,7 @@ function drawIronhaulCity(){
 // BOSS_PART_END s1.drawIronhaulCity.1
 
 // Nguồn: index.html:34314 · Dùng bởi: IronhaulBoss
-// BOSS_PART_BEGIN s1.ironhaulPolygon.1 EDITABLE
+// BOSS_PART_BEGIN s1.ironhaulPolygon.1 READ_ONLY
 function ironhaulPolygon(points,fill,edge='#152633'){
     ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(edge){ctx.strokeStyle=edge;ctx.lineWidth=2;ctx.stroke();}
 }
@@ -191,7 +191,7 @@ function ironhaulWheel(x,y,r,angle){
 // BOSS_PART_END s1.ironhaulWheel.1
 
 // Nguồn: index.html:34321 · Dùng bởi: IronhaulBoss
-// BOSS_PART_BEGIN s1.ironhaulTruck.1 EDITABLE
+// BOSS_PART_BEGIN s1.ironhaulTruck.1 READ_ONLY
 function ironhaulTruck(b,split=0){
     ctx.save();ctx.translate(b.cx(),b.y+b.h);ctx.scale(b.facingLeft?-1:1,1);
     const white=b.silver,body=white?'#dce5e8':'#426575',light=white?'#f6fbfa':'#7596a4',cab=white?'#becdd7':'#a95039';
@@ -221,12 +221,12 @@ function ironhaulTruck(b,split=0){
 // BOSS_PART_END s1.ironhaulTruck.1
 
 // Nguồn: index.html:34348 · Dùng bởi: IronhaulBoss
-// BOSS_PART_BEGIN s1.ironhaulMix.1 EDITABLE
+// BOSS_PART_BEGIN s1.ironhaulMix.1 READ_ONLY
 function ironhaulMix(a,b,t){return a+(b-a)*Math.max(0,Math.min(1,t));}
 // BOSS_PART_END s1.ironhaulMix.1
 
 // Nguồn: index.html:34349 · Dùng bởi: IronhaulBoss
-// BOSS_PART_BEGIN s1.ironhaulEase.1 EDITABLE
+// BOSS_PART_BEGIN s1.ironhaulEase.1 READ_ONLY
 function ironhaulEase(t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);}
 // BOSS_PART_END s1.ironhaulEase.1
 
@@ -313,6 +313,7 @@ function ironhaulRig(b){
         blade=ironhaulAngleMix(old.blade,blade,u);shieldAngle=ironhaulAngleMix(old.shieldAngle,shieldAngle,u);
         lean=ironhaulMix(old.lean,lean,u);crouch=ironhaulMix(old.crouch,crouch,u);turn=ironhaulAngleMix(old.turn*Math.PI*2,turn*Math.PI*2,u)/(Math.PI*2);
     }
+    if(b.playerCrouch){crouch=Math.max(crouch,2.8);swordTarget.y+=36;offTarget.y+=36;}
     const targets={swordTarget:{...swordTarget},offTarget:{...offTarget},blade,shieldAngle,lean,crouch,turn};
     const yaw=Math.cos(turn*Math.PI*2),width=Math.max(.2,Math.abs(yaw)),bob=air?0:Math.sin(gait*2)*speed*2+Math.sin(frames*.055)*.7;
     const pelvis={x:Math.sin(turn*Math.PI*2)*5,y:-94+crouch*15+bob};
@@ -339,13 +340,13 @@ function ironhaulRig(b){
 }
 // BOSS_PART_END s1.ironhaulRig.1
 
-// Nguồn: index.html:34443 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34444 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulWorldPoint.1 EDITABLE
 function ironhaulWorldPoint(b,p){return {x:b.cx()+b.dir()*p.x,y:b.y+b.h+p.y};}
 // BOSS_PART_END s1.ironhaulWorldPoint.1
 
-// Nguồn: index.html:34444 · Dùng bởi: IronhaulBoss
-// BOSS_PART_BEGIN s1.ironhaulWeapons.1 EDITABLE
+// Nguồn: index.html:34445 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulWeapons.1 READ_ONLY
 function ironhaulWeapons(b){
     const r=b.rigPose||ironhaulRig(b),grip=ironhaulWorldPoint(b,r.sword.hand),reach=(b.slash?.reach||112)*(1-r.fold*.65);
     const tip=ironhaulWorldPoint(b,{x:r.sword.hand.x+Math.cos(r.sword.angle)*reach,y:r.sword.hand.y+Math.sin(r.sword.angle)*reach});
@@ -356,14 +357,14 @@ function ironhaulWeapons(b){
 }
 // BOSS_PART_END s1.ironhaulWeapons.1
 
-// Nguồn: index.html:34452 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34453 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulJoint.1 EDITABLE
 function ironhaulJoint(p,r,col){
     ctx.fillStyle='#152934';ctx.beginPath();ctx.arc(p.x,p.y,r+2,0,7);ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,r,0,7);ctx.stroke();ctx.fillStyle='#a0b5bf';ctx.fillRect(p.x-2,p.y-2,4,4);
 }
 // BOSS_PART_END s1.ironhaulJoint.1
 
-// Nguồn: index.html:34455 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34456 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulBone.1 EDITABLE
 function ironhaulBone(a,b,w,col,hi,forearm=false){
     ctx.save();ctx.translate(a.x,a.y);ctx.rotate(Math.atan2(b.y-a.y,b.x-a.x));const L=Math.hypot(b.x-a.x,b.y-a.y);
@@ -376,7 +377,7 @@ function ironhaulBone(a,b,w,col,hi,forearm=false){
 }
 // BOSS_PART_END s1.ironhaulBone.1
 
-// Nguồn: index.html:34464 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34465 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulHand.1 EDITABLE
 function ironhaulHand(arm,col,hi){
     ctx.save();ctx.translate(arm.end.x,arm.end.y);ctx.rotate(arm.angle);
@@ -386,8 +387,8 @@ function ironhaulHand(arm,col,hi){
 }
 // BOSS_PART_END s1.ironhaulHand.1
 
-// Nguồn: index.html:34470 · Dùng bởi: IronhaulBoss
-// BOSS_PART_BEGIN s1.ironhaulRobot.1 EDITABLE
+// Nguồn: index.html:34471 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulRobot.1 READ_ONLY
 function ironhaulRobot(b,alpha=1){
     const w=ironhaulWeapons(b),r=w.rig,silver=b.silver,col=silver?'#cfdee8':'#4c748a',hi=silver?'#f6fdff':'#8aaebf',dark='#203b4a',energy=silver?'#93edfa':'#ffbf70';
     ctx.save();ctx.globalAlpha*=alpha;ctx.translate(b.cx(),b.y+b.h);ctx.scale(b.dir(),1);
@@ -431,7 +432,7 @@ function ironhaulRobot(b,alpha=1){
 }
 // BOSS_PART_END s1.ironhaulRobot.1
 
-// Nguồn: index.html:34512 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34513 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulPaintCrescent.1 EDITABLE
 function ironhaulPaintCrescent(q){
     const angle=Math.atan2(q.vy,q.vx),R=q.arcRadius||20,depth=q.arcDepth||28;
@@ -443,7 +444,7 @@ function ironhaulPaintCrescent(q){
 }
 // BOSS_PART_END s1.ironhaulPaintCrescent.1
 
-// Nguồn: index.html:34520 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34521 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulEnergySlash.1 EDITABLE
 function ironhaulEnergySlash(b,origin,tilt=0){
     const targetX=Number.isFinite(b.lockX)?b.lockX:dino.x+dino.w/2,targetY=Number.isFinite(b.lockY)?b.lockY:dino.y+dino.h/2;
@@ -460,8 +461,8 @@ function ironhaulEnergySlash(b,origin,tilt=0){
 }
 // BOSS_PART_END s1.ironhaulEnergySlash.1
 
-// Nguồn: index.html:34533 · Dùng bởi: IronhaulBoss
-// BOSS_PART_BEGIN s1.ironhaulCoreFx.1 EDITABLE
+// Nguồn: index.html:34534 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulCoreFx.1 READ_ONLY
 function ironhaulCoreFx(b){
     const charging=b.state==='ih_overcharge'&&b.subTimer<=74,charge=charging?ironhaulEase(b.subTimer/72):b.coreBuff>0?1:0;
     if(!charge||b.vehicle)return;
@@ -482,7 +483,7 @@ function ironhaulCoreFx(b){
 }
 // BOSS_PART_END s1.ironhaulCoreFx.1
 
-// Nguồn: index.html:34551 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34552 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulRound.1 EDITABLE
 function ironhaulRound(b,x,y,vx,vy,kind='bullet',targetX=null){
     const p=new BossProjectile(x,y,vx,vy,false,1);p._ironhaulOwner=b;p.ihKind=kind;p.age=0;p.color=b.silver?'#b4f7ff':'#ffc788';p.frail=kind==='bullet';
@@ -517,7 +518,7 @@ function ironhaulRound(b,x,y,vx,vy,kind='bullet',targetX=null){
 }
 // BOSS_PART_END s1.ironhaulRound.1
 
-// Nguồn: index.html:34582 · Dùng bởi: IronhaulBoss
+// Nguồn: index.html:34583 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.IronhaulBoss.1 EDITABLE
 class IronhaulBoss{
     static setupArena(){setupIronhaulArena();}
@@ -838,8 +839,7 @@ class IronhaulBoss{
         const wind=this.ram?.stage==='warn'||this.state==='ih_parry'&&this.subTimer<=34;
         if(wind){ctx.strokeStyle=this.state==='ih_parry'?'#bdfaff':'#ffbc6e';ctx.lineWidth=3;ctx.beginPath();ctx.arc(this.cx()+this.dir()*(this.vehicle?123:52),this.cy(),this.state==='ih_parry'?29:19,0,7);ctx.stroke();}
         ctx.restore();
-        const label=this.phase===1?'CONTAINER · 30 HP':this.silver?'SILVER AEGIS · KIẾM & KHIÊN':'GUNBLADE · 150 HP';
-        drawTopBossBar(this,this.silver?'#d9eff7':this.phase===1?'#f3b664':'#79b8d0','IRONHAUL · '+label);
+        drawTopBossBar(this,this.silver?'#d9eff7':this.phase===1?'#f3b664':'#79b8d0','IRONHAUL');
         ctx.save();hudManHinh(this);ctx.textAlign='center';ctx.font='bold 11px Consolas';ctx.fillStyle=this.silver?'#d9faff':'#f4cca0';ctx.fillText((this.coreBuff>0?'⚡ KIẾM CƯỜNG HÓA · ':'')+(IRONHAUL_MOVES[this.state]?.name||(['ih_shift','ih_silver'].includes(this.state)?'ĐANG CHUYỂN DẠNG…':'FREIGHT DISTRICT')),canvas.width/2,53);ctx.restore();
     }
 }

@@ -1,5 +1,5 @@
 // BOSS_FILE: BossShared
-// BOSS_SNAPSHOT: 90b44e51b8a8c0ad12fba495a59e199c399e173aab86fbee147786ba09666942
+// BOSS_SNAPSHOT: 39483d797c15c5e35e37a5b630ae4f295f939302db706fe13262c4e699541a28
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -1358,6 +1358,132 @@ const MMX_GIAP_TEN = { thuong: 'MEGA MAN X', fourth: 'X — FOURTH ARMOR', falco
 const MMX_GIAP_MAU = { thuong: '#42A5F5', fourth: '#EF5350', falcon: '#E0E0E0', gaea: '#FF8F00', ultimate: '#B388FF' };
 // BOSS_PART_END s0.MMX_GIAP_MAU.1
 
+// Nguồn: index.html:34314 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulPolygon.1 EDITABLE
+function ironhaulPolygon(points,fill,edge='#152633'){
+    ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(edge){ctx.strokeStyle=edge;ctx.lineWidth=2;ctx.stroke();}
+}
+// BOSS_PART_END s1.ironhaulPolygon.1
+
+// Nguồn: index.html:34321 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulTruck.1 EDITABLE
+function ironhaulTruck(b,split=0){
+    ctx.save();ctx.translate(b.cx(),b.y+b.h);ctx.scale(b.facingLeft?-1:1,1);
+    const white=b.silver,body=white?'#dce5e8':'#426575',light=white?'#f6fbfa':'#7596a4',cab=white?'#becdd7':'#a95039';
+    ctx.translate(0,-Math.sin(split*Math.PI)*22);
+    ctx.fillStyle='#23343c';ctx.fillRect(-142,-35,286,21);
+    // ISO container: corrugations, corner castings, locking rods and hazard labels.
+    ctx.save();ctx.translate(-split*90,-split*72);ctx.rotate(-split*.28);
+    ironhaulPolygon([[-142,-103],[50,-103],[55,-36],[-142,-36]],body);ctx.fillStyle=light;ctx.fillRect(-139,-101,186,5);
+    ctx.strokeStyle=white?'#8eabbc':'#2b4c5d';ctx.lineWidth=3;for(let x=-130;x<49;x+=13){ctx.beginPath();ctx.moveTo(x,-94);ctx.lineTo(x,-42);ctx.stroke();}
+    ctx.fillStyle='#ced7c9';ctx.font='bold 11px Consolas';ctx.textAlign='center';ctx.save();ctx.translate(-48,-72);if(b.facingLeft)ctx.scale(-1,1);ctx.fillText('IH · 081',0,0);ctx.restore();ctx.fillStyle='#cda858';ctx.fillRect(-125,-52,23,6);ctx.fillStyle='#1d2e37';ctx.fillRect(-122,-51,16,2);
+    ctx.fillStyle='#91a7af';for(const x of [-141,43])for(const y of [-102,-44])ctx.fillRect(x,y,7,7);ctx.restore();
+    ctx.save();ctx.translate(split*74,-split*45);ctx.rotate(split*.4);
+    ironhaulPolygon([[60,-83],[105,-83],[131,-58],[139,-27],[57,-27]],cab);ctx.fillStyle=light;ctx.fillRect(59,-84,47,6);
+    ironhaulPolygon([[75,-74],[104,-74],[122,-57],[75,-57]],'#112b3d','#b0d8dd');ctx.fillStyle='#517985';ctx.fillRect(78,-71,23,3);
+    ctx.fillStyle='#17232c';ctx.fillRect(118,-51,19,16);ctx.strokeStyle='#9bafb6';ctx.lineWidth=2;for(let y=-48;y<-33;y+=4){ctx.beginPath();ctx.moveTo(120,y);ctx.lineTo(136,y);ctx.stroke();}
+    ctx.fillStyle='#e7ddab';ctx.fillRect(132,-32,10,6);ctx.fillStyle='#9faeb4';ctx.fillRect(128,-22,18,7);ctx.fillRect(63,-36,24,4);ctx.fillStyle='#9eafb3';ctx.fillRect(58,-92,5,38);ctx.fillRect(50,-88,7,7);ctx.restore();
+    for(const x of [-119,-83,34,106])ironhaulWheel(x+(x<0?-split*35:split*35),-16-split*5,16,frames*.15*(b.driveDir||1));
+    const deploy=Math.min(1,b.subTimer/24);
+    if(b.state==='ih_cannon'){
+        ctx.save();ctx.translate(-20,-103);ctx.scale(1,deploy);ctx.fillStyle='#223e4e';ctx.fillRect(-30,-18,60,18);ctx.fillStyle='#91aab0';ctx.fillRect(-10,-35,32,20);ctx.fillStyle='#314d60';ctx.fillRect(15,-31,70,13);ctx.fillStyle='#ffcb72';ctx.fillRect(79,-30,7,11);ctx.restore();
+    }else if(b.state==='ih_gatling'){
+        ctx.save();ctx.translate(25,-94);ctx.scale(1,deploy);ctx.fillStyle='#253b49';ctx.fillRect(-14,-23,30,26);ctx.fillStyle='#7899a6';for(let k=0;k<3;k++)ctx.fillRect(7,-24+k*5,44,3);ctx.fillStyle='#f2ca83';ctx.fillRect(48,-25,5,17);ctx.restore();
+    }
+    if(b.muzzle>0){const gy=b.state==='ih_gatling'?-111:-124;ctx.fillStyle='#fff1ae';ctx.beginPath();ctx.moveTo(76,gy-7);ctx.lineTo(105,gy);ctx.lineTo(76,gy+7);ctx.closePath();ctx.fill();}
+    ctx.restore();
+}
+// BOSS_PART_END s1.ironhaulTruck.1
+
+// Nguồn: index.html:34348 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulMix.1 EDITABLE
+function ironhaulMix(a,b,t){return a+(b-a)*Math.max(0,Math.min(1,t));}
+// BOSS_PART_END s1.ironhaulMix.1
+
+// Nguồn: index.html:34349 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulEase.1 EDITABLE
+function ironhaulEase(t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);}
+// BOSS_PART_END s1.ironhaulEase.1
+
+// Nguồn: index.html:34445 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulWeapons.1 EDITABLE
+function ironhaulWeapons(b){
+    const r=b.rigPose||ironhaulRig(b),grip=ironhaulWorldPoint(b,r.sword.hand),reach=(b.slash?.reach||112)*(1-r.fold*.65);
+    const tip=ironhaulWorldPoint(b,{x:r.sword.hand.x+Math.cos(r.sword.angle)*reach,y:r.sword.hand.y+Math.sin(r.sword.angle)*reach});
+    const shield=ironhaulWorldPoint(b,r.off.hand),points=[[-27,-35],[19,-37],[32,-16],[25,29],[0,43],[-28,22],[-33,-13]].map(([x,y])=>ironhaulWorldPoint(b,ironhaulRot({x:x*r.shieldFace*IRONHAUL_SHIELD_SCALE,y:y*IRONHAUL_SHIELD_SCALE},r.off.angle,r.off.hand)));
+    const gun=ironhaulWorldPoint(b,{x:r.off.hand.x+Math.cos(r.off.angle)*48,y:r.off.hand.y+Math.sin(r.off.angle)*48});
+    const loX=Math.min(...points.map(p=>p.x)),loY=Math.min(...points.map(p=>p.y));
+    return {rig:r,grip,tip,shield,shieldPoints:points,shieldBox:{x:loX,y:loY,w:Math.max(...points.map(p=>p.x))-loX,h:Math.max(...points.map(p=>p.y))-loY},gun,gunAngle:Math.atan2(gun.y-shield.y,gun.x-shield.x)};
+}
+// BOSS_PART_END s1.ironhaulWeapons.1
+
+// Nguồn: index.html:34471 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulRobot.1 EDITABLE
+function ironhaulRobot(b,alpha=1){
+    const w=ironhaulWeapons(b),r=w.rig,silver=b.silver,col=silver?'#cfdee8':'#4c748a',hi=silver?'#f6fdff':'#8aaebf',dark='#203b4a',energy=silver?'#93edfa':'#ffbf70';
+    ctx.save();ctx.globalAlpha*=alpha;ctx.translate(b.cx(),b.y+b.h);ctx.scale(b.dir(),1);
+    const limb=(a,armed)=>{
+        ironhaulBone(a.root,a.joint,19,col,hi);ironhaulJoint(a.root,9,hi);ironhaulJoint(a.joint,7,energy);ironhaulBone(a.joint,a.end,22,col,hi,true);ironhaulJoint(a.end,5,hi);ironhaulHand(a,col,hi);
+        if(armed==='shield'&&silver&&b.shieldOut<=0){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);ctx.scale(r.shieldFace*IRONHAUL_SHIELD_SCALE,IRONHAUL_SHIELD_SCALE);
+            ironhaulPolygon([[-27,-35],[19,-37],[32,-16],[25,29],[0,43],[-28,22],[-33,-13]],'#7d98ab',hi);
+            ironhaulPolygon([[-21,-28],[15,-30],[24,-13],[18,23],[0,33],[-21,17],[-25,-10]],'#eaf7ff');
+            ironhaulPolygon([[0,-23],[12,0],[0,25],[-12,0]],'#315c71',energy);ctx.strokeStyle=energy;ctx.lineWidth=b.state==='ih_parry'?4:2;ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(0,23);ctx.stroke();
+            for(const [x,y] of [[-18,-23],[15,-22],[-18,16],[15,19]]){ctx.fillStyle='#607f92';ctx.fillRect(x-2,y-2,4,4);}ctx.restore();
+        }else if(armed==='gun'&&!silver&&!((b.state==='ih_cleaver'&&b.subTimer<103)||b.state==='ih_overcharge')){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);ironhaulPolygon([[-5,-8],[30,-9],[36,-5],[49,-5],[49,5],[8,9],[-5,3]],dark,hi);ctx.fillStyle=hi;ctx.fillRect(32,-4,17,8);ctx.fillStyle=energy;ctx.fillRect(8,-7,16,2);
+            if(b.muzzle>0){ctx.fillStyle='#ffedb7';ironhaulPolygon([[49,-7],[70,0],[49,7],[55,0]],ctx.fillStyle,null);}ctx.restore();}
+        else if(armed==='sword'){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);const L=(b.slash?.reach||112)*(1-r.fold*.65);
+            ironhaulPolygon([[0,-5],[L-20,-5],[L,0],[L-20,5],[0,5]],silver?'#f0fcff':'#bbcdd7',energy);ctx.fillStyle=energy;ctx.fillRect(11,-4,L-34,2);ctx.fillStyle=dark;ctx.fillRect(-10,-5,15,10);ctx.fillStyle=hi;ctx.fillRect(-2,-12,5,24);ctx.restore();}
+    };
+    const leg=l=>{
+        ironhaulJoint(l.hip,9,hi);ironhaulBone(l.hip,l.knee,24,col,hi);ironhaulJoint(l.knee,8,energy);ironhaulBone(l.knee,l.ankle,25,col,hi,true);
+        ctx.save();ctx.translate(l.ankle.x,l.ankle.y);ctx.rotate(l.angle);ironhaulPolygon([[-15,-6],[12,-7],[25,3],[25,9],[-17,9]],col);ctx.fillStyle=hi;ctx.fillRect(-11,-5,20,3);ctx.fillStyle=dark;ctx.fillRect(-15,6,37,4);ctx.restore();
+    };
+    leg(r.legs[0]);if(r.offBehind)limb(r.off,silver?'shield':'gun');
+    // Container hinges / backpack, pelvis yaw bearing, independent spine and chest rotation.
+    ctx.save();ctx.translate(r.chest.x,r.chest.y);ctx.rotate(r.lean);ctx.scale(r.width,1);
+    for(const side of [-1,1]){ctx.save();ctx.translate(side*38,-4);ctx.rotate(side*(-.2+r.turn*.28));ironhaulPolygon([[-10,-23],[12,-22],[17,54],[-11,58]],'#274655',hi);ctx.strokeStyle='#64889b';for(let y=-10;y<45;y+=11){ctx.beginPath();ctx.moveTo(-7,y);ctx.lineTo(12,y-2);ctx.stroke();}ctx.restore();}ctx.restore();
+    ironhaulBone(r.pelvis,r.chest,29,dark,hi);ironhaulJoint(r.pelvis,13,energy);
+    ctx.save();ctx.translate(r.pelvis.x,r.pelvis.y);ctx.scale(r.width,1);ironhaulPolygon([[-32,-8],[27,-8],[32,13],[12,21],[-22,18],[-35,6]],col);ctx.fillStyle=hi;ctx.fillRect(-18,-5,35,4);ctx.restore();
+    ctx.save();ctx.translate(r.chest.x,r.chest.y);ctx.rotate(r.lean);ctx.scale(r.width,1);
+    ironhaulPolygon([[-37,-19],[-23,-25],[24,-25],[38,-14],[30,21],[7,29],[-24,22],[-35,7]],col);
+    if(r.yaw>=0){ironhaulPolygon([[-29,-14],[0,-7],[29,-14],[24,8],[0,16],[-26,7]],silver?'#eff9ff':'#a75943');
+        for(const side of [-1,1])ironhaulPolygon([[side*3,-6],[side*25,-11],[side*23,3],[side*3,9]],'#14384a',hi);
+        ctx.fillStyle=energy;ctx.beginPath();ctx.arc(0,16,silver?6:4,0,7);ctx.fill();
+    }else{ctx.fillStyle=dark;ctx.fillRect(-22,-15,44,37);ctx.fillStyle=hi;for(let y=-9;y<20;y+=8)ctx.fillRect(-17,y,34,3);}
+    ctx.restore();
+    leg(r.legs[1]);
+    for(const arm of [r.off,r.sword]){ctx.save();ctx.translate(arm.root.x,arm.root.y);ctx.rotate(Math.atan2(arm.joint.y-arm.root.y,arm.joint.x-arm.root.x)*.2);ironhaulPolygon([[-14,-15],[13,-16],[18,-2],[11,16],[-16,12]],col);ctx.fillStyle=hi;ctx.fillRect(-12,-14,24,4);ironhaulWheel(0,0,10,0);ctx.restore();}
+    ctx.strokeStyle=hi;ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(r.chest.x,r.chest.y-19);ctx.lineTo(r.neck.x,r.neck.y);ctx.lineTo(r.head.x,r.head.y+4);ctx.stroke();
+    ironhaulJoint(r.neck,6,hi);ctx.save();ctx.translate(r.head.x,r.head.y);ctx.rotate(-r.lean*.4);ctx.scale(Math.max(.35,r.width),1);
+    ironhaulPolygon([[-15,-12],[-8,-21],[10,-21],[18,-9],[12,9],[-12,9]],col);ctx.fillStyle=dark;ctx.fillRect(-13,-8,28,8);if(r.yaw>=0){ctx.fillStyle=energy;ctx.fillRect(-10,-7,22,3);}else{ctx.fillStyle=hi;for(let x=-9;x<=9;x+=6)ctx.fillRect(x,-8,2,12);}ctx.fillStyle=hi;ctx.fillRect(-7,3,15,4);ctx.restore();
+    limb(r.sword,'sword');if(!r.offBehind)limb(r.off,silver?'shield':'gun');
+    if(b.pose==='dash'||!b.grounded){ctx.fillStyle=energy;for(const side of [-1,1]){const p=r.chest;ironhaulPolygon([[p.x+side*34,p.y+5],[p.x+side*34-18,p.y+17],[p.x+side*34-48-Math.sin(frames*2)*8,p.y+12]],energy,null);}}
+    ctx.restore();
+}
+// BOSS_PART_END s1.ironhaulRobot.1
+
+// Nguồn: index.html:34534 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulCoreFx.1 EDITABLE
+function ironhaulCoreFx(b){
+    const charging=b.state==='ih_overcharge'&&b.subTimer<=74,charge=charging?ironhaulEase(b.subTimer/72):b.coreBuff>0?1:0;
+    if(!charge||b.vehicle)return;
+    const g=ironhaulWeapons(b),r=g.rig,core=ironhaulWorldPoint(b,ironhaulRot({x:0,y:16},r.lean,r.chest));
+    ctx.save();ctx.strokeStyle=b.silver?'#d1ffff':'#91eaff';ctx.fillStyle=ctx.strokeStyle;
+    ctx.globalAlpha=.2+charge*.45;ctx.lineWidth=1+charge*3;ctx.beginPath();ctx.arc(core.x,core.y,7+charge*5+Math.sin(frames*.2),0,Math.PI*2);ctx.stroke();
+    if(charging){
+        const control={x:(core.x+g.grip.x)/2,y:Math.min(core.y,g.grip.y)-22};
+        ctx.beginPath();ctx.moveTo(core.x,core.y);ctx.quadraticCurveTo(control.x,control.y,g.grip.x,g.grip.y);ctx.stroke();
+        for(let i=0;i<6;i++){
+            const u=(frames*.035+i/6)%1,v=1-u,x=v*v*core.x+2*v*u*control.x+u*u*g.grip.x,y=v*v*core.y+2*v*u*control.y+u*u*g.grip.y;
+            ctx.fillRect(x-2,y-2,4,4);
+        }
+    }
+    ctx.globalAlpha=charge*.4;ctx.lineWidth=5+charge*4;ctx.beginPath();ctx.moveTo(g.grip.x,g.grip.y);ctx.lineTo(g.tip.x,g.tip.y);ctx.stroke();
+    ctx.globalAlpha=charge*.85;ctx.lineWidth=2;const u=(frames*.025)%1;
+    const x=ironhaulMix(g.grip.x,g.tip.x,u),y=ironhaulMix(g.grip.y,g.tip.y,u);ctx.beginPath();ctx.arc(x,y,3,0,7);ctx.stroke();ctx.restore();
+}
+// BOSS_PART_END s1.ironhaulCoreFx.1
+
 // Nguồn: index.html:35472 · Dùng bởi: IronhaulBoss, ZeusBoss
 // BOSS_PART_BEGIN s1.lavaGeysers.1 EDITABLE
 let lavaGeysers = [];
@@ -1626,12 +1752,12 @@ let echoTrees = [];
 let sporeStacks = 0, sporePools = [], sporeFlash = 0;
 // BOSS_PART_END s1.sporeStacks.1
 
-// Nguồn: index.html:98867 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:98871 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.SDTU_DON.1 EDITABLE
 const SDTU_DON = 70, SDTU_TUNG = 340, SDTU_CAN = 70, SDTU_YEU = 380;
 // BOSS_PART_END s6.SDTU_DON.1
 
-// Nguồn: index.html:98868 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:98872 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.SDT_ULT.1 EDITABLE
 const SDT_ULT = {
             sdtUltNen(){ return !this.sdtUltXong && this.hp <= this.maxHp * 0.25; },
@@ -2193,7 +2319,7 @@ const SDT_ULT = {
         };
 // BOSS_PART_END s6.SDT_ULT.1
 
-// Nguồn: index.html:99426 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:99430 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.capSdtUlt.1 EDITABLE
 (function capSdtUlt(){
             for (const C of [typeof VergilBoss !== 'undefined' ? VergilBoss : null,
@@ -2204,7 +2330,7 @@ const SDT_ULT = {
         })();
 // BOSS_PART_END s6.capSdtUlt.1
 
-// Nguồn: index.html:100009 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:100013 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.BOSS_CHUNG.1 EDITABLE
 const BOSS_CHUNG = {
             cx(){ return this.x + this.w / 2; },
@@ -2219,7 +2345,7 @@ const BOSS_CHUNG = {
         };
 // BOSS_PART_END s6.BOSS_CHUNG.1
 
-// Nguồn: index.html:100020 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:100024 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.capBoHamChung.1 EDITABLE
 (function capBoHamChung(){
             const DS = [

@@ -33,7 +33,7 @@ Tải file `.js` cần sửa bằng **Download raw file** trên GitHub. Xem [hư
 | [IaiRaptorBoss](IaiRaptorBoss.js) | 328 | 28.6 KB |
 | [IceFangBoss](IceFangBoss.js) | 327 | 27.8 KB |
 | [IndominusBoss](IndominusBoss.js) | 291 | 24.2 KB |
-| [IronhaulBoss](IronhaulBoss.js) | 861 | 63.9 KB |
+| [IronhaulBoss](IronhaulBoss.js) | 861 | 63.8 KB |
 | [LavaSerpentBoss](LavaSerpentBoss.js) | 246 | 24.3 KB |
 | [MagmaDragoonBoss](MagmaDragoonBoss.js) | 368 | 32.5 KB |
 | [MagmorBoss](MagmorBoss.js) | 315 | 26.7 KB |
