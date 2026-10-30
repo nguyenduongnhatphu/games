@@ -1,5 +1,5 @@
 // BOSS_FILE: IronhaulBoss
-// BOSS_SNAPSHOT: 36782d91d2329d9857af74607927116e9ca394bac5cc7f15d33431859a55fe63
+// BOSS_SNAPSHOT: 2b36ae4c51fabb54b8d0e06c3164b8f6c2ef05a8c767bbd93c893e9900521e3e
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -845,17 +845,17 @@ class IronhaulBoss{
 }
 // BOSS_PART_END s1.IronhaulBoss.1
 
-// Nguồn: index.html:35298 · Dùng bởi: IronhaulBoss, ZeusBoss
+// Nguồn: index.html:35421 · Dùng bởi: IronhaulBoss, ZeusBoss
 // BOSS_PART_BEGIN s1.lavaGeysers.1 READ_ONLY
 let lavaGeysers = [];
 // BOSS_PART_END s1.lavaGeysers.1
 
-// Nguồn: index.html:35299 · Dùng bởi: IndominusBoss, IronhaulBoss, ZeusBoss
+// Nguồn: index.html:35422 · Dùng bởi: IndominusBoss, IronhaulBoss, ZeusBoss
 // BOSS_PART_BEGIN s1.grassField.1 READ_ONLY
 let grassField = [];
 // BOSS_PART_END s1.grassField.1
 
-// Nguồn: index.html:35300 · Dùng bởi: IronhaulBoss, ZeusBoss
+// Nguồn: index.html:35423 · Dùng bởi: IronhaulBoss, ZeusBoss
 // BOSS_PART_BEGIN s1.forestScene.1 READ_ONLY
 let forestScene = null;
 // BOSS_PART_END s1.forestScene.1

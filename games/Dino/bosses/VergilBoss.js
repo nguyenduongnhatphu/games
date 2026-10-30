@@ -1,5 +1,5 @@
 // BOSS_FILE: VergilBoss
-// BOSS_SNAPSHOT: 36782d91d2329d9857af74607927116e9ca394bac5cc7f15d33431859a55fe63
+// BOSS_SNAPSHOT: 2b36ae4c51fabb54b8d0e06c3164b8f6c2ef05a8c767bbd93c893e9900521e3e
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -1891,12 +1891,12 @@ function drawSdtDante(b, x, y){
         }
 // BOSS_PART_END s0.drawSdtDante.1
 
-// Nguồn: index.html:98693 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:98816 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.SDTU_DON.1 READ_ONLY
 const SDTU_DON = 70, SDTU_TUNG = 340, SDTU_CAN = 70, SDTU_YEU = 380;
 // BOSS_PART_END s6.SDTU_DON.1
 
-// Nguồn: index.html:98694 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:98817 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.SDT_ULT.1 READ_ONLY
 const SDT_ULT = {
             sdtUltNen(){ return !this.sdtUltXong && this.hp <= this.maxHp * 0.25; },
@@ -2458,7 +2458,7 @@ const SDT_ULT = {
         };
 // BOSS_PART_END s6.SDT_ULT.1
 
-// Nguồn: index.html:99252 · Dùng bởi: DanteBoss, VergilBoss
+// Nguồn: index.html:99375 · Dùng bởi: DanteBoss, VergilBoss
 // BOSS_PART_BEGIN s6.capSdtUlt.1 READ_ONLY
 (function capSdtUlt(){
             for (const C of [typeof VergilBoss !== 'undefined' ? VergilBoss : null,
@@ -2469,7 +2469,7 @@ const SDT_ULT = {
         })();
 // BOSS_PART_END s6.capSdtUlt.1
 
-// Nguồn: index.html:99835 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:99958 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.BOSS_CHUNG.1 READ_ONLY
 const BOSS_CHUNG = {
             cx(){ return this.x + this.w / 2; },
@@ -2484,7 +2484,7 @@ const BOSS_CHUNG = {
         };
 // BOSS_PART_END s6.BOSS_CHUNG.1
 
-// Nguồn: index.html:99846 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:99969 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.capBoHamChung.1 READ_ONLY
 (function capBoHamChung(){
             const DS = [
@@ -2514,17 +2514,17 @@ const BOSS_CHUNG = {
         })();
 // BOSS_PART_END s6.capBoHamChung.1
 
-// Nguồn: index.html:110984 · Ngữ cảnh người chơi
+// Nguồn: index.html:111107 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s16.DANTE_SIN_DRILL.1 READ_ONLY
 const DANTE_SIN_DRILL={length:150,radius:48,rear:27,palette:{bd:'#24080c',dk:'#110507',lt:'#9a1b21',out:'#ff5722',rim:'#ffc400',eye:'#ffe0b2'}};
 // BOSS_PART_END s16.DANTE_SIN_DRILL.1
 
-// Nguồn: index.html:110985 · Ngữ cảnh người chơi
+// Nguồn: index.html:111108 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s16.danteDrawSinDrill.1 READ_ONLY
 function danteDrawSinDrill(cx,cy,dir,age){veCanhKhoan(cx,cy,dir<0?Math.PI:0,age,DANTE_SIN_DRILL.palette);}
 // BOSS_PART_END s16.danteDrawSinDrill.1
 
-// Nguồn: index.html:112293 · Ngữ cảnh người chơi
+// Nguồn: index.html:112416 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s18.YMT_MOVES.1 READ_ONLY
 const YMT_MOVES = {
     // 1. YAMATO COMBO A (J -> J -> J -> J): Thuần sát thương & tốc độ, không gây stun khóa cứng
@@ -2570,7 +2570,7 @@ const YMT_MOVES = {
 };
 // BOSS_PART_END s18.YMT_MOVES.1
 
-// Nguồn: index.html:112769 · Ngữ cảnh người chơi
+// Nguồn: index.html:112892 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s18.ymtPose.1 READ_ONLY
 function ymtPose(n, v, a, age) {
     const dir = a ? a.dir : (n.isFacingLeft ? -1 : 1);
@@ -2730,7 +2730,7 @@ function ymtPose(n, v, a, age) {
 }
 // BOSS_PART_END s18.ymtPose.1
 
-// Nguồn: index.html:113735 · Ngữ cảnh người chơi
+// Nguồn: index.html:113858 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s18.vgDrawKatana.1 READ_ONLY
 function vgDrawKatana(x, y, angle, len = 84, flat = 1, isSdt = false) {
     ctx.save();
@@ -2771,7 +2771,7 @@ function vgDrawKatana(x, y, angle, len = 84, flat = 1, isSdt = false) {
 }
 // BOSS_PART_END s18.vgDrawKatana.1
 
-// Nguồn: index.html:113774 · Ngữ cảnh người chơi
+// Nguồn: index.html:113897 · Ngữ cảnh người chơi
 // BOSS_PART_BEGIN s18.vgDrawMirageEdgeBlade.1 READ_ONLY
 function vgDrawMirageEdgeBlade(x, y, angle, len = 80, flat = 1) {
     ctx.save();
@@ -2805,7 +2805,7 @@ function vgDrawMirageEdgeBlade(x, y, angle, len = 80, flat = 1) {
 }
 // BOSS_PART_END s18.vgDrawMirageEdgeBlade.1
 
-// Nguồn: index.html:114234 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114357 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.VERGIL_BOSS_STRINGS.1 EDITABLE
 const VERGIL_BOSS_STRINGS = {
     // 1. YAMATO COMBO A (4 nhịp rút kiếm chuẩn + Tra kiếm lóe sáng ở cuối)
@@ -2869,7 +2869,7 @@ const VERGIL_BOSS_STRINGS = {
 };
 // BOSS_PART_END s19.VERGIL_BOSS_STRINGS.1
 
-// Nguồn: index.html:114296 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114419 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.VG_BOSS_FALLBACK_MOVES.1 EDITABLE
 const VG_BOSS_FALLBACK_MOVES = {
     a1:       { T: 20, wind: 5,  cancel: 12, end: 15, pose: 'iaiSlash',  hits: [6],             advance: 5 },
@@ -2897,7 +2897,7 @@ const VG_BOSS_FALLBACK_MOVES = {
 };
 // BOSS_PART_END s19.VG_BOSS_FALLBACK_MOVES.1
 
-// Nguồn: index.html:114321 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114444 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.vgBossGetMoveDef.1 EDITABLE
 function vgBossGetMoveDef(id) {
     const base = (typeof YMT_MOVES !== 'undefined' && YMT_MOVES[id]) ? YMT_MOVES[id] : (VG_BOSS_FALLBACK_MOVES[id] || VG_BOSS_FALLBACK_MOVES.a1);
@@ -2913,7 +2913,7 @@ function vgBossGetMoveDef(id) {
 }
 // BOSS_PART_END s19.vgBossGetMoveDef.1
 
-// Nguồn: index.html:114334 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114457 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.vgBossEnsureFx.1 EDITABLE
 function vgBossEnsureFx(boss) {
     if (!boss._atkFx) {
@@ -2929,7 +2929,7 @@ function vgBossEnsureFx(boss) {
 }
 // BOSS_PART_END s19.vgBossEnsureFx.1
 
-// Nguồn: index.html:114348 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114471 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.vgBossComputePose.1 EDITABLE
 function vgBossComputePose(boss, m, age, dir) {
     if (typeof ymtPose === 'function') {
@@ -2961,7 +2961,7 @@ function vgBossComputePose(boss, m, age, dir) {
 }
 // BOSS_PART_END s19.vgBossComputePose.1
 
-// Nguồn: index.html:114378 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114501 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.VergilBoss.prototype.startAttackerString.1 EDITABLE
 VergilBoss.prototype.startAttackerString = function(strId) {
     const pattern = VERGIL_BOSS_STRINGS[strId];
@@ -2997,7 +2997,7 @@ VergilBoss.prototype.startAttackerString = function(strId) {
 };
 // BOSS_PART_END s19.VergilBoss.prototype.startAttackerString.1
 
-// Nguồn: index.html:114411 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114534 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.VergilBoss.prototype.cancelAttackerString.1 EDITABLE
 VergilBoss.prototype.cancelAttackerString = function() {
     this._atkString = null;
@@ -3013,7 +3013,7 @@ VergilBoss.prototype.cancelAttackerString = function() {
 };
 // BOSS_PART_END s19.VergilBoss.prototype.cancelAttackerString.1
 
-// Nguồn: index.html:114425 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114548 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.vgBossTriggerStepHit.1 EDITABLE
 function vgBossTriggerStepHit(boss, st, m, hitIdx) {
     const fx = vgBossEnsureFx(boss);
@@ -3084,7 +3084,7 @@ function vgBossTriggerStepHit(boss, st, m, hitIdx) {
 }
 // BOSS_PART_END s19.vgBossTriggerStepHit.1
 
-// Nguồn: index.html:114493 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114616 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.VergilBoss.prototype.runAttackerString.1 EDITABLE
 VergilBoss.prototype.runAttackerString = function() {
     const st = this._atkString;
@@ -3258,12 +3258,12 @@ VergilBoss.prototype.runAttackerString = function() {
 };
 // BOSS_PART_END s19.VergilBoss.prototype.runAttackerString.1
 
-// Nguồn: index.html:114667 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114790 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.vgBossOrigPick.1 EDITABLE
 const vgBossOrigPick = VergilBoss.prototype.pickSkill;
 // BOSS_PART_END s19.vgBossOrigPick.1
 
-// Nguồn: index.html:114668 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114791 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.VergilBoss.prototype.pickSkill.1 EDITABLE
 VergilBoss.prototype.pickSkill = function() {
     if (this.phase !== 1 || this.suSt || this.suYeu || this.hp <= 0) {
@@ -3317,12 +3317,12 @@ VergilBoss.prototype.pickSkill = function() {
 };
 // BOSS_PART_END s19.VergilBoss.prototype.pickSkill.1
 
-// Nguồn: index.html:114719 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114842 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.vgBossOrigRun.1 EDITABLE
 const vgBossOrigRun = VergilBoss.prototype.runSkill;
 // BOSS_PART_END s19.vgBossOrigRun.1
 
-// Nguồn: index.html:114720 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114843 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.VergilBoss.prototype.runSkill.1 EDITABLE
 VergilBoss.prototype.runSkill = function() {
     if (this._atkString && this.state === 'v_attacker_str') {
@@ -3332,12 +3332,12 @@ VergilBoss.prototype.runSkill = function() {
 };
 // BOSS_PART_END s19.VergilBoss.prototype.runSkill.1
 
-// Nguồn: index.html:114727 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114850 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.vgBossOrigUpdate.1 EDITABLE
 const vgBossOrigUpdate = VergilBoss.prototype.update;
 // BOSS_PART_END s19.vgBossOrigUpdate.1
 
-// Nguồn: index.html:114728 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114851 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.VergilBoss.prototype.update.1 EDITABLE
 VergilBoss.prototype.update = function(...args) {
     if (this._atkString && (this.phase !== 1 || this.hp <= 0 || this.suSt || this.state !== 'v_attacker_str')) {
@@ -3374,12 +3374,12 @@ VergilBoss.prototype.update = function(...args) {
 };
 // BOSS_PART_END s19.VergilBoss.prototype.update.1
 
-// Nguồn: index.html:114765 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114888 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.vgBossOrigDraw.1 EDITABLE
 const vgBossOrigDraw = VergilBoss.prototype.draw;
 // BOSS_PART_END s19.vgBossOrigDraw.1
 
-// Nguồn: index.html:114766 · Dùng bởi: VergilBoss
+// Nguồn: index.html:114889 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.VergilBoss.prototype.draw.1 EDITABLE
 VergilBoss.prototype.draw = function() {
     // Tạm thời làm nhẹ các vùng tím (jce, dome, dim, cuts, _voidFx) trước khi gọi draw gốc
@@ -3577,12 +3577,12 @@ VergilBoss.prototype.draw = function() {
 };
 // BOSS_PART_END s19.VergilBoss.prototype.draw.1
 
-// Nguồn: index.html:114961 · Dùng bởi: VergilBoss
+// Nguồn: index.html:115084 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.vgBossSlashRectBase.1 EDITABLE
 const vgBossSlashRectBase=VergilBoss.prototype.slashRect;
 // BOSS_PART_END s19.vgBossSlashRectBase.1
 
-// Nguồn: index.html:114962 · Dùng bởi: VergilBoss
+// Nguồn: index.html:115085 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.VergilBoss.prototype.slashRect.1 EDITABLE
 VergilBoss.prototype.slashRect=function(){
     const r=this.slash?.attackerBox;
@@ -3590,7 +3590,7 @@ VergilBoss.prototype.slashRect=function(){
 };
 // BOSS_PART_END s19.VergilBoss.prototype.slashRect.1
 
-// Nguồn: index.html:114966 · Dùng bởi: VergilBoss
+// Nguồn: index.html:115089 · Dùng bởi: VergilBoss
 // BOSS_PART_BEGIN s19.VergilBoss.prototype.syncAttackerDoppelganger.1 EDITABLE
 VergilBoss.prototype.syncAttackerDoppelganger=function(){
     if(!this.dop||this.phase!==1)return;

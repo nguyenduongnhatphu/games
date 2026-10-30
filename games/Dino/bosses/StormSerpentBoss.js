@@ -1,5 +1,5 @@
 // BOSS_FILE: StormSerpentBoss
-// BOSS_SNAPSHOT: 36782d91d2329d9857af74607927116e9ca394bac5cc7f15d33431859a55fe63
+// BOSS_SNAPSHOT: 2b36ae4c51fabb54b8d0e06c3164b8f6c2ef05a8c767bbd93c893e9900521e3e
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -30,7 +30,7 @@ function hudManHinh(b){
         }
 // BOSS_PART_END s0.hudManHinh.1
 
-// Nguồn: index.html:38816 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:38939 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.StormSerpentBoss.1 EDITABLE
 class StormSerpentBoss {
             constructor(level){
@@ -475,32 +475,32 @@ class StormSerpentBoss {
         }
 // BOSS_PART_END s1.StormSerpentBoss.1
 
-// Nguồn: index.html:44132 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:44255 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.PX_BAO_COT.1 EDITABLE
 const PX_BAO_COT = 44, PX_COT_SONG = 30, PX_COT_RONG = 46;
 // BOSS_PART_END s1.PX_BAO_COT.1
 
-// Nguồn: index.html:44133 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:44256 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.PX_BAO_QUET.1 EDITABLE
 const PX_BAO_QUET = 40, PX_QUET_TOC = 12;
 // BOSS_PART_END s1.PX_BAO_QUET.1
 
-// Nguồn: index.html:44136 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:44259 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.PX_LUOI_CD.1 EDITABLE
 const PX_LUOI_CD = 250, PX_LUOI_CD2 = 190;
 // BOSS_PART_END s1.PX_LUOI_CD.1
 
-// Nguồn: index.html:44137 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:44260 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.PX_NGHI.1 EDITABLE
 const PX_NGHI = 100, PX_NGHI2 = 74;
 // BOSS_PART_END s1.PX_NGHI.1
 
-// Nguồn: index.html:44138 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:44261 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.PX_EP_DAI.1 EDITABLE
 const PX_EP_DAI = 170, PX_BAO_DAI = 380;
 // BOSS_PART_END s1.PX_EP_DAI.1
 
-// Nguồn: index.html:44139 · Dùng bởi: StormSerpentBoss
+// Nguồn: index.html:44262 · Dùng bởi: StormSerpentBoss
 // BOSS_PART_BEGIN s1.PX_XOAY_DAI.1 EDITABLE
 const PX_XOAY_DAI = 300;
 // BOSS_PART_END s1.PX_XOAY_DAI.1

@@ -112,6 +112,56 @@ with sync_playwright() as p:
         return 'PASS mirrored swept sword, no passive dash damage, directional native spear and perfect-guard opening';
     }'''))
     print(page.evaluate('''()=>{
+        for(const left of [false,true]){
+            const b=zSetup(false,left);b.begin('z_hunt');const poses=[],lands=[];let prevX=b.x,minY=b.y;
+            for(let i=1;i<=354;i++){
+                zTick(b);if(Math.abs(b.x-prevX)>30)lands.push(i);prevX=b.x;minY=Math.min(minY,b.y);
+                if([52,144,216].includes(i))check(!!b.slash,'missing thunder hunt sword '+i);
+                if(i===232)check(b.grounded&&b.y===b.baseY,'hunt does not land');
+            }
+            check(lands.join(',')==='29,120','hunt teleport timings '+lands);check(minY<b.baseY-90,'hunt has no aerial finisher');
+            check(b.state==='idle'&&!b.hazards.length&&!b.slash,'hunt never recovers');
+        }
+        const b=zSetup(true);b.begin('z_crown');const sent=[],origins=[];
+        for(let i=1;i<=298;i++){
+            zTick(b);if(i===96){check(b.crown[0].locked&&!b.crown[1].locked,'lance does not lock 24 frames early');const q=b.crown[0];origins.push({x:q.x,y:q.y,tx:q.tx,ty:q.ty});dino.x=800;}
+            for(const q of bossProjectiles)if(!sent.includes(q)){sent.push(q);check([120,136,152,168,184,200,216].includes(i),'unexpected crown fire timing '+i);}
+        }
+        check(sent.length===7,'missing crown lances '+sent.length);
+        const q=sent[0],origin=origins[0],angle=Math.atan2(origin.ty-origin.y,origin.tx-origin.x);
+        check(Math.abs(q.vx-Math.cos(angle)*7.5)<.001&&Math.abs(q.vy-Math.sin(angle)*7.5)<.001,'lance follows player after aim lock');
+        check(q.spawn.x===origin.x&&q.spawn.y===origin.y,'lance detaches from wrong point');
+        check(sent.every(q=>q.w===20&&q.h===20&&q.dmg===1),'lance wake gets a giant hidden hitbox');
+        return 'PASS mirrored teleport → two cuts → aerial finisher; exactly seven crown lances, locked aim, correct release points and small damage tips';
+    }'''))
+    print(page.evaluate('''()=>{
+        let b=zSetup();b.begin('z_clap');const h=b.hazards[0];
+        let damage=0;const take=dino.takeDamage;dino.takeDamage=()=>damage++;dino.isShielding=()=>false;
+        dino.x=h.x+100;dino.y=h.y-10;dino.w=dino.h=20;
+        for(let i=0;i<83;i++)zTick(b);check(!damage,'clap fires before windup');
+        for(let i=0;i<25;i++)zTick(b);check(damage===1,'clap pulse missing/repeated');dino.takeDamage=take;
+        check(!zeusPulseTouches({x:200,y:200,age:20,warn:0,life:24},{x:195,y:195,w:10,h:10}),'clap damages hollow interior after shell passes');
+        check(zeusPulseTouches({x:200,y:200,age:20,warn:0,life:24},{x:360,y:195,w:10,h:10}),'clap shell does not match visible ring');
+        b=zSetup(true);b.begin('z_tempest');for(let i=0;i<160;i++)zTick(b);const bridge=b.hazards.find(h=>h.kind==='bridge');
+        check(bridge&&bridge.age===0,'storm has no second-stage lightning bridge');
+        damage=0;dino.takeDamage=()=>damage++;dino.isShielding=()=>false;dino.x=(bridge.x+bridge.toX)/2;dino.y=bridge.y-10;dino.w=dino.h=20;
+        for(let i=0;i<41;i++)zTick(b);check(!damage,'bridge warning too short');zTick(b);check(damage===1,'bridge never fires');
+        b=zSetup(true);b.begin('z_cataclysm');for(let i=0;i<178;i++)zTick(b);const wave=b.hazards.find(h=>h.kind==='ring');
+        check(wave?.warn===38,'cataclysm has no warned aftershock');damage=0;dino.takeDamage=()=>damage++;dino.isShielding=()=>false;dino.w=dino.h=20;dino.x=b.cx()+140;dino.y=270;
+        for(let i=0;i<125;i++)zTick(b);check(!damage,'jump cannot avoid the ground aftershock');
+        return 'PASS delayed hollow clap pulse, 42-frame storm-bridge warning and jumpable final aftershock';
+    }'''))
+    print(page.evaluate('''()=>{
+        for(const move of ['z_crown','z_clap']){
+            const b=zSetup(move==='z_crown');b.begin(move);for(let i=0;i<45;i++)zTick(b);dealDamage(b,12,'flat');b.combatTick();
+            check(['z_fall','z_exposed'].includes(b.state)&&!b.crown.length&&!b.hazards.length,'new ritual cannot be interrupted '+move);
+            for(let i=0;i<200;i++)zTick(b);check(!bossProjectiles.length,'interrupted crown still launches');
+        }
+        let b=zSetup();b.idle(0);b.chooseAttack();check(b.state==='z_hunt','new grounded signature hidden behind RNG');
+        b=zSetup(true);b.idle(0);b.chooseAttack();check(b.state==='z_crown','new aerial signature hidden behind RNG');
+        return 'PASS new rituals cancel pending lances/fields; first ground and aerial choices expose the new signatures';
+    }'''))
+    print(page.evaluate('''()=>{
         for(const form of [0,7,8,9,10]){
             const b=zSetup(false,true,form);b.x=400;dino.x=b.x-55;dino.y=320-dino.h;loopAnToan();
             dispatchEvent(new KeyboardEvent('keydown',{code:'KeyJ'}));for(let i=0;i<100;i++)loopAnToan();dispatchEvent(new KeyboardEvent('keyup',{code:'KeyJ'}));
