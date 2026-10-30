@@ -1,5 +1,5 @@
 // BOSS_FILE: FlameLancerBoss
-// BOSS_SNAPSHOT: 4863609839309ada6c7e852f99b544516428c61879b5acfd487872b6e4c14714
+// BOSS_SNAPSHOT: 36782d91d2329d9857af74607927116e9ca394bac5cc7f15d33431859a55fe63
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -12,7 +12,7 @@
 const GWAVE_H = 96, GWAVE_SPD = 11.5;
 // BOSS_PART_END s0.GWAVE_H.1
 
-// Nguồn: index.html:36679 · Dùng bởi: FlameLancerBoss
+// Nguồn: index.html:37022 · Dùng bởi: FlameLancerBoss
 // BOSS_PART_BEGIN s1.FlameLancerBoss.1 EDITABLE
 class FlameLancerBoss {
             constructor(level){
@@ -442,12 +442,12 @@ class FlameLancerBoss {
         }
 // BOSS_PART_END s1.FlameLancerBoss.1
 
-// Nguồn: index.html:43626 · Dùng bởi: FlameLancerBoss
+// Nguồn: index.html:43969 · Dùng bởi: FlameLancerBoss
 // BOSS_PART_BEGIN s1.LNC_SPIN_T.1 EDITABLE
 const LNC_SPIN_T = 180, LNC_SPIN_SPD = 5;
 // BOSS_PART_END s1.LNC_SPIN_T.1
 
-// Nguồn: index.html:43628 · Dùng bởi: FlameLancerBoss
+// Nguồn: index.html:43971 · Dùng bởi: FlameLancerBoss
 // BOSS_PART_BEGIN s1.KATA.1 EDITABLE
 const KATA = [
             { t: 20, a0: -2.3, a1:  0.9, l0: 70, l1: 112, mv: 3.2, hit0: 6,  hit1: 16, face: true },                 // vung nguoc
@@ -459,42 +459,42 @@ const KATA = [
         ];
 // BOSS_PART_END s1.KATA.1
 
-// Nguồn: index.html:43636 · Dùng bởi: FlameLancerBoss
+// Nguồn: index.html:43979 · Dùng bởi: FlameLancerBoss
 // BOSS_PART_BEGIN s1.LNC_WAVE_SPD.1 EDITABLE
 const LNC_WAVE_SPD = 9.5;
 // BOSS_PART_END s1.LNC_WAVE_SPD.1
 
-// Nguồn: index.html:43637 · Dùng bởi: FlameLancerBoss
+// Nguồn: index.html:43980 · Dùng bởi: FlameLancerBoss
 // BOSS_PART_BEGIN s1.LNC_WAVE_H.1 EDITABLE
 const LNC_WAVE_H = 175;
 // BOSS_PART_END s1.LNC_WAVE_H.1
 
-// Nguồn: index.html:43638 · Dùng bởi: FlameLancerBoss
+// Nguồn: index.html:43981 · Dùng bởi: FlameLancerBoss
 // BOSS_PART_BEGIN s1.LNC_THRUST_SPD.1 EDITABLE
 const LNC_THRUST_SPD = 11;
 // BOSS_PART_END s1.LNC_THRUST_SPD.1
 
-// Nguồn: index.html:43644 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:43987 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.HEAT_MAX.1 READ_ONLY
 const HEAT_MAX = 100, HEAT_DECAY = 0.16, HEAT_BURNOUT = 170;
 // BOSS_PART_END s1.HEAT_MAX.1
 
-// Nguồn: index.html:43645 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:43988 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.heatInit.1 READ_ONLY
 function heatInit(b, gain) { b.heat = 0; b.heatGain = gain; b.burnoutT = 0; b.dmgMul = 1; }
 // BOSS_PART_END s1.heatInit.1
 
-// Nguồn: index.html:43646 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:43989 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.heatTier.1 READ_ONLY
 function heatTier(b) { return b.heat >= 75 ? 2 : (b.heat >= 40 ? 1 : 0); }
 // BOSS_PART_END s1.heatTier.1
 
-// Nguồn: index.html:43648 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:43991 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.heatRate.1 READ_ONLY
 function heatRate(b) { return [1, 0.78, 0.58][heatTier(b)]; }
 // BOSS_PART_END s1.heatRate.1
 
-// Nguồn: index.html:43649 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:43992 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.heatAdd.1 READ_ONLY
 function heatAdd(b, n) {
             if (b.burnoutT > 0) return;
@@ -503,7 +503,7 @@ function heatAdd(b, n) {
         }
 // BOSS_PART_END s1.heatAdd.1
 
-// Nguồn: index.html:43654 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:43997 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.heatBurnout.1 READ_ONLY
 function heatBurnout(b) {
             b.heat = 0; b.burnoutT = HEAT_BURNOUT; b.dmgMul = 2;
@@ -515,7 +515,7 @@ function heatBurnout(b) {
         }
 // BOSS_PART_END s1.heatBurnout.1
 
-// Nguồn: index.html:43663 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:44006 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.heatTick.1 READ_ONLY
 function heatTick(b) {
             if (b.burnoutT > 0) {
@@ -532,7 +532,7 @@ function heatTick(b) {
         }
 // BOSS_PART_END s1.heatTick.1
 
-// Nguồn: index.html:43676 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
+// Nguồn: index.html:44019 · Dùng bởi: EmberWolfBoss, FlameCoreBoss, FlameLancerBoss
 // BOSS_PART_BEGIN s1.drawHeatBar.1 READ_ONLY
 function drawHeatBar(b) {
             let w = 96, x = b.x + b.w / 2 - w / 2, y = b.y - 26;
@@ -553,7 +553,7 @@ function drawHeatBar(b) {
         }
 // BOSS_PART_END s1.drawHeatBar.1
 
-// Nguồn: index.html:99488 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:99835 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.BOSS_CHUNG.1 READ_ONLY
 const BOSS_CHUNG = {
             cx(){ return this.x + this.w / 2; },
@@ -568,7 +568,7 @@ const BOSS_CHUNG = {
         };
 // BOSS_PART_END s6.BOSS_CHUNG.1
 
-// Nguồn: index.html:99499 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
+// Nguồn: index.html:99846 · Dùng bởi: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, LavaSerpentBoss, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, OctopusBoss, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, PulsarCloneBoss, QuetzalBoss, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriDino, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss
 // BOSS_PART_BEGIN s6.capBoHamChung.1 READ_ONLY
 (function capBoHamChung(){
             const DS = [

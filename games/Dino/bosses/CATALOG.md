@@ -9,7 +9,7 @@ Tải file `.js` cần sửa bằng **Download raw file** trên GitHub. Xem [hư
 | [ArtoriasBoss](ArtoriasBoss.js) | 1310 | 78.9 KB |
 | [ChronoRexBoss](ChronoRexBoss.js) | 389 | 33.6 KB |
 | [ClawCloneBoss](ClawCloneBoss.js) | 302 | 26.0 KB |
-| [CliffGolemBoss](CliffGolemBoss.js) | 311 | 26.0 KB |
+| [CliffGolemBoss](CliffGolemBoss.js) | 311 | 26.1 KB |
 | [CloneBoss](CloneBoss.js) | 242 | 19.8 KB |
 | [CorruptionBoss](CorruptionBoss.js) | 1966 | 114.7 KB |
 | [DanteBoss](DanteBoss.js) | 5074 | 286.0 KB |
@@ -23,7 +23,7 @@ Tải file `.js` cần sửa bằng **Download raw file** trên GitHub. Xem [hư
 | [FlameCoreBoss](FlameCoreBoss.js) | 815 | 55.3 KB |
 | [FlameLancerBoss](FlameLancerBoss.js) | 599 | 40.9 KB |
 | [ForestTitanBoss](ForestTitanBoss.js) | 689 | 53.0 KB |
-| [GaelBoss](GaelBoss.js) | 2196 | 131.3 KB |
+| [GaelBoss](GaelBoss.js) | 2196 | 131.4 KB |
 | [GiantSpiderBoss](GiantSpiderBoss.js) | 398 | 29.5 KB |
 | [GodzillaBoss](GodzillaBoss.js) | 725 | 57.1 KB |
 | [GreatApeBoss](GreatApeBoss.js) | 474 | 36.8 KB |
@@ -32,17 +32,17 @@ Tải file `.js` cần sửa bằng **Download raw file** trên GitHub. Xem [hư
 | [HoGacBoss](HoGacBoss.js) | 654 | 39.0 KB |
 | [IaiRaptorBoss](IaiRaptorBoss.js) | 328 | 28.6 KB |
 | [IceFangBoss](IceFangBoss.js) | 327 | 27.8 KB |
-| [IndominusBoss](IndominusBoss.js) | 291 | 24.1 KB |
-| [IronhaulBoss](IronhaulBoss.js) | 861 | 63.8 KB |
+| [IndominusBoss](IndominusBoss.js) | 291 | 24.2 KB |
+| [IronhaulBoss](IronhaulBoss.js) | 861 | 63.9 KB |
 | [LavaSerpentBoss](LavaSerpentBoss.js) | 246 | 24.3 KB |
 | [MagmaDragoonBoss](MagmaDragoonBoss.js) | 368 | 32.5 KB |
 | [MagmorBoss](MagmorBoss.js) | 315 | 26.7 KB |
 | [MegaManXBoss](MegaManXBoss.js) | 1828 | 110.4 KB |
 | [MegalodonBoss](MegalodonBoss.js) | 544 | 41.4 KB |
-| [MosaBoss](MosaBoss.js) | 400 | 35.6 KB |
+| [MosaBoss](MosaBoss.js) | 400 | 35.7 KB |
 | [MountainGodBoss](MountainGodBoss.js) | 606 | 46.2 KB |
 | [NeroBoss](NeroBoss.js) | 1817 | 114.1 KB |
-| [OctopusBoss](OctopusBoss.js) | 673 | 44.8 KB |
+| [OctopusBoss](OctopusBoss.js) | 673 | 44.9 KB |
 | [PillarLordBoss](PillarLordBoss.js) | 359 | 28.8 KB |
 | [PoisonMothBoss](PoisonMothBoss.js) | 227 | 20.4 KB |
 | [PontiffBoss](PontiffBoss.js) | 714 | 48.6 KB |
@@ -51,7 +51,7 @@ Tải file `.js` cần sửa bằng **Download raw file** trên GitHub. Xem [hư
 | [PulsarCloneBoss](PulsarCloneBoss.js) | 293 | 26.0 KB |
 | [QuetzalBoss](QuetzalBoss.js) | 368 | 27.1 KB |
 | [ScarabLordBoss](ScarabLordBoss.js) | 332 | 29.0 KB |
-| [SiegeGoliathBoss](SiegeGoliathBoss.js) | 312 | 28.0 KB |
+| [SiegeGoliathBoss](SiegeGoliathBoss.js) | 312 | 28.1 KB |
 | [SlashBeastBoss](SlashBeastBoss.js) | 822 | 40.7 KB |
 | [SoulOfCinderBoss](SoulOfCinderBoss.js) | 2598 | 151.2 KB |
 | [SpinoBoss](SpinoBoss.js) | 226 | 20.6 KB |
@@ -63,7 +63,7 @@ Tải file `.js` cần sửa bằng **Download raw file** trên GitHub. Xem [hư
 | [SummitDragonBoss](SummitDragonBoss.js) | 208 | 19.8 KB |
 | [TRexBoss](TRexBoss.js) | 228 | 20.3 KB |
 | [TetrisBoss](TetrisBoss.js) | 270 | 26.0 KB |
-| [ThalassaBoss](ThalassaBoss.js) | 1375 | 93.1 KB |
+| [ThalassaBoss](ThalassaBoss.js) | 1375 | 93.2 KB |
 | [TrainingDummy](TrainingDummy.js) | 137 | 11.4 KB |
 | [TriDino](TriDino.js) | 141 | 14.7 KB |
 | [TriceratopsBoss](TriceratopsBoss.js) | 220 | 19.2 KB |
@@ -77,5 +77,6 @@ Tải file `.js` cần sửa bằng **Download raw file** trên GitHub. Xem [hư
 | [Yasuo2Boss](Yasuo2Boss.js) | 482 | 33.7 KB |
 | [YasuoBoss](YasuoBoss.js) | 549 | 36.6 KB |
 | [ZeroBoss](ZeroBoss.js) | 1264 | 69.8 KB |
+| [ZeusBoss](ZeusBoss.js) | 458 | 33.9 KB |
 
 [Phần dùng chung](shared/BossShared.js) chỉ cần gửi thêm khi AI cần sửa một vùng READ_ONLY dùng chung.
