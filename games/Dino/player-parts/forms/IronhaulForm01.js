@@ -1,11 +1,11 @@
 // PLAYER_FILE: IronhaulForm01
-// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
+// PLAYER_SNAPSHOT: bae52db6534a8318283b8c7d74ac1420b52adb74ae335721bf4bc7249c2da3be
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
-// Tham chiếu ngoài: CM, FloatingText, IronhaulBoss, Player, SFX, X_N_DANG, bosses, checkAABB, coBuc, combatStance, ctx, currentAmmoType, currentPower, danteKey, danteTick, dashCd, dashVx, dino, dkNenY, doDash, dojoMode, floatingTexts, frames, gameOver, gameState, gameVictory, ironhaulCoreFx, ironhaulEase, ironhaulIK, ironhaulMix, ironhaulRig, ironhaulRobot, ironhaulTruck, ironhaulWeapons, keys, mapTheme, paused, phuKien, platforms, resolveSolidPillars, resolveTetrisWalls, runeSlots, sgDamage, sgSegmentBox, sgTargets, shakeTimer, shinGuardReset, startGame, ultCharge, worldL, worldR, xDatForm, xDongBo, xFormIdx, xFormOn
+// Tham chiếu ngoài: CM, FloatingText, IronhaulBoss, Player, SFX, X_N_DANG, bosses, checkAABB, coBuc, combatStance, currentAmmoType, currentPower, danteKey, dashCd, dashVx, dino, dkNenY, doDash, dojoMode, floatingTexts, frames, gameOver, gameState, gameVictory, ironhaulEase, ironhaulIK, ironhaulMix, ironhaulRig, ironhaulWeapons, keys, mapTheme, paused, phuKien, platforms, resolveSolidPillars, resolveTetrisWalls, runeSlots, sgDamage, sgSegmentBox, sgTargets, shakeTimer, shinGuardReset, startGame, ultCharge, worldL, worldR, xDatForm, xDongBo, xFormIdx, xFormOn
 // index.html:115486 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.IRON_ROBOT_W.1 EDITABLE
 const IRON_ROBOT_W=46,IRON_ROBOT_H=78,IRON_ROBOT_CROUCH=55,IRON_ROBOT_SCALE=.44;
@@ -108,15 +108,15 @@ const IRON_PLAYER_MOVES={
     // 4. CƠ ĐỘNG NHÀO LỘN CHIẾN THUẬT (J/K + DASH & JUMP):
     // =========================================================================
     recoil:{
-        name:'RECOIL SLASH · LÙI BẮN',T:34,cancel:20,state:'ih_gunblade',offset:14,
-        sword:[[16,'cut',170,13,4]],shots:[6,12],round:'bullet',power:2.2,step:[1,14,-6.5],followJ:'pursuit',link:10,
-        motion:'back_flip',jet:3
+        name:'VAULT STAB · LỘN LÊN ĐÂM XUỐNG',T:48,cancel:40,state:'ih_skyfall',offset:0,
+        jump:[2,-7.8],sword:[[20,'downthrust',180,14,4.5]],step:[2,16,8],diveAt:16,waitLand:true,followJ:'pursuit',link:34,
+        motion:'vault_stab',jet:3
     },
     pursuit:{
-        name:'FULL BURN · TRUY KÍCH ĐÓNG CỌC',T:38,cancel:26,state:'ih_flank',offset:40,
-        sword:[[10,'rise',175,13,4.5],[22,'cut',195,15,6]],bunker:[23,115,4.5],step:[1,22,9.5],finish:true,
-        motion:'front_flip',jet:3
+        name:'REAR REAVER · VÒNG LƯNG XOAY TRẢM',T:42,cancel:36,state:'ih_reversal',offset:0,
+        sword:[[18,'spin',175,16,6]],flank:true,finish:true,motion:'rear_spin',jet:3
     },
+    lowcut:{name:'LOW REAVER · CHÉM QUÉT TẦM CÚI',T:28,cancel:18,state:'ih_combo',offset:18,sword:[[7,'low',155,14,4]],low:true,motion:'low_cut'},
     rail:{name:'SLIDING RAILGUN · TRƯỢT BẮN XUYÊN GIÁP',T:34,cancel:22,state:'ih_gunblade',offset:14,shots:[10,18],round:'rail',power:4.5,step:[2,16,6],motion:'low_slide',jet:2},
     gunvault:{
         name:'THRUSTER VAULT · BẬT NHẢY BẮN TRẢ',T:40,cancel:26,state:'ih_gunblade',offset:10,
@@ -270,7 +270,7 @@ function ironInit(n){
         lastDash:-1000,lastJ:-1000,lastK:-1000,
         silver:0,silverMax:720,silverReturn:0,silverFinishing:false,novaReady:0,
         rounds:[],fx:[],trails:[],ghosts:[],jets:[],bunkers:[],shells:[],
-        shieldOut:0,transition:0,lastX:n.x,gait:0,hitstop:0,driveSpeed:0,driveDistance:0,driveHeading:n.isFacingLeft?-1:1,driveDir:0,driveGuardUntil:-100,driveArmed:true,driveDashUntil:-100,driveHits:new Map()
+        shieldOut:0,transition:0,lastX:n.x,gait:0,hitstop:0,driveSpeed:0,driveDistance:0,driveHeading:n.isFacingLeft?-1:1,driveDir:0,driveGuardUntil:-100,driveShield:false,driveArmed:true,driveDashUntil:-100,driveHits:new Map(),truckAir:false,truckDrop:0
     };
     ultCharge=dojoMode?100:0;
 }
@@ -315,7 +315,7 @@ function ironWhite(p){return p.mode===1&&(p.silver>0||p.silverFinishing);}
 function ironResetDrive(n){
     const p=n.ironhaul;if(!p)return;
     p.driveSpeed=0;p.driveDistance=0;p.driveDir=0;p.driveHeading=n.isFacingLeft?-1:1;
-    p.driveGuardUntil=p.driveDashUntil=-100;p.driveArmed=true;p.driveHits=new Map();dashVx=0;
+    p.driveGuardUntil=p.driveGuardUntil>frames?p.driveGuardUntil:-100;p.driveDashUntil=-100;p.driveShield=false;p.driveArmed=true;p.driveHits=new Map();p.truckAir=false;p.truckAirFrames=0;p.truckDrop=0;dashVx=0;
 }
 // PLAYER_PART_END s22.ironResetDrive.1
 
@@ -329,14 +329,15 @@ function ironDriveMove(n,mv){
     if(!input){
         p.driveDistance=0;p.driveArmed=true;p.driveForward=boost;
         if(!boost)p.driveSpeed*=.6;
+        if(Math.abs(p.driveSpeed)<IRON_DRIVE_MAX*.9)p.driveShield=false;
         if(Math.abs(p.driveSpeed)<.2)p.driveSpeed=0;
         return p.driveSpeed;
     }
     const reverse=lock&&input!==heading;
     if(input!==p.driveDir||reverse!==p.driveReverse){
         p.driveDistance=0;p.driveArmed=!boost;
-        if(!boost)p.driveSpeed=0;
-        if(reverse)p.driveGuardUntil=-100;
+        if(!boost){p.driveSpeed=0;p.driveShield=false;}
+        if(reverse)p.driveShield=false;
     }
     p.driveDir=input;p.driveReverse=reverse;p.driveForward=!reverse;
     if(!reverse)p.driveHeading=input;
@@ -347,7 +348,7 @@ function ironDriveMove(n,mv){
 }
 // PLAYER_PART_END s22.ironDriveMove.1
 
-// index.html:115739 · Phạm vi: global
+// index.html:115740 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironDriveMoved.1 EDITABLE
 function ironDriveMoved(n){
     const p=n.ironhaul,dx=n.x-(p.driveFrom??n.x);
@@ -355,21 +356,34 @@ function ironDriveMoved(n){
     if(p.driveForward&&p.driveDir&&Math.sign(dx)===p.driveDir){
         p.driveDistance=Math.min(IRON_DRIVE_RUNUP,p.driveDistance+Math.abs(dx));
         if(p.driveArmed&&p.driveDistance>=IRON_DRIVE_RUNUP*.86&&Math.abs(p.driveSpeed)>=IRON_DRIVE_MAX*.9){
-            p.driveGuardUntil=frames+18;p.driveArmed=false;
+            p.driveShield=true;p.driveArmed=false;
         }
     }
-    if(p.driveForward&&Math.abs(dx)>=IRON_DRIVE_MAX*.85){
-        const box={x:Math.min(p.driveFrom,n.x),y:n.y,w:n.w+Math.abs(dx),h:n.h};
+    if(p.driveForward&&Math.abs(dx)>=1){
+        const box={x:p.driveHeading>0?p.driveFrom+n.w-10:n.x,y:n.y,w:10+Math.abs(dx),h:n.h};
         for(const o of ironTargets(n)){
             const root=o.__goc||o;
-            if(checkAABB(box,o)&&frames-(p.driveHits.get(root)??-1000)>=30){p.driveHits.set(root,frames);ironDamage(n,o,3,{dir:p.driveHeading,move:{finish:true}});}
+            if(checkAABB(box,o)&&frames-(p.driveHits.get(root)??-1000)>=30)ironDriveImpact(n,o);
         }
         for(const [o,at]of p.driveHits)if(frames-at>90)p.driveHits.delete(o);
     }
 }
 // PLAYER_PART_END s22.ironDriveMoved.1
 
-// index.html:115757 · Phạm vi: global
+// index.html:115758 · Phạm vi: global
+// PLAYER_PART_BEGIN s22.ironDriveImpact.1 EDITABLE
+function ironDriveImpact(n,o){
+    const p=n.ironhaul,root=o.__goc||o,fast=Math.abs(p.driveSpeed)>=IRON_DRIVE_MAX*.9||frames<p.driveDashUntil;
+    const dealt=ironDamage(n,o,fast?6.5:3,{dir:p.driveHeading,move:{finish:fast}});
+    if(dealt>0){
+        p.driveHits.set(root,frames);
+        if(fast&&p.driveShield){p.driveShield=false;p.driveGuardUntil=frames+10;}
+    }
+    return dealt;
+}
+// PLAYER_PART_END s22.ironDriveImpact.1
+
+// index.html:115767 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironDriveDash.1 EDITABLE
 function ironDriveDash(n,forced){
     const p=n.ironhaul;if(dashCd>0||n.webTimer>0||n.jcState||paused||gameOver||gameVictory)return;
@@ -377,28 +391,28 @@ function ironDriveDash(n,forced){
     ironCancel(n);p.guardUntil=p.perfectUntil=-100;p.lastDash=frames;
     p.driveHeading=p.driveDir=dir;p.driveReverse=false;p.driveForward=true;
     p.driveSpeed=dir*IRON_DRIVE_MAX;p.driveDistance=IRON_DRIVE_RUNUP;p.driveDashUntil=frames+8;
-    p.driveGuardUntil=frames+18;p.driveArmed=false;p.driveHits=new Map();
+    p.driveShield=true;p.driveGuardUntil=-100;p.driveArmed=false;p.driveHits=new Map();
     n.isFacingLeft=dir<0;n.dashDir=dir;dashVx=0;dashCd=34;p.transition=8;
     return true;
 }
 // PLAYER_PART_END s22.ironDriveDash.1
 
-// index.html:115767 · Phạm vi: global
+// index.html:115777 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironCapture.1 EDITABLE
 function ironCapture(n,duration=12){
-    const p=n.ironhaul;if(!p)return;const b=ironBody(n),t=ironhaulRig(b).targets;
+    const p=n.ironhaul;if(!p)return;const b=ironBody(n),t=(b.rigPose||ironhaulRig(b)).targets;
     const targets={...t,swordTarget:{...t.swordTarget},offTarget:{...t.offTarget}};
     if(b.playerCrouch){targets.swordTarget.y-=36;targets.offTarget.y-=36;}
     p.follow={at:frames,targets,duration};
 }
 // PLAYER_PART_END s22.ironCapture.1
 
-// index.html:115773 · Phạm vi: global
+// index.html:115783 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironCancel.1 EDITABLE
 function ironCancel(n=dino){const p=n.ironhaul;if(!p)return;ironCapture(n);p.attack=null;p.queue=null;p.k=null;p.pendingJump=null;}
 // PLAYER_PART_END s22.ironCancel.1
 
-// index.html:115774 · Phạm vi: global
+// index.html:115784 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironSilverStart.1 EDITABLE
 function ironSilverStart(n=dino){
     const p=n.ironhaul;if(!p||ironWhite(p)||ultCharge<100)return false;
@@ -407,22 +421,22 @@ function ironSilverStart(n=dino){
 }
 // PLAYER_PART_END s22.ironSilverStart.1
 
-// index.html:115779 · Phạm vi: global
+// index.html:115789 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironSilverEnd.1 EDITABLE
 function ironSilverEnd(n=dino){const p=n.ironhaul;if(!p)return;p.silver=0;p.silverFinishing=false;ironMode(n,p.silverReturn===2?2:0);ultCharge=0;}
 // PLAYER_PART_END s22.ironSilverEnd.1
 
-// index.html:115780 · Phạm vi: global
+// index.html:115790 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironPower.1 EDITABLE
 function ironPower(p,base,a){return (ironWhite(p)?base*1.5+1:base)*(a?.finisherPower||1);}
 // PLAYER_PART_END s22.ironPower.1
 
-// index.html:115781 · Phạm vi: global
+// index.html:115791 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironLabel.1 EDITABLE
 function ironLabel(s){floatingTexts.push(new FloatingText(dino.x-25,dino.y-25,s));}
 // PLAYER_PART_END s22.ironLabel.1
 
-// index.html:115783 · Phạm vi: global
+// index.html:115793 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironComputeKinematics.1 EDITABLE
 function ironComputeKinematics(n,p,a){
     if(!a||p.mode===2)return {rot:0,lean:0,scaleX:1,offX:0,offY:0,spearCone:0,drillSpin:0};
@@ -432,6 +446,16 @@ function ironComputeKinematics(n,p,a){
     let rot=0,lean=0,scaleX=1,offX=0,offY=0,spearCone=0,drillSpin=0;
 
     switch(m.motion){
+        case 'vault_stab':
+            rot=dir*ironhaulEase(Math.min(1,a.age/18))*Math.PI*2;
+            offY=-5*sinU;
+            break;
+        case 'rear_spin':
+            rot=dir*ironhaulEase(Math.max(0,Math.min(1,(a.age-18)/16)))*Math.PI*2;
+            break;
+        case 'low_cut':
+            lean=.06*sinU;
+            break;
         case 'deep_thrust': // Nhịp 2 (J2) & Bash: Hạ thấp trọng tâm, chồm mạnh thân người về trước và đâm thẳng mũi kiếm như mũi giáo phản lực!
             lean=0.38*sinU;
             offX=dir*16*sinU;
@@ -494,7 +518,7 @@ function ironComputeKinematics(n,p,a){
 }
 // PLAYER_PART_END s22.ironComputeKinematics.1
 
-// index.html:115852 · Phạm vi: global
+// index.html:115872 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironBody.1 EDITABLE
 function ironBody(n){
     const p=n.ironhaul,a=p.attack,scale=p.mode===2?.3:IRON_ROBOT_SCALE;
@@ -526,6 +550,13 @@ function ironBody(n){
     b.followPose=p.follow;b.playerBlend=true;b.playerReach=p.reach??112;if(ironWhite(p))b.coreBuff=Math.max(1,p.core||0);
     if(b.vehicle&&a?.move.round==='shell')b.state='ih_cannon';
     const target=ironTarget(n);b.lockX=(target?target.x+target.w/2:n.x+(n.isFacingLeft?-200:200))/scale;b.lockY=(target?target.y+target.h/2:n.y+n.h/2)/scale;
+    if(a?.slash&&['low','downthrust','spin'].includes(a.slash.kind)){
+        const r=ironhaulRig(b),kind=a.slash.kind,angle=a.slash.angle;
+        const goal=kind==='low'?{x:70,y:-55}:kind==='downthrust'?{x:55,y:-65}:{x:75,y:-100};
+        const arm=ironhaulIK(r.sword.root,goal,34,35,1);arm.angle=angle;
+        arm.hand={x:arm.end.x+Math.cos(angle)*11,y:arm.end.y+Math.sin(angle)*11};
+        r.sword=arm;r.targets.swordTarget={...goal};r.targets.blade=angle;b.rigPose=r;
+    }
     // Aim the player's actual arm/barrel in world space, independently of sword poses.
     if(!b.vehicle&&!b.silver&&(p.k!==null||['bullet','rail','shell','shell_burst'].includes(a?.move.round))){
         const r=ironhaulRig(b),m=ironKinematicsMatrix(b,n.x+n.w/2,n.y+n.h/2),det=m.a*m.d-m.b*m.c;
@@ -541,7 +572,7 @@ function ironBody(n){
 }
 // PLAYER_PART_END s22.ironBody.1
 
-// index.html:115897 · Phạm vi: global
+// index.html:115924 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironTargets.1 EDITABLE
 function ironTargets(n){
     const targets=sgTargets(n),clashing=new Set(targets.filter(o=>o._beamClashPoint).map(o=>o.ownerBoss));
@@ -549,7 +580,7 @@ function ironTargets(n){
 }
 // PLAYER_PART_END s22.ironTargets.1
 
-// index.html:115901 · Phạm vi: global
+// index.html:115928 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironTarget.1 EDITABLE
 function ironTarget(n){
     const dir=n.isFacingLeft?-1:1,cx=n.x+n.w/2,cy=n.y+n.h/2;
@@ -557,7 +588,7 @@ function ironTarget(n){
 }
 // PLAYER_PART_END s22.ironTarget.1
 
-// index.html:115906 · Phạm vi: global
+// index.html:115933 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironKinematicsMatrix.1 EDITABLE
 function ironKinematicsMatrix(b,cx,cy){
     const k=b._kin||{},angle=b.vehicle?0:(k.rot||0)+(b.facingLeft?-1:1)*(k.lean||0);
@@ -566,7 +597,7 @@ function ironKinematicsMatrix(b,cx,cy){
 }
 // PLAYER_PART_END s22.ironKinematicsMatrix.1
 
-// index.html:115911 · Phạm vi: global
+// index.html:115938 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironGeometry.1 EDITABLE
 function ironGeometry(n){
     const b=ironBody(n),g=ironhaulWeapons(b),s=b.scale,m=ironKinematicsMatrix(b,n.x+n.w/2,n.y+n.h/2);
@@ -577,7 +608,7 @@ function ironGeometry(n){
 }
 // PLAYER_PART_END s22.ironGeometry.1
 
-// index.html:115918 · Phạm vi: global
+// index.html:115945 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironDamage.1 EDITABLE
 function ironDamage(n,o,damage,attack){
     const dealt=sgDamage(n,o,damage,'ironhaul');
@@ -587,7 +618,7 @@ function ironDamage(n,o,damage,attack){
 }
 // PLAYER_PART_END s22.ironDamage.1
 
-// index.html:115924 · Phạm vi: global
+// index.html:115951 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironBegin.1 EDITABLE
 function ironBegin(id,n=dino){
     const p=n.ironhaul,m=IRON_PLAYER_MOVES[id];if(!p||!m||p.attack||frames<p.guardUntil)return false;
@@ -599,6 +630,9 @@ function ironBegin(id,n=dino){
     if(!['cut','rise','cross','thrust','execution','silvercut','spin','silverbloom','silvercross','sovereign'].includes(id))p.combo=0;
     ironCapture(n,10);
     p.attack={id,move:m,age:0,dir:n.isFacingLeft?-1:1,slash:null,shield:null,hits:new Set(),before,input:null,airWait:0};p.k=null;
+    if(id==='recoil'||m.flank){
+        p.attack.target=ironTarget(n);p.attack.from={x:n.x,feet:n.y+n.h};
+    }
     if(m.ultimate){p.attack.finisherPower=.9+2.7*p.silver/p.silverMax;p.silverFinishing=true;p.silver=0;ultCharge=0;n.invincible=true;n.invTimer=Math.max(n.invTimer,18);}
     if(id==='charge')p.coreReady=720;
     if(id==='nova')p.novaReady=360;
@@ -607,7 +641,7 @@ function ironBegin(id,n=dino){
 }
 // PLAYER_PART_END s22.ironBegin.1
 
-// index.html:115941 · Phạm vi: global
+// index.html:115971 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironSpawnMissiles.1 EDITABLE
 function ironSpawnMissiles(n,count=4){
     const p=n.ironhaul;if(!p)return;
@@ -640,7 +674,7 @@ function ironSpawnMissiles(n,count=4){
 }
 // PLAYER_PART_END s22.ironSpawnMissiles.1
 
-// index.html:115972 · Phạm vi: global
+// index.html:116002 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironTriggerBunker.1 EDITABLE
 function ironTriggerBunker(n,reach=96,basePower=4){
     const p=n.ironhaul;if(!p)return;
@@ -666,14 +700,18 @@ function ironTriggerBunker(n,reach=96,basePower=4){
 }
 // PLAYER_PART_END s22.ironTriggerBunker.1
 
-// index.html:115995 · Phạm vi: global
+// index.html:116025 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironCommand.1 EDITABLE
 function ironCommand(key,n=dino,charge=0,downOverride){
     const p=n.ironhaul;if(!p)return;
     if(key==='J')p.lastJ=frames;else if(key==='K')p.lastK=frames;
     if(p.attack){
         const a=p.attack,link=key==='J'?a.move.followJ:a.move.followK;
-        if(link&&a.age>=(a.move.link||10)){ironCancel(n);ironBegin(link,n);if(p.attack)p.attack.input=key;return;}
+        if(link){
+            if(a.age>=(a.move.link||10)&&(!a.move.waitLand||n.grounded)){ironCancel(n);ironBegin(link,n);if(p.attack)p.attack.input=key;}
+            else p.queue={key,charge,down:downOverride??!!(keys.KeyS||keys.ArrowDown),follow:link,until:frames+a.move.T+90};
+            return;
+        }
         // HỆ THỐNG COMBO B CƠ KHÍ: Đang chém J nhịp 1/2/3 mà bấm K -> Chuyển ngay sang Pháo Kích Gunblade / Đột Cọc Pile Bunker!
         if(key==='K'&&['cut','rise','cross'].includes(a.id)&&a.age>=6){
             const down=downOverride??!!(keys.KeyS||keys.ArrowDown);
@@ -698,8 +736,8 @@ function ironCommand(key,n=dino,charge=0,downOverride){
     let id;
     if(key==='J'){
         if(p.mode===2)id=dash?'ram':'gatling';
+        else if(down)id='lowcut';
         else if(dash){id=ironWhite(p)?'aegislance':'advance';p.lastDash=-1000;}
-        else if(down)id=ironWhite(p)?'bash':'upper';
         else if(!n.grounded&&!(p.combo>0&&frames-p.ended<=44)){id=(p.airCombo++%2)?'aircross':'air';}
         else{
             if(frames-p.ended>44)p.combo=0;
@@ -715,7 +753,7 @@ function ironCommand(key,n=dino,charge=0,downOverride){
 }
 // PLAYER_PART_END s22.ironCommand.1
 
-// index.html:116040 · Phạm vi: global
+// index.html:116074 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironKey.1 EDITABLE
 function ironKey(code,repeat){
     if(!ironActive())return false;
@@ -746,22 +784,22 @@ function ironKey(code,repeat){
 }
 // PLAYER_PART_END s22.ironKey.1
 
-// index.html:116067 · Phạm vi: global
+// index.html:116101 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironKeyBase.1 EDITABLE
 const ironKeyBase=danteKey;
 // PLAYER_PART_END s22.ironKeyBase.1
 
-// index.html:116067 · Phạm vi: global
+// index.html:116101 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.danteKey.1 EDITABLE
 danteKey=function(code,repeat){return ironKey(code,repeat)||ironKeyBase(code,repeat);};
 // PLAYER_PART_END s22.danteKey.1
 
-// index.html:116068 · Phạm vi: global
+// index.html:116102 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironDashBase.1 EDITABLE
 const ironDashBase=doDash;
 // PLAYER_PART_END s22.ironDashBase.1
 
-// index.html:116069 · Phạm vi: global
+// index.html:116103 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.doDash.1 EDITABLE
 doDash=function(...args){
     const p=ironActive()?dino.ironhaul:null,a=p?.attack,source=p?(p.k!==null?'K':a?.input&&a.age>=5?a.input:frames-p.lastK<=22?'K':frames-p.lastJ<=22?'J':null):null;
@@ -769,33 +807,33 @@ doDash=function(...args){
     const old=dashCd,result=ironDashBase.apply(this,args);
     if(p&&dashCd>old&&Math.abs(dashVx)>1&&!a?.move.ultimate){
         ironCancel();p.lastDash=frames;
-        const id=p.mode===2?(source==='K'?'broadside':'ram'):source==='J'?(ironWhite(p)?'aegisorbit':'recoil'):source==='K'?(ironWhite(p)?'aegisvault':'gunvault'):null;
-        if(id){ironBegin(id);if(p.attack){p.attack.input=null;if(['recoil','gunvault','aegisorbit'].includes(id))dashVx=-p.attack.dir*Math.max(10,Math.abs(dashVx));}}
+        const id=p.mode===2?(source==='K'?'broadside':'ram'):source==='J'?'recoil':source==='K'?(ironWhite(p)?'aegisvault':'gunvault'):null;
+        if(id){ironBegin(id);if(p.attack){p.attack.input=null;if(id==='recoil')dashVx=0;else if(['gunvault','aegisorbit'].includes(id))dashVx=-p.attack.dir*Math.max(10,Math.abs(dashVx));}}
     }return result;
 };
 // PLAYER_PART_END s22.doDash.1
 
-// index.html:116079 · Phạm vi: global
+// index.html:116113 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironGuardBase.1 EDITABLE
 const ironGuardBase=Player.prototype.isShielding;
 // PLAYER_PART_END s22.ironGuardBase.1
 
-// index.html:116080 · Phạm vi: global
+// index.html:116114 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.Player.prototype.isShielding.1 EDITABLE
 Player.prototype.isShielding=function(){if(ironOn()&&this===dino&&this.ironhaul)return frames<this.ironhaul.guardUntil;return ironGuardBase.call(this);};
 // PLAYER_PART_END s22.Player.prototype.isShielding.1
 
-// index.html:116081 · Phạm vi: global
+// index.html:116115 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironParryBase.1 EDITABLE
 const ironParryBase=shinGuardReset;
 // PLAYER_PART_END s22.ironParryBase.1
 
-// index.html:116082 · Phạm vi: global
+// index.html:116116 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.shinGuardReset.1 EDITABLE
 shinGuardReset=function(perfect){const p=ironActive()?dino.ironhaul:null;if(perfect&&p&&p.mode!==2&&frames<p.perfectUntil&&!p.counter){p.counter=frames+8;p.perfectUntil=-100;p.guardReady=frames;}return ironParryBase(perfect);};
 // PLAYER_PART_END s22.shinGuardReset.1
 
-// index.html:116083 · Phạm vi: global
+// index.html:116117 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironFriendlyRound.1 EDITABLE
 function ironFriendlyRound(n,kind,power,tilt=0){
     const p=n.ironhaul,a=p.attack,g=ironGeometry(n),target=ironTarget(n),dir=a?.dir||(n.isFacingLeft?-1:1);
@@ -826,7 +864,7 @@ function ironFriendlyRound(n,kind,power,tilt=0){
 }
 // PLAYER_PART_END s22.ironFriendlyRound.1
 
-// index.html:116110 · Phạm vi: global
+// index.html:116144 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironBlast.1 EDITABLE
 function ironBlast(n,q){
     const p=n.ironhaul,hit=new Set();for(const o of ironTargets(n)){const root=o.__goc||o;
@@ -835,7 +873,7 @@ function ironBlast(n,q){
 }
 // PLAYER_PART_END s22.ironBlast.1
 
-// index.html:116115 · Phạm vi: global
+// index.html:116149 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironArea.1 EDITABLE
 function ironArea(n,base,radius,a){
     const p=n.ironhaul,x=n.x+n.w/2,y=n.y+n.h-8,damage=ironPower(p,base,a);
@@ -844,7 +882,7 @@ function ironArea(n,base,radius,a){
 }
 // PLAYER_PART_END s22.ironArea.1
 
-// index.html:116120 · Phạm vi: global
+// index.html:116154 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironRoundTick.1 EDITABLE
 function ironRoundTick(n){
     const p=n.ironhaul;
@@ -897,129 +935,32 @@ function ironRoundTick(n){
 }
 // PLAYER_PART_END s22.ironRoundTick.1
 
-// index.html:116169 · Phạm vi: global
-// PLAYER_PART_BEGIN s22.ironTick.1 EDITABLE
-function ironTick(){
-    if(!ironActive())return;const n=dino;if(!n.ironhaul)ironInit(n);const p=n.ironhaul;
-    n.parryWindow=Math.max(0,p.perfectUntil-frames);n.meleeTimer=Math.max(0,Math.min(n.meleeTimer,p.guardUntil-frames));if(frames>=p.perfectUntil)n.meleeTimer=Math.min(22,n.meleeTimer);
-    if(p.silver>0&&!p.silverFinishing){p.silver--;ultCharge=0;if(!p.silver)ironSilverEnd(n);}
-    if(p.novaReady>0)p.novaReady--;
-    p.reach=(p.reach??112)+((p.attack?.slash?.reach??112)-(p.reach??112))*.38;
-    if(p.core>0)p.core--;if(p.coreReady>0)p.coreReady--;if(p.muzzle>0)p.muzzle--;if(p.transition>0)p.transition--;
-    p.fx=p.fx.filter(f=>--f.t>0);
-    p.trails=p.trails.filter(f=>--f.t>0);p.ghosts=p.ghosts.filter(f=>--f.t>0);
-    p.jets=(p.jets||[]).filter(j=>--j.t>0);
-    p.bunkers=(p.bunkers||[]).filter(b=>--b.t>0);
-    for(const sh of p.shells||[]){sh.x+=sh.vx;sh.y+=sh.vy;sh.vy+=0.38;sh.ang+=0.35;sh.t--;}
-    p.shells=(p.shells||[]).filter(sh=>sh.t>0);
-
-    if(n.grounded)p.airCombo=0;
-    if(p.pendingJump){if(frames>p.pendingJump.until)p.pendingJump=null;else if(!n.grounded&&(n.jumpCount||0)>p.pendingJump.jumpCount){const kind=p.pendingJump.kind;ironCancel(n);ironBegin(kind==='J'?(ironWhite(p)?'ascension':'skyripper'):(ironWhite(p)?'starfall':'gunrain'),n);}}
-    if(p.k!==null){if(keys.KeyK)p.k=Math.min(90,p.k+1);else{const charge=p.k;p.k=null;ironCommand('K',n,charge);}}
-    if(p.counter&&frames>=p.counter){p.counter=0;p.guardUntil=-100;ironBegin('riposte',n);}
-    if(!p.attack&&p.mode===2&&keys.KeyJ&&!keys.KeyK&&frames>=p.guardUntil)ironCommand('J',n);
-    const a=p.attack;
-    if(a){
-        const m=a.move,old=a.geometry||ironGeometry(n);a.age++;if(p.mode===2)a.dir=p.driveHeading;n.isFacingLeft=a.dir<0;
-        // Sinh luồng lửa phản lực (Jet Booster Plume) sau lưng và vai Robot khi tung đòn cơ khí
-        if(m.jet&&a.age>=2&&a.age<=m.T-6&&a.age%2===0){
-            p.jets.push({
-                x:n.x+n.w/2-a.dir*(p.mode===2?36:14),
-                y:n.y+(p.mode===2?20:26)+(Math.random()-0.5)*10,
-                dir:-a.dir,
-                power:m.jet,
-                white:ironWhite(p)||p.core>0,
-                t:7,max:7
-            });
-        }
-        if(m.jump&&a.age===m.jump[0]){n.dy=m.jump[1];n.grounded=false;}
-        if(m.airSlow&&a.age<=m.airSlow&&!n.grounded)n.dy=Math.min(n.dy,.55);
-        if(m.plunge&&a.age>=14&&!n.grounded)n.dy=Math.max(14,n.dy);
-        if(p.mode!==2&&m.step&&a.age>=m.step[0]&&a.age<=m.step[1]){
-            const x=n.x,target=ironTarget(n);let travel=m.step[2];
-            if(travel>0&&!m.ram&&target)travel=Math.min(travel,Math.max(0,(target.x+target.w/2-n.x-n.w/2)*a.dir-52));
-            n.x=Math.max(worldL(),Math.min(worldR()-n.w,n.x+a.dir*travel));if(mapTheme==='tetris')resolveTetrisWalls(n,n.x-x);else resolveSolidPillars(n);
-        }
-        for(const beat of m.sword||[])if(a.age===beat[0]){ironCapture(n,6);const [at,kind,reach,life,damage]=beat,angles=kind==='rise'?[.52,-1.9]:kind==='thrust'?[-.12,.08]:[-2.2,.65];a.slash={kind,reach:reach*(ironWhite(p)?1.14:1),life,age:0,a0:angles[0],a1:angles[1],angle:angles[0],damage:ironPower(p,damage+(p.core?1:0),a),hit:new Set()};}
-        for(const beat of m.shield||[])if(a.age===beat[0]){ironCapture(n,6);a.shield={kind:beat[1],age:0,life:beat[2],damage:ironPower(p,beat[3],a),hit:new Set()};}
-        if(a.slash){const s=a.slash;s.age++;s.angle=s.a0+(s.a1-s.a0)*ironhaulEase(s.age/s.life);}
-        if(a.shield)a.shield.age++;
-
-        // Kích hoạt Cọc Thủy Lực Pile Bunker (nếu đòn đánh có thuộc tính `bunker`)
-        if(m.bunker){
-            for(let bIdx=0;bIdx<m.bunker.length;bIdx+=3){
-                if(a.age===m.bunker[bIdx]){
-                    ironTriggerBunker(n,m.bunker[bIdx+1],m.bunker[bIdx+2]);
-                }
-            }
-        }
-        // Kích hoạt Phóng Tên Lửa Vòm Dẫn Đường (nếu đòn đánh có thuộc tính `missiles`)
-        if((m.missiles||[]).includes(a.age)){
-            ironSpawnMissiles(n,m.ultimate?4:ironWhite(p)?3:2);
-        }
-
-        const g=ironGeometry(n);a.geometry=g;
-        for(const o of ironTargets(n)){const root=o.__goc||o,s=a.slash,h=a.shield;
-            if(s&&!s.hit.has(root))for(let k=0;k<=6;k++){const u=k/6;if(sgSegmentBox(ironhaulMix(old.grip.x,g.grip.x,u),ironhaulMix(old.grip.y,g.grip.y,u),ironhaulMix(old.tip.x,g.tip.x,u),ironhaulMix(old.tip.y,g.tip.y,u),o,6)!==null){s.hit.add(root);ironDamage(n,o,s.damage,a);break;}}
-            if(h&&!p.shieldOut&&!h.hit.has(root)&&h.age>=h.life*.15&&h.age<=h.life*.92&&(checkAABB(g.shieldBox,o)||sgSegmentBox(old.shield.x,old.shield.y,g.shield.x,g.shield.y,o,10)!==null)){h.hit.add(root);ironDamage(n,o,h.damage,a);}
-            if(m.ram&&a.age>=2&&a.age<=26&&!a.hits.has(root)&&checkAABB(n,o)){a.hits.add(root);ironDamage(n,o,6.5,a);}
-        }
-        if(a.slash){
-            p.trails.push({grip:{...old.grip},tip:{...old.tip},toGrip:{...g.grip},toTip:{...g.tip},white:ironWhite(p),core:p.core>0,t:10});
-            if((p.core||ironWhite(p))&&a.slash.kind==='thrust'&&a.slash.age===6)ironFriendlyRound(n,'wave',3);
-            if(a.slash.age>=a.slash.life){ironCapture(n,8);a.slash=null;}
-        }
-        if(a.shield&&a.shield.age>=a.shield.life){ironCapture(n,8);a.shield=null;}
-        if((m.shots||[]).includes(a.age))ironFriendlyRound(n,m.round,m.power||(m.round==='shield'?4:1));
-        // Nạp lõi Overdrive Ignition (I): Kích hoạt ngay ở frame 12 thay vì bắt đứng chờ 72 frames!
-        if(a.id==='charge'&&a.age===12){
-            p.core=540;
-            p.fx.push({x:n.x+n.w/2,y:n.y+24,r:58,t:20,max:20});
-            ironLabel('OVERDRIVE CORE · 9 GIÂY');
-        }
-        if((m.waves||[]).includes(a.age))for(const tilt of m.fan?[-.22,0,.22]:[0])ironFriendlyRound(n,'wave',3.2,tilt);
-        if(m.nova&&a.age===m.nova[0])ironArea(n,m.nova[1],m.nova[2],a);
-        if(m.plunge&&a.age>=14&&n.grounded&&!a.landed){a.landed=true;ironArea(n,6.5,84,a);}
-        if(m.ultimate&&a.age===92)ironArea(n,14,155,a);
-        if(m.plunge&&!a.landed&&a.age>=m.T&&!(++a.airWait>90))a.age=m.T-1;
-        if(a.age>=m.T){ironCapture(n,8);p.attack=null;p.ended=frames;const queued=p.queue;p.queue=null;if(m.ultimate)ironSilverEnd(n);else if(queued&&frames<=queued.until)ironCommand(queued.key,n,queued.charge,queued.down);}
+// index.html:116203 · Phạm vi: global
+// PLAYER_PART_BEGIN s22.ironFlankStep.1 EDITABLE
+function ironFlankStep(n,a){
+    if(!a.flankGoal){
+        const t=a.target,dir=a.dir,goal=t&&t.hp>0&&!t._beamClashPoint?(dir>0?t.x+t.w+18:t.x-n.w-18):a.from.x+dir*90;
+        a.flankGoal={x:Math.max(worldL(),Math.min(worldR()-n.w,Math.max(a.from.x-3*CM,Math.min(a.from.x+3*CM,goal)))),dir:-dir};
     }
-    const dx=n.x-p.lastX;
-    if((Math.abs(dx)>6||p.attack?.move.jet>=3)&&frames%3===0){const b=ironBody(n);b.rigPose=b.rigPose||ironhaulRig(b);p.ghosts.push({body:b,cx:n.x+n.w/2,cy:n.y+n.h/2,t:10});}
-    p.ghosts=p.ghosts.slice(-6);p.trails=p.trails.slice(-24);
-    ironRoundTick(n);p.speed=(p.speed||0)*.6+dx*.4;p.gait+=Math.abs(dx)*.11;p.lastX=n.x;
+    if(a.age<=16){
+        const u=ironhaulEase(a.age/16),old=n.x;
+        n.x=ironhaulMix(a.from.x,a.flankGoal.x,u);
+        if(mapTheme==='tetris')resolveTetrisWalls(n,n.x-old);else resolveSolidPillars(n);
+        n.y=a.from.feet-Math.sin(a.age/16*Math.PI)*28-n.h;n.dy=0;n.grounded=false;
+    }else if(a.age===17){a.dir=a.flankGoal.dir;n.isFacingLeft=a.dir<0;n.dy=.5;}
 }
-// PLAYER_PART_END s22.ironTick.1
+// PLAYER_PART_END s22.ironFlankStep.1
 
-// index.html:116259 · Phạm vi: global
-// PLAYER_PART_BEGIN s22.ironCombatBase.1 EDITABLE
-const ironCombatBase=danteTick;
-// PLAYER_PART_END s22.ironCombatBase.1
-
-// index.html:116259 · Phạm vi: global
-// PLAYER_PART_BEGIN s22.danteTick.1 EDITABLE
-danteTick=function(){ironCombatBase();ironTick();};
-// PLAYER_PART_END s22.danteTick.1
-
-// index.html:116260 · Phạm vi: global
-// PLAYER_PART_BEGIN s22.ironDamageBase.1 EDITABLE
-const ironDamageBase=Player.prototype.takeDamage;
-// PLAYER_PART_END s22.ironDamageBase.1
-
-// index.html:116261 · Phạm vi: global
-// PLAYER_PART_BEGIN s22.Player.prototype.takeDamage.1 EDITABLE
-Player.prototype.takeDamage=function(...args){if(ironActive(this)&&this.ironhaul?.mode===2&&frames<this.ironhaul.driveGuardUntil)return;const hp=this.hp,result=ironDamageBase.apply(this,args);if(ironOn()&&this===dino&&this.ironhaul&&this.hp<hp){const p=this.ironhaul,a=p.attack;ironResetDrive(this);ironCancel(this);p.counter=0;p.combo=0;if(a?.move.ultimate)ironSilverEnd(this);}return result;};
-// PLAYER_PART_END s22.Player.prototype.takeDamage.1
-
-// index.html:116263 · Phạm vi: global
-// PLAYER_PART_BEGIN s22.ironRenderBodyWithKinematics.1 EDITABLE
-function ironRenderBodyWithKinematics(b,cx,cy){
-    const m=ironKinematicsMatrix(b,cx,cy);
-    ctx.save();
-    ctx.transform(m.a,m.b,m.c,m.d,m.e,m.f);
-    ctx.scale(b.scale,b.scale);
-    if(b.vehicle)ironhaulTruck(b);
-    else{ironhaulRobot(b);ironhaulCoreFx(b);}
-    ctx.restore();
+// index.html:116215 · Phạm vi: global
+// PLAYER_PART_BEGIN s22.ironTruckLanding.1 EDITABLE
+function ironTruckLanding(n){
+    const p=n.ironhaul;if(p.mode!==2||n._fallRecovery){p.truckAir=false;p.truckAirFrames=0;p.truckDrop=0;return;}
+    if(!n.grounded){p.truckAir=true;p.truckAirFrames=(p.truckAirFrames||0)+1;p.truckDrop=Math.max(p.truckDrop||0,n.dy);return;}
+    if(p.truckAir&&p.truckAirFrames>=3&&p.truckDrop>2){
+        const radius=100,damage=Math.min(7,3+Math.floor(p.truckDrop/3)),x=n.x+n.w/2,y=n.y+n.h;
+        for(const o of ironTargets(n))if(Math.hypot(Math.max(o.x,Math.min(x,o.x+o.w))-x,Math.max(o.y,Math.min(y,o.y+o.h))-y)<=radius)ironDamage(n,o,damage,{ultimate:false});
+        p.fx.push({x,y,r:radius,t:20,max:20});shakeTimer=Math.max(shakeTimer,7);SFX.tone(110,.1,'sawtooth',.1,55);
+    }
+    p.truckAir=false;p.truckAirFrames=0;p.truckDrop=0;
 }
-// PLAYER_PART_END s22.ironRenderBodyWithKinematics.1
+// PLAYER_PART_END s22.ironTruckLanding.1

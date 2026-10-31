@@ -1,5 +1,5 @@
 // BOSS_FILE: DeathBoss
-// BOSS_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
+// BOSS_SNAPSHOT: bae52db6534a8318283b8c7d74ac1420b52adb74ae335721bf4bc7249c2da3be
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.

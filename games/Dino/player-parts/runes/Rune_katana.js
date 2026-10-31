@@ -1,5 +1,5 @@
 // PLAYER_FILE: Rune_katana
-// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
+// PLAYER_SNAPSHOT: bae52db6534a8318283b8c7d74ac1420b52adb74ae335721bf4bc7249c2da3be
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.

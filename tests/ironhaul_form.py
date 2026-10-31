@@ -43,19 +43,24 @@ with sync_playwright() as p:
     print(page.evaluate('''()=>{
         for(const left of [false,true]){
             ihfSetup(2,left);bosses.length=0;dino.x=left?750:100;const start=dino.x,p=dino.ironhaul,key=left?'KeyA':'KeyD';keys[key]=true;
-            let previous=0,protection=null,steps=0;
-            while(Math.abs(p.driveSpeed)<12&&steps++<90){ihfStep();check(Math.abs(p.driveSpeed)>=previous,'forward acceleration reverses');previous=Math.abs(p.driveSpeed);if(frames<p.driveGuardUntil&&protection===null)protection=p.driveGuardUntil;}
+            let previous=0,steps=0;
+            while(Math.abs(p.driveSpeed)<12&&steps++<90){ihfStep();check(Math.abs(p.driveSpeed)>=previous,'forward acceleration reverses');previous=Math.abs(p.driveSpeed);}
             const distance=Math.abs(dino.x-start);
             check(steps<90&&distance>=6*CM-12&&distance<6*CM+25,'max speed is not reached after about 6 cm: '+distance);
-            check(protection!==null&&p.driveGuardUntil===protection,'no short near-max protection');
+            check(p.driveShield,'no near-max pre-impact shield');ihfStep(25);check(p.driveShield,'pre-impact shield expires before ramming');
             dino.invincible=false;dino.invTimer=0;const hp=dino.hp;
             const hit=()=>{const q=new BossProjectile(dino.x+dino.w/2,dino.y+dino.h/2,0,0,false,1);bossProjectiles.push(q);checkCollisions();check(!bossProjectiles.includes(q),'colliding hostile projectile is not consumed');};
-            hit();check(dino.hp===hp,'speed armour fails to absorb damage');
-            while(frames<protection)ihfStep();check(p.driveGuardUntil===protection,'continuous full speed refreshes protection');
+            hit();check(dino.hp===hp&&p.driveShield,'incoming shot consumes pre-impact shield');
+            const target={x:left?dino.x-48:dino.x+dino.w+8,y:dino.y,w:40,h:34,hp:50,maxHp:50};bosses.push(target);ihfStep();
+            check(target.hp===43.5&&!p.driveShield&&p.driveGuardUntil===frames+10,'full-speed impact damage or 10-frame tail wrong');bosses.length=0;
+            const protection=p.driveGuardUntil;hit();check(dino.hp===hp,'post-impact iframe fails');
+            keys[key]=false;keys.KeyS=true;keys[left?'KeyD':'KeyA']=true;ihfStep();
+            check(p.driveGuardUntil===protection&&!p.driveShield,'reverse cancels the guaranteed impact iframe');
+            while(frames<protection)ihfStep();check(p.driveGuardUntil===protection&&!p.driveShield,'continuous full speed re-arms shield after impact');
             hit();check(dino.hp===hp-1,'speed armour never expires');
 
             ihfSetup(2,left);dino.x=left?100:750;const q=dino.ironhaul;keys.KeyS=true;keys[left?'KeyD':'KeyA']=true;
-            for(let i=0;i<45;i++){ihfStep();check(Math.abs(q.driveSpeed)<=6&&frames>=q.driveGuardUntil,'reverse exceeds half speed or grants armour');}
+            for(let i=0;i<45;i++){ihfStep();check(Math.abs(q.driveSpeed)<=6&&!q.driveShield&&frames>=q.driveGuardUntil,'reverse exceeds half speed or grants armour');}
             check(dino.isFacingLeft===left&&Math.abs(q.driveSpeed)===6,'reverse changes heading or cannot reach reverse cap');
 
             ihfSetup(2,left);dino.x=400;keys[left?'KeyD':'KeyA']=true;dashCd=0;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);
@@ -79,14 +84,54 @@ with sync_playwright() as p:
             ihfSetup();for(const id of ['cut','rise','cross','thrust','execution']){ironBegin(id);ihfStep(IRON_PLAYER_MOVES[id].T);check(dino.grounded,'basic combo still auto-jumps '+id);}
             check(missiles===0,'normal J chain spams missiles');ihfSetup();ironBegin('barrage');ihfStep(40);check(missiles===2,'charged barrage is not limited to two missiles');
         }finally{ironSpawnMissiles=spawn;}
-        return 'PASS 6 cm run-up, finite speed armour, 50% reverse cap, steering / braking / blocked Dash, wall reset, grounded J combo, reduced missiles and K aim at varied heights in both directions';
+        return 'PASS 6 cm run-up, pre-impact shield, exact 10-frame impact tail, 50% reverse cap, steering / braking / blocked Dash, wall reset, grounded J combo, reduced missiles and K aim at varied heights';
+    }'''))
+    print(page.evaluate('''()=>{
+        for(const left of [false,true])for(const comboMode of [0,1]){
+            const target=ihfSetup(comboMode,left);ihfKey('KeyJ');ihfKey('KeyJ',false);ihfStep(8);dashCd=0;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);
+            ihfStep(3);ihfKey('KeyJ');ihfKey('KeyJ',false);check(dino.ironhaul.attack?.id==='recoil'&&dino.ironhaul.queue?.follow==='pursuit','early follow-up skips vault stab');
+            let airborne=false,stab=false,landed=false,wait=0;
+            while(dino.ironhaul.attack?.id==='recoil'&&wait++<100){
+                ihfStep();airborne ||= !dino.grounded;landed ||= dino.grounded;
+                if(dino.ironhaul.attack?.slash?.kind==='downthrust')stab=true;
+            }
+            check(airborne&&stab&&landed&&dino.ironhaul.attack?.id==='pursuit','vault stab does not land before rear spin');
+            const before=target.hp;ihfStep(17);check(left?dino.x+dino.w<target.x:dino.x>target.x+target.w,'flank did not reach the far side of target');
+            check(dino.isFacingLeft===!left,'flank does not turn back toward target');ihfStep(25);
+            check(target.hp===before-(comboMode?10:6)&&!dino.ironhaul.attack,'rear spin is not one finite damaging rotation');
+            ihfSetup();bosses.length=0;ihfKey('KeyJ');ihfKey('KeyJ',false);ihfStep(8);dashCd=0;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);ihfKey('KeyJ');ihfKey('KeyJ',false);ihfStep(110);check(!dino.ironhaul.attack,'targetless follow-up gets stuck');
+            for(const mode of [0,1]){
+                const low=ihfSetup(mode,left);low.y=295;low.h=25;ihfKey('KeyS');ihfKey('KeyJ');ihfKey('KeyJ',false);ihfKey('KeyS',false);
+                check(dino.ironhaul.attack?.id==='lowcut','crouch J does not select low sweep');ihfStep(10);const g=ironGeometry(dino),feet=dino.y+dino.h;
+                check(dino.isCrouching&&dino.grounded&&Math.abs(g.tip.y-g.grip.y)<10,'low sweep rises or is not horizontal');
+                check(g.grip.y>feet-40&&g.grip.y<feet-12&&low.hp<10000,'crouched blade does not hit low target');ihfStep(19);
+                check(!dino.isCrouching&&dino.h===78&&dino.y+dino.h===320,'low sweep leaves crouch / feet stuck');
+            }
+            const damages=[];
+            for(const kind of ['normal','max','dash']){
+                ihfSetup(2,left);bosses.length=0;dino.x=400;keys[left?'KeyA':'KeyD']=true;
+                if(kind==='max')while(Math.abs(dino.ironhaul.driveSpeed)<12)ihfStep();
+                if(kind==='dash'){dashCd=0;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);}
+                const t={x:left?dino.x-48:dino.x+dino.w+8,y:dino.y,w:40,h:34,hp:100,maxHp:100};bosses.push(t);
+                for(let i=0;i<12&&t.hp===100;i++)ihfStep();damages.push(100-t.hp);
+            }
+            check(damages[0]===3&&damages[1]===6.5&&damages[2]===damages[1],'Dash / max / slow ram strength wrong '+damages);
+            ihfSetup(2,left);bosses.length=0;
+            const ground=dino.y+dino.h,cx=dino.x+dino.w/2;
+            const targets=[-80,80,160].map(dx=>({x:cx+dx-10,y:ground-30,w:20,h:30,hp:50,maxHp:50}));bosses.push(...targets);
+            ihfKey('Space');ihfStep(3);ihfKey('Space',false);check(!dino.grounded&&targets.every(t=>t.hp===50),'take-off causes landing damage');
+            for(let i=0;i<100&&!dino.grounded;i++)ihfStep();
+            check(targets[0].hp<50&&targets[1].hp<50&&targets[2].hp===50,'truck landing radius or two-sided damage wrong');
+            const health=targets.map(t=>t.hp).join(',');ihfStep(30);check(targets.map(t=>t.hp).join(',')===health,'standing truck repeats landing explosion');
+        }
+        return 'PASS buffered J Dash J vault-stab / rear-spin sequence, low crouch sweep, equal max-speed / Dash impact damage and single two-sided truck landing shockwave';
     }'''))
     print(page.evaluate('''()=>{
         let count=0;
         for(const mode of [0,1,2])for(const left of [false,true]){
-            const ids=mode===0?['cut','rise','cross','thrust','execution','upper','advance','cleaver','gun','cannon','barrage','air','charge','recoil','pursuit','rail','gunvault','skyripper','gunrain','aircross','plunge','gunslash','morphslam']:mode===1?['silvercut','spin','silverfinish','throw','bash','shieldrush','reversal','riposte','air','silverbloom','silvercross','sovereign','aegislance','aegisorbit','aegiswheel','aegisvault','ascension','starfall','nova']:['gatling','truckcannon','ram','cannon','barrage','broadside'];
+            const ids=mode===0?['cut','rise','cross','thrust','execution','upper','advance','cleaver','gun','cannon','barrage','air','charge','recoil','pursuit','rail','gunvault','skyripper','gunrain','aircross','plunge','gunslash','morphslam','lowcut']:mode===1?['silvercut','spin','silverfinish','throw','bash','shieldrush','reversal','riposte','air','silverbloom','silvercross','sovereign','aegislance','aegisorbit','aegiswheel','aegisvault','ascension','starfall','nova']:['gatling','truckcannon','ram','cannon','barrage','broadside'];
             for(const id of ids){const t=ihfSetup(mode,left);if(mode===2&&id==='ram')keys[left?'KeyA':'KeyD']=true;check(ironBegin(id),'cannot start '+id);const T=IRON_PLAYER_MOVES[id].T;
-                if(['recoil','gunvault','gunslash'].includes(id)){
+                if(['gunvault','gunslash'].includes(id)){
                     // Backflip fire leaves the ground lane; put an aerial target in the real round's path.
                     const fire=IRON_PLAYER_MOVES[id].shots[0];ihfStep(fire);const q=dino.ironhaul.rounds[0];check(!!q,'no acrobatic round '+id);
                     t.x=q.x+q.vx-t.w/2;t.y=q.y+q.vy-t.h/2;ihfStep(T-fire);
@@ -167,7 +212,7 @@ with sync_playwright() as p:
     }'''))
     print(page.evaluate('''()=>{
         for(const mode of [0,1])for(const left of [false,true]){
-            const expected=mode?['aegisorbit','aegislance','aegisvault','aegiswheel','ascension','starfall']:['recoil','advance','gunvault','rail','skyripper','gunrain'];
+            const expected=mode?['recoil','aegislance','aegisvault','aegiswheel','ascension','starfall']:['recoil','advance','gunvault','rail','skyripper','gunrain'];
             ihfSetup(mode,left);ihfKey('KeyJ');ihfKey('KeyJ',false);ihfStep(10);dashCd=0;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);check(dino.ironhaul.attack?.id===expected[0],'J Dash missing '+mode);ihfStep(70);
             ihfSetup(mode,left);dashCd=0;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);ihfKey('KeyJ');ihfKey('KeyJ',false);check(dino.ironhaul.attack?.id===expected[1],'Dash J missing '+mode);ihfStep(80);
             ihfSetup(mode,left);ihfKey('KeyK');ihfStep(8);dashCd=0;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);ihfKey('KeyK',false);check(dino.ironhaul.attack?.id===expected[2],'K Dash missing '+mode);ihfStep(85);
@@ -176,7 +221,7 @@ with sync_playwright() as p:
             ihfSetup(mode,left);ihfKey('KeyK');ihfStep(8);ihfKey('Space');ihfStep();ihfKey('Space',false);ihfKey('KeyK',false);check(dino.ironhaul.attack?.id===expected[5],'K Jump missing '+mode);ihfStep(90);
             check(!dino.ironhaul.attack,'branch fails to recover');
         }
-        ihfSetup();ihfKey('KeyJ');ihfKey('KeyJ',false);ihfStep(8);dashCd=0;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);ihfStep(22);ihfKey('KeyJ');ihfKey('KeyJ',false);check(dino.ironhaul.attack?.id==='pursuit','J Dash J pursuit missing');
+        ihfSetup();ihfKey('KeyJ');ihfKey('KeyJ',false);ihfStep(8);dashCd=0;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);ihfStep(22);ihfKey('KeyJ');ihfKey('KeyJ',false);check(dino.ironhaul.attack?.id==='recoil'&&dino.ironhaul.queue?.follow==='pursuit','J Dash J did not buffer rear spin');ihfStep(12);check(dino.ironhaul.attack?.id==='pursuit','J Dash J pursuit missing');
         ihfSetup();ihfKey('KeyK');ihfStep(8);dashCd=0;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);ihfKey('KeyK',false);ihfStep(26);ihfKey('KeyK');ihfKey('KeyK',false);check(dino.ironhaul.attack?.id==='rail','K Dash K rail missing');
         for(const mode of [0,1]){
             ihfSetup(mode);const seq=mode?['silvercut','spin','silverbloom','silvercross','sovereign']:['cut','rise','cross','thrust','execution'];

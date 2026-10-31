@@ -1,5 +1,5 @@
 // PLAYER_FILE: PlayerMovement
-// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
+// PLAYER_SNAPSHOT: bae52db6534a8318283b8c7d74ac1420b52adb74ae335721bf4bc7249c2da3be
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
@@ -67,7 +67,7 @@ _updateGoc() {
                 this.tickPulsar();
                 if (this.jcState) { this.updateJC(); return; }
                 let sScale = this.getFormScale();
-                let crouchKey = keys['KeyS'] || keys['ArrowDown'];
+                let crouchKey = keys['KeyS'] || keys['ArrowDown'] || (this.id===1&&typeof ironOn==='function'&&ironOn()&&this.ironhaul?.attack?.move.low);
                 let fireKey = keys['KeyJ'];
                 let chargeKey = keys['KeyK'];
                 if (this.id === 1 && ((typeof xBat === 'function' && xBat()) || danteOn() || (typeof vergilOn==='function'&&vergilOn()) || (typeof ironOn==='function'&&ironOn()))){ fireKey = false; chargeKey = false; }

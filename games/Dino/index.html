@@ -47954,7 +47954,7 @@ class PulsarCloneBoss {
                 this.tickPulsar();
                 if (this.jcState) { this.updateJC(); return; }
                 let sScale = this.getFormScale();
-                let crouchKey = keys['KeyS'] || keys['ArrowDown'];
+                let crouchKey = keys['KeyS'] || keys['ArrowDown'] || (this.id===1&&typeof ironOn==='function'&&ironOn()&&this.ironhaul?.attack?.move.low);
                 let fireKey = keys['KeyJ'];
                 let chargeKey = keys['KeyK'];
                 if (this.id === 1 && ((typeof xBat === 'function' && xBat()) || danteOn() || (typeof vergilOn==='function'&&vergilOn()) || (typeof ironOn==='function'&&ironOn()))){ fireKey = false; chargeKey = false; }
@@ -115571,15 +115571,15 @@ const IRON_PLAYER_MOVES={
     // 4. CƠ ĐỘNG NHÀO LỘN CHIẾN THUẬT (J/K + DASH & JUMP):
     // =========================================================================
     recoil:{
-        name:'RECOIL SLASH · LÙI BẮN',T:34,cancel:20,state:'ih_gunblade',offset:14,
-        sword:[[16,'cut',170,13,4]],shots:[6,12],round:'bullet',power:2.2,step:[1,14,-6.5],followJ:'pursuit',link:10,
-        motion:'back_flip',jet:3
+        name:'VAULT STAB · LỘN LÊN ĐÂM XUỐNG',T:48,cancel:40,state:'ih_skyfall',offset:0,
+        jump:[2,-7.8],sword:[[20,'downthrust',180,14,4.5]],step:[2,16,8],diveAt:16,waitLand:true,followJ:'pursuit',link:34,
+        motion:'vault_stab',jet:3
     },
     pursuit:{
-        name:'FULL BURN · TRUY KÍCH ĐÓNG CỌC',T:38,cancel:26,state:'ih_flank',offset:40,
-        sword:[[10,'rise',175,13,4.5],[22,'cut',195,15,6]],bunker:[23,115,4.5],step:[1,22,9.5],finish:true,
-        motion:'front_flip',jet:3
+        name:'REAR REAVER · VÒNG LƯNG XOAY TRẢM',T:42,cancel:36,state:'ih_reversal',offset:0,
+        sword:[[18,'spin',175,16,6]],flank:true,finish:true,motion:'rear_spin',jet:3
     },
+    lowcut:{name:'LOW REAVER · CHÉM QUÉT TẦM CÚI',T:28,cancel:18,state:'ih_combo',offset:18,sword:[[7,'low',155,14,4]],low:true,motion:'low_cut'},
     rail:{name:'SLIDING RAILGUN · TRƯỢT BẮN XUYÊN GIÁP',T:34,cancel:22,state:'ih_gunblade',offset:14,shots:[10,18],round:'rail',power:4.5,step:[2,16,6],motion:'low_slide',jet:2},
     gunvault:{
         name:'THRUSTER VAULT · BẬT NHẢY BẮN TRẢ',T:40,cancel:26,state:'ih_gunblade',offset:10,
@@ -115685,7 +115685,7 @@ function ironInit(n){
         lastDash:-1000,lastJ:-1000,lastK:-1000,
         silver:0,silverMax:720,silverReturn:0,silverFinishing:false,novaReady:0,
         rounds:[],fx:[],trails:[],ghosts:[],jets:[],bunkers:[],shells:[],
-        shieldOut:0,transition:0,lastX:n.x,gait:0,hitstop:0,driveSpeed:0,driveDistance:0,driveHeading:n.isFacingLeft?-1:1,driveDir:0,driveGuardUntil:-100,driveArmed:true,driveDashUntil:-100,driveHits:new Map()
+        shieldOut:0,transition:0,lastX:n.x,gait:0,hitstop:0,driveSpeed:0,driveDistance:0,driveHeading:n.isFacingLeft?-1:1,driveDir:0,driveGuardUntil:-100,driveShield:false,driveArmed:true,driveDashUntil:-100,driveHits:new Map(),truckAir:false,truckDrop:0
     };
     ultCharge=dojoMode?100:0;
 }
@@ -115710,7 +115710,7 @@ function ironWhite(p){return p.mode===1&&(p.silver>0||p.silverFinishing);}
 function ironResetDrive(n){
     const p=n.ironhaul;if(!p)return;
     p.driveSpeed=0;p.driveDistance=0;p.driveDir=0;p.driveHeading=n.isFacingLeft?-1:1;
-    p.driveGuardUntil=p.driveDashUntil=-100;p.driveArmed=true;p.driveHits=new Map();dashVx=0;
+    p.driveGuardUntil=p.driveGuardUntil>frames?p.driveGuardUntil:-100;p.driveDashUntil=-100;p.driveShield=false;p.driveArmed=true;p.driveHits=new Map();p.truckAir=false;p.truckAirFrames=0;p.truckDrop=0;dashVx=0;
 }
 function ironDriveMove(n,mv){
     const p=n.ironhaul;p.driveFrom=n.x;dashVx=0;
@@ -115720,14 +115720,15 @@ function ironDriveMove(n,mv){
     if(!input){
         p.driveDistance=0;p.driveArmed=true;p.driveForward=boost;
         if(!boost)p.driveSpeed*=.6;
+        if(Math.abs(p.driveSpeed)<IRON_DRIVE_MAX*.9)p.driveShield=false;
         if(Math.abs(p.driveSpeed)<.2)p.driveSpeed=0;
         return p.driveSpeed;
     }
     const reverse=lock&&input!==heading;
     if(input!==p.driveDir||reverse!==p.driveReverse){
         p.driveDistance=0;p.driveArmed=!boost;
-        if(!boost)p.driveSpeed=0;
-        if(reverse)p.driveGuardUntil=-100;
+        if(!boost){p.driveSpeed=0;p.driveShield=false;}
+        if(reverse)p.driveShield=false;
     }
     p.driveDir=input;p.driveReverse=reverse;p.driveForward=!reverse;
     if(!reverse)p.driveHeading=input;
@@ -115742,17 +115743,26 @@ function ironDriveMoved(n){
     if(p.driveForward&&p.driveDir&&Math.sign(dx)===p.driveDir){
         p.driveDistance=Math.min(IRON_DRIVE_RUNUP,p.driveDistance+Math.abs(dx));
         if(p.driveArmed&&p.driveDistance>=IRON_DRIVE_RUNUP*.86&&Math.abs(p.driveSpeed)>=IRON_DRIVE_MAX*.9){
-            p.driveGuardUntil=frames+18;p.driveArmed=false;
+            p.driveShield=true;p.driveArmed=false;
         }
     }
-    if(p.driveForward&&Math.abs(dx)>=IRON_DRIVE_MAX*.85){
-        const box={x:Math.min(p.driveFrom,n.x),y:n.y,w:n.w+Math.abs(dx),h:n.h};
+    if(p.driveForward&&Math.abs(dx)>=1){
+        const box={x:p.driveHeading>0?p.driveFrom+n.w-10:n.x,y:n.y,w:10+Math.abs(dx),h:n.h};
         for(const o of ironTargets(n)){
             const root=o.__goc||o;
-            if(checkAABB(box,o)&&frames-(p.driveHits.get(root)??-1000)>=30){p.driveHits.set(root,frames);ironDamage(n,o,3,{dir:p.driveHeading,move:{finish:true}});}
+            if(checkAABB(box,o)&&frames-(p.driveHits.get(root)??-1000)>=30)ironDriveImpact(n,o);
         }
         for(const [o,at]of p.driveHits)if(frames-at>90)p.driveHits.delete(o);
     }
+}
+function ironDriveImpact(n,o){
+    const p=n.ironhaul,root=o.__goc||o,fast=Math.abs(p.driveSpeed)>=IRON_DRIVE_MAX*.9||frames<p.driveDashUntil;
+    const dealt=ironDamage(n,o,fast?6.5:3,{dir:p.driveHeading,move:{finish:fast}});
+    if(dealt>0){
+        p.driveHits.set(root,frames);
+        if(fast&&p.driveShield){p.driveShield=false;p.driveGuardUntil=frames+10;}
+    }
+    return dealt;
 }
 function ironDriveDash(n,forced){
     const p=n.ironhaul;if(dashCd>0||n.webTimer>0||n.jcState||paused||gameOver||gameVictory)return;
@@ -115760,12 +115770,12 @@ function ironDriveDash(n,forced){
     ironCancel(n);p.guardUntil=p.perfectUntil=-100;p.lastDash=frames;
     p.driveHeading=p.driveDir=dir;p.driveReverse=false;p.driveForward=true;
     p.driveSpeed=dir*IRON_DRIVE_MAX;p.driveDistance=IRON_DRIVE_RUNUP;p.driveDashUntil=frames+8;
-    p.driveGuardUntil=frames+18;p.driveArmed=false;p.driveHits=new Map();
+    p.driveShield=true;p.driveGuardUntil=-100;p.driveArmed=false;p.driveHits=new Map();
     n.isFacingLeft=dir<0;n.dashDir=dir;dashVx=0;dashCd=34;p.transition=8;
     return true;
 }
 function ironCapture(n,duration=12){
-    const p=n.ironhaul;if(!p)return;const b=ironBody(n),t=ironhaulRig(b).targets;
+    const p=n.ironhaul;if(!p)return;const b=ironBody(n),t=(b.rigPose||ironhaulRig(b)).targets;
     const targets={...t,swordTarget:{...t.swordTarget},offTarget:{...t.offTarget}};
     if(b.playerCrouch){targets.swordTarget.y-=36;targets.offTarget.y-=36;}
     p.follow={at:frames,targets,duration};
@@ -115779,7 +115789,7 @@ function ironSilverStart(n=dino){
 function ironSilverEnd(n=dino){const p=n.ironhaul;if(!p)return;p.silver=0;p.silverFinishing=false;ironMode(n,p.silverReturn===2?2:0);ultCharge=0;}
 function ironPower(p,base,a){return (ironWhite(p)?base*1.5+1:base)*(a?.finisherPower||1);}
 function ironLabel(s){floatingTexts.push(new FloatingText(dino.x-25,dino.y-25,s));}
-// Compact body motion for normal moves. Only the ultimate performs a full somersault.
+// Compact normal attacks; full turns belong to the vault-stab route and ultimate.
 function ironComputeKinematics(n,p,a){
     if(!a||p.mode===2)return {rot:0,lean:0,scaleX:1,offX:0,offY:0,spearCone:0,drillSpin:0};
     const m=a.move,u=Math.max(0,Math.min(1,a.age/Math.max(1,m.T)));
@@ -115788,6 +115798,16 @@ function ironComputeKinematics(n,p,a){
     let rot=0,lean=0,scaleX=1,offX=0,offY=0,spearCone=0,drillSpin=0;
 
     switch(m.motion){
+        case 'vault_stab':
+            rot=dir*ironhaulEase(Math.min(1,a.age/18))*Math.PI*2;
+            offY=-5*sinU;
+            break;
+        case 'rear_spin':
+            rot=dir*ironhaulEase(Math.max(0,Math.min(1,(a.age-18)/16)))*Math.PI*2;
+            break;
+        case 'low_cut':
+            lean=.06*sinU;
+            break;
         case 'deep_thrust': // Nhịp 2 (J2) & Bash: Hạ thấp trọng tâm, chồm mạnh thân người về trước và đâm thẳng mũi kiếm như mũi giáo phản lực!
             lean=0.38*sinU;
             offX=dir*16*sinU;
@@ -115879,6 +115899,13 @@ function ironBody(n){
     b.followPose=p.follow;b.playerBlend=true;b.playerReach=p.reach??112;if(ironWhite(p))b.coreBuff=Math.max(1,p.core||0);
     if(b.vehicle&&a?.move.round==='shell')b.state='ih_cannon';
     const target=ironTarget(n);b.lockX=(target?target.x+target.w/2:n.x+(n.isFacingLeft?-200:200))/scale;b.lockY=(target?target.y+target.h/2:n.y+n.h/2)/scale;
+    if(a?.slash&&['low','downthrust','spin'].includes(a.slash.kind)){
+        const r=ironhaulRig(b),kind=a.slash.kind,angle=a.slash.angle;
+        const goal=kind==='low'?{x:70,y:-55}:kind==='downthrust'?{x:55,y:-65}:{x:75,y:-100};
+        const arm=ironhaulIK(r.sword.root,goal,34,35,1);arm.angle=angle;
+        arm.hand={x:arm.end.x+Math.cos(angle)*11,y:arm.end.y+Math.sin(angle)*11};
+        r.sword=arm;r.targets.swordTarget={...goal};r.targets.blade=angle;b.rigPose=r;
+    }
     // Aim the player's actual arm/barrel in world space, independently of sword poses.
     if(!b.vehicle&&!b.silver&&(p.k!==null||['bullet','rail','shell','shell_burst'].includes(a?.move.round))){
         const r=ironhaulRig(b),m=ironKinematicsMatrix(b,n.x+n.w/2,n.y+n.h/2),det=m.a*m.d-m.b*m.c;
@@ -115931,6 +115958,9 @@ function ironBegin(id,n=dino){
     if(!['cut','rise','cross','thrust','execution','silvercut','spin','silverbloom','silvercross','sovereign'].includes(id))p.combo=0;
     ironCapture(n,10);
     p.attack={id,move:m,age:0,dir:n.isFacingLeft?-1:1,slash:null,shield:null,hits:new Set(),before,input:null,airWait:0};p.k=null;
+    if(id==='recoil'||m.flank){
+        p.attack.target=ironTarget(n);p.attack.from={x:n.x,feet:n.y+n.h};
+    }
     if(m.ultimate){p.attack.finisherPower=.9+2.7*p.silver/p.silverMax;p.silverFinishing=true;p.silver=0;ultCharge=0;n.invincible=true;n.invTimer=Math.max(n.invTimer,18);}
     if(id==='charge')p.coreReady=720;
     if(id==='nova')p.novaReady=360;
@@ -115997,7 +116027,11 @@ function ironCommand(key,n=dino,charge=0,downOverride){
     if(key==='J')p.lastJ=frames;else if(key==='K')p.lastK=frames;
     if(p.attack){
         const a=p.attack,link=key==='J'?a.move.followJ:a.move.followK;
-        if(link&&a.age>=(a.move.link||10)){ironCancel(n);ironBegin(link,n);if(p.attack)p.attack.input=key;return;}
+        if(link){
+            if(a.age>=(a.move.link||10)&&(!a.move.waitLand||n.grounded)){ironCancel(n);ironBegin(link,n);if(p.attack)p.attack.input=key;}
+            else p.queue={key,charge,down:downOverride??!!(keys.KeyS||keys.ArrowDown),follow:link,until:frames+a.move.T+90};
+            return;
+        }
         // HỆ THỐNG COMBO B CƠ KHÍ: Đang chém J nhịp 1/2/3 mà bấm K -> Chuyển ngay sang Pháo Kích Gunblade / Đột Cọc Pile Bunker!
         if(key==='K'&&['cut','rise','cross'].includes(a.id)&&a.age>=6){
             const down=downOverride??!!(keys.KeyS||keys.ArrowDown);
@@ -116022,8 +116056,8 @@ function ironCommand(key,n=dino,charge=0,downOverride){
     let id;
     if(key==='J'){
         if(p.mode===2)id=dash?'ram':'gatling';
+        else if(down)id='lowcut';
         else if(dash){id=ironWhite(p)?'aegislance':'advance';p.lastDash=-1000;}
-        else if(down)id=ironWhite(p)?'bash':'upper';
         else if(!n.grounded&&!(p.combo>0&&frames-p.ended<=44)){id=(p.airCombo++%2)?'aircross':'air';}
         else{
             if(frames-p.ended>44)p.combo=0;
@@ -116072,8 +116106,8 @@ doDash=function(...args){
     const old=dashCd,result=ironDashBase.apply(this,args);
     if(p&&dashCd>old&&Math.abs(dashVx)>1&&!a?.move.ultimate){
         ironCancel();p.lastDash=frames;
-        const id=p.mode===2?(source==='K'?'broadside':'ram'):source==='J'?(ironWhite(p)?'aegisorbit':'recoil'):source==='K'?(ironWhite(p)?'aegisvault':'gunvault'):null;
-        if(id){ironBegin(id);if(p.attack){p.attack.input=null;if(['recoil','gunvault','aegisorbit'].includes(id))dashVx=-p.attack.dir*Math.max(10,Math.abs(dashVx));}}
+        const id=p.mode===2?(source==='K'?'broadside':'ram'):source==='J'?'recoil':source==='K'?(ironWhite(p)?'aegisvault':'gunvault'):null;
+        if(id){ironBegin(id);if(p.attack){p.attack.input=null;if(id==='recoil')dashVx=0;else if(['gunvault','aegisorbit'].includes(id))dashVx=-p.attack.dir*Math.max(10,Math.abs(dashVx));}}
     }return result;
 };
 const ironGuardBase=Player.prototype.isShielding;
@@ -116166,8 +116200,31 @@ function ironRoundTick(n){
     }
     p.rounds=p.rounds.filter(q=>q.life>0);p.shieldOut=p.rounds.some(q=>q.kind==='shield')?1:0;
 }
+function ironFlankStep(n,a){
+    if(!a.flankGoal){
+        const t=a.target,dir=a.dir,goal=t&&t.hp>0&&!t._beamClashPoint?(dir>0?t.x+t.w+18:t.x-n.w-18):a.from.x+dir*90;
+        a.flankGoal={x:Math.max(worldL(),Math.min(worldR()-n.w,Math.max(a.from.x-3*CM,Math.min(a.from.x+3*CM,goal)))),dir:-dir};
+    }
+    if(a.age<=16){
+        const u=ironhaulEase(a.age/16),old=n.x;
+        n.x=ironhaulMix(a.from.x,a.flankGoal.x,u);
+        if(mapTheme==='tetris')resolveTetrisWalls(n,n.x-old);else resolveSolidPillars(n);
+        n.y=a.from.feet-Math.sin(a.age/16*Math.PI)*28-n.h;n.dy=0;n.grounded=false;
+    }else if(a.age===17){a.dir=a.flankGoal.dir;n.isFacingLeft=a.dir<0;n.dy=.5;}
+}
+function ironTruckLanding(n){
+    const p=n.ironhaul;if(p.mode!==2||n._fallRecovery){p.truckAir=false;p.truckAirFrames=0;p.truckDrop=0;return;}
+    if(!n.grounded){p.truckAir=true;p.truckAirFrames=(p.truckAirFrames||0)+1;p.truckDrop=Math.max(p.truckDrop||0,n.dy);return;}
+    if(p.truckAir&&p.truckAirFrames>=3&&p.truckDrop>2){
+        const radius=100,damage=Math.min(7,3+Math.floor(p.truckDrop/3)),x=n.x+n.w/2,y=n.y+n.h;
+        for(const o of ironTargets(n))if(Math.hypot(Math.max(o.x,Math.min(x,o.x+o.w))-x,Math.max(o.y,Math.min(y,o.y+o.h))-y)<=radius)ironDamage(n,o,damage,{ultimate:false});
+        p.fx.push({x,y,r:radius,t:20,max:20});shakeTimer=Math.max(shakeTimer,7);SFX.tone(110,.1,'sawtooth',.1,55);
+    }
+    p.truckAir=false;p.truckAirFrames=0;p.truckDrop=0;
+}
 function ironTick(){
     if(!ironActive())return;const n=dino;if(!n.ironhaul)ironInit(n);const p=n.ironhaul;
+    ironTruckLanding(n);
     n.parryWindow=Math.max(0,p.perfectUntil-frames);n.meleeTimer=Math.max(0,Math.min(n.meleeTimer,p.guardUntil-frames));if(frames>=p.perfectUntil)n.meleeTimer=Math.min(22,n.meleeTimer);
     if(p.silver>0&&!p.silverFinishing){p.silver--;ultCharge=0;if(!p.silver)ironSilverEnd(n);}
     if(p.novaReady>0)p.novaReady--;
@@ -116200,14 +116257,17 @@ function ironTick(){
             });
         }
         if(m.jump&&a.age===m.jump[0]){n.dy=m.jump[1];n.grounded=false;}
+        if(m.diveAt&&a.age>=m.diveAt&&!n.grounded)n.dy=Math.max(11,n.dy);
+        if(m.flank)ironFlankStep(n,a);
         if(m.airSlow&&a.age<=m.airSlow&&!n.grounded)n.dy=Math.min(n.dy,.55);
         if(m.plunge&&a.age>=14&&!n.grounded)n.dy=Math.max(14,n.dy);
         if(p.mode!==2&&m.step&&a.age>=m.step[0]&&a.age<=m.step[1]){
             const x=n.x,target=ironTarget(n);let travel=m.step[2];
-            if(travel>0&&!m.ram&&target)travel=Math.min(travel,Math.max(0,(target.x+target.w/2-n.x-n.w/2)*a.dir-52));
+            if(m.waitLand&&a.target?.hp>0)travel=Math.max(-travel,Math.min(travel,(a.target.x+a.target.w/2-n.x-n.w/2)*a.dir));
+            else if(travel>0&&!m.ram&&target)travel=Math.min(travel,Math.max(0,(target.x+target.w/2-n.x-n.w/2)*a.dir-52));
             n.x=Math.max(worldL(),Math.min(worldR()-n.w,n.x+a.dir*travel));if(mapTheme==='tetris')resolveTetrisWalls(n,n.x-x);else resolveSolidPillars(n);
         }
-        for(const beat of m.sword||[])if(a.age===beat[0]){ironCapture(n,6);const [at,kind,reach,life,damage]=beat,angles=kind==='rise'?[.52,-1.9]:kind==='thrust'?[-.12,.08]:[-2.2,.65];a.slash={kind,reach:reach*(ironWhite(p)?1.14:1),life,age:0,a0:angles[0],a1:angles[1],angle:angles[0],damage:ironPower(p,damage+(p.core?1:0),a),hit:new Set()};}
+        for(const beat of m.sword||[])if(a.age===beat[0]){ironCapture(n,6);const [at,kind,reach,life,damage]=beat,angles=kind==='rise'?[.52,-1.9]:kind==='thrust'?[-.12,.08]:kind==='downthrust'?[1.5,1.64]:kind==='low'?[-.08,.08]:kind==='spin'?[0,0]:[-2.2,.65];a.slash={kind,reach:reach*(ironWhite(p)?1.14:1),life,age:0,a0:angles[0],a1:angles[1],angle:angles[0],damage:ironPower(p,damage+(p.core?1:0),a),hit:new Set()};}
         for(const beat of m.shield||[])if(a.age===beat[0]){ironCapture(n,6);a.shield={kind:beat[1],age:0,life:beat[2],damage:ironPower(p,beat[3],a),hit:new Set()};}
         if(a.slash){const s=a.slash;s.age++;s.angle=s.a0+(s.a1-s.a0)*ironhaulEase(s.age/s.life);}
         if(a.shield)a.shield.age++;
@@ -116229,7 +116289,7 @@ function ironTick(){
         for(const o of ironTargets(n)){const root=o.__goc||o,s=a.slash,h=a.shield;
             if(s&&!s.hit.has(root))for(let k=0;k<=6;k++){const u=k/6;if(sgSegmentBox(ironhaulMix(old.grip.x,g.grip.x,u),ironhaulMix(old.grip.y,g.grip.y,u),ironhaulMix(old.tip.x,g.tip.x,u),ironhaulMix(old.tip.y,g.tip.y,u),o,6)!==null){s.hit.add(root);ironDamage(n,o,s.damage,a);break;}}
             if(h&&!p.shieldOut&&!h.hit.has(root)&&h.age>=h.life*.15&&h.age<=h.life*.92&&(checkAABB(g.shieldBox,o)||sgSegmentBox(old.shield.x,old.shield.y,g.shield.x,g.shield.y,o,10)!==null)){h.hit.add(root);ironDamage(n,o,h.damage,a);}
-            if(m.ram&&a.age>=2&&a.age<=26&&!a.hits.has(root)&&checkAABB(n,o)){a.hits.add(root);ironDamage(n,o,6.5,a);}
+            if(m.ram&&a.age>=2&&a.age<=26&&!a.hits.has(root)&&checkAABB(n,o)){a.hits.add(root);if(frames-(p.driveHits.get(root)??-1000)>=30)ironDriveImpact(n,o);}
         }
         if(a.slash){
             p.trails.push({grip:{...old.grip},tip:{...old.tip},toGrip:{...g.grip},toTip:{...g.tip},white:ironWhite(p),core:p.core>0,t:10});
@@ -116248,8 +116308,10 @@ function ironTick(){
         if(m.nova&&a.age===m.nova[0])ironArea(n,m.nova[1],m.nova[2],a);
         if(m.plunge&&a.age>=14&&n.grounded&&!a.landed){a.landed=true;ironArea(n,6.5,84,a);}
         if(m.ultimate&&a.age===92)ironArea(n,14,155,a);
-        if(m.plunge&&!a.landed&&a.age>=m.T&&!(++a.airWait>90))a.age=m.T-1;
-        if(a.age>=m.T){ironCapture(n,8);p.attack=null;p.ended=frames;const queued=p.queue;p.queue=null;if(m.ultimate)ironSilverEnd(n);else if(queued&&frames<=queued.until)ironCommand(queued.key,n,queued.charge,queued.down);}
+        if((m.plunge&&!a.landed||m.waitLand&&!n.grounded)&&a.age>=m.T&&!(++a.airWait>90))a.age=m.T-1;
+        const follow=p.queue?.follow&&a.age>=(m.link||10)&&(!m.waitLand||n.grounded)?p.queue:null;
+        if(follow){ironCancel(n);ironBegin(follow.follow,n);if(p.attack)p.attack.input=follow.key;}
+        else if(a.age>=m.T){ironCapture(n,8);p.attack=null;p.ended=frames;const queued=p.queue;p.queue=null;if(m.ultimate)ironSilverEnd(n);else if(queued&&!queued.follow&&frames<=queued.until)ironCommand(queued.key,n,queued.charge,queued.down);}
     }
     const dx=n.x-p.lastX;
     if((Math.abs(dx)>6||p.attack?.move.jet>=3)&&frames%3===0){const b=ironBody(n);b.rigPose=b.rigPose||ironhaulRig(b);p.ghosts.push({body:b,cx:n.x+n.w/2,cy:n.y+n.h/2,t:10});}
@@ -116258,7 +116320,7 @@ function ironTick(){
 }
 const ironCombatBase=danteTick;danteTick=function(){ironCombatBase();ironTick();};
 const ironDamageBase=Player.prototype.takeDamage;
-Player.prototype.takeDamage=function(...args){if(ironActive(this)&&this.ironhaul?.mode===2&&frames<this.ironhaul.driveGuardUntil)return;const hp=this.hp,result=ironDamageBase.apply(this,args);if(ironOn()&&this===dino&&this.ironhaul&&this.hp<hp){const p=this.ironhaul,a=p.attack;ironResetDrive(this);ironCancel(this);p.counter=0;p.combo=0;if(a?.move.ultimate)ironSilverEnd(this);}return result;};
+Player.prototype.takeDamage=function(...args){if(ironActive(this)&&this.ironhaul?.mode===2&&(this.ironhaul.driveShield||frames<this.ironhaul.driveGuardUntil))return;const hp=this.hp,result=ironDamageBase.apply(this,args);if(ironOn()&&this===dino&&this.ironhaul&&this.hp<hp){const p=this.ironhaul,a=p.attack;ironResetDrive(this);ironCancel(this);p.counter=0;p.combo=0;if(a?.move.ultimate)ironSilverEnd(this);}return result;};
 // Helper vẽ thân Robot có áp dụng Động Học Nhào Lộn / Đâm Lao / Xoay 360 (Kinematics Transform)
 function ironRenderBodyWithKinematics(b,cx,cy){
     const m=ironKinematicsMatrix(b,cx,cy);
@@ -116497,7 +116559,7 @@ function ironDraw(n){
     }
 
     for(const f of p.fx){ctx.save();ctx.globalAlpha=f.t/f.max;ctx.strokeStyle='#b4f5ff';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(f.x,f.y,f.r*(1-f.t/f.max*.6),f.r*.5*(1-f.t/f.max*.6),0,0,7);ctx.stroke();ctx.restore();}
-    if(p.mode===2&&frames<p.driveGuardUntil){ctx.save();ctx.strokeStyle='#aaf7ff';ctx.lineWidth=3;ctx.shadowColor='#55dcff';ctx.shadowBlur=12;ctx.translate(cx+dir*n.w*.44,cy);ctx.scale(dir,1);ctx.beginPath();ctx.ellipse(0,0,10,n.h*.65,0,-Math.PI/2,Math.PI/2);ctx.stroke();ctx.restore();}
+    if(p.mode===2&&(p.driveShield||frames<p.driveGuardUntil)){ctx.save();ctx.strokeStyle='#aaf7ff';ctx.lineWidth=3;ctx.shadowColor='#55dcff';ctx.shadowBlur=12;ctx.translate(cx+dir*n.w*.44,cy);ctx.scale(dir,1);ctx.beginPath();ctx.ellipse(0,0,10,n.h*.65,0,-Math.PI/2,Math.PI/2);ctx.stroke();ctx.restore();}
     if(p.mode===2&&Math.abs(p.driveSpeed)>8){ctx.save();ctx.strokeStyle='#94cfee';ctx.globalAlpha=.5;ctx.lineWidth=2;for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(cx-dir*50,cy-8+i*8);ctx.lineTo(cx-dir*(68+Math.abs(p.driveSpeed)*i),cy-8+i*8);ctx.stroke();}ctx.restore();}
     if(frames<p.guardUntil){ctx.save();ctx.strokeStyle=frames<p.perfectUntil?'#fff6c4':'#9de8ff';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(cx,cy,n.w*.82,n.h*.6,0,0,7);ctx.stroke();ctx.restore();}
     if(p.k!==null){ctx.save();ctx.strokeStyle=p.k>=32?'#fff5b5':'#80ddff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,cy,26,0,Math.PI*2*Math.min(1,p.k/32));ctx.stroke();ctx.restore();}
@@ -116515,7 +116577,7 @@ drawUI=function(){
     ironUiBase();if(!ironOn()||!dino.ironhaul)return;const p=dino.ironhaul,white=ironWhite(p);
     ctx.save();if(dojoMode)ctx.translate(0,15);ctx.fillStyle='#101e2c';ctx.fillRect(10,45,308,150);ctx.textAlign='left';ctx.font='bold 13px Consolas';ctx.fillStyle=white?'#efffff':'#b8edfa';ctx.fillText('IRONHAUL · '+IRON_MODES[p.mode],20,65);
     ctx.font='11px Consolas';ctx.fillStyle='#e1edf2';ctx.fillText(white?'SILVER AEGIS · '+(p.silverFinishing?'FINAL DISCHARGE':(p.silver/60).toFixed(1)+'s'):p.mode===2?'A/D: LÁI · S + NGƯỢC: LÙI · DASH: NITRO':'Q/E: ROBOT / TRUCK · J×5: COMBO',20,85);
-    formAmmoSummary(p.mode===2?'TỐC ĐỘ '+Math.round(Math.abs(p.driveSpeed)/IRON_DRIVE_MAX*100)+'% · '+(frames<p.driveGuardUntil?'GIÁP XUNG KÍCH':p.driveReverse?'SỐ LÙI':Math.round(p.driveDistance/IRON_DRIVE_RUNUP*100)+'% ĐÀ'):p.attack?.move.name||(p.k!==null?'GIỮ K: PHÁO TAM LIÊN':'J DASH / DASH J · K DASH / DASH K'),20,105,284,13);
+    formAmmoSummary(p.mode===2?'TỐC ĐỘ '+Math.round(Math.abs(p.driveSpeed)/IRON_DRIVE_MAX*100)+'% · '+(p.driveShield?'KHIÊN XUNG KÍCH':frames<p.driveGuardUntil?'IFRAME SAU VA CHẠM':p.driveReverse?'SỐ LÙI':Math.round(p.driveDistance/IRON_DRIVE_RUNUP*100)+'% ĐÀ'):p.attack?.move.name||(p.k!==null?'GIỮ K: PHÁO TAM LIÊN':'J DASH / DASH J · K DASH / DASH K'),20,105,284,13);
     ctx.fillText(white?'I: NOVA · O: SOVEREIGN · U: ĐÒN KẾT':p.core?'KIẾM CƯỜNG HÓA: '+(p.core/60).toFixed(1)+'s':'I: LÕI '+(p.coreReady?Math.ceil(p.coreReady/60)+'s':'SẴN SÀNG')+' · O: ĐÒN NẶNG',20,133);
     ctx.fillStyle='#294355';ctx.fillRect(20,146,282,8);ctx.fillStyle=white?'#ecffff':'#a8efff';ctx.fillRect(20,146,282*(white?(p.silverFinishing?0:p.silver/p.silverMax):Math.min(100,ultCharge)/100),8);ctx.fillStyle='#fff';ctx.fillText(white?'U: DỒN THỜI GIAN CÒN LẠI → AEGIS BREAKER':'U: SILVER AEGIS 12s · '+Math.floor(ultCharge)+'%',20,178);ctx.restore();
 };
@@ -116523,7 +116585,7 @@ const ironMenuBase=drawCustomMenu;
 drawCustomMenu=function(){
     ironMenuBase();if(!ironOn()||runePicker!==null||battuMa||runeXem||ammoPicker||cusNCPicker||ammoXem!==null)return;
     ctx.save();ctx.fillStyle='#10212e';ctx.fillRect(24,76,276,452);ctx.fillRect(702,80,272,436);ctx.textAlign='left';ctx.fillStyle='#b1edff';ctx.font='bold 21px Consolas';ctx.fillText('IRONHAUL · MECHA',38,108);ctx.fillText('SILVER AEGIS · ULT',716,111);ctx.font='12px Consolas';ctx.fillStyle='#dbeaf2';
-    apexWrap('CƠ GIÁP CHIẾN THUẬT (HEAVY MECHA)\n\n• J ×5: Kiếm Nhiệt → Nổ Cò Súng →\n  Đột Cọc Thủy Lực (Pile Bunker)!\n• Đang chém J bấm K: Pháo Kích\n  Gunblade & Đóng Cọc Cận Chiến!\n• K: Súng máy ngắm mục tiêu / Giữ K:\n  Pháo + 2 tên lửa dẫn đường\n• Dash J: Đột kích phản lực + Cọc\n• Dash K: Pháo Điện Từ (Railgun)\n• J/K + Dash: Lùi bắn & Phóng tên lửa\n• Xe: A/D lái, S + ngược để lùi\n• Dash xe: Nitro, tự do đổi hướng\n• Q/E khi đang đánh: BIẾN HÌNH\n  TÔNG XE / ĐẬP ĐẤT TỨC THÌ!\n• I: Nổ Lõi Overdrive tức thì + Tên lửa\n• O: Đột Cọc Thủy Lực Cực Đại\n• L: Khiên Từ Trường (Perfect -> Phản)',38,140,248,18);
+    apexWrap('CƠ GIÁP CHIẾN THUẬT (HEAVY MECHA)\n\n• J ×5: Kiếm Nhiệt → Nổ Cò Súng →\n  Đột Cọc Thủy Lực (Pile Bunker)!\n• Đang chém J bấm K: Pháo Kích\n  Gunblade & Đóng Cọc Cận Chiến!\n• K: Súng máy ngắm mục tiêu / Giữ K:\n  Pháo + 2 tên lửa dẫn đường\n• Dash J: Đột kích phản lực + Cọc\n• Dash K: Pháo Điện Từ (Railgun)\n• J Dash J: Lộn đâm → Vòng lưng xoay\n• Cúi J: Chém quét ngang tầm thấp\n• Xe: A/D lái, S + ngược để lùi\n• Dash xe: Húc mạnh, tự do đổi hướng\n• Xe nhảy: Đáp đất gây sát thương vùng\n• Q/E khi đang đánh: BIẾN HÌNH\n  TÔNG XE / ĐẬP ĐẤT TỨC THÌ!\n• I: Nổ Lõi Overdrive tức thì + Tên lửa\n• O: Đột Cọc Thủy Lực Cực Đại\n• L: Khiên Từ Trường (Perfect -> Phản)',38,140,248,18);
     apexWrap('SILVER AEGIS (OVERDRIVE 12 GIÂY)\nTriệu hồi Phễu Bay (Bit Funnels) &\nSát thương ×1.5 +1; Kiếm Quang Học.\n\n• J ×5: Quang Trảm → Khiên Xoay →\n  Cross Requiem → Sovereign Array\n  (Bão Kiếm Khí & Mưa Tên Lửa!)\n• Dash J: Thương Ánh Sáng + Cọc Nổ\n• Dash K: Song Luân Khiên + Tên Lửa\n• J/K Jump: Không Chiến Tên Lửa\n• Cúi K / I: Vụ Nổ Lõi Quang Học\n• O: Sovereign Array (Bão Kiếm Khí)\n\n• U LẦN NỮA: AEGIS BREAKER\n  Dồn năng lượng còn lại kích nổ\n  toàn màn hình + Mưa Tên Lửa!',716,142,246,17);ctx.restore();
 };
 const ironGuardMenuBase=drawCustomMenu;drawCustomMenu=function(){ironGuardMenuBase();if(!ironOn()||runePicker!==null||battuMa||runeXem||ammoPicker||cusNCPicker||ammoXem!==null)return;ctx.save();ctx.fillStyle='#120c06';ctx.fillRect(334,388,338,78);ctx.font='bold 13px Consolas';ctx.fillStyle='#b1edff';ctx.textAlign='left';ctx.fillText('GUARD',340,410);ctx.textAlign='center';ctx.fillText('PARRY / COUNTER',548,410);ctx.textAlign='left';ctx.font='11px Consolas';ctx.fillStyle='#90aebe';ctx.fillText('L: Perfect 7f / Silver 9f → phản kích',340,439);ctx.restore();};
