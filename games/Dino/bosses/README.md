@@ -11,6 +11,8 @@
 
 **Chỉ sửa file JS chưa làm game thay đổi.** Sau khi ghép, tải bản `index.html` mới để chơi như trước.
 
+Form người chơi, Rune, đạn và Power có bộ file riêng tại [mục lục người chơi](../PLAYER_FILES.md). Nếu sửa đồng thời Boss và người chơi, gửi các file từ cùng phiên bản để ghép cùng lúc.
+
 Một số file hay dùng:
 
 - [Dante](DanteBoss.js)
@@ -90,13 +92,23 @@ Nếu sửa cả Boss và phần dùng chung, ghép cùng lúc:
 node tools/boss-parts/index.cjs apply DanteBoss BossShared
 ```
 
+Nếu sửa cả file người chơi và Boss, dùng công cụ người chơi để ghép trong một lượt:
+
+```bash
+node tools/player-parts/index.cjs apply IronhaulForm IronhaulBoss
+```
+
+Cả hai lệnh ghép đều làm mới hai bộ snapshot khi chúng tồn tại. Lệnh Boss sẽ từ chối nếu có file người chơi đang sửa chưa được ghép, để bảo vệ bản sửa đó.
+
 Công cụ kiểm tra cú pháp, bản nguồn, vùng chỉ đọc và những file khác đang sửa trước khi ghi; thay đúng các đoạn ở vị trí gốc, rồi cập nhật lại các file tách. Nó không tự chạy hoặc chứng minh được cân bằng/cơ chế game: vẫn cần kiểm tra Boss bằng các bài test phù hợp và chơi thử.
 
 Sau một thay đổi trực tiếp vào HTML, làm mới các bản tách trước khi gửi AI lần sau:
 
 ```bash
 node tools/boss-parts/index.cjs export
+node tools/player-parts/index.cjs export
 node tools/boss-parts/index.cjs check
+node tools/player-parts/index.cjs check
 ```
 
 `export` không sửa HTML và sẽ từ chối ghi đè file tách đang có sửa đổi chưa ghép. File AI trả về từ một snapshot cũ cần được đối chiếu trước khi ghép để giữ các sửa đổi mới hơn. Không sửa `manifest.json` bằng tay.

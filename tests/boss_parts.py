@@ -33,7 +33,7 @@ def edit_part(filename, transform, mode='EDITABLE', label=None):
 
 print(command(REPO, 'check').strip())
 manifest = json.loads((PARTS / 'manifest.json').read_text())
-assert manifest['bossCount'] == 72 and manifest['sourceHash'] == digest(original)
+assert manifest['bossCount'] >= 74 and manifest['sourceHash'] == digest(original)
 for name, expected in {
     'DanteBoss': ['class DanteBoss', 'Object.assign(DanteBoss.prototype', 'startCloseCombo =', 'runSinDrill ='],
     'VergilBoss': ['class VergilBoss', 'Object.assign(VergilBoss.prototype', 'startAttackerString =', 'syncAttackerDoppelganger='],

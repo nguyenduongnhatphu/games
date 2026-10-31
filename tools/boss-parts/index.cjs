@@ -242,13 +242,24 @@ function apply(inputs) {
   }
   const next = build(updated);
   if (next.scripts !== build(html).scripts || next.manifest.files.map(f => f.name).join('|') !== manifest.files.map(f => f.name).join('|')) fail('Bản sửa làm đổi số script hoặc mất class Boss.');
+  let player = null, playerNext = null;
+  if (fs.existsSync(absolute('games/Dino/player-parts/manifest.json'))) {
+    player = require('../player-parts/index.cjs');
+    const pm = JSON.parse(read('games/Dino/player-parts/manifest.json'));
+    const pending = player.dirtyFiles(pm);
+    if (pending.length) fail('Còn file người chơi đang sửa: ' + pending.join(', ') + '. Ghép hoặc đối chiếu chúng trước.');
+    playerNext = player.build(updated);
+    player.validateNext(player.build(html).manifest, playerNext.manifest);
+  }
   fs.writeFileSync(absolute(sourcePath), updated);
   write(next);
+  if (player) player.write(playerNext);
   console.log(`Đã ghép ${changes.size} vùng vào ${sourcePath} và cập nhật toàn bộ file tách.`);
 }
 
 
-try {
+module.exports = {build, write, dirtyFiles, sections, structure, parse};
+if (require.main === module) try {
   const command = args[0] || 'check';
   if (command === 'apply') apply(args.slice(1));
   else if (command === 'export' || command === 'check') {

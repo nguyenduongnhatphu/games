@@ -42,6 +42,8 @@ Game thiên về **khám phá cơ chế** và thử nghiệm build hơn là ch�
 
 ➡️ [Tải từng file JS của Boss để gửi AI chỉnh sửa](games/Dino/bosses/README.md)
 
+➡️ [Tải từng file Form người chơi, Rune, đạn và Power để gửi AI chỉnh sửa](games/Dino/PLAYER_FILES.md)
+
 ### Hướng dẫn nhanh (Dino)
 
 | Mục | Phím / Cách dùng |
