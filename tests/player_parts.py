@@ -29,13 +29,15 @@ def edit(file,label,change,prefix='PLAYER'):
 
 print(command(REPO,'check').strip())
 m=json.loads((REPO/'games/Dino/player-parts/manifest.json').read_text())
+iron_entry=next(f for f in m['files'] if f['group']=='forms/IronhaulForm')
+iron_file=iron_entry['file'];iron_name=iron_entry['name']
 assert m['sourceHash']==digest(original) and len(m['runeIds'])==52
 assert m['ammoSlots']==list(range(21))
 assert len(m['files'])>=100
 for f in m['files']:
     assert (REPO/'games/Dino/player-parts'/f['file']).stat().st_size<70*1024,f['file']
 for file,tokens in {
-    'forms/IronhaulForm.js':['IRON_PLAYER_MOVES','ironSilverStart','skyripper','ironKey'],
+    iron_file:['IRON_PLAYER_MOVES','ironSilverStart','skyripper','ironKey'],
     'forms/ApexObelith.js':['apexCreate','tickObelith','fireObelithBeam'],
     'forms/DanteDSD.js':['DSW_MOVES','dswStrike'],
     'forms/DanteSDT.js':['danteJudgement','danteSinFire'],
@@ -52,11 +54,11 @@ with tempfile.TemporaryDirectory(prefix='dino-player-parts-') as temporary:
     shutil.copytree(REPO/'games/Dino/bosses',source.parent/'bosses')
     parts=source.parent/'player-parts';bosses=source.parent/'bosses'
     command(root,'export');assert source.read_bytes()==original
-    command(root,'apply','IronhaulForm');assert source.read_bytes()==original
+    command(root,'apply',iron_name);assert source.read_bytes()==original
     print('PASS lossless export and no-op import')
 
     # Object expression embedded in the native RUNES array: write only its original span.
-    stale=(parts/'forms/IronhaulForm.js').read_text()
+    stale=(parts/iron_file).read_text()
     hp=parts/'runes/Rune_hp.js'
     before,after=edit(hp,'.hp.',lambda s:s.replace("name:'+4 MÁU'","name:'+5 MÁU'"))
     command(root,'export',ok=False)
@@ -71,15 +73,15 @@ with tempfile.TemporaryDirectory(prefix='dino-player-parts-') as temporary:
     command(root,'apply','PlayerMovement');expected=expected.replace(before,after,1);assert source.read_text()==expected
 
     # New top-level helpers can be inserted inside a normal editable declaration.
-    incoming=root/'IronhaulForm - Gemini.js';incoming.write_text((parts/'forms/IronhaulForm.js').read_text())
+    incoming=root/'IronhaulForm - Gemini.js';incoming.write_text((parts/iron_file).read_text())
     before,after=edit(incoming,'.IRON_PLAYER_MOVES.',lambda s:'function ironPartsProbe(){return 1;}\n'+s)
     command(root,'apply',str(incoming));expected=expected.replace(before,after,1);assert source.read_text()==expected
-    assert 'ironPartsProbe' in (parts/'forms/IronhaulForm.js').read_text()
+    assert 'ironPartsProbe' in (parts/iron_file).read_text()
     print('PASS Rune object, Apex closure, Player class method and added helper round trips')
 
     unchanged=source.read_bytes()
     incoming.write_text(stale);assert 'bản game cũ' in command(root,'apply',str(incoming),ok=False)
-    current=(parts/'forms/IronhaulForm.js').read_text()
+    current=(parts/iron_file).read_text()
     incoming.write_text(current+'\nfunction lostOutside(){}\n');assert 'ngoài marker' in command(root,'apply',str(incoming),ok=False)
     incoming.write_text(current.replace('PLAYER_PART_END','MISSING',1));command(root,'apply',str(incoming),ok=False)
     incoming.write_text(current);edit(incoming,'.ironOn.',lambda s:'const = broken;');command(root,'apply',str(incoming),ok=False)
@@ -109,7 +111,7 @@ with tempfile.TemporaryDirectory(prefix='dino-player-parts-') as temporary:
 
     # A newer HTML can never be overwritten by fragments from an earlier revision.
     source.write_text(source.read_text()+'\n<!-- independent update -->\n');before=source.read_bytes()
-    assert 'index.html đã thay đổi' in command(root,'apply','IronhaulForm',ok=False)
+    assert 'index.html đã thay đổi' in command(root,'apply',iron_name,ok=False)
     assert source.read_bytes()==before
 
 assert SOURCE.read_bytes()==original,'tests changed the shipped game'

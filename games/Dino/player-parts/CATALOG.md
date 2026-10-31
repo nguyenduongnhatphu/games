@@ -30,7 +30,8 @@ Tải file JS bằng **Download raw file**. Xem [hướng dẫn gửi AI và gh�
 | [DanteSDT](forms/DanteSDT.js) | 402 | 23.6 KB |
 | [VergilForm01](forms/VergilForm01.js) | 1376 | 58.8 KB |
 | [VergilForm02](forms/VergilForm02.js) | 715 | 28.9 KB |
-| [IronhaulForm](forms/IronhaulForm.js) | 586 | 41.4 KB |
+| [IronhaulForm01](forms/IronhaulForm01.js) | 966 | 58.1 KB |
+| [IronhaulForm02](forms/IronhaulForm02.js) | 17 | 1.0 KB |
 
 ## Đạn / vũ khí
 

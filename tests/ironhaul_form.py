@@ -43,7 +43,7 @@ with sync_playwright() as p:
     print(page.evaluate('''()=>{
         let count=0;
         for(const mode of [0,1,2])for(const left of [false,true]){
-            const ids=mode===0?['cut','rise','cross','thrust','execution','upper','advance','cleaver','gun','cannon','barrage','air','charge','recoil','pursuit','rail','gunvault','skyripper','gunrain','aircross','plunge']:mode===1?['silvercut','spin','silverfinish','throw','bash','shieldrush','reversal','riposte','air','silverbloom','silvercross','sovereign','aegislance','aegisorbit','aegiswheel','aegisvault','ascension','starfall','nova']:['gatling','truckcannon','ram','cannon','barrage','broadside'];
+            const ids=mode===0?['cut','rise','cross','thrust','execution','upper','advance','cleaver','gun','cannon','barrage','air','charge','recoil','pursuit','rail','gunvault','skyripper','gunrain','aircross','plunge','gunslash','morphslam']:mode===1?['silvercut','spin','silverfinish','throw','bash','shieldrush','reversal','riposte','air','silverbloom','silvercross','sovereign','aegislance','aegisorbit','aegiswheel','aegisvault','ascension','starfall','nova']:['gatling','truckcannon','ram','cannon','barrage','broadside'];
             for(const id of ids){const t=ihfSetup(mode,left);check(ironBegin(id),'cannot start '+id);const T=IRON_PLAYER_MOVES[id].T;ihfStep(T);
                 check(!dino.ironhaul.attack,'move stuck '+id);check(!projectiles.length&&!bossProjectiles.length,'enemy or base Dino bullets leaked '+id);
                 if(id!=='charge')check(t.hp<10000,'no friendly damage '+mode+' '+left+' '+id);
@@ -51,6 +51,27 @@ with sync_playwright() as p:
             }
         }
         return 'PASS '+count+' move/mode/direction cases, real target damage, no hostile or base-Dino projectiles and no boss launch lock';
+    }'''))
+    print(page.evaluate('''()=>{
+        for(const left of [false,true]){
+            ihfSetup(0,left);ihfKey('KeyJ');ihfKey('KeyJ',false);ihfStep(11);
+            ihfKey('KeyJ');ihfKey('KeyJ',false);check(dino.ironhaul.attack?.id==='rise'&&dino.ironhaul.attack.age===0,'early J cancel waits for recovery');
+            ihfStep(6);ihfKey('KeyK');ihfKey('KeyK',false);check(dino.ironhaul.attack?.id==='gunslash','J K gunblade branch missing');
+            ihfStep(10);ihfKey('KeyJ');ihfKey('KeyJ',false);check(dino.ironhaul.attack?.id==='pursuit','gunblade pursuit missing');
+            const hp=dino.hp;ultCharge=37;ihfKey('KeyQ');ihfKey('KeyQ',false);
+            check(dino.ironhaul.mode===2&&dino.ironhaul.attack?.id==='ram','attack-to-truck morph missing');
+            ihfKey('KeyE');ihfKey('KeyE',false);check(dino.ironhaul.mode===0&&dino.ironhaul.attack?.id==='morphslam','truck-to-robot morph attack missing');
+            check(dino.hp===hp&&ultCharge===37,'tactical morph refills resources');ihfStep(120);
+            check(!dino.ironhaul.attack&&!dino.ironhaul.jets.length&&!dino.ironhaul.bunkers.length&&!dino.ironhaul.shells.length,'new mechanical effects never expire');
+            const t=ihfSetup(0,left);t.x=left?60:780;t.y=180;ironBegin('barrage');ihfStep(9);
+            const missiles=dino.ironhaul.rounds.filter(q=>q.kind==='missile');check(missiles.length===3&&missiles.every(q=>q.vy<0),'missile pods do not launch upwards');
+            for(let i=0;i<100;i++){if(i<30)t.x+=left?1:-1;ihfStep();}
+            check(t.hp<10000&&!dino.ironhaul.rounds.some(q=>q.kind==='missile'),'homing missiles cannot reach moving target or expire');
+            const t2=ihfSetup(1,left);t2.x=left?60:780;t2.y=180;dino.ironhaul.silver=2;ironSpawnMissiles(dino,4);
+            check(dino.ironhaul.rounds.every(q=>q.ultimate&&q.white),'white missile provenance lost');ihfStep(120);
+            check(t2.hp<10000&&dino.ironhaul.mode===0&&ultCharge===0,'lingering white missiles refill ultimate after expiry');
+        }
+        return 'PASS early J cancels, J K J branch, both tactical morph attacks, moving-target homing, finite new effects and white missile resource isolation';
     }'''))
     print(page.evaluate('''()=>{
         for(const mode of [0,1]){
@@ -91,7 +112,7 @@ with sync_playwright() as p:
         return 'PASS both directions: J Dash / Dash J / K Dash / Dash K / J Jump / K Jump, linked followups, five-step manual combos and ultimate-only white armour';
     }'''))
     print(page.evaluate('''()=>{
-        for(const [mode,id,age,part] of [[0,'execution',42,'sword'],[1,'spin',32,'shield']]){
+        for(const [mode,id,age,part] of [[0,'execution',28,'sword'],[1,'spin',22,'shield']]){
             ihfSetup(mode);ironBegin(id);ihfStep(age);const g0=ironGeometry(dino);ihfStep();const g1=ironGeometry(dino);
             const start=part==='sword'?g0.tip:g0.shield,end=part==='sword'?g1.tip:g1.shield;
             check(Math.hypot(end.x-start.x,end.y-start.y)<12,'weapon snaps at release '+id);
@@ -106,8 +127,8 @@ with sync_playwright() as p:
         return 'PASS smooth sword/shield release, bounded trails/ghosts, white damage boost, failed-dash charge preservation and clean timed expiry';
     }'''))
     print(page.evaluate('''()=>{
-        ihfSetup();ironBegin('charge');ihfStep(71);check(!dino.ironhaul.core,'core powers too early');ihfStep();check(dino.ironhaul.core===480,'8-second core missing');
-        ihfStep(20);check(!ironBegin('charge'),'no core cooldown');
+        ihfSetup();ironBegin('charge');ihfStep(11);check(!dino.ironhaul.core,'core powers too early');ihfStep();check(dino.ironhaul.core===540,'9-second core missing');
+        ihfStep(IRON_PLAYER_MOVES.charge.T-12);check(!ironBegin('charge'),'no core cooldown');
         ironBegin('thrust');ihfStep(38);check(dino.ironhaul.rounds.some(q=>q.kind==='wave'),'powered thrust has no energy slash');ihfStep(500);check(!dino.ironhaul.core,'core never expires');
         for(const mode of [0,2]){
             ihfSetup(mode);ultCharge=99;check(!ironSilverStart(),'underfilled transformation');ultCharge=100;dino.invincible=false;dino.invTimer=0;
@@ -128,11 +149,11 @@ with sync_playwright() as p:
         return 'PASS finite core/cooldown, powered energy slash, 100% transformation cost, exact 12-second expiry, enhanced moves, timed finisher scaling, finite immunity / interruption';
     }'''))
     print(page.evaluate('''()=>{
-        for(const mode of [0,1]){ihfSetup(mode);ihfKey('KeyL');ihfKey('KeyL',false);ihfStep(mode?8:6);check(dino.isShielding()&&dino.meleeTimer<23&&!dino.parryWindow&&frames>=dino.ironhaul.perfectUntil,'Perfect window exceeds documented duration');}
+        for(const mode of [0,1]){ihfSetup(mode);ihfKey('KeyL');ihfKey('KeyL',false);ihfStep(mode?9:7);check(dino.isShielding()&&dino.meleeTimer<23&&!dino.parryWindow&&frames>=dino.ironhaul.perfectUntil,'Perfect window exceeds documented duration');}
         ihfSetup(1);dino.invincible=false;dino.invTimer=0;ihfKey('KeyL');ihfKey('KeyL',false);check(dino.isShielding(),'no native guard');
         const hp=dino.hp,q=new BossProjectile(dino.x+dino.w/2,dino.y+dino.h/2,0,0,false,1);bossProjectiles.push(q);perfectParryCd=0;checkCollisions();
         check(dino.hp===hp&&!bossProjectiles.includes(q)&&dino.ironhaul.counter>frames,'silver perfect guard does not schedule riposte');
-        ihfStep(11);check(!dino.ironhaul.attack,'instant riposte');ihfStep(2);check(dino.ironhaul.attack?.id==='riposte','delayed riposte missing');ihfStep(60);check(!dino.ironhaul.attack&&!dino.isShielding(),'guard / riposte never ends');
+        ihfStep(7);check(!dino.ironhaul.attack,'instant riposte');ihfStep();check(dino.ironhaul.attack?.id==='riposte','delayed riposte missing');ihfStep(60);check(!dino.ironhaul.attack&&!dino.isShielding(),'guard / riposte never ends');
         for(const mode of [0,1,2]){
             ihfSetup(mode);const feet=dino.y+dino.h;
             for(let k=0;k<4;k++){keys.KeyS=true;ihfStep(8);keys.KeyS=false;ihfStep(8);check(dino.y+dino.h===feet,'crouch drifts floor '+mode);}
@@ -153,10 +174,10 @@ with sync_playwright() as p:
         ihfKey('Space');for(let i=0;i<14;i++)loopAnToan();ihfKey('Space',false);
         ihfKey('Space');loopAnToan();ihfKey('Space',false);check(dino.jumpCount>=2&&dino.dy<0,'new form has no double jump');
         check(!_loiKhung.size,'large map errors '+[..._loiKhung]);
-        for(const mode of [0,1,2])for(const kind of ['godzilla','fire']){
+        for(const [mode,move] of [[0,'gun'],[0,'barrage'],[0,'cleaver'],[1,'throw'],[1,'sovereign'],[2,'gatling'],[2,'truckcannon']])for(const kind of ['godzilla','fire']){
             ihfSetup(mode);bosses.length=0;const b=kind==='godzilla'?new GodzillaBoss():new FireCloneBoss();b.hp=b.maxHp=1000;b.x=800;b.y=320-b.h;
             b.state=kind==='godzilla'?'clash_go':'beam_clash';b.clashX=480;b.clashY=288;b.beamClashX=480;b.beamMouthY=288;b.beamMouthX=810;b.beamDir=-1;bosses.push(b);doChieuBatDau(b);ultCharge=0;
-            ironBegin(mode===2?'gatling':mode===1?'throw':'gun');ihfStep(60);check(doChieuLay(b).length>0,'mode ignores real beam clash '+mode+' '+kind);check(b.hp===1000&&ultCharge===0,'clash farms fake health / ultimate');
+            ironBegin(move);ihfStep(100);check(doChieuLay(b).length>0,'move ignores real beam clash '+move+' '+kind);check(b.hp===1000&&ultCharge===0,'clash farms fake health / ultimate '+move+' '+kind);
         }
         ihfSetup();const g=ironGeometry(dino);check([g.grip.x,g.tip.y,g.gun.x,g.shieldBox.w].every(Number.isFinite),'shared geometry invalid');
         // Walk a real arena against the existing boss and exercise every form.

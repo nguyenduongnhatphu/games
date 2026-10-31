@@ -95,7 +95,7 @@ node tools/boss-parts/index.cjs apply DanteBoss BossShared
 Nếu sửa cả file người chơi và Boss, dùng công cụ người chơi để ghép trong một lượt:
 
 ```bash
-node tools/player-parts/index.cjs apply IronhaulForm IronhaulBoss
+node tools/player-parts/index.cjs apply games/Dino/player-parts/forms/IronhaulForm*.js IronhaulBoss
 ```
 
 Cả hai lệnh ghép đều làm mới hai bộ snapshot khi chúng tồn tại. Lệnh Boss sẽ từ chối nếu có file người chơi đang sửa chưa được ghép, để bảo vệ bản sửa đó.

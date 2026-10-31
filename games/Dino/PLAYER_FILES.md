@@ -6,7 +6,7 @@ Game vẫn chạy bằng một file [index.html](index.html). Các file nhỏ n�
 
 | Bạn muốn sửa | File cần lấy |
 | --- | --- |
-| Ironhaul | [IronhaulForm.js](player-parts/forms/IronhaulForm.js) |
+| Ironhaul | [IronhaulForm01.js](player-parts/forms/IronhaulForm01.js) và [IronhaulForm02.js](player-parts/forms/IronhaulForm02.js) |
 | Dante: bộ điều khiển chung | [DanteForm.js](player-parts/forms/DanteForm.js) |
 | Dante: Devil Sword Dante | [DanteDSD.js](player-parts/forms/DanteDSD.js) |
 | Dante: Balrog / Cavaliere / King Cerberus | [Balrog](player-parts/forms/DanteBalrog.js) · [Cavaliere](player-parts/forms/DanteCavaliere.js) · [King Cerberus](player-parts/forms/DanteKingCerberus.js) |
@@ -21,6 +21,6 @@ Game vẫn chạy bằng một file [index.html](index.html). Các file nhỏ n�
 | Di chuyển, phòng thủ, sát thương, phím điều khiển | [Mục lục Player](player-parts/CATALOG.md#player--tích-hợp) |
 | Power / phụ kiện | [Mục lục Power](player-parts/CATALOG.md#power--phụ-kiện) |
 
-**[Toàn bộ 145 file nhỏ](player-parts/CATALOG.md)** · **[Hướng dẫn gửi AI](player-parts/README.md)** · **[File Boss](bosses/CATALOG.md)**
+**[Toàn bộ 146 file nhỏ](player-parts/CATALOG.md)** · **[Hướng dẫn gửi AI](player-parts/README.md)** · **[File Boss](bosses/CATALOG.md)**
 
 Các file có số `01`, `02`… là nhiều phần của cùng hệ. Khi sửa xuyên nhiều phần, gửi đủ các phần liên quan. Với Rune, file `Rune_*.js` chứa khai báo; bảng Rune chỉ thêm nơi xử lý tác dụng thực tế. Nếu chỉnh ngoại hình X hoặc Ironhaul, có thể cần thêm file Boss tương ứng vì dùng chung bộ vẽ.

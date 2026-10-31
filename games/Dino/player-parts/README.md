@@ -49,7 +49,7 @@ Bạn tải và gửi file là đủ; các lệnh dưới đây dành cho AI/l�
 ```bash
 npm ci --prefix tools/boss-parts
 node tools/player-parts/index.cjs check
-node tools/player-parts/index.cjs apply IronhaulForm
+node tools/player-parts/index.cjs apply games/Dino/player-parts/forms/IronhaulForm*.js
 node tools/player-parts/index.cjs apply "/đường/dẫn/VergilForm01 - AI.js" "/đường/dẫn/VergilForm02 - AI.js"
 ```
 
@@ -57,7 +57,7 @@ Sửa nhiều file hoặc cả người chơi lẫn Boss từ cùng snapshot th�
 
 ```bash
 node tools/player-parts/index.cjs apply Rune_hp PlayerMovement
-node tools/player-parts/index.cjs apply IronhaulForm IronhaulBoss
+node tools/player-parts/index.cjs apply games/Dino/player-parts/forms/IronhaulForm*.js IronhaulBoss
 ```
 
 Lệnh `apply` kiểm tra bản nguồn, marker, khung phạm vi, cú pháp, API/id còn tồn tại và các file khác đang sửa trước khi ghi. Nó từ chối vùng chồng nhau có xung đột, các sửa đổi Boss `READ_ONLY` và snapshot cũ. Cả bộ người chơi lẫn bộ Boss được cập nhật sau khi ghép. Lệnh Boss cũ cũng cập nhật bộ người chơi và từ chối ghi đè các sửa đổi đang chờ.
