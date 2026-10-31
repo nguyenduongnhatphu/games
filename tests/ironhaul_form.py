@@ -44,13 +44,48 @@ with sync_playwright() as p:
         let count=0;
         for(const mode of [0,1,2])for(const left of [false,true]){
             const ids=mode===0?['cut','rise','cross','thrust','execution','upper','advance','cleaver','gun','cannon','barrage','air','charge','recoil','pursuit','rail','gunvault','skyripper','gunrain','aircross','plunge','gunslash','morphslam']:mode===1?['silvercut','spin','silverfinish','throw','bash','shieldrush','reversal','riposte','air','silverbloom','silvercross','sovereign','aegislance','aegisorbit','aegiswheel','aegisvault','ascension','starfall','nova']:['gatling','truckcannon','ram','cannon','barrage','broadside'];
-            for(const id of ids){const t=ihfSetup(mode,left);check(ironBegin(id),'cannot start '+id);const T=IRON_PLAYER_MOVES[id].T;ihfStep(T);
+            for(const id of ids){const t=ihfSetup(mode,left);check(ironBegin(id),'cannot start '+id);const T=IRON_PLAYER_MOVES[id].T;
+                if(['recoil','gunvault','gunslash'].includes(id)){
+                    // Backflip fire leaves the ground lane; put an aerial target in the real round's path.
+                    const fire=IRON_PLAYER_MOVES[id].shots[0];ihfStep(fire);const q=dino.ironhaul.rounds[0];check(!!q,'no acrobatic round '+id);
+                    t.x=q.x+q.vx-t.w/2;t.y=q.y+q.vy-t.h/2;ihfStep(T-fire);
+                }else ihfStep(T);
                 check(!dino.ironhaul.attack,'move stuck '+id);check(!projectiles.length&&!bossProjectiles.length,'enemy or base Dino bullets leaked '+id);
                 if(id!=='charge')check(t.hp<10000,'no friendly damage '+mode+' '+left+' '+id);
                 check(t.dy===0,'boss gets permanent launcher '+id);count++;
             }
         }
         return 'PASS '+count+' move/mode/direction cases, real target damage, no hostile or base-Dino projectiles and no boss launch lock';
+    }'''))
+    print(page.evaluate('''()=>{
+        const render=ironhaulRobot;let captured=null,samples=0;
+        ironhaulRobot=function(b){
+            const m=ctx.getTransform(),g=ironhaulWeapons(b),point=p=>m.transformPoint(new DOMPoint(p.x,p.y));
+            captured={grip:point(g.grip),tip:point(g.tip),shield:point(g.shield),gun:point(g.gun)};
+            return render(b);
+        };
+        try{
+            for(const left of [false,true])for(const [mode,id] of [[0,'cut'],[0,'rise'],[0,'cross'],[0,'thrust'],[0,'execution'],[0,'upper'],[0,'advance'],[0,'air'],[0,'plunge'],[0,'recoil'],[0,'rail'],[0,'gun'],[0,'charge'],[1,'sovereign'],[1,'ascension'],[1,'starfall']]){
+                ihfSetup(mode,left);ironBegin(id);const T=IRON_PLAYER_MOVES[id].T;
+                for(let age=0;age<T;age++){
+                    ihfStep(1,false);const g=ironGeometry(dino);captured=null;
+                    ctx.save();ctx.translate(13,29);ctx.scale(.8,.8);const camera=ctx.getTransform();
+                    try{dino.draw();}finally{ctx.restore();}
+                    check(!!captured,'no robot draw '+id);
+                    for(const key of ['grip','tip','shield','gun']){
+                        const expected=camera.transformPoint(new DOMPoint(g[key].x,g[key].y));
+                        check(Math.hypot(expected.x-captured[key].x,expected.y-captured[key].y)<.001,'render / hit geometry diverges '+id+' '+age+' '+key);
+                    }
+                    samples++;
+                }
+            }
+        }finally{ironhaulRobot=render;}
+        for(const left of [false,true])for(const [id,age] of [['cut',7],['rise',8],['cross',9],['thrust',18],['execution',20],['advance',14]]){
+            ihfSetup(0,left);ironBegin(id);ihfStep(age);
+            const g=ironGeometry(dino),t={x:g.tip.x-4,y:g.tip.y-4,w:8,h:8,hp:50,maxHp:50};bosses.length=0;bosses.push(t);
+            ihfStep();check(t.hp<50,'drawn blade skips target on next swept frame '+id+' '+left);
+        }
+        return 'PASS '+samples+' flip / thrust / spin poses match actual Canvas grip, sword, shield and muzzle in both directions and with camera scaling; rendered-blade swept hits';
     }'''))
     print(page.evaluate('''()=>{
         for(const left of [false,true]){
@@ -108,7 +143,7 @@ with sync_playwright() as p:
             check(!dino.ironhaul.attack,'long combo auto loops');
         }
         ihfSetup();ironMode(dino,1);check(dino.ironhaul.mode===0,'free silver mode bypasses ultimate');
-        ihfSetup();ihfKey('KeyJ');ihfKey('KeyJ',false);ihfStep(18);ihfKey('KeyS');ihfKey('KeyK');ihfKey('KeyK',false);ihfKey('KeyS',false);ihfStep(10);check(dino.ironhaul.attack?.id==='cleaver','buffer loses the crouch modifier');
+        ihfSetup();ihfKey('KeyJ');ihfKey('KeyJ',false);ihfStep(8);ihfKey('KeyS');ihfKey('KeyK');ihfKey('KeyK',false);ihfKey('KeyS',false);ihfStep(10);check(dino.ironhaul.attack?.id==='cleaver','buffer loses the crouch modifier');
         return 'PASS both directions: J Dash / Dash J / K Dash / Dash K / J Jump / K Jump, linked followups, five-step manual combos and ultimate-only white armour';
     }'''))
     print(page.evaluate('''()=>{
@@ -129,7 +164,7 @@ with sync_playwright() as p:
     print(page.evaluate('''()=>{
         ihfSetup();ironBegin('charge');ihfStep(11);check(!dino.ironhaul.core,'core powers too early');ihfStep();check(dino.ironhaul.core===540,'9-second core missing');
         ihfStep(IRON_PLAYER_MOVES.charge.T-12);check(!ironBegin('charge'),'no core cooldown');
-        ironBegin('thrust');ihfStep(38);check(dino.ironhaul.rounds.some(q=>q.kind==='wave'),'powered thrust has no energy slash');ihfStep(500);check(!dino.ironhaul.core,'core never expires');
+        ironBegin('rise');ihfStep(20);check(dino.ironhaul.rounds.some(q=>q.kind==='wave'),'powered thrust has no energy slash');ihfStep(540);check(!dino.ironhaul.core,'core never expires');
         for(const mode of [0,2]){
             ihfSetup(mode);ultCharge=99;check(!ironSilverStart(),'underfilled transformation');ultCharge=100;dino.invincible=false;dino.invTimer=0;
             check(ironSilverStart()&&ultCharge===0&&dino.ironhaul.mode===1&&dino.ironhaul.silver===720,'white entry');

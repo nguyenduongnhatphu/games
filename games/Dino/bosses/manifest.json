@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "games/Dino/index.html",
-  "sourceHash": "5d0f15f3a03fc9fbe0541ede012a13e7d7b9bce48bb14b7d7206f3153fac704c",
+  "sourceHash": "d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b",
   "bossCount": 74,
   "files": [
     {
@@ -118,8 +118,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "201100910511364321f403be1266a19aafdc16d920aabf03118aa29400430f86",
-      "structureHash": "c56784709dbd7eec227f2972d3f2873d1659432402f91ce57b5e2390bb227717"
+      "hash": "e817d2a0d2550c04776634f3daa05dc16ff3abad9d1d91dc61a87d3af2b35e7d",
+      "structureHash": "bdd1803eca6dba815c55b9b85056e4ee6c1f0a9e42b4d1761fddb66e8ba6c7e3"
     },
     {
       "name": "ArcanaRexBoss",
@@ -243,8 +243,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "00e18cdd9019af529ba8a5899d3b6666309d2c35334f6b47ca56aac624a94e18",
-      "structureHash": "71d2acc0212f981700ca5c5c3156152d79a6ef6c09573265b021f7d85fa40276"
+      "hash": "adfeb68a577f7336c3be6c38223d2c7b871c1e67e1d1f695dfe8d5d59a200800",
+      "structureHash": "1340196aa9a52575b125f89f3fc6cc8c7e1b25eaf8c5d61ac2ce8bcda0139972"
     },
     {
       "name": "ArtoriasBoss",
@@ -370,8 +370,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "90d8492a851eda704f09b8ef974716d2595ef2c34da5752e734fca680f0bf823",
-      "structureHash": "dbfcd5331d4aa46a93fe2452953dfb32c16e1b6906f877bc70a9fc60ae30605e"
+      "hash": "ad218d15506b5f70db6c091763d13dbc0f4020a6dcd15f5f291e4546d154a86c",
+      "structureHash": "ab380fd65fa47a502243f3424aa2ee26a8bfa9989af2b85bc3c5020a7255819a"
     },
     {
       "name": "ChronoRexBoss",
@@ -485,8 +485,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "ec81280a0fe27687f5f9cdf1c443095014c5da6da5e817286f7b9c770c8d8594",
-      "structureHash": "52b29a69b9dfc54f50ed3a77e619256aa7c8d41297b8c81efe6db96607f8fe5e"
+      "hash": "5d48b9909cecc9649398f4afc8aca15bd73ab636f35919d37e276634e9883e62",
+      "structureHash": "02385e773e1bd1f07a73a805167237473b6251ddea35b7709d641ea138c2f0e5"
     },
     {
       "name": "ClawCloneBoss",
@@ -600,8 +600,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "1045436a605c1984f8dd71234428d54c84b054de302f4cccbab827c16417edd4",
-      "structureHash": "a2fec1c243c0bbdbe67ebfd52ae08f779819814518979491b96afb73522af2de"
+      "hash": "cd17a3e91713425fe1bad884c68587e90805f6c35aca81ea77b4aa643ed84607",
+      "structureHash": "4cb5d7b179c6afbd3a58ab2da49eec6404642ac425d49728090c5770e3497021"
     },
     {
       "name": "CliffGolemBoss",
@@ -718,8 +718,8 @@
         "troiVy",
         "visualEffects"
       ],
-      "hash": "8b5600fd4d6817f4b49da98276a176ef22084d9c0c7c2fde5835232b0ea8fac4",
-      "structureHash": "9e40c61bcc85ad03328a38d21b7565ee930a91a9b95a2d65f116103ef0db64b6"
+      "hash": "c69f8139457fbe10eaff05dda7b9fdddd439ebf577dcc821b720dba3fe0230a5",
+      "structureHash": "4f15b9dc2e6613d28d18338c4f4fc700403630c9d2c1c92b94315beb79123c62"
     },
     {
       "name": "CloneBoss",
@@ -828,8 +828,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "6d99b1f2a6fe52472fdcc6693239bf9ea571b69351c7161ed7eaed08e9436137",
-      "structureHash": "ebbef94ba54dd18ccb5cfeca71b355a5379eebc1c3467292cc0faab66d6bd605"
+      "hash": "0aca8d8ddd42691265f55e18ae755230c59fe7bd38ed0249eefd9461be08bcfb",
+      "structureHash": "981820144610b2effdd9b15b20ec55645f15dc642591ab8bc0d82243a3ad9943"
     },
     {
       "name": "CorruptionBoss",
@@ -964,8 +964,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "3f4b1171e7efbb182a888dfad70ab9ceada55a643a709136a1a7b0bf1cfa2f96",
-      "structureHash": "742e9bcfdf4484741ad2328da0f0304771756cdaa31981cdf8cf247f6a1e37e9"
+      "hash": "10e2cd2f01fec140df8b107faec8fede6718bcdce862bd3274a1adc673418981",
+      "structureHash": "6559e1850a840f1a3bf7a6f1b9373412ae52bebe4a5334f8cdf8583f96248e40"
     },
     {
       "name": "DanteBoss",
@@ -1177,8 +1177,8 @@
         "worldL",
         "worldR"
       ],
-      "hash": "550f2a26212bd8d7583c0ea4ef98ac9114705283d56d574e0d9358bdd24cbc65",
-      "structureHash": "6368f2459fe8733d534935466db61fa1a6329c7c61549073332311eb4b2c7e17"
+      "hash": "096da30470ede1a088b37fd980b2c6e7cff219d0f333fc44700f9f447f183c37",
+      "structureHash": "aa62d1ed7164f8415e29069cf84a62af181b575aaa4a57e2c196c5bdba431e7e"
     },
     {
       "name": "DeathBoss",
@@ -1327,8 +1327,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "e64ee8d4c40968f0ee51d61963e1014fc74966c4b70f4e0c8ec446d585c40b68",
-      "structureHash": "23aed3448a262906ab83172cfac0734fc557b0e19289dd0bf85d4862ec0f9f2c"
+      "hash": "af9b5289631e2b52394ffe810d17478cca4ae5868b86742ff1a34b506be07895",
+      "structureHash": "4566c71ed4f65185128959580ee00e461d0bf984be3cba1361cb00435ca625e1"
     },
     {
       "name": "DilophosBoss",
@@ -1441,8 +1441,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "4e6d971b6c45fde12a640bfa760d74b505a28359c61653b0ffd8478f7c752508",
-      "structureHash": "cf54ce90409829f740c1fe240a2dba5dadc58bc342ca6b6190b5f421a7ea6baa"
+      "hash": "188d6fbf5d500e8553a0eaf90ea5e66600f9e93c0f165719197dff7d28f332da",
+      "structureHash": "432f8f35cd666a5d33be22d90a624b5f64a394983f2c66a91f78cce88625c230"
     },
     {
       "name": "DragonLordBoss",
@@ -1567,8 +1567,8 @@
         "troiSinh",
         "visualEffects"
       ],
-      "hash": "e4d9678517f17abd77103283365c862b5002ddb037777e880419d214db698e79",
-      "structureHash": "c018258d48937449fa3f98c393937572bbd3c432fca37dbff9a3455143e7d344"
+      "hash": "72bc15e59d4adf547d2d15ec20e77689f401348a5e9b36be0d146f948d94bc14",
+      "structureHash": "fce5eb4b1bfe6c9ac965b5cf63de39f5d651f1111b39a952f2309f8b24d271b4"
     },
     {
       "name": "EchoStalkerBoss",
@@ -1678,8 +1678,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "08d33c3fdcbb1b51abd02a18c989993295e77a5aa635f5614d8f769c82c30652",
-      "structureHash": "940e294b74e73dc5c7f5f35173a7697351a4a1a971fb10a11b46f2967b62deb8"
+      "hash": "6ff1e49d6ac854f508ca7ea44140503e4300e36a36382545343186e914370f3f",
+      "structureHash": "5c206bfa5e2533081187db504460765204ce23bf1be9ef136852232bc8e0e014"
     },
     {
       "name": "EmberWolfBoss",
@@ -1797,8 +1797,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "e7f872a008ba70521baf0b3e4753b5363c59470f8a0b14fccb7c255194132ea5",
-      "structureHash": "817e622d0338d20d7daa2faff9ebe15c38b4d74316b3a5984780559eeebd442f"
+      "hash": "001b6853d5cd38a979b4e87ff970df92038c9840c8c03306c5acfc55fae221a9",
+      "structureHash": "86525dd978d92bb5cc181e2c48c61bf536d8b20e933308145035feceb1c496a7"
     },
     {
       "name": "FireCloneBoss",
@@ -1918,8 +1918,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "017df79ba2fcd180b1f0963789534781c3dfab8d948af9e1260fafdf572c067b",
-      "structureHash": "4bac70dd8b30e480fb33f4ce434aa94ab35a0cb7ed040c59415b160c798bafe9"
+      "hash": "1603fc17d49fc0acebeac1b74c5ecb15806e687cbeaac89c30aef9f6914f3b3a",
+      "structureHash": "2157d3cfeab9a1faa170ce49d19d542700c476cb0066b6905ec325e580e73a58"
     },
     {
       "name": "FireDragonBoss",
@@ -2031,8 +2031,8 @@
         "worldL",
         "worldR"
       ],
-      "hash": "8d42acf93b60b66c81daf4aa2100d748c36cfad01c94c9b8162c5f163046b7cf",
-      "structureHash": "afff538eaae8fc8a1f029fee9269ff887101a3175b267c053afc12afd6c51557"
+      "hash": "ce02d4f3dc6972ff696f12c2c05dc45e405439d232dec60ef66475f34d547d9d",
+      "structureHash": "8b3a23dcc29cf905db4c51c4cde00e08a3dcad3ba09d8d5f76458ad570ba3f9c"
     },
     {
       "name": "FlameCoreBoss",
@@ -2153,8 +2153,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "634e0eb10b5cda059b3e73b261112d3f6a4c3acd47049d774cc91bd9f94369c2",
-      "structureHash": "a0bee041ce304aa4e5108b3be3fd1e0ebaf96502ff4219d22cb363331134e8b0"
+      "hash": "67a871f74a83b3e3cb85ac7e86f966a8bd321ec11435680e9ac685f4c5384f47",
+      "structureHash": "59639deeb96b0c3a30ea4e1a8ad965c31bfd2daf6dab536a3e43826827455af3"
     },
     {
       "name": "FlameLancerBoss",
@@ -2278,8 +2278,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "80a738e56daf2f8def8f9d4fc626b4c23bdde49190900090aa96e273878830f7",
-      "structureHash": "beb8338963602d572bc4a93c8c37928d955a680a024ae1c0fb452e7a1017289e"
+      "hash": "ea137e2a50621c32b8497aea1410115b66139696323505d577d68cc914c4bcfb",
+      "structureHash": "1e46f55e9cb49b28b3e9836570c75e9b38b29f9875f05f3301136c38259356c2"
     },
     {
       "name": "ForestTitanBoss",
@@ -2395,8 +2395,8 @@
         "troiVy",
         "visualEffects"
       ],
-      "hash": "37d8e181a173ebf31014a30da1be98f63698e2c2c001be47fc7e5fdabdb1c2d1",
-      "structureHash": "594c3520c5ac37fd722a4c2d7d640f5da101c4fbf62cbf75ac9f1f7a15d61b64"
+      "hash": "4c9491c3f4b4902ec943da22485b9165bb5f9fca59982c3f2df7bbdfd548ec9e",
+      "structureHash": "1eb4f4d3e460869ea3908ae8167fbe7f14043ef2cdedd3a7536b8626a7f1ec53"
     },
     {
       "name": "GaelBoss",
@@ -2543,8 +2543,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "94242971a0bfb1a95b8a99b240826888b5610325aa302fb58dfc4c9b0045465e",
-      "structureHash": "0c5cfe22d35bd38d6c9c8e844c700404edeb0f55247544152bbf771080307c14"
+      "hash": "4d145948fd7bf54c58cf6624bd10eeeeceb40f4d56ab50537e864dd409d5a64b",
+      "structureHash": "36c8bb48001d86146e5291db1ee88b8ebd77d2e1f0cbb44e63540f8ba46dbf0a"
     },
     {
       "name": "GiantSpiderBoss",
@@ -2664,8 +2664,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "097ac582e85a84309196d3d1fd857dbe089702d222330f2a1ef2151c2d6083ae",
-      "structureHash": "853f96fcbf2e7b444ec41591a3c1bf35fb35cbc9a2d0acc254f7c6a96d061ddf"
+      "hash": "a842c195926866d68edaa36a46bdd4e27a999585aad4b6da7c7cefb4eb1dfd6e",
+      "structureHash": "eefec23c58acb619c081985c5cfb1472cb149b719eaa5a11a72a04b82e4f3fff"
     },
     {
       "name": "GodzillaBoss",
@@ -2786,8 +2786,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "f7305932b873474b29b9b2db0b36e8921a8e1b466016f56636fd9f7f5895cf73",
-      "structureHash": "adc0986dc813d4c0af4131229cdafb1e8c61d11e12e308642662076868c99e7b"
+      "hash": "b1b423a0a50a1cff12572e3e9100a3e064ac16d5a423b94883ed537dd9f56f25",
+      "structureHash": "ed54832cc98a98bb18a4c905efa852c54907658ff79a19af9135f1a269b9612c"
     },
     {
       "name": "GreatApeBoss",
@@ -2897,8 +2897,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "2327a06ed5291c967f6508040b9da51b43d62e6d89be48fe8e35ae2c604fc78e",
-      "structureHash": "f960177d653c70584b5fe867d5a67246727f7d90f4e35b72fcff5ecd9385ce88"
+      "hash": "338078dc1cfabaaad0a6e16af7a2b916d7af3178aeedc02d2e6dcab0f06121ac",
+      "structureHash": "2fd9ace6230dcea1d6b56835d63c1bca396eadc6203152a3f4b285771e970537"
     },
     {
       "name": "GreatSerpentBoss",
@@ -3019,8 +3019,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "76bee0a4ed834a9c8cc59f9b1df0d4a77c99682661cb51e9dd0472079de2c5be",
-      "structureHash": "ca94ddc9da582c5d0fbe2260351c7264047c9c9b430643896e684c608e73218e"
+      "hash": "2f9ba22bae359050de1f9020d041aaf0d053fec3c59a834f9c98d7f562a9c504",
+      "structureHash": "94b09f3f25863837b4157afc43a02704e634965705b50c6d380b8ac9a50402cd"
     },
     {
       "name": "HelicoprionBoss",
@@ -3067,8 +3067,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "848c560e0f4aa1f2801470ec81309bad4c6e2e6f022dbfc614edd87a30503e55",
-      "structureHash": "e202401d33bdb3b01f1d1b2a7a2d3cf78117a7d0157379c428057c5fee96d57e"
+      "hash": "fc1135816e75a7a0491ff9dbcd6fe5cdee34492ffbae1d9fb9cd41d6224ee791",
+      "structureHash": "fc776effd463e8f0f24d42ae7fed5d51aac31176fb6b9ce504ef2cbdd894a442"
     },
     {
       "name": "HoGacBoss",
@@ -3186,8 +3186,8 @@
         "worldL",
         "worldR"
       ],
-      "hash": "f4619cc5e7f24e12f3385fac591f8b1ef7b6fcd922c236522b9d78c1f0e70ac9",
-      "structureHash": "5b1cddf798fb50a60a9137b3c9884b6699b3685f419e5ac62efb7adb6480b787"
+      "hash": "c7fd7f5d73c0a6513fecbe51f9a40599e676a502cd1fb1762e7011273edb8136",
+      "structureHash": "59eb55397ad1869a614ce08fa67c784182706e7468b15e6d45da353d98ec16f6"
     },
     {
       "name": "IaiRaptorBoss",
@@ -3301,8 +3301,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "fc8028500bcf46b7c175ee09b44ed3e695851227338c6751ea655d2036375313",
-      "structureHash": "35e4e3b6590bf30294862007da3a7f493ac04b59ab7b728d47e889f3df53aa3d"
+      "hash": "93f785662e7b3fa4aaa7366fd31fd6467483874f12ceb482c9d6b21e30e597e3",
+      "structureHash": "c4b762c812297c2da2182c19bf8514cecc7565e8e2eeb7a27169857fa056620b"
     },
     {
       "name": "IceFangBoss",
@@ -3411,8 +3411,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "b59d14bd8e02dd85d50486653a9c66c4c1453602c34bf8932a546c170ad0433d",
-      "structureHash": "b52856ef43d76c604e31eb3ea45d39b6cb324f176e6c10bea40faee4a25e765f"
+      "hash": "8f15141fee089c37b1b19a309e399a53455424b943c58d14f5eb0c5862f381de",
+      "structureHash": "598770f0ee36ea5eb9063dd57df874a9da1dd3c811d569425818f8a850106e28"
     },
     {
       "name": "IndominusBoss",
@@ -3524,8 +3524,8 @@
         "pickFromBag",
         "shakeTimer"
       ],
-      "hash": "e172070ed3806ff3c65d638a271aebc26f0306219a86b56216f00fb4648ef495",
-      "structureHash": "b03bad05072db4462c1ff36853d9eeb85887f1d55345a32e9b4a8ac57cd402b8"
+      "hash": "3ac1f776a86ffa1f79317b7a6e20800e468578614b31f8155113a12c40181e84",
+      "structureHash": "ad1a8e940deb07b4a0d7011d96d54c072ec8bfc15327a8cb62108b6846680fdc"
     },
     {
       "name": "IronhaulBoss",
@@ -3606,8 +3606,8 @@
         "voidChanParry",
         "worldR"
       ],
-      "hash": "66faac7c36047eafc27f8682cf7039c796086d169f466ae7690a1d54f8444fb6",
-      "structureHash": "afb9112426c11043f8efcad240e71dc1678ffb8aaf0a580f89ba9df5356e4836"
+      "hash": "356552acefebce863638817049ed1fe18e3f8a0cc8160a167bf4baa5e799be77",
+      "structureHash": "fe7c5acbfd79dc61c90b2d2d63d281a9c313d0452a7be7f46c6b0cb02d2822cc"
     },
     {
       "name": "LavaSerpentBoss",
@@ -3722,8 +3722,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "ae9c707ee683194d47da29df556a72f50b60d35f3b9ea602ee3fda86f78070e6",
-      "structureHash": "0206aedebb444fc8f7b9d7539bbc0b28cde0b4e8703f813c02ac16a8178dd7d8"
+      "hash": "025e40686671d735c6875f4c8372b3fe766c6600cb4311b9aea87404c3735d7f",
+      "structureHash": "72543eadb7aa72c0052bb2e730781933cce316eb479db4610f0d33081895dfc5"
     },
     {
       "name": "MagmaDragoonBoss",
@@ -3835,8 +3835,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "aecfb13b52e9118be449d905a49f52f33acaaf40547a1778468b2d81938865ba",
-      "structureHash": "81253c569944fe1cd8355f40514bac392a4b32f3f03dec32713fa03b9575b351"
+      "hash": "bd16842b451fac9ec7149313df363459508408bfc6af3cdd1c2961ea823bbad5",
+      "structureHash": "550698a7ac8218f0f040036aeb72744e9a9acb1605f9630a2c6a995278cdf046"
     },
     {
       "name": "MagmorBoss",
@@ -3949,8 +3949,8 @@
         "troiVy",
         "visualEffects"
       ],
-      "hash": "cb37585c16b21a2f885c364cdc536b69a822bf7288821468861454ac5b835c40",
-      "structureHash": "f347b0c526e73f71ab7f170e44a3843d19a346557808f36fa3777da14ca63f26"
+      "hash": "165388e560f760968e15fa7b67be73dc0ff03a6c46d7962ca86cb34c88c4850b",
+      "structureHash": "0ffc317de29d12a834746d317eb89a9e319eeb80e818f7d988969a0cf08dc56d"
     },
     {
       "name": "MegaManXBoss",
@@ -4097,8 +4097,8 @@
         "xCong",
         "xDmgDan"
       ],
-      "hash": "716a74d1622a83d8992fb0a5599a2a9d991b98ae8c28d98fce7d0ea3ed5b17ba",
-      "structureHash": "a3c1b1cbbd6fbfc3db6c7de9d22a4879bd15636c1ae656e12cc83fbcfae37d75"
+      "hash": "9730839f8d09268ee5e912e30ea7a6d3129d16809450ab6dd6b8bd006287c63b",
+      "structureHash": "9bb7c6da74b5fe59c3026644fc2ce5fbb90f43c468690f32cb772c5ea235d875"
     },
     {
       "name": "MegalodonBoss",
@@ -4229,8 +4229,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "9aabc4743f011e5fae90d924daa64238ce058d3056574c31b8f0ca977994d2a8",
-      "structureHash": "e6a620b324c3801990214b78cc28597a7c787b32e224414110af77a1d1a9d51f"
+      "hash": "e068446198265565c917eef815bb0ddef6b7bd112995a6dbdda84f00e5ce9d12",
+      "structureHash": "2b4957e534e5291cd5aa6acdaf6112c852e5aabc80792bc68a5fd01aeaea185f"
     },
     {
       "name": "MosaBoss",
@@ -4349,8 +4349,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "22876aaaedca1a3381f20443b4c897fa38a34d3017757315bbf2f1bd9832a472",
-      "structureHash": "6e7dc791d7ebc216dfbaa766ca7e2360f73dc37974c8ca616c7089aeca43ca40"
+      "hash": "07cce98f071da0f9cfe9f99d2ae1f7736b62da5bda7e22348c7c59c992d2e807",
+      "structureHash": "fae8c6412e23e2ae94873770e08bac065160d0f17055dbc337308a3d1a9f652a"
     },
     {
       "name": "MountainGodBoss",
@@ -4469,8 +4469,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "93ed270674d27ee8f46459e5018ae99e25cb9298ac4ff34fa812fe09256269fa",
-      "structureHash": "0a18c56ff36d37fba89abf7e6df1d994e72a0c5503d137e0948e5123347ea9b1"
+      "hash": "715c403d6edae1b3d08f9dbd28a2724c87b6e98ea63044df75b7cfaf691aadd3",
+      "structureHash": "1390b32a8a4ecf930c3434f320e0ff7bc17fe436dc51b03095110128a43dfcc4"
     },
     {
       "name": "NeroBoss",
@@ -4599,8 +4599,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "f17d247004642f762c2a067c127ab604fea8176c3a356a5df6acdac9aaf26d11",
-      "structureHash": "1ab96c2b2818a6ecfbcd287a4997b50d7e437c85cd4476b11ed2c4ef4279bcf1"
+      "hash": "e21b8e903f5f05b134312d6a9c9fae623be464364bb72fc51a3d1f4742725e0a",
+      "structureHash": "56d3a03dbf24d5a4ba782beb64bcda9287ad210ca7f954fd2cc821dd224616fc"
     },
     {
       "name": "OctopusBoss",
@@ -4730,8 +4730,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "44b960be67b3d3076093b8dba37e99ac9897b4a64f3a88b14a91043c2e5fc238",
-      "structureHash": "6548f72575a7d0418da6db1a3fbdf7c859c7a80725c70f13bf40663c1cdf307f"
+      "hash": "8a69170e961b2ed75a60b3974982f2db99d9906e31c0c070e96467d4a7853227",
+      "structureHash": "5b27824dc646fc2bb9439964af2ea1b21898998f8bf09e0c2e6b4929e5fdf10f"
     },
     {
       "name": "PillarLordBoss",
@@ -4841,8 +4841,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "adb14d98dc0e91271ee0ecc28c63754320004f599d53625e930a4c1f15d67e2c",
-      "structureHash": "829b134115dbc02a9f14678ba36207bab20f64440355ba8257b214174634ca90"
+      "hash": "9aacdd19770aaec623e6c412b13a5518ea50e8df90301e13537dc0d8279b5b1c",
+      "structureHash": "471cf9403062adbbbface361d7907aacc9548cca48630f9eaac55340003d9fe8"
     },
     {
       "name": "PoisonMothBoss",
@@ -4955,8 +4955,8 @@
         "projectiles",
         "visualEffects"
       ],
-      "hash": "9714dcd2b202bece1eb21a1511a93fac1bf605d619aeb8d5e40fda76cbe86122",
-      "structureHash": "8122a4a5dd24b5b4f832a34c9b2c9cd2eb120403a9cfa0ca5d1d0c2e296fdba2"
+      "hash": "37e924fe8c086a81d21c488a125692e8223290e4d08231781b16f7039adc3c14",
+      "structureHash": "d87f8a71821f860cb938bbb2c267fc1cd0cb3ddd4820d1c4841254eb7e60c5de"
     },
     {
       "name": "PontiffBoss",
@@ -5080,8 +5080,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "7092763a0744e12e6169dab8512f30ebaf4564e6265bcb92a0165d77248ea9ca",
-      "structureHash": "caa77c29a6947e7decaa2c2005bd6499532884adbe9e716d2d291458185015f2"
+      "hash": "b3f0c0157cb20a499212212ef5f5194a1946e8e94da07e5cb5179dc5fc5ac03d",
+      "structureHash": "f011875cdd2dd6fc1ed9a02768542f0071acc75617324a071bc705857a9abbee"
     },
     {
       "name": "PteroBoss",
@@ -5191,8 +5191,8 @@
         "parryX",
         "visualEffects"
       ],
-      "hash": "9101aea3877ba3f9368c40ece9e40344922a2f6d1346287f85378aef7a116249",
-      "structureHash": "24d2e9f8d8b1a2eaffbfd75a79ac9c32e9693ddd3069b6e69f91ee7a3648c083"
+      "hash": "973c31f286a6d1818a1705a344a4bcdd72ad92f15761c6c5e7f90f388a5c558e",
+      "structureHash": "2631f6f505830ca3e2cb32ecae7e4c8b60125f5ffbd347b94c3da6bbce85bd00"
     },
     {
       "name": "PteroLordBoss",
@@ -5300,8 +5300,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "d06625dd44e28d1db64cea30ce745ac5d669394aec5a692df590bc85d42f28ad",
-      "structureHash": "d9aca808842f5ab1d96444e7528cddc2613cfd524d4419b695519772af90c8b6"
+      "hash": "04cced04a487d813896a0e95e5bb19fb1de42ebce41e34d2216b11979a2809ed",
+      "structureHash": "6c4f02e65097cdb476f853230e5f5f750b817589bdd36a840decc80e517e6a8b"
     },
     {
       "name": "PulsarCloneBoss",
@@ -5417,8 +5417,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "41209867b54cb2957de8656219e3e50cc9656bcd403059c572e9f4ca5f7f9c4e",
-      "structureHash": "8fd8175ffd85d25f7cf99ce26ed40d27b196616396e836a120f958521657c7a8"
+      "hash": "034eaca8af7c03627390883976d385bf359b9a9db0464a0c65d56ed7a890148a",
+      "structureHash": "f8597142347a0d8af6f29cf277f8f469f76d34977761216b595d80e8f98725f0"
     },
     {
       "name": "QuetzalBoss",
@@ -5531,8 +5531,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "360e9878f54fed373478a8ad1a2bacbdb66d55282f37456673bd40f8f10fc113",
-      "structureHash": "3217dc7931d6565eb354ee5cfbbdd44b9f21b434bbc16afcf9ee2ee7aec0e1ac"
+      "hash": "f11b0315147c5edbb38c70ae9eba3a9b38c3c1a80398540040658dbfca05603b",
+      "structureHash": "27e48147366d24b413af2e5f95d945d88ce9e84bbf352297de41de7f2e1bf4ea"
     },
     {
       "name": "ScarabLordBoss",
@@ -5646,8 +5646,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "504d36fa5b89f74f6fda2f065edede579b260f7ce5200722d70a793ded4cb0d9",
-      "structureHash": "10351d71662a0fa556cb07cb9219cf6adc9be99505806271443d6adcb7c292a9"
+      "hash": "47955e915136ac341789d464305e3e03414afb3ffe7000883acf6face29cc9c6",
+      "structureHash": "27774e7a2d00ef1bbd53a306054b3b257e784f933f297e7938cca73672b95b63"
     },
     {
       "name": "SiegeGoliathBoss",
@@ -5759,8 +5759,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "b0bdf8b207ae8ba660e44c20b3d5fde0e8fab2420cb037e99dee2bfacca39724",
-      "structureHash": "d154c4ae4e60d5dd4d81aface6862338c2417600c90c5cbf939981ea4704734c"
+      "hash": "d6ebcffa69beeb997916ed2b40b61920d98d018ad120f095f2a1effa986c6fc0",
+      "structureHash": "faf7e2b404366265e45b5efa54e5c7d76807a5d1c5a8ecf8941328947be78bdd"
     },
     {
       "name": "SlashBeastBoss",
@@ -5875,8 +5875,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "b5529cd0e3401e0b063d8744b8445fc749c834a4df4dd57520511bb7c1b28710",
-      "structureHash": "2c46e7cb7bde93e2e51db578120e33ffa0d32ebdf872ba265d6ddc466286d8c7"
+      "hash": "22fc61fa50982beb4b255db16eabd901286b2def95789c921688986792a33623",
+      "structureHash": "b443b9fff343c19767fc15380e127ae76fb0acfb46e8b13524346f791c0e6a1c"
     },
     {
       "name": "SoulOfCinderBoss",
@@ -6047,8 +6047,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "8d3886cb83a422c401e186450ed8cdf2aca0ea39cfcbcd7956afae0ea1b0a043",
-      "structureHash": "728657c7465e9ccd1e35a47e02fbf7f2373a8ab959bd836f3599cdd5672b1a96"
+      "hash": "44a35935fa2347c357d7bef0931daa6d5b7dc4c25ec546aaa93abe3d6168456f",
+      "structureHash": "e54c0e0579942b972ce58f5dfbda7931eafa79cda2075e23be6677dd59e5d7ee"
     },
     {
       "name": "SpinoBoss",
@@ -6158,8 +6158,8 @@
         "parryX",
         "visualEffects"
       ],
-      "hash": "92e0b44546f1c38913c4512a6d86f7411f677bc23a1ee5eec0097b4a9a167dc4",
-      "structureHash": "1781ca192c81b54cd333854525bb0ffd0e43a5a1a7d3acc5129cdb7a7e8f14d0"
+      "hash": "e61ff8505abc9dcce741f65f54a5da4ba634382ec06e0a4fa7859c37da006b27",
+      "structureHash": "c3c8eaf3c7b31f53d0719e287641dcb05cad29b6befc70d2a5414d74d6e83d89"
     },
     {
       "name": "SpinoLordBoss",
@@ -6273,8 +6273,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "361ec1b41daef1cb58f00e112d805e129d025efcdbe8f686991ab4d7b9e5f580",
-      "structureHash": "8796a15f591110ed0bbff98fcfabc95c5d5f553bc3f84935b7a0eca923ddd4f3"
+      "hash": "d28a42a7904babad65e7adbd7fca7070941f4b442139064b2dc64bf83c55c10f",
+      "structureHash": "167cb8ba57d915ede9cae947ba60ee85dc652ddf169ef426f1443fe113677da6"
     },
     {
       "name": "SporeCrownBoss",
@@ -6385,8 +6385,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "fc1c64a97d3fbaa9122a0b736db2916dfede54facf4a06e858b5a55d5ce64d29",
-      "structureHash": "e79a69a5bd97a65ffc9d41c2773847f21cf9e76863d2e255d5077a725face517"
+      "hash": "bb8de4d623969ad74cbd23d62523297dddb72b71236df95128477a29ac5cf459",
+      "structureHash": "008005ebe32e733b4af9a40d3c662e97ce5bc7b3a62d2bd318df80a4a6d65cc4"
     },
     {
       "name": "StoneRocBoss",
@@ -6495,8 +6495,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "7adff667bbad8513787f3bb36a18252042a588b606822a959141e0c2aa5fd571",
-      "structureHash": "e6686175a4c3487c73159e8943a5519066cc3a603a3f7035d7d0e630df7aefb1"
+      "hash": "d7eb720dd1651848c12216567a7cdeef7008134cb91afbcdfa82c505a3f0abbf",
+      "structureHash": "04f6fb6f2200737257378445ca8ccafe42912cded254acf79648477d11abd843"
     },
     {
       "name": "StormEagleBoss",
@@ -6609,8 +6609,8 @@
         "troiVy",
         "visualEffects"
       ],
-      "hash": "ab8583746b7edbedd0095f42a5b88d5bc037ae1a786050a5a97d6d1e2af6de3e",
-      "structureHash": "6b53ee01633230a6acc4dec7765593f13c90867fa5fb57962da13eed5d469bb4"
+      "hash": "9c8af3691d8bf3c9b885d8f8a6f064f589d7c446d0a5dfd5815097897b42fd77",
+      "structureHash": "c6097e65e4d6b43979a62fdb0e6a790f5e3ed714ee147cf42796297c41ed1328"
     },
     {
       "name": "StormSerpentBoss",
@@ -6647,8 +6647,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "067d51febe27ad2e33f5b64991cf541ab9f6c2c185be26eab55fde584968ad25",
-      "structureHash": "ec1673d6662802c627206f395b66b4924563433ebd1261bb3c219ed4f1b7950a"
+      "hash": "7dc4bda9bce45c8c991437354f953e3d1310d735ede58e9b8f9918c8957f7c4c",
+      "structureHash": "a82a2c9271478783432b3a4c7308f45ac0a80d9d3cf424927247d422692b5a3e"
     },
     {
       "name": "SummitDragonBoss",
@@ -6762,8 +6762,8 @@
         "pickFromBag",
         "shakeTimer"
       ],
-      "hash": "184b9c945c126b587e50e1f7bede487d995893bedeb66adf9c3985bb61434910",
-      "structureHash": "09f11bcffb9c336161e3e36c06f067a4b9af6ea24e1e328e09ce9e26d74cb603"
+      "hash": "38ea9e47d1725be8c6d354bc514e8c2f2ad63f1629cd1bc947128b4eaa9ac0b1",
+      "structureHash": "0e2fe2c63869f04bdf8d533038a630af8d98bd2f4649d7917e96d2ee55502d94"
     },
     {
       "name": "TRexBoss",
@@ -6872,8 +6872,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "08ace23494553adc7475af8cb3e2b1073ea9bca9c2f5e7c2e35170f6479fe2bd",
-      "structureHash": "917d478e04901c89d51b39973c6993a8c2901316d292b39a74c56322b5be6199"
+      "hash": "ee4f588a28daeed1e812faf5fbd39dde42371ae84cfc778763893da0cab8362c",
+      "structureHash": "d6d2a3fd551f7d92ca712499d062d0840f1f47d34c40043c52053e35fb4ff803"
     },
     {
       "name": "TetrisBoss",
@@ -6995,8 +6995,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "3e4f35c58da229cd53e521e16df180d1a7e61774fbfaa2ba3fb0d54fd85d3aba",
-      "structureHash": "21ca654d2c30af52c67a1c410a6f7742beb08cbbd406e96b2163a7a94c9ab7ce"
+      "hash": "a5eaf01c9d95e1fe4c26d6a9f8c41fc7694cbd32aad487e57075c532efd2605d",
+      "structureHash": "48bffe7dc2ed9771b1dbe233ba4c956b8b715744bdec5bb777345bdf108d46d0"
     },
     {
       "name": "ThalassaBoss",
@@ -7124,8 +7124,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "b534f9bab6665d2082667041a3a519f79f2d85cc482917cd38b7e626376efa3f",
-      "structureHash": "9bce278c88a4bfb5fdb6203f1cec61cf55593d761d144761256db66e17881fd9"
+      "hash": "9213fe67b26b2c2acb4a6c556a1e3be4b7f8bae40bbed267778aca01e702fef1",
+      "structureHash": "eae38d70c1e2dac1e67fa84525dfb597e26b5ed7b62e8cc185471478d82e3c50"
     },
     {
       "name": "TrainingDummy",
@@ -7229,8 +7229,8 @@
         "frames",
         "parry"
       ],
-      "hash": "fdcc17b06b6382b37d4e33284355996e72847e02cdcc5aecda469d5a439f3ccc",
-      "structureHash": "72f8ca4e82ff89fd8137d4b2753a28681bf91f2de005f2ef650dd8a754640fec"
+      "hash": "1732eb31aadb5c6ed867aeae8c585bdab7ff25a90aa4c451ae1f9d05c07d3412",
+      "structureHash": "76e14c3bd660faf22f98705a37ccb5b3540637ccab836a25a38cab39889047ab"
     },
     {
       "name": "TriDino",
@@ -7338,8 +7338,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "a8128e7eff3b9d684ef2123330787b42f277cc502e38292e9e81ba223c791563",
-      "structureHash": "f481f32c07cf116647e0b04fdd49fcadf365ec281353ab268f3ad783e4aade26"
+      "hash": "d4c9c9fa44ca4cb42d8b71dc709a1b0d9d30684f76c2b6c5c0970ac1fe1510f5",
+      "structureHash": "20b97985098e60eabf20f2be93e4f411e34389e5011c152202846159d2471e3b"
     },
     {
       "name": "TriceratopsBoss",
@@ -7450,8 +7450,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "c693749cb52ea851e3e54a80fee6e05ba591cd837a2f9306f8cd43a20f4db3c7",
-      "structureHash": "1d7a5c3164a34a2ad56df54de9b74a25032610d0515f97e4945d16eaece93b9a"
+      "hash": "fe0ccee8e0857dc56708aecc32fe61b214279a0e3f1eacb908c717af9f54f207",
+      "structureHash": "28e26f069bc6d805b2abc788991cc71971a7735e67556d1a9a683ac3adebbddc"
     },
     {
       "name": "TriceratopsLordBoss",
@@ -7563,8 +7563,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "f1965446686bcced1cb65d0b0f1ab6ccd570ce698df14da3dfcf127f9c120f47",
-      "structureHash": "19982dc329d8aa52bb7b9df89414ccdaaa9f81ba5ac65d7e439e6071033dc223"
+      "hash": "d476d17d6945763f5681775a68c9d07d14105281120550d24fd30d50ce2a79d2",
+      "structureHash": "fae0da165b05bf95d2ee56df036107fa335c539c16c86509f756a1a939d008f3"
     },
     {
       "name": "TyrantRexBoss",
@@ -7679,8 +7679,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "3a24bcf8884f8f62519cf0a2d84c4e9e049d7c65ab77dcac1cd68c744024bb82",
-      "structureHash": "86791d826aaa7e890b325a45e8cd684c79d3cd5dca2b3f172971cb59a2a734ba"
+      "hash": "e2f9194fbe36efe036a7eb1f779db707b1242e9b9f36358a9c91141f03454cb3",
+      "structureHash": "66955b53a8e161afa340957d4508f02dce243bd9a3586bfcfafedd1977c77d5a"
     },
     {
       "name": "UnityCloneBoss",
@@ -7809,8 +7809,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "364b5330bc4ea665bbdfd33a63d1dcbe053d168944899b640af404a8ec7d54a4",
-      "structureHash": "31562c4a30e516785c2724733f9c0b76dfdac6b055cfa27d36b8e8f26527ee89"
+      "hash": "28df06977c3e013bd8ba985240612851265cd6f7d1a90d9ebeab28c67486ac1f",
+      "structureHash": "8692b77ee8aed37869cdbc2212d73754a2368ab862a2192cb66742fc0e8aecc6"
     },
     {
       "name": "VajraRexBoss",
@@ -7919,8 +7919,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "987eff3c15bb61aa448959617a2e1668d742a66c194ec64fc63068c5fd1464f6",
-      "structureHash": "4931e37237b074440b2b64e24661ad59cc963851633b039805467e766dd969d0"
+      "hash": "490223b53e58cc6c7b6be7f2712e43c4144d78d8313c4ebf8ac93eaa126cd824",
+      "structureHash": "912e673d53f803dd4872e3f8b3110eefbda1489c3f508b2bb8fd3bef7b04d366"
     },
     {
       "name": "VergilBoss",
@@ -8088,8 +8088,8 @@
         "veCanhKhoan",
         "visualEffects"
       ],
-      "hash": "d0aa68aa3365ed6e181880ec42d97e6afe015fca29e838979fb0b41500469e05",
-      "structureHash": "198e4dc1a2d80a7b1bf881a9079b8a9fad70584f82f9ad852042d8a4f533d1a6"
+      "hash": "45ac03642b4063707bc8ffa86d3223a0932f6cfa86ea8efab173f777c894f9ad",
+      "structureHash": "c9c31f26e50b1ab6a56c9ac0edae5241836750e021727bc4b467b9924a791064"
     },
     {
       "name": "VoltCloneBoss",
@@ -8203,8 +8203,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "55918231efd6ed3c82fb3297ccb7ab268efcae05ee60a1004895eaa21d32b5cf",
-      "structureHash": "de2d8d3a872f0fadd8e3bbcbbf0e77dc7b70137cf80f962ce666c79a28f36df8"
+      "hash": "e51ad933bb75fd9f4baa3ee01f0082ea64b0790699c91fca428e812e98a4213c",
+      "structureHash": "31c237d9d40c328aedc2bb1a01127b08ed1540a6b520ea9abd0468b9e93a48c2"
     },
     {
       "name": "WarBoss",
@@ -8355,8 +8355,8 @@
         "troiVy",
         "visualEffects"
       ],
-      "hash": "c9af312711b6e68cd76b9d96e2df320aadf1ce79a16c584cbe9023c6344ff548",
-      "structureHash": "03c08d76a19400b00d54b7a2ddc558f2d04a1f7d99872541028ddbd346294fda"
+      "hash": "cec441f5b4e44f21fd6027299b1faf83e28be472f0d61df54899cfdef609a621",
+      "structureHash": "87c622844a1b506096ce2462936d43da7a7d105c37c5840b908ff3a483a879c9"
     },
     {
       "name": "Yasuo2Boss",
@@ -8470,8 +8470,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "a563d90327e20212095a9463415beb0fbb81c3042f6ec0a9ddf3bde3b21cf776",
-      "structureHash": "87da37200725c0d01c66cefabf1f5de51c65c26824a08702f7025980a6abcc30"
+      "hash": "1c41b159a3eab3b74fda70822fd849ffcddf616081c9078f2ae4bce2e9ecb945",
+      "structureHash": "ce75a7b8726de925f95f0751db0f7b1c642e9e958f5d712d4caa0224ebab649d"
     },
     {
       "name": "YasuoBoss",
@@ -8593,8 +8593,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "7c67a29e2e07a580c3cec1428f63f39f5e786e037982a7f290448d7c46d3ed53",
-      "structureHash": "ac0a48094cd40b04d539e23a3458c8866f43dd1aa1276fee206b94555b49615a"
+      "hash": "3052853d7271a40da3e50cb7fe4e8a35cbb835f3d0938bcdbb48460ca01bbdc9",
+      "structureHash": "f63a829df9bee4c6612a18ad6352f672403f871808302e6c1b22a94e1e3a93c0"
     },
     {
       "name": "ZeroBoss",
@@ -8713,8 +8713,8 @@
         "voidBat",
         "voidPhanRa"
       ],
-      "hash": "748d56747278aef6210d1d0b9f3f530a0cfe5446ca1fe5e99b01dcc8d223bc3a",
-      "structureHash": "59e5aba379b4dfc9ca491e28f0b92db529a57c3c6000e94b9b4599cbca97b4df"
+      "hash": "5a4499be26e02a05ef0a0751281066910f16eb5410a3b2ffad942214a1285ced",
+      "structureHash": "42d71357e98c2b54bdaab0aaf40b97d85849130576e4fdff55aa2dc504fb71b5"
     },
     {
       "name": "ZeusBoss",
@@ -8786,8 +8786,8 @@
         "voidChanParry",
         "worldR"
       ],
-      "hash": "cc5b1ed1144b7dfd8797b52ff8168e279ade18a0cd0ef95302026a75e0400c9c",
-      "structureHash": "c83644d910d4ac7dc53246ecf6a96a34744f941d4e417ba381b1c749d85ac0a1"
+      "hash": "1f9930bd36f7e5ad99e5de7ab25eb5514a3220c3f096a38b6937196257a40cd7",
+      "structureHash": "cd8d78908464b0c3f0642d6983e3b1d4f4c564f086086253d0e75aef0b2d5450"
     },
     {
       "name": "BossShared",
@@ -8934,8 +8934,8 @@
         "s6.capBoHamChung.1"
       ],
       "external": [],
-      "hash": "3b9d2f23ae35d835cb6c80d2f07e9b7258639a59ba8c4edf9f3eb6b871a7c700",
-      "structureHash": "b8907c1fdf1f4c4b77f28f69af92940a1bb9c843e658a36f7ceb94eabf771b98"
+      "hash": "672ca9d549bafbaea63711031746a71148309856c4c2a91e2b868f0fed9d20d4",
+      "structureHash": "0096f54fd914fea74340540e365b76dbd16758664423a559439e1c7926a34041"
     }
   ],
   "parts": [
