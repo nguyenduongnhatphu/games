@@ -1,12 +1,12 @@
 // PLAYER_FILE: VOLT
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Effect, FloatingText, SFX, activeLightnings, allTargets, bosses, calculateLightningChains, checkAABB, ctx, dashCd, dashVx, dino, doChieu, doChieuCo, doChieuThu, enemies, floatingTexts, frames, hasRune, luotMien, shakeTimer, ultCharge, visualEffects, vkDangKy, voltDashBat
-// index.html:51021 · Phạm vi: global
+// index.html:51025 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.voltLuotUlt.1 EDITABLE
 function voltLuotUlt(dir){
             // Luot SET trong ult Volt: tam ngan lai (truoc kia dashVx=90 lao gan het man)
@@ -19,7 +19,7 @@ function voltLuotUlt(dir){
         }
 // PLAYER_PART_END s4.voltLuotUlt.1
 
-// index.html:51032 · Phạm vi: Player.prototype
+// index.html:51036 · Phạm vi: Player.prototype
 const __Part1 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.fireLightning.1 EDITABLE
 fireLightning(count, totalTargets = 3) {
@@ -37,7 +37,7 @@ fireLightning(count, totalTargets = 3) {
 // PLAYER_PART_END s4.Player.prototype.fireLightning.1
 };
 
-// index.html:51044 · Phạm vi: Player.prototype
+// index.html:51048 · Phạm vi: Player.prototype
 const __Part2 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.tickLightningEffects.1 EDITABLE
 tickLightningEffects() {
@@ -65,7 +65,7 @@ tickLightningEffects() {
 // PLAYER_PART_END s4.Player.prototype.tickLightningEffects.1
 };
 
-// index.html:51066 · Phạm vi: Player.prototype
+// index.html:51070 · Phạm vi: Player.prototype
 const __Part3 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.drawLightningFx.1 EDITABLE
 drawLightningFx() {
@@ -90,7 +90,7 @@ drawLightningFx() {
 // PLAYER_PART_END s4.Player.prototype.drawLightningFx.1
 };
 
-// index.html:51085 · Phạm vi: Player.prototype
+// index.html:51089 · Phạm vi: Player.prototype
 const __Part4 = {
 // PLAYER_PART_BEGIN s4.Player.prototype._bolt.1 EDITABLE
 _bolt(x1, y1, x2, y2, col) {
@@ -100,7 +100,7 @@ _bolt(x1, y1, x2, y2, col) {
 // PLAYER_PART_END s4.Player.prototype._bolt.1
 };
 
-// index.html:51091 · Phạm vi: global
+// index.html:51095 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.6 EDITABLE
 vkDangKy(4, {
             ten: 'VOLT', mauUlt: '#00E5FF',

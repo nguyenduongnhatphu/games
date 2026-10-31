@@ -1,27 +1,27 @@
 // PLAYER_FILE: DanteSDT
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: CM, DSW_MOVES, Effect, SDT_ULT, SFX, checkAABB, combatStance, ctx, danteDraw, danteDrawSword, danteGhost, danteHit, danteKey, danteLabel, danteOn, danteSetStyle, danteStyle, danteStyleLive, danteStyleState, danteSwapWeapon, danteSwordCount, danteSwordPose, danteTeleport, danteTick, dashCd, dashVx, dino, doDash, dojoMode, drawDantePlayerBody, drawSdtDante, drawUI, dswFloor, dswPose, dswReleaseHolds, dswStart, dswState, faustReset, frames, keys, mapTheme, paused, resolveSolidPillars, resolveTetrisWalls, sgDamage, sgSegmentBox, sgTargets, shakeTimer, ultCharge, veCanhKhoan, visualEffects, worldL, worldR
-// index.html:111162 · Phạm vi: global
+// index.html:111166 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.DANTE_SIN_MAX.1 EDITABLE
 const DANTE_SIN_MAX=900,DANTE_SIN_PARTICLES=200;
 // PLAYER_PART_END s16.DANTE_SIN_MAX.1
 
-// index.html:111163 · Phạm vi: global
+// index.html:111167 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.DANTE_SIN_DRILL.1 EDITABLE
 const DANTE_SIN_DRILL={length:150,radius:48,rear:27,palette:{bd:'#24080c',dk:'#110507',lt:'#9a1b21',out:'#ff5722',rim:'#ffc400',eye:'#ffe0b2'}};
 // PLAYER_PART_END s16.DANTE_SIN_DRILL.1
 
-// index.html:111164 · Phạm vi: global
+// index.html:111168 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteDrawSinDrill.1 EDITABLE
 function danteDrawSinDrill(cx,cy,dir,age){veCanhKhoan(cx,cy,dir<0?Math.PI:0,age,DANTE_SIN_DRILL.palette);}
 // PLAYER_PART_END s16.danteDrawSinDrill.1
 
-// index.html:111165 · Phạm vi: global
+// index.html:111169 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteSinDrillBox.1 EDITABLE
 function danteSinDrillBox(fromX,toX,cy,dir){
  const {length,radius,rear}=DANTE_SIN_DRILL;
@@ -29,17 +29,17 @@ function danteSinDrillBox(fromX,toX,cy,dir){
 }
 // PLAYER_PART_END s16.danteSinDrillBox.1
 
-// index.html:111169 · Phạm vi: global
+// index.html:111173 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteSin.1 EDITABLE
 function danteSin(p=dino?.dante){return !!(p&&(p.sinTime>0||p.judgement));}
 // PLAYER_PART_END s16.danteSin.1
 
-// index.html:111170 · Phạm vi: global
+// index.html:111174 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteSinCharge.1 EDITABLE
 function danteSinCharge(p=dino?.dante){return p?.sinCharge||0;}
 // PLAYER_PART_END s16.danteSinCharge.1
 
-// index.html:111171 · Phạm vi: global
+// index.html:111175 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteSinClean.1 EDITABLE
 function danteSinClean(p){
  p.attack=null;p.k=null;p.cd=0;p.swapInput=null;p.swapReady=0;p.rounds=[];
@@ -50,7 +50,7 @@ function danteSinClean(p){
 }
 // PLAYER_PART_END s16.danteSinClean.1
 
-// index.html:111178 · Phạm vi: global
+// index.html:111182 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteSinEnter.1 EDITABLE
 function danteSinEnter(){
  const p=dino?.dante,charge=danteSinCharge(p);if(!p||!danteStyleLive()||paused||danteSin(p)||!(charge>0))return false;
@@ -60,19 +60,19 @@ function danteSinEnter(){
 }
 // PLAYER_PART_END s16.danteSinEnter.1
 
-// index.html:111184 · Phạm vi: global
+// index.html:111188 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteSinExit.1 EDITABLE
 function danteSinExit(){
  const p=dino.dante,saved=p.sinSaved||{arm:0,style:0};danteSinClean(p);p.sinTime=0;p.judgement=null;p.sinBullets=[];p.body._sin=false;p.body._sinDrill=false;p.dt=0;p.arm=saved.arm;p.style=saved.style;combatStance=p.style===1?0:p.style===2?2:3;p.sinSaved=null;dashVx=0;ultCharge=0;
 }
 // PLAYER_PART_END s16.danteSinExit.1
 
-// index.html:111187 · Phạm vi: global
+// index.html:111191 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.sinHitBase.1 EDITABLE
 const sinHitBase=danteHit;
 // PLAYER_PART_END s16.sinHitBase.1
 
-// index.html:111188 · Phạm vi: global
+// index.html:111192 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteHit.1 EDITABLE
 danteHit=function(p,o,damage,...args){
  const full=!o._beamClashPoint&&ultCharge>=100&&!p.dt&&!danteSin(p),dealt=sinHitBase(p,o,damage,...args);
@@ -81,22 +81,22 @@ danteHit=function(p,o,damage,...args){
 };
 // PLAYER_PART_END s16.danteHit.1
 
-// index.html:111193 · Phạm vi: global
+// index.html:111197 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.sinSwordCountBase.1 EDITABLE
 const sinSwordCountBase=danteSwordCount;
 // PLAYER_PART_END s16.sinSwordCountBase.1
 
-// index.html:111194 · Phạm vi: global
+// index.html:111198 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteSwordCount.1 EDITABLE
 danteSwordCount=function(){return danteSin()?6:sinSwordCountBase();};
 // PLAYER_PART_END s16.danteSwordCount.1
 
-// index.html:111195 · Phạm vi: global
+// index.html:111199 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.sinSwordStartBase.1 EDITABLE
 const sinSwordStartBase=dswStart;
 // PLAYER_PART_END s16.sinSwordStartBase.1
 
-// index.html:111196 · Phạm vi: global
+// index.html:111200 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.dswStart.1 EDITABLE
 dswStart=function(id,...args){
  const p=dino?.dante;if(danteSin(p)&&id==='stinger'){danteSinDrill();return;}
@@ -104,17 +104,17 @@ dswStart=function(id,...args){
 };
 // PLAYER_PART_END s16.dswStart.1
 
-// index.html:111200 · Phạm vi: global
+// index.html:111204 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.sinPoseBase.1 EDITABLE
 const sinPoseBase=dswPose;
 // PLAYER_PART_END s16.sinPoseBase.1
 
-// index.html:111201 · Phạm vi: global
+// index.html:111205 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.dswPose.1 EDITABLE
 dswPose=function(...args){const v=sinPoseBase(...args);if(args[0]?.dante&&danteSin(args[0].dante)){v.len*=1.35;v.tx=v.x+v.dir*Math.cos(v.angle)*v.len;v.ty=v.y+Math.sin(v.angle)*v.len*v.flat;v.red=true;}return v;};
 // PLAYER_PART_END s16.dswPose.1
 
-// index.html:111202 · Phạm vi: global
+// index.html:111206 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteSinBlink.1 EDITABLE
 function danteSinBlink(){
  const n=dino,dir=n.isFacingLeft?-1:1;
@@ -123,12 +123,12 @@ function danteSinBlink(){
 }
 // PLAYER_PART_END s16.danteSinBlink.1
 
-// index.html:111207 · Phạm vi: global
+// index.html:111211 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.sinDashBase.1 EDITABLE
 const sinDashBase=doDash;
 // PLAYER_PART_END s16.sinDashBase.1
 
-// index.html:111208 · Phạm vi: global
+// index.html:111212 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.doDash.1 EDITABLE
 doDash=function(direction){
  if(!danteSin())return sinDashBase(direction);if(!danteStyleLive()||paused||dino.dante.judgement)return;
@@ -139,7 +139,7 @@ doDash=function(direction){
 };
 // PLAYER_PART_END s16.doDash.1
 
-// index.html:111215 · Phạm vi: global
+// index.html:111219 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteSinDrill.1 EDITABLE
 function danteSinDrill(){
  const p=dino.dante;if(!p.sinTime||p.judgement||p.sinTime<45)return;
@@ -147,7 +147,7 @@ function danteSinDrill(){
 }
 // PLAYER_PART_END s16.danteSinDrill.1
 
-// index.html:111219 · Phạm vi: global
+// index.html:111223 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteSinFire.1 EDITABLE
 function danteSinFire(){
  const n=dino,p=n.dante;if(!p.sinTime||p.judgement||p.sinTime<36||p.sinShotCount>=DANTE_SIN_PARTICLES||frames<(p.sinShotReady||0)||p.attack)return;
@@ -162,7 +162,7 @@ function danteSinFire(){
 }
 // PLAYER_PART_END s16.danteSinFire.1
 
-// index.html:111230 · Phạm vi: global
+// index.html:111234 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteJudgement.1 EDITABLE
 function danteJudgement(){
  const n=dino,p=n.dante;if(!p.sinTime||p.judgement)return;
@@ -175,12 +175,12 @@ function danteJudgement(){
 }
 // PLAYER_PART_END s16.danteJudgement.1
 
-// index.html:111239 · Phạm vi: global
+// index.html:111243 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.sinKeyBase.1 EDITABLE
 const sinKeyBase=danteKey;
 // PLAYER_PART_END s16.sinKeyBase.1
 
-// index.html:111240 · Phạm vi: global
+// index.html:111244 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteKey.1 EDITABLE
 danteKey=function(code,repeat){
  if(!danteStyleLive())return sinKeyBase(code,repeat);
@@ -196,27 +196,27 @@ danteKey=function(code,repeat){
 };
 // PLAYER_PART_END s16.danteKey.1
 
-// index.html:111252 · Phạm vi: global
+// index.html:111256 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.sinSetStyleBase.1 EDITABLE
 const sinSetStyleBase=danteSetStyle;
 // PLAYER_PART_END s16.sinSetStyleBase.1
 
-// index.html:111253 · Phạm vi: global
+// index.html:111257 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteSetStyle.1 EDITABLE
 danteSetStyle=function(index){if(danteSin())return;return sinSetStyleBase(index);};
 // PLAYER_PART_END s16.danteSetStyle.1
 
-// index.html:111254 · Phạm vi: global
+// index.html:111258 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.sinSwapBase.1 EDITABLE
 const sinSwapBase=danteSwapWeapon;
 // PLAYER_PART_END s16.sinSwapBase.1
 
-// index.html:111255 · Phạm vi: global
+// index.html:111259 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteSwapWeapon.1 EDITABLE
 danteSwapWeapon=function(...args){if(danteSin())return;return sinSwapBase(...args);};
 // PLAYER_PART_END s16.danteSwapWeapon.1
 
-// index.html:111256 · Phạm vi: global
+// index.html:111260 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteSinTick.1 EDITABLE
 function danteSinTick(){
  if(!danteStyleLive()||paused)return;const n=dino,p=n.dante;
@@ -292,7 +292,7 @@ function danteSinTick(){
 }
 // PLAYER_PART_END s16.danteSinTick.1
 
-// index.html:111328 · Phạm vi: global
+// index.html:111332 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteJudgementFalloff.1 EDITABLE
 function danteJudgementFalloff(center,o){
  const x=Math.max(o.x,Math.min(center.x,o.x+o.w)),y=Math.max(o.y,Math.min(center.y,o.y+o.h));
@@ -300,7 +300,7 @@ function danteJudgementFalloff(center,o){
 }
 // PLAYER_PART_END s16.danteJudgementFalloff.1
 
-// index.html:111332 · Phạm vi: global
+// index.html:111336 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteJudgementSwords.1 EDITABLE
 function danteJudgementSwords(j,n){
  for(const sword of j.swords){
@@ -317,7 +317,7 @@ function danteJudgementSwords(j,n){
 }
 // PLAYER_PART_END s16.danteJudgementSwords.1
 
-// index.html:111345 · Phạm vi: global
+// index.html:111349 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteDrawJudgement.1 EDITABLE
 function danteDrawJudgement(j){
  SDT_ULT.veDonKet.call({suVung:{...j.fx,kiem:[]}});
@@ -337,22 +337,22 @@ function danteDrawJudgement(j){
 }
 // PLAYER_PART_END s16.danteDrawJudgement.1
 
-// index.html:111361 · Phạm vi: global
+// index.html:111365 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.sinTickBase.1 EDITABLE
 const sinTickBase=danteTick;
 // PLAYER_PART_END s16.sinTickBase.1
 
-// index.html:111362 · Phạm vi: global
+// index.html:111366 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteTick.1 EDITABLE
 danteTick=function(){sinTickBase();danteSinTick();};
 // PLAYER_PART_END s16.danteTick.1
 
-// index.html:111363 · Phạm vi: global
+// index.html:111367 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.sinBodyBase.1 EDITABLE
 const sinBodyBase=drawDantePlayerBody;
 // PLAYER_PART_END s16.sinBodyBase.1
 
-// index.html:111364 · Phạm vi: global
+// index.html:111368 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.drawDantePlayerBody.1 EDITABLE
 drawDantePlayerBody=function(b,x,y){if(!b._sin)return sinBodyBase(b,x,y);
  if(b._sinDrill){
@@ -361,12 +361,12 @@ drawDantePlayerBody=function(b,x,y){if(!b._sin)return sinBodyBase(b,x,y);
  drawSdtDante({...b,drawn:false},x-13,y-28);};
 // PLAYER_PART_END s16.drawDantePlayerBody.1
 
-// index.html:111369 · Phạm vi: global
+// index.html:111373 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.sinDrawBase.1 EDITABLE
 const sinDrawBase=danteDraw;
 // PLAYER_PART_END s16.sinDrawBase.1
 
-// index.html:111370 · Phạm vi: global
+// index.html:111374 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.danteDraw.1 EDITABLE
 danteDraw=function(n){
  sinDrawBase(n);const p=n.dante;if(!p||!danteSin(p))return;
@@ -380,12 +380,12 @@ danteDraw=function(n){
 };
 // PLAYER_PART_END s16.danteDraw.1
 
-// index.html:111380 · Phạm vi: global
+// index.html:111384 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.sinUIBase.1 EDITABLE
 const sinUIBase=drawUI;
 // PLAYER_PART_END s16.sinUIBase.1
 
-// index.html:111381 · Phạm vi: global
+// index.html:111385 · Phạm vi: global
 // PLAYER_PART_BEGIN s16.drawUI.1 EDITABLE
 drawUI=function(){
  sinUIBase();if(!danteOn()||!dino?.dante)return;const p=dino.dante;ctx.save();if(dojoMode)ctx.translate(0,15);

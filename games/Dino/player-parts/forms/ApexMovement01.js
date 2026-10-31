@@ -1,40 +1,40 @@
 // PLAYER_FILE: ApexMovement01
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: OCEAN_SURF, afterimages, apexColor, dino, doChieu, doChieuCo, doChieuThu, floatingTexts, keys, mapTheme, platforms, projectiles, sgDamage, sgRocketClash, sgSegmentBox, sgTargets, worldL, worldR
-// index.html:101356 · Phạm vi: apexCreate
+// index.html:101360 · Phạm vi: apexCreate
 function __Part0(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.updateJumpUI.1 EDITABLE
 function updateJumpUI(){}
 // PLAYER_PART_END s8.apexCreate.updateJumpUI.1
 }}
 
-// index.html:101356 · Phạm vi: apexCreate
+// index.html:101360 · Phạm vi: apexCreate
 function __Part1(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.updateDashUI.1 EDITABLE
 function updateDashUI(){}
 // PLAYER_PART_END s8.apexCreate.updateDashUI.1
 }}
 
-// index.html:101356 · Phạm vi: apexCreate
+// index.html:101360 · Phạm vi: apexCreate
 function __Part2(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.updateChargeUI.1 EDITABLE
 function updateChargeUI(){}
 // PLAYER_PART_END s8.apexCreate.updateChargeUI.1
 }}
 
-// index.html:101356 · Phạm vi: apexCreate
+// index.html:101360 · Phạm vi: apexCreate
 function __Part3(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.updateStatusBadge.1 EDITABLE
 function updateStatusBadge(){}
 // PLAYER_PART_END s8.apexCreate.updateStatusBadge.1
 }}
 
-// index.html:101702 · Phạm vi: apexCreate
+// index.html:101706 · Phạm vi: apexCreate
 function __Part4(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.startLedgeClimb.1 EDITABLE
 function startLedgeClimb() {
@@ -64,7 +64,7 @@ function startLedgeClimb() {
 // PLAYER_PART_END s8.apexCreate.startLedgeClimb.1
 }}
 
-// index.html:101726 · Phạm vi: apexCreate
+// index.html:101730 · Phạm vi: apexCreate
 function __Part5(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.triggerDash.1 EDITABLE
 function triggerDash(direction) {
@@ -139,7 +139,7 @@ function triggerDash(direction) {
 // PLAYER_PART_END s8.apexCreate.triggerDash.1
 }}
 
-// index.html:101795 · Phạm vi: apexCreate
+// index.html:101799 · Phạm vi: apexCreate
 function __Part6(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.triggerJump.1 EDITABLE
 function triggerJump() {
@@ -277,7 +277,7 @@ function triggerJump() {
 // PLAYER_PART_END s8.apexCreate.triggerJump.1
 }}
 
-// index.html:102595 · Phạm vi: apexCreate
+// index.html:102599 · Phạm vi: apexCreate
 function __Part7(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.update.1 EDITABLE
 function update(rawDtSec) {
@@ -1021,7 +1021,7 @@ function update(rawDtSec) {
 // PLAYER_PART_END s8.apexCreate.update.1
 }}
 
-// index.html:103333 · Phạm vi: apexCreate
+// index.html:103337 · Phạm vi: apexCreate
 function __Part8(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.updateLooseObjects.1 EDITABLE
 function updateLooseObjects(dt){
@@ -1300,21 +1300,21 @@ function updateLooseObjects(dt){
 // PLAYER_PART_END s8.apexCreate.updateLooseObjects.1
 }}
 
-// index.html:105422 · Phạm vi: apexCreate
+// index.html:105426 · Phạm vi: apexCreate
 function __Part9(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.wallBudget.1 EDITABLE
 let wallBudget=120,wallCooldown=0,wallRest=0,wallBreakAge=40;
 // PLAYER_PART_END s8.apexCreate.wallBudget.1
 }}
 
-// index.html:105423 · Phạm vi: apexCreate
+// index.html:105427 · Phạm vi: apexCreate
 function __Part10(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.previous.1 EDITABLE
 let previous={},dashHits=new Set(),leafClock=0,leafStage='',leafs=[],nativeMap=new Map();
 // PLAYER_PART_END s8.apexCreate.previous.1
 }}
 
-// index.html:105434 · Phạm vi: apexCreate
+// index.html:105438 · Phạm vi: apexCreate
 function __Part11(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.syncTargets.1 EDITABLE
 function syncTargets(){targets.length=0;for(const o of sgTargets(owner))targets.push({o,x:(o.x+o.w/2)/SCALE,y:(o.y+o.h/2)/SCALE,radius:Math.min(o.w,o.h)/2/SCALE,get hp(){return o.hp},vx:0,color:currentSkin.energyGlow});}

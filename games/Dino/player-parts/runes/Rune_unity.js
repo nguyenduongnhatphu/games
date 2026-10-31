@@ -1,12 +1,12 @@
 // PLAYER_FILE: Rune_unity
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: RUNES
-// index.html:83760 · Phạm vi: global
+// index.html:83764 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RUNES.push.9 EDITABLE
 RUNES.push({ id:'unity', name:'UNITY', nameEn:'UNITY', icon:'◆', cost:2, ammoRune:true,
             desc:'Tốn 2 ô. Mang theo BA loại đạn cùng lúc, đổi giữa trận bằng Q / E — 3 giây một lần, và mỗi lần đổi thì cả trận chạy ở NỬA TỐC ĐỘ trong 2 giây. KỸ NĂNG HỢP NHẤT [Y] — nạp riêng, KHÔNG dùng chung với chiêu cuối: ba viên ngọc gộp lại, đòn kế tiếp (J hoặc K) mang đặc tính gốc của cả ba hệ — hàng trăm tổ hợp khác nhau. Thanh Hợp Nhất nạp 1% mỗi giây, cộng thêm theo Stylish — đánh trúng, né đòn, lướt qua đạn đều đẩy nó lên, y như thanh chiêu cuối. Nhưng MỖI LƯỢT CẦM MỘT LOẠI ĐẠN chỉ góp được tối đa 20%: hết hạn mức thì thanh đứng im dù bạn làm gì, phải đổi đạn; đổi đi rồi quay lại thì được thêm 20% nữa. Muốn đầy thanh phải xoay vòng cả ba loại ít nhất năm lượt. Phím U vẫn là chiêu cuối RIÊNG của loại đạn đang cầm. Đổi đạn giữa Channel thì được, nhưng cú đổi sẽ NGẮT Channel đang chạy. Chọn 3 loại đạn ở bảng phía dưới.\n\nHAI HỆ CẬN CHIẾN CÓ ĐÒN RIÊNG: có GIÁO trong bộ ba thì Hợp Nhất triệu một cây giáo xoay quanh bạn 2.6 giây, mỗi vòng 3 sát thương và gạt sạch đạn địch — đang cầm giáo thì mũi bốc lửa, lên 5. Có BÚA thì Hợp Nhất kéo theo một luồng sét chạy từ chỗ bạn tới rìa bản đồ, mỗi tia 3 sát thương, mục tiêu càng to càng dính nhiều tia. Có ĐẠI KIẾM thì Hợp Nhất cắm một thanh kiếm lớn giữa map: mọi kẻ địch ăn 5 và bị khống chế 2 giây. Kẻ đang bay bị đập xuống, ăn thêm 5 và bị khống chế thêm 2 giây.\n\nBẢY LOẠI ĐẠN MỚI cũng góp đặc tính: CUSTOM — mỗi mục tiêu trúng ăn hiệu ứng nhánh HIỆU ỨNG đang lắp, lắp TIẾP TRỢ thì bắn kèm 2 TÊN LỬA miễn phí. MIDAS — kèm một HADOKEN TO 10 sát thương, bay hết map, xuyên. VENOM — mỗi viên trúng cấy 1 tầng Tơ và rơi 1 mảnh cơ thể. PHI TIÊU — mỗi viên trúng cắm một kim, hết loạt thì giật dây: mỗi kim +1. KIẾM VŨ — đạn KHÔNG bắn ra mà gom lên đầu thành SPIRIT BALL, rồi lao chéo xuống kẻ địch như THIÊN THẠCH và nổ to: mọi mục tiêu trong vùng nổ ăn 200% tổng sát thương cả loạt. DINOSAW — ném một LƯỠI CƯA tự tìm mục tiêu, 18 sát thương. LƯỠI HÁI — thần chết hiện ra ở mép sau màn hình, chém một NHÁT BÁN NGUYỆT tím khổng lồ quét ngang cả map, 10 sát thương.',

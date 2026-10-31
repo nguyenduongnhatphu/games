@@ -1,12 +1,12 @@
 // PLAYER_FILE: IronhaulForm02
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
-// Tham chiếu ngoài: IRON_FORM, IRON_MODES, Player, ammoPicker, ammoXem, apexWrap, battuMa, ctx, cusNCPicker, dino, dojoMode, dojoUltBusy, drawCustomMenu, drawUI, formAmmoSummary, frames, ironBody, ironForm, ironGeometry, ironOn, ironRenderBodyWithKinematics, ironTarget, ironWhite, ironhaulPolygon, ironhaulRobot, ironhaulTruck, runePicker, runeXem, ultCharge, xDatForm
-// index.html:116200 · Phạm vi: global
+// Tham chiếu ngoài: IRON_DRIVE_MAX, IRON_DRIVE_RUNUP, IRON_FORM, IRON_MODES, IRON_ROBOT_H, IRON_ROBOT_W, Player, ammoPicker, ammoXem, apexWrap, battuMa, ctx, cusNCPicker, dino, dojoMode, dojoUltBusy, drawCustomMenu, drawUI, formAmmoSummary, frames, ironBody, ironForm, ironGeometry, ironOn, ironRenderBodyWithKinematics, ironTarget, ironWhite, ironhaulPolygon, ironhaulRobot, ironhaulTruck, runePicker, runeXem, ultCharge, xDatForm
+// index.html:116273 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironDraw.1 EDITABLE
 function ironDraw(n){
     const p=n.ironhaul,b=ironBody(n);
@@ -235,85 +235,87 @@ function ironDraw(n){
     }
 
     for(const f of p.fx){ctx.save();ctx.globalAlpha=f.t/f.max;ctx.strokeStyle='#b4f5ff';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(f.x,f.y,f.r*(1-f.t/f.max*.6),f.r*.5*(1-f.t/f.max*.6),0,0,7);ctx.stroke();ctx.restore();}
+    if(p.mode===2&&frames<p.driveGuardUntil){ctx.save();ctx.strokeStyle='#aaf7ff';ctx.lineWidth=3;ctx.shadowColor='#55dcff';ctx.shadowBlur=12;ctx.translate(cx+dir*n.w*.44,cy);ctx.scale(dir,1);ctx.beginPath();ctx.ellipse(0,0,10,n.h*.65,0,-Math.PI/2,Math.PI/2);ctx.stroke();ctx.restore();}
+    if(p.mode===2&&Math.abs(p.driveSpeed)>8){ctx.save();ctx.strokeStyle='#94cfee';ctx.globalAlpha=.5;ctx.lineWidth=2;for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(cx-dir*50,cy-8+i*8);ctx.lineTo(cx-dir*(68+Math.abs(p.driveSpeed)*i),cy-8+i*8);ctx.stroke();}ctx.restore();}
     if(frames<p.guardUntil){ctx.save();ctx.strokeStyle=frames<p.perfectUntil?'#fff6c4':'#9de8ff';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(cx,cy,n.w*.82,n.h*.6,0,0,7);ctx.stroke();ctx.restore();}
     if(p.k!==null){ctx.save();ctx.strokeStyle=p.k>=32?'#fff5b5':'#80ddff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,cy,26,0,Math.PI*2*Math.min(1,p.k/32));ctx.stroke();ctx.restore();}
 }
 // PLAYER_PART_END s22.ironDraw.1
 
-// index.html:116430 · Phạm vi: global
+// index.html:116505 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironDrawBase.1 EDITABLE
 const ironDrawBase=Player.prototype.draw;
 // PLAYER_PART_END s22.ironDrawBase.1
 
-// index.html:116430 · Phạm vi: global
+// index.html:116505 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.Player.prototype.draw.1 EDITABLE
 Player.prototype.draw=function(...args){if(ironOn()&&this===dino&&this.ironhaul){ironDraw(this);return;}return ironDrawBase.apply(this,args);};
 // PLAYER_PART_END s22.Player.prototype.draw.1
 
-// index.html:116431 · Phạm vi: global
+// index.html:116506 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironPlayerPreview.1 EDITABLE
 function ironPlayerPreview(x,feet){
     for(const mode of [0,1,2]){
-        const cx=x+(mode-1)*90,w=mode===2?86:40,h=mode===2?34:68;
+        const cx=x+(mode-1)*90,w=mode===2?86:IRON_ROBOT_W,h=mode===2?34:IRON_ROBOT_H;
         const sample={x:cx-w/2,y:feet-h,w,h,isFacingLeft:false,grounded:true,ironhaul:{mode,attack:null,core:0,muzzle:0,shieldOut:0,gait:frames*.025,lastX:cx-w/2}};
         const b=ironBody(sample);ctx.save();ctx.scale(b.scale,b.scale);if(b.vehicle)ironhaulTruck(b);else ironhaulRobot(b);ctx.restore();
     }
 }
 // PLAYER_PART_END s22.ironPlayerPreview.1
 
-// index.html:116438 · Phạm vi: global
+// index.html:116513 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironUiBase.1 EDITABLE
 const ironUiBase=drawUI;
 // PLAYER_PART_END s22.ironUiBase.1
 
-// index.html:116439 · Phạm vi: global
+// index.html:116514 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.drawUI.1 EDITABLE
 drawUI=function(){
     ironUiBase();if(!ironOn()||!dino.ironhaul)return;const p=dino.ironhaul,white=ironWhite(p);
     ctx.save();if(dojoMode)ctx.translate(0,15);ctx.fillStyle='#101e2c';ctx.fillRect(10,45,308,150);ctx.textAlign='left';ctx.font='bold 13px Consolas';ctx.fillStyle=white?'#efffff':'#b8edfa';ctx.fillText('IRONHAUL · '+IRON_MODES[p.mode],20,65);
-    ctx.font='11px Consolas';ctx.fillStyle='#e1edf2';ctx.fillText(white?'SILVER AEGIS · '+(p.silverFinishing?'FINAL DISCHARGE':(p.silver/60).toFixed(1)+'s'):'Q/E: ROBOT / TRUCK · J×5: COMBO',20,85);
-    formAmmoSummary(p.attack?.move.name||(p.k!==null?'GIỮ K: PHÁO TAM LIÊN':'J DASH / DASH J · K DASH / DASH K'),20,105,284,13);
+    ctx.font='11px Consolas';ctx.fillStyle='#e1edf2';ctx.fillText(white?'SILVER AEGIS · '+(p.silverFinishing?'FINAL DISCHARGE':(p.silver/60).toFixed(1)+'s'):p.mode===2?'A/D: LÁI · S + NGƯỢC: LÙI · DASH: NITRO':'Q/E: ROBOT / TRUCK · J×5: COMBO',20,85);
+    formAmmoSummary(p.mode===2?'TỐC ĐỘ '+Math.round(Math.abs(p.driveSpeed)/IRON_DRIVE_MAX*100)+'% · '+(frames<p.driveGuardUntil?'GIÁP XUNG KÍCH':p.driveReverse?'SỐ LÙI':Math.round(p.driveDistance/IRON_DRIVE_RUNUP*100)+'% ĐÀ'):p.attack?.move.name||(p.k!==null?'GIỮ K: PHÁO TAM LIÊN':'J DASH / DASH J · K DASH / DASH K'),20,105,284,13);
     ctx.fillText(white?'I: NOVA · O: SOVEREIGN · U: ĐÒN KẾT':p.core?'KIẾM CƯỜNG HÓA: '+(p.core/60).toFixed(1)+'s':'I: LÕI '+(p.coreReady?Math.ceil(p.coreReady/60)+'s':'SẴN SÀNG')+' · O: ĐÒN NẶNG',20,133);
     ctx.fillStyle='#294355';ctx.fillRect(20,146,282,8);ctx.fillStyle=white?'#ecffff':'#a8efff';ctx.fillRect(20,146,282*(white?(p.silverFinishing?0:p.silver/p.silverMax):Math.min(100,ultCharge)/100),8);ctx.fillStyle='#fff';ctx.fillText(white?'U: DỒN THỜI GIAN CÒN LẠI → AEGIS BREAKER':'U: SILVER AEGIS 12s · '+Math.floor(ultCharge)+'%',20,178);ctx.restore();
 };
 // PLAYER_PART_END s22.drawUI.1
 
-// index.html:116447 · Phạm vi: global
+// index.html:116522 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironMenuBase.1 EDITABLE
 const ironMenuBase=drawCustomMenu;
 // PLAYER_PART_END s22.ironMenuBase.1
 
-// index.html:116448 · Phạm vi: global
+// index.html:116523 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.drawCustomMenu.1 EDITABLE
 drawCustomMenu=function(){
     ironMenuBase();if(!ironOn()||runePicker!==null||battuMa||runeXem||ammoPicker||cusNCPicker||ammoXem!==null)return;
     ctx.save();ctx.fillStyle='#10212e';ctx.fillRect(24,76,276,452);ctx.fillRect(702,80,272,436);ctx.textAlign='left';ctx.fillStyle='#b1edff';ctx.font='bold 21px Consolas';ctx.fillText('IRONHAUL · MECHA',38,108);ctx.fillText('SILVER AEGIS · ULT',716,111);ctx.font='12px Consolas';ctx.fillStyle='#dbeaf2';
-    apexWrap('CƠ GIÁP CHIẾN THUẬT (HEAVY MECHA)\n\n• J ×5: Kiếm Nhiệt → Nổ Cò Súng →\n  Đột Cọc Thủy Lực (Pile Bunker)!\n• Đang chém J bấm K: Pháo Kích\n  Gunblade & Đóng Cọc Cận Chiến!\n• K: Súng máy / Giữ K: Mưa Tên Lửa\n  Vòm Dẫn Đường (Valkyrie Pods)\n• Dash J: Đột kích phản lực + Cọc\n• Dash K: Pháo Điện Từ (Railgun)\n• J/K + Dash: Lùi bắn & Phóng tên lửa\n• Q/E khi đang đánh: BIẾN HÌNH\n  TÔNG XE / ĐẬP ĐẤT TỨC THÌ!\n• I: Nổ Lõi Overdrive tức thì + Tên lửa\n• O: Đột Cọc Thủy Lực Cực Đại\n• L: Khiên Từ Trường (Perfect -> Phản)',38,140,248,18);
+    apexWrap('CƠ GIÁP CHIẾN THUẬT (HEAVY MECHA)\n\n• J ×5: Kiếm Nhiệt → Nổ Cò Súng →\n  Đột Cọc Thủy Lực (Pile Bunker)!\n• Đang chém J bấm K: Pháo Kích\n  Gunblade & Đóng Cọc Cận Chiến!\n• K: Súng máy ngắm mục tiêu / Giữ K:\n  Pháo + 2 tên lửa dẫn đường\n• Dash J: Đột kích phản lực + Cọc\n• Dash K: Pháo Điện Từ (Railgun)\n• J/K + Dash: Lùi bắn & Phóng tên lửa\n• Xe: A/D lái, S + ngược để lùi\n• Dash xe: Nitro, tự do đổi hướng\n• Q/E khi đang đánh: BIẾN HÌNH\n  TÔNG XE / ĐẬP ĐẤT TỨC THÌ!\n• I: Nổ Lõi Overdrive tức thì + Tên lửa\n• O: Đột Cọc Thủy Lực Cực Đại\n• L: Khiên Từ Trường (Perfect -> Phản)',38,140,248,18);
     apexWrap('SILVER AEGIS (OVERDRIVE 12 GIÂY)\nTriệu hồi Phễu Bay (Bit Funnels) &\nSát thương ×1.5 +1; Kiếm Quang Học.\n\n• J ×5: Quang Trảm → Khiên Xoay →\n  Cross Requiem → Sovereign Array\n  (Bão Kiếm Khí & Mưa Tên Lửa!)\n• Dash J: Thương Ánh Sáng + Cọc Nổ\n• Dash K: Song Luân Khiên + Tên Lửa\n• J/K Jump: Không Chiến Tên Lửa\n• Cúi K / I: Vụ Nổ Lõi Quang Học\n• O: Sovereign Array (Bão Kiếm Khí)\n\n• U LẦN NỮA: AEGIS BREAKER\n  Dồn năng lượng còn lại kích nổ\n  toàn màn hình + Mưa Tên Lửa!',716,142,246,17);ctx.restore();
 };
 // PLAYER_PART_END s22.drawCustomMenu.1
 
-// index.html:116454 · Phạm vi: global
+// index.html:116529 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironGuardMenuBase.1 EDITABLE
 const ironGuardMenuBase=drawCustomMenu;
 // PLAYER_PART_END s22.ironGuardMenuBase.1
 
-// index.html:116454 · Phạm vi: global
+// index.html:116529 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.drawCustomMenu.2 EDITABLE
 drawCustomMenu=function(){ironGuardMenuBase();if(!ironOn()||runePicker!==null||battuMa||runeXem||ammoPicker||cusNCPicker||ammoXem!==null)return;ctx.save();ctx.fillStyle='#120c06';ctx.fillRect(334,388,338,78);ctx.font='bold 13px Consolas';ctx.fillStyle='#b1edff';ctx.textAlign='left';ctx.fillText('GUARD',340,410);ctx.textAlign='center';ctx.fillText('PARRY / COUNTER',548,410);ctx.textAlign='left';ctx.font='11px Consolas';ctx.fillStyle='#90aebe';ctx.fillText('L: Perfect 7f / Silver 9f → phản kích',340,439);ctx.restore();};
 // PLAYER_PART_END s22.drawCustomMenu.2
 
-// index.html:116455 · Phạm vi: global
+// index.html:116530 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.ironUltBusyBase.1 EDITABLE
 const ironUltBusyBase=dojoUltBusy;
 // PLAYER_PART_END s22.ironUltBusyBase.1
 
-// index.html:116455 · Phạm vi: global
+// index.html:116530 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.dojoUltBusy.1 EDITABLE
 dojoUltBusy=function(n){return !!(ironOn()&&n===dino&&n.ironhaul?.attack?.move.ultimate)||ironUltBusyBase(n);};
 // PLAYER_PART_END s22.dojoUltBusy.1
 
-// index.html:116456 · Phạm vi: global
+// index.html:116531 · Phạm vi: global
 // PLAYER_PART_BEGIN s22.IfStatement.1 EDITABLE
 if(ironForm)xDatForm(IRON_FORM);
 // PLAYER_PART_END s22.IfStatement.1

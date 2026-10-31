@@ -1,12 +1,12 @@
 // PLAYER_FILE: EngineHooks
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: CUS_DAN, DANG_NOR_LUOT, DANG_XUONG, DANG_XUONG_LUOT, Effect, FloatingText, MAP_CHUOI, MIDAS_DAN, MIDAS_PARRY, MIDAS_PARRY_HH, OCEAN_SURF, PARRY_MIN_BLOCK, PARRY_MIN_PERFECT, PARRY_PCT_BLOCK, PARRY_PCT_PERFECT, PARRY_RG_BONUS, PARRY_ULT_BLOCK, PARRY_ULT_PERFECT, Player, SFX, SM_CLONE_LIFE, ST_NHIP, _bucCache, activeLightnings, addStyle, aegisShieldDmg, afterimages, aiBat, aiBatP1, aiDoKho, aiReset, allTargets, baseSpeed, battuDem, battuNhay, bienChon, bienDT, bienKhoiTao, birdBank, birdDmgAcc, birdSpendCd, boomerangs, bossContactAttack, bossLevel, bossProjectiles, bossRushStage, bossWaitTimer, bosses, camReset, camX, canvas, checkAABB, clNhanTat, cloneGauntlet, combatStance, critStack, currentAmmoType, currentForm, cusAcDs, cusAcNo, cusAcPhan, cusCapCua, cusCgDan, cusDanBuoc, cusGb, cusKhoan, cusKvReset, cusMt, cusMtTen, cusNkPhim, cusNkTat, cusNkTatSo, cusNoBom, cusNoCd, cusNoDat, cusNoLon, cusNuke, cusPtChay, cusPtDan, cusQN, cusRgBat, cusRgDan, cusRgKBat, cusRgLuotBat, cusRgSet, cusStand, cusTLNo, cusTTCd, cusTTHom, cusTTNo, cusTTTruc, cusTanChay, cusTl, cusToaHen, cusToaHenDat, cusToaTia, cusToaVong, cusUfo, cusUfoBat, cusUfoHoiCd, cusUzA, cusUzDan, cusUzu, damageBossFromAmmo, damageBossWithFirstStrike, damagePrismBossWithRunes, danteGuardContact, dantePerfectGuard, danteRoyalShield, danteStyleState, dashCd, dashVx, deathCineActive, deathCineFrame, deathReviveLevel, defMode, defUnits, dino, dino2, dkNenY, doChieuDong, doVoVatBoss, dodgeCd, dojoMode, dragReset, dswCancel, duelMode, duelOver, duelWinner, enemies, fireBrands, flashKind, floatingTexts, forestBossQueue, forestNextChunk, forestQueueInit, forestScene, frames, freeMove, gaeChop, gaeTro, gameOver, gameSpeed, gameState, gameVictory, gauntletGate, grassField, grazeFlashTimer, grazeX, grazeY, handleEnemyDeath, hasRune, hearts, hitstopTimer, ironSilverEnd, keys, khienLuotHit, khienManh, kimCoAnh, kimCoDe, lanMang, lanRieng2, laserBlockFlag, laserEngaged, laserFireTimer, lastMoveTapDir, lastMoveTapTime, lavaFlood, lavaGeysers, lh, lhLuot, lhReset, luotMien, mapChay, mapNen, mapTheme, mayDanhDauLuot, midasCong, midasHado, midasHadoNo, midasHakiCham, mortarBuoc, nextBossScore, noDamageTaken, noDmgStreak, noPhanHach, normalBossStage, novaAcSong, novaBlast, novaBom, novaEpCd, novaMau, novaMui, novaPtGiat, obstacles, p2AmmoType, p2Form, parryX, paused, perfectParryCd, pet1Cd, pet1GuardShots, pet1Shots, pet2Cd, pet2Dash, pet2Lua, pet2OrbitMines, pet2Shots, pet3Cd, pet3CooldownReduction, pet3IdleFrames, pet3X, pet3Y, pet4Cd, pet4Charges, pet4Flash, pet4SpendCd, pet4X, pet4Y, pet5A, pet5B, pet6Active, pet6Angle, pet6Rings, pet6X, pet6Y, platforms, playerHexImpact, prismDmg, projectiles, pulsarScaledDamage, pulseSetVung, pulseSieuTrung, pvpDauMay, pvpDeathTimer, pvpDich, pvpLuat, pvpMayKho, pvpNguoi1, pvpVoBoc, qsFin, qsFlash, qsMarks, qsPerfect, qsT, quetRuneBatHopPhap, reflectToX, reflectToY, resetTimBoss, reviveOverlay, rgcDam, rgcKho, ruDayDs, score, sdtBat, sdtCd, sdtKhoan, sdtNhap, sdtVot, sdtXoe, setTan, setTia, setVet, setupWilderness, sgHitDone, sgHitSnapshot, sgLuot, shakeTimer, shieldCharge, shinGuardReset, smBlades, smClone, smSpawnBlade, spawnAfterimage, spawnTimerCactus, spawnTimerEnemy, spiderTree, sssArmed, stBat, stLuotXuong, stReset, stTieu, styReset, styleFlash, styleGrace, stylePoints, styleRankIdx, summitApproach, summitForkCd, summitLastBand, tdCd, tdCho, tdT, testBossSelection, trdReset, ttMoi, ultCharge, ultTestFill, uniArmed, uniChamT, uniChoHoi, uniGems, uniHop, uniHopO, uniMoiReset, unitySwapCd, venGiot, venTo, venVungs, visualEffects, voidBat, voidChanParry, voidPhanRa, voidTeleBatDau, volcanoApproach, volcanoNextChunk, voltBossTicks, voltDashBat, voltLuotUlt, voltTia, voltTrashTicks, wilderness, wkgHatTung, wkgLuot, wkgReset, worldL, worldR, xBat, xChoi
-// index.html:89737 · Phạm vi: global
+// index.html:89741 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.startGame.1 EDITABLE
 function startGame(mode) {
             wilderness = null;
@@ -110,7 +110,7 @@ function startGame(mode) {
         }
 // PLAYER_PART_END s6.startGame.1
 
-// index.html:89838 · Phạm vi: global
+// index.html:89842 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.handleMoveTap.1 EDITABLE
 function handleMoveTap(dir) {
             let now = Date.now();
@@ -119,7 +119,7 @@ function handleMoveTap(dir) {
         }
 // PLAYER_PART_END s6.handleMoveTap.1
 
-// index.html:90764 · Phạm vi: global
+// index.html:90768 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.doDash.1 EDITABLE
 function doDash(epHuong) {
             if (dashCd > 0) return;
@@ -214,12 +214,12 @@ function doDash(epHuong) {
         }
 // PLAYER_PART_END s6.doDash.1
 
-// index.html:92770 · Phạm vi: global
+// index.html:92774 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.sanhChoUlt.1 EDITABLE
 function sanhChoUlt(){ return !(gameState === 'pvp' && !pvpLuat.ult); }
 // PLAYER_PART_END s6.sanhChoUlt.1
 
-// index.html:94034 · Phạm vi: global
+// index.html:94038 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.parry.1 EDITABLE
 function parry(y){
             visualEffects.push(new Effect(parryX(), (y === undefined ? dino.y : y), 'parry'));
@@ -228,7 +228,7 @@ function parry(y){
         }
 // PLAYER_PART_END s6.parry.1
 
-// index.html:95102 · Phạm vi: global
+// index.html:95106 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.launchFromPit.1 EDITABLE
 function launchFromPit(n,gravity=n.gravity){
             const left=Math.max(worldL(),camX||0),right=Math.min(worldR(),left+canvas.width),cx=n.x+n.w/2;
@@ -264,7 +264,7 @@ function launchFromPit(n,gravity=n.gravity){
         }
 // PLAYER_PART_END s6.launchFromPit.1
 
-// index.html:95134 · Phạm vi: global
+// index.html:95138 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.followFallRecovery.1 EDITABLE
 function followFallRecovery(n){
             const r=n._fallRecovery;if(!r)return;
@@ -274,7 +274,7 @@ function followFallRecovery(n){
         }
 // PLAYER_PART_END s6.followFallRecovery.1
 
-// index.html:95140 · Phạm vi: global
+// index.html:95144 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.coBuc.1 EDITABLE
 function coBuc(){
             if (mapTheme === 'ocean') return true;   // @@HE-BIEN: bien luon dung vat ly nen/be (co khi khong co be nao tren man)
@@ -290,7 +290,7 @@ function coBuc(){
         }
 // PLAYER_PART_END s6.coBuc.1
 
-// index.html:97449 · Phạm vi: global
+// index.html:97453 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.parryDamage.1 EDITABLE
 function parryDamage(tgt, perfect){
             if (!tgt) return 0;
@@ -301,7 +301,7 @@ function parryDamage(tgt, perfect){
         }
 // PLAYER_PART_END s6.parryDamage.1
 
-// index.html:97456 · Phạm vi: global
+// index.html:97460 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.parryGainUlt.1 EDITABLE
 function parryGainUlt(perfect){
             // @@HE-MIDAS-MOVE: parry cung la mot nguon nap thanh tich. Moc o day vi day la
@@ -314,7 +314,7 @@ function parryGainUlt(perfect){
         }
 // PLAYER_PART_END s6.parryGainUlt.1
 
-// index.html:97465 · Phạm vi: global
+// index.html:97469 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.checkCollisions.1 EDITABLE
 function checkCollisions() {
             if (gameState === 'pvp') return; 

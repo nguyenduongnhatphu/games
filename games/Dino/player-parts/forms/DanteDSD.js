@@ -1,12 +1,12 @@
 // PLAYER_FILE: DanteDSD
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: DANTE_ATTACK_RATE, Effect, OCEAN_FLOOR, Player, canvas, checkAABB, ctx, danteActive, danteBalrogRelay, danteBossOpening, danteBossWindows, danteControlAllowed, danteDraw, danteHit, danteIsBoss, danteKey, danteLabel, danteOn, danteRelease, danteSin, danteTick, dashCd, dashVx, dino, dkNenY, doDash, frames, gameOver, gameVictory, keys, mapTheme, paused, platforms, playerAttackStep, playerComboBuffer, playerComboTrack, playerFinisherControl, sgTargets, shakeTimer, vergilOn, vgDealDamage, visualEffects, worldL, worldR
-// index.html:106735 · Phạm vi: global
+// index.html:106739 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.DSW_MOVES.1 EDITABLE
 const DSW_MOVES={
  a1:{name:'COMBO A · DOWN',T:20,wind:4,end:13,damage:3,pose:'down',advance:5},
@@ -41,24 +41,24 @@ const DSW_MOVES={
 };
 // PLAYER_PART_END s12.DSW_MOVES.1
 
-// index.html:106766 · Phạm vi: global
+// index.html:106770 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.DSW_DANCE.1 EDITABLE
 const DSW_DANCE=['dhit','ddown','dup','dcross','dspin','dstab','dwave1','dwave2','dfinish'];
 // PLAYER_PART_END s12.DSW_DANCE.1
 
-// index.html:106768 · Phạm vi: global
+// index.html:106772 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswState.1 EDITABLE
 function dswState(p){
  return p.sword||(p.sword={queue:[],last:'',ended:-1000,lastDash:-1000,dashDir:1,airSlow:0,round:null,waves:[],trail:[],sparks:[],controls:new Set(),pose:null});
 }
 // PLAYER_PART_END s12.dswState.1
 
-// index.html:106771 · Phạm vi: global
+// index.html:106775 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswUsing.1 EDITABLE
 function dswUsing(){return danteActive(dino)&&dino.dante&&dino.dante.arm===0;}
 // PLAYER_PART_END s12.dswUsing.1
 
-// index.html:106772 · Phạm vi: global
+// index.html:106776 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswFloor.1 EDITABLE
 function dswFloor(x,feet){
  let floor=mapTheme==='ocean'?OCEAN_FLOOR:dkNenY();
@@ -67,7 +67,7 @@ function dswFloor(x,feet){
 }
 // PLAYER_PART_END s12.dswFloor.1
 
-// index.html:106781 · Phạm vi: global
+// index.html:106785 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswControl.1 EDITABLE
 function dswControl(o,opt={},p=dino.dante){
  o=o.__goc||o;
@@ -207,7 +207,7 @@ function dswControl(o,opt={},p=dino.dante){
 }
 // PLAYER_PART_END s12.dswControl.1
 
-// index.html:106918 · Phạm vi: global
+// index.html:106922 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswReleaseHolds.1 EDITABLE
 function dswReleaseHolds(s){
  for(const o of s.controls){
@@ -220,7 +220,7 @@ function dswReleaseHolds(s){
 }
 // PLAYER_PART_END s12.dswReleaseHolds.1
 
-// index.html:106928 · Phạm vi: global
+// index.html:106932 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswStart.1 EDITABLE
 function dswStart(id,extra={}){
  const n=dino,p=n.dante,s=dswState(p),m=DSW_MOVES[id];if(!m||n.hp<=0)return;
@@ -242,7 +242,7 @@ function dswStart(id,extra={}){
 }
 // PLAYER_PART_END s12.dswStart.1
 
-// index.html:106947 · Phạm vi: global
+// index.html:106951 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswCommand.1 EDITABLE
 function dswCommand(cmd){
  const n=dino,p=n.dante,s=dswState(p),a=p.attack;
@@ -258,7 +258,7 @@ function dswCommand(cmd){
 }
 // PLAYER_PART_END s12.dswCommand.1
 
-// index.html:106963 · Phạm vi: global
+// index.html:106967 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswDispatch.1 EDITABLE
 function dswDispatch(cmd){
  const n=dino,p=n.dante,s=dswState(p),recent=frames-s.ended<=35,last=recent?s.last:'';
@@ -311,12 +311,12 @@ function dswDispatch(cmd){
 }
 // PLAYER_PART_END s12.dswDispatch.1
 
-// index.html:107013 · Phạm vi: global
+// index.html:107017 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswKeyBase.1 EDITABLE
 const dswKeyBase=danteKey;
 // PLAYER_PART_END s12.dswKeyBase.1
 
-// index.html:107014 · Phạm vi: global
+// index.html:107018 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteKey.2 EDITABLE
 danteKey=function(code,repeat){
  if(!dswUsing())return dswKeyBase(code,repeat);
@@ -350,12 +350,12 @@ danteKey=function(code,repeat){
 };
 // PLAYER_PART_END s12.danteKey.2
 
-// index.html:107045 · Phạm vi: global
+// index.html:107049 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswReleaseBase.1 EDITABLE
 const dswReleaseBase=danteRelease;
 // PLAYER_PART_END s12.dswReleaseBase.1
 
-// index.html:107046 · Phạm vi: global
+// index.html:107050 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteRelease.2 EDITABLE
 danteRelease=function(){
  if(!dswUsing())return dswReleaseBase();
@@ -368,12 +368,12 @@ danteRelease=function(){
 };
 // PLAYER_PART_END s12.danteRelease.2
 
-// index.html:107056 · Phạm vi: global
+// index.html:107060 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswDashBase.1 EDITABLE
 const dswDashBase=doDash;
 // PLAYER_PART_END s12.dswDashBase.1
 
-// index.html:107057 · Phạm vi: global
+// index.html:107061 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.doDash.1 EDITABLE
 doDash=function(...args){
  const before=dashCd;dswDashBase(...args);
@@ -384,7 +384,7 @@ doDash=function(...args){
 };
 // PLAYER_PART_END s12.doDash.1
 
-// index.html:107065 · Phạm vi: global
+// index.html:107069 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswCancel.1 EDITABLE
 function dswCancel(p){
  if(!p||!p.sword)return;
@@ -393,7 +393,7 @@ function dswCancel(p){
 }
 // PLAYER_PART_END s12.dswCancel.1
 
-// index.html:107074 · Phạm vi: global
+// index.html:107078 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswPose.1 EDITABLE
 function dswPose(n,a,age){
  const dir=a?a.dir:(n.isFacingLeft?-1:1),m=a||{};
@@ -508,7 +508,7 @@ function dswPose(n,a,age){
 }
 // PLAYER_PART_END s12.dswPose.1
 
-// index.html:107186 · Phạm vi: global
+// index.html:107190 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswBladeTouches.1 EDITABLE
 function dswBladeTouches(o,v,w=12){
  const steps=14, ow=o.w||24, oh=o.h||32;
@@ -520,7 +520,7 @@ function dswBladeTouches(o,v,w=12){
 }
 // PLAYER_PART_END s12.dswBladeTouches.1
 
-// index.html:107195 · Phạm vi: global
+// index.html:107199 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswStrike.1 EDITABLE
 function dswStrike(n,p,a,pulse,prevAge){
  const s=dswState(p);
@@ -582,7 +582,7 @@ function dswStrike(n,p,a,pulse,prevAge){
 }
 // PLAYER_PART_END s12.dswStrike.1
 
-// index.html:107254 · Phạm vi: global
+// index.html:107258 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswWave.1 EDITABLE
 function dswWave(n,p,a,idx=0){
  const s=dswState(p);
@@ -599,7 +599,7 @@ function dswWave(n,p,a,idx=0){
 }
 // PLAYER_PART_END s12.dswWave.1
 
-// index.html:107268 · Phạm vi: global
+// index.html:107272 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswFinish.1 EDITABLE
 function dswFinish(p,a){
  const s=dswState(p);p.attack=null;s.last=a.id;s.ended=frames;
@@ -621,7 +621,7 @@ function dswFinish(p,a){
 }
 // PLAYER_PART_END s12.dswFinish.1
 
-// index.html:107287 · Phạm vi: global
+// index.html:107291 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswTick.1 EDITABLE
 function dswTick(n,p){
  const s=dswState(p);
@@ -763,22 +763,22 @@ function dswTick(n,p){
 }
 // PLAYER_PART_END s12.dswTick.1
 
-// index.html:107426 · Phạm vi: global
+// index.html:107430 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswTickBase.1 EDITABLE
 const dswTickBase=danteTick;
 // PLAYER_PART_END s12.dswTickBase.1
 
-// index.html:107427 · Phạm vi: global
+// index.html:107431 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteTick.2 EDITABLE
 danteTick=function(){dswTickBase();if(danteActive(dino)&&dino.dante){const p=dino.dante;if(p.arm===0||p.sword)dswTick(dino,p);}};
 // PLAYER_PART_END s12.danteTick.2
 
-// index.html:107429 · Phạm vi: global
+// index.html:107433 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswUpdateBase.1 EDITABLE
 const dswUpdateBase=Player.prototype.update;
 // PLAYER_PART_END s12.dswUpdateBase.1
 
-// index.html:107430 · Phạm vi: global
+// index.html:107434 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.Player.prototype.update.1 EDITABLE
 Player.prototype.update=function(...args){
  if(!dswUsing()||this!==dino)return dswUpdateBase.apply(this,args);
@@ -795,12 +795,12 @@ Player.prototype.update=function(...args){
 };
 // PLAYER_PART_END s12.Player.prototype.update.1
 
-// index.html:107444 · Phạm vi: global
+// index.html:107448 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswDamageBase.1 EDITABLE
 const dswDamageBase=Player.prototype.takeDamage;
 // PLAYER_PART_END s12.dswDamageBase.1
 
-// index.html:107445 · Phạm vi: global
+// index.html:107449 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.Player.prototype.takeDamage.2 EDITABLE
 Player.prototype.takeDamage=function(...args){
  const hp=this.hp,result=dswDamageBase.apply(this,args);
@@ -809,7 +809,7 @@ Player.prototype.takeDamage=function(...args){
 };
 // PLAYER_PART_END s12.Player.prototype.takeDamage.2
 
-// index.html:107454 · Phạm vi: global
+// index.html:107458 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswPaintBlade.1 EDITABLE
 function dswPaintBlade(x,y,angle,len=78,red=false,flat=1){
  ctx.save();
@@ -880,7 +880,7 @@ function dswPaintBlade(x,y,angle,len=78,red=false,flat=1){
 }
 // PLAYER_PART_END s12.dswPaintBlade.1
 
-// index.html:107523 · Phạm vi: global
+// index.html:107527 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteArmJoints.1 EDITABLE
 function danteArmJoints(sx,sy,wx,wy,dir=1){
  const dx=wx-sx,dy=wy-sy,raw=Math.hypot(dx,dy),d=Math.max(1,Math.min(26.5,raw));
@@ -893,7 +893,7 @@ function danteArmJoints(sx,sy,wx,wy,dir=1){
 }
 // PLAYER_PART_END s12.danteArmJoints.1
 
-// index.html:107532 · Phạm vi: global
+// index.html:107536 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswPaintArmIK.1 EDITABLE
 function dswPaintArmIK(sx,sy,wx,wy,dir){
  const dx=wx-sx, dy=wy-sy;
@@ -922,7 +922,7 @@ function dswPaintArmIK(sx,sy,wx,wy,dir){
 }
 // PLAYER_PART_END s12.dswPaintArmIK.1
 
-// index.html:107558 · Phạm vi: global
+// index.html:107562 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswDraw.1 EDITABLE
 function dswDraw(n){
  const p=n.dante,s=dswState(p),a=p.attack,v=s.pose||dswPose(n,null,0);
@@ -1055,12 +1055,12 @@ function dswDraw(n){
 }
 // PLAYER_PART_END s12.dswDraw.1
 
-// index.html:107688 · Phạm vi: global
+// index.html:107692 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.dswDrawBase.1 EDITABLE
 const dswDrawBase=danteDraw;
 // PLAYER_PART_END s12.dswDrawBase.1
 
-// index.html:107689 · Phạm vi: global
+// index.html:107693 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteDraw.2 EDITABLE
 danteDraw=function(n){
  const p=n.dante;

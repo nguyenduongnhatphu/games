@@ -1,117 +1,117 @@
 // PLAYER_FILE: VENOM01
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: FloatingText, LT, SFX, allTargets, checkAABB, ctx, dangLuotHoacChop, dealDamage, dino, floatingTexts, frames, gdCatHop, keys, setCanApDon, setCanDmg, setCanTam, shakeTimer, slamLaoBat
-// index.html:61896 · Phạm vi: global
+// index.html:61900 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_VUNG_DMG.1 EDITABLE
 const VEN_VUNG_DMG = 4;
 // PLAYER_PART_END s4.VEN_VUNG_DMG.1
 
-// index.html:61897 · Phạm vi: global
+// index.html:61901 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_TAM.1 EDITABLE
 const VEN_TAM = [130, 165, 200];
 // PLAYER_PART_END s4.VEN_TAM.1
 
-// index.html:61898 · Phạm vi: global
+// index.html:61902 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_TAM_XIEN.1 EDITABLE
 const VEN_TAM_XIEN = 250;
 // PLAYER_PART_END s4.VEN_TAM_XIEN.1
 
-// index.html:61899 · Phạm vi: global
+// index.html:61903 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_DMG.1 EDITABLE
 const VEN_DMG = [3, 3, 5];
 // PLAYER_PART_END s4.VEN_DMG.1
 
-// index.html:61900 · Phạm vi: global
+// index.html:61904 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_HAT_TAM.1 EDITABLE
 const VEN_HAT_TAM = 150, VEN_HAT_DMG = 4;
 // PLAYER_PART_END s4.VEN_HAT_TAM.1
 
-// index.html:61901 · Phạm vi: global
+// index.html:61905 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_KHONG_R.1 EDITABLE
 const VEN_KHONG_R = 150, VEN_KHONG_DMG = 3;
 // PLAYER_PART_END s4.VEN_KHONG_R.1
 
-// index.html:61902 · Phạm vi: global
+// index.html:61906 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_CHE_DMG.1 EDITABLE
 const VEN_CHE_DMG = 5, VEN_CHE_CHAN = 2;
 // PLAYER_PART_END s4.VEN_CHE_DMG.1
 
-// index.html:61903 · Phạm vi: global
+// index.html:61907 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_LAO_DMG.1 EDITABLE
 const VEN_LAO_DMG = 6, VEN_LAO_R = 130;
 // PLAYER_PART_END s4.VEN_LAO_DMG.1
 
-// index.html:61904 · Phạm vi: global
+// index.html:61908 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_LUOT_DMG.1 EDITABLE
 const VEN_LUOT_DMG = 5, VEN_LUOT_TAM = 190;
 // PLAYER_PART_END s4.VEN_LUOT_DMG.1
 
-// index.html:61905 · Phạm vi: global
+// index.html:61909 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_XUYEN_DMG.1 EDITABLE
 const VEN_XUYEN_DMG = 4, VEN_XUYEN_XA = 55;
 // PLAYER_PART_END s4.VEN_XUYEN_DMG.1
 
-// index.html:61906 · Phạm vi: global
+// index.html:61910 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_VUNG_R0.1 EDITABLE
 const VEN_VUNG_R0 = 90, VEN_VUNG_THEM = 45, VEN_VUNG_MAX = 225;
 // PLAYER_PART_END s4.VEN_VUNG_R0.1
 
-// index.html:61907 · Phạm vi: global
+// index.html:61911 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_VUNG_SONG.1 EDITABLE
 const VEN_VUNG_SONG = 240, VEN_GAI_DMG = 4;
 // PLAYER_PART_END s4.VEN_VUNG_SONG.1
 
-// index.html:61908 · Phạm vi: global
+// index.html:61912 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_TANG_MAX.1 EDITABLE
 const VEN_TANG_MAX = 4, VEN_TANG_SONG = 300;
 // PLAYER_PART_END s4.VEN_TANG_MAX.1
 
-// index.html:61914 · Phạm vi: global
+// index.html:61918 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_TROI_T.1 EDITABLE
 const VEN_TROI_T = 75, VEN_TROI_MIEN = 600;
 // PLAYER_PART_END s4.VEN_TROI_T.1
 
-// index.html:61917 · Phạm vi: global
+// index.html:61921 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_C2_DMG.1 EDITABLE
 const VEN_C2_DMG = 12, VEN_C2_SO = 1, VEN_C2_TAM = 285;
 // PLAYER_PART_END s4.VEN_C2_DMG.1
 
-// index.html:61918 · Phạm vi: global
+// index.html:61922 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_C3_DMG.1 EDITABLE
 const VEN_C3_DMG = 6, VEN_C3_R = 200;
 // PLAYER_PART_END s4.VEN_C3_DMG.1
 
-// index.html:61923 · Phạm vi: global
+// index.html:61927 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_C4_TAM.1 EDITABLE
 const VEN_C4_TAM = 300, VEN_C4_DMG = 10, VEN_C4_TUONG = 4;
 // PLAYER_PART_END s4.VEN_C4_TAM.1
 
-// index.html:61924 · Phạm vi: global
+// index.html:61928 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_C4_TAN.1 EDITABLE
 const VEN_C4_TAN = 16, VEN_C4_LAO = 26;
 // PLAYER_PART_END s4.VEN_C4_TAN.1
 
-// index.html:61928 · Phạm vi: global
+// index.html:61932 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_CH_DMG.1 EDITABLE
 const VEN_CH_DMG = 5, VEN_CH_NHIP = 25, VEN_CH_TAM = 110;
 // PLAYER_PART_END s4.VEN_CH_DMG.1
 
-// index.html:61943 · Phạm vi: global
+// index.html:61947 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_GAI_NHAM_X.1 EDITABLE
 const VEN_GAI_NHAM_X = 118;
 // PLAYER_PART_END s4.VEN_GAI_NHAM_X.1
 
-// index.html:61944 · Phạm vi: global
+// index.html:61948 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_GAI_LECH.1 EDITABLE
 const VEN_GAI_LECH = 34;
 // PLAYER_PART_END s4.VEN_GAI_LECH.1
 
-// index.html:61945 · Phạm vi: global
+// index.html:61949 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_GAI_CHO.1 EDITABLE
 const VEN_GAI_CHO = [[-10, -22, -2.85, -14],   // TREN — nham cao
                              [  2,   2, -2.35,  -6],   // TREN — nham cao
@@ -119,47 +119,47 @@ const VEN_GAI_CHO = [[-10, -22, -2.85, -14],   // TREN — nham cao
                              [  6,  48, -1.20,  34]];
 // PLAYER_PART_END s4.VEN_GAI_CHO.1
 
-// index.html:61949 · Phạm vi: global
+// index.html:61953 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_GAI_MOC.1 EDITABLE
 const VEN_GAI_MOC = 30;
 // PLAYER_PART_END s4.VEN_GAI_MOC.1
 
-// index.html:61950 · Phạm vi: global
+// index.html:61954 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_DU_XA.1 EDITABLE
 const VEN_DU_XA = 150, VEN_DU_KHUNG = 26;
 // PLAYER_PART_END s4.VEN_DU_XA.1
 
-// index.html:61951 · Phạm vi: global
+// index.html:61955 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_ULT_KHUNG.1 EDITABLE
 const VEN_ULT_KHUNG = 600, VEN_ULT_TAM = 1.30, VEN_ULT_CONG = 2;
 // PLAYER_PART_END s4.VEN_ULT_KHUNG.1
 
-// index.html:61952 · Phạm vi: global
+// index.html:61956 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_GIOT_CHO.1 EDITABLE
 const VEN_GIOT_CHO = 40, VEN_GIOT_DMG = 4, VEN_GIOT_BK = 260;
 // PLAYER_PART_END s4.VEN_GIOT_CHO.1
 
-// index.html:61961 · Phạm vi: global
+// index.html:61965 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_NOVA_CHO.1 EDITABLE
 const VEN_NOVA_CHO = 120;
 // PLAYER_PART_END s4.VEN_NOVA_CHO.1
 
-// index.html:61962 · Phạm vi: global
+// index.html:61966 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_NOVA_DMG.1 EDITABLE
 const VEN_NOVA_DMG = 2;
 // PLAYER_PART_END s4.VEN_NOVA_DMG.1
 
-// index.html:61963 · Phạm vi: global
+// index.html:61967 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_GIOT_MAX.1 EDITABLE
 const VEN_GIOT_MAX = 20;
 // PLAYER_PART_END s4.VEN_GIOT_MAX.1
 
-// index.html:61964 · Phạm vi: global
+// index.html:61968 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venVungs.1 EDITABLE
 let venVungs = [];
 // PLAYER_PART_END s4.venVungs.1
 
-// index.html:61975 · Phạm vi: global
+// index.html:61979 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venDanHoi.1 EDITABLE
 function venDanHoi(k){
             if (k <= 0 || k >= 1) return 0;
@@ -169,7 +169,7 @@ function venDanHoi(k){
         }
 // PLAYER_PART_END s4.venDanHoi.1
 
-// index.html:61982 · Phạm vi: global
+// index.html:61986 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venVeVoi.1 EDITABLE
 function venVeVoi(x, y, ang, dai, k, day){
             let L = dai * venDanHoi(k);
@@ -216,7 +216,7 @@ function venVeVoi(x, y, ang, dai, k, day){
         }
 // PLAYER_PART_END s4.venVeVoi.1
 
-// index.html:62026 · Phạm vi: global
+// index.html:62030 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venVeGio.1 EDITABLE
 function venVeGio(cx, cy, a0, a, dai, k){
             let mo = Math.max(0, 1 - k * 1.35); if (mo <= 0.02) return;
@@ -233,7 +233,7 @@ function venVeGio(cx, cy, a0, a, dai, k){
         }
 // PLAYER_PART_END s4.venVeGio.1
 
-// index.html:62040 · Phạm vi: global
+// index.html:62044 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venVeRoi.1 EDITABLE
 function venVeRoi(cx, cy, a0, a, dai, k, day){
             let L = dai * Math.min(1, 0.35 + k * 2.2) * (k > 0.7 ? (1 - (k - 0.7) / 0.3) : 1);
@@ -273,7 +273,7 @@ function venVeRoi(cx, cy, a0, a, dai, k, day){
         }
 // PLAYER_PART_END s4.venVeRoi.1
 
-// index.html:62077 · Phạm vi: global
+// index.html:62081 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venDaoBan.1 EDITABLE
 function venDaoBan(ctx, S){
             // ban dao ve trong he da xoay san; truc dai chay theo +x
@@ -323,7 +323,7 @@ function venDaoBan(ctx, S){
         }
 // PLAYER_PART_END s4.venDaoBan.1
 
-// index.html:62124 · Phạm vi: global
+// index.html:62128 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venRoiMut.1 EDITABLE
 function venRoiMut(cx, cy, a0, a, dai, k){
             let L = dai * Math.min(1, 0.35 + k * 2.2) * (k > 0.7 ? (1 - (k - 0.7) / 0.3) : 1);
@@ -337,7 +337,7 @@ function venRoiMut(cx, cy, a0, a, dai, k){
         }
 // PLAYER_PART_END s4.venRoiMut.1
 
-// index.html:62135 · Phạm vi: global
+// index.html:62139 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venVeDao.1 EDITABLE
 function venVeDao(cx, cy, a0, a, dai, k, day){
             let R = dai * 0.62;
@@ -353,7 +353,7 @@ function venVeDao(cx, cy, a0, a, dai, k, day){
         }
 // PLAYER_PART_END s4.venVeDao.1
 
-// index.html:62149 · Phạm vi: global
+// index.html:62153 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venMocDam.1 EDITABLE
 function venMocDam(k){
             if (k <= 0 || k >= 1) return 0;
@@ -363,7 +363,7 @@ function venMocDam(k){
         }
 // PLAYER_PART_END s4.venMocDam.1
 
-// index.html:62157 · Phạm vi: global
+// index.html:62161 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venVeMoc.1 EDITABLE
 function venVeMoc(bx, by, dir, goc, huong, Rh, Lg0, k, day){
             let g0 = venMocDam(k);
@@ -421,7 +421,7 @@ function venVeMoc(bx, by, dir, goc, huong, Rh, Lg0, k, day){
         }
 // PLAYER_PART_END s4.venVeMoc.1
 
-// index.html:62212 · Phạm vi: global
+// index.html:62216 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venVeToa.1 EDITABLE
 function venVeToa(cx, cy, so, dai, k, day, lech0){
             for (let i = 0; i < so; i++){
@@ -431,7 +431,7 @@ function venVeToa(cx, cy, so, dai, k, day, lech0){
         }
 // PLAYER_PART_END s4.venVeToa.1
 
-// index.html:62219 · Phạm vi: global
+// index.html:62223 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venTickTo.1 EDITABLE
 function venTickTo(){
             for (let i = venTo.length - 1; i >= 0; i--){
@@ -454,7 +454,7 @@ function venTickTo(){
         }
 // PLAYER_PART_END s4.venTickTo.1
 
-// index.html:62242 · Phạm vi: global
+// index.html:62246 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venNovaGiot.1 EDITABLE
 function venNovaGiot(x){
             if (typeof venGiot === 'undefined') return;
@@ -466,7 +466,7 @@ function venNovaGiot(x){
         }
 // PLAYER_PART_END s4.venNovaGiot.1
 
-// index.html:62250 · Phạm vi: global
+// index.html:62254 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venTickGiot.1 EDITABLE
 function venTickGiot(){
             for (let i = venGiot.length - 1; i >= 0; i--){
@@ -495,7 +495,7 @@ function venTickGiot(){
         }
 // PLAYER_PART_END s4.venTickGiot.1
 
-// index.html:62276 · Phạm vi: global
+// index.html:62280 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venKhoa.1 EDITABLE
 function venKhoa(o, khung){
             if (!o) return;
@@ -504,7 +504,7 @@ function venKhoa(o, khung){
         }
 // PLAYER_PART_END s4.venKhoa.1
 
-// index.html:62282 · Phạm vi: global
+// index.html:62286 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venCongTang.1 EDITABLE
 function venCongTang(o){
             if (!o || o.hp === undefined || o.hp <= 0) return;
@@ -523,7 +523,7 @@ function venCongTang(o){
         }
 // PLAYER_PART_END s4.venCongTang.1
 
-// index.html:62298 · Phạm vi: global
+// index.html:62302 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venVeMang.1 EDITABLE
 function venVeMang(o, tang, ken){
             let x = o.x, y = o.y, w = o.w || 20, h = o.h || 20;
@@ -559,7 +559,7 @@ function venVeMang(o, tang, ken){
         }
 // PLAYER_PART_END s4.venVeMang.1
 
-// index.html:62331 · Phạm vi: global
+// index.html:62335 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venVeMangTatCa.1 EDITABLE
 function venVeMangTatCa(){
             if (typeof allTargets !== 'function') return;
@@ -571,7 +571,7 @@ function venVeMangTatCa(){
         }
 // PLAYER_PART_END s4.venVeMangTatCa.1
 
-// index.html:62340 · Phạm vi: global
+// index.html:62344 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venTickTang.1 EDITABLE
 function venTickTang(){
             if (typeof allTargets !== 'function') return;
@@ -589,7 +589,7 @@ function venTickTang(){
         }
 // PLAYER_PART_END s4.venTickTang.1
 
-// index.html:62355 · Phạm vi: global
+// index.html:62359 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venTickVung.1 EDITABLE
 function venTickVung(){
             venTickTang();
@@ -623,7 +623,7 @@ function venTickVung(){
         }
 // PLAYER_PART_END s4.venTickVung.1
 
-// index.html:62386 · Phạm vi: global
+// index.html:62390 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venVeVung.1 EDITABLE
 function venVeVung(){
             for (const v of venVungs){
@@ -648,27 +648,27 @@ function venVeVung(){
         }
 // PLAYER_PART_END s4.venVeVung.1
 
-// index.html:62421 · Phạm vi: global
+// index.html:62425 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_DAO_CONG.1 EDITABLE
 const VEN_DAO_CONG = 0.95, VEN_DAO_HOOK = 0.62, VEN_DAO_W = 0.29;
 // PLAYER_PART_END s4.VEN_DAO_CONG.1
 
-// index.html:62433 · Phạm vi: global
+// index.html:62437 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VEN_TO_XA.1 EDITABLE
 const VEN_TO_XA = 560, VEN_TO_TOC = 11;
 // PLAYER_PART_END s4.VEN_TO_XA.1
 
-// index.html:62434 · Phạm vi: global
+// index.html:62438 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venTo.1 EDITABLE
 let venTo = [];
 // PLAYER_PART_END s4.venTo.1
 
-// index.html:62435 · Phạm vi: global
+// index.html:62439 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.venGiot.1 EDITABLE
 let venGiot = [];
 // PLAYER_PART_END s4.venGiot.1
 
-// index.html:62455 · Phạm vi: Player.prototype
+// index.html:62459 · Phạm vi: Player.prototype
 const __Part54 = {
 // PLAYER_PART_BEGIN s4.Player.prototype._venDanh.1 EDITABLE
 _venDanh(dmg, life, reach, hTop, hBot, cd, ton, fx){
@@ -715,7 +715,7 @@ _venDanh(dmg, life, reach, hTop, hBot, cd, ton, fx){
 // PLAYER_PART_END s4.Player.prototype._venDanh.1
 };
 
-// index.html:62496 · Phạm vi: Player.prototype
+// index.html:62500 · Phạm vi: Player.prototype
 const __Part55 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venomSlash.1 EDITABLE
 venomSlash(){
@@ -744,7 +744,7 @@ venomSlash(){
 // PLAYER_PART_END s4.Player.prototype.venomSlash.1
 };
 
-// index.html:62519 · Phạm vi: Player.prototype
+// index.html:62523 · Phạm vi: Player.prototype
 const __Part56 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venCombo.1 EDITABLE
 venCombo(){
@@ -762,7 +762,7 @@ venCombo(){
 // PLAYER_PART_END s4.Player.prototype.venCombo.1
 };
 
-// index.html:62531 · Phạm vi: Player.prototype
+// index.html:62535 · Phạm vi: Player.prototype
 const __Part57 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venChemHat.1 EDITABLE
 venChemHat(){
@@ -779,7 +779,7 @@ venChemHat(){
 // PLAYER_PART_END s4.Player.prototype.venChemHat.1
 };
 
-// index.html:62542 · Phạm vi: Player.prototype
+// index.html:62546 · Phạm vi: Player.prototype
 const __Part58 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venBungGai.1 EDITABLE
 venBungGai(){                       // J tren khong: gai bung MOI PHIA
@@ -801,7 +801,7 @@ venBungGai(){                       // J tren khong: gai bung MOI PHIA
 // PLAYER_PART_END s4.Player.prototype.venBungGai.1
 };
 
-// index.html:62558 · Phạm vi: Player.prototype
+// index.html:62562 · Phạm vi: Player.prototype
 const __Part59 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venCheXuong.1 EDITABLE
 venCheXuong(){                      // xuong + J tren khong: che thang xuong
@@ -812,7 +812,7 @@ venCheXuong(){                      // xuong + J tren khong: che thang xuong
 // PLAYER_PART_END s4.Player.prototype.venCheXuong.1
 };
 
-// index.html:62563 · Phạm vi: Player.prototype
+// index.html:62567 · Phạm vi: Player.prototype
 const __Part60 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venLaoXuong.1 EDITABLE
 venLaoXuong(){                      // J tu tren CAO: lao xuong no gai
@@ -824,7 +824,7 @@ venLaoXuong(){                      // J tu tren CAO: lao xuong no gai
 // PLAYER_PART_END s4.Player.prototype.venLaoXuong.1
 };
 
-// index.html:62569 · Phạm vi: Player.prototype
+// index.html:62573 · Phạm vi: Player.prototype
 const __Part61 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venLuotDam.1 EDITABLE
 venLuotDam(){                       // Dash -> J: moc gai ve phia truoc
@@ -836,7 +836,7 @@ venLuotDam(){                       // Dash -> J: moc gai ve phia truoc
 // PLAYER_PART_END s4.Player.prototype.venLuotDam.1
 };
 
-// index.html:62575 · Phạm vi: Player.prototype
+// index.html:62579 · Phạm vi: Player.prototype
 const __Part62 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venVungThem.1 EDITABLE
 venVungThem(){                      // cui + J: tao / no rong vung dich
@@ -857,7 +857,7 @@ venVungThem(){                      // cui + J: tao / no rong vung dich
 // PLAYER_PART_END s4.Player.prototype.venVungThem.1
 };
 
-// index.html:62591 · Phạm vi: Player.prototype
+// index.html:62595 · Phạm vi: Player.prototype
 const __Part63 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venVungKet.1 EDITABLE
 venVungKet(kieu){
@@ -873,7 +873,7 @@ venVungKet(kieu){
 // PLAYER_PART_END s4.Player.prototype.venVungKet.1
 };
 
-// index.html:62607 · Phạm vi: Player.prototype
+// index.html:62611 · Phạm vi: Player.prototype
 const __Part64 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venVungManh.1 EDITABLE
 venVungManh(){
@@ -884,7 +884,7 @@ venVungManh(){
 // PLAYER_PART_END s4.Player.prototype.venVungManh.1
 };
 
-// index.html:62616 · Phạm vi: Player.prototype
+// index.html:62620 · Phạm vi: Player.prototype
 const __Part65 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venChemLoLung.1 EDITABLE
 venChemLoLung(){
@@ -904,7 +904,7 @@ venChemLoLung(){
 // PLAYER_PART_END s4.Player.prototype.venChemLoLung.1
 };
 
-// index.html:62630 · Phạm vi: Player.prototype
+// index.html:62634 · Phạm vi: Player.prototype
 const __Part66 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venBanTo.1 EDITABLE
 venBanTo(){
@@ -917,7 +917,7 @@ venBanTo(){
 // PLAYER_PART_END s4.Player.prototype.venBanTo.1
 };
 
-// index.html:62637 · Phạm vi: Player.prototype
+// index.html:62641 · Phạm vi: Player.prototype
 const __Part67 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venChem4.1 EDITABLE
 venChem4(){                    // MOC 2 — bon nhat lien tiep truoc mat
@@ -928,7 +928,7 @@ venChem4(){                    // MOC 2 — bon nhat lien tiep truoc mat
 // PLAYER_PART_END s4.Player.prototype.venChem4.1
 };
 
-// index.html:62642 · Phạm vi: Player.prototype
+// index.html:62646 · Phạm vi: Player.prototype
 const __Part68 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venGaiQuanh.1 EDITABLE
 venGaiQuanh(){                 // MOC 3 — gai moc dai ra tu than, moi phia
@@ -947,7 +947,7 @@ venGaiQuanh(){                 // MOC 3 — gai moc dai ra tu than, moi phia
 // PLAYER_PART_END s4.Player.prototype.venGaiQuanh.1
 };
 
-// index.html:62662 · Phạm vi: Player.prototype
+// index.html:62666 · Phạm vi: Player.prototype
 const __Part69 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venTom.1 EDITABLE
 venTom(){
@@ -962,7 +962,7 @@ venTom(){
 // PLAYER_PART_END s4.Player.prototype.venTom.1
 };
 
-// index.html:62672 · Phạm vi: Player.prototype
+// index.html:62676 · Phạm vi: Player.prototype
 const __Part70 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venTomBat.1 EDITABLE
 venTomBat(dir){
@@ -981,7 +981,7 @@ venTomBat(dir){
 // PLAYER_PART_END s4.Player.prototype.venTomBat.1
 };
 
-// index.html:62685 · Phạm vi: Player.prototype
+// index.html:62689 · Phạm vi: Player.prototype
 const __Part71 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venDu.1 EDITABLE
 venDu(){                       // nhay thu 3 = DU TO, khong phai nhay

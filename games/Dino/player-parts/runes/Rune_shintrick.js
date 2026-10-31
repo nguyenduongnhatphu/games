@@ -1,12 +1,12 @@
 // PLAYER_FILE: Rune_shintrick
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: RUNES
-// index.html:83754 · Phạm vi: global
+// index.html:83758 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RUNES.push.8 EDITABLE
 RUNES.push({ id:'shintrick', name:'SHIN TRICKSTER', nameEn:'SHIN TRICKSTER', icon:'🎯', cost:2, ammoRune:true, onlyStance:1,
             desc:'Tốn 2 ô. ĐỘC QUYỀN TRICKSTER. Bắn thường KHÔNG giới hạn: không tốn đạn, không bao giờ quá nhiệt, và mở khoá đòn Charge ngay trong thế Trickster. '

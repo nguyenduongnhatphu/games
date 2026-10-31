@@ -1,12 +1,12 @@
 // PLAYER_FILE: DinoRender
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Player, bzVeChanNgoi, bzVeGiap, bzVeGiapMay, ctx, currentAmmoType, deathCineActive, deathSkel, frames, keys, kinhPal, previewDino, veBzGiapThan, veKinhManh, vePhuKien, vePhuKienThan, veTenLuaNeuCo, vkMoc, xuongVeLoiAt
-// index.html:106005 · Phạm vi: global
+// index.html:106009 · Phạm vi: global
 // PLAYER_PART_BEGIN s10.trialPose.1 EDITABLE
 function trialPose(n,form,crouch,airborne){
  const preview=typeof previewDino!=='undefined'&&n===previewDino;
@@ -45,12 +45,12 @@ function trialPose(n,form,crouch,airborne){
 }
 // PLAYER_PART_END s10.trialPose.1
 
-// index.html:106041 · Phạm vi: global
+// index.html:106045 · Phạm vi: global
 // PLAYER_PART_BEGIN s10.trialOriginalBody.1 EDITABLE
 const trialOriginalBody=Player.prototype.drawDinoBody;
 // PLAYER_PART_END s10.trialOriginalBody.1
 
-// index.html:106042 · Phạm vi: global
+// index.html:106046 · Phạm vi: global
 // PLAYER_PART_BEGIN s10.Player.prototype.drawDinoBody.1 EDITABLE
 Player.prototype.drawDinoBody=function(bx,by,form,crouch,airborne,palOverride){
  if(form===7||form===8||form<0||form>8)return trialOriginalBody.apply(this,arguments);
@@ -150,7 +150,7 @@ Player.prototype.drawDinoBody=function(bx,by,form,crouch,airborne,palOverride){
 };
 // PLAYER_PART_END s10.Player.prototype.drawDinoBody.1
 
-// index.html:106139 · Phạm vi: global
+// index.html:106143 · Phạm vi: global
 // PLAYER_PART_BEGIN s10.trialConstructBody.1 EDITABLE
 function trialConstructBody(n,bx,by,form,crouch,airborne,pal){
  const bone=form===6,m=trialPose(n,form,crouch,airborne),cs=m.crouch,dy=cs*9,bob=Math.sin(frames*.065)*.35+m.land*4;

@@ -1,12 +1,12 @@
 // PLAYER_FILE: MJOLNIR02
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: BUA_NEM_TAM, BUA_TAM, BUA_UNI_BUOC, BUA_UNI_DMG, BUA_UNI_MAX, BUA_UNI_R, BUA_UNI_TRE, BUA_ZEUS_MOC, CAM_TROI, Effect, FloatingText, SFX, allTargets, buaHeSo, buaNguoi, buaParryOk, canvas, checkAABB, combatStance, ctx, cutBossProjectiles, dealDamage, floatingTexts, frames, keys, shakeTimer, ultCharge, visualEffects, vkDangKy, worldL, worldR
-// index.html:59965 · Phạm vi: Player.prototype
+// index.html:59969 · Phạm vi: Player.prototype
 const __Part0 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.buaUniBatSet.1 EDITABLE
 buaUniBatSet(){
@@ -22,7 +22,7 @@ buaUniBatSet(){
 // PLAYER_PART_END s4.Player.prototype.buaUniBatSet.1
 };
 
-// index.html:59975 · Phạm vi: Player.prototype
+// index.html:59979 · Phạm vi: Player.prototype
 const __Part1 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.buaUniTick.1 EDITABLE
 buaUniTick(){
@@ -49,7 +49,7 @@ buaUniTick(){
 // PLAYER_PART_END s4.Player.prototype.buaUniTick.1
 };
 
-// index.html:59996 · Phạm vi: Player.prototype
+// index.html:60000 · Phạm vi: Player.prototype
 const __Part2 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.buaUniVe.1 EDITABLE
 buaUniVe(){
@@ -69,7 +69,7 @@ buaUniVe(){
 // PLAYER_PART_END s4.Player.prototype.buaUniVe.1
 };
 
-// index.html:60011 · Phạm vi: Player.prototype
+// index.html:60015 · Phạm vi: Player.prototype
 const __Part3 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.buaVeTia.1 EDITABLE
 buaVeTia(x1, y1, x2, y2, day, seed){
@@ -89,7 +89,7 @@ buaVeTia(x1, y1, x2, y2, day, seed){
 // PLAYER_PART_END s4.Player.prototype.buaVeTia.1
 };
 
-// index.html:60031 · Phạm vi: Player.prototype
+// index.html:60035 · Phạm vi: Player.prototype
 const __Part4 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.buaTickUlt.1 EDITABLE
 buaTickUlt(){
@@ -174,7 +174,7 @@ buaTickUlt(){
 // PLAYER_PART_END s4.Player.prototype.buaTickUlt.1
 };
 
-// index.html:60110 · Phạm vi: Player.prototype
+// index.html:60114 · Phạm vi: Player.prototype
 const __Part5 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.buaVeUlt.1 EDITABLE
 buaVeUlt(){
@@ -211,7 +211,7 @@ buaVeUlt(){
 // PLAYER_PART_END s4.Player.prototype.buaVeUlt.1
 };
 
-// index.html:60143 · Phạm vi: global
+// index.html:60147 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.13 EDITABLE
 vkDangKy(11, {
             ten: 'MJOLNIR',

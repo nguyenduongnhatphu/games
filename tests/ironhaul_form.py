@@ -15,7 +15,7 @@ with sync_playwright() as p:
             xDatForm(11);testBossSelection=81;startGame('test_boss');bossWaitTimer=99999;
             bosses.length=enemies.length=obstacles.length=projectiles.length=bossProjectiles.length=0;
             platforms.length=0;platforms.push({x:-60,top:320,w:canvas.width+120,h:110});
-            dino.x=400;dino.y=320-dino.h;dino.grounded=true;dino.dy=0;if(mode===1)dino.ironhaul.silver=720;ironMode(dino,mode);dino.isFacingLeft=left;
+            dino.x=400;dino.y=320-dino.h;dino.grounded=true;dino.dy=0;if(mode===1)dino.ironhaul.silver=720;ironMode(dino,mode);dino.isFacingLeft=left;dino.ironhaul.driveHeading=left?-1:1;
             dino.invincible=true;dino.invTimer=99999;
             const target={name:'TARGET',aiRieng:true,state:'idle',actionTimer:99999,x:left?dino.x-55:dino.x+dino.w+15,y:252,w:40,h:68,hp:10000,maxHp:10000,dy:0,grounded:true,update(){},draw(){}};
             bosses.push(target);return target;
@@ -35,16 +35,57 @@ with sync_playwright() as p:
         gameState='custom_menu';resetPreview();drawCustomMenu();xDatForm(0);
         check(runeSlots.join(',')===before.runes&&currentAmmoType===before.ammo&&phuKien===before.accessory&&combatStance===before.stance,'loadout not restored');
         for(const f of [7,8,9,10,11,0,11]){xDatForm(f);check(xFormIdx()===f,'selection leaks '+f);}
-        ihfSetup();check(dino.hp===10&&dino.maxHp===10&&dino.w===40&&dino.h===68,'robot dimensions / HP');
+        ihfSetup();check(dino.hp===10&&dino.maxHp===10&&dino.w===46&&dino.h===78,'robot dimensions / HP');
         const p=dino.ironhaul;dino.hp=7;ultCharge=63;p.core=123;p.coreReady=300;const cx=dino.x+dino.w/2,feet=dino.y+dino.h;
         for(const mode of [1,2,0]){ironMode(dino,mode);check(Math.abs(dino.x+dino.w/2-cx)<.001&&dino.y+dino.h===feet,'morph changes centre / feet');check(dino.hp===7&&ultCharge===63&&p.core===123&&p.coreReady===300,'morph refills resources');}
         return 'PASS exclusive form selection, locked/restored equipment, 10 HP, small rig and resource-preserving morphs';
     }'''))
     print(page.evaluate('''()=>{
+        for(const left of [false,true]){
+            ihfSetup(2,left);bosses.length=0;dino.x=left?750:100;const start=dino.x,p=dino.ironhaul,key=left?'KeyA':'KeyD';keys[key]=true;
+            let previous=0,protection=null,steps=0;
+            while(Math.abs(p.driveSpeed)<12&&steps++<90){ihfStep();check(Math.abs(p.driveSpeed)>=previous,'forward acceleration reverses');previous=Math.abs(p.driveSpeed);if(frames<p.driveGuardUntil&&protection===null)protection=p.driveGuardUntil;}
+            const distance=Math.abs(dino.x-start);
+            check(steps<90&&distance>=6*CM-12&&distance<6*CM+25,'max speed is not reached after about 6 cm: '+distance);
+            check(protection!==null&&p.driveGuardUntil===protection,'no short near-max protection');
+            dino.invincible=false;dino.invTimer=0;const hp=dino.hp;
+            const hit=()=>{const q=new BossProjectile(dino.x+dino.w/2,dino.y+dino.h/2,0,0,false,1);bossProjectiles.push(q);checkCollisions();check(!bossProjectiles.includes(q),'colliding hostile projectile is not consumed');};
+            hit();check(dino.hp===hp,'speed armour fails to absorb damage');
+            while(frames<protection)ihfStep();check(p.driveGuardUntil===protection,'continuous full speed refreshes protection');
+            hit();check(dino.hp===hp-1,'speed armour never expires');
+
+            ihfSetup(2,left);dino.x=left?100:750;const q=dino.ironhaul;keys.KeyS=true;keys[left?'KeyD':'KeyA']=true;
+            for(let i=0;i<45;i++){ihfStep();check(Math.abs(q.driveSpeed)<=6&&frames>=q.driveGuardUntil,'reverse exceeds half speed or grants armour');}
+            check(dino.isFacingLeft===left&&Math.abs(q.driveSpeed)===6,'reverse changes heading or cannot reach reverse cap');
+
+            ihfSetup(2,left);dino.x=400;keys[left?'KeyD':'KeyA']=true;dashCd=0;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);
+            const r=dino.ironhaul,dir=left?1:-1;
+            check(r.driveSpeed===dir*12&&!r.attack&&dino.isFacingLeft===!left,'Dash ignores movement direction or forces an attack');
+            const x=dino.x;ihfStep();check(Math.abs(dino.x-x-dir*12)<.01,'Dash speed is not immediate or is doubled');
+            keys[left?'KeyD':'KeyA']=false;keys[left?'KeyA':'KeyD']=true;ihfStep();check(r.driveSpeed===-dir*12&&dino.isFacingLeft===left,'Nitro cannot steer');
+            const until=r.driveGuardUntil;dashCd=10;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);check(r.driveGuardUntil===until,'failed Dash refreshes armour');
+            for(const k in keys)delete keys[k];ihfStep(35);check(!r.driveSpeed&&!r.attack,'truck cannot brake');
+        }
+        ihfSetup(2);dino.x=worldR()-dino.w;keys.KeyD=true;ihfStep(60);check(!dino.ironhaul.driveDistance&&!dino.ironhaul.driveSpeed&&frames>=dino.ironhaul.driveGuardUntil,'wall contact charges speed / armour');
+        ihfSetup(2);platforms.push({x:-60,w:canvas.width+120,top:240,h:20});dino.y=240-dino.h;keys.KeyS=keys.KeyA=true;
+        ihfStep(12);check(dino.grounded&&dino.y+dino.h===240,'reverse gear accidentally drops through platforms');
+        for(const left of [false,true])for(const y of [120,260,300]){
+            const target=ihfSetup(0,left);target.x=left?140:700;target.y=y;target.h=30;
+            ironBegin('gun');ihfStep(65);check(target.hp<10000,'K aim misses target '+left+' '+y);
+        }
+        ihfSetup();bosses.length=0;ironBegin('gun');ihfStep(4);check(dino.ironhaul.rounds.every(q=>Math.abs(q.vy)<4),'K points at sky without target');
+        let missiles=0;const spawn=ironSpawnMissiles;ironSpawnMissiles=function(n,count){missiles+=count??0;return spawn(n,count);};
+        try{
+            ihfSetup();for(const id of ['cut','rise','cross','thrust','execution']){ironBegin(id);ihfStep(IRON_PLAYER_MOVES[id].T);check(dino.grounded,'basic combo still auto-jumps '+id);}
+            check(missiles===0,'normal J chain spams missiles');ihfSetup();ironBegin('barrage');ihfStep(40);check(missiles===2,'charged barrage is not limited to two missiles');
+        }finally{ironSpawnMissiles=spawn;}
+        return 'PASS 6 cm run-up, finite speed armour, 50% reverse cap, steering / braking / blocked Dash, wall reset, grounded J combo, reduced missiles and K aim at varied heights in both directions';
+    }'''))
+    print(page.evaluate('''()=>{
         let count=0;
         for(const mode of [0,1,2])for(const left of [false,true]){
             const ids=mode===0?['cut','rise','cross','thrust','execution','upper','advance','cleaver','gun','cannon','barrage','air','charge','recoil','pursuit','rail','gunvault','skyripper','gunrain','aircross','plunge','gunslash','morphslam']:mode===1?['silvercut','spin','silverfinish','throw','bash','shieldrush','reversal','riposte','air','silverbloom','silvercross','sovereign','aegislance','aegisorbit','aegiswheel','aegisvault','ascension','starfall','nova']:['gatling','truckcannon','ram','cannon','barrage','broadside'];
-            for(const id of ids){const t=ihfSetup(mode,left);check(ironBegin(id),'cannot start '+id);const T=IRON_PLAYER_MOVES[id].T;
+            for(const id of ids){const t=ihfSetup(mode,left);if(mode===2&&id==='ram')keys[left?'KeyA':'KeyD']=true;check(ironBegin(id),'cannot start '+id);const T=IRON_PLAYER_MOVES[id].T;
                 if(['recoil','gunvault','gunslash'].includes(id)){
                     // Backflip fire leaves the ground lane; put an aerial target in the real round's path.
                     const fire=IRON_PLAYER_MOVES[id].shots[0];ihfStep(fire);const q=dino.ironhaul.rounds[0];check(!!q,'no acrobatic round '+id);
@@ -98,8 +139,8 @@ with sync_playwright() as p:
             ihfKey('KeyE');ihfKey('KeyE',false);check(dino.ironhaul.mode===0&&dino.ironhaul.attack?.id==='morphslam','truck-to-robot morph attack missing');
             check(dino.hp===hp&&ultCharge===37,'tactical morph refills resources');ihfStep(120);
             check(!dino.ironhaul.attack&&!dino.ironhaul.jets.length&&!dino.ironhaul.bunkers.length&&!dino.ironhaul.shells.length,'new mechanical effects never expire');
-            const t=ihfSetup(0,left);t.x=left?60:780;t.y=180;ironBegin('barrage');ihfStep(9);
-            const missiles=dino.ironhaul.rounds.filter(q=>q.kind==='missile');check(missiles.length===3&&missiles.every(q=>q.vy<0),'missile pods do not launch upwards');
+            const t=ihfSetup(0,left);t.x=left?60:780;t.y=180;ironBegin('barrage');ihfStep(14);
+            const missiles=dino.ironhaul.rounds.filter(q=>q.kind==='missile');check(missiles.length===2&&missiles.every(q=>q.vy<0),'missile pods do not launch upwards');
             for(let i=0;i<100;i++){if(i<30)t.x+=left?1:-1;ihfStep();}
             check(t.hp<10000&&!dino.ironhaul.rounds.some(q=>q.kind==='missile'),'homing missiles cannot reach moving target or expire');
             const t2=ihfSetup(1,left);t2.x=left?60:780;t2.y=180;dino.ironhaul.silver=2;ironSpawnMissiles(dino,4);
@@ -121,7 +162,7 @@ with sync_playwright() as p:
         ihfKey('KeyE');ihfKey('KeyE',false);check(dino.ironhaul.mode===1,'Q/E leaves ultimate armour');dino.ironhaul.silver=1;ihfStep();check(dino.ironhaul.mode===2&&dino.ironhaul.rounds.includes(q),'expiry deletes thrown shield');
         ihfStep(120);check(!dino.ironhaul.rounds.some(q=>q.kind==='shield')&&!dino.ironhaul.shieldOut,'shield never returns');
         const t=ihfSetup(2);ihfKey('KeyJ');ihfStep(90);ihfKey('KeyJ',false);ihfStep(20);check(t.hp<9996,'held truck gatling missing');
-        ihfSetup(2);dashCd=0;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);check(dino.ironhaul.attack?.id==='ram','native dash does not ram');ihfStep(45);check(!dino.ironhaul.attack,'ram is infinite');
+        ihfSetup(2);dashCd=0;ihfKey('ShiftLeft');ihfKey('ShiftLeft',false);check(!dino.ironhaul.attack&&Math.abs(dino.ironhaul.driveSpeed)===12,'truck dash is not freely driven Nitro');ihfStep(45);check(!dino.ironhaul.attack&&!dino.ironhaul.driveSpeed,'Nitro does not brake');
         return 'PASS public J/K input, finite combo buffer, charged cannon, Q/E morph, persistent returning shield, truck hold-fire and dash ram';
     }'''))
     print(page.evaluate('''()=>{
@@ -204,7 +245,7 @@ with sync_playwright() as p:
             check(dino.y+dino.h<320&&dino.hp>0,'pit relaunch is too low');
             check(ironBegin(mode===2?'gatling':'air'),'cannot attack during rebound');ihfStep();check(!!dino.ironhaul.attack,'rebound deletes new aerial attack');ihfStep(90);
         }
-        xDatForm(11);mapTheme='wilds';startGame('normal');check(dino.x>5000&&dino.ironhaul&&dino.h===68,'large map entry');
+        xDatForm(11);mapTheme='wilds';startGame('normal');check(dino.x>5000&&dino.ironhaul&&dino.h===78,'large map entry');
         const start=dino.x;ihfKey('KeyD');for(let i=0;i<45;i++)loopAnToan();ihfKey('KeyD',false);check(dino.x>start+100,'large-map movement blocked');
         ihfKey('Space');for(let i=0;i<14;i++)loopAnToan();ihfKey('Space',false);
         ihfKey('Space');loopAnToan();ihfKey('Space',false);check(dino.jumpCount>=2&&dino.dy<0,'new form has no double jump');
@@ -228,7 +269,7 @@ with sync_playwright() as p:
     }'''))
     # Saved selection must work without opening Customize.
     page.evaluate('xDatForm(11)');page.reload()
-    assert page.evaluate("()=>{startGame('normal');return ironOn()&&xFormIdx()===11&&!!dino.ironhaul&&dino.h===68&&dino.hp===10;}")
+    assert page.evaluate("()=>{startGame('normal');return ironOn()&&xFormIdx()===11&&!!dino.ironhaul&&dino.h===78&&dino.hp===10;}")
     point=page.evaluate("()=>{gameState='custom_menu';xDatForm(10);resetPreview();drawCustomMenu();const r=canvas.getBoundingClientRect();return {x:r.x+649*r.width/canvas.width,y:r.y+100*r.height/canvas.height};}")
     page.mouse.click(point['x'],point['y']);assert page.evaluate('ironOn()&&xFormIdx()===11')
     page.mouse.click(point['x'],point['y']);assert page.evaluate('!ironOn()&&xFormIdx()===0')

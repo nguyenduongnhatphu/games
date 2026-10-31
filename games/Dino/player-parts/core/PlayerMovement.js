@@ -1,11 +1,11 @@
 // PLAYER_FILE: PlayerMovement
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
-// Tham chiếu ngoài: DANG_RUSH_CHAY, DT_W, Effect, FloatingText, OCEAN_SURF, SFX, VG_H, VG_W, VK, ammoToiDa, asHeSoChay, asTick, battuBat, bienTuiKhi, bosses, bzBat, coBuc, combatStance, currentAmmoType, currentForm, cusNguoiDang, cusNkGiuNguoi, cutBossProjectiles, dangCua, dangMauGoc, dangMauThem, dangTick, dangTocMul, danteOn, dashVx, deathSkel, deoPhu, floatingTexts, frames, gameState, giaoLaCanChien, hasRune, ironOn, jkKep, keys, launchFromPit, mapTheme, mauPhu, mayGiuLuot, p2AmmoType, platforms, projectiles, pvpDich, resolveSolidPillars, resolveTetrisWalls, sgOn, sgRobot, sgState, stBat, tetris, vergilOn, visualEffects, vkMoc, voidBat, wildernessOn, worldL, worldR, xBat
+// Tham chiếu ngoài: DANG_RUSH_CHAY, DT_W, Effect, FloatingText, IRON_ROBOT_CROUCH, IRON_ROBOT_H, IRON_ROBOT_W, OCEAN_SURF, SFX, VG_H, VG_W, VK, ammoToiDa, asHeSoChay, asTick, battuBat, bienTuiKhi, bosses, bzBat, coBuc, combatStance, currentAmmoType, currentForm, cusNguoiDang, cusNkGiuNguoi, cutBossProjectiles, dangCua, dangMauGoc, dangMauThem, dangTick, dangTocMul, danteOn, dashVx, deathSkel, deoPhu, floatingTexts, frames, gameState, giaoLaCanChien, hasRune, ironActive, ironDriveMove, ironDriveMoved, ironOn, jkKep, keys, launchFromPit, mapTheme, mauPhu, mayGiuLuot, p2AmmoType, platforms, projectiles, pvpDich, resolveSolidPillars, resolveTetrisWalls, sgOn, sgRobot, sgState, stBat, tetris, vergilOn, visualEffects, vkMoc, voidBat, wildernessOn, worldL, worldR, xBat
 // index.html:47340 · Phạm vi: Player
 class __Part0 {
 // PLAYER_PART_BEGIN s3.Player.constructor.1 EDITABLE
@@ -104,6 +104,7 @@ _updateGoc() {
                         // VENOM moc 4: dang dung THE TAN de phong tay thi ghim chan.
                         if (this._venTan > 0){ mv = 0; dashVx = 0; }
                         if (mayGiuLuot(this)) mv = 0;
+                        if (this.id===1 && typeof ironDriveMove==='function' && ironActive(this) && this.ironhaul?.mode===2) mv=ironDriveMove(this,mv);
                         let hmove = mv + dashVx;
                         this.x += hmove;
                         if (mayGiuLuot(this)) {
@@ -115,6 +116,7 @@ _updateGoc() {
                         if (this.x < worldL()) this.x = worldL();
                         if (this.x > worldR() - this.w) this.x = worldR() - this.w;
                         if (mapTheme==='tetris') resolveTetrisWalls(this, hmove); else resolveSolidPillars(this);
+                        if (this.id===1 && typeof ironDriveMoved==='function' && ironActive(this) && this.ironhaul?.mode===2) ironDriveMoved(this);
                     }
                     // LUON HUONG MAT VE BOSS (khi dang danh boss) - facing tach roi khoi huong di chuyen
                     // Chieu cuoi cua KIEM bi cong nay loai tru 'pvp' — do duoc: bam U trong
@@ -131,7 +133,9 @@ _updateGoc() {
                            update() chay, nhung HUONG BAN da duoc quyet ngay trong update() —
                            mat quay dung ma dan van bay nguoc ra sau.
                            Trong PvP thi "muc tieu" la nguoi choi kia, xu ly truoc moi thu. */
-                        if (gameState === 'pvp'){
+                        if (this.id===1 && typeof ironActive==='function' && ironActive(this) && this.ironhaul?.mode===2) {
+                            this.isFacingLeft=this.ironhaul.driveHeading<0;
+                        } else if (gameState === 'pvp'){
                             let _dt = (typeof pvpDich === 'function') ? pvpDich(this) : null;
                             if (_dt){
                                 let dxp = (_dt.x + _dt.w / 2) - pcx;
@@ -157,7 +161,7 @@ _updateGoc() {
                 if (this.clawUltState) { shootKey = false; fireKey = false; chargeKey = false; this.clawTickUlt(); }   // @@VK-DINOSWORD
 
                 let doDrop = false;
-                if (coBuc() && (gameState === 'normal' || gameState === 'test_boss' || gameState === 'boss_rush' || gameState === 'pvp') && this.grounded && crouchKey && this.dropTimer <= 0 && !this.tank) {
+                if (coBuc() && (gameState === 'normal' || gameState === 'test_boss' || gameState === 'boss_rush' || gameState === 'pvp') && this.grounded && crouchKey && this.dropTimer <= 0 && !this.tank && !(this.id===1&&typeof ironOn==='function'&&ironOn()&&this.ironhaul?.mode===2&&(keys.KeyA||keys.KeyD||keys.ArrowLeft||keys.ArrowRight))) {
                     let curTop = this.y + this.h;
                     if (platforms.some(pf => this.x + this.w > pf.x + 5 && this.x < pf.x + pf.w - 5 && pf.top > curTop + 20 && pf.top < curTop + 150)) doDrop = true;
                     if (mapTheme === 'ocean' && Math.abs(curTop - OCEAN_SURF) < 22) doDrop = true;   // dung tren BEO: bam S de lan xuong nuoc
@@ -171,7 +175,7 @@ _updateGoc() {
                 if (this.isCrouching !== _wasCrouch && this.grounded) this.y += (this.isCrouching ? 20 : -20) * sScale;
                 if(this.id===1&&danteOn()){this.h=this.isCrouching?40:60;this.w=DT_W;}
                 if(this.id===1&&(typeof vergilOn==='function'&&vergilOn())){this.h=this.isCrouching?38:VG_H;this.w=VG_W;}
-                if(this.id===1&&typeof ironOn==='function'&&ironOn()){this.w=this.ironhaul?.mode===2?86:40;this.h=this.ironhaul?.mode===2?34:this.isCrouching?48:68;}
+                if(this.id===1&&typeof ironOn==='function'&&ironOn()){this.w=this.ironhaul?.mode===2?86:IRON_ROBOT_W;this.h=this.ironhaul?.mode===2?34:this.isCrouching?IRON_ROBOT_CROUCH:IRON_ROBOT_H;if(this.ironhaul?.mode!==2&&this.isCrouching!==_wasCrouch&&this.grounded)this.y+=(this.isCrouching?1:-1)*(IRON_ROBOT_H-IRON_ROBOT_CROUCH-20*sScale);}
                 if (doDrop) { this.dropTimer = 16; this.dropFromTop = this.y + this.h; this.grounded = false; if (this.dy < 1) this.dy = 1; }
 
                 // Body Slam chi bat khi dang tren khong sau it nhat lan nhay thu hai.

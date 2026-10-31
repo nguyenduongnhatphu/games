@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "games/Dino/index.html",
-  "sourceHash": "d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b",
+  "sourceHash": "7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c",
   "bossCount": 74,
   "files": [
     {
@@ -118,8 +118,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "e817d2a0d2550c04776634f3daa05dc16ff3abad9d1d91dc61a87d3af2b35e7d",
-      "structureHash": "bdd1803eca6dba815c55b9b85056e4ee6c1f0a9e42b4d1761fddb66e8ba6c7e3"
+      "hash": "823c8d3078eec21cdf38803588ec3d255da151671768ec0eeb7f85736ab37db7",
+      "structureHash": "9d59e5c32cc21b791627dc086ce5d79d4256185e87eacccdc6fe069ffaba8e8a"
     },
     {
       "name": "ArcanaRexBoss",
@@ -243,8 +243,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "adfeb68a577f7336c3be6c38223d2c7b871c1e67e1d1f695dfe8d5d59a200800",
-      "structureHash": "1340196aa9a52575b125f89f3fc6cc8c7e1b25eaf8c5d61ac2ce8bcda0139972"
+      "hash": "1191fd3a3aeaef76b07e7ad15324a95565babfc08568aae2a10eb4529c7cce09",
+      "structureHash": "807a7194323beffefa83d47c067eecc59aafd4869b32c99586d512a50b371244"
     },
     {
       "name": "ArtoriasBoss",
@@ -370,8 +370,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "ad218d15506b5f70db6c091763d13dbc0f4020a6dcd15f5f291e4546d154a86c",
-      "structureHash": "ab380fd65fa47a502243f3424aa2ee26a8bfa9989af2b85bc3c5020a7255819a"
+      "hash": "1d3d7e2550f0635bf3c32cc3e0e028a3f7ba32e0d70ec9eef5e15462c23180e2",
+      "structureHash": "ca3b3692a730544116342096f32bbfca25389fcdd75b3c13d3fc976c2bc1ac16"
     },
     {
       "name": "ChronoRexBoss",
@@ -485,8 +485,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "5d48b9909cecc9649398f4afc8aca15bd73ab636f35919d37e276634e9883e62",
-      "structureHash": "02385e773e1bd1f07a73a805167237473b6251ddea35b7709d641ea138c2f0e5"
+      "hash": "6ce68c79d7619de05532fa12d0eda2eebc95b5e6ba540c397e0613aa9241aa8c",
+      "structureHash": "f450cd9b7737272b98c3303bef839da0a6d10700bbf1013d49874742d2b07eea"
     },
     {
       "name": "ClawCloneBoss",
@@ -600,8 +600,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "cd17a3e91713425fe1bad884c68587e90805f6c35aca81ea77b4aa643ed84607",
-      "structureHash": "4cb5d7b179c6afbd3a58ab2da49eec6404642ac425d49728090c5770e3497021"
+      "hash": "a750e6faf18095e20e137787a50d6e187507ba4b4a2b7f00ae5c6967c615b350",
+      "structureHash": "84ad2ec0bd5b058fd87c9f40ae1b163471945c0ba807123e182c542ad9ae346c"
     },
     {
       "name": "CliffGolemBoss",
@@ -718,8 +718,8 @@
         "troiVy",
         "visualEffects"
       ],
-      "hash": "c69f8139457fbe10eaff05dda7b9fdddd439ebf577dcc821b720dba3fe0230a5",
-      "structureHash": "4f15b9dc2e6613d28d18338c4f4fc700403630c9d2c1c92b94315beb79123c62"
+      "hash": "27411d445c7f7440132da775f1b1a189a6713f8dac753d3eb41dd84f84c1802d",
+      "structureHash": "ca2a340ac75c1fc2cb3498abbbe8a9e98b075f93e84ce17bc6eeeee6254617a7"
     },
     {
       "name": "CloneBoss",
@@ -828,8 +828,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "0aca8d8ddd42691265f55e18ae755230c59fe7bd38ed0249eefd9461be08bcfb",
-      "structureHash": "981820144610b2effdd9b15b20ec55645f15dc642591ab8bc0d82243a3ad9943"
+      "hash": "443743ea45282d1fba88aa45a225777ac9a016eba3dbb12e877356bd2eef4117",
+      "structureHash": "031beb63c32de301776e0887f9a35b10c26ee364816095afdc6798b5e4922362"
     },
     {
       "name": "CorruptionBoss",
@@ -964,8 +964,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "10e2cd2f01fec140df8b107faec8fede6718bcdce862bd3274a1adc673418981",
-      "structureHash": "6559e1850a840f1a3bf7a6f1b9373412ae52bebe4a5334f8cdf8583f96248e40"
+      "hash": "087b6fbdcb58bf2effea26bac3d453b56b1c47ca42d309cf4c41f6754e7b4762",
+      "structureHash": "82162ed167297c9a374b08e4f86c6a267178dbf418529fbf7ede54556c325313"
     },
     {
       "name": "DanteBoss",
@@ -1177,8 +1177,8 @@
         "worldL",
         "worldR"
       ],
-      "hash": "096da30470ede1a088b37fd980b2c6e7cff219d0f333fc44700f9f447f183c37",
-      "structureHash": "aa62d1ed7164f8415e29069cf84a62af181b575aaa4a57e2c196c5bdba431e7e"
+      "hash": "af11265545c44cf9187cac10faeacb0d75be119f5d955a62379d743e2714cfff",
+      "structureHash": "8059bd25352ae178110a3e2e789eb61e496f573cdb2eefe245f303d866a8d9a1"
     },
     {
       "name": "DeathBoss",
@@ -1327,8 +1327,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "af9b5289631e2b52394ffe810d17478cca4ae5868b86742ff1a34b506be07895",
-      "structureHash": "4566c71ed4f65185128959580ee00e461d0bf984be3cba1361cb00435ca625e1"
+      "hash": "0840503d2276b46bd9a51e22b8518edc48d17d062cc265c4a7881b2bc1049ee3",
+      "structureHash": "b21ac02c791cf4bdcf09c8ee5276cd912b6aabeb0a6e73cac9ca5e85069b4d5a"
     },
     {
       "name": "DilophosBoss",
@@ -1441,8 +1441,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "188d6fbf5d500e8553a0eaf90ea5e66600f9e93c0f165719197dff7d28f332da",
-      "structureHash": "432f8f35cd666a5d33be22d90a624b5f64a394983f2c66a91f78cce88625c230"
+      "hash": "b1d7c8dcc1798962d2aca73352edac3183efebebc501e83f59c8ae184fd43ff2",
+      "structureHash": "7a4b9bea8f99251a47814089730b1ee2e8738642f338ad5764726ccc6269d909"
     },
     {
       "name": "DragonLordBoss",
@@ -1567,8 +1567,8 @@
         "troiSinh",
         "visualEffects"
       ],
-      "hash": "72bc15e59d4adf547d2d15ec20e77689f401348a5e9b36be0d146f948d94bc14",
-      "structureHash": "fce5eb4b1bfe6c9ac965b5cf63de39f5d651f1111b39a952f2309f8b24d271b4"
+      "hash": "c171c1b8aff222416172034e0544c55f9e536373997a98dfc383cf620df24b0f",
+      "structureHash": "3cce5009b09f45606879f37994d3cfe77cb938703b544b321702fd4be7e3b18c"
     },
     {
       "name": "EchoStalkerBoss",
@@ -1678,8 +1678,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "6ff1e49d6ac854f508ca7ea44140503e4300e36a36382545343186e914370f3f",
-      "structureHash": "5c206bfa5e2533081187db504460765204ce23bf1be9ef136852232bc8e0e014"
+      "hash": "1f2aef1edabde15e9f2f98a0d25f80967dbd6ba525f4a1dde648c4ef4ee2b48a",
+      "structureHash": "050d7e85bc896f3659d354e9d179d4a2f145c797e21ff521542bfcb1fc5eeabb"
     },
     {
       "name": "EmberWolfBoss",
@@ -1797,8 +1797,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "001b6853d5cd38a979b4e87ff970df92038c9840c8c03306c5acfc55fae221a9",
-      "structureHash": "86525dd978d92bb5cc181e2c48c61bf536d8b20e933308145035feceb1c496a7"
+      "hash": "18d95ea8f77b18b2a64ba36ff1fd114f1e862297f6438442d88041960ead6222",
+      "structureHash": "9283d51dc791bb82f558203bb6b7aec65c3600b5c15847fb8a59dc71af0a89c6"
     },
     {
       "name": "FireCloneBoss",
@@ -1918,8 +1918,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "1603fc17d49fc0acebeac1b74c5ecb15806e687cbeaac89c30aef9f6914f3b3a",
-      "structureHash": "2157d3cfeab9a1faa170ce49d19d542700c476cb0066b6905ec325e580e73a58"
+      "hash": "fe269c06fbaf2d3ad80d12887348998368796dc88dde2e324c80d0481a5f7ca0",
+      "structureHash": "543d0ce483f178112bb808a6226d5e1817158b14dc60072023eb38887e54e468"
     },
     {
       "name": "FireDragonBoss",
@@ -2031,8 +2031,8 @@
         "worldL",
         "worldR"
       ],
-      "hash": "ce02d4f3dc6972ff696f12c2c05dc45e405439d232dec60ef66475f34d547d9d",
-      "structureHash": "8b3a23dcc29cf905db4c51c4cde00e08a3dcad3ba09d8d5f76458ad570ba3f9c"
+      "hash": "0ea3ed90d870bcab1c486d234bbb6d03305f1b6c0f7a66e7be7fe159b440a41a",
+      "structureHash": "553b3baade671a1592d35dcda392d83c6799621d6434f4e9f5e9606c02433fd4"
     },
     {
       "name": "FlameCoreBoss",
@@ -2153,8 +2153,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "67a871f74a83b3e3cb85ac7e86f966a8bd321ec11435680e9ac685f4c5384f47",
-      "structureHash": "59639deeb96b0c3a30ea4e1a8ad965c31bfd2daf6dab536a3e43826827455af3"
+      "hash": "f0688f1ed59adbb6549859562e992c4ec5d326167cb2647571393fd87029dac6",
+      "structureHash": "7d3452fe192837af8216325f799065c30f96b42f5aac3bbb5289058df2f74cd9"
     },
     {
       "name": "FlameLancerBoss",
@@ -2278,8 +2278,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "ea137e2a50621c32b8497aea1410115b66139696323505d577d68cc914c4bcfb",
-      "structureHash": "1e46f55e9cb49b28b3e9836570c75e9b38b29f9875f05f3301136c38259356c2"
+      "hash": "ff72adc4dcf342cb30ac67308f2492085a76b602538969dc0ffb3ac0ad33fe5a",
+      "structureHash": "26dc8a9e82d2d241128ff71a8aa7e1d38413c5d77a78338c736b9d8da09cded1"
     },
     {
       "name": "ForestTitanBoss",
@@ -2395,8 +2395,8 @@
         "troiVy",
         "visualEffects"
       ],
-      "hash": "4c9491c3f4b4902ec943da22485b9165bb5f9fca59982c3f2df7bbdfd548ec9e",
-      "structureHash": "1eb4f4d3e460869ea3908ae8167fbe7f14043ef2cdedd3a7536b8626a7f1ec53"
+      "hash": "1e79c10c34c4c64a339223f00495e388e7fa058061186425beb2ba673f77435c",
+      "structureHash": "58db182f4b8719ecfb937591e43afc2fa6be18ed8b24732c9d2dc275b3efd32d"
     },
     {
       "name": "GaelBoss",
@@ -2543,8 +2543,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "4d145948fd7bf54c58cf6624bd10eeeeceb40f4d56ab50537e864dd409d5a64b",
-      "structureHash": "36c8bb48001d86146e5291db1ee88b8ebd77d2e1f0cbb44e63540f8ba46dbf0a"
+      "hash": "823f94000feb7996e244925d1fddc45ef8db2733dc0f4b97dd819694bb6bbbe9",
+      "structureHash": "586d5f905e25d478d35d836c4cb389fe260a1e82f51180f39a44b4962418b664"
     },
     {
       "name": "GiantSpiderBoss",
@@ -2664,8 +2664,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "a842c195926866d68edaa36a46bdd4e27a999585aad4b6da7c7cefb4eb1dfd6e",
-      "structureHash": "eefec23c58acb619c081985c5cfb1472cb149b719eaa5a11a72a04b82e4f3fff"
+      "hash": "f1c753d131cce9e456907e042f17c2d653999a6d227172004ed54abf0de46adf",
+      "structureHash": "fbe77c645b3c141e735e109539531a55a74a8fd46ba1b45139d80ede26e38306"
     },
     {
       "name": "GodzillaBoss",
@@ -2786,8 +2786,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "b1b423a0a50a1cff12572e3e9100a3e064ac16d5a423b94883ed537dd9f56f25",
-      "structureHash": "ed54832cc98a98bb18a4c905efa852c54907658ff79a19af9135f1a269b9612c"
+      "hash": "c6a21f6023b8e7f72195a346be41bdea2fb93fe98db95d300a87cbb9020c4dcd",
+      "structureHash": "7cedaae0a9c8ed63f2db912e0e1b8e5bd8628b39486bdc83c067f2f9d1d1231a"
     },
     {
       "name": "GreatApeBoss",
@@ -2897,8 +2897,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "338078dc1cfabaaad0a6e16af7a2b916d7af3178aeedc02d2e6dcab0f06121ac",
-      "structureHash": "2fd9ace6230dcea1d6b56835d63c1bca396eadc6203152a3f4b285771e970537"
+      "hash": "473385787d38d1d5fda5ae2ff5ecea3a243157504e114e4db432ed38669ebf78",
+      "structureHash": "77ed90c6822ad3e24f86d69d1dc9e6b1d436a5e1be44cf5564af07b47d115a95"
     },
     {
       "name": "GreatSerpentBoss",
@@ -3019,8 +3019,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "2f9ba22bae359050de1f9020d041aaf0d053fec3c59a834f9c98d7f562a9c504",
-      "structureHash": "94b09f3f25863837b4157afc43a02704e634965705b50c6d380b8ac9a50402cd"
+      "hash": "ea63b4f593e21cd7ad6611703243785375b280bdb8aff6151c71b36e97aa38ea",
+      "structureHash": "26140083ad5f006cde81e224570b6a1dd5a713f37cefc10c09a851c78badf6cb"
     },
     {
       "name": "HelicoprionBoss",
@@ -3067,8 +3067,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "fc1135816e75a7a0491ff9dbcd6fe5cdee34492ffbae1d9fb9cd41d6224ee791",
-      "structureHash": "fc776effd463e8f0f24d42ae7fed5d51aac31176fb6b9ce504ef2cbdd894a442"
+      "hash": "8bb1a2f04e885b03bccac1a2666d73131e5e4e5403dcdd9f7c3c1346102040c6",
+      "structureHash": "f657697d22fb020a4662fd01bf34888d3b9c3a10b61c2bf1455f0b986c710a8d"
     },
     {
       "name": "HoGacBoss",
@@ -3186,8 +3186,8 @@
         "worldL",
         "worldR"
       ],
-      "hash": "c7fd7f5d73c0a6513fecbe51f9a40599e676a502cd1fb1762e7011273edb8136",
-      "structureHash": "59eb55397ad1869a614ce08fa67c784182706e7468b15e6d45da353d98ec16f6"
+      "hash": "b95df2e962d99be5ea7a934e5146b7e2f7f58eb4fdee3a14b7f901a5001a2334",
+      "structureHash": "9ceb56a692f429a7e150fdbd36f7e9e1969afeb4529c4493de69be3055defe02"
     },
     {
       "name": "IaiRaptorBoss",
@@ -3301,8 +3301,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "93f785662e7b3fa4aaa7366fd31fd6467483874f12ceb482c9d6b21e30e597e3",
-      "structureHash": "c4b762c812297c2da2182c19bf8514cecc7565e8e2eeb7a27169857fa056620b"
+      "hash": "f8160b8f2ed5d34fa0056db31acd7d3292a4b62c4493736ab090880695c5599a",
+      "structureHash": "dd695225bdc7e00b9a7acd06c50f80c6d2dde30598aa4f7f9d8893c8b6fb947a"
     },
     {
       "name": "IceFangBoss",
@@ -3411,8 +3411,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "8f15141fee089c37b1b19a309e399a53455424b943c58d14f5eb0c5862f381de",
-      "structureHash": "598770f0ee36ea5eb9063dd57df874a9da1dd3c811d569425818f8a850106e28"
+      "hash": "552d101ed26afc5d6da5ec4016a39acb91eddac7678cfe06b2d7aa1a266fb033",
+      "structureHash": "f0156468c0b16c046e7606d33dd9a973993102cf366b8043c838f6ce479c92d3"
     },
     {
       "name": "IndominusBoss",
@@ -3524,8 +3524,8 @@
         "pickFromBag",
         "shakeTimer"
       ],
-      "hash": "3ac1f776a86ffa1f79317b7a6e20800e468578614b31f8155113a12c40181e84",
-      "structureHash": "ad1a8e940deb07b4a0d7011d96d54c072ec8bfc15327a8cb62108b6846680fdc"
+      "hash": "986ed7e2af265653e754f94952d9b898aa840ab9a5ad4ceb65f7b98e8b7ef0d1",
+      "structureHash": "00112f3182d1f8b84466f98fc9ad98e31360d20553360bbbb18479e784ee0b9b"
     },
     {
       "name": "IronhaulBoss",
@@ -3606,8 +3606,8 @@
         "voidChanParry",
         "worldR"
       ],
-      "hash": "356552acefebce863638817049ed1fe18e3f8a0cc8160a167bf4baa5e799be77",
-      "structureHash": "fe7c5acbfd79dc61c90b2d2d63d281a9c313d0452a7be7f46c6b0cb02d2822cc"
+      "hash": "5a05cbdeba2323a21034b64a3150d4709a14b2e063992305effd63a6ef2db2a3",
+      "structureHash": "8dbf1924143d350f759f4d7a1f8c743d74e1da54f86442cf830f3ef253547402"
     },
     {
       "name": "LavaSerpentBoss",
@@ -3722,8 +3722,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "025e40686671d735c6875f4c8372b3fe766c6600cb4311b9aea87404c3735d7f",
-      "structureHash": "72543eadb7aa72c0052bb2e730781933cce316eb479db4610f0d33081895dfc5"
+      "hash": "baf9e1bd4991689a691460180be3bafd6f6c93149d8a76df3c634910993031ec",
+      "structureHash": "c68c3febb5e364ddbba6fcd951f2c912168c7e255e2dafe6872a58457f74fc52"
     },
     {
       "name": "MagmaDragoonBoss",
@@ -3835,8 +3835,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "bd16842b451fac9ec7149313df363459508408bfc6af3cdd1c2961ea823bbad5",
-      "structureHash": "550698a7ac8218f0f040036aeb72744e9a9acb1605f9630a2c6a995278cdf046"
+      "hash": "427ba9c7265829c465f4ce4674fb3ae4b409235e33455502a3d36f0c93a459fc",
+      "structureHash": "73f1dee1b74757d0df0afd5dd731747c20288b4f010ee7782e2cd870710a5a74"
     },
     {
       "name": "MagmorBoss",
@@ -3949,8 +3949,8 @@
         "troiVy",
         "visualEffects"
       ],
-      "hash": "165388e560f760968e15fa7b67be73dc0ff03a6c46d7962ca86cb34c88c4850b",
-      "structureHash": "0ffc317de29d12a834746d317eb89a9e319eeb80e818f7d988969a0cf08dc56d"
+      "hash": "389cdd164d9a85e2a642c1d67810e2bd22379b0a027d847faaff9d05432f173a",
+      "structureHash": "5b0c500b4d7d9e51ba2475ce3ec9887ffdcf94638950a7aa5314d4379f9c8309"
     },
     {
       "name": "MegaManXBoss",
@@ -4097,8 +4097,8 @@
         "xCong",
         "xDmgDan"
       ],
-      "hash": "9730839f8d09268ee5e912e30ea7a6d3129d16809450ab6dd6b8bd006287c63b",
-      "structureHash": "9bb7c6da74b5fe59c3026644fc2ce5fbb90f43c468690f32cb772c5ea235d875"
+      "hash": "a5161a81d94ce9da54f76070fb6e1988b12ac99f58f2ff156ac194a8de7fe8e1",
+      "structureHash": "1875d3d87ed514a12e14e09d2569c62450da8ee9ad38bb879c025e58d75a9759"
     },
     {
       "name": "MegalodonBoss",
@@ -4229,8 +4229,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "e068446198265565c917eef815bb0ddef6b7bd112995a6dbdda84f00e5ce9d12",
-      "structureHash": "2b4957e534e5291cd5aa6acdaf6112c852e5aabc80792bc68a5fd01aeaea185f"
+      "hash": "c2da1c9b5e9454df316f2d6e73b80bf4df20c08d0633704c8fb830e21d58bdfd",
+      "structureHash": "318b9c96eb868e7767760fa8a8a126ab17b2c5d086d36d1aa579d30ff7b54f10"
     },
     {
       "name": "MosaBoss",
@@ -4349,8 +4349,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "07cce98f071da0f9cfe9f99d2ae1f7736b62da5bda7e22348c7c59c992d2e807",
-      "structureHash": "fae8c6412e23e2ae94873770e08bac065160d0f17055dbc337308a3d1a9f652a"
+      "hash": "088bb1ce7d9461726ee8c69f133d5f55aaff0b976d3f1ba7734c5f237336f74f",
+      "structureHash": "4b40eddda5e94d986507950cdaa8b32c7f418a2816453971a2ca6fea2f601a66"
     },
     {
       "name": "MountainGodBoss",
@@ -4469,8 +4469,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "715c403d6edae1b3d08f9dbd28a2724c87b6e98ea63044df75b7cfaf691aadd3",
-      "structureHash": "1390b32a8a4ecf930c3434f320e0ff7bc17fe436dc51b03095110128a43dfcc4"
+      "hash": "3eab6aecb4e5efc367c5aafd0b1522bebee0597a306473662415c02f85aaf51f",
+      "structureHash": "9c2b7ef112c38fb25417a1cc06f7314e06e16ad84146f8f9d5648cd18fa746c1"
     },
     {
       "name": "NeroBoss",
@@ -4599,8 +4599,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "e21b8e903f5f05b134312d6a9c9fae623be464364bb72fc51a3d1f4742725e0a",
-      "structureHash": "56d3a03dbf24d5a4ba782beb64bcda9287ad210ca7f954fd2cc821dd224616fc"
+      "hash": "5b645fad4a8af59bf13187855d43b0b2f9d44c3e4712d16f64d64c654ddc8126",
+      "structureHash": "bb944e45094dfbfefc97cf80c41441dbf43359c5c64a7398ad427951991be0c1"
     },
     {
       "name": "OctopusBoss",
@@ -4730,8 +4730,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "8a69170e961b2ed75a60b3974982f2db99d9906e31c0c070e96467d4a7853227",
-      "structureHash": "5b27824dc646fc2bb9439964af2ea1b21898998f8bf09e0c2e6b4929e5fdf10f"
+      "hash": "86b1d78a55ec0e349f87bc9ad581e2590297d08453d249b7892a53c13f8ad220",
+      "structureHash": "757326b1a46f3eb9f34ee20975764e93905364824085dfa2c671350a10b88636"
     },
     {
       "name": "PillarLordBoss",
@@ -4841,8 +4841,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "9aacdd19770aaec623e6c412b13a5518ea50e8df90301e13537dc0d8279b5b1c",
-      "structureHash": "471cf9403062adbbbface361d7907aacc9548cca48630f9eaac55340003d9fe8"
+      "hash": "34cfd80be728e1772a0b555ac87bb6934497029fd3e61e89f1eb0f80d0dc290a",
+      "structureHash": "78b0d9e3ed2134f9de675a5fe9301f986f5d02e2fa1a4923f5d7c4c77f17ac5e"
     },
     {
       "name": "PoisonMothBoss",
@@ -4955,8 +4955,8 @@
         "projectiles",
         "visualEffects"
       ],
-      "hash": "37e924fe8c086a81d21c488a125692e8223290e4d08231781b16f7039adc3c14",
-      "structureHash": "d87f8a71821f860cb938bbb2c267fc1cd0cb3ddd4820d1c4841254eb7e60c5de"
+      "hash": "8a201ebcf2d353428ed752d40d03852b851f5d6e329bcaf12ee37912eecf8575",
+      "structureHash": "d03abe34f6ecff5a437a45620f024ddf47a9318b4c6cc80225e0319f35bdac4e"
     },
     {
       "name": "PontiffBoss",
@@ -5080,8 +5080,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "b3f0c0157cb20a499212212ef5f5194a1946e8e94da07e5cb5179dc5fc5ac03d",
-      "structureHash": "f011875cdd2dd6fc1ed9a02768542f0071acc75617324a071bc705857a9abbee"
+      "hash": "cc0aeea497be8713399e534098f1d4c106c2166fccf0b3dcc78492f2fea34583",
+      "structureHash": "9c93743deada855571a614312448510878f4f550441ddb6f2e7c5f7043a9f7c3"
     },
     {
       "name": "PteroBoss",
@@ -5191,8 +5191,8 @@
         "parryX",
         "visualEffects"
       ],
-      "hash": "973c31f286a6d1818a1705a344a4bcdd72ad92f15761c6c5e7f90f388a5c558e",
-      "structureHash": "2631f6f505830ca3e2cb32ecae7e4c8b60125f5ffbd347b94c3da6bbce85bd00"
+      "hash": "95abf242ca2db74158db6cad3863685f4d565825541175cbd079c611a6e1f36e",
+      "structureHash": "ba78548edfed2585f9bf979087edf2a2bccaa891d90b1d01ea04ae5e667b7fac"
     },
     {
       "name": "PteroLordBoss",
@@ -5300,8 +5300,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "04cced04a487d813896a0e95e5bb19fb1de42ebce41e34d2216b11979a2809ed",
-      "structureHash": "6c4f02e65097cdb476f853230e5f5f750b817589bdd36a840decc80e517e6a8b"
+      "hash": "8699ed2079bab903b00064bd4fdc0d63d201c8a105eeeb90894a624006b6c44f",
+      "structureHash": "4b0edc73adf175452402d2b2857a88dec6d331971e1234348065d6a552973f15"
     },
     {
       "name": "PulsarCloneBoss",
@@ -5417,8 +5417,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "034eaca8af7c03627390883976d385bf359b9a9db0464a0c65d56ed7a890148a",
-      "structureHash": "f8597142347a0d8af6f29cf277f8f469f76d34977761216b595d80e8f98725f0"
+      "hash": "906bb2d46b9e2716c08546a3f2992ce4f4cfba442efa9bfc38c80d383ebe0add",
+      "structureHash": "08851dd03d99b9b8be65608e359840b93b278bb5bed2ceb0597cb24d0e941560"
     },
     {
       "name": "QuetzalBoss",
@@ -5531,8 +5531,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "f11b0315147c5edbb38c70ae9eba3a9b38c3c1a80398540040658dbfca05603b",
-      "structureHash": "27e48147366d24b413af2e5f95d945d88ce9e84bbf352297de41de7f2e1bf4ea"
+      "hash": "e6d9e39653564142cf1a126f6dae3763e4d8149605f004f724102b355f08b236",
+      "structureHash": "f1c22091087eaefbd7037076178ed6901d809b4f804b6585875daca61b16832f"
     },
     {
       "name": "ScarabLordBoss",
@@ -5646,8 +5646,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "47955e915136ac341789d464305e3e03414afb3ffe7000883acf6face29cc9c6",
-      "structureHash": "27774e7a2d00ef1bbd53a306054b3b257e784f933f297e7938cca73672b95b63"
+      "hash": "f1bc339569c5acd3f7db94820cc9b7e253c46cd34bb1241000f7232fda14bce8",
+      "structureHash": "54cb8ed77d29821873414c12e0711aa1fc2dea71c92516e9ab4be0a96288d974"
     },
     {
       "name": "SiegeGoliathBoss",
@@ -5759,8 +5759,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "d6ebcffa69beeb997916ed2b40b61920d98d018ad120f095f2a1effa986c6fc0",
-      "structureHash": "faf7e2b404366265e45b5efa54e5c7d76807a5d1c5a8ecf8941328947be78bdd"
+      "hash": "f9cadf017b203be85d6c33ca7af8544f124c7dfd3090cd229c5c94298e2b7524",
+      "structureHash": "aeef93fef830203eae0dae5bb7d5bc8d65197350e64b3933d8155fa8065ef532"
     },
     {
       "name": "SlashBeastBoss",
@@ -5875,8 +5875,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "22fc61fa50982beb4b255db16eabd901286b2def95789c921688986792a33623",
-      "structureHash": "b443b9fff343c19767fc15380e127ae76fb0acfb46e8b13524346f791c0e6a1c"
+      "hash": "7f58d16bf0bc45acebfd411a5883a47967939a8a0c5f05ade8d2c1f14cff4550",
+      "structureHash": "6aea30f1a2000199c4b7ad3b4c73bc6aaff48e1f81d2bee9aeecfbb77fc75557"
     },
     {
       "name": "SoulOfCinderBoss",
@@ -6047,8 +6047,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "44a35935fa2347c357d7bef0931daa6d5b7dc4c25ec546aaa93abe3d6168456f",
-      "structureHash": "e54c0e0579942b972ce58f5dfbda7931eafa79cda2075e23be6677dd59e5d7ee"
+      "hash": "fcd156ab4e52da3e95d1ad166695e158a0414dc853d3167a644ca508abdac563",
+      "structureHash": "40a579c4f200b64fc0addf058c45ec128f012491a8a015c070b97da39cf7eee8"
     },
     {
       "name": "SpinoBoss",
@@ -6158,8 +6158,8 @@
         "parryX",
         "visualEffects"
       ],
-      "hash": "e61ff8505abc9dcce741f65f54a5da4ba634382ec06e0a4fa7859c37da006b27",
-      "structureHash": "c3c8eaf3c7b31f53d0719e287641dcb05cad29b6befc70d2a5414d74d6e83d89"
+      "hash": "353ed2bbae70ed046ba47ecb8d77b68d4d04d476cc802ddec15da8141c6c6da8",
+      "structureHash": "000c993a2164f8c1e49c8e393c11f72d893d23836c3ece57f4ebfad712261383"
     },
     {
       "name": "SpinoLordBoss",
@@ -6273,8 +6273,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "d28a42a7904babad65e7adbd7fca7070941f4b442139064b2dc64bf83c55c10f",
-      "structureHash": "167cb8ba57d915ede9cae947ba60ee85dc652ddf169ef426f1443fe113677da6"
+      "hash": "153f00ae7cca76dc788ee7ff11bfe589379b158ff02fe8e2f855a8ce2f8af9af",
+      "structureHash": "006b5ff570ce4fb9f19291160ec5a17bac5e129ea112460a48400f678153113e"
     },
     {
       "name": "SporeCrownBoss",
@@ -6385,8 +6385,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "bb8de4d623969ad74cbd23d62523297dddb72b71236df95128477a29ac5cf459",
-      "structureHash": "008005ebe32e733b4af9a40d3c662e97ce5bc7b3a62d2bd318df80a4a6d65cc4"
+      "hash": "0693eabd4a2b1fcbac1655e8a3a5fe2f9a585d498866304d258e3a79e52ae0a1",
+      "structureHash": "27e9e18caad240f939e5a9667510d262824a6540b680ffb27447dc062046efdf"
     },
     {
       "name": "StoneRocBoss",
@@ -6495,8 +6495,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "d7eb720dd1651848c12216567a7cdeef7008134cb91afbcdfa82c505a3f0abbf",
-      "structureHash": "04f6fb6f2200737257378445ca8ccafe42912cded254acf79648477d11abd843"
+      "hash": "02581d96185bea36a5710d3a1f68bcfdd722988e9de4d7f467d39294e6a59830",
+      "structureHash": "bf2d94bcc708e6bc96329b4db094d5e70fc282017c34ef0a2036fa53bda00a76"
     },
     {
       "name": "StormEagleBoss",
@@ -6609,8 +6609,8 @@
         "troiVy",
         "visualEffects"
       ],
-      "hash": "9c8af3691d8bf3c9b885d8f8a6f064f589d7c446d0a5dfd5815097897b42fd77",
-      "structureHash": "c6097e65e4d6b43979a62fdb0e6a790f5e3ed714ee147cf42796297c41ed1328"
+      "hash": "5b807be1a8ad86532e9d279e4ac26c394c7bd55ff76897d81a253c61d79e67b7",
+      "structureHash": "e422020b7f55da1b6b0711bab62cea1671570c13a1807975c943487e3edff40d"
     },
     {
       "name": "StormSerpentBoss",
@@ -6647,8 +6647,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "7dc4bda9bce45c8c991437354f953e3d1310d735ede58e9b8f9918c8957f7c4c",
-      "structureHash": "a82a2c9271478783432b3a4c7308f45ac0a80d9d3cf424927247d422692b5a3e"
+      "hash": "5dbaac2993e68b376312845b338c8038148db5f6a26d67b1da8c105adb836529",
+      "structureHash": "98f7766240409e187180038cf8184b8bb9c267befd41183d886b81e84a23d17d"
     },
     {
       "name": "SummitDragonBoss",
@@ -6762,8 +6762,8 @@
         "pickFromBag",
         "shakeTimer"
       ],
-      "hash": "38ea9e47d1725be8c6d354bc514e8c2f2ad63f1629cd1bc947128b4eaa9ac0b1",
-      "structureHash": "0e2fe2c63869f04bdf8d533038a630af8d98bd2f4649d7917e96d2ee55502d94"
+      "hash": "49dcc57950b28a46ed9c109c4d4648893a15fd6753d135f644763aedc1bddc26",
+      "structureHash": "a072a4766a61c95c8e0b74e4715a929d9d53dde90f0d8647ba71f05978ca5d49"
     },
     {
       "name": "TRexBoss",
@@ -6872,8 +6872,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "ee4f588a28daeed1e812faf5fbd39dde42371ae84cfc778763893da0cab8362c",
-      "structureHash": "d6d2a3fd551f7d92ca712499d062d0840f1f47d34c40043c52053e35fb4ff803"
+      "hash": "f186b77f2183245cb25cf16b7cd5d87596621679d0235b94e3d7dcab2b6c98ff",
+      "structureHash": "76666818f2cc8edfdbfd8ab0b13960ad00b90c125d1f277e87e125ec01f589b2"
     },
     {
       "name": "TetrisBoss",
@@ -6995,8 +6995,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "a5eaf01c9d95e1fe4c26d6a9f8c41fc7694cbd32aad487e57075c532efd2605d",
-      "structureHash": "48bffe7dc2ed9771b1dbe233ba4c956b8b715744bdec5bb777345bdf108d46d0"
+      "hash": "073df97531e5c7fbb67ddcee98ad7fde3b2217429f40c97b2e15e2e251b3990b",
+      "structureHash": "7f7605e39d5576d86f52b94dc550c8bcbac5e2e2fc556ddf80c2f6a2ed4e0701"
     },
     {
       "name": "ThalassaBoss",
@@ -7124,8 +7124,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "9213fe67b26b2c2acb4a6c556a1e3be4b7f8bae40bbed267778aca01e702fef1",
-      "structureHash": "eae38d70c1e2dac1e67fa84525dfb597e26b5ed7b62e8cc185471478d82e3c50"
+      "hash": "2fb065e05acc5f597b03e2062d9c4eb21727037063e3b941ac63245c14fcc30a",
+      "structureHash": "67240920824f66feb021443daeb8630d06d0884067bc958f10973fcdaaa7ad4b"
     },
     {
       "name": "TrainingDummy",
@@ -7229,8 +7229,8 @@
         "frames",
         "parry"
       ],
-      "hash": "1732eb31aadb5c6ed867aeae8c585bdab7ff25a90aa4c451ae1f9d05c07d3412",
-      "structureHash": "76e14c3bd660faf22f98705a37ccb5b3540637ccab836a25a38cab39889047ab"
+      "hash": "3809d99878e0ade7be288f8a179fc51af16170962bf0a8a7fdd89216a3e2d3e7",
+      "structureHash": "ac82275897909e20228b1fdd15ff935c6efc649cdb181ba2fca8a19e30f509c1"
     },
     {
       "name": "TriDino",
@@ -7338,8 +7338,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "d4c9c9fa44ca4cb42d8b71dc709a1b0d9d30684f76c2b6c5c0970ac1fe1510f5",
-      "structureHash": "20b97985098e60eabf20f2be93e4f411e34389e5011c152202846159d2471e3b"
+      "hash": "2e760f2f1ed723e3ab70e44f2c96ce7a18e5680783dfd4887c62f510c6f46340",
+      "structureHash": "f2adcce7702a5d2ced88f2d90b127cf9f5c79bf03309d7ae6bb1376aecd56d32"
     },
     {
       "name": "TriceratopsBoss",
@@ -7450,8 +7450,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "fe0ccee8e0857dc56708aecc32fe61b214279a0e3f1eacb908c717af9f54f207",
-      "structureHash": "28e26f069bc6d805b2abc788991cc71971a7735e67556d1a9a683ac3adebbddc"
+      "hash": "85b3431bc51e330685e2f8ac5807c4d94355d24b91b373de3b07c87306620b15",
+      "structureHash": "3494bd558f93750923fe7dcc8e5e03ce74d6154d80a91844176541a0d57da3db"
     },
     {
       "name": "TriceratopsLordBoss",
@@ -7563,8 +7563,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "d476d17d6945763f5681775a68c9d07d14105281120550d24fd30d50ce2a79d2",
-      "structureHash": "fae0da165b05bf95d2ee56df036107fa335c539c16c86509f756a1a939d008f3"
+      "hash": "074457eaa4f95b7b27861ee31a1a50f98f59f43da9e7a938fc82f728fadb3b37",
+      "structureHash": "6c2a0021ef5f5354a761b1360f6307eb3975f75f0368757c5ef51e6f260c0fda"
     },
     {
       "name": "TyrantRexBoss",
@@ -7679,8 +7679,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "e2f9194fbe36efe036a7eb1f779db707b1242e9b9f36358a9c91141f03454cb3",
-      "structureHash": "66955b53a8e161afa340957d4508f02dce243bd9a3586bfcfafedd1977c77d5a"
+      "hash": "3751d46c300ed6fa0156578e4d57901b2569108a3ce3b23947b48d239d2c17d6",
+      "structureHash": "bdf83d2b722eedc520899ce69c15ed7a2dd00b0987ead9567d68905e6022baa9"
     },
     {
       "name": "UnityCloneBoss",
@@ -7809,8 +7809,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "28df06977c3e013bd8ba985240612851265cd6f7d1a90d9ebeab28c67486ac1f",
-      "structureHash": "8692b77ee8aed37869cdbc2212d73754a2368ab862a2192cb66742fc0e8aecc6"
+      "hash": "c2385fac6d4617498492a8055514e847d42e15bdfbe107ab61c27e553d3067e9",
+      "structureHash": "458ffd8ca107572a6bf64146c0da251858ea168b1fc49e68c15afc9c0a816567"
     },
     {
       "name": "VajraRexBoss",
@@ -7919,8 +7919,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "490223b53e58cc6c7b6be7f2712e43c4144d78d8313c4ebf8ac93eaa126cd824",
-      "structureHash": "912e673d53f803dd4872e3f8b3110eefbda1489c3f508b2bb8fd3bef7b04d366"
+      "hash": "c5f213be2d877a2ae8389d1549c81dddc01182fd60137bb603ca3fb9004fe193",
+      "structureHash": "7adf16b7573462257b62f835f8a48e4293c6de7966910664765a90c98b35a90f"
     },
     {
       "name": "VergilBoss",
@@ -8088,8 +8088,8 @@
         "veCanhKhoan",
         "visualEffects"
       ],
-      "hash": "45ac03642b4063707bc8ffa86d3223a0932f6cfa86ea8efab173f777c894f9ad",
-      "structureHash": "c9c31f26e50b1ab6a56c9ac0edae5241836750e021727bc4b467b9924a791064"
+      "hash": "61e152685dbb78ac8ec75c406e66679a55c14ffcd90fb5df5243d8d3a49fddca",
+      "structureHash": "2edc61bf1b73e459938d8508ae1b96e86d20cf218dc975a618b90bac5b1a8a48"
     },
     {
       "name": "VoltCloneBoss",
@@ -8203,8 +8203,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "e51ad933bb75fd9f4baa3ee01f0082ea64b0790699c91fca428e812e98a4213c",
-      "structureHash": "31c237d9d40c328aedc2bb1a01127b08ed1540a6b520ea9abd0468b9e93a48c2"
+      "hash": "ee3dbb811fa9a8da0979b5c5fab7caf4523203ac4a8eee004e80f2cf7cbd9278",
+      "structureHash": "308e50df44fe3ac5efac5851087d82d19e317ef3e26516a29f08154c8177ea01"
     },
     {
       "name": "WarBoss",
@@ -8355,8 +8355,8 @@
         "troiVy",
         "visualEffects"
       ],
-      "hash": "cec441f5b4e44f21fd6027299b1faf83e28be472f0d61df54899cfdef609a621",
-      "structureHash": "87c622844a1b506096ce2462936d43da7a7d105c37c5840b908ff3a483a879c9"
+      "hash": "b90d3f7d8cac9b81dfc36f97d3d9f6a892cf1bb0745e9d4f5e4b25a4e2d46727",
+      "structureHash": "86f3aa6f3bce24fb21a54350342dd0007770abb1b5ea833a1ff916e62513ebec"
     },
     {
       "name": "Yasuo2Boss",
@@ -8470,8 +8470,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "1c41b159a3eab3b74fda70822fd849ffcddf616081c9078f2ae4bce2e9ecb945",
-      "structureHash": "ce75a7b8726de925f95f0751db0f7b1c642e9e958f5d712d4caa0224ebab649d"
+      "hash": "150f6db6ea35ba1b50cc68bca082bb73e4faa6d714545d0bac055b6127a28188",
+      "structureHash": "5c9ff5e00c27e9851a5966c117cfc5cb686393e129a6d60df38bdeb09925ea9f"
     },
     {
       "name": "YasuoBoss",
@@ -8593,8 +8593,8 @@
         "shakeTimer",
         "visualEffects"
       ],
-      "hash": "3052853d7271a40da3e50cb7fe4e8a35cbb835f3d0938bcdbb48460ca01bbdc9",
-      "structureHash": "f63a829df9bee4c6612a18ad6352f672403f871808302e6c1b22a94e1e3a93c0"
+      "hash": "58139ba66b933280e001c18819bb39898f5c146ea39e6035c275f7193dfa33bb",
+      "structureHash": "4b382ba40cb75257532a6eae18acfd7bc8886b524594d5378e43038b00a57166"
     },
     {
       "name": "ZeroBoss",
@@ -8713,8 +8713,8 @@
         "voidBat",
         "voidPhanRa"
       ],
-      "hash": "5a4499be26e02a05ef0a0751281066910f16eb5410a3b2ffad942214a1285ced",
-      "structureHash": "42d71357e98c2b54bdaab0aaf40b97d85849130576e4fdff55aa2dc504fb71b5"
+      "hash": "5ba64c41e6ccf6bbcf622ca53efd740c4b8335a374440d76773c8d6dd9e47a1c",
+      "structureHash": "24a1ad01e80c0b4f26773fdd4e1d989de299d4f24c571537646898247766c141"
     },
     {
       "name": "ZeusBoss",
@@ -8786,8 +8786,8 @@
         "voidChanParry",
         "worldR"
       ],
-      "hash": "1f9930bd36f7e5ad99e5de7ab25eb5514a3220c3f096a38b6937196257a40cd7",
-      "structureHash": "cd8d78908464b0c3f0642d6983e3b1d4f4c564f086086253d0e75aef0b2d5450"
+      "hash": "4052a15c6a30c6e1fd515c5c9d3658d0aed71f95f4dc84db2b26b0ec657a94ff",
+      "structureHash": "3f7c69ce566634dd4cf8954e5d536baa649055ce854bc58f81b71a570b4021ef"
     },
     {
       "name": "BossShared",
@@ -8883,6 +8883,7 @@
         "s1.ironhaulTruck.1",
         "s1.ironhaulMix.1",
         "s1.ironhaulEase.1",
+        "s1.ironhaulIK.1",
         "s1.ironhaulRig.1",
         "s1.ironhaulWeapons.1",
         "s1.ironhaulRobot.1",
@@ -8934,8 +8935,8 @@
         "s6.capBoHamChung.1"
       ],
       "external": [],
-      "hash": "672ca9d549bafbaea63711031746a71148309856c4c2a91e2b868f0fed9d20d4",
-      "structureHash": "0096f54fd914fea74340540e365b76dbd16758664423a559439e1c7926a34041"
+      "hash": "d08108544ef10fe67806de6c6c4023532b63abd5011680ce5e40a3e8fa742717",
+      "structureHash": "3338bbc0526e88048771ce64f7d8e2c380da57130d6480e28e4908567fb79806"
     }
   ],
   "parts": [
@@ -14390,7 +14391,7 @@
       "names": [
         "ironhaulIK"
       ],
-      "owner": "IronhaulBoss",
+      "owner": "shared",
       "usedBy": [
         "IronhaulBoss"
       ]
@@ -16435,9 +16436,9 @@
     },
     {
       "id": "s5.TrainingDummy.1",
-      "start": 5377813,
-      "end": 5383022,
-      "line": 79356,
+      "start": 5378641,
+      "end": 5383850,
+      "line": 79360,
       "script": 5,
       "hash": "029e2a9f822d58446405b4f66fc7ebdbec6dd01f743d89adf9f3cdecceda9be4",
       "names": [
@@ -16450,9 +16451,9 @@
     },
     {
       "id": "s6.SDTU_DON.1",
-      "start": 6867846,
-      "end": 6867914,
-      "line": 98871,
+      "start": 6868674,
+      "end": 6868742,
+      "line": 98875,
       "script": 6,
       "hash": "e17399c9626362678d80cd73e6c9da8d59e7897d774049e4cfe8ef8aced2ba0f",
       "names": [
@@ -16469,9 +16470,9 @@
     },
     {
       "id": "s6.SDT_ULT.1",
-      "start": 6867923,
-      "end": 6907791,
-      "line": 98872,
+      "start": 6868751,
+      "end": 6908619,
+      "line": 98876,
       "script": 6,
       "hash": "2458682b9273314fd180e2b6316ccb491b4593ab8a76f1cede8fe1349f110419",
       "names": [
@@ -16485,9 +16486,9 @@
     },
     {
       "id": "s6.capSdtUlt.1",
-      "start": 6907800,
-      "end": 6908158,
-      "line": 99430,
+      "start": 6908628,
+      "end": 6908986,
+      "line": 99434,
       "script": 6,
       "hash": "73496c61c5f2d53a9e2e7584d7c385e200c944a52e896f093fe282383db29d9a",
       "names": [],
@@ -16499,9 +16500,9 @@
     },
     {
       "id": "s6.HG_W.1",
-      "start": 6908654,
-      "end": 6908746,
-      "line": 99444,
+      "start": 6909482,
+      "end": 6909574,
+      "line": 99448,
       "script": 6,
       "hash": "cf87c2ffe9b48f10c48011a75ed55f5e241f1bf1e580afb7584dfdac727544b5",
       "names": [
@@ -16520,9 +16521,9 @@
     },
     {
       "id": "s6.HoGacBoss.1",
-      "start": 6908755,
-      "end": 6937195,
-      "line": 99445,
+      "start": 6909583,
+      "end": 6938023,
+      "line": 99449,
       "script": 6,
       "hash": "04a811ebb87f394317a6da249801df7a6ecbb1c62cefebd9f132688c28b7f48f",
       "names": [
@@ -16535,9 +16536,9 @@
     },
     {
       "id": "s6.BOSS_CHUNG.1",
-      "start": 6938478,
-      "end": 6938930,
-      "line": 100013,
+      "start": 6939306,
+      "end": 6939758,
+      "line": 100017,
       "script": 6,
       "hash": "06399608530b81aca3d1a980bd9b07d1d978e6eb81a2ce381149d1b4518ad824",
       "names": [
@@ -16619,9 +16620,9 @@
     },
     {
       "id": "s6.capBoHamChung.1",
-      "start": 6938939,
-      "end": 6940652,
-      "line": 100024,
+      "start": 6939767,
+      "end": 6941480,
+      "line": 100028,
       "script": 6,
       "hash": "be5abf8db2dc275693beff8aedeb0c419427b079601cc362cd4a9d19c320563e",
       "names": [],
@@ -16701,9 +16702,9 @@
     },
     {
       "id": "s12.DSW_MOVES.1",
-      "start": 7324560,
-      "end": 7327163,
-      "line": 106735,
+      "start": 7325388,
+      "end": 7327991,
+      "line": 106739,
       "script": 12,
       "hash": "946f00eb96fdaabb26f3612ea43465cf8f93b3c6bd42f4b08387e9b3ce11dd5f",
       "names": [
@@ -16714,9 +16715,9 @@
     },
     {
       "id": "s12.dswPose.1",
-      "start": 7339013,
-      "end": 7342121,
-      "line": 107074,
+      "start": 7339841,
+      "end": 7342949,
+      "line": 107078,
       "script": 12,
       "hash": "247ef86fd0f4ef57da60b9119f405f6e9a2f42b4f96fb7f30888572468e1030a",
       "names": [
@@ -16727,9 +16728,9 @@
     },
     {
       "id": "s12.dswPaintBlade.1",
-      "start": 7351149,
-      "end": 7353139,
-      "line": 107454,
+      "start": 7351977,
+      "end": 7353967,
+      "line": 107458,
       "script": 12,
       "hash": "bb89cbbbb06ae0607be169f5faa78c93c2c41fd4e29933e2ebdb0f1a35bd8e0b",
       "names": [
@@ -16740,9 +16741,9 @@
     },
     {
       "id": "s12.dswPaintArmIK.1",
-      "start": 7353661,
-      "end": 7354671,
-      "line": 107532,
+      "start": 7354489,
+      "end": 7355499,
+      "line": 107536,
       "script": 12,
       "hash": "b6170d1d38ffb5cacb63ce1598b599294a2e93ebe9508efd694828db2a11aa33",
       "names": [
@@ -16753,9 +16754,9 @@
     },
     {
       "id": "s12.BLR_MOVES.1",
-      "start": 7359385,
-      "end": 7363574,
-      "line": 107702,
+      "start": 7360213,
+      "end": 7364402,
+      "line": 107706,
       "script": 12,
       "hash": "a46d18fa07cca3e5fe0ce445b564e649c541e4a69ef4e0caf92ea9b8575c1b50",
       "names": [
@@ -16766,9 +16767,9 @@
     },
     {
       "id": "s12.blrPaintFistArm.1",
-      "start": 7381349,
-      "end": 7382452,
-      "line": 108278,
+      "start": 7382177,
+      "end": 7383280,
+      "line": 108282,
       "script": 12,
       "hash": "5a0b1f7e37be378d36f3b7fa60f448152efeb9980cc411f0c53f9f05878f034f",
       "names": [
@@ -16779,9 +16780,9 @@
     },
     {
       "id": "s12.CAV_MOVES.1",
-      "start": 7393905,
-      "end": 7396079,
-      "line": 108578,
+      "start": 7394733,
+      "end": 7396907,
+      "line": 108582,
       "script": 12,
       "hash": "9c8192d6bef764126229a5e30af980b19b092aa3143ae0a66ce45192ed00836c",
       "names": [
@@ -16792,9 +16793,9 @@
     },
     {
       "id": "s12.cavPaintGiantSaw.1",
-      "start": 7408775,
-      "end": 7410794,
-      "line": 108967,
+      "start": 7409603,
+      "end": 7411622,
+      "line": 108971,
       "script": 12,
       "hash": "89241076d41732ae1890620058698c11807d2c7043c463bda795a72aca0c6946",
       "names": [
@@ -16805,9 +16806,9 @@
     },
     {
       "id": "s12.cavPaintFullBike.1",
-      "start": 7410896,
-      "end": 7413147,
-      "line": 109033,
+      "start": 7411724,
+      "end": 7413975,
+      "line": 109037,
       "script": 12,
       "hash": "584f7bc4bd87c1232a05832ed87e829619ffcae0f377ce4667b844842522927e",
       "names": [
@@ -16818,9 +16819,9 @@
     },
     {
       "id": "s12.KCB_MOVES.1",
-      "start": 7416974,
-      "end": 7420120,
-      "line": 109195,
+      "start": 7417802,
+      "end": 7420948,
+      "line": 109199,
       "script": 12,
       "hash": "3898b76cba9c9a76560799669daa63b827584bd3d5998ad6a76cc73142bb8ee3",
       "names": [
@@ -16831,9 +16832,9 @@
     },
     {
       "id": "s12.kcbPaintBoStaff.1",
-      "start": 7436035,
-      "end": 7436668,
-      "line": 109730,
+      "start": 7436863,
+      "end": 7437496,
+      "line": 109734,
       "script": 12,
       "hash": "3a16e12d5b772c427201332a85e900161b3bd07ba7fd6ccfb180169aa437f39e",
       "names": [
@@ -16844,9 +16845,9 @@
     },
     {
       "id": "s15.danteSwordPose.1",
-      "start": 7492109,
-      "end": 7495968,
-      "line": 110730,
+      "start": 7492937,
+      "end": 7496796,
+      "line": 110734,
       "script": 15,
       "hash": "b63c800c2315245dbeb63a9e8c83b9f9dc8b5a302e933a028df351e63127aa59",
       "names": [
@@ -16857,9 +16858,9 @@
     },
     {
       "id": "s15.danteDrawSword.1",
-      "start": 7502865,
-      "end": 7506388,
-      "line": 110955,
+      "start": 7503693,
+      "end": 7507216,
+      "line": 110959,
       "script": 15,
       "hash": "23dcd8ad34e7c4caff30453f2d891e493abe032d7d48e830b05200224c477f41",
       "names": [
@@ -16870,9 +16871,9 @@
     },
     {
       "id": "s16.DANTE_SIN_DRILL.1",
-      "start": 7513379,
-      "end": 7513523,
-      "line": 111163,
+      "start": 7514207,
+      "end": 7514351,
+      "line": 111167,
       "script": 16,
       "hash": "e892a7de3c6ff579941dc60e41ee588ba6aa0227cdb6ef20bf03f95a25bb6c29",
       "names": [
@@ -16883,9 +16884,9 @@
     },
     {
       "id": "s16.danteDrawSinDrill.1",
-      "start": 7513524,
-      "end": 7513630,
-      "line": 111164,
+      "start": 7514352,
+      "end": 7514458,
+      "line": 111168,
       "script": 16,
       "hash": "67d7d1da8c1ca30ebe9e16ba585f18c795282ec21fb57e1009a18c8ee4c264e6",
       "names": [
@@ -16896,9 +16897,9 @@
     },
     {
       "id": "s16.danteSinDrillBox.1",
-      "start": 7513631,
-      "end": 7513832,
-      "line": 111165,
+      "start": 7514459,
+      "end": 7514660,
+      "line": 111169,
       "script": 16,
       "hash": "2ed92930f558582cc296e088e6dab33df2a6fa15cbc7d69d3241c2f9fadcaffa",
       "names": [
@@ -16909,9 +16910,9 @@
     },
     {
       "id": "s17.DANTE_BOSS_MELEE.1",
-      "start": 7531340,
-      "end": 7533500,
-      "line": 111402,
+      "start": 7532168,
+      "end": 7534328,
+      "line": 111406,
       "script": 17,
       "hash": "80c5f65f67b3c361284c2b17b85b29feaabb4809188419ef6c8d17cefa507152",
       "names": [
@@ -16924,9 +16925,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.meleePriority.1",
-      "start": 7533502,
-      "end": 7533543,
-      "line": 111468,
+      "start": 7534330,
+      "end": 7534371,
+      "line": 111472,
       "script": 17,
       "hash": "3265beff93cdb56151589317ccf710154c46741c7fd70c19f05fcac89beee8b2",
       "names": [],
@@ -16937,9 +16938,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.startSinDrill.1",
-      "start": 7533780,
-      "end": 7534605,
-      "line": 111473,
+      "start": 7534608,
+      "end": 7535433,
+      "line": 111477,
       "script": 17,
       "hash": "85ffdbdca9b09b6f5c00474177e5b5f4da20dfef3e39b766f9b99c951157a6e0",
       "names": [],
@@ -16950,9 +16951,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.cancelSinDrill.1",
-      "start": 7534606,
-      "end": 7534839,
-      "line": 111486,
+      "start": 7535434,
+      "end": 7535667,
+      "line": 111490,
       "script": 17,
       "hash": "6a89e462a7aa04e73d4e1b06a56fd86855bd8fdc863bd6264261b8569efbb248",
       "names": [],
@@ -16963,9 +16964,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.runSinDrill.1",
-      "start": 7534840,
-      "end": 7536491,
-      "line": 111492,
+      "start": 7535668,
+      "end": 7537319,
+      "line": 111496,
       "script": 17,
       "hash": "ebf5bba0fcd3496285f82e9f0f8f9ac597bae6f7f34597ce40fe2ca1749564ef",
       "names": [],
@@ -16976,9 +16977,9 @@
     },
     {
       "id": "s17.bossDrillClearBase.1",
-      "start": 7536492,
-      "end": 7536545,
-      "line": 111526,
+      "start": 7537320,
+      "end": 7537373,
+      "line": 111530,
       "script": 17,
       "hash": "baba859537388ff60b665f57528fb282d64fdd76c8e3da1a3216e0b9af30c5a3",
       "names": [
@@ -16991,9 +16992,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.suDon.1",
-      "start": 7536546,
-      "end": 7536660,
-      "line": 111527,
+      "start": 7537374,
+      "end": 7537488,
+      "line": 111531,
       "script": 17,
       "hash": "e53ec6a38f3698219f907b4cedfb2bf16dff4634303d5b54f1d66554fb7e2764",
       "names": [],
@@ -17004,9 +17005,9 @@
     },
     {
       "id": "s17.danteDrawBossSinDrill.1",
-      "start": 7536662,
-      "end": 7537601,
-      "line": 111529,
+      "start": 7537490,
+      "end": 7538429,
+      "line": 111533,
       "script": 17,
       "hash": "a25ab3f7b0676f3ff4e2ae414ae4d3d1735f0a40127df28ea8b1c2720062b78f",
       "names": [
@@ -17019,9 +17020,9 @@
     },
     {
       "id": "s17.danteBossLookupMove.1",
-      "start": 7537603,
-      "end": 7537995,
-      "line": 111544,
+      "start": 7538431,
+      "end": 7538823,
+      "line": 111548,
       "script": 17,
       "hash": "7535f79ed1c5ef2c4f66ed81b19383b2a28c261ae2d91d2bdbc12a00d6b3875e",
       "names": [
@@ -17034,9 +17035,9 @@
     },
     {
       "id": "s17.danteBossGetStepMove.1",
-      "start": 7537997,
-      "end": 7538821,
-      "line": 111552,
+      "start": 7538825,
+      "end": 7539649,
+      "line": 111556,
       "script": 17,
       "hash": "f90cca8d7ff6d9f758cf2d35b825b69fd89660de691b28e65bc7c2942a9a618d",
       "names": [
@@ -17049,9 +17050,9 @@
     },
     {
       "id": "s17.danteBossMeleePool.1",
-      "start": 7538823,
-      "end": 7538948,
-      "line": 111576,
+      "start": 7539651,
+      "end": 7539776,
+      "line": 111580,
       "script": 17,
       "hash": "bb24edac56d6a473e1becf4ed3c3ce26d82165383702415312c1a23f8421c7bf",
       "names": [
@@ -17064,9 +17065,9 @@
     },
     {
       "id": "s17.danteBossEnsureFx.1",
-      "start": 7539043,
-      "end": 7539360,
-      "line": 111581,
+      "start": 7539871,
+      "end": 7540188,
+      "line": 111585,
       "script": 17,
       "hash": "e18dd4f49b372d91341427af3cd913db7a04b864ae00c768adbabe58d4777754",
       "names": [
@@ -17079,9 +17080,9 @@
     },
     {
       "id": "s17.danteBossSpawnPhantomSwords.1",
-      "start": 7539441,
-      "end": 7540257,
-      "line": 111597,
+      "start": 7540269,
+      "end": 7541085,
+      "line": 111601,
       "script": 17,
       "hash": "478529e1a3e485ddfebffd898e2bff187656a74115ed2ea1ddfb3a3be2e1bf9d",
       "names": [
@@ -17094,9 +17095,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.startCloseCombo.1",
-      "start": 7540259,
-      "end": 7542053,
-      "line": 111618,
+      "start": 7541087,
+      "end": 7542881,
+      "line": 111622,
       "script": 17,
       "hash": "e72a85bbc2094ed4e15150b2fc22693294746f62057f5371345d330f088ed413",
       "names": [],
@@ -17107,9 +17108,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.cancelCloseCombo.1",
-      "start": 7542055,
-      "end": 7542438,
-      "line": 111665,
+      "start": 7542883,
+      "end": 7543266,
+      "line": 111669,
       "script": 17,
       "hash": "16f254b9607b29a2579f8bf95019e5b2a7eaa3202ca3d7a6588e6834afe42c8f",
       "names": [],
@@ -17120,9 +17121,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.closeComboRecover.1",
-      "start": 7542440,
-      "end": 7542893,
-      "line": 111679,
+      "start": 7543268,
+      "end": 7543721,
+      "line": 111683,
       "script": 17,
       "hash": "b1e5c3652c8ecdb56c4d48af477996bf1d8c9283f6bba15619b1e66831b93a9a",
       "names": [],
@@ -17133,9 +17134,9 @@
     },
     {
       "id": "s17.danteBossExecuteHit.1",
-      "start": 7542967,
-      "end": 7548572,
-      "line": 111698,
+      "start": 7543795,
+      "end": 7549400,
+      "line": 111702,
       "script": 17,
       "hash": "53bb7bc5e1823fb667ccb95b6d56b1752f04d6970e8d910dc0dccbe4d8f1fdde",
       "names": [
@@ -17148,9 +17149,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.runCloseCombo.1",
-      "start": 7548574,
-      "end": 7559205,
-      "line": 111824,
+      "start": 7549402,
+      "end": 7560033,
+      "line": 111828,
       "script": 17,
       "hash": "058921f8381cbe7ba2c2058ea74949cea23bb277678e6f9c10f27ef736bb5804",
       "names": [],
@@ -17161,9 +17162,9 @@
     },
     {
       "id": "s17.bossClosePickBase.1",
-      "start": 7559438,
-      "end": 7559494,
-      "line": 112075,
+      "start": 7560266,
+      "end": 7560322,
+      "line": 112079,
       "script": 17,
       "hash": "f22bae5dcbafa431c609291e7a30c025209c439533a0f0e47dda0e87f966f16f",
       "names": [
@@ -17176,9 +17177,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.pickSkill.1",
-      "start": 7559495,
-      "end": 7561166,
-      "line": 112076,
+      "start": 7560323,
+      "end": 7561994,
+      "line": 112080,
       "script": 17,
       "hash": "3ff140777dadf179477a776f6585a1d1ff8e8bd46534c26984a7a5d841e77d3b",
       "names": [],
@@ -17189,9 +17190,9 @@
     },
     {
       "id": "s17.bossCloseStartBase.1",
-      "start": 7561168,
-      "end": 7561223,
-      "line": 112119,
+      "start": 7561996,
+      "end": 7562051,
+      "line": 112123,
       "script": 17,
       "hash": "a13893e04e715c09bc7608d38006ccc522dc2ae6a04b4e7026cdcb1832941f5e",
       "names": [
@@ -17204,9 +17205,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.raChieu.1",
-      "start": 7561224,
-      "end": 7561728,
-      "line": 112120,
+      "start": 7562052,
+      "end": 7562556,
+      "line": 112124,
       "script": 17,
       "hash": "9ccd81a285a76803b41932289dfbf1f77bc3740f58ac897093414f71144b2b2b",
       "names": [],
@@ -17217,9 +17218,9 @@
     },
     {
       "id": "s17.bossCloseEvadeBase.1",
-      "start": 7561730,
-      "end": 7561783,
-      "line": 112132,
+      "start": 7562558,
+      "end": 7562611,
+      "line": 112136,
       "script": 17,
       "hash": "646a58b32f931b7f3ff47950d3bb428ab8452462f621b27c8ab0d52fcd9787bf",
       "names": [
@@ -17232,9 +17233,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.batNe.1",
-      "start": 7561784,
-      "end": 7562156,
-      "line": 112133,
+      "start": 7562612,
+      "end": 7562984,
+      "line": 112137,
       "script": 17,
       "hash": "aef7be7332de340ef1acc8dc4c4d747873dc85c62a6d447115318e546bcff882",
       "names": [],
@@ -17245,9 +17246,9 @@
     },
     {
       "id": "s17.bossCloseRunBase.1",
-      "start": 7562158,
-      "end": 7562212,
-      "line": 112141,
+      "start": 7562986,
+      "end": 7563040,
+      "line": 112145,
       "script": 17,
       "hash": "ee520507fcb3321b9f4b9734fb2c78eb7b7627dc94375f867b8b3e3fcedffe63",
       "names": [
@@ -17260,9 +17261,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.runSkill.1",
-      "start": 7562213,
-      "end": 7562442,
-      "line": 112142,
+      "start": 7563041,
+      "end": 7563270,
+      "line": 112146,
       "script": 17,
       "hash": "29c34c379cf4db08d8cf34ec0db9c706346914121251365885feae06ca1db0d2",
       "names": [],
@@ -17273,9 +17274,9 @@
     },
     {
       "id": "s17.bossCloseChainBase.1",
-      "start": 7562444,
-      "end": 7562498,
-      "line": 112149,
+      "start": 7563272,
+      "end": 7563326,
+      "line": 112153,
       "script": 17,
       "hash": "0690af25cc4e420c7d7dad6eaf5c4560552071673c9acbd31e9a012d2547f023",
       "names": [
@@ -17288,9 +17289,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.dmcNoi.1",
-      "start": 7562499,
-      "end": 7562633,
-      "line": 112150,
+      "start": 7563327,
+      "end": 7563461,
+      "line": 112154,
       "script": 17,
       "hash": "d9efc9f15a41c6d6c9a0f4af20d8adf6915e90614ae413ee32f7045fe11a9988",
       "names": [],
@@ -17301,9 +17302,9 @@
     },
     {
       "id": "s17.bossCloseUpdateBase.1",
-      "start": 7562635,
-      "end": 7562690,
-      "line": 112155,
+      "start": 7563463,
+      "end": 7563518,
+      "line": 112159,
       "script": 17,
       "hash": "a66fe93f4baf6ff48045d6706c2f2ebd212931fdf6366e372660c8000d0c0a9e",
       "names": [
@@ -17316,9 +17317,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.update.1",
-      "start": 7562691,
-      "end": 7563473,
-      "line": 112156,
+      "start": 7563519,
+      "end": 7564301,
+      "line": 112160,
       "script": 17,
       "hash": "7b68bc2f2ea55f481ae161a72167f23499dc0f221fab31ffbfb6a593ef85e4f2",
       "names": [],
@@ -17329,9 +17330,9 @@
     },
     {
       "id": "s17.bossCloseDrawBase.1",
-      "start": 7563567,
-      "end": 7563618,
-      "line": 112170,
+      "start": 7564395,
+      "end": 7564446,
+      "line": 112174,
       "script": 17,
       "hash": "f3029f4b9317784b05e55e23dc116fb825a60c5f56cd82b7e71de064a387330a",
       "names": [
@@ -17344,9 +17345,9 @@
     },
     {
       "id": "s17.DanteBoss.prototype.draw.1",
-      "start": 7563619,
-      "end": 7575559,
-      "line": 112171,
+      "start": 7564447,
+      "end": 7576387,
+      "line": 112175,
       "script": 17,
       "hash": "6e5664eca1c6063b06813f795ebfa75ea2a3068b442d5a950ff5f08b54c332b0",
       "names": [],
@@ -17357,9 +17358,9 @@
     },
     {
       "id": "s18.YMT_MOVES.1",
-      "start": 7579049,
-      "end": 7584421,
-      "line": 112472,
+      "start": 7579877,
+      "end": 7585249,
+      "line": 112476,
       "script": 18,
       "hash": "f357ac1578dc3a05efe6cb9d7ef07427d6560b1a1f066a564553c4bccfa6aae5",
       "names": [
@@ -17370,9 +17371,9 @@
     },
     {
       "id": "s18.ymtPose.1",
-      "start": 7601770,
-      "end": 7607398,
-      "line": 112948,
+      "start": 7602598,
+      "end": 7608226,
+      "line": 112952,
       "script": 18,
       "hash": "57026bcffd50199490bf007527fe5844d4631b9c34b51ba805a534abae08987b",
       "names": [
@@ -17383,9 +17384,9 @@
     },
     {
       "id": "s18.vgDrawKatana.1",
-      "start": 7641620,
-      "end": 7642772,
-      "line": 113914,
+      "start": 7642448,
+      "end": 7643600,
+      "line": 113918,
       "script": 18,
       "hash": "093653a7df684b0eb198d88b6d04e637030adea38c11142141dcf2565d7ed291",
       "names": [
@@ -17396,9 +17397,9 @@
     },
     {
       "id": "s18.vgDrawMirageEdgeBlade.1",
-      "start": 7642845,
-      "end": 7643551,
-      "line": 113953,
+      "start": 7643673,
+      "end": 7644379,
+      "line": 113957,
       "script": 18,
       "hash": "23c3f097b073b21b188ded4a2f0cc497445ec0a31340bbd0fdb7191b5d6be2b5",
       "names": [
@@ -17409,9 +17410,9 @@
     },
     {
       "id": "s19.VERGIL_BOSS_STRINGS.1",
-      "start": 7661674,
-      "end": 7663902,
-      "line": 114413,
+      "start": 7662502,
+      "end": 7664730,
+      "line": 114417,
       "script": 19,
       "hash": "216122dfa30c308d7abe18a1eae3be40001f4d3cf713d7e722b353004e8ace39",
       "names": [
@@ -17424,9 +17425,9 @@
     },
     {
       "id": "s19.VG_BOSS_FALLBACK_MOVES.1",
-      "start": 7664021,
-      "end": 7666718,
-      "line": 114475,
+      "start": 7664849,
+      "end": 7667546,
+      "line": 114479,
       "script": 19,
       "hash": "babde8183cd23a729cebd23efbdf93d4d747b3437acb61d42cc41cd1ff99b26f",
       "names": [
@@ -17439,9 +17440,9 @@
     },
     {
       "id": "s19.vgBossGetMoveDef.1",
-      "start": 7666720,
-      "end": 7667444,
-      "line": 114500,
+      "start": 7667548,
+      "end": 7668272,
+      "line": 114504,
       "script": 19,
       "hash": "23bad1b7e5b92338f4fb0002b4f8a5c3e6890acc6555ab80c0678ce3389cca13",
       "names": [
@@ -17454,9 +17455,9 @@
     },
     {
       "id": "s19.vgBossEnsureFx.1",
-      "start": 7667446,
-      "end": 7667707,
-      "line": 114513,
+      "start": 7668274,
+      "end": 7668535,
+      "line": 114517,
       "script": 19,
       "hash": "ce890a8c3461f54dda501c3ee85783c8450f54a492d4ee1c1cac76c5bd40c805",
       "names": [
@@ -17469,9 +17470,9 @@
     },
     {
       "id": "s19.vgBossComputePose.1",
-      "start": 7667804,
-      "end": 7669218,
-      "line": 114527,
+      "start": 7668632,
+      "end": 7670046,
+      "line": 114531,
       "script": 19,
       "hash": "ae80c9fb850ed88561aa3e7c11da0f65934ce36d900f7182b33e5d7727e8a954",
       "names": [
@@ -17484,9 +17485,9 @@
     },
     {
       "id": "s19.VergilBoss.prototype.startAttackerString.1",
-      "start": 7669272,
-      "end": 7670312,
-      "line": 114557,
+      "start": 7670100,
+      "end": 7671140,
+      "line": 114561,
       "script": 19,
       "hash": "385bac9e4141558037c48d2f4fcabdfb47dcb5f0d6f271c03edb50369cc39c56",
       "names": [],
@@ -17497,9 +17498,9 @@
     },
     {
       "id": "s19.VergilBoss.prototype.cancelAttackerString.1",
-      "start": 7670314,
-      "end": 7670643,
-      "line": 114590,
+      "start": 7671142,
+      "end": 7671471,
+      "line": 114594,
       "script": 19,
       "hash": "449419abf1e36ec27a1451b72cb7a804f1c604ae5eb2237e684c89fa71124a83",
       "names": [],
@@ -17510,9 +17511,9 @@
     },
     {
       "id": "s19.vgBossTriggerStepHit.1",
-      "start": 7670731,
-      "end": 7673450,
-      "line": 114604,
+      "start": 7671559,
+      "end": 7674278,
+      "line": 114608,
       "script": 19,
       "hash": "7b4a27465e5731a2b13daac1cd0eafb59b65d4fa8810fd20bedbe4ffc7c113aa",
       "names": [
@@ -17525,9 +17526,9 @@
     },
     {
       "id": "s19.VergilBoss.prototype.runAttackerString.1",
-      "start": 7673452,
-      "end": 7679914,
-      "line": 114672,
+      "start": 7674280,
+      "end": 7680742,
+      "line": 114676,
       "script": 19,
       "hash": "d604cfb926b5fc71d42ea99be5f997e0c88be1ff1181b7aa10289023c06f8b02",
       "names": [],
@@ -17538,9 +17539,9 @@
     },
     {
       "id": "s19.vgBossOrigPick.1",
-      "start": 7680164,
-      "end": 7680218,
-      "line": 114846,
+      "start": 7680992,
+      "end": 7681046,
+      "line": 114850,
       "script": 19,
       "hash": "501e2bcccb3ba0907b81e126c5bc7b5702fe0a03ca6220c2d2458ddc43d54a1a",
       "names": [
@@ -17553,9 +17554,9 @@
     },
     {
       "id": "s19.VergilBoss.prototype.pickSkill.1",
-      "start": 7680219,
-      "end": 7682060,
-      "line": 114847,
+      "start": 7681047,
+      "end": 7682888,
+      "line": 114851,
       "script": 19,
       "hash": "d67ea163f69f3383497ac6c9bd9f4be29caca1559a99f2e4a6c24cd3185c91f4",
       "names": [],
@@ -17566,9 +17567,9 @@
     },
     {
       "id": "s19.vgBossOrigRun.1",
-      "start": 7682062,
-      "end": 7682114,
-      "line": 114898,
+      "start": 7682890,
+      "end": 7682942,
+      "line": 114902,
       "script": 19,
       "hash": "f9eab219eab91a4b4c7f91a487caf47a80930190f54474e91a00919b1cf3614d",
       "names": [
@@ -17581,9 +17582,9 @@
     },
     {
       "id": "s19.VergilBoss.prototype.runSkill.1",
-      "start": 7682115,
-      "end": 7682308,
-      "line": 114899,
+      "start": 7682943,
+      "end": 7683136,
+      "line": 114903,
       "script": 19,
       "hash": "d5bfab2dbd8813d5381b28128b5f070663a9492337d814fc37c6b783f4179829",
       "names": [],
@@ -17594,9 +17595,9 @@
     },
     {
       "id": "s19.vgBossOrigUpdate.1",
-      "start": 7682310,
-      "end": 7682363,
-      "line": 114906,
+      "start": 7683138,
+      "end": 7683191,
+      "line": 114910,
       "script": 19,
       "hash": "cd130b416887141c8619c7cd04af0da0f24667ce652c0785b84687fba09ff753",
       "names": [
@@ -17609,9 +17610,9 @@
     },
     {
       "id": "s19.VergilBoss.prototype.update.1",
-      "start": 7682364,
-      "end": 7683753,
-      "line": 114907,
+      "start": 7683192,
+      "end": 7684581,
+      "line": 114911,
       "script": 19,
       "hash": "fe06b3304d8c93102c782dc5dcc4fe6ad9a5857e668e831588987a6d30574eee",
       "names": [],
@@ -17622,9 +17623,9 @@
     },
     {
       "id": "s19.vgBossOrigDraw.1",
-      "start": 7683996,
-      "end": 7684045,
-      "line": 114944,
+      "start": 7684824,
+      "end": 7684873,
+      "line": 114948,
       "script": 19,
       "hash": "7a85ffc99f04dcefc1e616f5ea919a3c0bc35111b6b8a25865063ad5a7a68a96",
       "names": [
@@ -17637,9 +17638,9 @@
     },
     {
       "id": "s19.VergilBoss.prototype.draw.1",
-      "start": 7684046,
-      "end": 7692123,
-      "line": 114945,
+      "start": 7684874,
+      "end": 7692951,
+      "line": 114949,
       "script": 19,
       "hash": "407c5ac2f617b4adb679dbd66ade437b6f206cad99d0a820cbb672a19bfdfedf",
       "names": [],
@@ -17650,9 +17651,9 @@
     },
     {
       "id": "s19.vgBossSlashRectBase.1",
-      "start": 7692125,
-      "end": 7692182,
-      "line": 115140,
+      "start": 7692953,
+      "end": 7693010,
+      "line": 115144,
       "script": 19,
       "hash": "785e9e25b8d23388bca43ebfc092a235e39e13e10b270da5d53e4b0e34241907",
       "names": [
@@ -17665,9 +17666,9 @@
     },
     {
       "id": "s19.VergilBoss.prototype.slashRect.1",
-      "start": 7692183,
-      "end": 7692350,
-      "line": 115141,
+      "start": 7693011,
+      "end": 7693178,
+      "line": 115145,
       "script": 19,
       "hash": "6bdd98265b979d8e75fca48c5393236e368c934ebe582511987ee6c89bb01165",
       "names": [],
@@ -17678,9 +17679,9 @@
     },
     {
       "id": "s19.VergilBoss.prototype.syncAttackerDoppelganger.1",
-      "start": 7692351,
-      "end": 7692610,
-      "line": 115145,
+      "start": 7693179,
+      "end": 7693438,
+      "line": 115149,
       "script": 19,
       "hash": "3ccccf2aae550e02362e8742f387b7de101cb074c115a73702639cd55fd8919f",
       "names": [],

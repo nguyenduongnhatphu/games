@@ -1,12 +1,12 @@
 // PLAYER_FILE: CUSTOM08
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: CM, CUSNO_CHO, CUS_DAN, CUS_MC_BANG, CUS_MC_NAP, CUS_NONG, CUS_QD_TOCBAN, CUS_TACH_GOC, CUS_TL_BAN, CUS_TL_DMG, CUS_TL_LEN, CUS_TL_SO, CUS_TL_TOC, CUS_TOA_CM_CAP, CUS_TOA_SO, CUS_TOA_XUYEN, CUS_TOC, CUS_TOCDO, CUS_TT_BAN, CUS_UFO_VAO, CUS_ULT_DRONE, CUS_ULT_KHO, CUS_VIEN_H, CUS_VIEN_W, CUS_XA_TOC, FloatingText, LT, Projectile, SFX, allTargets, camX, camY, canvas, checkAABB, ctx, currentAmmoType, cusBvNo, cusCapCua, cusHelixBat, cusKvBat, cusMcBat, cusNoBom, cusPtBat, cusQdBat, cusQdHoi, cusQdR, cusSHGop, cusToaBat, cusToaNo, cusUfo, cusUltCap, cusUltChon, cusVkNo, cusXaToc, dashVx, dealDamage, dino, floatingTexts, frames, gameState, hoverAiming, keys, projectiles, pvpMucCua, shakeTimer, ultCharge, worldL, worldR
-// index.html:68573 · Phạm vi: global
+// index.html:68577 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusVeTanChay.1 EDITABLE
 function cusVeTanChay(mx, my, mw, mh, u){
             {
@@ -46,7 +46,7 @@ function cusVeTanChay(mx, my, mw, mh, u){
         }
 // PLAYER_PART_END s4.cusVeTanChay.1
 
-// index.html:68611 · Phạm vi: global
+// index.html:68615 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusUfoVeHutBoss.1 EDITABLE
 function cusUfoVeHutBoss(b, u){
             let tx = cusUfo ? cusUfo.x : (b.x + b.w/2);
@@ -66,7 +66,7 @@ function cusUfoVeHutBoss(b, u){
         }
 // PLAYER_PART_END s4.cusUfoVeHutBoss.1
 
-// index.html:68628 · Phạm vi: global
+// index.html:68632 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusUfoVe.1 EDITABLE
 function cusUfoVe(){
             let U = cusUfo; if (!U) return;
@@ -127,7 +127,7 @@ function cusUfoVe(){
         }
 // PLAYER_PART_END s4.cusUfoVe.1
 
-// index.html:68685 · Phạm vi: global
+// index.html:68689 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusTTNo.1 EDITABLE
 function cusTTNo(x, y, dmg, tru){
             cusNoLonDat(x, y, CUS_TT_BAN, "255,213,79");
@@ -144,12 +144,12 @@ function cusTTNo(x, y, dmg, tru){
         }
 // PLAYER_PART_END s4.cusTTNo.1
 
-// index.html:68707 · Phạm vi: global
+// index.html:68711 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusToaHen.1 EDITABLE
 let cusToaHen = [], cusToaVong = [], cusToaTia = [];
 // PLAYER_PART_END s4.cusToaHen.1
 
-// index.html:68708 · Phạm vi: global
+// index.html:68712 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusToaHenDat.1 EDITABLE
 function cusToaHenDat(proj, x, y){
             if (!proj) return;
@@ -164,7 +164,7 @@ function cusToaHenDat(proj, x, y){
         }
 // PLAYER_PART_END s4.cusToaHenDat.1
 
-// index.html:68719 · Phạm vi: global
+// index.html:68723 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusToaHenTick.1 EDITABLE
 function cusToaHenTick(){
             for (let i = cusToaHen.length - 1; i >= 0; i--){
@@ -176,7 +176,7 @@ function cusToaHenTick(){
         }
 // PLAYER_PART_END s4.cusToaHenTick.1
 
-// index.html:68727 · Phạm vi: global
+// index.html:68731 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusToaVe.1 EDITABLE
 function cusToaVe(){
             // dau cham bao truoc cho chum sap no — de nguoi choi doc duoc no se roi o dau
@@ -190,7 +190,7 @@ function cusToaVe(){
         }
 // PLAYER_PART_END s4.cusToaVe.1
 
-// index.html:68747 · Phạm vi: global
+// index.html:68751 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusToaVeTren.1 EDITABLE
 function cusToaVeTren(){
             if (typeof projectiles !== 'undefined')
@@ -231,7 +231,7 @@ function cusToaVeTren(){
         }
 // PLAYER_PART_END s4.cusToaVeTren.1
 
-// index.html:68788 · Phạm vi: global
+// index.html:68792 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusTLTim.1 EDITABLE
 function cusTLTim(p){
             if (typeof allTargets !== 'function') return null;
@@ -245,19 +245,19 @@ function cusTLTim(p){
         }
 // PLAYER_PART_END s4.cusTLTim.1
 
-// index.html:68801 · Phạm vi: global
+// index.html:68805 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusNoLon.1 EDITABLE
 let cusNoLon = [];
 // PLAYER_PART_END s4.cusNoLon.1
 
-// index.html:68802 · Phạm vi: global
+// index.html:68806 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusNoLonDat.1 EDITABLE
 function cusNoLonDat(x, y, r, mau){
             cusNoLon.push({ x: x, y: y, r: r, t: 0, tong: 26, mau: mau || "255,183,77" });
         }
 // PLAYER_PART_END s4.cusNoLonDat.1
 
-// index.html:68805 · Phạm vi: global
+// index.html:68809 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusNoLonVe.1 EDITABLE
 function cusNoLonVe(){
             for (let i = cusNoLon.length - 1; i >= 0; i--){
@@ -301,7 +301,7 @@ function cusNoLonVe(){
         }
 // PLAYER_PART_END s4.cusNoLonVe.1
 
-// index.html:68845 · Phạm vi: global
+// index.html:68849 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusTLNo.1 EDITABLE
 function cusTLNo(x, y, dmg, tru){
             cusNoLonDat(x, y, CUS_TL_BAN, "255,183,77");
@@ -321,7 +321,7 @@ function cusTLNo(x, y, dmg, tru){
         }
 // PLAYER_PART_END s4.cusTLNo.1
 
-// index.html:68864 · Phạm vi: global
+// index.html:68868 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusDroneTao.1 EDITABLE
 function cusDroneTao(ng, loai, tran){
             if (!ng) return null;
@@ -337,7 +337,7 @@ function cusDroneTao(ng, loai, tran){
         }
 // PLAYER_PART_END s4.cusDroneTao.1
 
-// index.html:68876 · Phạm vi: global
+// index.html:68880 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusUltTick.1 EDITABLE
 function cusUltTick(){
             if (typeof cusBomTick === 'function') cusBomTick();   // @@HE-CUSBOM
@@ -355,7 +355,7 @@ function cusUltTick(){
         }
 // PLAYER_PART_END s4.cusUltTick.1
 
-// index.html:68890 · Phạm vi: global
+// index.html:68894 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusUltNo.1 EDITABLE
 function cusUltNo(ng){
             // @@HE-CUSKV — lap KIEM VU thi chieu cuoi bi ep thanh VAN KIEM QUY TONG
@@ -409,52 +409,52 @@ function cusUltNo(ng){
         }
 // PLAYER_PART_END s4.cusUltNo.1
 
-// index.html:68944 · Phạm vi: global
+// index.html:68948 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.CUS_BOM_MO.1 EDITABLE
 const CUS_BOM_MO = 24, CUS_BOM_SO = 3, CUS_BOM_BUOC = 3;
 // PLAYER_PART_END s4.CUS_BOM_MO.1
 
-// index.html:68945 · Phạm vi: global
+// index.html:68949 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.CUS_BOM_DMG.1 EDITABLE
 const CUS_BOM_DMG = [0, 25, 30, 33];
 // PLAYER_PART_END s4.CUS_BOM_DMG.1
 
-// index.html:68946 · Phạm vi: global
+// index.html:68950 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.CUS_BOM_RCM.1 EDITABLE
 const CUS_BOM_RCM = [0, 4, 5, 6];
 // PLAYER_PART_END s4.CUS_BOM_RCM.1
 
-// index.html:68947 · Phạm vi: global
+// index.html:68951 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.CUS_BOM_SC.1 EDITABLE
 const CUS_BOM_SC  = [0, 1.15, 1.4, 1.7];
 // PLAYER_PART_END s4.CUS_BOM_SC.1
 
-// index.html:68948 · Phạm vi: global
+// index.html:68952 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.CUS_BOM_VY.1 EDITABLE
 const CUS_BOM_VY = 4, CUS_BOM_TOC = 8, CUS_BOM_HAN = 480, CUS_BOM_EP = 16;
 // PLAYER_PART_END s4.CUS_BOM_VY.1
 
-// index.html:68949 · Phạm vi: global
+// index.html:68953 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusBom.1 EDITABLE
 let cusBom = null;
 // PLAYER_PART_END s4.cusBom.1
 
-// index.html:68950 · Phạm vi: global
+// index.html:68954 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusBomCm.1 EDITABLE
 function cusBomCm(){ return (typeof CM === 'number') ? CM : (canvas.width / 23); }
 // PLAYER_PART_END s4.cusBomCm.1
 
-// index.html:68951 · Phạm vi: global
+// index.html:68955 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusBomDat.1 EDITABLE
 function cusBomDat(){ return 320; }
 // PLAYER_PART_END s4.cusBomDat.1
 
-// index.html:68952 · Phạm vi: global
+// index.html:68956 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusBomCap.1 EDITABLE
 function cusBomCap(S){ return Math.max(1, Math.min(3, (S && S.cap) || 1)); }
 // PLAYER_PART_END s4.cusBomCap.1
 
-// index.html:68953 · Phạm vi: global
+// index.html:68957 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusBomTren.1 EDITABLE
 function cusBomTren(){
             let top = (typeof camY === 'number' ? camY : -160) - 80;
@@ -462,7 +462,7 @@ function cusBomTren(){
         }
 // PLAYER_PART_END s4.cusBomTren.1
 
-// index.html:68957 · Phạm vi: global
+// index.html:68961 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusBomKhoang.1 EDITABLE
 function cusBomKhoang(o, x, y){
             let x0 = o.x, y0 = o.y, x1 = o.x + (o.w || 20), y1 = o.y + (o.h || 20);
@@ -471,7 +471,7 @@ function cusBomKhoang(o, x, y){
         }
 // PLAYER_PART_END s4.cusBomKhoang.1
 
-// index.html:68962 · Phạm vi: global
+// index.html:68966 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusBomBat.1 EDITABLE
 function cusBomBat(ng, cap){
             cusBom = { ng: ng, pha: 'mo', t: 0, x: ng.x + ng.w / 2, con: CUS_BOM_SO, roi: [], no: [],
@@ -483,7 +483,7 @@ function cusBomBat(ng, cap){
         }
 // PLAYER_PART_END s4.cusBomBat.1
 
-// index.html:68970 · Phạm vi: global
+// index.html:68974 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusBomTha.1 EDITABLE
 function cusBomTha(S){
             if (!S || S.con <= 0) return;
@@ -495,7 +495,7 @@ function cusBomTha(S){
         }
 // PLAYER_PART_END s4.cusBomTha.1
 
-// index.html:68978 · Phạm vi: global
+// index.html:68982 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusBomNo.1 EDITABLE
 function cusBomNo(S, x, y){
             let cm = cusBomCm(), cap = cusBomCap(S);
@@ -519,7 +519,7 @@ function cusBomNo(S, x, y){
         }
 // PLAYER_PART_END s4.cusBomNo.1
 
-// index.html:68998 · Phạm vi: global
+// index.html:69002 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusBomNha.1 EDITABLE
 function cusBomNha(ng){
             if (!ng) return;
@@ -530,7 +530,7 @@ function cusBomNha(ng){
         }
 // PLAYER_PART_END s4.cusBomNha.1
 
-// index.html:69005 · Phạm vi: global
+// index.html:69009 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusBomTick.1 EDITABLE
 function cusBomTick(){
             let S = cusBom; if (!S) return;
@@ -578,7 +578,7 @@ function cusBomTick(){
         }
 // PLAYER_PART_END s4.cusBomTick.1
 
-// index.html:69049 · Phạm vi: global
+// index.html:69053 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusBomVeQua.1 EDITABLE
 function cusBomVeQua(x, y, sc){
             ctx.save();
@@ -600,7 +600,7 @@ function cusBomVeQua(x, y, sc){
         }
 // PLAYER_PART_END s4.cusBomVeQua.1
 
-// index.html:69067 · Phạm vi: global
+// index.html:69071 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusBomVe.1 EDITABLE
 function cusBomVe(S){
             if (!S) return;
@@ -642,7 +642,7 @@ function cusBomVe(S){
         }
 // PLAYER_PART_END s4.cusBomVe.1
 
-// index.html:69106 · Phạm vi: global
+// index.html:69110 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cusNoVe.1 EDITABLE
 function cusNoVe(){
             for (let b of cusNoBom){
@@ -657,7 +657,7 @@ function cusNoVe(){
         }
 // PLAYER_PART_END s4.cusNoVe.1
 
-// index.html:69120 · Phạm vi: Player.prototype
+// index.html:69124 · Phạm vi: Player.prototype
 const __Part36 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusBan.1 EDITABLE
 cusBan(kho){
@@ -732,7 +732,7 @@ cusBan(kho){
 // PLAYER_PART_END s4.Player.prototype.cusBan.1
 };
 
-// index.html:69194 · Phạm vi: Player.prototype
+// index.html:69198 · Phạm vi: Player.prototype
 const __Part37 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusBanGhep.1 EDITABLE
 cusBanGhep(kho){
@@ -805,7 +805,7 @@ cusBanGhep(kho){
 // PLAYER_PART_END s4.Player.prototype.cusBanGhep.1
 };
 
-// index.html:69264 · Phạm vi: Player.prototype
+// index.html:69268 · Phạm vi: Player.prototype
 const __Part38 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusBanTo.1 EDITABLE
 cusBanTo(){
@@ -827,7 +827,7 @@ cusBanTo(){
 // PLAYER_PART_END s4.Player.prototype.cusBanTo.1
 };
 
-// index.html:69285 · Phạm vi: Player.prototype
+// index.html:69289 · Phạm vi: Player.prototype
 const __Part39 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusBanTenLua.1 EDITABLE
 cusBanTenLua(kho){
@@ -855,7 +855,7 @@ cusBanTenLua(kho){
 // PLAYER_PART_END s4.Player.prototype.cusBanTenLua.1
 };
 
-// index.html:69309 · Phạm vi: Player.prototype
+// index.html:69313 · Phạm vi: Player.prototype
 const __Part40 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusBanToa.1 EDITABLE
 cusBanToa(kho, so){
@@ -886,7 +886,7 @@ cusBanToa(kho, so){
 // PLAYER_PART_END s4.Player.prototype.cusBanToa.1
 };
 
-// index.html:69338 · Phạm vi: Player.prototype
+// index.html:69342 · Phạm vi: Player.prototype
 const __Part41 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusBanHelix.1 EDITABLE
 cusBanHelix(kho){
@@ -916,7 +916,7 @@ cusBanHelix(kho){
 // PLAYER_PART_END s4.Player.prototype.cusBanHelix.1
 };
 
-// index.html:69371 · Phạm vi: Player.prototype
+// index.html:69375 · Phạm vi: Player.prototype
 const __Part42 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusBanQuyDao.1 EDITABLE
 cusBanQuyDao(kho){
@@ -939,7 +939,7 @@ cusBanQuyDao(kho){
 // PLAYER_PART_END s4.Player.prototype.cusBanQuyDao.1
 };
 
-// index.html:69390 · Phạm vi: Player.prototype
+// index.html:69394 · Phạm vi: Player.prototype
 const __Part43 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusQdNapDan.1 EDITABLE
 cusQdNapDan(){

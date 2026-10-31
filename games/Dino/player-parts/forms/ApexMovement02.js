@@ -1,12 +1,12 @@
 // PLAYER_FILE: ApexMovement02
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: afterimages, apexColor, apexControl, apexInput, apexNativePlatforms, apexSync, bienDayHT, channelShieldLocked, coBuc, currentShieldType, dashCd, dashVx, dino, dkNenY, frames, gameState, keys, launchFromPit, mapTheme, platforms, sgSegmentBox, shieldCdNguoiChoi, ultCharge, worldL, worldR
-// index.html:105435 · Phạm vi: apexCreate
+// index.html:105439 · Phạm vi: apexCreate
 function __Part0(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.syncPlatforms.1 EDITABLE
 function syncPlatforms(){
@@ -26,7 +26,7 @@ function syncPlatforms(){
 // PLAYER_PART_END s8.apexCreate.syncPlatforms.1
 }}
 
-// index.html:105449 · Phạm vi: apexCreate
+// index.html:105453 · Phạm vi: apexCreate
 function __Part1(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.contactLeaves.1 EDITABLE
 function contactLeaves(){for(const p of platforms){if(p.source&&p.source.isLeaf&&(dino.activePlatform===p||dino.ledgePlatform===p))p.source.leafArmed=true;}for(const p of leafs){if(p.fallen||p.ttl!==null)continue;const side=Math.min(Math.abs(dino.x+28-p.x),Math.abs(dino.x-28-p.x-p.w))<8&&dino.y>p.y&&dino.y-96<p.y+p.h;
@@ -34,21 +34,21 @@ function contactLeaves(){for(const p of platforms){if(p.source&&p.source.isLeaf&
 // PLAYER_PART_END s8.apexCreate.contactLeaves.1
 }}
 
-// index.html:105451 · Phạm vi: apexCreate
+// index.html:105455 · Phạm vi: apexCreate
 function __Part2(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.inputEvents.1 EDITABLE
 const inputEvents=[],eventKeys={},moveTap={left:-9999,right:-9999};
 // PLAYER_PART_END s8.apexCreate.inputEvents.1
 }}
 
-// index.html:105451 · Phạm vi: apexCreate
+// index.html:105455 · Phạm vi: apexCreate
 function __Part3(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.inputFrame.1 EDITABLE
 let inputFrame=0;
 // PLAYER_PART_END s8.apexCreate.inputFrame.1
 }}
 
-// index.html:105475 · Phạm vi: apexCreate
+// index.html:105479 · Phạm vi: apexCreate
 function __Part4(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.applyInput.1 EDITABLE
 function applyInput(k){keys.left=!!(k.KeyA||k.ArrowLeft);keys.right=!!(k.KeyD||k.ArrowRight);keys.down=!!(k.KeyS||k.ArrowDown);
@@ -69,14 +69,14 @@ function applyInput(k){keys.left=!!(k.KeyA||k.ArrowLeft);keys.right=!!(k.KeyD||k
 // PLAYER_PART_END s8.apexCreate.applyInput.1
 }}
 
-// index.html:105490 · Phạm vi: apexCreate
+// index.html:105494 · Phạm vi: apexCreate
 function __Part5(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.input.1 EDITABLE
 function input(){inputFrame++;for(const e of inputEvents){eventKeys[e.code]=e.down;applyInput(eventKeys);}inputEvents.length=0;Object.assign(eventKeys,apexInput());applyInput(eventKeys);}
 // PLAYER_PART_END s8.apexCreate.input.1
 }}
 
-// index.html:105491 · Phạm vi: apexCreate
+// index.html:105495 · Phạm vi: apexCreate
 function __Part6(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.tick.1 EDITABLE
 function tick(){

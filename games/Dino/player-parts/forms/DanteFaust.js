@@ -1,12 +1,12 @@
 // PLAYER_FILE: DanteFaust
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: DANTE_ATTACK_RATE, LT, Player, SFX, ammoPicker, ammoXem, apexWrap, camY, ctx, danteActive, danteBulletColor, danteDraw, danteHit, danteKey, danteLabel, danteOn, danteRangedBase, danteStyle, danteTick, dashCd, dashVx, dino, dkNenY, doDash, dojoMode, drawCustomMenu, drawUI, dswControl, dswPaintArmIK, eiAim, frames, gameOver, gameVictory, keys, paused, playerAttackStep, playerComboTrack, playerFinisherControl, runePicker, sgSegmentBox, sgTargets, shakeTimer
-// index.html:110290 · Phạm vi: global
+// index.html:110294 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.FAUST_MOVES.1 EDITABLE
 const FAUST_MOVES={
  shot:{name:'DR. FAUST · GUNFIRE',T:9},
@@ -21,22 +21,22 @@ const FAUST_MOVES={
 };
 // PLAYER_PART_END s14.FAUST_MOVES.1
 
-// index.html:110301 · Phạm vi: global
+// index.html:110305 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustState.1 EDITABLE
 function faustState(p){return p.faust||(p.faust={hold:0,orbit:0,angle:0,ringHits:new Map(),hat:null,combo:0,lastSlash:-1000,lastDash:-1000,flash:0,trail:[],swings:[],sparks:[],impacts:[],meteors:[],spears:[],beam:null,lock:null});}
 // PLAYER_PART_END s14.faustState.1
 
-// index.html:110302 · Phạm vi: global
+// index.html:110306 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustActive.1 EDITABLE
 function faustActive(){return danteActive(dino)&&dino.dante?.arm===5&&!gameOver&&!gameVictory;}
 // PLAYER_PART_END s14.faustActive.1
 
-// index.html:110303 · Phạm vi: global
+// index.html:110307 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustReset.1 EDITABLE
 function faustReset(p){if(!p?.faust)return;const f=p.faust;f.hold=f.orbit=0;f.hat=null;f.ringHits.clear();f.trail=[];f.swings=[];f.sparks=[];f.impacts=[];f.meteors=[];f.spears=[];f.beam=f.lock=null;p.body.hat=null;p.body._faustLegs=null;if(p.arm===5)p.body._swordLean=p.body._swordLunge=0;}
 // PLAYER_PART_END s14.faustReset.1
 
-// index.html:110304 · Phạm vi: global
+// index.html:110308 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustCommand.1 EDITABLE
 function faustCommand(special,charge=0){
  if(!faustActive()||paused)return;
@@ -62,7 +62,7 @@ function faustCommand(special,charge=0){
 }
 // PLAYER_PART_END s14.faustCommand.1
 
-// index.html:110326 · Phạm vi: global
+// index.html:110330 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustRound.1 EDITABLE
 function faustRound(n,p,angle,damage){
  p.rounds.push({arm:5,x:n.x+n.w/2+Math.cos(angle)*27,y:n.y+23,vx:Math.cos(angle)*16,vy:Math.sin(angle)*16,r:4,kind:'bullet',color:danteBulletColor(p),damage:danteRangedBase(p,1)+(p.dt?2:0),life:65,age:0,hit:new Set()});
@@ -70,7 +70,7 @@ function faustRound(n,p,angle,damage){
 }
 // PLAYER_PART_END s14.faustRound.1
 
-// index.html:110330 · Phạm vi: global
+// index.html:110334 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustHatShape.1 EDITABLE
 function faustHatShape(x,y,rotation=0,scale=1){
  ctx.save();ctx.translate(x,y);ctx.rotate(rotation);ctx.scale(scale,scale);
@@ -81,7 +81,7 @@ function faustHatShape(x,y,rotation=0,scale=1){
 }
 // PLAYER_PART_END s14.faustHatShape.1
 
-// index.html:110338 · Phạm vi: global
+// index.html:110342 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustPoint.1 EDITABLE
 function faustPoint(n,x,y){
  const b=n.dante.body,c=Math.cos(b._swordLean||0),s=Math.sin(b._swordLean||0),dir=n.isFacingLeft?-1:1;
@@ -89,7 +89,7 @@ function faustPoint(n,x,y){
 }
 // PLAYER_PART_END s14.faustPoint.1
 
-// index.html:110342 · Phạm vi: global
+// index.html:110346 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustPose.1 EDITABLE
 function faustPose(n,a,age=a.age){
  const t=Math.max(0,Math.min(1,(age-5)/11)),ease=t*t*(3-2*t);
@@ -100,7 +100,7 @@ function faustPose(n,a,age=a.age){
 }
 // PLAYER_PART_END s14.faustPose.1
 
-// index.html:110349 · Phạm vi: global
+// index.html:110353 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustParticles.1 EDITABLE
 function faustParticles(f,x,y,count=10,color='#ff789f'){
  for(let i=0;i<count;i++){const angle=Math.PI*2*i/count+Math.random()*.2,speed=1+Math.random()*4;f.sparks.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-1,t:16+Math.random()*12,max:28,color});}
@@ -108,7 +108,7 @@ function faustParticles(f,x,y,count=10,color='#ff789f'){
 }
 // PLAYER_PART_END s14.faustParticles.1
 
-// index.html:110353 · Phạm vi: global
+// index.html:110357 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustStrike.1 EDITABLE
 function faustStrike(n,p,a){
  const f=faustState(p),current=faustPose(n,a).world,prev=faustPose(n,a,a.age-1).world;
@@ -126,7 +126,7 @@ function faustStrike(n,p,a){
 }
 // PLAYER_PART_END s14.faustStrike.1
 
-// index.html:110367 · Phạm vi: global
+// index.html:110371 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustAim.1 EDITABLE
 function faustAim(n,dir){
  const cx=n.x+n.w/2,cy=n.y+23;
@@ -135,7 +135,7 @@ function faustAim(n,dir){
 }
 // PLAYER_PART_END s14.faustAim.1
 
-// index.html:110372 · Phạm vi: global
+// index.html:110376 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustLock.1 EDITABLE
 function faustLock(n,dir){
  const t=sgTargets(n).filter(o=>(o.x+o.w/2-n.x-n.w/2)*dir>=0&&Math.abs(o.x-n.x)<850).sort((a,b)=>Math.abs(a.x-n.x)-Math.abs(b.x-n.x))[0];
@@ -143,7 +143,7 @@ function faustLock(n,dir){
 }
 // PLAYER_PART_END s14.faustLock.1
 
-// index.html:110376 · Phạm vi: global
+// index.html:110380 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustBeam.1 EDITABLE
 function faustBeam(n,p,a){
  const f=faustState(p),x=n.x+n.w/2,y=n.y+23,length=780,tx=x+Math.cos(a.angle)*length,ty=y+Math.sin(a.angle)*length;
@@ -156,7 +156,7 @@ function faustBeam(n,p,a){
 }
 // PLAYER_PART_END s14.faustBeam.1
 
-// index.html:110385 · Phạm vi: global
+// index.html:110389 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustMeteorTick.1 EDITABLE
 function faustMeteorTick(n,p,f){
  for(const m of f.meteors){
@@ -175,7 +175,7 @@ function faustMeteorTick(n,p,f){
 }
 // PLAYER_PART_END s14.faustMeteorTick.1
 
-// index.html:110400 · Phạm vi: global
+// index.html:110404 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustSpears.1 EDITABLE
 function faustSpears(n,p,f){
  for(const q of f.spears){
@@ -188,7 +188,7 @@ function faustSpears(n,p,f){
 }
 // PLAYER_PART_END s14.faustSpears.1
 
-// index.html:110409 · Phạm vi: global
+// index.html:110413 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustOrbit.1 EDITABLE
 function faustOrbit(n,p,f){
  const cx=n.x+n.w/2,cy=n.y+n.h/2,radius=64,old=f.angle;
@@ -208,7 +208,7 @@ function faustOrbit(n,p,f){
 }
 // PLAYER_PART_END s14.faustOrbit.1
 
-// index.html:110425 · Phạm vi: global
+// index.html:110429 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustHatTick.1 EDITABLE
 function faustHatTick(n,p,f){
  const h=f.hat;if(!h)return;
@@ -225,7 +225,7 @@ function faustHatTick(n,p,f){
 }
 // PLAYER_PART_END s14.faustHatTick.1
 
-// index.html:110438 · Phạm vi: global
+// index.html:110442 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustTick.1 EDITABLE
 function faustTick(){
  if(!dino?.dante)return;
@@ -275,12 +275,12 @@ function faustTick(){
 }
 // PLAYER_PART_END s14.faustTick.1
 
-// index.html:110484 · Phạm vi: global
+// index.html:110488 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustKeyBase.1 EDITABLE
 const faustKeyBase=danteKey;
 // PLAYER_PART_END s14.faustKeyBase.1
 
-// index.html:110485 · Phạm vi: global
+// index.html:110489 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.danteKey.1 EDITABLE
 danteKey=function(code,repeat){
  if(faustActive()&&!paused&&!repeat){
@@ -295,12 +295,12 @@ danteKey=function(code,repeat){
 };
 // PLAYER_PART_END s14.danteKey.1
 
-// index.html:110496 · Phạm vi: global
+// index.html:110500 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustDashBase.1 EDITABLE
 const faustDashBase=doDash;
 // PLAYER_PART_END s14.faustDashBase.1
 
-// index.html:110497 · Phạm vi: global
+// index.html:110501 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.doDash.1 EDITABLE
 doDash=function(...args){
  const using=faustActive()&&!paused,before=dashCd,release=using&&faustState(dino.dante).orbit;
@@ -318,27 +318,27 @@ doDash=function(...args){
 };
 // PLAYER_PART_END s14.doDash.1
 
-// index.html:110511 · Phạm vi: global
+// index.html:110515 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustTickBase.1 EDITABLE
 const faustTickBase=danteTick;
 // PLAYER_PART_END s14.faustTickBase.1
 
-// index.html:110512 · Phạm vi: global
+// index.html:110516 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.danteTick.1 EDITABLE
 danteTick=function(){faustTickBase();faustTick();};
 // PLAYER_PART_END s14.danteTick.1
 
-// index.html:110513 · Phạm vi: global
+// index.html:110517 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustDamageBase.1 EDITABLE
 const faustDamageBase=Player.prototype.takeDamage;
 // PLAYER_PART_END s14.faustDamageBase.1
 
-// index.html:110514 · Phạm vi: global
+// index.html:110518 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.Player.prototype.takeDamage.1 EDITABLE
 Player.prototype.takeDamage=function(...args){const hp=this.hp,result=faustDamageBase.apply(this,args);if(this.dante&&this.hp<hp)faustReset(this.dante);return result;};
 // PLAYER_PART_END s14.Player.prototype.takeDamage.1
 
-// index.html:110515 · Phạm vi: global
+// index.html:110519 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustDraw.1 EDITABLE
 function faustDraw(n){
  const p=n.dante,f=faustState(p),a=p.attack,cx=n.x+n.w/2,cy=n.y+n.h/2,dir=n.isFacingLeft?-1:1;
@@ -368,7 +368,7 @@ function faustDraw(n){
 }
 // PLAYER_PART_END s14.faustDraw.1
 
-// index.html:110541 · Phạm vi: global
+// index.html:110545 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustDrawEffects.1 EDITABLE
 function faustDrawEffects(n,p,f,a){
  ctx.save();
@@ -409,32 +409,32 @@ ctx.strokeStyle='#ffc2a0';ctx.lineWidth=4*(1-t)+1;ctx.beginPath();ctx.ellipse(h.
 }
 // PLAYER_PART_END s14.faustDrawEffects.1
 
-// index.html:110578 · Phạm vi: global
+// index.html:110582 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustDrawBase.1 EDITABLE
 const faustDrawBase=danteDraw;
 // PLAYER_PART_END s14.faustDrawBase.1
 
-// index.html:110579 · Phạm vi: global
+// index.html:110583 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.danteDraw.1 EDITABLE
 danteDraw=function(n){faustDrawBase(n);if(danteOn()&&n.dante?.arm===5)faustDraw(n);};
 // PLAYER_PART_END s14.danteDraw.1
 
-// index.html:110580 · Phạm vi: global
+// index.html:110584 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustUIBase.1 EDITABLE
 const faustUIBase=drawUI;
 // PLAYER_PART_END s14.faustUIBase.1
 
-// index.html:110581 · Phạm vi: global
+// index.html:110585 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.drawUI.1 EDITABLE
 drawUI=function(){faustUIBase();if(!danteOn()||dino?.dante?.arm!==5)return;const p=dino.dante,f=faustState(p);ctx.save();if(dojoMode)ctx.translate(0,15);ctx.fillStyle='#1c1119';ctx.fillRect(15,92,275,20);ctx.font='11px Consolas,monospace';ctx.fillStyle='#ffb4cd';ctx.textAlign='left';ctx.fillText(p.k!==null?(keys.KeyS||keys.ArrowDown?'RED SHOT: '+Math.min(3,Math.floor(p.k/30))+'/3':'RED HOT NIGHT: '+Math.min(100,Math.floor(p.k/60*100))+'%'):f.orbit?'MAN HAT · ORBIT':p.attack?p.attack.name:'J: FIRE / HOLD: ORBIT · K: HAT',20,105);ctx.restore();};
 // PLAYER_PART_END s14.drawUI.1
 
-// index.html:110582 · Phạm vi: global
+// index.html:110586 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.faustMenuBase.1 EDITABLE
 const faustMenuBase=drawCustomMenu;
 // PLAYER_PART_END s14.faustMenuBase.1
 
-// index.html:110583 · Phạm vi: global
+// index.html:110587 · Phạm vi: global
 // PLAYER_PART_BEGIN s14.drawCustomMenu.1 EDITABLE
 drawCustomMenu=function(){faustMenuBase();if(!danteOn()||dino?.dante?.arm!==5||runePicker!==null||ammoPicker||ammoXem!==null)return;ctx.save();ctx.fillStyle='#190e14';ctx.fillRect(708,135,262,380);ctx.font='bold 14px Consolas,monospace';ctx.fillStyle='#ff85ab';ctx.textAlign='left';ctx.fillText('DR. FAUST · Q/E',716,157);ctx.font='11px Consolas,monospace';ctx.fillStyle='#eee0df';apexWrap(LT('J: bắn · Giữ J: vòng đạn\nĐang có vòng đạn → Dash:\nphóng 6 mũi truy kích mục tiêu\nDash J: RED SHOT xuyên xa\n\nK: ném mũ · K tiếp: gọi về nổ\nCúi K ×3: chém → quất → hất\nAir K: xoay người chém mũ\nDash K: lướt cắt vành mũ\n\nCúi + giữ K 0.5–1.5s:\nRED SHOT — 3 tia, lực tăng dần\nGiữ K 1s (không cúi):\nRED HOT NIGHT — khóa vị trí\n3 thiên thạch / Gunslinger: 4', 'J: fire · Hold J: orbit\nOrbit → Dash: launch 6\nhoming crystal spears\nDash J: long piercing RED SHOT\n\nK: throw · K again: recall burst\nDown K x3: slash, backhand, lift\nAir K: spinning brim slash\nDash K: sliding hat cut\n\nDown + hold K 0.5–1.5s:\nRED SHOT — 3 piercing pulses\nHold K 1s (no crouch):\nRED HOT NIGHT — lock position\n3 meteors / 4 in Gunslinger'),716,181,248,22);ctx.restore();};
 // PLAYER_PART_END s14.drawCustomMenu.1

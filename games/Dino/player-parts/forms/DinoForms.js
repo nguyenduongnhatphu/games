@@ -1,32 +1,32 @@
 // PLAYER_FILE: DinoForms
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Effect, FloatingText, LT, SFX, XUONG_BONE, XUONG_DK, XUONG_OUT, ctx, currentForm, dashVx, dealDamage, deathCineActive, deathCineFrame, deathReviveLevel, dino, enemies, floatingTexts, frames, gameState, reviveOverlay, shakeTimer, visualEffects
-// index.html:83145 · Phạm vi: global
+// index.html:83149 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.DANG_NOR_LUOT.1 EDITABLE
 const DANG_NOR_LUOT = 0.85, DANG_RUSH_CHAY = 1.06;
 // PLAYER_PART_END s6.DANG_NOR_LUOT.1
 
-// index.html:83146 · Phạm vi: global
+// index.html:83150 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.DANG_HQ_R.1 EDITABLE
 const DANG_HQ_R = 46, DANG_HQ_NHIP = 60, DANG_VAY_CHO = 1500;
 // PLAYER_PART_END s6.DANG_HQ_R.1
 
-// index.html:83147 · Phạm vi: global
+// index.html:83151 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dangCua.1 EDITABLE
 function dangCua(ng){ return ng && ng.id === 1 ? currentForm : (ng ? ng.form : 0); }
 // PLAYER_PART_END s6.dangCua.1
 
-// index.html:83148 · Phạm vi: global
+// index.html:83152 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dangMauThem.1 EDITABLE
 function dangMauThem(f){ return (f === 2 || f === 3) ? 1 : 0; }
 // PLAYER_PART_END s6.dangMauThem.1
 
-// index.html:83149 · Phạm vi: global
+// index.html:83153 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dangTick.1 EDITABLE
 function dangTick(ng){
             if (!ng || ng.id !== 1 || gameState === 'pvp') return;
@@ -52,7 +52,7 @@ function dangTick(ng){
         }
 // PLAYER_PART_END s6.dangTick.1
 
-// index.html:83185 · Phạm vi: global
+// index.html:83189 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dangVayChan.1 EDITABLE
 function dangVayChan(ng){
             if (!ng || ng.id !== 1 || gameState === 'pvp' || currentForm !== 3) return false;
@@ -65,7 +65,7 @@ function dangVayChan(ng){
         }
 // PLAYER_PART_END s6.dangVayChan.1
 
-// index.html:83195 · Phạm vi: global
+// index.html:83199 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dangVeNoiTai.1 EDITABLE
 function dangVeNoiTai(ng, cx, cy){
             if (!ng || ng.id !== 1) return;
@@ -81,32 +81,32 @@ function dangVeNoiTai(ng, cx, cy){
         }
 // PLAYER_PART_END s6.dangVeNoiTai.1
 
-// index.html:85577 · Phạm vi: global
+// index.html:85581 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.DANG_KINH.1 EDITABLE
 const DANG_KINH = 5, DANG_XUONG = 6;
 // PLAYER_PART_END s6.DANG_KINH.1
 
-// index.html:85578 · Phạm vi: global
+// index.html:85582 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.DANG_TOC_MOI.1 EDITABLE
 const DANG_TOC_MOI = 1.05, DANG_NHAY_MOI = Math.sqrt(1.05), DANG_XUONG_LUOT = 0.95;
 // PLAYER_PART_END s6.DANG_TOC_MOI.1
 
-// index.html:85579 · Phạm vi: global
+// index.html:85583 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.DEATH_SKEL_TOTAL.1 EDITABLE
 const DEATH_SKEL_TOTAL = 170;
 // PLAYER_PART_END s6.DEATH_SKEL_TOTAL.1
 
-// index.html:85580 · Phạm vi: global
+// index.html:85584 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.deathSkel.1 EDITABLE
 let deathSkel = null;
 // PLAYER_PART_END s6.deathSkel.1
 
-// index.html:85581 · Phạm vi: global
+// index.html:85585 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dangMauGoc.1 EDITABLE
 function dangMauGoc(f){ return f === DANG_KINH ? 3 : (f === DANG_XUONG ? 4 : 5); }
 // PLAYER_PART_END s6.dangMauGoc.1
 
-// index.html:85582 · Phạm vi: global
+// index.html:85586 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dangTocMul.1 EDITABLE
 function dangTocMul(ng){
             if (!ng || ng.id !== 1 || gameState === 'pvp') return 1;
@@ -116,7 +116,7 @@ function dangTocMul(ng){
         }
 // PLAYER_PART_END s6.dangTocMul.1
 
-// index.html:85588 · Phạm vi: global
+// index.html:85592 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dangNhayMul.1 EDITABLE
 function dangNhayMul(ng){
             if (!ng || ng.id !== 1 || gameState === 'pvp') return 1;
@@ -126,7 +126,7 @@ function dangNhayMul(ng){
         }
 // PLAYER_PART_END s6.dangNhayMul.1
 
-// index.html:85596 · Phạm vi: global
+// index.html:85600 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.kinhPal.1 EDITABLE
 function kinhPal(ng){
             let L = (ng && ng.id === 1 && ng.kinhLop !== undefined) ? ng.kinhLop : 2;
@@ -136,7 +136,7 @@ function kinhPal(ng){
         }
 // PLAYER_PART_END s6.kinhPal.1
 
-// index.html:85602 · Phạm vi: global
+// index.html:85606 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.kinhTinhThe.1 EDITABLE
 function kinhTinhThe(x, y, w, h, ang, al){
             ctx.save(); ctx.translate(x, y); ctx.rotate(ang || 0);
@@ -148,7 +148,7 @@ function kinhTinhThe(x, y, w, h, ang, al){
         }
 // PLAYER_PART_END s6.kinhTinhThe.1
 
-// index.html:85631 · Phạm vi: global
+// index.html:85635 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.kinhVo.1 EDITABLE
 function kinhVo(ng, n){
             let cx = ng.x + ng.w / 2, cy = ng.y + ng.h / 2, parts = [];
@@ -170,7 +170,7 @@ function kinhVo(ng, n){
         }
 // PLAYER_PART_END s6.kinhVo.1
 
-// index.html:85650 · Phạm vi: global
+// index.html:85654 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.kinhAnDon.1 EDITABLE
 function kinhAnDon(ng, amount){
             if (!ng || ng.id !== 1 || gameState === 'pvp' || dangCua(ng) !== DANG_KINH || (ng.kinhLop || 0) <= 0) return amount;
@@ -184,7 +184,7 @@ function kinhAnDon(ng, amount){
         }
 // PLAYER_PART_END s6.kinhAnDon.1
 
-// index.html:85660 · Phạm vi: global
+// index.html:85664 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.kinhVeHud.1 EDITABLE
 function kinhVeHud(){
             if (typeof dino === 'undefined' || !dino || gameState === 'pvp' || dangCua(dino) !== DANG_KINH) return;
@@ -201,12 +201,12 @@ function kinhVeHud(){
         }
 // PLAYER_PART_END s6.kinhVeHud.1
 
-// index.html:85676 · Phạm vi: global
+// index.html:85680 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xuongRnd.1 EDITABLE
 function xuongRnd(i, s){ let x = Math.sin(i * 127.1 + s * 311.7) * 43758.5453; return x - Math.floor(x); }
 // PLAYER_PART_END s6.xuongRnd.1
 
-// index.html:85678 · Phạm vi: global
+// index.html:85682 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xuongParts.1 EDITABLE
 function xuongParts(bx, by, dy, ph, crouch, airborne){
             const P = [];
@@ -230,7 +230,7 @@ function xuongParts(bx, by, dy, ph, crouch, airborne){
         }
 // PLAYER_PART_END s6.xuongParts.1
 
-// index.html:85698 · Phạm vi: global
+// index.html:85702 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xuongVeManh.1 EDITABLE
 function xuongVeManh(P){
             ctx.save(); ctx.translate(P.cx, P.cy); ctx.rotate(P.ang);
@@ -269,7 +269,7 @@ function xuongVeManh(P){
         }
 // PLAYER_PART_END s6.xuongVeManh.1
 
-// index.html:85733 · Phạm vi: global
+// index.html:85737 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xuongVeLoiAt.1 EDITABLE
 function xuongVeLoiAt(x, y, glow){
             ctx.save();
@@ -282,7 +282,7 @@ function xuongVeLoiAt(x, y, glow){
         }
 // PLAYER_PART_END s6.xuongVeLoiAt.1
 
-// index.html:85743 · Phạm vi: global
+// index.html:85747 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xuongLoiVi.1 EDITABLE
 function xuongLoiVi(t, bx, by){
             let hx = bx + 21, hy = by + 22, rise = Math.min(1, t / 30), tp = (t - 78) / 70, e = tp > 0 ? Math.min(1, tp / 0.9) : 0; e = e * e * (3 - 2 * e);
@@ -290,7 +290,7 @@ function xuongLoiVi(t, bx, by){
         }
 // PLAYER_PART_END s6.xuongLoiVi.1
 
-// index.html:85748 · Phạm vi: global
+// index.html:85752 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xuongChetParts.1 EDITABLE
 function xuongChetParts(parts, bx, by, t){
             const g = 0.45, ground = by + 43, coreX = bx + 21;
@@ -316,7 +316,7 @@ function xuongChetParts(parts, bx, by, t){
         }
 // PLAYER_PART_END s6.xuongChetParts.1
 
-// index.html:85781 · Phạm vi: global
+// index.html:85785 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xuongVeLoi.1 EDITABLE
 function xuongVeLoi(){                                                                                // goi tu drawDeathScene sau khi to trang
             if (!deathSkel || deathSkel.bx === undefined) return;
@@ -329,7 +329,7 @@ function xuongVeLoi(){                                                          
         }
 // PLAYER_PART_END s6.xuongVeLoi.1
 
-// index.html:85790 · Phạm vi: global
+// index.html:85794 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xuongHoiSinh.1 EDITABLE
 function xuongHoiSinh(){
             deathSkel = null; deathCineActive = false; deathReviveLevel = 0;
@@ -340,7 +340,7 @@ function xuongHoiSinh(){
         }
 // PLAYER_PART_END s6.xuongHoiSinh.1
 
-// index.html:87699 · Phạm vi: global
+// index.html:87703 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dangLuotHoacChop.1 EDITABLE
 function dangLuotHoacChop(){
             if (typeof dashVx !== 'undefined' && Math.abs(dashVx) > 2) return true;

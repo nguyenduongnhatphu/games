@@ -1,12 +1,12 @@
 // PLAYER_FILE: Rune_trident
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: RUNES
-// index.html:83733 · Phạm vi: global
+// index.html:83737 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RUNES.push.4 EDITABLE
 RUNES.push({ id:'trident', name:'TRIDENT', nameEn:'TRIDENT', icon:'\u{1F531}', cost:2, ammoRune:true, onlyAmmo:10,   // @@HE-TRIDENT
             desc:'Tốn 2 ô. Biến Giáo thành ĐINH BA của hải thần và khoá Power sang MUSOU.\n\nCOMBO: J J J J vung · vung · chọc · chọc. J K K vung rồi xoay người HẤT TUNG, nhảy lên CHÉM XUỐNG. J J K K vung · vung · ĐÂM XUYÊN ra sau lưng rồi quay lại đâm. J J J K vung · vung · chọc XIÊN kẻ địch rồi VUNG HẤT BAY (đập tường +1). Vung 2 · chọc 4 · đòn K bồi 4. Các đòn khác (cúi, trên không, lướt) giữ như Giáo.\n\nK: chạm = chọc kèm GIÁO KHÍ hình đinh ba (4). 0.5s LIÊN HOÀN THƯƠNG 3-5 mũi (3). 1s CỘT NƯỚC 3-5 cột (3), từ 1.5s thêm cú đâm (4) đẩy ra CON SÓNG (3). 1.75s ném đinh ba TÁCH 3 GIÁO (6), từ 2.25s thêm THỦY CẦU (5). 2.5s THỦY LAO khoá kẻ địch 1.5s (2 mỗi 0.5s). CHANNEL: CƯỠI SÓNG, sóng quét qua gây 4.\n\nCHIÊU CUỐI: LINH HỒN NGỌN GIÁO — hải thần hiện ra phóng đinh ba, ghim kẻ địch tới cuối bản đồ, 100 sát thương + choáng 2 giây.',

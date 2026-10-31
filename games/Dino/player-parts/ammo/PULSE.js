@@ -1,57 +1,57 @@
 // PLAYER_FILE: PULSE
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Effect, FloatingText, Projectile, SFX, allTargets, bossProjectiles, bosses, checkAABB, ctx, currentAmmoType, damageBossFromAmmo, damageBossWithFirstStrike, dealDamage, dino, dino2, doChieuThu, floatingTexts, frames, gameState, infVeVan, obstacles, overchargeT, p2AmmoType, projectiles, pvpDich, pvpNguoi1, pvpVoBoc, shakeTimer, ultCharge, visualEffects, vkDangKy, worldL, worldR
-// index.html:48860 · Phạm vi: global
+// index.html:48864 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PULSE_NL_NAP.1 EDITABLE
 const PULSE_NL_NAP  = { thuong: 2, cuoi: 4, to: 4, xuyen: 6 };
 // PLAYER_PART_END s4.PULSE_NL_NAP.1
 
-// index.html:48861 · Phạm vi: global
+// index.html:48865 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PULSE_NL_TON.1 EDITABLE
 const PULSE_NL_TON  = { thuong: 5, to: 10, xuyen: 10, toa: 20 };
 // PLAYER_PART_END s4.PULSE_NL_TON.1
 
-// index.html:48863 · Phạm vi: global
+// index.html:48867 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PULSE_NL_HS.1 EDITABLE
 let PULSE_NL_HS = 2;
 // PLAYER_PART_END s4.PULSE_NL_HS.1
 
-// index.html:48866 · Phạm vi: global
+// index.html:48870 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PULSE_SAC_THEM.1 EDITABLE
 var PULSE_SAC_THEM = 1;
 // PLAYER_PART_END s4.PULSE_SAC_THEM.1
 
-// index.html:48867 · Phạm vi: global
+// index.html:48871 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PULSE_LZ_TON.1 EDITABLE
 const PULSE_LZ_TON  = 20;
 // PLAYER_PART_END s4.PULSE_LZ_TON.1
 
-// index.html:48868 · Phạm vi: global
+// index.html:48872 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PULSE_SET_DAI.1 EDITABLE
 const PULSE_SET_DAI = 240;
 // PLAYER_PART_END s4.PULSE_SET_DAI.1
 
-// index.html:48869 · Phạm vi: global
+// index.html:48873 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PULSE_SET_NHIP.1 EDITABLE
 const PULSE_SET_NHIP = 30;
 // PLAYER_PART_END s4.PULSE_SET_NHIP.1
 
-// index.html:48870 · Phạm vi: global
+// index.html:48874 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PULSE_SET_MAX.1 EDITABLE
 const PULSE_SET_MAX = 10;
 // PLAYER_PART_END s4.PULSE_SET_MAX.1
 
-// index.html:48871 · Phạm vi: global
+// index.html:48875 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseSetVung.1 EDITABLE
 let pulseSetVung = [];
 // PLAYER_PART_END s4.pulseSetVung.1
 
-// index.html:48872 · Phạm vi: global
+// index.html:48876 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseNap.1 EDITABLE
 function pulseNap(ng, loai){
             if (!ng || ng.pulseTang) return;
@@ -68,7 +68,7 @@ function pulseNap(ng, loai){
         }
 // PLAYER_PART_END s4.pulseNap.1
 
-// index.html:48886 · Phạm vi: global
+// index.html:48890 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseDung.1 EDITABLE
 function pulseDung(ng, loai){
             if (!ng || !ng.pulseTang) return false;
@@ -78,7 +78,7 @@ function pulseDung(ng, loai){
         }
 // PLAYER_PART_END s4.pulseDung.1
 
-// index.html:48892 · Phạm vi: global
+// index.html:48896 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseCuongHoa.1 EDITABLE
 function pulseCuongHoa(n0, loai){
             for (let i = n0; i < projectiles.length; i++){
@@ -93,7 +93,7 @@ function pulseCuongHoa(n0, loai){
         }
 // PLAYER_PART_END s4.pulseCuongHoa.1
 
-// index.html:48903 · Phạm vi: global
+// index.html:48907 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseVienCuoi.1 EDITABLE
 function pulseVienCuoi(n0, st){
             for (let i = n0; i < projectiles.length; i++){
@@ -107,7 +107,7 @@ function pulseVienCuoi(n0, st){
         }
 // PLAYER_PART_END s4.pulseVienCuoi.1
 
-// index.html:48913 · Phạm vi: global
+// index.html:48917 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseVungDanh.1 EDITABLE
 function pulseVungDanh(x, y, R, dmg, owner){
             let ar = { x: x - R, y: y - R, w: R * 2, h: R * 2 };
@@ -122,7 +122,7 @@ function pulseVungDanh(x, y, R, dmg, owner){
         }
 // PLAYER_PART_END s4.pulseVungDanh.1
 
-// index.html:48924 · Phạm vi: global
+// index.html:48928 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseSetDat.1 EDITABLE
 function pulseSetDat(x, y, r, owner){
             pulseSetVung.push({ x: x, y: y, r: r, t: 0, owner: owner || 1, pha: Math.random() * 9 });
@@ -130,7 +130,7 @@ function pulseSetDat(x, y, r, owner){
         }
 // PLAYER_PART_END s4.pulseSetDat.1
 
-// index.html:48929 · Phạm vi: global
+// index.html:48933 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseSieuTrung.1 EDITABLE
 function pulseSieuTrung(proj){
             if (!proj) return;
@@ -144,7 +144,7 @@ function pulseSieuTrung(proj){
         }
 // PLAYER_PART_END s4.pulseSieuTrung.1
 
-// index.html:48939 · Phạm vi: global
+// index.html:48943 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseSetTick.1 EDITABLE
 function pulseSetTick(){
             for (let ng of [typeof dino !== 'undefined' ? dino : null, typeof dino2 !== 'undefined' ? dino2 : null]){
@@ -181,7 +181,7 @@ function pulseSetTick(){
         }
 // PLAYER_PART_END s4.pulseSetTick.1
 
-// index.html:48972 · Phạm vi: global
+// index.html:48976 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseSetVe.1 EDITABLE
 function pulseSetVe(){
             for (let V of pulseSetVung){
@@ -205,7 +205,7 @@ function pulseSetVe(){
         }
 // PLAYER_PART_END s4.pulseSetVe.1
 
-// index.html:49002 · Phạm vi: global
+// index.html:49006 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseVeLiem.1 EDITABLE
 function pulseVeLiem(Lx, Hy, mau){
             let cT = mau.c || "#00E5FF", cG = mau.b || "#4DD0E1", cS = mau.a || "#7C83FD";
@@ -239,7 +239,7 @@ function pulseVeLiem(Lx, Hy, mau){
         }
 // PLAYER_PART_END s4.pulseVeLiem.1
 
-// index.html:49032 · Phạm vi: global
+// index.html:49036 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseVeVien.1 EDITABLE
 function pulseVeVien(p){
             let cx = p.x + p.w / 2, cy = p.y + p.h / 2, L = p.pulseSieu;
@@ -294,12 +294,12 @@ function pulseVeVien(p){
         }
 // PLAYER_PART_END s4.pulseVeVien.1
 
-// index.html:49091 · Phạm vi: global
+// index.html:49095 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PULSE_QUET.1 EDITABLE
 const PULSE_QUET = 24;
 // PLAYER_PART_END s4.PULSE_QUET.1
 
-// index.html:49092 · Phạm vi: global
+// index.html:49096 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PULSE_MACH.1 EDITABLE
 const PULSE_MACH = [
             [[-14,10],[-2,14],[6,15],[10,12],[22,12],[28,14],[32,7],[40,7]],   // duoi -> lung -> co -> dau
@@ -311,13 +311,13 @@ const PULSE_MACH = [
         ];
 // PLAYER_PART_END s4.PULSE_MACH.1
 
-// index.html:49100 · Phạm vi: global
+// index.html:49104 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PULSE_THAN.1 EDITABLE
 const PULSE_THAN = [[-21,6],[5,14],[17,9],[29,11],[31,2],[45,1],[52,7],[52,18],[40,19],[35,21],[42,28],[41,33],[32,31],
                             [32,43],[25,43],[24,36],[21,37],[19,44],[12,44],[15,34],[7,30],[-21,9]];
 // PLAYER_PART_END s4.PULSE_THAN.1
 
-// index.html:49102 · Phạm vi: global
+// index.html:49106 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseVeMach.1 EDITABLE
 function pulseVeMach(ng){
             if (!ng || ng.ammoType !== 0 || (ng.hp !== undefined && ng.hp <= 0)) return;
@@ -371,7 +371,7 @@ function pulseVeMach(ng){
         }
 // PLAYER_PART_END s4.pulseVeMach.1
 
-// index.html:49152 · Phạm vi: global
+// index.html:49156 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulseVeThanh.1 EDITABLE
 function pulseVeThanh(ng){
             infVeVan(ng);   // @@HE-INF-NHIET
@@ -392,7 +392,7 @@ function pulseVeThanh(ng){
         }
 // PLAYER_PART_END s4.pulseVeThanh.1
 
-// index.html:49169 · Phạm vi: global
+// index.html:49173 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.noPhanHach.1 EDITABLE
 function noPhanHach(proj){
             proj._split = true;
@@ -433,7 +433,7 @@ function noPhanHach(proj){
         }
 // PLAYER_PART_END s4.noPhanHach.1
 
-// index.html:49208 · Phạm vi: Player.prototype
+// index.html:49212 · Phạm vi: Player.prototype
 const __Part26 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.firePulseBasic.1 EDITABLE
 firePulseBasic() { 
@@ -458,7 +458,7 @@ firePulseBasic() {
 // PLAYER_PART_END s4.Player.prototype.firePulseBasic.1
 };
 
-// index.html:49228 · Phạm vi: Player.prototype
+// index.html:49232 · Phạm vi: Player.prototype
 const __Part27 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.fireBigBullet.1 EDITABLE
 fireBigBullet() { 
@@ -471,7 +471,7 @@ fireBigBullet() {
 // PLAYER_PART_END s4.Player.prototype.fireBigBullet.1
 };
 
-// index.html:49238 · Phạm vi: Player.prototype
+// index.html:49242 · Phạm vi: Player.prototype
 const __Part28 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.firePiercingBullet.1 EDITABLE
 firePiercingBullet() { 
@@ -484,7 +484,7 @@ firePiercingBullet() {
 // PLAYER_PART_END s4.Player.prototype.firePiercingBullet.1
 };
 
-// index.html:49246 · Phạm vi: Player.prototype
+// index.html:49250 · Phạm vi: Player.prototype
 const __Part29 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.fireFission.1 EDITABLE
 fireFission() {
@@ -508,7 +508,7 @@ fireFission() {
 // PLAYER_PART_END s4.Player.prototype.fireFission.1
 };
 
-// index.html:49270 · Phạm vi: Player.prototype
+// index.html:49274 · Phạm vi: Player.prototype
 const __Part30 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.createSpread.1 EDITABLE
 createSpread(x, y, dmg, type, dir, endlessSpread = false, soVien) {
@@ -523,7 +523,7 @@ createSpread(x, y, dmg, type, dir, endlessSpread = false, soVien) {
 // PLAYER_PART_END s4.Player.prototype.createSpread.1
 };
 
-// index.html:49279 · Phạm vi: Player.prototype
+// index.html:49283 · Phạm vi: Player.prototype
 const __Part31 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.pulseVeLaser.1 EDITABLE
 pulseVeLaser(pos) {
@@ -611,7 +611,7 @@ pulseVeLaser(pos) {
 // PLAYER_PART_END s4.Player.prototype.pulseVeLaser.1
 };
 
-// index.html:49363 · Phạm vi: global
+// index.html:49367 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.2 EDITABLE
 vkDangKy(0, {
             ten: 'PULSE', mauUlt: '#2979FF',

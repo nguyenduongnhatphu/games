@@ -1,12 +1,12 @@
 // PLAYER_FILE: PowersAndAccessories02
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Effect, FloatingText, QS_MUS, SFX, ST_HOI, ST_KHOA, ST_MAX, ST_MUS_CD, ST_MUS_HO, ST_NAY, addStyle, bosses, checkAABB, dashCd, dashVx, dealDamage, dino, doDash, enemies, floatingTexts, gameState, keys, obstacles, qsT, qsThemVet, qsTran, quetTrieuHoiTuDong, shakeTimer, spawnAfterimage, stBat, stCharge, stFreeAir, stHoi, stKhoa, stMusCd, stNay, stXuongT, visualEffects
-// index.html:90660 · Phạm vi: global
+// index.html:90664 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.stTick.1 EDITABLE
 function stTick(){
             if (!stBat()) return;
@@ -17,7 +17,7 @@ function stTick(){
         }
 // PLAYER_PART_END s6.stTick.1
 
-// index.html:90668 · Phạm vi: global
+// index.html:90672 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.stTieu.1 EDITABLE
 function stTieu(){
             if (stKhoa > 0 || stCharge <= 0) return false;
@@ -28,12 +28,12 @@ function stTieu(){
         }
 // PLAYER_PART_END s6.stTieu.1
 
-// index.html:90675 · Phạm vi: global
+// index.html:90679 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.stCong.1 EDITABLE
 function stCong(){ if (stKhoa > 0) { stKhoa = 0; stCharge = 1; } else if (stCharge < qsTran()) stCharge++; }
 // PLAYER_PART_END s6.stCong.1
 
-// index.html:90677 · Phạm vi: global
+// index.html:90681 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.stMustang.1 EDITABLE
 function stMustang(){
             // TACH LAM HAI: SAT THUONG khi luot xuyen qua thi LUON co, con cu HAT LEN (Mustang)
@@ -88,12 +88,12 @@ function stMustang(){
         }
 // PLAYER_PART_END s6.stMustang.1
 
-// index.html:90731 · Phạm vi: global
+// index.html:90735 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.ST_LEN.1 EDITABLE
 const ST_LEN = -18.5;
 // PLAYER_PART_END s6.ST_LEN.1
 
-// index.html:90732 · Phạm vi: global
+// index.html:90736 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.stLuotLen.1 EDITABLE
 function stLuotLen(){
             if (!stBat()) return false;
@@ -104,7 +104,7 @@ function stLuotLen(){
         }
 // PLAYER_PART_END s6.stLuotLen.1
 
-// index.html:90740 · Phạm vi: global
+// index.html:90744 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.stLuotXuong.1 EDITABLE
 function stLuotXuong(){
             if (!stBat() || dino.grounded || stXuongT > 0) return false;
@@ -115,7 +115,7 @@ function stLuotXuong(){
         }
 // PLAYER_PART_END s6.stLuotXuong.1
 
-// index.html:90748 · Phạm vi: global
+// index.html:90752 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.stTuDongTrenKhong.1 EDITABLE
 function stTuDongTrenKhong(){
             if (!stBat() || dino.grounded || dino.jcState || dino.ultActive || dino.webTimer > 0) return;

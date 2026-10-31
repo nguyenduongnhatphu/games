@@ -1,17 +1,17 @@
 // PLAYER_FILE: PlayerComboShared
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Effect, danteBossWindows, danteIsBoss, dswControl, frames, shakeTimer, visualEffects
-// index.html:106559 · Phạm vi: global
+// index.html:106563 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.DANTE_ATTACK_RATE.1 EDITABLE
 const DANTE_ATTACK_RATE=.8, VERGIL_ATTACK_RATE=.65;
 // PLAYER_PART_END s12.DANTE_ATTACK_RATE.1
 
-// index.html:106560 · Phạm vi: global
+// index.html:106564 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.playerAttackStep.1 EDITABLE
 function playerAttackStep(a,rate){
  a._lastCombatTick=frames;
@@ -21,7 +21,7 @@ function playerAttackStep(a,rate){
 }
 // PLAYER_PART_END s12.playerAttackStep.1
 
-// index.html:106566 · Phạm vi: global
+// index.html:106570 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.playerComboCancel.1 EDITABLE
 function playerComboCancel(a){
  const end=a.end??a.cancel??a.T??a.duration;
@@ -29,12 +29,12 @@ function playerComboCancel(a){
 }
 // PLAYER_PART_END s12.playerComboCancel.1
 
-// index.html:106571 · Phạm vi: global
+// index.html:106575 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.playerComboBuffer.1 EDITABLE
 function playerComboBuffer(queue,cmd){queue.splice(0,queue.length,cmd);}
 // PLAYER_PART_END s12.playerComboBuffer.1
 
-// index.html:106574 · Phạm vi: global
+// index.html:106578 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.PLAYER_FINISH_ROUTES.1 EDITABLE
 const PLAYER_FINISH_ROUTES={
  dsd:[['a1','a2','a3'],['a1','bspin','bstab','thrust'],['air1','air2','air3','air4'],['dhit','ddown','dup','dcross','dspin','dstab','dwave1','dwave2','dfinish']],
@@ -46,7 +46,7 @@ const PLAYER_FINISH_ROUTES={
 };
 // PLAYER_PART_END s12.PLAYER_FINISH_ROUTES.1
 
-// index.html:106582 · Phạm vi: global
+// index.html:106586 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.playerComboTrack.1 EDITABLE
 function playerComboTrack(p,a,weapon){
  const prev=p._comboMove,T=prev?.T??prev?.duration,cancel=prev?.faust?16:(prev?.cancel??prev?.end??T);
@@ -58,7 +58,7 @@ function playerComboTrack(p,a,weapon){
 }
 // PLAYER_PART_END s12.playerComboTrack.1
 
-// index.html:106590 · Phạm vi: global
+// index.html:106594 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.playerFinisherControl.1 EDITABLE
 function playerFinisherControl(n,p,a,target,opt={}){
  const o=target?.__goc||target;

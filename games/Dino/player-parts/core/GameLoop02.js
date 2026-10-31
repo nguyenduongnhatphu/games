@@ -1,236 +1,236 @@
 // PLAYER_FILE: GameLoop02
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: BIEN_TOC, Effect, FloatingText, PVP_ULT_NAP, R14, SFX, UNI_SWAP_CD, activeShieldWasHeld, addStyle, aiBat, aiBatP1, aiNghi, aiNghiP1, baseSpeed, battuBat, bienSauNguoi, bienVeHud, bienVeTren, birdBank, birdSpendCd, boomAiLoc, bossProjectiles, bosses, bzVeDemTren, channelShieldLocked, checkAABB, checkCollisions, checkPvPCollisions, coKhoChim, ctx, currentShieldType, cusCgVeCung, cusChKhoaKhien, cusNkPhim, cusNkVeMan, cusToaVeTren, cwVe, danteOn, dashCd, defMode, defPlayerHits, diemNhan, dino, dino2, dodgeCd, dojoMode, dojoRefillUltimates, drawAfterimages, drawBoomerangs, drawDefenseHud, drawDojoPicker, drawFireBrands, drawGrazeFlash, drawLightningEffects, drawMenuPanel, drawPets, drawPrismStacks, drawReviveOverlay, drawRuneShieldBubble, drawSporeStacksOnPlayer, drawSwordmaster, drawUI, drawWildernessHud, dsawVe, flashKind, floatingTexts, frames, gameSpeed, gameState, grazeFlashTimer, grazeX, grazeY, hasRune, highScore, hitFxTick, hitFxVe, hitstopTimer, keys, kimCoTick, lanApAnhChup, lanBoPhim2, lanChu, lanGui, lanKhach, lanNhipChu, lanNhipKhach, lanRieng2, lanVienP2, lanVoiP2, lhVeTren, mapTheme, midasVe, midasVeNut, mortarBuoc, noDmgStreak, perfectParryCd, pet2TickDash, pet2TickLua, projectiles, pulseVeThanh, pvpDeathTimer, pvpDiem, pvpGatDan, pvpQuayMat, qsTick, reviveOverlay, rgcVe, routeDaHien, routeDangChay, routeMap, score, shakeTimer, shieldCharge, stMustang, stTick, stTuDongTrenKhong, tdNeSatSuon, tdVePhu, tickBoomerangs, tickDojoQueue, tickFireBrands, tickLifesteal, tickMinionProxy, tickNoise, tickPrismStacks, tickSpore, tickSwordmaster, tickUnityUlt, trdTickSau, ultCharge, uniChamT, uniChoHoi, uniHopNapTick, unitySwapCd, unitySync, updateAfterimages, updatePets, veKhoanTren, visualEffects, voltTickTia, vuKhi2Tick, vuKhi2Ve, wildernessOn, wkgBat, wkgNguoiSau, wkgNguoiTruoc, wkgTickSau, wsChoChay, xVe
-// index.html:98548 · Phạm vi: loop
+// index.html:98552 · Phạm vi: loop
 function __Part0(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.89 EDITABLE
 if (typeof wkgTickSau === 'function') wkgTickSau();
 // PLAYER_PART_END s6.loop.IfStatement.89
 }}
 
-// index.html:98549 · Phạm vi: loop
+// index.html:98553 · Phạm vi: loop
 function __Part1(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.90 EDITABLE
 if (typeof trdTickSau === 'function') trdTickSau();
 // PLAYER_PART_END s6.loop.IfStatement.90
 }}
 
-// index.html:98550 · Phạm vi: loop
+// index.html:98554 · Phạm vi: loop
 function __Part2(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.91 EDITABLE
 if (typeof bienSauNguoi === 'function') bienSauNguoi();
 // PLAYER_PART_END s6.loop.IfStatement.91
 }}
 
-// index.html:98551 · Phạm vi: loop
+// index.html:98555 · Phạm vi: loop
 function __Part3(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.92 EDITABLE
 if (gameState === 'pvp') pvpQuayMat(false);
 // PLAYER_PART_END s6.loop.IfStatement.92
 }}
 
-// index.html:98552 · Phạm vi: loop
+// index.html:98556 · Phạm vi: loop
 function __Part4(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.93 EDITABLE
 if (typeof tdVePhu === 'function') tdVePhu();
 // PLAYER_PART_END s6.loop.IfStatement.93
 }}
 
-// index.html:98553 · Phạm vi: loop
+// index.html:98557 · Phạm vi: loop
 function __Part5(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.94 EDITABLE
 if (typeof wkgNguoiTruoc === 'function') wkgNguoiTruoc();
 // PLAYER_PART_END s6.loop.IfStatement.94
 }}
 
-// index.html:98554 · Phạm vi: loop
+// index.html:98558 · Phạm vi: loop
 function __Part6(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.dino.draw.1 EDITABLE
 dino.draw();
 // PLAYER_PART_END s6.loop.dino.draw.1
 }}
 
-// index.html:98555 · Phạm vi: loop
+// index.html:98559 · Phạm vi: loop
 function __Part7(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.95 EDITABLE
 if (typeof xVe === 'function') xVe();
 // PLAYER_PART_END s6.loop.IfStatement.95
 }}
 
-// index.html:98556 · Phạm vi: loop
+// index.html:98560 · Phạm vi: loop
 function __Part8(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.96 EDITABLE
 if (dino.dk && dino.dk.ult && dino.dk.ult.bz && typeof bzVeDemTren === 'function') bzVeDemTren(dino);
 // PLAYER_PART_END s6.loop.IfStatement.96
 }}
 
-// index.html:98557 · Phạm vi: loop
+// index.html:98561 · Phạm vi: loop
 function __Part9(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.97 EDITABLE
 if (dino.tank && dino.rfVeTank) dino.rfVeTank();
 // PLAYER_PART_END s6.loop.IfStatement.97
 }}
 
-// index.html:98558 · Phạm vi: loop
+// index.html:98562 · Phạm vi: loop
 function __Part10(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.98 EDITABLE
 if (typeof lhVeTren === 'function') lhVeTren();
 // PLAYER_PART_END s6.loop.IfStatement.98
 }}
 
-// index.html:98559 · Phạm vi: loop
+// index.html:98563 · Phạm vi: loop
 function __Part11(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.99 EDITABLE
 if (typeof hitFxTick === 'function'){ hitFxTick(); hitFxVe(); }
 // PLAYER_PART_END s6.loop.IfStatement.99
 }}
 
-// index.html:98560 · Phạm vi: loop
+// index.html:98564 · Phạm vi: loop
 function __Part12(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.100 EDITABLE
 if (typeof cwVe === 'function') cwVe(dino);
 // PLAYER_PART_END s6.loop.IfStatement.100
 }}
 
-// index.html:98561 · Phạm vi: loop
+// index.html:98565 · Phạm vi: loop
 function __Part13(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.101 EDITABLE
 if (typeof cusCgVeCung === 'function') cusCgVeCung(dino);
 // PLAYER_PART_END s6.loop.IfStatement.101
 }}
 
-// index.html:98562 · Phạm vi: loop
+// index.html:98566 · Phạm vi: loop
 function __Part14(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.102 EDITABLE
 if (typeof rgcVe === 'function') rgcVe();
 // PLAYER_PART_END s6.loop.IfStatement.102
 }}
 
-// index.html:98563 · Phạm vi: loop
+// index.html:98567 · Phạm vi: loop
 function __Part15(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.103 EDITABLE
 if (typeof pulseVeThanh === 'function') pulseVeThanh(dino);
 // PLAYER_PART_END s6.loop.IfStatement.103
 }}
 
-// index.html:98566 · Phạm vi: loop
+// index.html:98570 · Phạm vi: loop
 function __Part16(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.104 EDITABLE
 if (typeof veKhoanTren === 'function') veKhoanTren();
 // PLAYER_PART_END s6.loop.IfStatement.104
 }}
 
-// index.html:98567 · Phạm vi: loop
+// index.html:98571 · Phạm vi: loop
 function __Part17(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.105 EDITABLE
 if (typeof dsawVe === 'function') dsawVe(dino);
 // PLAYER_PART_END s6.loop.IfStatement.105
 }}
 
-// index.html:98568 · Phạm vi: loop
+// index.html:98572 · Phạm vi: loop
 function __Part18(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.106 EDITABLE
 if (typeof btVePhu === 'function') btVePhu();
 // PLAYER_PART_END s6.loop.IfStatement.106
 }}
 
-// index.html:98569 · Phạm vi: loop
+// index.html:98573 · Phạm vi: loop
 function __Part19(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.107 EDITABLE
 if (typeof bienVeTren === 'function') bienVeTren();
 // PLAYER_PART_END s6.loop.IfStatement.107
 }}
 
-// index.html:98570 · Phạm vi: loop
+// index.html:98574 · Phạm vi: loop
 function __Part20(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.108 EDITABLE
 if (typeof wkgNguoiSau === 'function') wkgNguoiSau();
 // PLAYER_PART_END s6.loop.IfStatement.108
 }}
 
-// index.html:98571 · Phạm vi: loop
+// index.html:98575 · Phạm vi: loop
 function __Part21(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.109 EDITABLE
 if (typeof midasVe === 'function') midasVe(dino);
 // PLAYER_PART_END s6.loop.IfStatement.109
 }}
 
-// index.html:98572 · Phạm vi: loop
+// index.html:98576 · Phạm vi: loop
 function __Part22(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.110 EDITABLE
 if (typeof midasVeNut === 'function') midasVeNut();
 // PLAYER_PART_END s6.loop.IfStatement.110
 }}
 
-// index.html:98573 · Phạm vi: loop
+// index.html:98577 · Phạm vi: loop
 function __Part23(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.111 EDITABLE
 if (typeof dino.dsVe === 'function') dino.dsVe();
 // PLAYER_PART_END s6.loop.IfStatement.111
 }}
 
-// index.html:98573 · Phạm vi: loop
+// index.html:98577 · Phạm vi: loop
 function __Part24(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.dino.drawUltAura.1 EDITABLE
 dino.drawUltAura();
 // PLAYER_PART_END s6.loop.dino.drawUltAura.1
 }}
 
-// index.html:98573 · Phạm vi: loop
+// index.html:98577 · Phạm vi: loop
 function __Part25(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.dino.drawJC.1 EDITABLE
 dino.drawJC();
 // PLAYER_PART_END s6.loop.dino.drawJC.1
 }}
 
-// index.html:98573 · Phạm vi: loop
+// index.html:98577 · Phạm vi: loop
 function __Part26(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.dino.drawUltBeam.1 EDITABLE
 dino.drawUltBeam();
 // PLAYER_PART_END s6.loop.dino.drawUltBeam.1
 }}
 
-// index.html:98573 · Phạm vi: loop
+// index.html:98577 · Phạm vi: loop
 function __Part27(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.dino.drawClawJCircles.1 EDITABLE
 dino.drawClawJCircles();
 // PLAYER_PART_END s6.loop.dino.drawClawJCircles.1
 }}
 
-// index.html:98573 · Phạm vi: loop
+// index.html:98577 · Phạm vi: loop
 function __Part28(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.dino.drawClawSwords.1 EDITABLE
 dino.drawClawSwords();
 // PLAYER_PART_END s6.loop.dino.drawClawSwords.1
 }}
 
-// index.html:98573 · Phạm vi: loop
+// index.html:98577 · Phạm vi: loop
 function __Part29(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.dino.drawFireFx.1 EDITABLE
 dino.drawFireFx();
 // PLAYER_PART_END s6.loop.dino.drawFireFx.1
 }}
 
-// index.html:98573 · Phạm vi: loop
+// index.html:98577 · Phạm vi: loop
 function __Part30(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.dino.drawLightningFx.1 EDITABLE
 dino.drawLightningFx();
 // PLAYER_PART_END s6.loop.dino.drawLightningFx.1
 }}
 
-// index.html:98573 · Phạm vi: loop
+// index.html:98577 · Phạm vi: loop
 function __Part31(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.dino.drawPulsar.1 EDITABLE
 dino.drawPulsar();
 // PLAYER_PART_END s6.loop.dino.drawPulsar.1
 }}
 
-// index.html:98574 · Phạm vi: loop
+// index.html:98578 · Phạm vi: loop
 function __Part32(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.112 EDITABLE
 if ((dino.dashShieldTimer||0) > 0 && hasRune('headbutt')){ let dd=dino.dashDir||(dino.isFacingLeft?-1:1), cx=dd<0?dino.x-2:dino.x+dino.w+2, cy=dino.y+dino.h/2, r=dino.h*0.8;
@@ -240,70 +240,70 @@ if ((dino.dashShieldTimer||0) > 0 && hasRune('headbutt')){ let dd=dino.dashDir||
 // PLAYER_PART_END s6.loop.IfStatement.112
 }}
 
-// index.html:98578 · Phạm vi: loop
+// index.html:98582 · Phạm vi: loop
 function __Part33(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.113 EDITABLE
 if (hasRune('pet')||hasRune('petx')||hasRune('pet2')||hasRune('pet2x')||hasRune('pet3')||hasRune('pet3x')||hasRune('pet4')||hasRune('pet4x')||hasRune('pet5')||hasRune('pet5x')||hasRune('pet6')||hasRune('pet6x')) { updatePets(); drawPets(); }
 // PLAYER_PART_END s6.loop.IfStatement.113
 }}
 
-// index.html:98579 · Phạm vi: loop
+// index.html:98583 · Phạm vi: loop
 function __Part34(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.updateAfterimages.1 EDITABLE
 updateAfterimages();
 // PLAYER_PART_END s6.loop.updateAfterimages.1
 }}
 
-// index.html:98579 · Phạm vi: loop
+// index.html:98583 · Phạm vi: loop
 function __Part35(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.drawAfterimages.1 EDITABLE
 drawAfterimages();
 // PLAYER_PART_END s6.loop.drawAfterimages.1
 }}
 
-// index.html:98579 · Phạm vi: loop
+// index.html:98583 · Phạm vi: loop
 function __Part36(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.114 EDITABLE
 if (typeof kimCoTick === 'function') kimCoTick();
 // PLAYER_PART_END s6.loop.IfStatement.114
 }}
 
-// index.html:98580 · Phạm vi: loop
+// index.html:98584 · Phạm vi: loop
 function __Part37(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.tickFireBrands.1 EDITABLE
 tickFireBrands();
 // PLAYER_PART_END s6.loop.tickFireBrands.1
 }}
 
-// index.html:98580 · Phạm vi: loop
+// index.html:98584 · Phạm vi: loop
 function __Part38(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.drawFireBrands.1 EDITABLE
 drawFireBrands();
 // PLAYER_PART_END s6.loop.drawFireBrands.1
 }}
 
-// index.html:98581 · Phạm vi: loop
+// index.html:98585 · Phạm vi: loop
 function __Part39(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.tickPrismStacks.1 EDITABLE
 tickPrismStacks();
 // PLAYER_PART_END s6.loop.tickPrismStacks.1
 }}
 
-// index.html:98581 · Phạm vi: loop
+// index.html:98585 · Phạm vi: loop
 function __Part40(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.drawPrismStacks.1 EDITABLE
 drawPrismStacks();
 // PLAYER_PART_END s6.loop.drawPrismStacks.1
 }}
 
-// index.html:98584 · Phạm vi: loop
+// index.html:98588 · Phạm vi: loop
 function __Part41(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.tickBoomerangs.1 EDITABLE
 tickBoomerangs();
 // PLAYER_PART_END s6.loop.tickBoomerangs.1
 }}
 
-// index.html:98585 · Phạm vi: loop
+// index.html:98589 · Phạm vi: loop
 function __Part42(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.115 EDITABLE
 if (gameState === 'pvp' && typeof lanVoiP2 === 'function' && typeof dino2 !== 'undefined' && dino2)
@@ -311,63 +311,63 @@ if (gameState === 'pvp' && typeof lanVoiP2 === 'function' && typeof dino2 !== 'u
 // PLAYER_PART_END s6.loop.IfStatement.115
 }}
 
-// index.html:98587 · Phạm vi: loop
+// index.html:98591 · Phạm vi: loop
 function __Part43(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.drawBoomerangs.1 EDITABLE
 drawBoomerangs();
 // PLAYER_PART_END s6.loop.drawBoomerangs.1
 }}
 
-// index.html:98588 · Phạm vi: loop
+// index.html:98592 · Phạm vi: loop
 function __Part44(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.tickSwordmaster.1 EDITABLE
 tickSwordmaster();
 // PLAYER_PART_END s6.loop.tickSwordmaster.1
 }}
 
-// index.html:98588 · Phạm vi: loop
+// index.html:98592 · Phạm vi: loop
 function __Part45(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.drawSwordmaster.1 EDITABLE
 drawSwordmaster();
 // PLAYER_PART_END s6.loop.drawSwordmaster.1
 }}
 
-// index.html:98589 · Phạm vi: loop
+// index.html:98593 · Phạm vi: loop
 function __Part46(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.drawRuneShieldBubble.1 EDITABLE
 drawRuneShieldBubble();
 // PLAYER_PART_END s6.loop.drawRuneShieldBubble.1
 }}
 
-// index.html:98591 · Phạm vi: loop
+// index.html:98595 · Phạm vi: loop
 function __Part47(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.116 EDITABLE
 if (bosses.some(b => b.name === "ECHO STALKER")) tickNoise();
 // PLAYER_PART_END s6.loop.IfStatement.116
 }}
 
-// index.html:98592 · Phạm vi: loop
+// index.html:98596 · Phạm vi: loop
 function __Part48(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.117 EDITABLE
 if (bosses.some(b => b.name === "SPORE CROWN")) { tickSpore(); drawSporeStacksOnPlayer(); }
 // PLAYER_PART_END s6.loop.IfStatement.117
 }}
 
-// index.html:98593 · Phạm vi: loop
+// index.html:98597 · Phạm vi: loop
 function __Part49(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.tickLifesteal.1 EDITABLE
 tickLifesteal();
 // PLAYER_PART_END s6.loop.tickLifesteal.1
 }}
 
-// index.html:98594 · Phạm vi: loop
+// index.html:98598 · Phạm vi: loop
 function __Part50(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.118 EDITABLE
 if (coKhoChim()){ if (birdSpendCd>0) birdSpendCd--; if (birdBank>0 && dino.hp<dino.maxHp && birdSpendCd<=0){ dino.hp++; birdBank--; birdSpendCd=12; floatingTexts.push(new FloatingText(dino.x, dino.y-30, "+1")); if (typeof SFX!=='undefined'&&SFX.tone) SFX.tone(760,0.08,'sine',0.12,1000); } }
 // PLAYER_PART_END s6.loop.IfStatement.118
 }}
 
-// index.html:98596 · Phạm vi: loop
+// index.html:98600 · Phạm vi: loop
 function __Part51(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.119 EDITABLE
 if (currentShieldType === 1 && dino && (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss' || gameState === 'pvp')) {
@@ -394,105 +394,105 @@ if (currentShieldType === 1 && dino && (gameState === 'normal' || gameState === 
 // PLAYER_PART_END s6.loop.IfStatement.119
 }}
 
-// index.html:98617 · Phạm vi: loop
+// index.html:98621 · Phạm vi: loop
 function __Part52(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.120 EDITABLE
 if (dino.webTimer > 0) { ctx.save(); ctx.strokeStyle = "rgba(255,255,255,0.85)"; ctx.lineWidth = 1.5; let wx = dino.x + dino.w/2, wy = dino.y + dino.h/2; for (let i = 0; i < 8; i++) { let a = i / 8 * Math.PI * 2; ctx.beginPath(); ctx.moveTo(wx, wy); ctx.lineTo(wx + Math.cos(a) * 34, wy + Math.sin(a) * 34); ctx.stroke(); } ctx.beginPath(); ctx.arc(wx, wy, 16, 0, Math.PI*2); ctx.stroke(); ctx.beginPath(); ctx.arc(wx, wy, 28, 0, Math.PI*2); ctx.stroke(); ctx.restore(); }
 // PLAYER_PART_END s6.loop.IfStatement.120
 }}
 
-// index.html:98618 · Phạm vi: loop
+// index.html:98622 · Phạm vi: loop
 function __Part53(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.unitySync.1 EDITABLE
 unitySync();
 // PLAYER_PART_END s6.loop.unitySync.1
 }}
 
-// index.html:98619 · Phạm vi: loop
+// index.html:98623 · Phạm vi: loop
 function __Part54(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.121 EDITABLE
 if (typeof uniHopNapTick === 'function') uniHopNapTick();
 // PLAYER_PART_END s6.loop.IfStatement.121
 }}
 
-// index.html:98621 · Phạm vi: loop
+// index.html:98625 · Phạm vi: loop
 function __Part55(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.122 EDITABLE
 if (uniChoHoi && uniChamT <= 0){ uniChoHoi = 0; unitySwapCd = UNI_SWAP_CD; }
 // PLAYER_PART_END s6.loop.IfStatement.122
 }}
 
-// index.html:98622 · Phạm vi: loop
+// index.html:98626 · Phạm vi: loop
 function __Part56(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.123 EDITABLE
 if (unitySwapCd > 0) unitySwapCd--;
 // PLAYER_PART_END s6.loop.IfStatement.123
 }}
 
-// index.html:98623 · Phạm vi: loop
+// index.html:98627 · Phạm vi: loop
 function __Part57(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.tickUnityUlt.1 EDITABLE
 tickUnityUlt();
 // PLAYER_PART_END s6.loop.tickUnityUlt.1
 }}
 
-// index.html:98624 · Phạm vi: loop
+// index.html:98628 · Phạm vi: loop
 function __Part58(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.124 EDITABLE
 if (dodgeCd > 0) dodgeCd--;
 // PLAYER_PART_END s6.loop.IfStatement.124
 }}
 
-// index.html:98624 · Phạm vi: loop
+// index.html:98628 · Phạm vi: loop
 function __Part59(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.125 EDITABLE
 if (perfectParryCd > 0) perfectParryCd--;
 // PLAYER_PART_END s6.loop.IfStatement.125
 }}
 
-// index.html:98624 · Phạm vi: loop
+// index.html:98628 · Phạm vi: loop
 function __Part60(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.126 EDITABLE
 if (dashCd > 0) dashCd--;
 // PLAYER_PART_END s6.loop.IfStatement.126
 }}
 
-// index.html:98624 · Phạm vi: loop
+// index.html:98628 · Phạm vi: loop
 function __Part61(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.127 EDITABLE
 if (dino.dashShieldTimer > 0) dino.dashShieldTimer--;
 // PLAYER_PART_END s6.loop.IfStatement.127
 }}
 
-// index.html:98625 · Phạm vi: loop
+// index.html:98629 · Phạm vi: loop
 function __Part62(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.stTick.1 EDITABLE
 stTick();
 // PLAYER_PART_END s6.loop.stTick.1
 }}
 
-// index.html:98625 · Phạm vi: loop
+// index.html:98629 · Phạm vi: loop
 function __Part63(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.stMustang.1 EDITABLE
 stMustang();
 // PLAYER_PART_END s6.loop.stMustang.1
 }}
 
-// index.html:98625 · Phạm vi: loop
+// index.html:98629 · Phạm vi: loop
 function __Part64(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.stTuDongTrenKhong.1 EDITABLE
 stTuDongTrenKhong();
 // PLAYER_PART_END s6.loop.stTuDongTrenKhong.1
 }}
 
-// index.html:98625 · Phạm vi: loop
+// index.html:98629 · Phạm vi: loop
 function __Part65(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.qsTick.1 EDITABLE
 qsTick();
 // PLAYER_PART_END s6.loop.qsTick.1
 }}
 
-// index.html:98626 · Phạm vi: loop
+// index.html:98630 · Phạm vi: loop
 function __Part66(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.128 EDITABLE
 if (dodgeCd <= 0 && !dino.invincible && !dino.isShielding() && !dino.jcState && (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss')) {
@@ -514,7 +514,7 @@ if (dodgeCd <= 0 && !dino.invincible && !dino.isShielding() && !dino.jcState && 
 // PLAYER_PART_END s6.loop.IfStatement.128
 }}
 
-// index.html:98642 · Phạm vi: loop
+// index.html:98646 · Phạm vi: loop
 function __Part67(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.129 EDITABLE
 if (!dino.grounded && !dino.jcState && (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss')) {
@@ -534,7 +534,7 @@ if (!dino.grounded && !dino.jcState && (gameState === 'normal' || gameState === 
 // PLAYER_PART_END s6.loop.IfStatement.129
 }}
 
-// index.html:98656 · Phạm vi: loop
+// index.html:98660 · Phạm vi: loop
 function __Part68(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.130 EDITABLE
 if (dino.isCrouching && !dino.jcState && (gameState === 'normal' || gameState === 'boss_rush' || gameState === 'test_boss')) {
@@ -554,14 +554,14 @@ if (dino.isCrouching && !dino.jcState && (gameState === 'normal' || gameState ==
 // PLAYER_PART_END s6.loop.IfStatement.130
 }}
 
-// index.html:98670 · Phạm vi: loop
+// index.html:98674 · Phạm vi: loop
 function __Part69(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.131 EDITABLE
 if (hitstopTimer <= 0 && grazeFlashTimer > 0) { grazeFlashTimer--; drawGrazeFlash(); }
 // PLAYER_PART_END s6.loop.IfStatement.131
 }}
 
-// index.html:98672 · Phạm vi: loop
+// index.html:98676 · Phạm vi: loop
 function __Part70(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.132 EDITABLE
 if (gameState === 'pvp') {
@@ -653,7 +653,7 @@ if (gameState === 'pvp') {
 // PLAYER_PART_END s6.loop.IfStatement.132
 }}
 
-// index.html:98766 · Phạm vi: loop
+// index.html:98770 · Phạm vi: loop
 function __Part71(){ while(false){
 // PLAYER_PART_BEGIN s6.loop._chaySentry.1 EDITABLE
 const _chaySentry = () => {
@@ -668,14 +668,14 @@ const _chaySentry = () => {
 // PLAYER_PART_END s6.loop._chaySentry.1
 }}
 
-// index.html:98775 · Phạm vi: loop
+// index.html:98779 · Phạm vi: loop
 function __Part72(){ while(false){
 // PLAYER_PART_BEGIN s6.loop._chaySentry.2 EDITABLE
 _chaySentry();
 // PLAYER_PART_END s6.loop._chaySentry.2
 }}
 
-// index.html:98776 · Phạm vi: loop
+// index.html:98780 · Phạm vi: loop
 function __Part73(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.133 EDITABLE
 if (gameState === 'pvp' && typeof lanVoiP2 === 'function' && typeof dino2 !== 'undefined' && dino2)
@@ -683,105 +683,105 @@ if (gameState === 'pvp' && typeof lanVoiP2 === 'function' && typeof dino2 !== 'u
 // PLAYER_PART_END s6.loop.IfStatement.133
 }}
 
-// index.html:98782 · Phạm vi: loop
+// index.html:98786 · Phạm vi: loop
 function __Part74(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.134 EDITABLE
 if (!R14 && routeDangChay && dino && dino.hp <= 0){ routeDangChay = false; routeDaHien = false; routeMap = null; }
 // PLAYER_PART_END s6.loop.IfStatement.134
 }}
 
-// index.html:98783 · Phạm vi: loop
+// index.html:98787 · Phạm vi: loop
 function __Part75(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.135 EDITABLE
 if (typeof voltTickTia === 'function') voltTickTia();
 // PLAYER_PART_END s6.loop.IfStatement.135
 }}
 
-// index.html:98784 · Phạm vi: loop
+// index.html:98788 · Phạm vi: loop
 function __Part76(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.tickMinionProxy.1 EDITABLE
 tickMinionProxy();
 // PLAYER_PART_END s6.loop.tickMinionProxy.1
 }}
 
-// index.html:98785 · Phạm vi: loop
+// index.html:98789 · Phạm vi: loop
 function __Part77(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.136 EDITABLE
 if (typeof pet2TickLua === 'function'){ pet2TickDash(); pet2TickLua(); }
 // PLAYER_PART_END s6.loop.IfStatement.136
 }}
 
-// index.html:98786 · Phạm vi: loop
+// index.html:98790 · Phạm vi: loop
 function __Part78(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.137 EDITABLE
 if (defMode) defPlayerHits();
 // PLAYER_PART_END s6.loop.IfStatement.137
 }}
 
-// index.html:98790 · Phạm vi: loop
+// index.html:98794 · Phạm vi: loop
 function __Part79(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.138 EDITABLE
 if (typeof cusToaVeTren === 'function') cusToaVeTren();
 // PLAYER_PART_END s6.loop.IfStatement.138
 }}
 
-// index.html:98791 · Phạm vi: loop
+// index.html:98795 · Phạm vi: loop
 function __Part80(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.drawLightningEffects.1 EDITABLE
 drawLightningEffects();
 // PLAYER_PART_END s6.loop.drawLightningEffects.1
 }}
 
-// index.html:98792 · Phạm vi: loop
+// index.html:98796 · Phạm vi: loop
 function __Part81(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.ctx.restore.1 EDITABLE
 ctx.restore();
 // PLAYER_PART_END s6.loop.ctx.restore.1
 }}
 
-// index.html:98793 · Phạm vi: loop
+// index.html:98797 · Phạm vi: loop
 function __Part82(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.139 EDITABLE
 if (typeof cusNkVeMan === 'function') cusNkVeMan();
 // PLAYER_PART_END s6.loop.IfStatement.139
 }}
 
-// index.html:98794 · Phạm vi: loop
+// index.html:98798 · Phạm vi: loop
 function __Part83(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.drawUI.1 EDITABLE
 drawUI();
 // PLAYER_PART_END s6.loop.drawUI.1
 }}
 
-// index.html:98795 · Phạm vi: loop
+// index.html:98799 · Phạm vi: loop
 function __Part84(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.140 EDITABLE
 if (wildernessOn()) drawWildernessHud();
 // PLAYER_PART_END s6.loop.IfStatement.140
 }}
 
-// index.html:98796 · Phạm vi: loop
+// index.html:98800 · Phạm vi: loop
 function __Part85(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.141 EDITABLE
 if (typeof bienVeHud === 'function') bienVeHud();
 // PLAYER_PART_END s6.loop.IfStatement.141
 }}
 
-// index.html:98797 · Phạm vi: loop
+// index.html:98801 · Phạm vi: loop
 function __Part86(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.142 EDITABLE
 if (defMode) drawDefenseHud();
 // PLAYER_PART_END s6.loop.IfStatement.142
 }}
 
-// index.html:98798 · Phạm vi: loop
+// index.html:98802 · Phạm vi: loop
 function __Part87(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.143 EDITABLE
 if (reviveOverlay){ drawReviveOverlay(reviveOverlay); reviveOverlay.frame++; if (reviveOverlay.frame > reviveOverlay.total) reviveOverlay = null; }
 // PLAYER_PART_END s6.loop.IfStatement.143
 }}
 
-// index.html:98800 · Phạm vi: loop
+// index.html:98804 · Phạm vi: loop
 function __Part88(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.144 EDITABLE
 if (gameState !== 'pvp') {
@@ -834,14 +834,14 @@ if (gameState !== 'pvp') {
 // PLAYER_PART_END s6.loop.IfStatement.144
 }}
 
-// index.html:98849 · Phạm vi: loop
+// index.html:98853 · Phạm vi: loop
 function __Part89(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.IfStatement.145 EDITABLE
 if (dojoMode) { dojoRefillUltimates(); if (dino && dino.hp < dino.maxHp) dino.hp = dino.maxHp; tickDojoQueue(); drawMenuPanel(); drawDojoPicker(); }
 // PLAYER_PART_END s6.loop.IfStatement.145
 }}
 
-// index.html:98850 · Phạm vi: loop
+// index.html:98854 · Phạm vi: loop
 function __Part90(){ while(false){
 // PLAYER_PART_BEGIN s6.loop.ExpressionStatement.1 EDITABLE
 frames++;

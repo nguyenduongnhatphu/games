@@ -1,12 +1,12 @@
 // PLAYER_FILE: DualGuns02
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: AI_HOSO, AMMO_CHITIET_EN, AMMO_CHITIET_VI, AMMO_NAMES, AMMO_NHOM, CHARGE_TIERS, HUD_HANG, LT, PVP_HS, PVP_SAN, Player, SG_DAN, STY_DPS, UNITY_PAL_SRC, ammoColors, ctx, deathCineActive, dino, frames, gameOver, gameState, hudHangSau, keys, sgAmmoHud, sgBefore, sgCannonBeam, sgChangeForm, sgDraw, sgFan, sgFireCannon, sgOn, sgReleaseCharge, sgReload, sgRobot, sgRobotEnd, sgRobotGun, sgRobotMissile, sgRobotSlash, sgRobotStart, sgRobotSwordPose, sgRobotSwordSweep, sgRoll, sgShot, sgState, sgSwordJ, sgSwordK, sgTick, ultCharge, vkDangKy
-// index.html:100841 · Phạm vi: global
+// index.html:100845 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.sgRobotTick.1 EDITABLE
 function sgRobotTick(n,fire,k){
     const r=sgRobot(n);if(!r)return;
@@ -27,7 +27,7 @@ function sgRobotTick(n,fire,k){
 }
 // PLAYER_PART_END s7.sgRobotTick.1
 
-// index.html:100858 · Phạm vi: global
+// index.html:100862 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.sgChargeRing.1 EDITABLE
 function sgChargeRing(n,pos){
     const s=sgState(n),t=n.aKeyHeldTime;
@@ -40,12 +40,12 @@ function sgChargeRing(n,pos){
 }
 // PLAYER_PART_END s7.sgChargeRing.1
 
-// index.html:100867 · Phạm vi: global
+// index.html:100871 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.sgRobotAmmoHud.1 EDITABLE
 function sgRobotAmmoHud(n){const r=sgRobot(n);ctx.save();ctx.font='bold 11px sans-serif';ctx.fillStyle='#a9f2ff';ctx.fillText('PLASMA · ∞',86,65);ctx.restore();}
 // PLAYER_PART_END s7.sgRobotAmmoHud.1
 
-// index.html:100868 · Phạm vi: global
+// index.html:100872 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.sgRobotHud.1 EDITABLE
 function sgRobotHud(n,y){
     const r=sgRobot(n);if(!r)return;if(!Number.isFinite(y))y=hudHangSau()+HUD_HANG+4;
@@ -57,7 +57,7 @@ function sgRobotHud(n,y){
 }
 // PLAYER_PART_END s7.sgRobotHud.1
 
-// index.html:100876 · Phạm vi: global
+// index.html:100880 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.sgDrawRobot.1 EDITABLE
 function sgDrawRobot(n, x, y) {
     const r = sgRobot(n);
@@ -294,7 +294,7 @@ function sgDrawRobot(n, x, y) {
 }
 // PLAYER_PART_END s7.sgDrawRobot.1
 
-// index.html:101110 · Phạm vi: global
+// index.html:101114 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.vkDangKy.1 EDITABLE
 vkDangKy(SG_DAN,{
     ten:'SONG SÚNG',theLuc:12,sacToiDa:60,khongHoiDan:true,
@@ -323,22 +323,22 @@ vkDangKy(SG_DAN,{
 });
 // PLAYER_PART_END s7.vkDangKy.1
 
-// index.html:101136 · Phạm vi: global
+// index.html:101140 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.sgUpdateGoc.1 EDITABLE
 const sgUpdateGoc=Player.prototype._updateGoc;
 // PLAYER_PART_END s7.sgUpdateGoc.1
 
-// index.html:101137 · Phạm vi: global
+// index.html:101141 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.Player.prototype._updateGoc.1 EDITABLE
 Player.prototype._updateGoc=function(){sgBefore(this);const out=sgUpdateGoc.call(this);if(sgOn(this)&&this.sg&&this.sg.beam){this.x=this.sg.beam.x;this.y=this.sg.beam.y;this.dy=0;}return out;};
 // PLAYER_PART_END s7.Player.prototype._updateGoc.1
 
-// index.html:101138 · Phạm vi: global
+// index.html:101142 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.sgFormGoc.1 EDITABLE
 const sgFormGoc=Player.prototype.drawForm;
 // PLAYER_PART_END s7.sgFormGoc.1
 
-// index.html:101139 · Phạm vi: global
+// index.html:101143 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.Player.prototype.drawForm.1 EDITABLE
 Player.prototype.drawForm=function(...args){
     if(sgRobot(this)&&(args[4]===undefined||args[4]===-1)){sgDrawRobot(this,args[1],args[2]);return;}
@@ -350,52 +350,52 @@ Player.prototype.drawForm=function(...args){
 };
 // PLAYER_PART_END s7.Player.prototype.drawForm.1
 
-// index.html:101147 · Phạm vi: global
+// index.html:101151 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.AMMO_NAMES.push.1 EDITABLE
 AMMO_NAMES.push('SONG SÚNG');
 // PLAYER_PART_END s7.AMMO_NAMES.push.1
 
-// index.html:101147 · Phạm vi: global
+// index.html:101151 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.ammoColors.push.1 EDITABLE
 ammoColors.push('#73deef');
 // PLAYER_PART_END s7.ammoColors.push.1
 
-// index.html:101147 · Phạm vi: global
+// index.html:101151 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.AMMO_NHOM.push.1 EDITABLE
 AMMO_NHOM.push(1);
 // PLAYER_PART_END s7.AMMO_NHOM.push.1
 
-// index.html:101148 · Phạm vi: global
+// index.html:101152 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.UNITY_PAL_SRC.push.1 EDITABLE
 UNITY_PAL_SRC.push({c:'#73deef',d:'#163949'});
 // PLAYER_PART_END s7.UNITY_PAL_SRC.push.1
 
-// index.html:101149 · Phạm vi: global
+// index.html:101153 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.STY_DPS.push.1 EDITABLE
 STY_DPS.push(6);
 // PLAYER_PART_END s7.STY_DPS.push.1
 
-// index.html:101149 · Phạm vi: global
+// index.html:101153 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.PVP_HS.push.1 EDITABLE
 PVP_HS.push(1);
 // PLAYER_PART_END s7.PVP_HS.push.1
 
-// index.html:101149 · Phạm vi: global
+// index.html:101153 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.PVP_SAN.push.1 EDITABLE
 PVP_SAN.push(0);
 // PLAYER_PART_END s7.PVP_SAN.push.1
 
-// index.html:101150 · Phạm vi: global
+// index.html:101154 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.AI_HOSO.push.1 EDITABLE
 AI_HOSO.push({dai:[260,520],ep:false,sac:1.5,xa:true,moc:[90]});
 // PLAYER_PART_END s7.AI_HOSO.push.1
 
-// index.html:101151 · Phạm vi: global
+// index.html:101155 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.CHARGE_TIERS.push.1 EDITABLE
 CHARGE_TIERS.push([[15,'#ffab40'],[30,'#73deef'],[60,'#ffffff']]);
 // PLAYER_PART_END s7.CHARGE_TIERS.push.1
 
-// index.html:101152 · Phạm vi: global
+// index.html:101156 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.AMMO_CHITIET_VI.push.1 EDITABLE
 AMMO_CHITIET_VI.push([
     '#SONG SÚNG / SONG KIẾM / ĐẠI BÁC — BẢN MẪU',
@@ -419,7 +419,7 @@ AMMO_CHITIET_VI.push([
 ]);
 // PLAYER_PART_END s7.AMMO_CHITIET_VI.push.1
 
-// index.html:101172 · Phạm vi: global
+// index.html:101176 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.AMMO_CHITIET_EN.push.1 EDITABLE
 AMMO_CHITIET_EN.push([
     '#PISTOLS / GUNBLADES / CANNON', '-Each pistol has 6 rounds. J alternates; R reloads. Q/E cycle all three forms; J attacks. U activates the Robot ultimate with a full meter.',
@@ -432,7 +432,7 @@ AMMO_CHITIET_EN.push([
 ]);
 // PLAYER_PART_END s7.AMMO_CHITIET_EN.push.1
 
-// index.html:101182 · Phạm vi: global
+// index.html:101186 · Phạm vi: global
 // PLAYER_PART_BEGIN s7.window.addEventListener.1 EDITABLE
 window.addEventListener('keydown',e=>{
     if((e.code==='KeyQ'||e.code==='KeyE') && !e.repeat && typeof dino!=='undefined' && sgOn(dino)

@@ -1,12 +1,12 @@
 // PLAYER_FILE: Rune_voltdash
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: RUNES
-// index.html:83750 · Phạm vi: global
+// index.html:83754 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RUNES.push.7 EDITABLE
 RUNES.push({ id:'voltdash', name:'LƯỚT SÉT', nameEn:'LIGHTNING DASH', icon:'⚡', cost:1,
             desc:'Tốn 1 ô. MỌI loại đạn: cú lướt đi xa hơn hẳn (36 thay vì 22) và gây 3 sát thương cho kẻ địch bạn lướt xuyên qua. CẦM VOLT thì lướt còn phóng thêm một TIA SÉT từ sau lưng ra trước, xuyên mọi mục tiêu, 3 sát thương nữa. Ghép SIÊU TỐC thì cả hai lên 5. Trong Lightning Form của Volt cả hai lên 6. Với MIDAS, cả J Dash lẫn Dash J đều bắn thêm một chưởng sét giống Volt. Với MJÖLNIR thì nó mở hàng sấm 7cm: hai combo Dash+J và J→Dash giáng 10 cột sét trước mặt, mỗi cột 1 sát thương kèm choáng — rune không tăng tốc hay tầm lướt của Búa, nó là hiệu ứng sạc búa trước cú đập.\n\nVỚI VŨ KHÍ CẬN CHIẾN: rune không sinh thêm tia sét rời nào. Nó chỉ làm hai việc — cộng sát thương, và nhuộm chính nhát chém sang tông điện khiến nhát đó nở to ra 28%. KIẾM — cả hai nhát của chuỗi Lướt Chém đều +2, lưỡi kiếm khí của nhát hai bay 340 thay vì 260. GIÁO — Lướt Đâm và nhát bồi đều +2 và sâu thêm 28%, có một tia chạy dọc thân giáo; Mũi Tên Khí bay lâu hơn, rộng hơn, +2. BÚA — vốn đã có sấm sét, không đụng vào.',

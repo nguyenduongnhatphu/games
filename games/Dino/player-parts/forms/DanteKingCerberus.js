@@ -1,12 +1,12 @@
 // PLAYER_FILE: DanteKingCerberus
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: DANTE_ATTACK_RATE, Effect, Player, SFX, bossProjectiles, canvas, checkAABB, ctx, danteActive, danteControlAllowed, danteDraw, danteHit, danteKey, danteLabel, danteRelease, danteTick, dashCd, dashVx, dino, doDash, dswControl, dswFloor, frames, gameOver, gameVictory, keys, paused, playerAttackStep, playerComboBuffer, playerComboCancel, playerComboTrack, playerFinisherControl, sgTargets, shakeTimer, visualEffects
-// index.html:109195 · Phạm vi: global
+// index.html:109199 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.KCB_MOVES.1 EDITABLE
 const KCB_MOVES = {
  // 1. COMBO A (J -> J -> J -> J): Vụt chéo -> Quét ngang -> Chọc gậy lửa 3 phát -> Bổ đập nổ băng
@@ -36,7 +36,7 @@ const KCB_MOVES = {
 };
 // PLAYER_PART_END s12.KCB_MOVES.1
 
-// index.html:109222 · Phạm vi: global
+// index.html:109226 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbState.1 EDITABLE
 function kcbState(p){
  return p.cerberus || (p.cerberus = {
@@ -57,12 +57,12 @@ function kcbState(p){
 }
 // PLAYER_PART_END s12.kcbState.1
 
-// index.html:109239 · Phạm vi: global
+// index.html:109243 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbUsing.1 EDITABLE
 function kcbUsing(){ return danteActive(dino) && dino.dante && dino.dante.arm === 3; }
 // PLAYER_PART_END s12.kcbUsing.1
 
-// index.html:109241 · Phạm vi: global
+// index.html:109245 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbStart.1 EDITABLE
 function kcbStart(id, extra = {}){
  const n = dino, p = n.dante, c = kcbState(p), m = KCB_MOVES[id];
@@ -100,7 +100,7 @@ function kcbStart(id, extra = {}){
 }
 // PLAYER_PART_END s12.kcbStart.1
 
-// index.html:109276 · Phạm vi: global
+// index.html:109280 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbCommand.1 EDITABLE
 function kcbCommand(cmd){
  const n = dino, p = n.dante, c = kcbState(p), a = p.attack;
@@ -136,7 +136,7 @@ function kcbCommand(cmd){
 }
 // PLAYER_PART_END s12.kcbCommand.1
 
-// index.html:109309 · Phạm vi: global
+// index.html:109313 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbDispatch.1 EDITABLE
 function kcbDispatch(cmd){
  const n = dino, p = n.dante, c = kcbState(p), recent = frames - c.ended <= 40, last = recent ? c.last : '';
@@ -172,12 +172,12 @@ function kcbDispatch(cmd){
 }
 // PLAYER_PART_END s12.kcbDispatch.1
 
-// index.html:109342 · Phạm vi: global
+// index.html:109346 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbKeyBase.1 EDITABLE
 const kcbKeyBase = danteKey;
 // PLAYER_PART_END s12.kcbKeyBase.1
 
-// index.html:109343 · Phạm vi: global
+// index.html:109347 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteKey.5 EDITABLE
 danteKey = function(code, repeat){
  if(!kcbUsing()) return kcbKeyBase(code, repeat);
@@ -212,12 +212,12 @@ danteKey = function(code, repeat){
 };
 // PLAYER_PART_END s12.danteKey.5
 
-// index.html:109375 · Phạm vi: global
+// index.html:109379 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbReleaseBase.1 EDITABLE
 const kcbReleaseBase = danteRelease;
 // PLAYER_PART_END s12.kcbReleaseBase.1
 
-// index.html:109376 · Phạm vi: global
+// index.html:109380 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteRelease.5 EDITABLE
 danteRelease = function(){
  if(kcbUsing()) return;
@@ -225,12 +225,12 @@ danteRelease = function(){
 };
 // PLAYER_PART_END s12.danteRelease.5
 
-// index.html:109381 · Phạm vi: global
+// index.html:109385 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbDashBase.1 EDITABLE
 const kcbDashBase = doDash;
 // PLAYER_PART_END s12.kcbDashBase.1
 
-// index.html:109382 · Phạm vi: global
+// index.html:109386 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.doDash.4 EDITABLE
 doDash = function(...args){
  const before = dashCd;
@@ -242,12 +242,12 @@ doDash = function(...args){
 };
 // PLAYER_PART_END s12.doDash.4
 
-// index.html:109391 · Phạm vi: global
+// index.html:109395 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbDamageBase.1 EDITABLE
 const kcbDamageBase = Player.prototype.takeDamage;
 // PLAYER_PART_END s12.kcbDamageBase.1
 
-// index.html:109392 · Phạm vi: global
+// index.html:109396 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.Player.prototype.takeDamage.4 EDITABLE
 Player.prototype.takeDamage = function(...args){
  if(kcbUsing() && this === dino && this.dante?.attack?.id === 'iceage'){
@@ -259,7 +259,7 @@ Player.prototype.takeDamage = function(...args){
 };
 // PLAYER_PART_END s12.Player.prototype.takeDamage.4
 
-// index.html:109401 · Phạm vi: global
+// index.html:109405 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbStrike.1 EDITABLE
 function kcbStrike(n, p, c, a, pulse){
  const dtBonus = p.dt > 0 ? 1.5 : 0;
@@ -398,7 +398,7 @@ function kcbStrike(n, p, c, a, pulse){
 }
 // PLAYER_PART_END s12.kcbStrike.1
 
-// index.html:109537 · Phạm vi: global
+// index.html:109541 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbFinish.1 EDITABLE
 function kcbFinish(p, c, a){
  p.attack = null; c.last = a.id; c.ended = frames;
@@ -410,7 +410,7 @@ function kcbFinish(p, c, a){
 }
 // PLAYER_PART_END s12.kcbFinish.1
 
-// index.html:109546 · Phạm vi: global
+// index.html:109550 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbTick.1 EDITABLE
 function kcbTick(n, p){
  const c = kcbState(p);
@@ -575,12 +575,12 @@ function kcbTick(n, p){
 }
 // PLAYER_PART_END s12.kcbTick.1
 
-// index.html:109708 · Phạm vi: global
+// index.html:109712 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbTickBase.1 EDITABLE
 const kcbTickBase = danteTick;
 // PLAYER_PART_END s12.kcbTickBase.1
 
-// index.html:109709 · Phạm vi: global
+// index.html:109713 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteTick.5 EDITABLE
 danteTick = function(){
  kcbTickBase();
@@ -591,12 +591,12 @@ danteTick = function(){
 };
 // PLAYER_PART_END s12.danteTick.5
 
-// index.html:109717 · Phạm vi: global
+// index.html:109721 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbUpdateBase.1 EDITABLE
 const kcbUpdateBase = Player.prototype.update;
 // PLAYER_PART_END s12.kcbUpdateBase.1
 
-// index.html:109718 · Phạm vi: global
+// index.html:109722 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.Player.prototype.update.4 EDITABLE
 Player.prototype.update = function(...args){
  if(!kcbUsing() || this !== dino) return kcbUpdateBase.apply(this, args);
@@ -606,7 +606,7 @@ Player.prototype.update = function(...args){
 };
 // PLAYER_PART_END s12.Player.prototype.update.4
 
-// index.html:109730 · Phạm vi: global
+// index.html:109734 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbPaintBoStaff.1 EDITABLE
 function kcbPaintBoStaff(len, glowCol = '#FF6D00'){
  ctx.save();
@@ -629,7 +629,7 @@ function kcbPaintBoStaff(len, glowCol = '#FF6D00'){
 }
 // PLAYER_PART_END s12.kcbPaintBoStaff.1
 
-// index.html:109750 · Phạm vi: global
+// index.html:109754 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbDraw.1 EDITABLE
 function kcbDraw(n){
  const p = n.dante, c = kcbState(p), a = p.attack;
@@ -912,12 +912,12 @@ function kcbDraw(n){
 }
 // PLAYER_PART_END s12.kcbDraw.1
 
-// index.html:110030 · Phạm vi: global
+// index.html:110034 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.kcbDrawBase.1 EDITABLE
 const kcbDrawBase = danteDraw;
 // PLAYER_PART_END s12.kcbDrawBase.1
 
-// index.html:110031 · Phạm vi: global
+// index.html:110035 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteDraw.5 EDITABLE
 danteDraw = function(n){
  const p = n.dante;

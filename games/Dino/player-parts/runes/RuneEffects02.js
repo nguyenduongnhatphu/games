@@ -1,12 +1,12 @@
 // PLAYER_FILE: RuneEffects02
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: AegisRexBoss, ArcanaRexBoss, ArtoriasBoss, BIEN_CHANG, ChronoRexBoss, ClawCloneBoss, CliffGolemBoss, CloneBoss, CorruptionBoss, DINHNUI_CHANG, DanteBoss, DeathBoss, DilophosBoss, DragonLordBoss, EchoStalkerBoss, Effect, EmberWolfBoss, FireCloneBoss, FireDragonBoss, FlameCoreBoss, FlameLancerBoss, FloatingText, ForestTitanBoss, GaelBoss, GiantSpiderBoss, GodzillaBoss, GreatApeBoss, GreatSerpentBoss, Heart, HelicoprionBoss, HoGacBoss, IaiRaptorBoss, IceFangBoss, IndominusBoss, IronhaulBoss, LavaSerpentBoss, MUA_HOA_DMG, MagmaDragoonBoss, MagmorBoss, MegaManXBoss, MegalodonBoss, MosaBoss, MountainGodBoss, NeroBoss, Obstacle, OctopusBoss, PVP_CUI_NE, PVP_HS, PillarLordBoss, PoisonMothBoss, PontiffBoss, PteroBoss, PteroLordBoss, Pterodactyl, PulsarCloneBoss, QuetzalBoss, R14, Raptor, ScarabLordBoss, SiegeGoliathBoss, SlashBeastBoss, SoulOfCinderBoss, SpinoBoss, SpinoLordBoss, SporeCrownBoss, StoneRocBoss, StormEagleBoss, StormSerpentBoss, SummitDragonBoss, TRexBoss, TetrisBoss, ThalassaBoss, TrainingDummy, TriceratopsBoss, TriceratopsLordBoss, TyrantRexBoss, UnityCloneBoss, VOLCANO_CHANG, VajraRexBoss, VergilBoss, VoltCloneBoss, WarBoss, Yasuo2Boss, YasuoBoss, ZeroBoss, ZeusBoss, baseSpeed, bienDonDep, bienSpawn, boidoiGiamMau, bossLevel, bossRushStage, bossWaitTimer, bosses, camReset, canvas, checkAABB, cloneGauntlet, cloneStages, currentAmmoType, cusNkPhim, dealDamage, defHurt, defMode, defUnits, dino, dino2, duelApDung, duelChon, duelMode, duelOver, duelTS, duelTSReset, duelTen, duelWinner, enemies, fireBrands, floatingTexts, forestBossQueue, forestQueueInit, forestSpawn, frames, gameSpeed, gameState, gameVictory, gauntletGate, hasRune, hearts, lavaGeysers, mapBuoc, mapChay, mapSangKeTiep, mapSoBoss, mapTheme, midasHado, midasHadoNo, nextBossScore, noPhanHach, normalBossStage, novaBlast, obstacles, offsetDoubleGroundBosses, platforms, prismDmg, projectiles, pulseSieuTrung, pvpDaNhan, pvpKeDanh, pvpNguoi1, pvpTinhDmg, pvpVoBoc, r14ChinhMau, routeDaHien, routeDangChay, routeMap, routeThangChang, score, selfTest, selfTestKQ, setupAbyssArena, setupApeArena, setupArtoriasArena, setupBeachArena, setupChronoArena, setupCinderArena, setupCoreArena, setupCorruptArena, setupDanteArena, setupDeathArena, setupDinhNuiArena, setupDragonLordArena, setupDragoonArena, setupDuelArena, setupDuneArena, setupEchoArena, setupEmberArena, setupFireDragonArena, setupForgeArena, setupGaelArena, setupGrassArena, setupHoGacArena, setupIceFangArena, setupLancerArena, setupLavaSerpentArena, setupMagmorArena, setupMegArena, setupNeroArena, setupOceanArena, setupPhongXaArena, setupPillarLordArena, setupPlateauArena, setupPontiffArena, setupSerpentArena, setupShrineArena, setupSlashBeastArena, setupSpiderArena, setupSporeArena, setupSummitBossRoom, setupSummitPeakArena, setupSwampArena, setupTetrisArena, setupUnityArena, setupVajraArena, setupVergilArena, setupVolcanoArena, setupWarArena, setupYasuoArena, setupZeroArena, sgCredit, spawnTimerCactus, spawnTimerEnemy, spawnTrio, summitApproach, summitSpawn, testBossSelection, visualEffects, volcanoApproach, volcanoSpawn, wildernessOn
-// index.html:96283 · Phạm vi: global
+// index.html:96287 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.defPlayerHits.1 EDITABLE
 function defPlayerHits(){
             if (!defMode) return;
@@ -54,7 +54,7 @@ function defPlayerHits(){
         }
 // PLAYER_PART_END s6.defPlayerHits.1
 
-// index.html:96909 · Phạm vi: global
+// index.html:96913 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.spawnEntities.1 EDITABLE
 function spawnEntities() {
             if (wildernessOn()) return; // Static, authored world: no runner chunks or campaign boss queue.
@@ -471,7 +471,7 @@ function spawnEntities() {
         }
 // PLAYER_PART_END s6.spawnEntities.1
 
-// index.html:97324 · Phạm vi: global
+// index.html:97328 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.checkPvPCollisions.1 EDITABLE
 function checkPvPCollisions() {
             let players = [dino, dino2];

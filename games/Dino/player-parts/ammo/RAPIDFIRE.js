@@ -1,42 +1,42 @@
 // PLAYER_FILE: RAPIDFIRE
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: CM, Effect, FloatingText, Projectile, SFX, allTargets, camX, canvas, combatStance, ctx, currentAmmoType, dino, floatingTexts, frames, gameState, hasRune, keys, platforms, projectiles, shakeTimer, ultCharge, visualEffects, vkDangKy
-// index.html:50034 · Phạm vi: global
+// index.html:50038 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.RF_NHIET_MAX.1 EDITABLE
 const RF_NHIET_MAX = 50, RF_NHIET_HOI = RF_NHIET_MAX / 300, RF_QUANHIET = 300;
 // PLAYER_PART_END s4.RF_NHIET_MAX.1
 
-// index.html:50035 · Phạm vi: global
+// index.html:50039 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.RF_NHIET_CHO.1 EDITABLE
 const RF_NHIET_CHO = 18;
 // PLAYER_PART_END s4.RF_NHIET_CHO.1
 
-// index.html:50036 · Phạm vi: global
+// index.html:50040 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.RF_DRONE_DAN.1 EDITABLE
 const RF_DRONE_DAN = 60;
 // PLAYER_PART_END s4.RF_DRONE_DAN.1
 
-// index.html:50037 · Phạm vi: global
+// index.html:50041 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.RF_DRONE_TIM.1 EDITABLE
 const RF_DRONE_TIM = 40;
 // PLAYER_PART_END s4.RF_DRONE_TIM.1
 
-// index.html:50040 · Phạm vi: global
+// index.html:50044 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.RF_DRONE_CHO.1 EDITABLE
 const RF_DRONE_CHO = 180;
 // PLAYER_PART_END s4.RF_DRONE_CHO.1
 
-// index.html:50044 · Phạm vi: global
+// index.html:50048 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.RF_TAN_DAN.1 EDITABLE
 const RF_TAN_DAN = 5, RF_TAN_QUET = 1;
 // PLAYER_PART_END s4.RF_TAN_DAN.1
 
-// index.html:50045 · Phạm vi: global
+// index.html:50049 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.rfTanCuoc.1 EDITABLE
 function rfTanCuoc(d){
             if (!d || d.roi || d.tan) return;
@@ -44,72 +44,72 @@ function rfTanCuoc(d){
         }
 // PLAYER_PART_END s4.rfTanCuoc.1
 
-// index.html:50049 · Phạm vi: global
+// index.html:50053 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.RF_CHUOI.1 EDITABLE
 const RF_CHUOI = 30;
 // PLAYER_PART_END s4.RF_CHUOI.1
 
-// index.html:50050 · Phạm vi: global
+// index.html:50054 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.RF_NGUOI.1 EDITABLE
 const RF_NGUOI = 24;
 // PLAYER_PART_END s4.RF_NGUOI.1
 
-// index.html:50051 · Phạm vi: global
+// index.html:50055 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.RF_LECH.1 EDITABLE
 const RF_LECH = 7;
 // PLAYER_PART_END s4.RF_LECH.1
 
-// index.html:50066 · Phạm vi: global
+// index.html:50070 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.TL_USUNG_MOI_GIAY.1 EDITABLE
 const TL_USUNG_MOI_GIAY = 8;
 // PLAYER_PART_END s4.TL_USUNG_MOI_GIAY.1
 
-// index.html:50067 · Phạm vi: global
+// index.html:50071 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.TL_TANK_MAU.1 EDITABLE
 const TL_TANK_MAU = 10;
 // PLAYER_PART_END s4.TL_TANK_MAU.1
 
-// index.html:50068 · Phạm vi: global
+// index.html:50072 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.TL_TANK_HOI.1 EDITABLE
 const TL_TANK_HOI = 120;
 // PLAYER_PART_END s4.TL_TANK_HOI.1
 
-// index.html:50069 · Phạm vi: global
+// index.html:50073 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.TL_DRONE_NAP.1 EDITABLE
 const TL_DRONE_NAP = 300;
 // PLAYER_PART_END s4.TL_DRONE_NAP.1
 
-// index.html:50070 · Phạm vi: global
+// index.html:50074 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.TL_PHAO_NAP.1 EDITABLE
 const TL_PHAO_NAP = 180;
 // PLAYER_PART_END s4.TL_PHAO_NAP.1
 
-// index.html:50071 · Phạm vi: global
+// index.html:50075 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.TL_PHAO_TRAN.1 EDITABLE
 const TL_PHAO_TRAN = 1;
 // PLAYER_PART_END s4.TL_PHAO_TRAN.1
 
-// index.html:50072 · Phạm vi: global
+// index.html:50076 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.TL_KHIEN_DAI.1 EDITABLE
 const TL_KHIEN_DAI = 180;
 // PLAYER_PART_END s4.TL_KHIEN_DAI.1
 
-// index.html:50073 · Phạm vi: global
+// index.html:50077 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.TL_KHIEN_CD.1 EDITABLE
 const TL_KHIEN_CD = 480;
 // PLAYER_PART_END s4.TL_KHIEN_CD.1
 
-// index.html:50074 · Phạm vi: global
+// index.html:50078 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.tlBat.1 EDITABLE
 function tlBat(){ return typeof hasRune === 'function' && hasRune('trienlien') && currentAmmoType === 2; }
 // PLAYER_PART_END s4.tlBat.1
 
-// index.html:50075 · Phạm vi: global
+// index.html:50079 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.tlThe.1 EDITABLE
 let tlThe = -1;
 // PLAYER_PART_END s4.tlThe.1
 
-// index.html:50076 · Phạm vi: global
+// index.html:50080 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.tlDoiThe.1 EDITABLE
 function tlDoiThe(cu, moi){
             if (!dino) return;
@@ -157,7 +157,7 @@ function tlDoiThe(cu, moi){
         }
 // PLAYER_PART_END s4.tlDoiThe.1
 
-// index.html:50120 · Phạm vi: global
+// index.html:50124 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.tlVe.1 EDITABLE
 function tlVe(){
             if (!dino || !tlBat()) return;
@@ -211,7 +211,7 @@ function tlVe(){
         }
 // PLAYER_PART_END s4.tlVe.1
 
-// index.html:50170 · Phạm vi: global
+// index.html:50174 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.tlTick.1 EDITABLE
 function tlTick(){
             if (!dino) return;
@@ -251,7 +251,7 @@ function tlTick(){
         }
 // PLAYER_PART_END s4.tlTick.1
 
-// index.html:50212 · Phạm vi: Player.prototype
+// index.html:50216 · Phạm vi: Player.prototype
 const __Part23 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.rfTien.1 EDITABLE
 rfTien(){                       // 0 -> 1 theo chuoi ban
@@ -260,7 +260,7 @@ rfTien(){                       // 0 -> 1 theo chuoi ban
 // PLAYER_PART_END s4.Player.prototype.rfTien.1
 };
 
-// index.html:50215 · Phạm vi: Player.prototype
+// index.html:50219 · Phạm vi: Player.prototype
 const __Part24 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.rfCong.1 EDITABLE
 rfCong(){
@@ -270,7 +270,7 @@ rfCong(){
 // PLAYER_PART_END s4.Player.prototype.rfCong.1
 };
 
-// index.html:50219 · Phạm vi: Player.prototype
+// index.html:50223 · Phạm vi: Player.prototype
 const __Part25 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.rfTick.1 EDITABLE
 rfTick(){
@@ -293,7 +293,7 @@ rfTick(){
 // PLAYER_PART_END s4.Player.prototype.rfTick.1
 };
 
-// index.html:50236 · Phạm vi: Player.prototype
+// index.html:50240 · Phạm vi: Player.prototype
 const __Part26 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.rfNongLen.1 EDITABLE
 rfNongLen(n){
@@ -311,7 +311,7 @@ rfNongLen(n){
 // PLAYER_PART_END s4.Player.prototype.rfNongLen.1
 };
 
-// index.html:50248 · Phạm vi: Player.prototype
+// index.html:50252 · Phạm vi: Player.prototype
 const __Part27 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.fireRapidSingle.1 EDITABLE
 fireRapidSingle() {
@@ -337,7 +337,7 @@ fireRapidSingle() {
 // PLAYER_PART_END s4.Player.prototype.fireRapidSingle.1
 };
 
-// index.html:50268 · Phạm vi: Player.prototype
+// index.html:50272 · Phạm vi: Player.prototype
 const __Part28 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.tankLeoHo.1 EDITABLE
 tankLeoHo(){
@@ -362,7 +362,7 @@ tankLeoHo(){
 // PLAYER_PART_END s4.Player.prototype.tankLeoHo.1
 };
 
-// index.html:50287 · Phạm vi: Player.prototype
+// index.html:50291 · Phạm vi: Player.prototype
 const __Part29 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.rfTickTank.1 EDITABLE
 rfTickTank(){
@@ -433,7 +433,7 @@ rfTickTank(){
 // PLAYER_PART_END s4.Player.prototype.rfTickTank.1
 };
 
-// index.html:50352 · Phạm vi: Player.prototype
+// index.html:50356 · Phạm vi: Player.prototype
 const __Part30 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.rfNoTank.1 EDITABLE
 rfNoTank(){
@@ -453,7 +453,7 @@ rfNoTank(){
 // PLAYER_PART_END s4.Player.prototype.rfNoTank.1
 };
 
-// index.html:50366 · Phạm vi: Player.prototype
+// index.html:50370 · Phạm vi: Player.prototype
 const __Part31 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.rfBanPhao.1 EDITABLE
 rfBanPhao(){
@@ -469,7 +469,7 @@ rfBanPhao(){
 // PLAYER_PART_END s4.Player.prototype.rfBanPhao.1
 };
 
-// index.html:50376 · Phạm vi: Player.prototype
+// index.html:50380 · Phạm vi: Player.prototype
 const __Part32 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.rfGocNong.1 EDITABLE
 rfGocNong(){
@@ -480,7 +480,7 @@ rfGocNong(){
 // PLAYER_PART_END s4.Player.prototype.rfGocNong.1
 };
 
-// index.html:50381 · Phạm vi: Player.prototype
+// index.html:50385 · Phạm vi: Player.prototype
 const __Part33 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.rfMiengNong.1 EDITABLE
 rfMiengNong(){
@@ -490,7 +490,7 @@ rfMiengNong(){
 // PLAYER_PART_END s4.Player.prototype.rfMiengNong.1
 };
 
-// index.html:50385 · Phạm vi: Player.prototype
+// index.html:50389 · Phạm vi: Player.prototype
 const __Part34 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.rfVeTank.1 EDITABLE
 rfVeTank(){
@@ -555,7 +555,7 @@ rfVeTank(){
 // PLAYER_PART_END s4.Player.prototype.rfVeTank.1
 };
 
-// index.html:50444 · Phạm vi: Player.prototype
+// index.html:50448 · Phạm vi: Player.prototype
 const __Part35 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.rfTickDrone.1 EDITABLE
 rfTickDrone(){
@@ -655,7 +655,7 @@ rfTickDrone(){
 // PLAYER_PART_END s4.Player.prototype.rfTickDrone.1
 };
 
-// index.html:50538 · Phạm vi: Player.prototype
+// index.html:50542 · Phạm vi: Player.prototype
 const __Part36 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.rfVeDrone.1 EDITABLE
 rfVeDrone(){
@@ -690,7 +690,7 @@ rfVeDrone(){
 // PLAYER_PART_END s4.Player.prototype.rfVeDrone.1
 };
 
-// index.html:50567 · Phạm vi: Player.prototype
+// index.html:50571 · Phạm vi: Player.prototype
 const __Part37 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.fireRapidChannel.1 EDITABLE
 fireRapidChannel() {
@@ -704,7 +704,7 @@ fireRapidChannel() {
 // PLAYER_PART_END s4.Player.prototype.fireRapidChannel.1
 };
 
-// index.html:50577 · Phạm vi: Player.prototype
+// index.html:50581 · Phạm vi: Player.prototype
 const __Part38 = {
 // PLAYER_PART_BEGIN s4.Player.prototype._tickSentry.1 EDITABLE
 _tickSentry(){
@@ -765,7 +765,7 @@ _tickSentry(){
 // PLAYER_PART_END s4.Player.prototype._tickSentry.1
 };
 
-// index.html:50632 · Phạm vi: Player.prototype
+// index.html:50636 · Phạm vi: Player.prototype
 const __Part39 = {
 // PLAYER_PART_BEGIN s4.Player.prototype._veSentry.1 EDITABLE
 _veSentry(){
@@ -814,7 +814,7 @@ _veSentry(){
 // PLAYER_PART_END s4.Player.prototype._veSentry.1
 };
 
-// index.html:50675 · Phạm vi: Player.prototype
+// index.html:50679 · Phạm vi: Player.prototype
 const __Part40 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.hoverTick.1 EDITABLE
 hoverTick(){
@@ -858,7 +858,7 @@ hoverTick(){
 // PLAYER_PART_END s4.Player.prototype.hoverTick.1
 };
 
-// index.html:50715 · Phạm vi: global
+// index.html:50719 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.4 EDITABLE
 vkDangKy(2, {
             ten: 'RAPIDFIRE', mauUlt: '#00E676',

@@ -1,12 +1,12 @@
 // PLAYER_FILE: DanteRender
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: DT_ARMS, DT_H, DT_SWITCH, DT_W, canvas, ctx, frames
-// index.html:106224 · Phạm vi: global
+// index.html:106228 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.DantePlayerRig.1 EDITABLE
 class DantePlayerRig {
             constructor(level){
@@ -32,7 +32,7 @@ class DantePlayerRig {
 }
 // PLAYER_PART_END s12.DantePlayerRig.1
 
-// index.html:106247 · Phạm vi: global
+// index.html:106251 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.drawDantePlayerBody.1 EDITABLE
 function drawDantePlayerBody(b, x, y){
             let dr = b.facingLeft ? -1 : 1, cxb = x + DT_W/2;
@@ -302,7 +302,7 @@ function drawDantePlayerBody(b, x, y){
         }
 // PLAYER_PART_END s12.drawDantePlayerBody.1
 
-// index.html:106514 · Phạm vi: global
+// index.html:106518 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.drawDantePlayerDtOverlay.1 EDITABLE
 function drawDantePlayerDtOverlay(b, x, y){
             let dr = b.facingLeft ? -1 : 1, W = 52, H = 76, cxb = x + W/2;

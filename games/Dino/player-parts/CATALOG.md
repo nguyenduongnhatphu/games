@@ -30,8 +30,8 @@ Tải file JS bằng **Download raw file**. Xem [hướng dẫn gửi AI và gh�
 | [DanteSDT](forms/DanteSDT.js) | 402 | 23.6 KB |
 | [VergilForm01](forms/VergilForm01.js) | 1376 | 58.8 KB |
 | [VergilForm02](forms/VergilForm02.js) | 715 | 28.9 KB |
-| [IronhaulForm01](forms/IronhaulForm01.js) | 932 | 51.9 KB |
-| [IronhaulForm02](forms/IronhaulForm02.js) | 319 | 16.5 KB |
+| [IronhaulForm01](forms/IronhaulForm01.js) | 1025 | 56.1 KB |
+| [IronhaulForm02](forms/IronhaulForm02.js) | 321 | 17.5 KB |
 
 ## Đạn / vũ khí
 
@@ -151,7 +151,7 @@ Tải file JS bằng **Download raw file**. Xem [hướng dẫn gửi AI và gh�
 | [ProjectilesAndEffects01](core/ProjectilesAndEffects01.js) | 325 | 24.3 KB |
 | [ProjectilesAndEffects02](core/ProjectilesAndEffects02.js) | 704 | 50.6 KB |
 | [DamageShared](core/DamageShared.js) | 148 | 7.1 KB |
-| [PlayerMovement](core/PlayerMovement.js) | 463 | 39.5 KB |
+| [PlayerMovement](core/PlayerMovement.js) | 467 | 40.4 KB |
 | [PlayerRender](core/PlayerRender.js) | 506 | 35.7 KB |
 | [PlayerDefense](core/PlayerDefense.js) | 217 | 17.1 KB |
 | [PlayerCombat](core/PlayerCombat.js) | 392 | 24.2 KB |

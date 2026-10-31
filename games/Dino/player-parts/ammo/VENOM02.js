@@ -1,12 +1,12 @@
 // PLAYER_FILE: VENOM02
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Effect, FloatingText, SFX, VEN_C2_DMG, VEN_C2_SO, VEN_C2_TAM, VEN_C4_DMG, VEN_C4_LAO, VEN_C4_TAM, VEN_C4_TAN, VEN_C4_TUONG, VEN_CHE_CHAN, VEN_CH_DMG, VEN_CH_NHIP, VEN_CH_TAM, VEN_DU_KHUNG, VEN_DU_XA, VEN_GAI_CHO, VEN_GAI_LECH, VEN_GAI_MOC, VEN_GAI_NHAM_X, VEN_GIOT_CHO, VEN_LAO_DMG, VEN_LAO_R, VEN_TO_XA, VEN_ULT_KHUNG, VEN_XUYEN_DMG, VEN_XUYEN_XA, allTargets, bamXuongKhong, checkAABB, combatStance, ctx, dashVx, floatingTexts, frames, gdCatHop, hasRune, keys, setCanApDon, setCanDmg, shakeTimer, venGiot, venKhoa, venNovaGiot, venTickVung, venTo, venVeDao, venVeGio, venVeMangTatCa, venVeMoc, venVeRoi, venVeToa, venVeVoi, venVeVung, visualEffects, vkDangKy
-// index.html:62692 · Phạm vi: Player.prototype
+// index.html:62696 · Phạm vi: Player.prototype
 const __Part0 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venomTick.1 EDITABLE
 venomTick(){
@@ -166,7 +166,7 @@ venomTick(){
 // PLAYER_PART_END s4.Player.prototype.venomTick.1
 };
 
-// index.html:62848 · Phạm vi: Player.prototype
+// index.html:62852 · Phạm vi: Player.prototype
 const __Part1 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venVeRoi.1 EDITABLE
 venVeRoi(){
@@ -203,7 +203,7 @@ venVeRoi(){
 // PLAYER_PART_END s4.Player.prototype.venVeRoi.1
 };
 
-// index.html:62879 · Phạm vi: Player.prototype
+// index.html:62883 · Phạm vi: Player.prototype
 const __Part2 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venFx.1 EDITABLE
 venFx(kieu, o){
@@ -214,7 +214,7 @@ venFx(kieu, o){
 // PLAYER_PART_END s4.Player.prototype.venFx.1
 };
 
-// index.html:62884 · Phạm vi: Player.prototype
+// index.html:62888 · Phạm vi: Player.prototype
 const __Part3 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venVeFx.1 EDITABLE
 venVeFx(){
@@ -250,7 +250,7 @@ venVeFx(){
 // PLAYER_PART_END s4.Player.prototype.venVeFx.1
 };
 
-// index.html:62914 · Phạm vi: Player.prototype
+// index.html:62918 · Phạm vi: Player.prototype
 const __Part4 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.venomVe.1 EDITABLE
 venomVe(){
@@ -401,7 +401,7 @@ venomVe(){
 // PLAYER_PART_END s4.Player.prototype.venomVe.1
 };
 
-// index.html:63070 · Phạm vi: global
+// index.html:63074 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.15 EDITABLE
 vkDangKy(13, {
             ten: 'VENOM',

@@ -1,42 +1,42 @@
 // PLAYER_FILE: BOOMERANG
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Effect, FloatingText, PVP_HS, SFX, addStyle, allTargets, bosses, canvas, checkAABB, combatStance, ctx, damageFromAmmoAny, dino, doChieuThu, enemies, floatingTexts, frames, gameState, hasRune, novaBlast, parry, score, shakeTimer, ultCharge, visualEffects, vkDangKy
-// index.html:53552 · Phạm vi: global
+// index.html:53556 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.boomerangs.1 EDITABLE
 let boomerangs = [];
 // PLAYER_PART_END s4.boomerangs.1
 
-// index.html:53553 · Phạm vi: global
+// index.html:53557 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.BOOM_CATCH_R.1 EDITABLE
 const BOOM_CATCH_R = 46;
 // PLAYER_PART_END s4.BOOM_CATCH_R.1
 
-// index.html:53554 · Phạm vi: global
+// index.html:53558 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.BOOM_A_MIN.1 EDITABLE
 const BOOM_A_MIN = 330;
 // PLAYER_PART_END s4.BOOM_A_MIN.1
 
-// index.html:53555 · Phạm vi: global
+// index.html:53559 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.BOOM_A_MAX.1 EDITABLE
 const BOOM_A_MAX = 900;
 // PLAYER_PART_END s4.BOOM_A_MAX.1
 
-// index.html:53556 · Phạm vi: global
+// index.html:53560 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.BOOM_HOVER.1 EDITABLE
 const BOOM_HOVER = 52;
 // PLAYER_PART_END s4.BOOM_HOVER.1
 
-// index.html:53557 · Phạm vi: global
+// index.html:53561 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.BOOM_DRIFT.1 EDITABLE
 const BOOM_DRIFT = 2.5;
 // PLAYER_PART_END s4.BOOM_DRIFT.1
 
-// index.html:53565 · Phạm vi: global
+// index.html:53569 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.boomApply.1 EDITABLE
 function boomApply(rect, dmg, hitSet) {
             let any = false;
@@ -59,7 +59,7 @@ function boomApply(rect, dmg, hitSet) {
         }
 // PLAYER_PART_END s4.boomApply.1
 
-// index.html:53585 · Phạm vi: global
+// index.html:53589 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.boomNearestX.1 EDITABLE
 function boomNearestX(bx, by) {
             let best = null, bd = 1e9;
@@ -69,7 +69,7 @@ function boomNearestX(bx, by) {
         }
 // PLAYER_PART_END s4.boomNearestX.1
 
-// index.html:53592 · Phạm vi: global
+// index.html:53596 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.boomAim.1 EDITABLE
 function boomAim(x, y, faceDir) {
             let t = boomNearestX(x, y);
@@ -84,7 +84,7 @@ function boomAim(x, y, faceDir) {
         }
 // PLAYER_PART_END s4.boomAim.1
 
-// index.html:53605 · Phạm vi: global
+// index.html:53609 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.boomPos.1 EDITABLE
 function boomPos(b, ph) {
             let u = b.A * Math.sin(ph);                    // doc truc chinh
@@ -95,7 +95,7 @@ function boomPos(b, ph) {
         }
 // PLAYER_PART_END s4.boomPos.1
 
-// index.html:53614 · Phạm vi: global
+// index.html:53618 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.boomLost.1 EDITABLE
 function boomLost(b) {
             if (!b || b.big || !b.owner) return;
@@ -105,12 +105,12 @@ function boomLost(b) {
         }
 // PLAYER_PART_END s4.boomLost.1
 
-// index.html:53623 · Phạm vi: global
+// index.html:53627 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.BOOM_AIM_CAP.1 EDITABLE
 const BOOM_AIM_CAP = 38 * Math.PI / 180;
 // PLAYER_PART_END s4.BOOM_AIM_CAP.1
 
-// index.html:53625 · Phạm vi: global
+// index.html:53629 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.throwBoomerang.1 EDITABLE
 function throwBoomerang(p, opts) {
             opts = opts || {};
@@ -153,12 +153,12 @@ function throwBoomerang(p, opts) {
         }
 // PLAYER_PART_END s4.throwBoomerang.1
 
-// index.html:53665 · Phạm vi: global
+// index.html:53669 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.boomAiLoc.1 EDITABLE
 let boomAiLoc = null;
 // PLAYER_PART_END s4.boomAiLoc.1
 
-// index.html:53666 · Phạm vi: global
+// index.html:53670 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.tickBoomerangs.1 EDITABLE
 function tickBoomerangs() {
             let p = boomAiLoc || dino;
@@ -270,7 +270,7 @@ function tickBoomerangs() {
         }
 // PLAYER_PART_END s4.tickBoomerangs.1
 
-// index.html:53776 · Phạm vi: global
+// index.html:53780 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.catchBoomerang.1 EDITABLE
 function catchBoomerang(p, b) {
             let _nv = (typeof hasRune === 'function' && hasRune('explshot'));
@@ -300,7 +300,7 @@ function catchBoomerang(p, b) {
         }
 // PLAYER_PART_END s4.catchBoomerang.1
 
-// index.html:53802 · Phạm vi: global
+// index.html:53806 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.drawBoomerangs.1 EDITABLE
 function drawBoomerangs() {
             for (let b of boomerangs) {
@@ -355,7 +355,7 @@ function drawBoomerangs() {
         }
 // PLAYER_PART_END s4.drawBoomerangs.1
 
-// index.html:53854 · Phạm vi: global
+// index.html:53858 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.boomNhayUlt.1 EDITABLE
 function boomNhayUlt(){
             let rb = dino.boomUltRide;
@@ -379,7 +379,7 @@ function boomNhayUlt(){
         }
 // PLAYER_PART_END s4.boomNhayUlt.1
 
-// index.html:53878 · Phạm vi: Player.prototype
+// index.html:53882 · Phạm vi: Player.prototype
 const __Part18 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.boomHoverThrow.1 EDITABLE
 boomHoverThrow() {
@@ -392,7 +392,7 @@ boomHoverThrow() {
 // PLAYER_PART_END s4.Player.prototype.boomHoverThrow.1
 };
 
-// index.html:53887 · Phạm vi: Player.prototype
+// index.html:53891 · Phạm vi: Player.prototype
 const __Part19 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.boomThrow.1 EDITABLE
 boomThrow(held) {
@@ -411,7 +411,7 @@ boomThrow(held) {
 // PLAYER_PART_END s4.Player.prototype.boomThrow.1
 };
 
-// index.html:53901 · Phạm vi: Player.prototype
+// index.html:53905 · Phạm vi: Player.prototype
 const __Part20 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.boomChannelThrow.1 EDITABLE
 boomChannelThrow() {
@@ -423,7 +423,7 @@ boomChannelThrow() {
 // PLAYER_PART_END s4.Player.prototype.boomChannelThrow.1
 };
 
-// index.html:53908 · Phạm vi: Player.prototype
+// index.html:53912 · Phạm vi: Player.prototype
 const __Part21 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.boomTickChannel.1 EDITABLE
 boomTickChannel(chargeKey) {
@@ -449,7 +449,7 @@ boomTickChannel(chargeKey) {
 // PLAYER_PART_END s4.Player.prototype.boomTickChannel.1
 };
 
-// index.html:53928 · Phạm vi: Player.prototype
+// index.html:53932 · Phạm vi: Player.prototype
 const __Part22 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.boomVeXoay.1 EDITABLE
 boomVeXoay() {
@@ -474,7 +474,7 @@ boomVeXoay() {
 // PLAYER_PART_END s4.Player.prototype.boomVeXoay.1
 };
 
-// index.html:53949 · Phạm vi: global
+// index.html:53953 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.9 EDITABLE
 vkDangKy(7, {
             ten: 'BOOMERANG',

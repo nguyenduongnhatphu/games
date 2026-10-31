@@ -1,47 +1,47 @@
 // PLAYER_FILE: XForm
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: DPR, FloatingText, LT, MMX_GIAP_MAU, MMX_GIAP_TEN, MMX_VK, MMX_VK_TEN, MegaManXBoss, POWERS, SFX, canvas, combatStance, ctx, currentForm, currentLang, currentPower, danteForm, dashVx, deathCineActive, deathCineFrame, deathSkel, dino, floatingTexts, frames, gameOver, gameState, gameVictory, hudChu, keys, kinhTinhThe, paused, wildernessOn, xuongChetParts, xuongParts, xuongVeLoiAt, xuongVeManh
-// index.html:85558 · Phạm vi: global
+// index.html:85562 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xChoi.1 EDITABLE
 let xChoi = null, xNL = 0, xLuu = null;
 // PLAYER_PART_END s6.xChoi.1
 
-// index.html:85560 · Phạm vi: global
+// index.html:85564 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.XNL_TICK.1 EDITABLE
 const XNL_TICK = 60;
 // PLAYER_PART_END s6.XNL_TICK.1
 
-// index.html:85560 · Phạm vi: global
+// index.html:85564 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xNLt.1 EDITABLE
 let xNLt = 0;
 // PLAYER_PART_END s6.xNLt.1
 
-// index.html:85566 · Phạm vi: global
+// index.html:85570 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xForm.1 EDITABLE
 let xForm = false, xPowerCu = -1;
 // PLAYER_PART_END s6.xForm.1
 
-// index.html:85567 · Phạm vi: global
+// index.html:85571 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.TryStatement.1 EDITABLE
 try { xForm = localStorage.getItem('dino_x_form') === '1'; } catch(e){}
 // PLAYER_PART_END s6.TryStatement.1
 
-// index.html:85568 · Phạm vi: global
+// index.html:85572 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.X_POWER.1 EDITABLE
 const X_POWER = POWERS.findIndex(p => p.id === 'x');
 // PLAYER_PART_END s6.X_POWER.1
 
-// index.html:85569 · Phạm vi: global
+// index.html:85573 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.X_N_DANG.1 EDITABLE
 const X_N_DANG = 12;
 // PLAYER_PART_END s6.X_N_DANG.1
 
-// index.html:85611 · Phạm vi: global
+// index.html:85615 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.veKinhManh.1 EDITABLE
 function veKinhManh(bx, by, cs, br, layers){
             const Y = (v, k) => by + v + cs * k + br, Y2 = (v) => by + v + cs * 13 + br;
@@ -65,12 +65,12 @@ function veKinhManh(bx, by, cs, br, layers){
         }
 // PLAYER_PART_END s6.veKinhManh.1
 
-// index.html:85675 · Phạm vi: global
+// index.html:85679 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.XUONG_BONE.1 EDITABLE
 const XUONG_BONE = '#e9e2cf', XUONG_DK = '#b9ae92', XUONG_OUT = '#2b2418';
 // PLAYER_PART_END s6.XUONG_BONE.1
 
-// index.html:85770 · Phạm vi: global
+// index.html:85774 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.veDinoXuong.1 EDITABLE
 function veDinoXuong(bx, by, crouch, airborne, ng){
             let chet = !!(deathSkel && deathCineActive && ng && ng.id === 1);
@@ -85,27 +85,27 @@ function veDinoXuong(bx, by, crouch, airborne, ng){
         }
 // PLAYER_PART_END s6.veDinoXuong.1
 
-// index.html:85798 · Phạm vi: global
+// index.html:85802 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.apexOn.1 EDITABLE
 function apexOn(){return currentForm===8 && !xForm;}
 // PLAYER_PART_END s6.apexOn.1
 
-// index.html:85799 · Phạm vi: global
+// index.html:85803 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xFormOn.1 EDITABLE
 function xFormOn(){ return xForm || (typeof danteForm!=='undefined'&&danteForm); }
 // PLAYER_PART_END s6.xFormOn.1
 
-// index.html:85800 · Phạm vi: global
+// index.html:85804 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xFormIdx.1 EDITABLE
 function xFormIdx(){ return typeof danteForm!=='undefined'&&danteForm ? 9 : xForm ? 7 : currentForm; }
 // PLAYER_PART_END s6.xFormIdx.1
 
-// index.html:85801 · Phạm vi: global
+// index.html:85805 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xDang.1 EDITABLE
 function xDang(){ return xForm && gameState !== 'pvp'; }
 // PLAYER_PART_END s6.xDang.1
 
-// index.html:85802 · Phạm vi: global
+// index.html:85806 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xDongBo.1 EDITABLE
 function xDongBo(){
             if (typeof POWERS === 'undefined' || X_POWER < 0) return;
@@ -119,7 +119,7 @@ function xDongBo(){
         }
 // PLAYER_PART_END s6.xDongBo.1
 
-// index.html:85812 · Phạm vi: global
+// index.html:85816 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xDatForm.1 EDITABLE
 function xDatForm(i){
             i = ((i % X_N_DANG) + X_N_DANG) % X_N_DANG;
@@ -131,17 +131,17 @@ function xDatForm(i){
         }
 // PLAYER_PART_END s6.xDatForm.1
 
-// index.html:85820 · Phạm vi: global
+// index.html:85824 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xHudOn.1 EDITABLE
 function xHudOn(){ return xBat() && !!xChoi; }
 // PLAYER_PART_END s6.xHudOn.1
 
-// index.html:85821 · Phạm vi: global
+// index.html:85825 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xBat.1 EDITABLE
 function xBat(){ return typeof POWERS !== 'undefined' && POWERS[currentPower] && POWERS[currentPower].id === 'x'; }
 // PLAYER_PART_END s6.xBat.1
 
-// index.html:85831 · Phạm vi: global
+// index.html:85835 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xDmgDan.1 EDITABLE
 function xDmgDan(o){
             if (!o) return 2;
@@ -158,12 +158,12 @@ function xDmgDan(o){
         }
 // PLAYER_PART_END s6.xDmgDan.1
 
-// index.html:85844 · Phạm vi: global
+// index.html:85848 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xCong.1 EDITABLE
 function xCong(n){ xNL = Math.max(0, Math.min(50, xNL + (n || 1))); }
 // PLAYER_PART_END s6.xCong.1
 
-// index.html:85845 · Phạm vi: global
+// index.html:85849 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xVao.1 EDITABLE
 function xVao(){
             if (xChoi || typeof MegaManXBoss !== 'function' || typeof dino === 'undefined' || !dino) return;
@@ -177,7 +177,7 @@ function xVao(){
         }
 // PLAYER_PART_END s6.xVao.1
 
-// index.html:85855 · Phạm vi: global
+// index.html:85859 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xRoi.1 EDITABLE
 function xRoi(){
             if (xLuu && typeof dino !== 'undefined' && dino){
@@ -187,7 +187,7 @@ function xRoi(){
         }
 // PLAYER_PART_END s6.xRoi.1
 
-// index.html:85861 · Phạm vi: global
+// index.html:85865 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xDoiVk.1 EDITABLE
 function xDoiVk(dir){
             if (!xChoi || xChoi.bien) return;
@@ -202,22 +202,22 @@ function xDoiVk(dir){
         }
 // PLAYER_PART_END s6.xDoiVk.1
 
-// index.html:85872 · Phạm vi: global
+// index.html:85876 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xArmorMenu.1 EDITABLE
 let xArmorMenu=null;
 // PLAYER_PART_END s6.xArmorMenu.1
 
-// index.html:85873 · Phạm vi: global
+// index.html:85877 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.X_ARMOR_CHOICES.1 EDITABLE
 const X_ARMOR_CHOICES=['fourth','falcon','gaea','ultimate'];
 // PLAYER_PART_END s6.X_ARMOR_CHOICES.1
 
-// index.html:85874 · Phạm vi: global
+// index.html:85878 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xArmorClose.1 EDITABLE
 function xArmorClose(){xArmorMenu=null;for(const k of Object.keys(keys))keys[k]=false;if(xChoi){xChoi._giuK=null;xChoi.sacLv=0;}}
 // PLAYER_PART_END s6.xArmorClose.1
 
-// index.html:85875 · Phạm vi: global
+// index.html:85879 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xArmorSelect.1 EDITABLE
 function xArmorSelect(g){
             const p=xChoi;if(!p)return xArmorClose();const cost=g==='thuong'?0:g==='ultimate'?5:1;
@@ -226,7 +226,7 @@ function xArmorSelect(g){
         }
 // PLAYER_PART_END s6.xArmorSelect.1
 
-// index.html:85880 · Phạm vi: global
+// index.html:85884 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xArmorOpen.1 EDITABLE
 function xArmorOpen(){
             if(!xBat()||!xChoi||xChoi.bien||paused||gameOver||gameVictory)return;
@@ -236,7 +236,7 @@ function xArmorOpen(){
         }
 // PLAYER_PART_END s6.xArmorOpen.1
 
-// index.html:85886 · Phạm vi: global
+// index.html:85890 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xArmorKey.1 EDITABLE
 function xArmorKey(e){
             e.preventDefault();if(e.repeat)return;
@@ -248,17 +248,17 @@ function xArmorKey(e){
         }
 // PLAYER_PART_END s6.xArmorKey.1
 
-// index.html:85894 · Phạm vi: global
+// index.html:85898 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xArmorRects.1 EDITABLE
 function xArmorRects(){const w=Math.min(180,(canvas.width-100)/4),gap=14,left=(canvas.width-(w*4+gap*3))/2,y=canvas.height/2-120;return X_ARMOR_CHOICES.map((g,i)=>({g,x:left+i*(w+gap),y,w,h:230}));}
 // PLAYER_PART_END s6.xArmorRects.1
 
-// index.html:85895 · Phạm vi: global
+// index.html:85899 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xArmorClick.1 EDITABLE
 function xArmorClick(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;for(const b of xArmorRects())if(x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h)return xArmorSelect(b.g);if(x>=canvas.width/2-150&&x<=canvas.width/2+150&&y>=canvas.height/2+135&&y<=canvas.height/2+175)xArmorSelect('thuong');}
 // PLAYER_PART_END s6.xArmorClick.1
 
-// index.html:85896 · Phạm vi: global
+// index.html:85900 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xArmorDraw.1 EDITABLE
 function xArmorDraw(){
             const m=xArmorMenu;if(!m)return;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.drawImage(m.bg,0,0);ctx.fillStyle='rgba(3,9,23,.88)';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.textAlign='center';ctx.font='bold 24px Consolas';ctx.fillStyle='#cdeeff';ctx.fillText(LT('CHỌN GIÁP X','SELECT X ARMOR'),canvas.width/2,canvas.height/2-166);ctx.font='13px Consolas';ctx.fillStyle='#91a9c3';ctx.fillText(LT('ĐÃ TẠM DỪNG · Năng lượng ','PAUSED · Energy ')+xNL+'/50',canvas.width/2,canvas.height/2-139);
@@ -267,12 +267,12 @@ function xArmorDraw(){
         }
 // PLAYER_PART_END s6.xArmorDraw.1
 
-// index.html:85901 · Phạm vi: global
+// index.html:85905 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xDoiGiap.1 EDITABLE
 function xDoiGiap(dir){xArmorOpen();}
 // PLAYER_PART_END s6.xDoiGiap.1
 
-// index.html:85902 · Phạm vi: global
+// index.html:85906 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xBan.1 EDITABLE
 function xBan(){
             let p = xChoi;
@@ -288,7 +288,7 @@ function xBan(){
         }
 // PLAYER_PART_END s6.xBan.1
 
-// index.html:85914 · Phạm vi: global
+// index.html:85918 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xNhaK.1 EDITABLE
 function xNhaK(){
             let p = xChoi;
@@ -317,7 +317,7 @@ function xNhaK(){
         }
 // PLAYER_PART_END s6.xNhaK.1
 
-// index.html:85939 · Phạm vi: global
+// index.html:85943 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xUlt.1 EDITABLE
 function xUlt(){
             let p = xChoi;
@@ -331,7 +331,7 @@ function xUlt(){
         }
 // PLAYER_PART_END s6.xUlt.1
 
-// index.html:85949 · Phạm vi: global
+// index.html:85953 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xAnPhim.1 EDITABLE
 function xAnPhim(code, lap){
             if (!xBat() || !xChoi) return false;
@@ -349,7 +349,7 @@ function xAnPhim(code, lap){
         }
 // PLAYER_PART_END s6.xAnPhim.1
 
-// index.html:85963 · Phạm vi: global
+// index.html:85967 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xTick.1 EDITABLE
 function xTick(){
             if (!xBat() || typeof dino === 'undefined' || !dino){ if (xChoi || xLuu) xRoi(); return; }
@@ -403,7 +403,7 @@ function xTick(){
         }
 // PLAYER_PART_END s6.xTick.1
 
-// index.html:86013 · Phạm vi: global
+// index.html:86017 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xVe.1 EDITABLE
 function xVe(){
             if (!xBat() || !xChoi) return;
@@ -412,12 +412,12 @@ function xVe(){
         }
 // PLAYER_PART_END s6.xVe.1
 
-// index.html:86018 · Phạm vi: global
+// index.html:86022 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xTenVk.1 EDITABLE
 function xTenVk(){ return (xChoi && (xChoi.vkChon || 'buster') !== 'buster') ? MMX_VK_TEN[xChoi.vkChon] : 'X-BUSTER'; }
 // PLAYER_PART_END s6.xTenVk.1
 
-// index.html:86020 · Phạm vi: global
+// index.html:86024 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xHudVuKhi.1 EDITABLE
 function xHudVuKhi(){
             if (!xChoi) return;
@@ -428,7 +428,7 @@ function xHudVuKhi(){
         }
 // PLAYER_PART_END s6.xHudVuKhi.1
 
-// index.html:86028 · Phạm vi: global
+// index.html:86032 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.xHudVe.1 EDITABLE
 function xHudVe(ry){
             let p = xChoi; if (!p) return ry;

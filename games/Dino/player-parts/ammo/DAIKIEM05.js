@@ -1,12 +1,12 @@
 // PLAYER_FILE: DAIKIEM05
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: BZ_LH_HP_MIN, BZ_NAP, DK_CHAY, DK_CHAY_BUFF, DK_CHAY_DAT, DK_DAN, DK_DA_N, DK_JC_DMG, DK_JC_HUT, DK_JC_K, Effect, FloatingText, LT, SFX, bzBat, bzKenBat, canvas, combatStance, ctx, dealDamage, dino, dkBatDau, dkChu, dkCua, dkDungYen, dkEm, dkNangLuong, dkNhaK, dkParry, dkTick, dkUltBat, dkVeKiem, dkVeTrenNguoi, floatingTexts, hasRune, hitDat, shakeTimer, ultCharge, uniTargets, venKhoa, visualEffects, vkDangKy, worldCX, worldL, worldR
-// index.html:76217 · Phạm vi: global
+// index.html:76221 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.dkVeUlt.1 EDITABLE
 function dkVeUlt(ng, U){
             if (U && U.bz) return;
@@ -85,12 +85,12 @@ function dkVeUlt(ng, U){
         }
 // PLAYER_PART_END s4.dkVeUlt.1
 
-// index.html:76294 · Phạm vi: global
+// index.html:76298 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.dkUni.1 EDITABLE
 var dkUni = null;
 // PLAYER_PART_END s4.dkUni.1
 
-// index.html:76295 · Phạm vi: global
+// index.html:76299 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.dkUniBat.1 EDITABLE
 function dkUniBat(){
             let L2 = (typeof worldL === 'function') ? worldL() : 0;
@@ -102,7 +102,7 @@ function dkUniBat(){
         }
 // PLAYER_PART_END s4.dkUniBat.1
 
-// index.html:76303 · Phạm vi: global
+// index.html:76307 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.dkUniTick.1 EDITABLE
 function dkUniTick(){
             let Gk = dkUni; if (!Gk) return;
@@ -142,7 +142,7 @@ function dkUniTick(){
         }
 // PLAYER_PART_END s4.dkUniTick.1
 
-// index.html:76341 · Phạm vi: global
+// index.html:76345 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.21 EDITABLE
 vkDangKy(DK_DAN, {
             ten: 'DAI KIEM',

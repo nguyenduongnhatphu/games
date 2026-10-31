@@ -1,12 +1,12 @@
 // PLAYER_FILE: PULSAR
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Effect, FloatingText, Projectile, SFX, allTargets, canvas, combatStance, ctx, dealDamage, floatingTexts, frames, hasRune, projectiles, shakeTimer, ultCharge, visualEffects, vkDangKy, worldCX, worldL, worldR
-// index.html:53242 · Phạm vi: global
+// index.html:53246 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.pulsarScaledDamage.1 EDITABLE
 function pulsarScaledDamage(proj) {
             if (!proj || (!proj.pulsar && !proj._fromStar)) return proj ? (proj.dmg || 1) : 1;
@@ -26,7 +26,7 @@ function pulsarScaledDamage(proj) {
         }
 // PLAYER_PART_END s4.pulsarScaledDamage.1
 
-// index.html:53260 · Phạm vi: Player.prototype
+// index.html:53264 · Phạm vi: Player.prototype
 const __Part1 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.firePulsarBullet.1 EDITABLE
 firePulsarBullet() {
@@ -38,7 +38,7 @@ firePulsarBullet() {
 // PLAYER_PART_END s4.Player.prototype.firePulsarBullet.1
 };
 
-// index.html:53268 · Phạm vi: Player.prototype
+// index.html:53272 · Phạm vi: Player.prototype
 const __Part2 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.pulsarBac.1 EDITABLE
 pulsarBac(f) {
@@ -55,7 +55,7 @@ pulsarBac(f) {
 // PLAYER_PART_END s4.Player.prototype.pulsarBac.1
 };
 
-// index.html:53279 · Phạm vi: Player.prototype
+// index.html:53283 · Phạm vi: Player.prototype
 const __Part3 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.createPulsarStar.1 EDITABLE
 createPulsarStar(f, onBody) {
@@ -71,7 +71,7 @@ createPulsarStar(f, onBody) {
 // PLAYER_PART_END s4.Player.prototype.createPulsarStar.1
 };
 
-// index.html:53289 · Phạm vi: Player.prototype
+// index.html:53293 · Phạm vi: Player.prototype
 const __Part4 = {
 // PLAYER_PART_BEGIN s4.Player.prototype._pulsarUltCho.1 EDITABLE
 _pulsarUltCho(i){
@@ -82,7 +82,7 @@ _pulsarUltCho(i){
 // PLAYER_PART_END s4.Player.prototype._pulsarUltCho.1
 };
 
-// index.html:53294 · Phạm vi: Player.prototype
+// index.html:53298 · Phạm vi: Player.prototype
 const __Part5 = {
 // PLAYER_PART_BEGIN s4.Player.prototype._tickPulsarUlt.1 EDITABLE
 _tickPulsarUlt(){
@@ -144,7 +144,7 @@ _tickPulsarUlt(){
 // PLAYER_PART_END s4.Player.prototype._tickPulsarUlt.1
 };
 
-// index.html:53350 · Phạm vi: Player.prototype
+// index.html:53354 · Phạm vi: Player.prototype
 const __Part6 = {
 // PLAYER_PART_BEGIN s4.Player.prototype._pulsarEmitRound.1 EDITABLE
 _pulsarEmitRound(st) {
@@ -155,7 +155,7 @@ _pulsarEmitRound(st) {
 // PLAYER_PART_END s4.Player.prototype._pulsarEmitRound.1
 };
 
-// index.html:53355 · Phạm vi: Player.prototype
+// index.html:53359 · Phạm vi: Player.prototype
 const __Part7 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.tickPulsar.1 EDITABLE
 tickPulsar() {
@@ -217,7 +217,7 @@ tickPulsar() {
 // PLAYER_PART_END s4.Player.prototype.tickPulsar.1
 };
 
-// index.html:53411 · Phạm vi: Player.prototype
+// index.html:53415 · Phạm vi: Player.prototype
 const __Part8 = {
 // PLAYER_PART_BEGIN s4.Player.prototype._drawStar.1 EDITABLE
 _drawStar(cx, cy, R, angle, col, big) {
@@ -231,7 +231,7 @@ _drawStar(cx, cy, R, angle, col, big) {
 // PLAYER_PART_END s4.Player.prototype._drawStar.1
 };
 
-// index.html:53419 · Phạm vi: Player.prototype
+// index.html:53423 · Phạm vi: Player.prototype
 const __Part9 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.drawPulsar.1 EDITABLE
 drawPulsar() {
@@ -291,7 +291,7 @@ drawPulsar() {
 // PLAYER_PART_END s4.Player.prototype.drawPulsar.1
 };
 
-// index.html:53474 · Phạm vi: Player.prototype
+// index.html:53478 · Phạm vi: Player.prototype
 const __Part10 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.pulsarTickRoi.1 EDITABLE
 pulsarTickRoi(crouchKey) {
@@ -303,7 +303,7 @@ pulsarTickRoi(crouchKey) {
 // PLAYER_PART_END s4.Player.prototype.pulsarTickRoi.1
 };
 
-// index.html:53482 · Phạm vi: global
+// index.html:53486 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.8 EDITABLE
 vkDangKy(6, {
             ten: 'PULSAR',

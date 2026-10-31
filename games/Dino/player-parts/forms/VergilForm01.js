@@ -1,32 +1,32 @@
 // PLAYER_FILE: VergilForm01
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Effect, FloatingText, SFX, VERGIL_ATTACK_RATE, VG_H, VG_W, WILDS, X_N_DANG, addStyle, allTargets, bosses, camX, canvas, checkAABB, combatStance, currentAmmoType, currentForm, currentPower, danteControlAllowed, danteForm, danteSync, dashVx, dealDamage, dino, dojoMode, dswControl, dswFloor, floatingTexts, frames, gameOver, gameState, gameVictory, keys, paused, phuKien, playerAttackStep, playerComboBuffer, playerComboCancel, playerComboTrack, playerFinisherControl, sgDamage, sgTargets, shakeTimer, startGame, ultCharge, visualEffects, wildernessOn, worldL, worldR, xDatForm, xDongBo, xForm, xFormIdx, xFormOn
-// index.html:112456 · Phạm vi: global
+// index.html:112460 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.VG_FORM_IDX.1 EDITABLE
 const VG_FORM_IDX = 10;
 // PLAYER_PART_END s18.VG_FORM_IDX.1
 
-// index.html:112457 · Phạm vi: global
+// index.html:112461 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.VG_CONC_MAX.1 EDITABLE
 const VG_CONC_MAX = 300;
 // PLAYER_PART_END s18.VG_CONC_MAX.1
 
-// index.html:112458 · Phạm vi: global
+// index.html:112462 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.VG_SDT_MAX.1 EDITABLE
 const VG_SDT_MAX  = 720;
 // PLAYER_PART_END s18.VG_SDT_MAX.1
 
-// index.html:112459 · Phạm vi: global
+// index.html:112463 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.VG_CC_LOCKOUT.1 EDITABLE
 const VG_CC_LOCKOUT = 120;
 // PLAYER_PART_END s18.VG_CC_LOCKOUT.1
 
-// index.html:112461 · Phạm vi: global
+// index.html:112465 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.VG_MIRAGE_MODES.1 EDITABLE
 const VG_MIRAGE_MODES = [
     { n: 'SHOOTING BLADES', c: '#40C4FF', cost: 0 },
@@ -36,7 +36,7 @@ const VG_MIRAGE_MODES = [
 ];
 // PLAYER_PART_END s18.VG_MIRAGE_MODES.1
 
-// index.html:112472 · Phạm vi: global
+// index.html:112476 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.YMT_MOVES.1 EDITABLE
 const YMT_MOVES = {
     // 1. YAMATO COMBO A (J -> J -> J -> J): Thuần sát thương & tốc độ, không gây stun khóa cứng
@@ -82,27 +82,27 @@ const YMT_MOVES = {
 };
 // PLAYER_PART_END s18.YMT_MOVES.1
 
-// index.html:112515 · Phạm vi: global
+// index.html:112519 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vergilForm.1 EDITABLE
 let vergilForm = false, vergilLoadout = null;
 // PLAYER_PART_END s18.vergilForm.1
 
-// index.html:112516 · Phạm vi: global
+// index.html:112520 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.TryStatement.1 EDITABLE
 try { vergilForm = localStorage.getItem('dino_vergil_form') === '1'; } catch (e) {}
 // PLAYER_PART_END s18.TryStatement.1
 
-// index.html:112518 · Phạm vi: global
+// index.html:112522 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vergilOn.1 EDITABLE
 function vergilOn() { return vergilForm && gameState !== 'pvp'; }
 // PLAYER_PART_END s18.vergilOn.1
 
-// index.html:112519 · Phạm vi: global
+// index.html:112523 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vergilActive.1 EDITABLE
 function vergilActive(n) { return vergilOn() && ['normal', 'boss_rush', 'test_boss'].includes(gameState) && n === dino && n.hp > 0; }
 // PLAYER_PART_END s18.vergilActive.1
 
-// index.html:112522 · Phạm vi: global
+// index.html:112526 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vergilSync.1 EDITABLE
 function vergilSync() {
     if (vergilOn()) {
@@ -116,7 +116,7 @@ function vergilSync() {
 }
 // PLAYER_PART_END s18.vergilSync.1
 
-// index.html:112532 · Phạm vi: global
+// index.html:112536 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.setVergilForm.1 EDITABLE
 function setVergilForm(enable) {
     vergilForm=!!enable;
@@ -126,12 +126,12 @@ function setVergilForm(enable) {
 }
 // PLAYER_PART_END s18.setVergilForm.1
 
-// index.html:112538 · Phạm vi: global
+// index.html:112542 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgDatFormBase.1 EDITABLE
 const vgDatFormBase=xDatForm;
 // PLAYER_PART_END s18.vgDatFormBase.1
 
-// index.html:112539 · Phạm vi: global
+// index.html:112543 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.xDatForm.1 EDITABLE
 xDatForm=function(i) {
     const choose=((i%X_N_DANG)+X_N_DANG)%X_N_DANG;
@@ -141,27 +141,27 @@ xDatForm=function(i) {
 };
 // PLAYER_PART_END s18.xDatForm.1
 
-// index.html:112545 · Phạm vi: global
+// index.html:112549 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgFormIdxBase.1 EDITABLE
 const vgFormIdxBase=xFormIdx,vgFormOnBase=xFormOn,vgSyncBase=xDongBo;
 // PLAYER_PART_END s18.vgFormIdxBase.1
 
-// index.html:112546 · Phạm vi: global
+// index.html:112550 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.xFormIdx.1 EDITABLE
 xFormIdx=function(){return vergilForm?VG_FORM_IDX:vgFormIdxBase();};
 // PLAYER_PART_END s18.xFormIdx.1
 
-// index.html:112547 · Phạm vi: global
+// index.html:112551 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.xFormOn.1 EDITABLE
 xFormOn=function(){return vergilForm||vgFormOnBase();};
 // PLAYER_PART_END s18.xFormOn.1
 
-// index.html:112548 · Phạm vi: global
+// index.html:112552 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.xDongBo.1 EDITABLE
 xDongBo=function(){vgSyncBase();vergilSync();};
 // PLAYER_PART_END s18.xDongBo.1
 
-// index.html:112550 · Phạm vi: global
+// index.html:112554 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vergilLabel.1 EDITABLE
 function vergilLabel(s, col) {
     const ft = new FloatingText(dino.x - 28, dino.y - 34, s);
@@ -170,12 +170,12 @@ function vergilLabel(s, col) {
 }
 // PLAYER_PART_END s18.vergilLabel.1
 
-// index.html:112561 · Phạm vi: global
+// index.html:112565 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgTargetCcMap.1 EDITABLE
 const vgTargetCcMap = new WeakMap();
 // PLAYER_PART_END s18.vgTargetCcMap.1
 
-// index.html:112563 · Phạm vi: global
+// index.html:112567 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgCanApplyCC.1 EDITABLE
 function vgCanApplyCC(target, ccKey) {
     if (!target || !ccKey) return false;
@@ -200,7 +200,7 @@ function vgCanApplyCC(target, ccKey) {
 }
 // PLAYER_PART_END s18.vgCanApplyCC.1
 
-// index.html:112585 · Phạm vi: global
+// index.html:112589 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vergilInit.1 EDITABLE
 function vergilInit(n) {
     const feet = n.y + n.h;
@@ -258,7 +258,7 @@ function vergilInit(n) {
 }
 // PLAYER_PART_END s18.vergilInit.1
 
-// index.html:112640 · Phạm vi: global
+// index.html:112644 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.IfStatement.1 EDITABLE
 if (typeof startGame === 'function') {
     const vgStartBase = startGame;
@@ -271,21 +271,21 @@ if (typeof startGame === 'function') {
 }
 // PLAYER_PART_END s18.IfStatement.1
 
-// index.html:112650 · Phạm vi: global
+// index.html:112654 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgConcLevel.1 EDITABLE
 function vgConcLevel(v) {
     return v.conc >= 250 ? 2 : (v.conc >= 100 ? 1 : 0);
 }
 // PLAYER_PART_END s18.vgConcLevel.1
 
-// index.html:112654 · Phạm vi: global
+// index.html:112658 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgAddConc.1 EDITABLE
 function vgAddConc(v, amount) {
     v.conc = Math.max(0, Math.min(VG_CONC_MAX, v.conc + amount));
 }
 // PLAYER_PART_END s18.vgAddConc.1
 
-// index.html:112658 · Phạm vi: global
+// index.html:112662 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgAddGhost.1 EDITABLE
 function vgAddGhost(n, v) {
     v.ghosts.push({
@@ -297,14 +297,14 @@ function vgAddGhost(n, v) {
 }
 // PLAYER_PART_END s18.vgAddGhost.1
 
-// index.html:112667 · Phạm vi: global
+// index.html:112671 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.v_markedValid.1 EDITABLE
 function v_markedValid(v) {
     return v && v.markedTarget && !v.markedTarget._beamClashPoint && v.markedTarget.hp > 0 && v.markTimer > 0;
 }
 // PLAYER_PART_END s18.v_markedValid.1
 
-// index.html:112671 · Phạm vi: global
+// index.html:112675 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgFindTarget.1 EDITABLE
 function vgFindTarget(n, dir, maxDist = 720, physical = false) {
     const cx = n.x + n.w / 2, cy = n.y + n.h / 2;
@@ -318,12 +318,12 @@ function vgFindTarget(n, dir, maxDist = 720, physical = false) {
 }
 // PLAYER_PART_END s18.vgFindTarget.1
 
-// index.html:112682 · Phạm vi: global
+// index.html:112686 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgControl.1 EDITABLE
 function vgControl(o,opt){return dswControl(o,opt,dino.vergil);}
 // PLAYER_PART_END s18.vgControl.1
 
-// index.html:112684 · Phạm vi: global
+// index.html:112688 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgDealDamage.1 EDITABLE
 function vgDealDamage(v, target, baseDmg, tag = 'yamato') {
     const lv = vgConcLevel(v);
@@ -350,7 +350,7 @@ function vgDealDamage(v, target, baseDmg, tag = 'yamato') {
 }
 // PLAYER_PART_END s18.vgDealDamage.1
 
-// index.html:112711 · Phạm vi: global
+// index.html:112715 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgPerformTrick.1 EDITABLE
 function vgPerformTrick(n, v, mode) {
     const dir = n.isFacingLeft ? -1 : 1;
@@ -414,7 +414,7 @@ function vgPerformTrick(n, v, mode) {
 }
 // PLAYER_PART_END s18.vgPerformTrick.1
 
-// index.html:112776 · Phạm vi: global
+// index.html:112780 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgFireRangedMirage.1 EDITABLE
 function vgFireRangedMirage(n, v, forceMode = null) {
     const mode = forceMode !== null ? forceMode : v.mirageMode;
@@ -499,7 +499,7 @@ function vgFireRangedMirage(n, v, forceMode = null) {
 }
 // PLAYER_PART_END s18.vgFireRangedMirage.1
 
-// index.html:112861 · Phạm vi: global
+// index.html:112865 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.ymtStart.1 EDITABLE
 function ymtStart(id, extra = {}) {
     const n = dino, v = n.vergil, m = YMT_MOVES[id];
@@ -589,7 +589,7 @@ function ymtStart(id, extra = {}) {
 }
 // PLAYER_PART_END s18.ymtStart.1
 
-// index.html:112948 · Phạm vi: global
+// index.html:112952 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.ymtPose.1 EDITABLE
 function ymtPose(n, v, a, age) {
     const dir = a ? a.dir : (n.isFacingLeft ? -1 : 1);
@@ -749,7 +749,7 @@ function ymtPose(n, v, a, age) {
 }
 // PLAYER_PART_END s18.ymtPose.1
 
-// index.html:113106 · Phạm vi: global
+// index.html:113110 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.ymtStrike.1 EDITABLE
 function ymtStrike(n, v, a, pulse) {
     const lv = vgConcLevel(v);
@@ -833,7 +833,7 @@ function ymtStrike(n, v, a, pulse) {
 }
 // PLAYER_PART_END s18.ymtStrike.1
 
-// index.html:113188 · Phạm vi: global
+// index.html:113192 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.ymtDispatch.1 EDITABLE
 function ymtDispatch(cmd) {
     const n = dino, v = n.vergil;
@@ -908,7 +908,7 @@ function ymtDispatch(cmd) {
 }
 // PLAYER_PART_END s18.ymtDispatch.1
 
-// index.html:113260 · Phạm vi: global
+// index.html:113264 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.ymtCommand.1 EDITABLE
 function ymtCommand(cmd) {
     const n = dino, v = n.vergil, a = v.attack;
@@ -942,7 +942,7 @@ function ymtCommand(cmd) {
 }
 // PLAYER_PART_END s18.ymtCommand.1
 
-// index.html:113294 · Phạm vi: global
+// index.html:113298 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgTriggerJCE.1 EDITABLE
 function vgTriggerJCE(n, v) {
     if (v.jce) return false;
@@ -970,7 +970,7 @@ function vgTriggerJCE(n, v) {
 }
 // PLAYER_PART_END s18.vgTriggerJCE.1
 
-// index.html:113322 · Phạm vi: global
+// index.html:113326 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vergilTick.1 EDITABLE
 function vergilTick() {
     if (!vergilActive(dino)) return;

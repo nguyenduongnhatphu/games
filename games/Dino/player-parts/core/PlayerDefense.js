@@ -1,5 +1,5 @@
 // PLAYER_FILE: PlayerDefense
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
@@ -36,7 +36,7 @@ endUlt() {
 // PLAYER_PART_END s3.Player.endUlt.1
 }
 
-// index.html:48591 · Phạm vi: Player
+// index.html:48595 · Phạm vi: Player
 class __Part2 {
 // PLAYER_PART_BEGIN s3.Player.takeDamage.1 EDITABLE
 takeDamage(amount = 1) {
@@ -195,7 +195,7 @@ takeDamage(amount = 1) {
 // PLAYER_PART_END s3.Player.takeDamage.1
 }
 
-// index.html:48747 · Phạm vi: Player
+// index.html:48751 · Phạm vi: Player
 class __Part3 {
 // PLAYER_PART_BEGIN s3.Player.xuLyChet.1 EDITABLE
 xuLyChet(){

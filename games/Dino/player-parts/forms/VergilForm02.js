@@ -1,12 +1,12 @@
 // PLAYER_FILE: VergilForm02
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Effect, Player, SFX, VG_CONC_MAX, VG_FORM_IDX, VG_MIRAGE_MODES, VG_SDT_MAX, ammoPicker, ammoXem, apexWrap, battuMa, camX, camY, canvas, ctx, cusNCPicker, danteKey, danteTick, dino, doDash, dojoMode, dojoUltBusy, drawCustomMenu, drawSinVergil, drawUI, drawVergilBody, frames, gameOver, gameState, gameVictory, keys, paused, resetPreview, runePicker, runeXem, shakeTimer, ultCharge, v_markedValid, vergilActive, vergilForm, vergilInit, vergilLabel, vergilOn, vergilTick, vgAddConc, vgConcLevel, vgFireRangedMirage, vgPerformTrick, vgTriggerJCE, visualEffects, xDatForm, ymtCommand, ymtPose
-// index.html:113727 · Phạm vi: global
+// index.html:113731 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.IfStatement.2 EDITABLE
 if (typeof danteKey === 'function') {
     const vgKeyBase = danteKey;
@@ -117,7 +117,7 @@ if (typeof danteKey === 'function') {
 }
 // PLAYER_PART_END s18.IfStatement.2
 
-// index.html:113835 · Phạm vi: global
+// index.html:113839 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.IfStatement.3 EDITABLE
 if (typeof doDash === 'function') {
     const vgDashBase = doDash;
@@ -137,7 +137,7 @@ if (typeof doDash === 'function') {
 }
 // PLAYER_PART_END s18.IfStatement.3
 
-// index.html:113852 · Phạm vi: global
+// index.html:113856 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.IfStatement.4 EDITABLE
 if (typeof danteTick === 'function') {
     const vgTickWrap = danteTick;
@@ -148,7 +148,7 @@ if (typeof danteTick === 'function') {
 }
 // PLAYER_PART_END s18.IfStatement.4
 
-// index.html:113860 · Phạm vi: global
+// index.html:113864 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.IfStatement.5 EDITABLE
 if (typeof Player !== 'undefined') {
     const vgPlayerUpdateBase = Player.prototype.update;
@@ -202,7 +202,7 @@ if (typeof Player !== 'undefined') {
 }
 // PLAYER_PART_END s18.IfStatement.5
 
-// index.html:113914 · Phạm vi: global
+// index.html:113918 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgDrawKatana.1 EDITABLE
 function vgDrawKatana(x, y, angle, len = 84, flat = 1, isSdt = false) {
     ctx.save();
@@ -243,7 +243,7 @@ function vgDrawKatana(x, y, angle, len = 84, flat = 1, isSdt = false) {
 }
 // PLAYER_PART_END s18.vgDrawKatana.1
 
-// index.html:113953 · Phạm vi: global
+// index.html:113957 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgDrawMirageEdgeBlade.1 EDITABLE
 function vgDrawMirageEdgeBlade(x, y, angle, len = 80, flat = 1) {
     ctx.save();
@@ -277,7 +277,7 @@ function vgDrawMirageEdgeBlade(x, y, angle, len = 80, flat = 1) {
 }
 // PLAYER_PART_END s18.vgDrawMirageEdgeBlade.1
 
-// index.html:113984 · Phạm vi: global
+// index.html:113988 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgDrawMirageSword.1 EDITABLE
 function vgDrawMirageSword(s, col = '#40C4FF') {
     ctx.save();
@@ -299,7 +299,7 @@ function vgDrawMirageSword(s, col = '#40C4FF') {
 }
 // PLAYER_PART_END s18.vgDrawMirageSword.1
 
-// index.html:114003 · Phạm vi: global
+// index.html:114007 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vergilDraw.1 EDITABLE
 function vergilDraw(n) {
     const v = n.vergil;
@@ -544,7 +544,7 @@ function vergilDraw(n) {
 }
 // PLAYER_PART_END s18.vergilDraw.1
 
-// index.html:114245 · Phạm vi: global
+// index.html:114249 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.IfStatement.6 EDITABLE
 if (typeof Player !== 'undefined') {
     const vgDrawWrap = Player.prototype.draw;
@@ -558,7 +558,7 @@ if (typeof Player !== 'undefined') {
 }
 // PLAYER_PART_END s18.IfStatement.6
 
-// index.html:114259 · Phạm vi: global
+// index.html:114263 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.IfStatement.7 EDITABLE
 if (typeof drawUI === 'function') {
     const vgUIBase = drawUI;
@@ -626,7 +626,7 @@ if (typeof drawUI === 'function') {
 }
 // PLAYER_PART_END s18.IfStatement.7
 
-// index.html:114324 · Phạm vi: global
+// index.html:114328 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.IfStatement.8 EDITABLE
 if (typeof drawCustomMenu === 'function') {
     const vgMenuBase = drawCustomMenu;
@@ -699,17 +699,17 @@ if (typeof drawCustomMenu === 'function') {
 }
 // PLAYER_PART_END s18.IfStatement.8
 
-// index.html:114394 · Phạm vi: global
+// index.html:114398 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.vgUltBusyBase.1 EDITABLE
 const vgUltBusyBase=dojoUltBusy;
 // PLAYER_PART_END s18.vgUltBusyBase.1
 
-// index.html:114395 · Phạm vi: global
+// index.html:114399 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.dojoUltBusy.1 EDITABLE
 dojoUltBusy=function(n){return !!(vergilOn()&&n===dino&&n.vergil&&(n.vergil.sdt>0||n.vergil.jce))||vgUltBusyBase(n);};
 // PLAYER_PART_END s18.dojoUltBusy.1
 
-// index.html:114397 · Phạm vi: global
+// index.html:114401 · Phạm vi: global
 // PLAYER_PART_BEGIN s18.IfStatement.9 EDITABLE
 if(vergilForm)xDatForm(VG_FORM_IDX);
 // PLAYER_PART_END s18.IfStatement.9

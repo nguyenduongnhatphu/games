@@ -1,12 +1,12 @@
 // PLAYER_FILE: SPEAR05
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Effect, FloatingText, GIAO_C3_TAM, GIAO_DONG_HET, GIAO_DONG_MAX, GIAO_KET, GIAO_KF, GIAO_MUA_R, GIAO_UNI_DMG, GIAO_UNI_DMG_LUA, GIAO_UNI_NHIP, GIAO_UNI_R0, GIAO_UNI_R1, GIAO_UNI_T, PVP_HS, SFX, VK, allTargets, bossProjectiles, bosses, checkAABB, combatStance, ctx, currentAmmoType, cutBossProjectiles, dangLuotHoacChop, dashVx, dealDamage, dragDai, enemies, floatingTexts, frames, gameState, gdCatHop, giaoCong, giaoLay, giaoSong, giaoTickSong, giaoVeSong, hasRune, keys, setCanBat, setCanDmg, setCanTam, setCanTia, shakeTimer, slamLaoBat, trd, trdBat, trdChBat, trdK, trdUltBat, trdVeVung, ultCharge, visualEffects, vkDangKy, wkgBat, wkgChan, wkgChanBat, wkgK, wkgUltBat, wkgVeGay, worldL, worldR
-// index.html:58621 · Phạm vi: Player.prototype
+// index.html:58625 · Phạm vi: Player.prototype
 const __Part0 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoUniBatXoay.1 EDITABLE
 giaoUniBatXoay(){
@@ -23,7 +23,7 @@ giaoUniBatXoay(){
 // PLAYER_PART_END s4.Player.prototype.giaoUniBatXoay.1
 };
 
-// index.html:58635 · Phạm vi: Player.prototype
+// index.html:58639 · Phạm vi: Player.prototype
 const __Part1 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoUniMui.1 EDITABLE
 giaoUniMui(){
@@ -42,7 +42,7 @@ giaoUniMui(){
 // PLAYER_PART_END s4.Player.prototype.giaoUniMui.1
 };
 
-// index.html:58648 · Phạm vi: Player.prototype
+// index.html:58652 · Phạm vi: Player.prototype
 const __Part2 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoUniBanKinh.1 EDITABLE
 giaoUniBanKinh(){
@@ -53,7 +53,7 @@ giaoUniBanKinh(){
 // PLAYER_PART_END s4.Player.prototype.giaoUniBanKinh.1
 };
 
-// index.html:58653 · Phạm vi: Player.prototype
+// index.html:58657 · Phạm vi: Player.prototype
 const __Part3 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoUniTick.1 EDITABLE
 giaoUniTick(){
@@ -95,7 +95,7 @@ giaoUniTick(){
 // PLAYER_PART_END s4.Player.prototype.giaoUniTick.1
 };
 
-// index.html:58689 · Phạm vi: Player.prototype
+// index.html:58693 · Phạm vi: Player.prototype
 const __Part4 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoUniVe.1 EDITABLE
 giaoUniVe(){
@@ -167,7 +167,7 @@ giaoUniVe(){
 // PLAYER_PART_END s4.Player.prototype.giaoUniVe.1
 };
 
-// index.html:58755 · Phạm vi: Player.prototype
+// index.html:58759 · Phạm vi: Player.prototype
 const __Part5 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoDatDap.1 EDITABLE
 giaoDatDap(x, y, k){ k = k || 1; let T = Math.round(18 + 8 * k);
@@ -175,7 +175,7 @@ giaoDatDap(x, y, k){ k = k || 1; let T = Math.round(18 + 8 * k);
 // PLAYER_PART_END s4.Player.prototype.giaoDatDap.1
 };
 
-// index.html:58759 · Phạm vi: Player.prototype
+// index.html:58763 · Phạm vi: Player.prototype
 const __Part6 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoVeDap.1 EDITABLE
 giaoVeDap(){
@@ -211,7 +211,7 @@ giaoVeDap(){
 // PLAYER_PART_END s4.Player.prototype.giaoVeDap.1
 };
 
-// index.html:58791 · Phạm vi: Player.prototype
+// index.html:58795 · Phạm vi: Player.prototype
 const __Part7 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoTickMuiTen.1 EDITABLE
 giaoTickMuiTen(){
@@ -251,7 +251,7 @@ giaoTickMuiTen(){
 // PLAYER_PART_END s4.Player.prototype.giaoTickMuiTen.1
 };
 
-// index.html:58825 · Phạm vi: Player.prototype
+// index.html:58829 · Phạm vi: Player.prototype
 const __Part8 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoVeMuiTen.1 EDITABLE
 giaoVeMuiTen(){
@@ -280,14 +280,14 @@ giaoVeMuiTen(){
 // PLAYER_PART_END s4.Player.prototype.giaoVeMuiTen.1
 };
 
-// index.html:58848 · Phạm vi: Player.prototype
+// index.html:58852 · Phạm vi: Player.prototype
 const __Part9 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoBatChannel.1 EDITABLE
 giaoBatChannel(){ this.giaoChan = { t: 0 }; }
 // PLAYER_PART_END s4.Player.prototype.giaoBatChannel.1
 };
 
-// index.html:58849 · Phạm vi: Player.prototype
+// index.html:58853 · Phạm vi: Player.prototype
 const __Part10 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoNhaChannel.1 EDITABLE
 giaoNhaChannel(){
@@ -299,7 +299,7 @@ giaoNhaChannel(){
 // PLAYER_PART_END s4.Player.prototype.giaoNhaChannel.1
 };
 
-// index.html:58855 · Phạm vi: Player.prototype
+// index.html:58859 · Phạm vi: Player.prototype
 const __Part11 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoTick.1 EDITABLE
 giaoTick(){
@@ -369,7 +369,7 @@ giaoTick(){
 // PLAYER_PART_END s4.Player.prototype.giaoTick.1
 };
 
-// index.html:58919 · Phạm vi: Player.prototype
+// index.html:58923 · Phạm vi: Player.prototype
 const __Part12 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoVe.1 EDITABLE
 giaoVe(){
@@ -418,7 +418,7 @@ giaoVe(){
 // PLAYER_PART_END s4.Player.prototype.giaoVe.1
 };
 
-// index.html:58963 · Phạm vi: Player.prototype
+// index.html:58967 · Phạm vi: Player.prototype
 const __Part13 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoVeVet.1 EDITABLE
 giaoVeVet(){
@@ -443,7 +443,7 @@ giaoVeVet(){
 // PLAYER_PART_END s4.Player.prototype.giaoVeVet.1
 };
 
-// index.html:58983 · Phạm vi: Player.prototype
+// index.html:58987 · Phạm vi: Player.prototype
 const __Part14 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.giaoVeThan.1 EDITABLE
 giaoVeThan(px, py, ang, dir, L, al){
@@ -485,7 +485,7 @@ giaoVeThan(px, py, ang, dir, L, al){
 // PLAYER_PART_END s4.Player.prototype.giaoVeThan.1
 };
 
-// index.html:59021 · Phạm vi: global
+// index.html:59025 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.12 EDITABLE
 vkDangKy(10, {
             ten: 'SPEAR',

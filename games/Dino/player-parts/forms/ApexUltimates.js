@@ -1,47 +1,47 @@
 // PLAYER_FILE: ApexUltimates
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: DPR, SFX, apexColor, apexInput, bossProjectiles, bosses, camX, camY, canvas, ctx, dino, dojoMode, drawEnvironment, enemies, frames, gameOver, gameState, gameVictory, mapTheme, obstacles, oceanCamY, sanhChoUlt, sgDamage, sgSegmentBox, tetrisCamY, ultCharge, worldL, worldR
-// index.html:104936 · Phạm vi: apexCreate
+// index.html:104940 · Phạm vi: apexCreate
 function __Part0(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.ultimate.1 EDITABLE
 let ultimate=null,magmaTime=0,magmaAge=0;
 // PLAYER_PART_END s8.apexCreate.ultimate.1
 }}
 
-// index.html:104937 · Phạm vi: apexCreate
+// index.html:104941 · Phạm vi: apexCreate
 function __Part1(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.liveUltimate.1 EDITABLE
 function liveUltimate(){return !!ultimate&&ultimate.kind===4&&ultimate.mode==='ricochet';}
 // PLAYER_PART_END s8.apexCreate.liveUltimate.1
 }}
 
-// index.html:104938 · Phạm vi: apexCreate
+// index.html:104942 · Phạm vi: apexCreate
 function __Part2(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.ultNames.1 EDITABLE
 const ultNames=['EMERALD · ATOMIC EXTINCTION','MAGMA · MOLTEN SOVEREIGN','STALKER · EVENT HORIZON','NEBULA · WORLD SEVER','OBELITH · SUNDERING ASCENT'];
 // PLAYER_PART_END s8.apexCreate.ultNames.1
 }}
 
-// index.html:104939 · Phạm vi: apexCreate
+// index.html:104943 · Phạm vi: apexCreate
 function __Part3(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.magmaBonus.1 EDITABLE
 function magmaBonus(){return magmaTime>0?2:0;}
 // PLAYER_PART_END s8.apexCreate.magmaBonus.1
 }}
 
-// index.html:104940 · Phạm vi: apexCreate
+// index.html:104944 · Phạm vi: apexCreate
 function __Part4(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.magmaReach.1 EDITABLE
 function magmaReach(){return magmaTime>0?1.5:1;}
 // PLAYER_PART_END s8.apexCreate.magmaReach.1
 }}
 
-// index.html:104941 · Phạm vi: apexCreate
+// index.html:104945 · Phạm vi: apexCreate
 function __Part5(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.ultStart.1 EDITABLE
 function ultStart(){
@@ -65,7 +65,7 @@ function ultStart(){
 // PLAYER_PART_END s8.apexCreate.ultStart.1
 }}
 
-// index.html:104959 · Phạm vi: apexCreate
+// index.html:104963 · Phạm vi: apexCreate
 function __Part6(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.ultCaptureLive.1 EDITABLE
 function ultCaptureLive(v){
@@ -89,7 +89,7 @@ function ultCaptureLive(v){
 // PLAYER_PART_END s8.apexCreate.ultCaptureLive.1
 }}
 
-// index.html:104977 · Phạm vi: apexCreate
+// index.html:104981 · Phạm vi: apexCreate
 function __Part7(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.ultCapture.1 EDITABLE
 function ultCapture(v){
@@ -102,7 +102,7 @@ function ultCapture(v){
 // PLAYER_PART_END s8.apexCreate.ultCapture.1
 }}
 
-// index.html:104984 · Phạm vi: apexCreate
+// index.html:104988 · Phạm vi: apexCreate
 function __Part8(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.ultHit.1 EDITABLE
 function ultHit(v,damage){
@@ -114,7 +114,7 @@ function ultHit(v,damage){
 // PLAYER_PART_END s8.apexCreate.ultHit.1
 }}
 
-// index.html:104990 · Phạm vi: apexCreate
+// index.html:104994 · Phạm vi: apexCreate
 function __Part9(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.ultEnd.1 EDITABLE
 function ultEnd(){
@@ -127,14 +127,14 @@ function ultEnd(){
 // PLAYER_PART_END s8.apexCreate.ultEnd.1
 }}
 
-// index.html:104997 · Phạm vi: apexCreate
+// index.html:105001 · Phạm vi: apexCreate
 function __Part10(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.ultMouth.1 EDITABLE
 function ultMouth(){const r=computeSkeletalRig(0,0,dino.walkCycle,dino.breathCycle,0,dino.headPitch,0,dino.isGrounded);return {x:(dino.x+dino.facing*(r.headX+Math.cos(r.headRotation)*40))*SCALE,y:(dino.y+r.headY+Math.sin(r.headRotation)*40+5)*SCALE};}
 // PLAYER_PART_END s8.apexCreate.ultMouth.1
 }}
 
-// index.html:104998 · Phạm vi: apexCreate
+// index.html:105002 · Phạm vi: apexCreate
 function __Part11(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.ultTick.1 EDITABLE
 function ultTick(){
@@ -166,7 +166,7 @@ function ultTick(){
 // PLAYER_PART_END s8.apexCreate.ultTick.1
 }}
 
-// index.html:105024 · Phạm vi: apexCreate
+// index.html:105028 · Phạm vi: apexCreate
 function __Part12(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawUltVictim.1 EDITABLE
 function drawUltVictim(v,u){
@@ -186,14 +186,14 @@ function drawUltVictim(v,u){
 // PLAYER_PART_END s8.apexCreate.drawUltVictim.1
 }}
 
-// index.html:105038 · Phạm vi: apexCreate
+// index.html:105042 · Phạm vi: apexCreate
 function __Part13(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.ultLine.1 EDITABLE
 function ultLine(x,y,a,len,width,color){ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.fillStyle=color;ctx.shadowColor=color;ctx.shadowBlur=width>5?12:3;ctx.beginPath();ctx.moveTo(-len/2,0);ctx.quadraticCurveTo(-len*.1,-width*.6,len/2,0);ctx.quadraticCurveTo(len*.1,width*.6,-len/2,0);ctx.fill();ctx.restore();}
 // PLAYER_PART_END s8.apexCreate.ultLine.1
 }}
 
-// index.html:105039 · Phạm vi: apexCreate
+// index.html:105043 · Phạm vi: apexCreate
 function __Part14(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.ultDashGhost.1 EDITABLE
 function ultDashGhost(cut,age){
@@ -203,7 +203,7 @@ function ultDashGhost(cut,age){
 // PLAYER_PART_END s8.apexCreate.ultDashGhost.1
 }}
 
-// index.html:105044 · Phạm vi: apexCreate
+// index.html:105048 · Phạm vi: apexCreate
 function __Part15(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawUltimate.1 EDITABLE
 function drawUltimate(){
@@ -240,7 +240,7 @@ function drawUltimate(){
 // PLAYER_PART_END s8.apexCreate.drawUltimate.1
 }}
 
-// index.html:105075 · Phạm vi: apexCreate
+// index.html:105079 · Phạm vi: apexCreate
 function __Part16(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.cinematicFrame.1 EDITABLE
 function cinematicFrame(){
@@ -255,7 +255,7 @@ function cinematicFrame(){
 // PLAYER_PART_END s8.apexCreate.cinematicFrame.1
 }}
 
-// index.html:105084 · Phạm vi: apexCreate
+// index.html:105088 · Phạm vi: apexCreate
 function __Part17(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.tickMagma.1 EDITABLE
 function tickMagma(){
@@ -266,7 +266,7 @@ function tickMagma(){
 // PLAYER_PART_END s8.apexCreate.tickMagma.1
 }}
 
-// index.html:105089 · Phạm vi: apexCreate
+// index.html:105093 · Phạm vi: apexCreate
 function __Part18(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.finishMagmaFrame.1 EDITABLE
 function finishMagmaFrame(){
@@ -276,7 +276,7 @@ function finishMagmaFrame(){
 // PLAYER_PART_END s8.apexCreate.finishMagmaFrame.1
 }}
 
-// index.html:105093 · Phạm vi: apexCreate
+// index.html:105097 · Phạm vi: apexCreate
 function __Part19(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawMagmaAura.1 EDITABLE
 function drawMagmaAura(){
@@ -286,7 +286,7 @@ function drawMagmaAura(){
 // PLAYER_PART_END s8.apexCreate.drawMagmaAura.1
 }}
 
-// index.html:105097 · Phạm vi: apexCreate
+// index.html:105101 · Phạm vi: apexCreate
 function __Part20(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawMagmaVeins.1 EDITABLE
 function drawMagmaVeins(r){

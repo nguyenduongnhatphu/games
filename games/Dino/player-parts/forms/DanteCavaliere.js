@@ -1,12 +1,12 @@
 // PLAYER_FILE: DanteCavaliere
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: DANTE_ATTACK_RATE, Effect, Player, SFX, canvas, checkAABB, ctx, danteActive, danteControlAllowed, danteDraw, danteHit, danteKey, danteLabel, danteRelease, danteTick, dashCd, dashVx, dino, doDash, dswControl, frames, gameOver, gameVictory, keys, paused, playerAttackStep, playerComboBuffer, playerComboCancel, playerComboTrack, playerFinisherControl, sgTargets, shakeTimer, visualEffects
-// index.html:108578 · Phạm vi: global
+// index.html:108582 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.CAV_MOVES.1 EDITABLE
 const CAV_MOVES = {
  // 1. COMBO A (J -> J -> J): Nghiền cưa đa nhịp gom mục tiêu (có thể rẽ nhánh sang K bất kỳ lúc nào)
@@ -30,7 +30,7 @@ const CAV_MOVES = {
 };
 // PLAYER_PART_END s12.CAV_MOVES.1
 
-// index.html:108599 · Phạm vi: global
+// index.html:108603 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavState.1 EDITABLE
 function cavState(p){
  return p.cavaliere || (p.cavaliere = {
@@ -47,12 +47,12 @@ function cavState(p){
 }
 // PLAYER_PART_END s12.cavState.1
 
-// index.html:108612 · Phạm vi: global
+// index.html:108616 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavUsing.1 EDITABLE
 function cavUsing(){ return danteActive(dino) && dino.dante && dino.dante.arm === 2; }
 // PLAYER_PART_END s12.cavUsing.1
 
-// index.html:108614 · Phạm vi: global
+// index.html:108618 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavStart.1 EDITABLE
 function cavStart(id, extra = {}){
  const n = dino, p = n.dante, c = cavState(p), m = CAV_MOVES[id];
@@ -80,7 +80,7 @@ function cavStart(id, extra = {}){
 }
 // PLAYER_PART_END s12.cavStart.1
 
-// index.html:108639 · Phạm vi: global
+// index.html:108643 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavCommand.1 EDITABLE
 function cavCommand(cmd){
  const n = dino, p = n.dante, c = cavState(p), a = p.attack;
@@ -110,7 +110,7 @@ function cavCommand(cmd){
 }
 // PLAYER_PART_END s12.cavCommand.1
 
-// index.html:108666 · Phạm vi: global
+// index.html:108670 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavDispatch.1 EDITABLE
 function cavDispatch(cmd){
  const n = dino, p = n.dante, c = cavState(p), recent = frames - c.ended <= 42, last = recent ? c.last : '';
@@ -145,12 +145,12 @@ function cavDispatch(cmd){
 }
 // PLAYER_PART_END s12.cavDispatch.1
 
-// index.html:108699 · Phạm vi: global
+// index.html:108703 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavKeyBase.1 EDITABLE
 const cavKeyBase = danteKey;
 // PLAYER_PART_END s12.cavKeyBase.1
 
-// index.html:108700 · Phạm vi: global
+// index.html:108704 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteKey.4 EDITABLE
 danteKey = function(code, repeat){
  if(!cavUsing()) return cavKeyBase(code, repeat);
@@ -185,12 +185,12 @@ danteKey = function(code, repeat){
 };
 // PLAYER_PART_END s12.danteKey.4
 
-// index.html:108732 · Phạm vi: global
+// index.html:108736 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavReleaseBase.1 EDITABLE
 const cavReleaseBase = danteRelease;
 // PLAYER_PART_END s12.cavReleaseBase.1
 
-// index.html:108733 · Phạm vi: global
+// index.html:108737 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteRelease.4 EDITABLE
 danteRelease = function(){
  if(cavUsing()) return;
@@ -198,12 +198,12 @@ danteRelease = function(){
 };
 // PLAYER_PART_END s12.danteRelease.4
 
-// index.html:108738 · Phạm vi: global
+// index.html:108742 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavDashBase.1 EDITABLE
 const cavDashBase = doDash;
 // PLAYER_PART_END s12.cavDashBase.1
 
-// index.html:108739 · Phạm vi: global
+// index.html:108743 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.doDash.3 EDITABLE
 doDash = function(...args){
  const before = dashCd;
@@ -215,7 +215,7 @@ doDash = function(...args){
 };
 // PLAYER_PART_END s12.doDash.3
 
-// index.html:108749 · Phạm vi: global
+// index.html:108753 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavStrike.1 EDITABLE
 function cavStrike(n, p, c, a, pulse){
  const dtBonus = p.dt > 0 ? 1.5 : 0;
@@ -300,7 +300,7 @@ function cavStrike(n, p, c, a, pulse){
 }
 // PLAYER_PART_END s12.cavStrike.1
 
-// index.html:108831 · Phạm vi: global
+// index.html:108835 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavFinish.1 EDITABLE
 function cavFinish(p, c, a){
  p.attack = null; c.last = a.id; c.ended = frames;
@@ -308,7 +308,7 @@ function cavFinish(p, c, a){
 }
 // PLAYER_PART_END s12.cavFinish.1
 
-// index.html:108836 · Phạm vi: global
+// index.html:108840 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavTick.1 EDITABLE
 function cavTick(n, p){
  const c = cavState(p);
@@ -420,12 +420,12 @@ function cavTick(n, p){
 }
 // PLAYER_PART_END s12.cavTick.1
 
-// index.html:108945 · Phạm vi: global
+// index.html:108949 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavTickBase.1 EDITABLE
 const cavTickBase = danteTick;
 // PLAYER_PART_END s12.cavTickBase.1
 
-// index.html:108946 · Phạm vi: global
+// index.html:108950 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteTick.4 EDITABLE
 danteTick = function(){
  cavTickBase();
@@ -436,12 +436,12 @@ danteTick = function(){
 };
 // PLAYER_PART_END s12.danteTick.4
 
-// index.html:108954 · Phạm vi: global
+// index.html:108958 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavUpdateBase.1 EDITABLE
 const cavUpdateBase = Player.prototype.update;
 // PLAYER_PART_END s12.cavUpdateBase.1
 
-// index.html:108955 · Phạm vi: global
+// index.html:108959 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.Player.prototype.update.3 EDITABLE
 Player.prototype.update = function(...args){
  if(!cavUsing() || this !== dino) return cavUpdateBase.apply(this, args);
@@ -451,7 +451,7 @@ Player.prototype.update = function(...args){
 };
 // PLAYER_PART_END s12.Player.prototype.update.3
 
-// index.html:108967 · Phạm vi: global
+// index.html:108971 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavPaintGiantSaw.1 EDITABLE
 function cavPaintGiantSaw(x, y, angle, spin, dir, sparkGlow = false){
  ctx.save();
@@ -519,7 +519,7 @@ function cavPaintGiantSaw(x, y, angle, spin, dir, sparkGlow = false){
 }
 // PLAYER_PART_END s12.cavPaintGiantSaw.1
 
-// index.html:109033 · Phạm vi: global
+// index.html:109037 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavPaintFullBike.1 EDITABLE
 function cavPaintFullBike(bx, by, dir, spin, tilt = 0, driftScale = 1){
  ctx.save();
@@ -585,7 +585,7 @@ function cavPaintFullBike(bx, by, dir, spin, tilt = 0, driftScale = 1){
 }
 // PLAYER_PART_END s12.cavPaintFullBike.1
 
-// index.html:109096 · Phạm vi: global
+// index.html:109100 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavDraw.1 EDITABLE
 function cavDraw(n){
  const p = n.dante, c = cavState(p), a = p.attack;
@@ -674,12 +674,12 @@ function cavDraw(n){
 }
 // PLAYER_PART_END s12.cavDraw.1
 
-// index.html:109182 · Phạm vi: global
+// index.html:109186 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.cavDrawBase.1 EDITABLE
 const cavDrawBase = danteDraw;
 // PLAYER_PART_END s12.cavDrawBase.1
 
-// index.html:109183 · Phạm vi: global
+// index.html:109187 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteDraw.4 EDITABLE
 danteDraw = function(n){
  const p = n.dante;

@@ -1,12 +1,12 @@
 // PLAYER_FILE: SPEAR03
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: CAM_TROI, Effect, FloatingText, GIAO_CS, POWERS, SFX, TRD_POWER, WKG_MAU_CO, WKG_MAU_CO2, WKG_MAU_CO3, bosses, camX, canvas, combatStance, ctx, currentAmmoType, currentForm, currentPower, dangLuotHoacChop, dashVx, dealDamage, defMode, defUnits, dino, enemies, floatingTexts, frames, gameState, gdCatHop, giaoLay, hasRune, hitCat, hitDam, hitDiem, keys, pvpDich, pvpVoBoc, shakeTimer, slamLaoBat, venKhoa, visualEffects, wkgBat, wkgBuff, wkgDat, wkgFx, wkgHatTung, wkgLoc, wkgMay, wkgMoi, wkgNac, wkgPhan, wkgSet, wkgSpin, wkgUlt, wkgVeCon, wkgVong, worldL, worldR
-// index.html:56843 · Phạm vi: global
+// index.html:56847 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.wkgVeMay.1 EDITABLE
 function wkgVeMay(x, y, w, al){
             ctx.save(); ctx.globalAlpha = al === undefined ? 1 : al;
@@ -23,7 +23,7 @@ function wkgVeMay(x, y, w, al){
         }
 // PLAYER_PART_END s4.wkgVeMay.1
 
-// index.html:56859 · Phạm vi: global
+// index.html:56863 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.wkgVeBong.1 EDITABLE
 function wkgVeBong(x, y, trai, al, P, nhan){
             let d = trai ? -1 : 1;
@@ -47,7 +47,7 @@ function wkgVeBong(x, y, trai, al, P, nhan){
         }
 // PLAYER_PART_END s4.wkgVeBong.1
 
-// index.html:56880 · Phạm vi: global
+// index.html:56884 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.wkgVeFx.1 EDITABLE
 function wkgVeFx(){
             for (let F of wkgFx){
@@ -109,7 +109,7 @@ function wkgVeFx(){
         }
 // PLAYER_PART_END s4.wkgVeFx.1
 
-// index.html:56940 · Phạm vi: global
+// index.html:56944 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.wkgVePhan.1 EDITABLE
 function wkgVePhan(P){
             ctx.save();
@@ -136,7 +136,7 @@ function wkgVePhan(P){
         }
 // PLAYER_PART_END s4.wkgVePhan.1
 
-// index.html:56963 · Phạm vi: global
+// index.html:56967 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.wkgVe.1 EDITABLE
 function wkgVe(){
             if (typeof dino === 'undefined' || !dino || !wkgBat()) return;
@@ -352,27 +352,27 @@ function wkgVe(){
         }
 // PLAYER_PART_END s4.wkgVe.1
 
-// index.html:57198 · Phạm vi: global
+// index.html:57202 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.TRD_CM.1 EDITABLE
 const TRD_CM = 43.4;
 // PLAYER_PART_END s4.TRD_CM.1
 
-// index.html:57199 · Phạm vi: global
+// index.html:57203 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.TRD_TIERS.1 EDITABLE
 const TRD_TIERS = [[30, "#80DEEA"], [60, "#26C6DA"], [90, "#4DD0E1"], [105, "#00ACC1"], [135, "#B2EBF2"], [150, "#E0F7FA"]];
 // PLAYER_PART_END s4.TRD_TIERS.1
 
-// index.html:57200 · Phạm vi: global
+// index.html:57204 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.TRD_I_CD.1 EDITABLE
 const TRD_I_CD = 90, TRD_HAO_T = 600, TRD_NAC_DMG = 20, TRD_NAC_MAX = 3;
 // PLAYER_PART_END s4.TRD_I_CD.1
 
-// index.html:57201 · Phạm vi: global
+// index.html:57205 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trd.1 EDITABLE
 let trd = null, trdPowerCu = -1;
 // PLAYER_PART_END s4.trd.1
 
-// index.html:57202 · Phạm vi: global
+// index.html:57206 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdMoi.1 EDITABLE
 function trdMoi(){
             return { chuoi: '', chuoiT: 0, cong: 0, congT: 0, nac: 0, dem: 0, hpCu: new Map(),
@@ -381,22 +381,22 @@ function trdMoi(){
         }
 // PLAYER_PART_END s4.trdMoi.1
 
-// index.html:57207 · Phạm vi: global
+// index.html:57211 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdBat.1 EDITABLE
 function trdBat(){ return typeof hasRune === 'function' && hasRune('trident') && currentAmmoType === 10; }
 // PLAYER_PART_END s4.trdBat.1
 
-// index.html:57208 · Phạm vi: global
+// index.html:57212 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdReset.1 EDITABLE
 function trdReset(){ trd = trdMoi(); }
 // PLAYER_PART_END s4.trdReset.1
 
-// index.html:57209 · Phạm vi: global
+// index.html:57213 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdCong.1 EDITABLE
 function trdCong(){ return (trd && trdBat()) ? trd.cong : 0; }
 // PLAYER_PART_END s4.trdCong.1
 
-// index.html:57210 · Phạm vi: global
+// index.html:57214 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdDongBo.1 EDITABLE
 function trdDongBo(){
             if (typeof POWERS === 'undefined' || typeof TRD_POWER === 'undefined') return;
@@ -411,7 +411,7 @@ function trdDongBo(){
         }
 // PLAYER_PART_END s4.trdDongBo.1
 
-// index.html:57222 · Phạm vi: global
+// index.html:57226 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdDs.1 EDITABLE
 function trdDs(){
             let ds = [];
@@ -423,7 +423,7 @@ function trdDs(){
         }
 // PLAYER_PART_END s4.trdDs.1
 
-// index.html:57230 · Phạm vi: global
+// index.html:57234 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdDanhVat.1 EDITABLE
 function trdDanhVat(o, dmg){
             if (!o) return;
@@ -431,7 +431,7 @@ function trdDanhVat(o, dmg){
         }
 // PLAYER_PART_END s4.trdDanhVat.1
 
-// index.html:57235 · Phạm vi: global
+// index.html:57239 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdHop.1 EDITABLE
 function trdHop(x0, y0, x1, y1, dmg, hit, fn){
             let n = 0;
@@ -457,7 +457,7 @@ function trdHop(x0, y0, x1, y1, dmg, hit, fn){
         }
 // PLAYER_PART_END s4.trdHop.1
 
-// index.html:57258 · Phạm vi: global
+// index.html:57262 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdDoan.1 EDITABLE
 function trdDoan(x0, y0, x1, y1, r, dmg, hit){
             let n = 0;
@@ -477,7 +477,7 @@ function trdDoan(x0, y0, x1, y1, r, dmg, hit){
         }
 // PLAYER_PART_END s4.trdDoan.1
 
-// index.html:57274 · Phạm vi: global
+// index.html:57278 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdGan.1 EDITABLE
 function trdGan(ng, soLuong){
             let cx = ng.x + ng.w / 2, cy = ng.y + ng.h / 2;
@@ -486,7 +486,7 @@ function trdGan(ng, soLuong){
         }
 // PLAYER_PART_END s4.trdGan.1
 
-// index.html:57280 · Phạm vi: global
+// index.html:57284 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdDay.1 EDITABLE
 function trdDay(o, v, T){
             if (!o || !trd) return;
@@ -495,7 +495,7 @@ function trdDay(o, v, T){
         }
 // PLAYER_PART_END s4.trdDay.1
 
-// index.html:57285 · Phạm vi: global
+// index.html:57289 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTickDay.1 EDITABLE
 function trdTickDay(){
             if (!trd) return;
@@ -520,17 +520,17 @@ function trdTickDay(){
         }
 // PLAYER_PART_END s4.trdTickDay.1
 
-// index.html:57306 · Phạm vi: global
+// index.html:57310 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdFx.1 EDITABLE
 function trdFx(o){ if (trd) trd.fx.push(o); }
 // PLAYER_PART_END s4.trdFx.1
 
-// index.html:57313 · Phạm vi: global
+// index.html:57317 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdBoNhanhGiao.1 EDITABLE
 function trdBoNhanhGiao(ng){ ng._giaoLuotNoi = 0; ng._giaoQuatNoi = 0; ng._giaoNhanh = 0; }
 // PLAYER_PART_END s4.trdBoNhanhGiao.1
 
-// index.html:57316 · Phạm vi: global
+// index.html:57320 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdJ.1 EDITABLE
 function trdJ(ng){
             if (!trd) trd = trdMoi();
@@ -563,7 +563,7 @@ function trdJ(ng){
         }
 // PLAYER_PART_END s4.trdJ.1
 
-// index.html:57347 · Phạm vi: global
+// index.html:57351 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdK.1 EDITABLE
 function trdK(ng, hg, og){
             if (!trd) trd = trdMoi();
@@ -658,7 +658,7 @@ function trdK(ng, hg, og){
         }
 // PLAYER_PART_END s4.trdK.1
 
-// index.html:57440 · Phạm vi: global
+// index.html:57444 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdChBat.1 EDITABLE
 function trdChBat(ng){
             if (!trd) trd = trdMoi();
@@ -668,12 +668,12 @@ function trdChBat(ng){
         }
 // PLAYER_PART_END s4.trdChBat.1
 
-// index.html:57446 · Phạm vi: global
+// index.html:57450 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdChNha.1 EDITABLE
 function trdChNha(ng){ if (trd) trd.ch = null; }
 // PLAYER_PART_END s4.trdChNha.1
 
-// index.html:57448 · Phạm vi: global
+// index.html:57452 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdNhay.1 EDITABLE
 function trdNhay(){
             if (!trd || !trd.ch || !trdBat()) return false;
@@ -683,7 +683,7 @@ function trdNhay(){
         }
 // PLAYER_PART_END s4.trdNhay.1
 
-// index.html:57456 · Phạm vi: global
+// index.html:57460 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdPhimIO.1 EDITABLE
 function trdPhimIO(code){
             if (!trd) trd = trdMoi();
@@ -703,7 +703,7 @@ function trdPhimIO(code){
         }
 // PLAYER_PART_END s4.trdPhimIO.1
 
-// index.html:57474 · Phạm vi: global
+// index.html:57478 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdUltBat.1 EDITABLE
 function trdUltBat(ng){
             if (!trd) trd = trdMoi();
@@ -715,7 +715,7 @@ function trdUltBat(ng){
         }
 // PLAYER_PART_END s4.trdUltBat.1
 
-// index.html:57484 · Phạm vi: global
+// index.html:57488 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTick.1 EDITABLE
 function trdTick(){
             if (typeof dino === 'undefined' || !dino) return;
@@ -746,7 +746,7 @@ function trdTick(){
         }
 // PLAYER_PART_END s4.trdTick.1
 
-// index.html:57511 · Phạm vi: global
+// index.html:57515 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTickI.1 EDITABLE
 function trdTickI(ng){
             let I = trd.I; if (!I) return;
@@ -765,7 +765,7 @@ function trdTickI(ng){
         }
 // PLAYER_PART_END s4.trdTickI.1
 
-// index.html:57526 · Phạm vi: global
+// index.html:57530 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTickViec.1 EDITABLE
 function trdTickViec(ng){
             let V = trd.viec; if (!V) return;
@@ -825,7 +825,7 @@ function trdTickViec(ng){
         }
 // PLAYER_PART_END s4.trdTickViec.1
 
-// index.html:57582 · Phạm vi: global
+// index.html:57586 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTickLien.1 EDITABLE
 function trdTickLien(ng){
             let L = trd.lien; if (!L) return;
@@ -844,7 +844,7 @@ function trdTickLien(ng){
         }
 // PLAYER_PART_END s4.trdTickLien.1
 
-// index.html:57597 · Phạm vi: global
+// index.html:57601 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTickCot.1 EDITABLE
 function trdTickCot(){
             for (let i = trd.cot.length - 1; i >= 0; i--){
@@ -856,7 +856,7 @@ function trdTickCot(){
         }
 // PLAYER_PART_END s4.trdTickCot.1
 
-// index.html:57605 · Phạm vi: global
+// index.html:57609 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTickSong.1 EDITABLE
 function trdTickSong(){
             for (let i = trd.song.length - 1; i >= 0; i--){
@@ -868,7 +868,7 @@ function trdTickSong(){
         }
 // PLAYER_PART_END s4.trdTickSong.1
 
-// index.html:57614 · Phạm vi: global
+// index.html:57618 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTickNoi.1 EDITABLE
 function trdTickNoi(ng){
             let N = trd.noi; if (!N) return;
@@ -889,7 +889,7 @@ function trdTickNoi(ng){
         }
 // PLAYER_PART_END s4.trdTickNoi.1
 
-// index.html:57631 · Phạm vi: global
+// index.html:57635 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTickGiao.1 EDITABLE
 function trdTickGiao(){
             for (let i = trd.giao.length - 1; i >= 0; i--){
@@ -920,7 +920,7 @@ function trdTickGiao(){
         }
 // PLAYER_PART_END s4.trdTickGiao.1
 
-// index.html:57658 · Phạm vi: global
+// index.html:57662 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTickCau.1 EDITABLE
 function trdTickCau(){
             for (let i = trd.cau.length - 1; i >= 0; i--){
@@ -936,7 +936,7 @@ function trdTickCau(){
         }
 // PLAYER_PART_END s4.trdTickCau.1
 
-// index.html:57670 · Phạm vi: global
+// index.html:57674 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTickNguc.1 EDITABLE
 function trdTickNguc(){
             for (let i = trd.nguc.length - 1; i >= 0; i--){
@@ -950,7 +950,7 @@ function trdTickNguc(){
         }
 // PLAYER_PART_END s4.trdTickNguc.1
 
-// index.html:57680 · Phạm vi: global
+// index.html:57684 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTickCh.1 EDITABLE
 function trdTickCh(ng){
             let C = trd.ch; if (!C) return;
@@ -967,12 +967,12 @@ function trdTickCh(ng){
         }
 // PLAYER_PART_END s4.trdTickCh.1
 
-// index.html:57696 · Phạm vi: global
+// index.html:57700 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.TRD_HT_SC.1 EDITABLE
 const TRD_HT_SC = 2.1, TRD_ULT_NEM = 60, TRD_ULT_DAT = 316;
 // PLAYER_PART_END s4.TRD_HT_SC.1
 
-// index.html:57698 · Phạm vi: global
+// index.html:57702 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdUltBui.1 EDITABLE
 function trdUltBui(P, d, n){
             if (!P.bui) P.bui = [];
@@ -981,7 +981,7 @@ function trdUltBui(P, d, n){
         }
 // PLAYER_PART_END s4.trdUltBui.1
 
-// index.html:57703 · Phạm vi: global
+// index.html:57707 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdUltBuiTick.1 EDITABLE
 function trdUltBuiTick(P){
             for (let i = P.bui.length - 1; i >= 0; i--){
@@ -991,7 +991,7 @@ function trdUltBuiTick(P){
         }
 // PLAYER_PART_END s4.trdUltBuiTick.1
 
-// index.html:57710 · Phạm vi: global
+// index.html:57714 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdHaiThanX.1 EDITABLE
 function trdHaiThanX(U, ng){
             let c0 = (typeof camX !== 'undefined' ? camX : 0);
@@ -999,7 +999,7 @@ function trdHaiThanX(U, ng){
         }
 // PLAYER_PART_END s4.trdHaiThanX.1
 
-// index.html:57714 · Phạm vi: global
+// index.html:57718 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTayHaiThan.1 EDITABLE
 function trdTayHaiThan(U, ng){
             let bx = trdHaiThanX(U, ng), u = U.t < TRD_ULT_NEM ? Math.min(1, U.t / 44) : 1;
@@ -1009,7 +1009,7 @@ function trdTayHaiThan(U, ng){
         }
 // PLAYER_PART_END s4.trdTayHaiThan.1
 
-// index.html:57720 · Phạm vi: global
+// index.html:57724 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.trdTickUlt.1 EDITABLE
 function trdTickUlt(ng){
             let U = trd.ult; if (!U) return;

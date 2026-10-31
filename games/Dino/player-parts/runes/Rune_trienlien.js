@@ -1,12 +1,12 @@
 // PLAYER_FILE: Rune_trienlien
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: RUNES
-// index.html:83713 · Phạm vi: global
+// index.html:83717 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RUNES.push.1 EDITABLE
 RUNES.push({ id:'trienlien', name:'TAM LUÂN', nameEn:'TRIAD DOCTRINE', icon:'☰', cost:2, ammoRune:true, onlyAmmo:2,
             desc:'Tốn 2 ô. ĐỘC QUYỀN RAPIDFIRE. KHÔNG CÓ CHARGE — giữ [K] không tích gì ở bất kỳ thế nào, nên cũng không có Channel. Sức mạnh của Tam Luân nằm ở việc ĐỔI THẾ đúng lúc, không phải giữ phím. CHIÊU CUỐI VÀ KHIÊN TAY CŨNG BỊ KHOÁ Ở CẢ BA THẾ — bạn sống bằng Drone Khiên và vỏ xe tăng. Ba thế thành ba cỗ máy nuôi lẫn nhau — gần như mọi thứ phải NẠP ở thế này rồi ĐỔI SANG thế khác mới xài được. TRICKSTER (đi map): vừa vào là cắm một ụ súng chưa khai hoả, mỗi giây nó nạp thêm 8 viên; Drone Laser quét map liên tục thay bạn. Không bắn được gì ở thế này — bạn đang tích của để dành. Đổi thế thì ụ súng nhả hết. GUNSLINGER (công thủ): bắn thường không bao giờ Quá Nhiệt, và mỗi lần vào thế là Drone Khiên chắn toàn bộ 3 giây (hồi 8 giây). Đổi lại chiêu cuối bị KHOÁ, chạy chậm dần tới 1/3, nhảy bị giật ngược. ROYAL GUARD (câu giờ): hoá xe tăng 10 máu — không né được, chỉ đứng chịu đòn, nhưng có Drone 60 viên và đúng 1 quả pháo để giải tán đám đông hoặc phang boss. Bạn vào đây để hai thế kia kịp hồi. Nạp drone, hồi máu xe và nạp pháo chỉ chạy khi bạn đang ở thế khác.',

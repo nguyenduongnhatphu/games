@@ -1,12 +1,12 @@
 // PLAYER_FILE: DanteEbonyIvory
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: CUS_DAN, DANTE_ATTACK_RATE, DantePlayerRig, LT, MegaManXBoss, Player, SFX, VG_H, ammoPicker, ammoXem, apexCreate, apexOn, apexWrap, battuMa, ctx, currentAmmoType, cusNCPicker, danteActive, danteBulletColor, danteDraw, danteHit, danteKey, danteLabel, danteOn, danteRangedBase, danteStyle, danteSync, danteTick, dashCd, dashVx, dino, doDash, dojoMode, drawCustomMenu, drawDantePlayerBody, drawUI, drawVergilBody, frames, gameOver, gameVictory, ironPlayerPreview, keys, paused, playerAttackStep, previewDino, runePicker, runeXem, sgTargets, sgVaultTarget, shakeTimer, wrapLines, xFormIdx
-// index.html:110044 · Phạm vi: global
+// index.html:110048 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.EI_MOVES.1 EDITABLE
 const EI_MOVES={
  shot:{name:'EBONY & IVORY',T:8,shots:[1],damage:1},
@@ -22,12 +22,12 @@ const EI_MOVES={
 };
 // PLAYER_PART_END s13.EI_MOVES.1
 
-// index.html:110056 · Phạm vi: global
+// index.html:110060 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiState.1 EDITABLE
 function eiState(p){return p.ebony||(p.ebony={hand:0,flash:[],rainUsed:false,lastJ:-1000,lastK:-1000,lastDash:-1000,slideReady:-1000,dashDir:1});}
 // PLAYER_PART_END s13.eiState.1
 
-// index.html:110057 · Phạm vi: global
+// index.html:110061 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiCommand.1 EDITABLE
 function eiCommand(special,charge){
  const n=dino,p=n.dante;
@@ -48,7 +48,7 @@ function eiCommand(special,charge){
 }
 // PLAYER_PART_END s13.eiCommand.1
 
-// index.html:110074 · Phạm vi: global
+// index.html:110078 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiShoot.1 EDITABLE
 function eiShoot(n,p,a,angle,hand,damage,charged=false){
  const e=eiState(p),x=n.x+n.w/2+Math.cos(angle)*34+(hand?-9:9),y=n.y+22+Math.sin(angle)*18+(hand?3:-3);
@@ -58,12 +58,12 @@ function eiShoot(n,p,a,angle,hand,damage,charged=false){
 }
 // PLAYER_PART_END s13.eiShoot.1
 
-// index.html:110081 · Phạm vi: global
+// index.html:110085 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiUsing.1 EDITABLE
 function eiUsing(){return danteActive(dino)&&dino.dante?.arm===4&&!paused&&!gameOver&&!gameVictory;}
 // PLAYER_PART_END s13.eiUsing.1
 
-// index.html:110082 · Phạm vi: global
+// index.html:110086 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiStartMove.1 EDITABLE
 function eiStartMove(id,charge=0){
  const n=dino,p=n.dante,e=eiState(p),m=EI_MOVES[id];
@@ -80,12 +80,12 @@ function eiStartMove(id,charge=0){
 }
 // PLAYER_PART_END s13.eiStartMove.1
 
-// index.html:110095 · Phạm vi: global
+// index.html:110099 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiKeyBase.1 EDITABLE
 const eiKeyBase=danteKey;
 // PLAYER_PART_END s13.eiKeyBase.1
 
-// index.html:110096 · Phạm vi: global
+// index.html:110100 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.danteKey.1 EDITABLE
 danteKey=function(code,repeat){
  if(eiUsing()&&!repeat){
@@ -104,12 +104,12 @@ danteKey=function(code,repeat){
 };
 // PLAYER_PART_END s13.danteKey.1
 
-// index.html:110111 · Phạm vi: global
+// index.html:110115 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiDashBase.1 EDITABLE
 const eiDashBase=doDash;
 // PLAYER_PART_END s13.eiDashBase.1
 
-// index.html:110112 · Phạm vi: global
+// index.html:110116 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.doDash.1 EDITABLE
 doDash=function(...args){
  const using=eiUsing(),before=dashCd,p=using?dino.dante:null,e=p?eiState(p):null;
@@ -123,7 +123,7 @@ doDash=function(...args){
 };
 // PLAYER_PART_END s13.doDash.1
 
-// index.html:110122 · Phạm vi: global
+// index.html:110126 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiAim.1 EDITABLE
 function eiAim(n,dir){
  const cx=n.x+n.w/2,cy=n.y+22;
@@ -134,7 +134,7 @@ function eiAim(n,dir){
 }
 // PLAYER_PART_END s13.eiAim.1
 
-// index.html:110129 · Phạm vi: global
+// index.html:110133 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiCoyote.1 EDITABLE
 function eiCoyote(n,p,a,angle,damage){
  const x=n.x+n.w/2,y=n.y+24,range=185;
@@ -152,7 +152,7 @@ function eiCoyote(n,p,a,angle,damage){
 }
 // PLAYER_PART_END s13.eiCoyote.1
 
-// index.html:110143 · Phạm vi: global
+// index.html:110147 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiDashMove.1 EDITABLE
 function eiDashMove(n,p,a,m){
  if(!['stinger','slide','fireworks','vault'].includes(a.id))return false;
@@ -188,7 +188,7 @@ function eiDashMove(n,p,a,m){
 }
 // PLAYER_PART_END s13.eiDashMove.1
 
-// index.html:110175 · Phạm vi: global
+// index.html:110179 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiTick.1 EDITABLE
 function eiTick(){
  if(!danteActive(dino)||!dino.dante)return;
@@ -218,17 +218,17 @@ function eiTick(){
 }
 // PLAYER_PART_END s13.eiTick.1
 
-// index.html:110201 · Phạm vi: global
+// index.html:110205 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiTickBase.1 EDITABLE
 const eiTickBase=danteTick;
 // PLAYER_PART_END s13.eiTickBase.1
 
-// index.html:110202 · Phạm vi: global
+// index.html:110206 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.danteTick.1 EDITABLE
 danteTick=function(){eiTickBase();eiTick();};
 // PLAYER_PART_END s13.danteTick.1
 
-// index.html:110203 · Phạm vi: global
+// index.html:110207 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiDraw.1 EDITABLE
 function eiDraw(n){
  const p=n.dante,e=eiState(p),a=p.attack,dir=n.isFacingLeft?-1:1;
@@ -254,17 +254,17 @@ function eiDraw(n){
 }
 // PLAYER_PART_END s13.eiDraw.1
 
-// index.html:110225 · Phạm vi: global
+// index.html:110229 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiDrawBase.1 EDITABLE
 const eiDrawBase=danteDraw;
 // PLAYER_PART_END s13.eiDrawBase.1
 
-// index.html:110226 · Phạm vi: global
+// index.html:110230 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.danteDraw.1 EDITABLE
 danteDraw=function(n){eiDrawBase(n);if(n.dante&&n.dante.arm===4)eiDraw(n);};
 // PLAYER_PART_END s13.danteDraw.1
 
-// index.html:110229 · Phạm vi: global
+// index.html:110233 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.formAmmoSummary.1 EDITABLE
 function formAmmoSummary(text,x,y,width,lineHeight){
  const lines=wrapLines(text||'',width);
@@ -278,17 +278,17 @@ function formAmmoSummary(text,x,y,width,lineHeight){
 }
 // PLAYER_PART_END s13.formAmmoSummary.1
 
-// index.html:110239 · Phạm vi: global
+// index.html:110243 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.formSamples.1 EDITABLE
 const formSamples=new Map();
 // PLAYER_PART_END s13.formSamples.1
 
-// index.html:110240 · Phạm vi: global
+// index.html:110244 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.formPreviewBase.1 EDITABLE
 const formPreviewBase=drawCustomMenu;
 // PLAYER_PART_END s13.formPreviewBase.1
 
-// index.html:110241 · Phạm vi: global
+// index.html:110245 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.drawCustomMenu.1 EDITABLE
 drawCustomMenu=function(){
  formPreviewBase();
@@ -322,12 +322,12 @@ drawCustomMenu=function(){
 };
 // PLAYER_PART_END s13.drawCustomMenu.1
 
-// index.html:110271 · Phạm vi: global
+// index.html:110275 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiUIBase.1 EDITABLE
 const eiUIBase=drawUI;
 // PLAYER_PART_END s13.eiUIBase.1
 
-// index.html:110272 · Phạm vi: global
+// index.html:110276 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.drawUI.1 EDITABLE
 drawUI=function(){
  eiUIBase();
@@ -338,12 +338,12 @@ drawUI=function(){
 };
 // PLAYER_PART_END s13.drawUI.1
 
-// index.html:110279 · Phạm vi: global
+// index.html:110283 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.eiHelpBase.1 EDITABLE
 const eiHelpBase=drawCustomMenu;
 // PLAYER_PART_END s13.eiHelpBase.1
 
-// index.html:110280 · Phạm vi: global
+// index.html:110284 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.drawCustomMenu.2 EDITABLE
 drawCustomMenu=function(){
  eiHelpBase();if(!danteOn()||dino?.dante?.arm!==4)return;
@@ -352,7 +352,7 @@ drawCustomMenu=function(){
 };
 // PLAYER_PART_END s13.drawCustomMenu.2
 
-// index.html:110286 · Phạm vi: global
+// index.html:110290 · Phạm vi: global
 // PLAYER_PART_BEGIN s13.danteSync.1 EDITABLE
 danteSync();
 // PLAYER_PART_END s13.danteSync.1

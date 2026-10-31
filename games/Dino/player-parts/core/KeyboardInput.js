@@ -1,12 +1,12 @@
 // PLAYER_FILE: KeyboardInput
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: CAM_TROI, FloatingText, MIDAS_DAN, MIDAS_DENJIN, MIDAS_DENJIN_CD, MIDAS_DENJIN_CUA, MIDAS_DENJIN_GO, MIDAS_OVERHEAT, MIDAS_XA_GO, OCEAN_SURF, SFX, ST_LEN, apexActive, apexInputEvent, battuGo, battuMa, battuXacNhan, battuXoa, bienTuiKhi, boomNhayUlt, channelShieldLocked, combatStance, currentAmmoType, currentShieldType, dangCua, dangNhayMul, danteKey, danteOn, danteRelease, dashVx, defGoiQuan, defMode, dino, doDash, dragonBat, dtNhanPhim, floatingTexts, frames, gameOver, gameState, gameVictory, handleMoveTap, hasRune, keys, lanCuA, lanCuB, lanGhiPhimVua, lanKhach, lanUiHien, lanUiMoDong, lhBat, lhNhay, lhPhimIO, mapTheme, midasCong, midasCua, midasDam, midasDamDat, midasDamThuong, midasDamXa, midasFx, midasGhi, midasHado, midasHasho, midasKame, midasKhop, midasLuotDam, midasNhayDap, midasShoryu, midasThienTruy, previewDino, pvpDiem, pvpLuat, pvpSan, sanhApLuat, sanhChoUlt, sanhChuPhat, sdtGhiNhap, sgJump, sgOn, shakeTimer, shieldCdNguoiChoi, stBat, stLuotLen, startGame, trdBat, trdNhay, trdPhimIO, uniArmed, uniHopBat, unityFire, unitySwap, voidBat, voidTeleBatDau, vxThu, wkgKhien, wkgNhay, xAnPhim, xArmorKey, xArmorMenu, xBat, xNhaK
-// index.html:90855 · Phạm vi: global
+// index.html:90859 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.window.addEventListener.1 EDITABLE
 window.addEventListener('keydown', e => { 
             if(xArmorMenu){xArmorKey(e);return;} 
@@ -231,7 +231,7 @@ window.addEventListener('keydown', e => {
         });
 // PLAYER_PART_END s6.window.addEventListener.1
 
-// index.html:91076 · Phạm vi: global
+// index.html:91080 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.window.addEventListener.2 EDITABLE
 window.addEventListener('keyup', e => {
             if(xArmorMenu){keys[e.code]=false;e.preventDefault();return;}

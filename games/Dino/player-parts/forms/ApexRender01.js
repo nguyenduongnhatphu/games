@@ -1,12 +1,12 @@
 // PLAYER_FILE: ApexRender01
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: afterimages, apexColor, ctx, dino, floatingTexts, platforms, projectiles
-// index.html:101538 · Phạm vi: apexCreate
+// index.html:101542 · Phạm vi: apexCreate
 function __Part0(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.computeSkeletalRig.1 EDITABLE
 function computeSkeletalRig(c, d, walkCycle, breathCycle, recoil, headPitch, vy, isGrounded) {
@@ -176,7 +176,7 @@ function computeSkeletalRig(c, d, walkCycle, breathCycle, recoil, headPitch, vy,
 // PLAYER_PART_END s8.apexCreate.computeSkeletalRig.1
 }}
 
-// index.html:102386 · Phạm vi: apexCreate
+// index.html:102390 · Phạm vi: apexCreate
 function __Part1(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.getMouthWorldPositionAndAngle.1 EDITABLE
 function getMouthWorldPositionAndAngle(targetWorldX, targetWorldY) {
@@ -229,7 +229,7 @@ function getMouthWorldPositionAndAngle(targetWorldX, targetWorldY) {
 // PLAYER_PART_END s8.apexCreate.getMouthWorldPositionAndAngle.1
 }}
 
-// index.html:103606 · Phạm vi: apexCreate
+// index.html:103610 · Phạm vi: apexCreate
 function __Part2(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.tnNode.1 EDITABLE
 function tnNode(arr, idx) {
@@ -238,7 +238,7 @@ function tnNode(arr, idx) {
 // PLAYER_PART_END s8.apexCreate.tnNode.1
 }}
 
-// index.html:103609 · Phạm vi: apexCreate
+// index.html:103613 · Phạm vi: apexCreate
 function __Part3(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawEnergySpine.1 EDITABLE
 function drawEnergySpine(x, y, w, h, angle, spineIdx, totalSpines) {
@@ -282,7 +282,7 @@ function drawEnergySpine(x, y, w, h, angle, spineIdx, totalSpines) {
 // PLAYER_PART_END s8.apexCreate.drawEnergySpine.1
 }}
 
-// index.html:103647 · Phạm vi: apexCreate
+// index.html:103651 · Phạm vi: apexCreate
 function __Part4(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawDashAfterimages.1 EDITABLE
 function drawDashAfterimages() {
@@ -312,7 +312,7 @@ function drawDashAfterimages() {
 // PLAYER_PART_END s8.apexCreate.drawDashAfterimages.1
 }}
 
-// index.html:103671 · Phạm vi: apexCreate
+// index.html:103675 · Phạm vi: apexCreate
 function __Part5(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawParticlesAndEffects.1 EDITABLE
 function drawParticlesAndEffects() {
@@ -374,7 +374,7 @@ function drawParticlesAndEffects() {
 // PLAYER_PART_END s8.apexCreate.drawParticlesAndEffects.1
 }}
 
-// index.html:103727 · Phạm vi: apexCreate
+// index.html:103731 · Phạm vi: apexCreate
 function __Part6(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawArticulatedLeg.1 EDITABLE
 function drawArticulatedLeg(hipX, hipY, stepPhase, isBackLeg, crouchFactor, dashFactor) {
@@ -513,7 +513,7 @@ function drawArticulatedLeg(hipX, hipY, stepPhase, isBackLeg, crouchFactor, dash
 // PLAYER_PART_END s8.apexCreate.drawArticulatedLeg.1
 }}
 
-// index.html:103860 · Phạm vi: apexCreate
+// index.html:103864 · Phạm vi: apexCreate
 function __Part7(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawArticulatedArm.1 EDITABLE
 function drawArticulatedArm(shoulderX, shoulderY, isBackArm, crouchFactor, dashFactor, lookAwayFactor = 0) {
@@ -602,7 +602,7 @@ function drawArticulatedArm(shoulderX, shoulderY, isBackArm, crouchFactor, dashF
 // PLAYER_PART_END s8.apexCreate.drawArticulatedArm.1
 }}
 
-// index.html:103943 · Phạm vi: apexCreate
+// index.html:103947 · Phạm vi: apexCreate
 function __Part8(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawDinosaur.1 EDITABLE
 function drawDinosaur() {
@@ -1096,7 +1096,7 @@ function drawDinosaur() {
 // PLAYER_PART_END s8.apexCreate.drawDinosaur.1
 }}
 
-// index.html:104431 · Phạm vi: apexCreate
+// index.html:104435 · Phạm vi: apexCreate
 function __Part9(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawProjectiles.1 EDITABLE
 function drawProjectiles() {

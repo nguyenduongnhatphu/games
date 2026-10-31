@@ -1,42 +1,42 @@
 // PLAYER_FILE: CRYO
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: CAM_TROI, Effect, FloatingText, PVP_HS, Projectile, SFX, addStyle, allTargets, bosses, canvas, checkAABB, ctx, dino, dsTrangThai, floatingTexts, frames, gameState, projectiles, pvpTuDoiThu, shakeTimer, ultCharge, visualEffects, vkDangKy
-// index.html:54027 · Phạm vi: global
+// index.html:54031 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.CRYO_TANG.1 EDITABLE
 const CRYO_TANG = 5, CRYO_DONG = 90, CRYO_MIEN = 180, CRYO_ULT_DONG = 180;
 // PLAYER_PART_END s4.CRYO_TANG.1
 
-// index.html:54028 · Phạm vi: global
+// index.html:54032 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.CRYO_ULT_VO.1 EDITABLE
 const CRYO_ULT_VO = 5;
 // PLAYER_PART_END s4.CRYO_ULT_VO.1
 
-// index.html:54036 · Phạm vi: global
+// index.html:54040 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoDangBang.1 EDITABLE
 function cryoDangBang(o){ return o && (o._cryoBang || 0) > 0; }
 // PLAYER_PART_END s4.cryoDangBang.1
 
-// index.html:54039 · Phạm vi: global
+// index.html:54043 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoBangUlt.1 EDITABLE
 function cryoBangUlt(o){ return o && (o._cryoUB || 0) > 0; }
 // PLAYER_PART_END s4.cryoBangUlt.1
 
-// index.html:54040 · Phạm vi: global
+// index.html:54044 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoTangCua.1 EDITABLE
 function cryoTangCua(o){ return (o && o._cryoT) || 0; }
 // PLAYER_PART_END s4.cryoTangCua.1
 
-// index.html:54043 · Phạm vi: global
+// index.html:54047 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoKhoaTich.1 EDITABLE
 function cryoKhoaTich(o){ return o && (o._cryoMien || 0) > 0; }
 // PLAYER_PART_END s4.cryoKhoaTich.1
 
-// index.html:54044 · Phạm vi: global
+// index.html:54048 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoCong.1 EDITABLE
 function cryoCong(o, n, bu){
             if (!o || o.hp === undefined || o.invulnAll) return 0;
@@ -59,7 +59,7 @@ function cryoCong(o, n, bu){
         }
 // PLAYER_PART_END s4.cryoCong.1
 
-// index.html:54065 · Phạm vi: global
+// index.html:54069 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoPha.1 EDITABLE
 function cryoPha(o, dmgPha){
             if (cryoBangUlt(o)) return 0;        // bang ULT: danh vao khong lam vo duoc
@@ -74,7 +74,7 @@ function cryoPha(o, dmgPha){
         }
 // PLAYER_PART_END s4.cryoPha.1
 
-// index.html:54078 · Phạm vi: global
+// index.html:54082 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoDon.1 EDITABLE
 function cryoDon(o, dmgGoc, tang, dmgPha, bu){
             let d = cryoPha(o, dmgPha);
@@ -83,7 +83,7 @@ function cryoDon(o, dmgGoc, tang, dmgPha, bu){
         }
 // PLAYER_PART_END s4.cryoDon.1
 
-// index.html:54084 · Phạm vi: global
+// index.html:54088 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoDoGanGai.1 EDITABLE
 function cryoDoGanGai(){
             if (typeof projectiles === 'undefined' || typeof allTargets !== 'function') return;
@@ -108,7 +108,7 @@ function cryoDoGanGai(){
         }
 // PLAYER_PART_END s4.cryoDoGanGai.1
 
-// index.html:54106 · Phạm vi: global
+// index.html:54110 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoTick.1 EDITABLE
 function cryoTick(){
             cryoDoGanGai();
@@ -147,7 +147,7 @@ function cryoTick(){
         }
 // PLAYER_PART_END s4.cryoTick.1
 
-// index.html:54142 · Phạm vi: global
+// index.html:54146 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoVeBaoTuyet.1 EDITABLE
 function cryoVeBaoTuyet(){
             ctx.save(); ctx.globalAlpha = 0.30; ctx.fillStyle = "#E1F5FE";
@@ -162,7 +162,7 @@ function cryoVeBaoTuyet(){
         }
 // PLAYER_PART_END s4.cryoVeBaoTuyet.1
 
-// index.html:54154 · Phạm vi: global
+// index.html:54158 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoVeUlt.1 EDITABLE
 function cryoVeUlt(t, tamX){
             // LAN SONG BANG lan ra hai ben tu nguoi choi trong ~40 khung dau
@@ -207,7 +207,7 @@ function cryoVeUlt(t, tamX){
         }
 // PLAYER_PART_END s4.cryoVeUlt.1
 
-// index.html:54197 · Phạm vi: global
+// index.html:54201 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoVeTinhThe.1 EDITABLE
 function cryoVeTinhThe(o, manh){
             let W = (o.w||20), H = (o.h||20), cx = o.x + W/2, cy = o.y + H/2;
@@ -252,7 +252,7 @@ function cryoVeTinhThe(o, manh){
         }
 // PLAYER_PART_END s4.cryoVeTinhThe.1
 
-// index.html:54240 · Phạm vi: global
+// index.html:54244 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoVeThanh.1 EDITABLE
 function cryoVeThanh(o){
             let W = (o.w||20), cx = o.x + W/2, by = o.y - 20;
@@ -285,7 +285,7 @@ function cryoVeThanh(o){
         }
 // PLAYER_PART_END s4.cryoVeThanh.1
 
-// index.html:54270 · Phạm vi: global
+// index.html:54274 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.cryoVe.1 EDITABLE
 function cryoVe(){
             if (typeof allTargets !== 'function') return;
@@ -304,12 +304,12 @@ function cryoVe(){
         }
 // PLAYER_PART_END s4.cryoVe.1
 
-// index.html:54289 · Phạm vi: global
+// index.html:54293 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.CRYO_GAI_TAM.1 EDITABLE
 let CRYO_GAI_TAM = 40;
 // PLAYER_PART_END s4.CRYO_GAI_TAM.1
 
-// index.html:54293 · Phạm vi: Player.prototype
+// index.html:54297 · Phạm vi: Player.prototype
 const __Part17 = {
 // PLAYER_PART_BEGIN s4.Player.prototype._cryoDan.1 EDITABLE
 _cryoDan(x, y, dmg, tang, pha, spd, vy){
@@ -322,7 +322,7 @@ _cryoDan(x, y, dmg, tang, pha, spd, vy){
 // PLAYER_PART_END s4.Player.prototype._cryoDan.1
 };
 
-// index.html:54300 · Phạm vi: Player.prototype
+// index.html:54304 · Phạm vi: Player.prototype
 const __Part18 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.fireCryoHoa.1 EDITABLE
 fireCryoHoa(){                                  // danh thuong: 1 dmg, 1 tang, pha 3
@@ -338,7 +338,7 @@ fireCryoHoa(){                                  // danh thuong: 1 dmg, 1 tang, p
 // PLAYER_PART_END s4.Player.prototype.fireCryoHoa.1
 };
 
-// index.html:54310 · Phạm vi: Player.prototype
+// index.html:54314 · Phạm vi: Player.prototype
 const __Part19 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cryoKhoi.1 EDITABLE
 cryoKhoi(){                                     // 0.25-0.75s: khoi bang nen. 3 dmg, 2 tang, pha 5
@@ -352,7 +352,7 @@ cryoKhoi(){                                     // 0.25-0.75s: khoi bang nen. 3 
 // PLAYER_PART_END s4.Player.prototype.cryoKhoi.1
 };
 
-// index.html:54318 · Phạm vi: Player.prototype
+// index.html:54322 · Phạm vi: Player.prototype
 const __Part20 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cryoGai.1 EDITABLE
 cryoGai(){                                      // 0.75-1.25s: khoi GAI, trung thi toa manh
@@ -366,7 +366,7 @@ cryoGai(){                                      // 0.75-1.25s: khoi GAI, trung t
 // PLAYER_PART_END s4.Player.prototype.cryoGai.1
 };
 
-// index.html:54326 · Phạm vi: Player.prototype
+// index.html:54330 · Phạm vi: Player.prototype
 const __Part21 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cryoNoGai.1 EDITABLE
 cryoNoGai(px, py){
@@ -391,7 +391,7 @@ cryoNoGai(px, py){
 // PLAYER_PART_END s4.Player.prototype.cryoNoGai.1
 };
 
-// index.html:54345 · Phạm vi: Player.prototype
+// index.html:54349 · Phạm vi: Player.prototype
 const __Part22 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cryoTuong.1 EDITABLE
 cryoTuong(giu){                                 // 1.25s+: tuong bang lon dan
@@ -420,14 +420,14 @@ cryoTuong(giu){                                 // 1.25s+: tuong bang lon dan
 // PLAYER_PART_END s4.Player.prototype.cryoTuong.1
 };
 
-// index.html:54369 · Phạm vi: Player.prototype
+// index.html:54373 · Phạm vi: Player.prototype
 const __Part23 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cryoCaoSong.1 EDITABLE
 cryoCaoSong(d){ return Math.min(320 * 2/3, 26 + d * 0.40); }
 // PLAYER_PART_END s4.Player.prototype.cryoCaoSong.1
 };
 
-// index.html:54370 · Phạm vi: Player.prototype
+// index.html:54374 · Phạm vi: Player.prototype
 const __Part24 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cryoTickTuong.1 EDITABLE
 cryoTickTuong(){
@@ -450,7 +450,7 @@ cryoTickTuong(){
 // PLAYER_PART_END s4.Player.prototype.cryoTickTuong.1
 };
 
-// index.html:54387 · Phạm vi: Player.prototype
+// index.html:54391 · Phạm vi: Player.prototype
 const __Part25 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cryoVeTuong.1 EDITABLE
 cryoVeTuong(){
@@ -483,7 +483,7 @@ cryoVeTuong(){
 // PLAYER_PART_END s4.Player.prototype.cryoVeTuong.1
 };
 
-// index.html:54415 · Phạm vi: Player.prototype
+// index.html:54419 · Phạm vi: Player.prototype
 const __Part26 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cryoTickChannel.1 EDITABLE
 cryoTickChannel() {
@@ -500,7 +500,7 @@ cryoTickChannel() {
 // PLAYER_PART_END s4.Player.prototype.cryoTickChannel.1
 };
 
-// index.html:54428 · Phạm vi: global
+// index.html:54432 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.10 EDITABLE
 vkDangKy(8, {
             ten: 'CRYO',

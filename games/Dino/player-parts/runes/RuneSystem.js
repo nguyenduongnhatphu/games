@@ -1,27 +1,27 @@
 // PLAYER_FILE: RuneSystem
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: AMMO_NAMES, FloatingText, KHOA_COMBO, LT, POWERS, RUNES, SFX, apexOn, canvas, combatStance, comboKhoa, currentAmmoType, currentForm, currentLang, currentPower, danteOn, floatingTexts, gameState, ironOn, lhDongBo, runePicker, trdDongBo, vergilOn, wkgDongBo, xBat, xDongBo
-// index.html:83692 · Phạm vi: global
+// index.html:83696 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeSlots.1 EDITABLE
 let runeSlots = [null, null];
 // PLAYER_PART_END s6.runeSlots.1
 
-// index.html:83693 · Phạm vi: global
+// index.html:83697 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.ExpressionStatement.1 EDITABLE
 (function(){ try { let sv = JSON.parse(localStorage.getItem('dino_runes') || '[]'); runeSlots = [sv[0]||null, sv[1]||null]; } catch(e){} })();
 // PLAYER_PART_END s6.ExpressionStatement.1
 
-// index.html:83696 · Phạm vi: global
+// index.html:83700 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeLevelPick.1 EDITABLE
 let runeLevelPick = null;
 // PLAYER_PART_END s6.runeLevelPick.1
 
-// index.html:83738 · Phạm vi: global
+// index.html:83742 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.IfStatement.1 EDITABLE
 if (Array.isArray(runeSlots) && runeSlots.indexOf('luoihai') >= 0){
             runeSlots = runeSlots.map(v => v === 'luoihai' ? null : v);
@@ -30,34 +30,34 @@ if (Array.isArray(runeSlots) && runeSlots.indexOf('luoihai') >= 0){
         }
 // PLAYER_PART_END s6.IfStatement.1
 
-// index.html:83794 · Phạm vi: global
+// index.html:83798 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.BlockStatement.1 EDITABLE
 { let _r;
           _r = RUNES.find(x => x.id === 'shintrick');  if (_r) _r.onlyPower = 0;
           _r = RUNES.find(x => x.id === 'trienlien');  if (_r) _r.onlyPower = 0; }
 // PLAYER_PART_END s6.BlockStatement.1
 
-// index.html:83798 · Phạm vi: global
+// index.html:83802 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeOnlyAmmo.1 EDITABLE
 function runeOnlyAmmo(id){ let r = RUNES.find(x => x.id === id); return (r && r.onlyAmmo !== undefined) ? r.onlyAmmo : -1; }
 // PLAYER_PART_END s6.runeOnlyAmmo.1
 
-// index.html:83799 · Phạm vi: global
+// index.html:83803 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeAmmoLabel.1 EDITABLE
 function runeAmmoLabel(id){ let r = RUNES.find(x => x.id === id); if (r && Array.isArray(r.onlyAmmoAny)) return r.onlyAmmoAny.map(a => AMMO_NAMES[a]).join(' / '); return AMMO_NAMES[runeOnlyAmmo(id)] || ''; }
 // PLAYER_PART_END s6.runeAmmoLabel.1
 
-// index.html:83800 · Phạm vi: global
+// index.html:83804 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeOnlyStance.1 EDITABLE
 function runeOnlyStance(id){ let r = RUNES.find(x => x.id === id); return (r && r.onlyStance !== undefined) ? r.onlyStance : -1; }
 // PLAYER_PART_END s6.runeOnlyStance.1
 
-// index.html:83811 · Phạm vi: global
+// index.html:83815 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeOnlyPower.1 EDITABLE
 function runeOnlyPower(id){ let r = RUNES.find(x => x.id === id); return (r && r.onlyPower !== undefined) ? r.onlyPower : -1; }
 // PLAYER_PART_END s6.runeOnlyPower.1
 
-// index.html:83815 · Phạm vi: global
+// index.html:83819 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeLocked.1 EDITABLE
 function runeLocked(id){
             if(id==='triplejump'&&currentForm===4)return true;
@@ -71,27 +71,27 @@ function runeLocked(id){
             return false; }
 // PLAYER_PART_END s6.runeLocked.1
 
-// index.html:83825 · Phạm vi: global
+// index.html:83829 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeStanceOff.1 EDITABLE
 function runeStanceOff(id){ let st = runeOnlyStance(id); return st >= 0 && combatStance !== st; }
 // PLAYER_PART_END s6.runeStanceOff.1
 
-// index.html:83845 · Phạm vi: global
+// index.html:83849 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.PET_RUNE_IDS.1 EDITABLE
 const PET_RUNE_IDS = new Set(['pet','petx','pet2','pet2x','pet3','pet3x','pet4','pet4x','pet5','pet5x','pet6','pet6x','revive','revivex','instult','instultx','chanshld','chanshldx','critstrike','critstrikex']);
 // PLAYER_PART_END s6.PET_RUNE_IDS.1
 
-// index.html:83847 · Phạm vi: global
+// index.html:83851 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RNAME.1 EDITABLE
 function RNAME(o){ return (currentLang==='en' && o && o.nameEn) ? o.nameEn : (o ? o.name : ''); }
 // PLAYER_PART_END s6.RNAME.1
 
-// index.html:83848 · Phạm vi: global
+// index.html:83852 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RDESC.1 EDITABLE
 function RDESC(o){ return (currentLang==='en' && o && o.descEn) ? o.descEn : (o ? (o.desc||'') : ''); }
 // PLAYER_PART_END s6.RDESC.1
 
-// index.html:83856 · Phạm vi: global
+// index.html:83860 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RUNE_CAT_OF.1 EDITABLE
 const RUNE_CAT_OF = {
             battu:'test',
@@ -100,12 +100,12 @@ const RUNE_CAT_OF = {
         };
 // PLAYER_PART_END s6.RUNE_CAT_OF.1
 
-// index.html:83871 · Phạm vi: global
+// index.html:83875 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RUNE_DOCQUYEN.1 EDITABLE
 const RUNE_DOCQUYEN = new Set(['trienlien','katana','swordmaster','shintrick','huvo','chanlong','cus3o','rgcounter']);
 // PLAYER_PART_END s6.RUNE_DOCQUYEN.1
 
-// index.html:83872 · Phạm vi: global
+// index.html:83876 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RUNE_CATS.1 EDITABLE
 const RUNE_CATS = [
             /* Muc THU NGHIEM dat LEN DAU danh sach — day la cong cu Hans mo ra de xem bo don,
@@ -120,32 +120,32 @@ const RUNE_CATS = [
         ];
 // PLAYER_PART_END s6.RUNE_CATS.1
 
-// index.html:83903 · Phạm vi: global
+// index.html:83907 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeScroll.1 EDITABLE
 let runeScroll = 0;
 // PLAYER_PART_END s6.runeScroll.1
 
-// index.html:83950 · Phạm vi: global
+// index.html:83954 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeMerged.1 EDITABLE
 function runeMerged(){ return !!runeSlots[0] && runeSlots[0] === runeSlots[1] && runeCost(runeSlots[0]) === 2; }
 // PLAYER_PART_END s6.runeMerged.1
 
-// index.html:83954 · Phạm vi: global
+// index.html:83958 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeXem.1 EDITABLE
 let runeXem = null;
 // PLAYER_PART_END s6.runeXem.1
 
-// index.html:83955 · Phạm vi: global
+// index.html:83959 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeXemScroll.1 EDITABLE
 let runeXemScroll = 0, runeXemMax = 0;
 // PLAYER_PART_END s6.runeXemScroll.1
 
-// index.html:83956 · Phạm vi: global
+// index.html:83960 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RUNE_LUP.1 EDITABLE
 const RUNE_LUP = 20;
 // PLAYER_PART_END s6.RUNE_LUP.1
 
-// index.html:83965 · Phạm vi: global
+// index.html:83969 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeTomHay.1 EDITABLE
 function runeTomHay(r){
             if (!r) return '';
@@ -155,7 +155,7 @@ function runeTomHay(r){
         }
 // PLAYER_PART_END s6.runeTomHay.1
 
-// index.html:83976 · Phạm vi: global
+// index.html:83980 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeKhoaTom.1 EDITABLE
 function runeKhoaTom(id){
             let r = RUNES.find(x => x.id === id);
@@ -167,7 +167,7 @@ function runeKhoaTom(id){
         }
 // PLAYER_PART_END s6.runeKhoaTom.1
 
-// index.html:83985 · Phạm vi: global
+// index.html:83989 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeDongKhoa.1 EDITABLE
 function runeDongKhoa(r){
             if (!r) return '';
@@ -188,7 +188,7 @@ function runeDongKhoa(r){
         }
 // PLAYER_PART_END s6.runeDongKhoa.1
 
-// index.html:84004 · Phạm vi: global
+// index.html:84008 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeTomTat.1 EDITABLE
 function runeTomTat(t){
             let d = String(t || '').replace(/\n/g, ' ').trim();
@@ -203,24 +203,24 @@ function runeTomTat(t){
         }
 // PLAYER_PART_END s6.runeTomTat.1
 
-// index.html:84016 · Phạm vi: global
+// index.html:84020 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeTachDoan.1 EDITABLE
 function runeTachDoan(t){
             return String(t || '').split('. ').map(x => x.trim()).filter(x => x.length);
         }
 // PLAYER_PART_END s6.runeTachDoan.1
 
-// index.html:84030 · Phạm vi: global
+// index.html:84034 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeCost.1 EDITABLE
 function runeCost(id){ let r = RUNES.find(x => x.id === id); return (r && r.cost) ? r.cost : 1; }
 // PLAYER_PART_END s6.runeCost.1
 
-// index.html:84031 · Phạm vi: global
+// index.html:84035 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeIcon.1 EDITABLE
 function runeIcon(id){ let r = RUNES.find(x => x.id === id); return r ? r.icon : ''; }
 // PLAYER_PART_END s6.runeIcon.1
 
-// index.html:84272 · Phạm vi: global
+// index.html:84276 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dongBoPowerRune.1 EDITABLE
 function dongBoPowerRune(){
             if (typeof wkgDongBo === 'function') wkgDongBo();
@@ -230,7 +230,7 @@ function dongBoPowerRune(){
         }
 // PLAYER_PART_END s6.dongBoPowerRune.1
 
-// index.html:84278 · Phạm vi: global
+// index.html:84282 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.goRuneDocQuyenLech.1 EDITABLE
 function goRuneDocQuyenLech(){
             let doi = false;
@@ -242,7 +242,7 @@ function goRuneDocQuyenLech(){
         }
 // PLAYER_PART_END s6.goRuneDocQuyenLech.1
 
-// index.html:84306 · Phạm vi: global
+// index.html:84310 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RUNE_TOM.1 EDITABLE
 const RUNE_TOM = {
             trienlien: { vi:'Thay đổi mạnh về lối chơi của Rapidfire. Ba thế đã chứa trọn bộ kỹ năng lẫn chiêu cuối, nên chiêu cuối và khiên tay bị khoá. Sử dụng các Stance đang có như những năng lực khác nhau và phải thay đổi Stance liên tục để tận dụng tối đa khả năng của Rune.',
@@ -258,12 +258,12 @@ const RUNE_TOM = {
         };
 // PLAYER_PART_END s6.RUNE_TOM.1
 
-// index.html:85515 · Phạm vi: global
+// index.html:85519 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.comboTenRune.1 EDITABLE
 function comboTenRune(id){ let r = RUNES.find(x => x.id === id); return r ? RNAME(r) : id; }
 // PLAYER_PART_END s6.comboTenRune.1
 
-// index.html:85516 · Phạm vi: global
+// index.html:85520 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.setRuneSlot.1 EDITABLE
 function setRuneSlot(id){
             let oi = runePicker === 0 ? 1 : 0, other = runeSlots[oi];
@@ -282,7 +282,7 @@ function setRuneSlot(id){
         }
 // PLAYER_PART_END s6.setRuneSlot.1
 
-// index.html:88113 · Phạm vi: global
+// index.html:88117 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.hasRune.1 EDITABLE
 function hasRune(id){
             if(apexOn() || (typeof danteOn==='function'&&danteOn()) || (typeof vergilOn==='function'&&vergilOn()) || (typeof ironOn==='function'&&ironOn()))return false;
@@ -293,12 +293,12 @@ function hasRune(id){
         }
 // PLAYER_PART_END s6.hasRune.1
 
-// index.html:88270 · Phạm vi: global
+// index.html:88274 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.saveRunes.1 EDITABLE
 function saveRunes(){ try { localStorage.setItem('dino_runes', JSON.stringify(runeSlots)); } catch(e){} }
 // PLAYER_PART_END s6.saveRunes.1
 
-// index.html:88274 · Phạm vi: global
+// index.html:88278 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.quetRuneBatHopPhap.1 EDITABLE
 function quetRuneBatHopPhap(baoTin){
             let thao = [];
@@ -325,12 +325,12 @@ function quetRuneBatHopPhap(baoTin){
         }
 // PLAYER_PART_END s6.quetRuneBatHopPhap.1
 
-// index.html:92489 · Phạm vi: global
+// index.html:92493 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.pvpRuneCat.1 EDITABLE
 let pvpRuneCat = null;
 // PLAYER_PART_END s6.pvpRuneCat.1
 
-// index.html:92496 · Phạm vi: global
+// index.html:92500 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.pvpCatRune.1 EDITABLE
 function pvpCatRune(){
             if (pvpRuneCat) return;
@@ -339,7 +339,7 @@ function pvpCatRune(){
         }
 // PLAYER_PART_END s6.pvpCatRune.1
 
-// index.html:92502 · Phạm vi: global
+// index.html:92506 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.pvpTraRune.1 EDITABLE
 function pvpTraRune(){
             if (!pvpRuneCat) return;
@@ -348,7 +348,7 @@ function pvpTraRune(){
         }
 // PLAYER_PART_END s6.pvpTraRune.1
 
-// index.html:92511 · Phạm vi: global
+// index.html:92515 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.pvpRuneCanh.1 EDITABLE
 function pvpRuneCanh(){
             if (gameState !== 'pvp' && gameState !== 'pvp_setup') pvpTraRune();

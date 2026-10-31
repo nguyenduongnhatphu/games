@@ -1,12 +1,12 @@
 // PLAYER_FILE: ApexCombat
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: afterimages, apexColor, apexControl, apexLaunch, baseSpeed, dino, doChieu, doChieuCo, doChieuThu, keys, projectiles, sgDamage, sgSegmentBox
-// index.html:101927 · Phạm vi: apexCreate
+// index.html:101931 · Phạm vi: apexCreate
 function __Part0(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.executeClawComboStep.1 EDITABLE
 function executeClawComboStep(step) {
@@ -198,7 +198,7 @@ function executeClawComboStep(step) {
 // PLAYER_PART_END s8.apexCreate.executeClawComboStep.1
 }}
 
-// index.html:102113 · Phạm vi: apexCreate
+// index.html:102117 · Phạm vi: apexCreate
 function __Part1(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.executeChargedBite.1 EDITABLE
 function executeChargedBite() {
@@ -256,7 +256,7 @@ function executeChargedBite() {
 // PLAYER_PART_END s8.apexCreate.executeChargedBite.1
 }}
 
-// index.html:102165 · Phạm vi: apexCreate
+// index.html:102169 · Phạm vi: apexCreate
 function __Part2(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.executeAirBuzzsaw.1 EDITABLE
 function executeAirBuzzsaw() {
@@ -292,7 +292,7 @@ function executeAirBuzzsaw() {
 // PLAYER_PART_END s8.apexCreate.executeAirBuzzsaw.1
 }}
 
-// index.html:102195 · Phạm vi: apexCreate
+// index.html:102199 · Phạm vi: apexCreate
 function __Part3(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.executeAirSlash.1 EDITABLE
 function executeAirSlash() {
@@ -332,7 +332,7 @@ function executeAirSlash() {
 // PLAYER_PART_END s8.apexCreate.executeAirSlash.1
 }}
 
-// index.html:102229 · Phạm vi: apexCreate
+// index.html:102233 · Phạm vi: apexCreate
 function __Part4(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.executeDashTailSpin.1 EDITABLE
 function executeDashTailSpin() {
@@ -369,7 +369,7 @@ function executeDashTailSpin() {
 // PLAYER_PART_END s8.apexCreate.executeDashTailSpin.1
 }}
 
-// index.html:102260 · Phạm vi: apexCreate
+// index.html:102264 · Phạm vi: apexCreate
 function __Part5(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.executeCrocodileDeathRoll.1 EDITABLE
 function executeCrocodileDeathRoll() {
@@ -396,7 +396,7 @@ function executeCrocodileDeathRoll() {
 // PLAYER_PART_END s8.apexCreate.executeCrocodileDeathRoll.1
 }}
 
-// index.html:102281 · Phạm vi: apexCreate
+// index.html:102285 · Phạm vi: apexCreate
 function __Part6(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.executeCrouchClampBite.1 EDITABLE
 function executeCrouchClampBite() {
@@ -435,7 +435,7 @@ function executeCrouchClampBite() {
 // PLAYER_PART_END s8.apexCreate.executeCrouchClampBite.1
 }}
 
-// index.html:102314 · Phạm vi: apexCreate
+// index.html:102318 · Phạm vi: apexCreate
 function __Part7(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.triggerPrimaryMeleeAction.1 EDITABLE
 function triggerPrimaryMeleeAction() {
@@ -481,7 +481,7 @@ function triggerPrimaryMeleeAction() {
 // PLAYER_PART_END s8.apexCreate.triggerPrimaryMeleeAction.1
 }}
 
-// index.html:102354 · Phạm vi: apexCreate
+// index.html:102358 · Phạm vi: apexCreate
 function __Part8(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.startMeleePress.1 EDITABLE
 function startMeleePress() {
@@ -504,7 +504,7 @@ function startMeleePress() {
 // PLAYER_PART_END s8.apexCreate.startMeleePress.1
 }}
 
-// index.html:102371 · Phạm vi: apexCreate
+// index.html:102375 · Phạm vi: apexCreate
 function __Part9(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.releaseMeleePress.1 EDITABLE
 function releaseMeleePress() {
@@ -525,7 +525,7 @@ function releaseMeleePress() {
 // PLAYER_PART_END s8.apexCreate.releaseMeleePress.1
 }}
 
-// index.html:102433 · Phạm vi: apexCreate
+// index.html:102437 · Phạm vi: apexCreate
 function __Part10(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.startRangedCharge.1 EDITABLE
 function startRangedCharge() {
@@ -538,7 +538,7 @@ function startRangedCharge() {
 // PLAYER_PART_END s8.apexCreate.startRangedCharge.1
 }}
 
-// index.html:102440 · Phạm vi: apexCreate
+// index.html:102444 · Phạm vi: apexCreate
 function __Part11(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.releaseRangedCharge.1 EDITABLE
 function releaseRangedCharge(targetWorldX, targetWorldY) {
@@ -699,14 +699,14 @@ function releaseRangedCharge(targetWorldX, targetWorldY) {
 // PLAYER_PART_END s8.apexCreate.releaseRangedCharge.1
 }}
 
-// index.html:105425 · Phạm vi: apexCreate
+// index.html:105429 · Phạm vi: apexCreate
 function __Part12(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.hitTarget.1 EDITABLE
 function hitTarget(t,amount){return t.o?sgDamage(owner,t.o,amount+magmaBonus(),'apex'):0;}
 // PLAYER_PART_END s8.apexCreate.hitTarget.1
 }}
 
-// index.html:105426 · Phạm vi: apexCreate
+// index.html:105430 · Phạm vi: apexCreate
 function __Part13(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.damageTargetsInArea.1 EDITABLE
 function damageTargetsInArea(x,y,rx,ry,damage,kb,label=''){
@@ -720,7 +720,7 @@ function damageTargetsInArea(x,y,rx,ry,damage,kb,label=''){
 // PLAYER_PART_END s8.apexCreate.damageTargetsInArea.1
 }}
 
-// index.html:105452 · Phạm vi: apexCreate
+// index.html:105456 · Phạm vi: apexCreate
 function __Part14(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.jumpAttack.1 EDITABLE
 function jumpAttack(){
@@ -737,21 +737,21 @@ function jumpAttack(){
 // PLAYER_PART_END s8.apexCreate.jumpAttack.1
 }}
 
-// index.html:105463 · Phạm vi: apexCreate
+// index.html:105467 · Phạm vi: apexCreate
 function __Part15(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.rise.1 EDITABLE
 let rise=null;
 // PLAYER_PART_END s8.apexCreate.rise.1
 }}
 
-// index.html:105466 · Phạm vi: apexCreate
+// index.html:105470 · Phạm vi: apexCreate
 function __Part16(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.startTailRise.1 EDITABLE
 function startTailRise(){dino.meleeState='tail_rise';dino.meleeTimer=dino.meleeMaxTimer=26;dino.meleeComboStep=0;dino.meleeComboResetTimer=0;dino.meleeQueuedNext=false;dino.riseAngle=0;dino.vx=dino.facing*4;dino.airSpinAngle=0;rise={hit:new Set(),prev:tailPoints(),trail:[],source:{}};comboBadge.textContent='J → NHẢY · ĐUÔI HẤT TUNG';}
 // PLAYER_PART_END s8.apexCreate.startTailRise.1
 }}
 
-// index.html:105467 · Phạm vi: apexCreate
+// index.html:105471 · Phạm vi: apexCreate
 function __Part17(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.tickTailRise.1 EDITABLE
 function tickTailRise(){if(!rise)return;if(dino.meleeState!=='tail_rise'){rise=null;return;}dino.riseAngle=-Math.PI*2*Math.pow(1-dino.meleeTimer/26,.55);const pts=tailPoints(),segments=[];

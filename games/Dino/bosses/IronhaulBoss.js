@@ -1,5 +1,5 @@
 // BOSS_FILE: IronhaulBoss
-// BOSS_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// BOSS_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -241,7 +241,7 @@ function ironhaulRot(p,a,origin={x:0,y:0}){return {x:origin.x+p.x*Math.cos(a)-p.
 // BOSS_PART_END s1.ironhaulRot.1
 
 // Nguồn: index.html:34352 · Dùng bởi: IronhaulBoss
-// BOSS_PART_BEGIN s1.ironhaulIK.1 EDITABLE
+// BOSS_PART_BEGIN s1.ironhaulIK.1 READ_ONLY
 function ironhaulIK(root,target,upper,lower,bend=1){
     const dx=target.x-root.x,dy=target.y-root.y,L=Math.hypot(dx,dy)||1;
     const d=Math.max(Math.abs(upper-lower)+.01,Math.min(upper+lower-.01,L)),ux=dx/L,uy=dy/L;

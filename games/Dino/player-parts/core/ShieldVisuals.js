@@ -1,12 +1,12 @@
 // PLAYER_FILE: ShieldVisuals
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Player, apexActive, apexOn, combatStance, ctx, dino, frames
-// index.html:105776 · Phạm vi: global
+// index.html:105780 · Phạm vi: global
 // PLAYER_PART_BEGIN s9.newPlayerHexVisual.1 EDITABLE
 function newPlayerHexVisual(owner){
  const dino={x:0,y:0,shieldBlend:0,shieldRadius:50,shieldRotY:0,shieldRotX:.22,shieldParryWindow:0};
@@ -229,22 +229,22 @@ function newPlayerHexVisual(owner){
 }
 // PLAYER_PART_END s9.newPlayerHexVisual.1
 
-// index.html:105995 · Phạm vi: global
+// index.html:105999 · Phạm vi: global
 // PLAYER_PART_BEGIN s9.playerHexImpact.1 EDITABLE
 function playerHexImpact(n,x,y){if(!n||!n.isShielding())return;if(apexActive(n)&&n.apex)n.apex.shieldImpact(x,y);else{if(!n.hexVisual)n.hexVisual=newPlayerHexVisual(n);n.hexVisual.impact(x,y);}}
 // PLAYER_PART_END s9.playerHexImpact.1
 
-// index.html:105996 · Phạm vi: global
+// index.html:106000 · Phạm vi: global
 // PLAYER_PART_BEGIN s9.Player.prototype._drawHexShield.1 EDITABLE
 Player.prototype._drawHexShield=function(){};
 // PLAYER_PART_END s9.Player.prototype._drawHexShield.1
 
-// index.html:105997 · Phạm vi: global
+// index.html:106001 · Phạm vi: global
 // PLAYER_PART_BEGIN s9.fullHexPlayerDraw.1 EDITABLE
 const fullHexPlayerDraw=Player.prototype.draw;
 // PLAYER_PART_END s9.fullHexPlayerDraw.1
 
-// index.html:105998 · Phạm vi: global
+// index.html:106002 · Phạm vi: global
 // PLAYER_PART_BEGIN s9.Player.prototype.draw.1 EDITABLE
 Player.prototype.draw=function(...args){if(apexOn()&&this.id===1&&this.apex)return fullHexPlayerDraw.apply(this,args);if(!this.hexVisual)this.hexVisual=newPlayerHexVisual(this);this.hexVisual.draw(false);const result=fullHexPlayerDraw.apply(this,args);this.hexVisual.draw(true);return result;};
 // PLAYER_PART_END s9.Player.prototype.draw.1

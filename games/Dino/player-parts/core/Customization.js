@@ -1,12 +1,12 @@
 // PLAYER_FILE: Customization
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: AI_KHO, AMMO_NAMES, APEX_SKINS, CUS_DAN, CX, HUD_HANG, LANG, LH_POWER, LT, PHU_KIEN, POWERS, RNAME, RUNES, RUNE_LUP, ST_HOI, ST_MAX, TRD_POWER, VK, WKG_POWER, X_N_DANG, _ammoKhung, _ammoLupBtn, _chamKhung, _cusNCBtn, afterimages, afterimgCd, aiBat, aiDoKho, ammoColors, ammoPicker, ammoXem, apexColor, apexOn, apexRoleText, battuBat, battuDem, battuMa, battuNhay, birdBank, birdDmgAcc, canvas, coKhoChim, combatStance, ctx, currentAmmoType, currentForm, currentLang, currentPower, currentShieldType, cusMoTaDan, cusNCPicker, danteOn, dashCd, diemNhan, dino, dino2, dragonBat, drawAmmoChiTiet, drawAmmoPicker, drawBattuMa, drawCusNCPicker, drawHinhThai, drawRuneChiTiet, drawRunePicker, drawStyleRank, drawUnityHud, drawUnityRowsMerged, formAmmoSummary, frames, gameState, hasRune, highScore, hinhThaiMo, hudChu, hudHangDragon, hudHangSau, hudHangUnity, ironOn, kinhVeHud, lanRieng2, lhDongBo, lifestealNeed, mouseX, mouseY, nutThuVe, phuKien, previewDino, previewEnemies, pvpThanhMau, pvpThanhUlt, qsDangBat, qsDemDao, qsFin, qsMarks, qsT, runeDongKhoa, runeIcon, runeMerged, runePicker, runeSlots, runeTomHay, runeXem, score, sgHud, sgOn, sgRobot, shieldCdNguoiChoi, shieldCharge, stBat, stCharge, stFreeAir, stHoi, stKhoa, ultCharge, uniVeThanhHop, unityOn, unityRowsMerged, veNutLup, veVienCham, vergilOn, vkMoc, voidBat, vxVeVach, wrapText, xBat, xDongBo, xFormIdx, xFormOn, xHudOn, xHudVe, xHudVuKhi
-// index.html:76467 · Phạm vi: global
+// index.html:76471 · Phạm vi: global
 // PLAYER_PART_BEGIN s5.resetPreview.1 EDITABLE
 function resetPreview() {
             previewEnemies = [];
@@ -16,7 +16,7 @@ function resetPreview() {
         }
 // PLAYER_PART_END s5.resetPreview.1
 
-// index.html:76559 · Phạm vi: global
+// index.html:76563 · Phạm vi: global
 // PLAYER_PART_BEGIN s5.drawUI.1 EDITABLE
 function drawUI() {
             if (gameState === 'pvp') {
@@ -238,7 +238,7 @@ function drawUI() {
         }
 // PLAYER_PART_END s5.drawUI.1
 
-// index.html:77139 · Phạm vi: global
+// index.html:77143 · Phạm vi: global
 // PLAYER_PART_BEGIN s5.drawCustomMenu.1 EDITABLE
 function drawCustomMenu() {
             if (typeof lhDongBo === 'function') lhDongBo();   // @@HE-LHDAN: chon Luoi hai o day thi bang Power khoa ngay sang DEATH

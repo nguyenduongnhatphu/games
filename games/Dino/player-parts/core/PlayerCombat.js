@@ -1,5 +1,5 @@
 // PLAYER_FILE: PlayerCombat
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
@@ -173,7 +173,7 @@ slamCanDuoi(ix, iy, to){
 // PLAYER_PART_END s3.Player.slamCanDuoi.1
 }
 
-// index.html:48350 · Phạm vi: Player
+// index.html:48354 · Phạm vi: Player
 class __Part7 {
 // PLAYER_PART_BEGIN s3.Player.meleeStrike.1 EDITABLE
 meleeStrike(rect, dmg) {
@@ -215,7 +215,7 @@ meleeStrike(rect, dmg) {
 // PLAYER_PART_END s3.Player.meleeStrike.1
 }
 
-// index.html:48413 · Phạm vi: Player
+// index.html:48417 · Phạm vi: Player
 class __Part8 {
 // PLAYER_PART_BEGIN s3.Player.swordSwing.1 EDITABLE
 swordSwing(kind, life, tail) {
@@ -225,7 +225,7 @@ swordSwing(kind, life, tail) {
 // PLAYER_PART_END s3.Player.swordSwing.1
 }
 
-// index.html:48423 · Phạm vi: Player
+// index.html:48427 · Phạm vi: Player
 class __Part9 {
 // PLAYER_PART_BEGIN s3.Player.hoverNgam.1 EDITABLE
 hoverNgam(){
@@ -242,7 +242,7 @@ hoverNgam(){
 // PLAYER_PART_END s3.Player.hoverNgam.1
 }
 
-// index.html:48435 · Phạm vi: Player
+// index.html:48439 · Phạm vi: Player
 class __Part10 {
 // PLAYER_PART_BEGIN s3.Player._beginSlash.1 EDITABLE
 _beginSlash(dmg, life, dir, reach, hTop, hBot, spinR) {
@@ -286,7 +286,7 @@ _beginSlash(dmg, life, dir, reach, hTop, hBot, spinR) {
 // PLAYER_PART_END s3.Player._beginSlash.1
 }
 
-// index.html:48474 · Phạm vi: Player
+// index.html:48478 · Phạm vi: Player
 class __Part11 {
 // PLAYER_PART_BEGIN s3.Player._slashRect.1 EDITABLE
 _slashRect(coreOnly) {
@@ -309,7 +309,7 @@ _slashRect(coreOnly) {
 // PLAYER_PART_END s3.Player._slashRect.1
 }
 
-// index.html:48491 · Phạm vi: Player
+// index.html:48495 · Phạm vi: Player
 class __Part12 {
 // PLAYER_PART_BEGIN s3.Player._slashStrike.1 EDITABLE
 _slashStrike(rect, dmg, hitSet) {
@@ -374,7 +374,7 @@ _slashStrike(rect, dmg, hitSet) {
 // PLAYER_PART_END s3.Player._slashStrike.1
 }
 
-// index.html:48551 · Phạm vi: Player
+// index.html:48555 · Phạm vi: Player
 class __Part13 {
 // PLAYER_PART_BEGIN s3.Player.hoverMidCharge.1 EDITABLE
 hoverMidCharge(ammo) {

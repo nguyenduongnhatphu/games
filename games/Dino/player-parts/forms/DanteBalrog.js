@@ -1,17 +1,17 @@
 // PLAYER_FILE: DanteBalrog
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: DANTE_ATTACK_RATE, Effect, Player, SFX, checkAABB, ctx, danteActive, danteControlAllowed, danteDraw, danteHit, danteKey, danteLabel, danteOn, danteRelease, danteStyleState, danteTick, dashCd, dashVx, dino, doDash, dojoMode, drawUI, dswControl, dswFloor, dswReleaseHolds, dswState, frames, gameOver, gameVictory, keys, paused, playerAttackStep, playerComboBuffer, playerComboCancel, playerComboTrack, playerFinisherControl, sgTargets, shakeTimer, visualEffects
-// index.html:107701 · Phạm vi: global
+// index.html:107705 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.BLR_DAMAGE_SCALE.1 EDITABLE
 const BLR_DAMAGE_SCALE = 0.85;
 // PLAYER_PART_END s12.BLR_DAMAGE_SCALE.1
 
-// index.html:107702 · Phạm vi: global
+// index.html:107706 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.BLR_MOVES.1 EDITABLE
 const BLR_MOVES = {
  flydragon1:{name:'FLY DRAGON · RUSH PUNCH',T:28,wind:5,cancel:20,end:18,damage:4,pose:'magmaFin',hits:[8],heat:1,fire:true},
@@ -56,12 +56,12 @@ const BLR_MOVES = {
 };
 // PLAYER_PART_END s12.BLR_MOVES.1
 
-// index.html:107743 · Phạm vi: global
+// index.html:107747 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.BLR_PYRO.1 EDITABLE
 const BLR_PYRO = ['pyro1', 'pyro2', 'pyro3'];
 // PLAYER_PART_END s12.BLR_PYRO.1
 
-// index.html:107745 · Phạm vi: global
+// index.html:107749 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrState.1 EDITABLE
 function blrState(p){
  return p.balrog || (p.balrog = {
@@ -83,12 +83,12 @@ function blrState(p){
 }
 // PLAYER_PART_END s12.blrState.1
 
-// index.html:107763 · Phạm vi: global
+// index.html:107767 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrUsing.1 EDITABLE
 function blrUsing(){ return danteActive(dino) && dino.dante && dino.dante.arm === 1; }
 // PLAYER_PART_END s12.blrUsing.1
 
-// index.html:107765 · Phạm vi: global
+// index.html:107769 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrAddHeat.1 EDITABLE
 function blrAddHeat(p, b, amount){
  if(b.ignite > 0) return;
@@ -111,7 +111,7 @@ function blrAddHeat(p, b, amount){
 }
 // PLAYER_PART_END s12.blrAddHeat.1
 
-// index.html:107786 · Phạm vi: global
+// index.html:107790 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrSpawnFireWave.1 EDITABLE
 function blrSpawnFireWave(n, p, b, dir){
  const cx = n.x + n.w/2, cy = n.y + n.h/2;
@@ -146,7 +146,7 @@ function blrSpawnFireWave(n, p, b, dir){
 }
 // PLAYER_PART_END s12.blrSpawnFireWave.1
 
-// index.html:107818 · Phạm vi: global
+// index.html:107822 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrStart.1 EDITABLE
 function blrStart(id, extra = {}){
  const n = dino, p = n.dante, b = blrState(p), m = BLR_MOVES[id];
@@ -177,7 +177,7 @@ function blrStart(id, extra = {}){
 }
 // PLAYER_PART_END s12.blrStart.1
 
-// index.html:107846 · Phạm vi: global
+// index.html:107850 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteBalrogRelay.1 EDITABLE
 function danteBalrogRelay(){
  const n=dino,p=n.dante,s=dswState(p);
@@ -190,7 +190,7 @@ function danteBalrogRelay(){
 }
 // PLAYER_PART_END s12.danteBalrogRelay.1
 
-// index.html:107856 · Phạm vi: global
+// index.html:107860 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrCommand.1 EDITABLE
 function blrCommand(cmd){
  const n = dino, p = n.dante, b = blrState(p), a = p.attack;
@@ -221,7 +221,7 @@ function blrCommand(cmd){
 }
 // PLAYER_PART_END s12.blrCommand.1
 
-// index.html:107884 · Phạm vi: global
+// index.html:107888 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrDispatch.1 EDITABLE
 function blrDispatch(cmd){
  const n = dino, p = n.dante, b = blrState(p), recent = frames - b.ended <= 42, last = recent ? b.last : '';
@@ -263,12 +263,12 @@ function blrDispatch(cmd){
 }
 // PLAYER_PART_END s12.blrDispatch.1
 
-// index.html:107923 · Phạm vi: global
+// index.html:107927 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrKeyBase.1 EDITABLE
 const blrKeyBase = danteKey;
 // PLAYER_PART_END s12.blrKeyBase.1
 
-// index.html:107924 · Phạm vi: global
+// index.html:107928 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteKey.3 EDITABLE
 danteKey = function(code, repeat){
  if(!blrUsing()) return blrKeyBase(code, repeat);
@@ -303,12 +303,12 @@ danteKey = function(code, repeat){
 };
 // PLAYER_PART_END s12.danteKey.3
 
-// index.html:107957 · Phạm vi: global
+// index.html:107961 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrReleaseBase.1 EDITABLE
 const blrReleaseBase = danteRelease;
 // PLAYER_PART_END s12.blrReleaseBase.1
 
-// index.html:107958 · Phạm vi: global
+// index.html:107962 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteRelease.3 EDITABLE
 danteRelease = function(){
  if(blrUsing()) return;
@@ -316,12 +316,12 @@ danteRelease = function(){
 };
 // PLAYER_PART_END s12.danteRelease.3
 
-// index.html:107963 · Phạm vi: global
+// index.html:107967 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrDashBase.1 EDITABLE
 const blrDashBase = doDash;
 // PLAYER_PART_END s12.blrDashBase.1
 
-// index.html:107964 · Phạm vi: global
+// index.html:107968 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.doDash.2 EDITABLE
 doDash = function(...args){
  const before = dashCd;
@@ -333,12 +333,12 @@ doDash = function(...args){
 };
 // PLAYER_PART_END s12.doDash.2
 
-// index.html:107973 · Phạm vi: global
+// index.html:107977 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrDamageBase.1 EDITABLE
 const blrDamageBase = Player.prototype.takeDamage;
 // PLAYER_PART_END s12.blrDamageBase.1
 
-// index.html:107974 · Phạm vi: global
+// index.html:107978 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.Player.prototype.takeDamage.3 EDITABLE
 Player.prototype.takeDamage = function(...args){
  if(blrUsing() && this === dino && this.dante?.attack?.id === 'bantam'){
@@ -353,7 +353,7 @@ Player.prototype.takeDamage = function(...args){
 };
 // PLAYER_PART_END s12.Player.prototype.takeDamage.3
 
-// index.html:107987 · Phạm vi: global
+// index.html:107991 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrSpawnPunchArc.1 EDITABLE
 function blrSpawnPunchArc(b, a, hitIndex){
  let arcType = a.pose;
@@ -368,7 +368,7 @@ function blrSpawnPunchArc(b, a, hitIndex){
 }
 // PLAYER_PART_END s12.blrSpawnPunchArc.1
 
-// index.html:107999 · Phạm vi: global
+// index.html:108003 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrStrike.1 EDITABLE
 function blrStrike(n, p, b, a, pulse, customDmg = null, customOpt = {}){
  const ignBonus = (b.ignite > 0 ? 1 : 0) + (p.dt > 0 ? 2 : 0);
@@ -437,7 +437,7 @@ function blrStrike(n, p, b, a, pulse, customDmg = null, customOpt = {}){
 }
 // PLAYER_PART_END s12.blrStrike.1
 
-// index.html:108065 · Phạm vi: global
+// index.html:108069 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrFinish.1 EDITABLE
 function blrFinish(p, b, a){
  p.attack = null; b.last = a.id; b.ended = frames; b.stanceT = 36;
@@ -460,7 +460,7 @@ function blrFinish(p, b, a){
 }
 // PLAYER_PART_END s12.blrFinish.1
 
-// index.html:108085 · Phạm vi: global
+// index.html:108089 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrTick.1 EDITABLE
 function blrTick(n, p){
  const b = blrState(p);
@@ -636,12 +636,12 @@ function blrTick(n, p){
 }
 // PLAYER_PART_END s12.blrTick.1
 
-// index.html:108258 · Phạm vi: global
+// index.html:108262 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrTickBase.1 EDITABLE
 const blrTickBase = danteTick;
 // PLAYER_PART_END s12.blrTickBase.1
 
-// index.html:108259 · Phạm vi: global
+// index.html:108263 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteTick.3 EDITABLE
 danteTick = function(){
  blrTickBase();
@@ -652,12 +652,12 @@ danteTick = function(){
 };
 // PLAYER_PART_END s12.danteTick.3
 
-// index.html:108267 · Phạm vi: global
+// index.html:108271 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrUpdateBase.1 EDITABLE
 const blrUpdateBase = Player.prototype.update;
 // PLAYER_PART_END s12.blrUpdateBase.1
 
-// index.html:108268 · Phạm vi: global
+// index.html:108272 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.Player.prototype.update.2 EDITABLE
 Player.prototype.update = function(...args){
  if(!blrUsing() || this !== dino) return blrUpdateBase.apply(this, args);
@@ -667,7 +667,7 @@ Player.prototype.update = function(...args){
 };
 // PLAYER_PART_END s12.Player.prototype.update.2
 
-// index.html:108278 · Phạm vi: global
+// index.html:108282 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrPaintFistArm.1 EDITABLE
 function blrPaintFistArm(sx, sy, fx, fy, dir, ignited, isPunching = false){
  const dx = fx - sx, dy = fy - sy;
@@ -691,7 +691,7 @@ function blrPaintFistArm(sx, sy, fx, fy, dir, ignited, isPunching = false){
 }
 // PLAYER_PART_END s12.blrPaintFistArm.1
 
-// index.html:108299 · Phạm vi: global
+// index.html:108303 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrDraw.1 EDITABLE
 function blrDraw(n){
  const p = n.dante, b = blrState(p), a = p.attack;
@@ -941,12 +941,12 @@ function blrDraw(n){
 }
 // PLAYER_PART_END s12.blrDraw.1
 
-// index.html:108546 · Phạm vi: global
+// index.html:108550 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrDrawBase.1 EDITABLE
 const blrDrawBase = danteDraw;
 // PLAYER_PART_END s12.blrDrawBase.1
 
-// index.html:108547 · Phạm vi: global
+// index.html:108551 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.danteDraw.3 EDITABLE
 danteDraw = function(n){
  const p = n.dante;
@@ -956,12 +956,12 @@ danteDraw = function(n){
 };
 // PLAYER_PART_END s12.danteDraw.3
 
-// index.html:108555 · Phạm vi: global
+// index.html:108559 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.blrUIBase.1 EDITABLE
 const blrUIBase = drawUI;
 // PLAYER_PART_END s12.blrUIBase.1
 
-// index.html:108556 · Phạm vi: global
+// index.html:108560 · Phạm vi: global
 // PLAYER_PART_BEGIN s12.drawUI.2 EDITABLE
 drawUI = function(){
  blrUIBase();

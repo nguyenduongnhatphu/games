@@ -1,52 +1,52 @@
 // PLAYER_FILE: PRISM
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: FloatingText, Projectile, SFX, bosses, ctx, dino, dino2, enemies, floatingTexts, frames, gameState, obstacles, projectiles, shakeTimer, ultCharge, vkDangKy
-// index.html:50837 · Phạm vi: global
+// index.html:50841 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PRISM_STEP.1 EDITABLE
 const PRISM_STEP = 3;
 // PLAYER_PART_END s4.PRISM_STEP.1
 
-// index.html:50838 · Phạm vi: global
+// index.html:50842 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PRISM_MAX_TIER.1 EDITABLE
 const PRISM_MAX_TIER = 3;
 // PLAYER_PART_END s4.PRISM_MAX_TIER.1
 
-// index.html:50839 · Phạm vi: global
+// index.html:50843 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PRISM_MAX_HITS.1 EDITABLE
 const PRISM_MAX_HITS = PRISM_STEP * PRISM_MAX_TIER;
 // PLAYER_PART_END s4.PRISM_MAX_HITS.1
 
-// index.html:50840 · Phạm vi: global
+// index.html:50844 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PRISM_HOLD.1 EDITABLE
 const PRISM_HOLD = 180;
 // PLAYER_PART_END s4.PRISM_HOLD.1
 
-// index.html:50841 · Phạm vi: global
+// index.html:50845 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PRISM_BLEED.1 EDITABLE
 const PRISM_BLEED = 12;
 // PLAYER_PART_END s4.PRISM_BLEED.1
 
-// index.html:50842 · Phạm vi: global
+// index.html:50846 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.PRISM_COL.1 EDITABLE
 const PRISM_COL = ["#80DEEA", "#4DD0E1", "#FFF176", "#FFB74D", "#FF80AB", "#E040FB", "#FFFFFF"];
 // PLAYER_PART_END s4.PRISM_COL.1
 
-// index.html:50843 · Phạm vi: global
+// index.html:50847 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.prismTier.1 EDITABLE
 function prismTier(o) { return o && o._pxN ? Math.floor(o._pxN / PRISM_STEP) : 0; }
 // PLAYER_PART_END s4.prismTier.1
 
-// index.html:50844 · Phạm vi: global
+// index.html:50848 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.prismCol.1 EDITABLE
 function prismCol(t) { return PRISM_COL[Math.min(PRISM_COL.length - 1, t)]; }
 // PLAYER_PART_END s4.prismCol.1
 
-// index.html:50845 · Phạm vi: global
+// index.html:50849 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.tickPrismStacks.1 EDITABLE
 function tickPrismStacks() {
             // Truoc day danh sach nay khong co nguoi choi, nen trong PvP tang danh dau
@@ -63,7 +63,7 @@ function tickPrismStacks() {
         }
 // PLAYER_PART_END s4.tickPrismStacks.1
 
-// index.html:50858 · Phạm vi: global
+// index.html:50862 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.drawPrismStacks.1 EDITABLE
 function drawPrismStacks() {
             let all = bosses.concat(enemies, obstacles);
@@ -113,7 +113,7 @@ function drawPrismStacks() {
         }
 // PLAYER_PART_END s4.drawPrismStacks.1
 
-// index.html:50906 · Phạm vi: Player.prototype
+// index.html:50910 · Phạm vi: Player.prototype
 const __Part10 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.fireSplitShot.1 EDITABLE
 fireSplitShot(chargeTime) { 
@@ -173,7 +173,7 @@ fireSplitShot(chargeTime) {
 // PLAYER_PART_END s4.Player.prototype.fireSplitShot.1
 };
 
-// index.html:50960 · Phạm vi: Player.prototype
+// index.html:50964 · Phạm vi: Player.prototype
 const __Part11 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.fireSplitBounce.1 EDITABLE
 fireSplitBounce() {
@@ -185,7 +185,7 @@ fireSplitBounce() {
 // PLAYER_PART_END s4.Player.prototype.fireSplitBounce.1
 };
 
-// index.html:50968 · Phạm vi: global
+// index.html:50972 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.5 EDITABLE
 vkDangKy(3, {
             ten: 'PRISM', mauUlt: '#FFEB3B',

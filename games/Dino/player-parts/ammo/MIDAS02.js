@@ -1,12 +1,12 @@
 // PLAYER_FILE: MIDAS02
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Effect, FloatingText, LT, MIDAS_CHO_ROT, MIDAS_DAM_KHUNG, MIDAS_DAN, MIDAS_DENJIN_CUA, MIDAS_DENJIN_TO, MIDAS_DENJIN_TON, MIDAS_DL_DMG, MIDAS_HADO_XA, MIDAS_HAKI_BV, MIDAS_HAKI_CHAM, MIDAS_HAKI_DAI, MIDAS_HASHO_DAY, MIDAS_KHONG_GIAM, MIDAS_MOC_TOC, MIDAS_NEN, MIDAS_NOVA_CONG, MIDAS_NOVA_NHIP, MIDAS_NX_DMG, MIDAS_NX_IFR, MIDAS_OVERHEAT, MIDAS_ROT_MOC, MIDAS_ROT_TRAN, MIDAS_SHORYU_DMG, MIDAS_SONG_MOC, MIDAS_TT_DMG, MIDAS_ULT_HS, SFX, allTargets, bosses, canvas, checkAABB, ctx, dashVx, dino, dino2, enemies, floatingTexts, frames, gameState, gdCatHop, giaoSong, hasRune, keys, midasBac, midasCua, midasDamThuong, midasDay, midasFx, midasHado, midasHadoDenjinLoLung, midasHakiCham, midasKameTick, midasNut, midasSetDen, midasTTNo, midasVeDamLuot, midasVeFx, midasVeKame, projectiles, setCanApDon, setCanBat, setCanDmg, shakeTimer, ultCharge, visualEffects, vkDangKy, voltTia
-// index.html:61117 · Phạm vi: global
+// index.html:61121 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasTick.1 EDITABLE
 function midasTick(ng){
             if (!ng || ng.ammoType !== MIDAS_DAN) return;
@@ -173,7 +173,7 @@ function midasTick(ng){
         }
 // PLAYER_PART_END s4.midasTick.1
 
-// index.html:61282 · Phạm vi: global
+// index.html:61286 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasDam.1 EDITABLE
 function midasDam(ng, heSo){
             if (!ng || ng.ammoType !== MIDAS_DAN) return false;
@@ -235,7 +235,7 @@ function midasDam(ng, heSo){
         }
 // PLAYER_PART_END s4.midasDam.1
 
-// index.html:61342 · Phạm vi: global
+// index.html:61346 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasVeNamDam.1 EDITABLE
 function midasVeNamDam(A, tien, mo){
             if (A.haki) return midasVeNamDamHaki(A, tien, mo, A.haki === true ? 1 : A.haki);   // @@HE-HAKI
@@ -276,7 +276,7 @@ function midasVeNamDam(A, tien, mo){
         }
 // PLAYER_PART_END s4.midasVeNamDam.1
 
-// index.html:61381 · Phạm vi: global
+// index.html:61385 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasVeNamDamHaki.1 EDITABLE
 function midasVeNamDamHaki(A, tien, mo, k){
             let sc = A.sc, dir = A.dir, x = A.x + dir * tien, y = A.y, R = 15 * sc;
@@ -307,7 +307,7 @@ function midasVeNamDamHaki(A, tien, mo, k){
         }
 // PLAYER_PART_END s4.midasVeNamDamHaki.1
 
-// index.html:61410 · Phạm vi: global
+// index.html:61414 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasVeSac.1 EDITABLE
 function midasVeSac(ng, M){
             let d = M.dmg; if (d < 1) return;
@@ -368,7 +368,7 @@ function midasVeSac(ng, M){
         }
 // PLAYER_PART_END s4.midasVeSac.1
 
-// index.html:61474 · Phạm vi: global
+// index.html:61478 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasVeDam.1 EDITABLE
 function midasVeDam(ng, M){
             let A = M.dam; if (!A) return;
@@ -515,7 +515,7 @@ function midasVeDam(ng, M){
         }
 // PLAYER_PART_END s4.midasVeDam.1
 
-// index.html:61619 · Phạm vi: global
+// index.html:61623 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasVeHaki.1 EDITABLE
 function midasVeHaki(ng, M){
             let K = M.haki, t = K.t, cx = ng.x + ng.w / 2, cy = ng.y + ng.h / 2, sc = ng.getFormScale(), dir = ng.isFacingLeft ? -1 : 1;
@@ -547,7 +547,7 @@ function midasVeHaki(ng, M){
         }
 // PLAYER_PART_END s4.midasVeHaki.1
 
-// index.html:61650 · Phạm vi: global
+// index.html:61654 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasVeTay.1 EDITABLE
 function midasVeTay(ng, M){
             if (M.dam || M.kame || M.haki) return;
@@ -571,7 +571,7 @@ function midasVeTay(ng, M){
         }
 // PLAYER_PART_END s4.midasVeTay.1
 
-// index.html:61670 · Phạm vi: global
+// index.html:61674 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasVe.1 EDITABLE
 function midasVe(ng){
             if (!ng || ng.ammoType !== MIDAS_DAN) return;
@@ -634,7 +634,7 @@ function midasVe(ng){
         }
 // PLAYER_PART_END s4.midasVe.1
 
-// index.html:61731 · Phạm vi: global
+// index.html:61735 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasVang.1 EDITABLE
 function midasVang(nan, tu){
             if (!nan) return;
@@ -642,7 +642,7 @@ function midasVang(nan, tu){
         }
 // PLAYER_PART_END s4.midasVang.1
 
-// index.html:61739 · Phạm vi: global
+// index.html:61743 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasDayTick.1 EDITABLE
 function midasDayTick(){
             let ds = [];
@@ -671,7 +671,7 @@ function midasDayTick(){
         }
 // PLAYER_PART_END s4.midasDayTick.1
 
-// index.html:61765 · Phạm vi: global
+// index.html:61769 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasTickVangTatCa.1 EDITABLE
 function midasTickVangTatCa(){
             midasDayTick();
@@ -682,7 +682,7 @@ function midasTickVangTatCa(){
         }
 // PLAYER_PART_END s4.midasTickVangTatCa.1
 
-// index.html:61773 · Phạm vi: global
+// index.html:61777 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasTickVang.1 EDITABLE
 function midasTickVang(ng){
             if (!ng || !ng._bayXa) return;
@@ -704,7 +704,7 @@ function midasTickVang(ng){
         }
 // PLAYER_PART_END s4.midasTickVang.1
 
-// index.html:61793 · Phạm vi: global
+// index.html:61797 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.midasVeNut.1 EDITABLE
 function midasVeNut(){
             let N = midasNut; if (!N) return;
@@ -761,7 +761,7 @@ function midasVeNut(){
         }
 // PLAYER_PART_END s4.midasVeNut.1
 
-// index.html:61847 · Phạm vi: global
+// index.html:61851 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.14 EDITABLE
 vkDangKy(12, {
             ten: 'MIDAS',

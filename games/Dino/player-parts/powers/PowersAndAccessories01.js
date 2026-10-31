@@ -1,12 +1,12 @@
 // PLAYER_FILE: PowersAndAccessories01
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: BUA_CAO, BUA_TRUOC, DO_VO_VAT, Effect, FloatingText, LT, Projectile, SDT_CONG, SFX, STYLE_RANKS, _dtBoom, _dtProj, _dtSeq, _dtSet, _dtSoDan, activeLightnings, allTargets, bossProjectiles, bosses, camX, camY, canvas, chanLongBat, checkAABB, clNhan, clNhanTat, clNhanTick, clNhanVe, ctx, currentAmmoType, currentForm, currentPower, cutBossProjectiles, dealDamage, deoPhu, dino, dragCau, dragTick, dragVe, dragVeRong, dragonBat, dtLaCanChien, enemies, floatingTexts, frames, gameState, hasRune, hudChu, hudHangDragon, hvBoPhapNo, hvBoPhapTick, katBat, projectiles, score, sdtDangBat, sdtDuDieuKien, sdtKichHoat, shakeTimer, styleRankNow, visualEffects, worldL, worldR
-// index.html:83210 · Phạm vi: global
+// index.html:83214 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.PHU_KIEN.1 EDITABLE
 const PHU_KIEN = [
             { id: 'none',   ten: 'KHÔNG',          tenEn: 'NONE' },
@@ -20,17 +20,17 @@ const PHU_KIEN = [
         ];
 // PLAYER_PART_END s6.PHU_KIEN.1
 
-// index.html:83220 · Phạm vi: global
+// index.html:83224 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.phuKien.1 EDITABLE
 let phuKien = Math.max(0, Math.min(PHU_KIEN.length - 1, parseInt(localStorage.getItem("dino_phukien")) || 0));
 // PLAYER_PART_END s6.phuKien.1
 
-// index.html:83231 · Phạm vi: global
+// index.html:83235 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.mauPhu.1 EDITABLE
 function mauPhu(){ return (deoPhu('giap') || deoPhu('kabuto')) ? 1 : 0; }
 // PLAYER_PART_END s6.mauPhu.1
 
-// index.html:85542 · Phạm vi: global
+// index.html:85546 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.POWERS.1 EDITABLE
 const POWERS = [
             { id:'base', ten:'STANCE',  tenEn:'STANCE', mau:'#FF8F00',
@@ -50,62 +50,62 @@ const POWERS = [
         ];
 // PLAYER_PART_END s6.POWERS.1
 
-// index.html:86066 · Phạm vi: global
+// index.html:86070 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.POWERS.push.1 EDITABLE
 POWERS.push({ id:'wukong', ten:'SON WUKONG', tenEn:'SON WUKONG', mau:'#D6A43C', runeMo:true,
             mo:'Chỉ bật khi đeo rune SON WUKONG với GIÁO. Thế đánh khoá ở GUNSLINGER. NHẢY thành LẬP CÔN — cắm gậy xuống đất rồi đứng lên ngọn, ba nấc. LƯỚT khi đang trên gậy thành CÂN ĐẨU VÂN — bay tự do 5 giây. KHIÊN thành XOAY CÔN — quay gậy chặn đạn, càng chặn nhiều thì đòn kết càng nặng.',
             moEn:'Only active with the SON WUKONG rune on the SPEAR. Stance is locked to GUNSLINGER. JUMP becomes PILLAR — plant the staff and stand on its tip, three tiers. DASH while perched becomes the SOMERSAULT CLOUD — 5 seconds of free flight. The SHIELD becomes SPIN — twirl the staff to cut bullets; the more you block, the heavier the finisher.' });
 // PLAYER_PART_END s6.POWERS.push.1
 
-// index.html:86071 · Phạm vi: global
+// index.html:86075 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.POWERS.push.2 EDITABLE
 POWERS.push({ id:'musou', ten:'MUSOU', tenEn:'MUSOU', mau:'#FF5252', runeMo:true,
             mo:'Chỉ bật khi đeo rune TRIDENT với GIÁO. Thế đánh khoá ở GUNSLINGER. I: tụ lực 0.2 giây, loé sáng rồi ĐÂM XUYÊN 6 sát thương, bất tử lúc đâm. O: HÀO QUANG ĐỎ — mỗi nấc +1 sát thương cho MỌI đòn. Gây 20 sát thương được 1 nấc, giữ tối đa 3; bấm O nhiều lần thì cộng dồn (tối đa +3), kéo dài 10 giây.',
             moEn:'Only active with the TRIDENT rune on the SPEAR. Stance is locked to GUNSLINGER. I: focus for 0.2s, flash, then a PIERCING THRUST for 6, invulnerable while thrusting. O: RED AURA — every stack adds +1 to EVERY hit. Deal 20 damage to earn a stack, hold up to 3; press O again to stack them (up to +3), lasting 10 seconds.' });
 // PLAYER_PART_END s6.POWERS.push.2
 
-// index.html:86076 · Phạm vi: global
+// index.html:86080 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.POWERS.push.3 EDITABLE
 POWERS.push({ id:'death', ten:'DEATH', tenEn:'DEATH', mau:'#AB47BC', runeMo:true,
             mo:'Chỉ bật khi cầm LƯỠI HÁI. Thế đánh khoá ở GUNSLINGER. Đánh trúng thì tích NỘ. Nộ đầy bấm I hoặc O: HIỆN THÂN THẦN CHẾT 10 giây — chém nhanh hơn, thu hồi nhanh hơn, thần chết đi theo, cúi J có thêm nhát của thần chết. Đang hiện thân mà đạt hạng S trở lên thì bấm I/O lần nữa: THẦN CHẾT GIÁNG THẾ — mọi đòn +1 sát thương, tầm x1.3, cộng thêm giờ theo hạng.',
             moEn:'Only active while holding the REAPER SCYTHE. Stance is locked to GUNSLINGER. Hits build RAGE. At full rage press I or O: DEATH MANIFEST for 10 seconds — faster cuts, faster recovery, the Reaper follows you, and crouch J adds a Reaper strike. While manifested at rank S or higher press I/O again: DEATH INCARNATE — +1 damage on every hit, 1.3x reach, extra time by rank.' });
 // PLAYER_PART_END s6.POWERS.push.3
 
-// index.html:86091 · Phạm vi: global
+// index.html:86095 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.DT_DAI.1 EDITABLE
 const DT_DAI = 600, DT_NO_MAX = 100, DT_TRE = 14, DT_CD = 60, DT_NAP_MAX = 3;
 // PLAYER_PART_END s6.DT_DAI.1
 
-// index.html:86093 · Phạm vi: global
+// index.html:86097 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.DT_SAU.1 EDITABLE
 const DT_SAU = 64, DT_TRUOC = 86;
 // PLAYER_PART_END s6.DT_SAU.1
 
-// index.html:86101 · Phạm vi: global
+// index.html:86105 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.DT_THAN_PAL.1 EDITABLE
 const DT_THAN_PAL = { bd:"#2A0710", hd:"#3D0A16", dk:"#150309", lt:"#7A1420", foot:"#140206",
                               spk:"#FF6E40", out:"#FF5722", rim:"#FFAB40", eye:"#FFE0B2", pup:"#FF3D00",
                               aura:null, crest:4 };
 // PLAYER_PART_END s6.DT_THAN_PAL.1
 
-// index.html:86106 · Phạm vi: global
+// index.html:86110 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.DT_THAN_PAL_KAT.1 EDITABLE
 const DT_THAN_PAL_KAT = { bd:"#0B1533", hd:"#12204A", dk:"#060B1E", lt:"#1E3A7A", foot:"#050916",
                                   spk:"#4FC3F7", out:"#2979FF", rim:"#82B1FF", eye:"#E1F5FE", pup:"#00B0FF",
                                   aura:null, crest:4 };
 // PLAYER_PART_END s6.DT_THAN_PAL_KAT.1
 
-// index.html:86109 · Phạm vi: global
+// index.html:86113 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtLaKatana.1 EDITABLE
 function dtLaKatana(){ return typeof katBat === 'function' && katBat(currentAmmoType); }
 // PLAYER_PART_END s6.dtLaKatana.1
 
-// index.html:86110 · Phạm vi: global
+// index.html:86114 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtPalNow.1 EDITABLE
 function dtPalNow(){ return dtLaKatana() ? DT_THAN_PAL_KAT : DT_THAN_PAL; }
 // PLAYER_PART_END s6.dtPalNow.1
 
-// index.html:86113 · Phạm vi: global
+// index.html:86117 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.DT_MAU_XANH.1 EDITABLE
 const DT_MAU_XANH = { "#FF3D00":"#2979FF", "#FF5722":"#2979FF", "#E64A19":"#1565C0",
                               "#FF6E40":"#4FC3F7", "#FFAB40":"#82B1FF", "#FFE0B2":"#E1F5FE",
@@ -113,17 +113,17 @@ const DT_MAU_XANH = { "#FF3D00":"#2979FF", "#FF5722":"#2979FF", "#E64A19":"#1565
                               "#FF8A65":"#81D4FA", "#FFD180":"#B3E5FC", "#BF360C":"#0D47A1" };
 // PLAYER_PART_END s6.DT_MAU_XANH.1
 
-// index.html:86117 · Phạm vi: global
+// index.html:86121 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtMau.1 EDITABLE
 function dtMau(c){ return dtLaKatana() ? (DT_MAU_XANH[c] || c) : c; }
 // PLAYER_PART_END s6.dtMau.1
 
-// index.html:86118 · Phạm vi: global
+// index.html:86122 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtNo.1 EDITABLE
 let dtNo = 0, dtT = 0, dtClone = null, dtCd = 0, dtNap = 0, dtBang = [];
 // PLAYER_PART_END s6.dtNo.1
 
-// index.html:86128 · Phạm vi: global
+// index.html:86132 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtDoBan.1 EDITABLE
 function dtDoBan(){
             let co = false;
@@ -148,17 +148,17 @@ function dtDoBan(){
         }
 // PLAYER_PART_END s6.dtDoBan.1
 
-// index.html:86150 · Phạm vi: global
+// index.html:86154 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.powerChonTay.1 EDITABLE
 function powerChonTay(){ return POWERS.filter(p => !p.runeMo).length; }
 // PLAYER_PART_END s6.powerChonTay.1
 
-// index.html:86152 · Phạm vi: global
+// index.html:86156 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtCongNo.1 EDITABLE
 function dtCongNo(n){ if (dragonBat() && dtT <= 0) dtNo = Math.min(DT_NO_MAX, dtNo + n); }
 // PLAYER_PART_END s6.dtCongNo.1
 
-// index.html:86154 · Phạm vi: global
+// index.html:86158 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtNhanPhim.1 EDITABLE
 function dtNhanPhim(){
             if (!dragonBat()) return false;
@@ -167,7 +167,7 @@ function dtNhanPhim(){
         }
 // PLAYER_PART_END s6.dtNhanPhim.1
 
-// index.html:86160 · Phạm vi: global
+// index.html:86164 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtChupPose.1 EDITABLE
 function dtChupPose(){
             if (currentAmmoType === 5)
@@ -182,7 +182,7 @@ function dtChupPose(){
         }
 // PLAYER_PART_END s6.dtChupPose.1
 
-// index.html:86171 · Phạm vi: global
+// index.html:86175 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtKichHoat.1 EDITABLE
 function dtKichHoat(){
             if (!dragonBat() || dtT > 0 || dtNo < DT_NO_MAX) return false;
@@ -205,7 +205,7 @@ function dtKichHoat(){
         }
 // PLAYER_PART_END s6.dtKichHoat.1
 
-// index.html:86190 · Phạm vi: global
+// index.html:86194 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtTick.1 EDITABLE
 function dtTick(){
             if (!dragonBat()) { dtT = 0; dtClone = null; clNhanTat(); if (typeof dino !== 'undefined' && dino) dino._dtDon = null; return; }
@@ -307,7 +307,7 @@ function dtTick(){
         }
 // PLAYER_PART_END s6.dtTick.1
 
-// index.html:86289 · Phạm vi: global
+// index.html:86293 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtVungDanh.1 EDITABLE
 function dtVungDanh(c, a){
             let cx = c.x + dino.w/2, cy = c.y + dino.h/2;
@@ -323,7 +323,7 @@ function dtVungDanh(c, a){
         }
 // PLAYER_PART_END s6.dtVungDanh.1
 
-// index.html:86302 · Phạm vi: global
+// index.html:86306 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtRaDonCan.1 EDITABLE
 function dtRaDonCan(c, a){
             if (!a) return;
@@ -342,7 +342,7 @@ function dtRaDonCan(c, a){
         }
 // PLAYER_PART_END s6.dtRaDonCan.1
 
-// index.html:86318 · Phạm vi: global
+// index.html:86322 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtBanXa.1 EDITABLE
 function dtBanXa(c){
             if (dtCd > 0){ dtNap = Math.min(DT_NAP_MAX, dtNap + 1); return; }
@@ -362,7 +362,7 @@ function dtBanXa(c){
         }
 // PLAYER_PART_END s6.dtBanXa.1
 
-// index.html:87459 · Phạm vi: global
+// index.html:87463 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtVe.1 EDITABLE
 function dtVe(){
             if (!dragonBat()) return;
@@ -459,7 +459,7 @@ function dtVe(){
         }
 // PLAYER_PART_END s6.dtVe.1
 
-// index.html:87554 · Phạm vi: global
+// index.html:87558 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtVeNetRong.1 EDITABLE
 function dtVeNetRong(c, d, fade){
             let br = Math.sin(frames * 0.09) * 0.7;
@@ -514,7 +514,7 @@ function dtVeNetRong(c, d, fade){
         }
 // PLAYER_PART_END s6.dtVeNetRong.1
 
-// index.html:87611 · Phạm vi: global
+// index.html:87615 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtVeCanh.1 EDITABLE
 function dtVeCanh(cx, cy, d, fade, dangLao){
             let vay = Math.sin(frames * 0.15);
@@ -557,7 +557,7 @@ function dtVeCanh(cx, cy, d, fade, dangLao){
         }
 // PLAYER_PART_END s6.dtVeCanh.1
 
-// index.html:87652 · Phạm vi: global
+// index.html:87656 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.dtVeVuKhi.1 EDITABLE
 function dtVeVuKhi(c, fade){
             let PZ = c.pose;
@@ -605,17 +605,17 @@ function dtVeVuKhi(c, fade){
         }
 // PLAYER_PART_END s6.dtVeVuKhi.1
 
-// index.html:87696 · Phạm vi: global
+// index.html:87700 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidBat.1 EDITABLE
 function voidBat(){ return currentPower === 1; }
 // PLAYER_PART_END s6.voidBat.1
 
-// index.html:87704 · Phạm vi: global
+// index.html:87708 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidPhan.1 EDITABLE
 let voidPhan = [];
 // PLAYER_PART_END s6.voidPhan.1
 
-// index.html:87707 · Phạm vi: global
+// index.html:87711 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidDmgQuy.1 EDITABLE
 function voidDmgQuy(g){
             if (!g) return 1;
@@ -636,7 +636,7 @@ function voidDmgQuy(g){
         }
 // PLAYER_PART_END s6.voidDmgQuy.1
 
-// index.html:87724 · Phạm vi: global
+// index.html:87728 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidNhamBoss.1 EDITABLE
 function voidNhamBoss(x, y, sp){
             let best = null, bd = 1e9;
@@ -658,7 +658,7 @@ function voidNhamBoss(x, y, sp){
         }
 // PLAYER_PART_END s6.voidNhamBoss.1
 
-// index.html:87742 · Phạm vi: global
+// index.html:87746 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidPhanRa.1 EDITABLE
 function voidPhanRa(x, y, goc, ve){
             let dmg = voidDmgQuy(goc);
@@ -692,7 +692,7 @@ function voidPhanRa(x, y, goc, ve){
         }
 // PLAYER_PART_END s6.voidPhanRa.1
 
-// index.html:87772 · Phạm vi: global
+// index.html:87776 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidPhanTick.1 EDITABLE
 function voidPhanTick(){
             if (!voidPhan.length) return;
@@ -719,7 +719,7 @@ function voidPhanTick(){
         }
 // PLAYER_PART_END s6.voidPhanTick.1
 
-// index.html:87795 · Phạm vi: global
+// index.html:87799 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidCongTick.1 EDITABLE
 function voidCongTick(){
             if (!voidBat() || typeof dino === 'undefined' || !dino || !dino.isShielding()) return;
@@ -754,7 +754,7 @@ function voidCongTick(){
         }
 // PLAYER_PART_END s6.voidCongTick.1
 
-// index.html:87826 · Phạm vi: global
+// index.html:87830 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidDiemDan.1 EDITABLE
 function voidDiemDan(o){
             if (!o || o.dead || typeof o.x !== 'number') return null;
@@ -768,7 +768,7 @@ function voidDiemDan(o){
         }
 // PLAYER_PART_END s6.voidDiemDan.1
 
-// index.html:87836 · Phạm vi: global
+// index.html:87840 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidQuetDanRieng.1 EDITABLE
 function voidQuetDanRieng(L, R, T, B){
             if (typeof bosses === 'undefined') return;
@@ -816,7 +816,7 @@ function voidQuetDanRieng(L, R, T, B){
         }
 // PLAYER_PART_END s6.voidQuetDanRieng.1
 
-// index.html:87880 · Phạm vi: global
+// index.html:87884 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidVeCong.1 EDITABLE
 function voidVeCong(){
             if (!voidBat() || typeof dino === 'undefined' || !dino || !dino.isShielding()) return;
@@ -840,22 +840,22 @@ function voidVeCong(){
         }
 // PLAYER_PART_END s6.voidVeCong.1
 
-// index.html:87901 · Phạm vi: global
+// index.html:87905 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidChanParry.1 EDITABLE
 function voidChanParry(){ return typeof voidBat === 'function' && voidBat(); }
 // PLAYER_PART_END s6.voidChanParry.1
 
-// index.html:87903 · Phạm vi: global
+// index.html:87907 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.VOID_KHUNG.1 EDITABLE
 const VOID_KHUNG = 7;
 // PLAYER_PART_END s6.VOID_KHUNG.1
 
-// index.html:87904 · Phạm vi: global
+// index.html:87908 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidVet.1 EDITABLE
 let voidVet = [];
 // PLAYER_PART_END s6.voidVet.1
 
-// index.html:87905 · Phạm vi: global
+// index.html:87909 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidTeleBatDau.1 EDITABLE
 function voidTeleBatDau(tx, ty, laLuot){
             if (typeof dino === 'undefined' || !dino || dino._voidTe) return false;
@@ -868,7 +868,7 @@ function voidTeleBatDau(tx, ty, laLuot){
         }
 // PLAYER_PART_END s6.voidTeleBatDau.1
 
-// index.html:87976 · Phạm vi: global
+// index.html:87980 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidTeleTick.1 EDITABLE
 function voidTeleTick(){
             hvBoPhapTick();
@@ -888,7 +888,7 @@ function voidTeleTick(){
         }
 // PLAYER_PART_END s6.voidTeleTick.1
 
-// index.html:87992 · Phạm vi: global
+// index.html:87996 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voidVeVet.1 EDITABLE
 function voidVeVet(){
             for (const v of voidVet){
@@ -918,7 +918,7 @@ function voidVeVet(){
         }
 // PLAYER_PART_END s6.voidVeVet.1
 
-// index.html:89967 · Phạm vi: global
+// index.html:89971 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.DT_CHISO.1 EDITABLE
 const DT_CHISO = [
             { k:'hp',  ten:'MÁU',        tenEn:'HP'     },
@@ -928,57 +928,57 @@ const DT_CHISO = [
         ];
 // PLAYER_PART_END s6.DT_CHISO.1
 
-// index.html:89973 · Phạm vi: global
+// index.html:89977 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.DT_MIN.1 EDITABLE
 const DT_MIN = 0, DT_MAX = 300, DT_BUOC = 10;
 // PLAYER_PART_END s6.DT_MIN.1
 
-// index.html:90506 · Phạm vi: global
+// index.html:90510 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.ST_MAX.1 EDITABLE
 const ST_MAX = 3;
 // PLAYER_PART_END s6.ST_MAX.1
 
-// index.html:90507 · Phạm vi: global
+// index.html:90511 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.ST_HOI.1 EDITABLE
 const ST_HOI = 26;
 // PLAYER_PART_END s6.ST_HOI.1
 
-// index.html:90508 · Phạm vi: global
+// index.html:90512 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.ST_KHOA.1 EDITABLE
 const ST_KHOA = 120;
 // PLAYER_PART_END s6.ST_KHOA.1
 
-// index.html:90509 · Phạm vi: global
+// index.html:90513 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.ST_NHIP.1 EDITABLE
 const ST_NHIP = 14;
 // PLAYER_PART_END s6.ST_NHIP.1
 
-// index.html:90510 · Phạm vi: global
+// index.html:90514 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.ST_NAY.1 EDITABLE
 const ST_NAY = [14.5, 11.5, 8.5, 5.5];
 // PLAYER_PART_END s6.ST_NAY.1
 
-// index.html:90511 · Phạm vi: global
+// index.html:90515 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.ST_MUS_HO.1 EDITABLE
 const ST_MUS_HO = 3;
 // PLAYER_PART_END s6.ST_MUS_HO.1
 
-// index.html:90512 · Phạm vi: global
+// index.html:90516 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.ST_MUS_CD.1 EDITABLE
 const ST_MUS_CD = 14;
 // PLAYER_PART_END s6.ST_MUS_CD.1
 
-// index.html:90513 · Phạm vi: global
+// index.html:90517 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.stCharge.1 EDITABLE
 let stCharge = ST_MAX, stHoi = 0, stKhoa = 0, stFreeAir = true, stNay = 0, stXuongT = 0, stMusCd = 0;
 // PLAYER_PART_END s6.stCharge.1
 
-// index.html:90514 · Phạm vi: global
+// index.html:90518 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.stBat.1 EDITABLE
 function stBat(){ return typeof hasRune === 'function' && hasRune('shintrick'); }
 // PLAYER_PART_END s6.stBat.1
 
-// index.html:90659 · Phạm vi: global
+// index.html:90663 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.stReset.1 EDITABLE
 function stReset(){ stCharge = ST_MAX; stHoi = 0; stKhoa = 0; stFreeAir = true; stNay = 0; stXuongT = 0; stMusCd = 0; }
 // PLAYER_PART_END s6.stReset.1

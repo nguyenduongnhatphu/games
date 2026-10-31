@@ -1,12 +1,12 @@
 // PLAYER_FILE: DINOSWORD03
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: CRESCENT_GAP, DSW_ARC, Effect, FloatingText, KAT_J_TRAN, Projectile, SFX, allTargets, clawSwordCap, clawSwordTick, ctx, cutBossProjectiles, dashVx, drawDinoSwordArt, dswAngleCat, dswBladeCol, dswHexRGB, dswTier, floatingTexts, frames, gameState, giaoSong, hasRune, jkKep, katBat, katDrive, katJBam, katJCE, katNhaChannel, katNhaJ, katRoundTrip, katStinger, keys, projectiles, pvpDich, setCanBat, setCanDmg, setCanTam, shakeTimer, slamCong, ultCharge, visualEffects, vkDangKy, worldL, worldR
-// index.html:52814 · Phạm vi: Player.prototype
+// index.html:52818 · Phạm vi: Player.prototype
 const __Part0 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.dsVe.1 EDITABLE
 dsVe(){
@@ -89,7 +89,7 @@ dsVe(){
 // PLAYER_PART_END s4.Player.prototype.dsVe.1
 };
 
-// index.html:52891 · Phạm vi: Player.prototype
+// index.html:52895 · Phạm vi: Player.prototype
 const __Part1 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.clawHeavy.1 EDITABLE
 clawHeavy() {
@@ -107,7 +107,7 @@ clawHeavy() {
 // PLAYER_PART_END s4.Player.prototype.clawHeavy.1
 };
 
-// index.html:52906 · Phạm vi: Player.prototype
+// index.html:52910 · Phạm vi: Player.prototype
 const __Part2 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.shippuuga.1 EDITABLE
 shippuuga() {
@@ -127,7 +127,7 @@ shippuuga() {
 // PLAYER_PART_END s4.Player.prototype.shippuuga.1
 };
 
-// index.html:52922 · Phạm vi: Player.prototype
+// index.html:52926 · Phạm vi: Player.prototype
 const __Part3 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.shippuugaLen.1 EDITABLE
 shippuugaLen() {
@@ -148,7 +148,7 @@ shippuugaLen() {
 // PLAYER_PART_END s4.Player.prototype.shippuugaLen.1
 };
 
-// index.html:52938 · Phạm vi: Player.prototype
+// index.html:52942 · Phạm vi: Player.prototype
 const __Part4 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.shippuugaBo.1 EDITABLE
 shippuugaBo() {
@@ -177,7 +177,7 @@ shippuugaBo() {
 // PLAYER_PART_END s4.Player.prototype.shippuugaBo.1
 };
 
-// index.html:52963 · Phạm vi: Player.prototype
+// index.html:52967 · Phạm vi: Player.prototype
 const __Part5 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.setNhuomLuoi.1 EDITABLE
 setNhuomLuoi(){
@@ -187,7 +187,7 @@ setNhuomLuoi(){
 // PLAYER_PART_END s4.Player.prototype.setNhuomLuoi.1
 };
 
-// index.html:52967 · Phạm vi: Player.prototype
+// index.html:52971 · Phạm vi: Player.prototype
 const __Part6 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.fireCrescent.1 EDITABLE
 fireCrescent(big, pierce, dmg, nguoc) {
@@ -209,7 +209,7 @@ fireCrescent(big, pierce, dmg, nguoc) {
 // PLAYER_PART_END s4.Player.prototype.fireCrescent.1
 };
 
-// index.html:52984 · Phạm vi: Player.prototype
+// index.html:52988 · Phạm vi: Player.prototype
 const __Part7 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.kkTick.1 EDITABLE
 kkTick(){
@@ -224,7 +224,7 @@ kkTick(){
 // PLAYER_PART_END s4.Player.prototype.kkTick.1
 };
 
-// index.html:52993 · Phạm vi: Player.prototype
+// index.html:52997 · Phạm vi: Player.prototype
 const __Part8 = {
 // PLAYER_PART_BEGIN s4.Player.prototype._kkBan.1 EDITABLE
 _kkBan(C){
@@ -254,7 +254,7 @@ _kkBan(C){
 // PLAYER_PART_END s4.Player.prototype._kkBan.1
 };
 
-// index.html:53017 · Phạm vi: Player.prototype
+// index.html:53021 · Phạm vi: Player.prototype
 const __Part9 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.startClawUltimate.1 EDITABLE
 startClawUltimate() {
@@ -280,7 +280,7 @@ startClawUltimate() {
 // PLAYER_PART_END s4.Player.prototype.startClawUltimate.1
 };
 
-// index.html:53038 · Phạm vi: Player.prototype
+// index.html:53042 · Phạm vi: Player.prototype
 const __Part10 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.clawTickCrescent2.1 EDITABLE
 clawTickCrescent2() {
@@ -310,7 +310,7 @@ clawTickCrescent2() {
 // PLAYER_PART_END s4.Player.prototype.clawTickCrescent2.1
 };
 
-// index.html:53063 · Phạm vi: Player.prototype
+// index.html:53067 · Phạm vi: Player.prototype
 const __Part11 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.clawTickDive.1 EDITABLE
 clawTickDive() {
@@ -334,7 +334,7 @@ clawTickDive() {
 // PLAYER_PART_END s4.Player.prototype.clawTickDive.1
 };
 
-// index.html:53082 · Phạm vi: Player.prototype
+// index.html:53086 · Phạm vi: Player.prototype
 const __Part12 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.clawTickUlt.1 EDITABLE
 clawTickUlt() {
@@ -386,7 +386,7 @@ clawTickUlt() {
 // PLAYER_PART_END s4.Player.prototype.clawTickUlt.1
 };
 
-// index.html:53130 · Phạm vi: global
+// index.html:53134 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.7 EDITABLE
 vkDangKy(5, {
             ten: 'DINOSWORD',

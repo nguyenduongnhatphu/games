@@ -1,12 +1,12 @@
 // PLAYER_FILE: CUSTOM09
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: CUS_AC_HOI, CUS_AC_NAC, CUS_BANG, CUS_CG_FULL, CUS_CG_HOI, CUS_CG_XUYEN, CUS_KHO_NAP, CUS_KHO_TRAN, CUS_KV_HOP_DAU, CUS_KV_HOP_NHIP, CUS_KV_LUNG, CUS_KV_SINH, CUS_LZ_HOI, CUS_LZ_HOIDAN, CUS_LZ_KHOANG, CUS_LZ_KMAX, CUS_LZ_KNAP, CUS_LZ_TU, CUS_MC_SAC, CUS_MT_THEM, CUS_MT_TRAN, CUS_PT_HOI, CUS_PT_KMOC, CUS_PT_NAP, CUS_PT_NHIP, CUS_PT_TRAN, CUS_RG_HOI, CUS_RG_KHET, CUS_RG_KLEN, CUS_RG_KR, CUS_RG_KRO, CUS_TL_DMG, CUS_TOA_CHARGE, CUS_TOA_SO, CUS_TT_DMG, CUS_TT_TRAN, CUS_UFO_BAT, CUS_UZ_NO, CW_BINH, CW_CUI_CUA, CW_CUI_SO, CW_DMG, CW_NAP_TOC, CW_NHIP, CW_RO_VANG, CW_RO_XANH, CW_VANG_DAI, CW_VANG_NHIP, CW_XANH_CHO, CW_XANH_DMG, CW_XANH_KHOA, CW_XANH_LEN, CW_XANH_NANG, Effect, FloatingText, KV_DAN, LT, PT_DAN, Projectile, SFX, allTargets, canvas, checkAABB, ctx, cusAcBan, cusAcBat, cusAcNacTu, cusBangDan, cusCapCua, cusCgBan, cusCgBat, cusCgDmg, cusCgMau, cusCgMax, cusChBat, cusChCap, cusChMoc, cusChNha, cusChTick, cusChVao, cusCwBat, cusKhoKhung, cusKhoTran, cusKv, cusKvBan, cusKvBat, cusKvHopNem, cusKvLay, cusKvLoLung, cusKvSoLung, cusKvThem, cusKvTranCam, cusKvTranPhong, cusKvVanPhong, cusLap, cusLapDung, cusLaserBan, cusLaserBat, cusMcBat, cusMt, cusMtBay, cusNuke, cusPtBat, cusPtCanKim, cusPtChay, cusPtDps, cusPtGoc, cusPtLoLung, cusPtNem, cusPtRut, cusPvpDanh, cusQdBat, cusRgBan, cusRgBat, cusRgDmg, cusRgKBat, cusRgKDmg, cusRgKHeSo, cusRgN, cusRgRoNhip, cusRgRoR, cusRgTiaSet, cusRgTick, cusTTBat, cusTl, cusToaBat, cusUfoBat, cusUfoHoiCd, cusUltCap, cusUltNo, cusUzu, cwDanh, cwTimCham, dangLuotHoacChop, dealDamage, dino, doChieuThu, floatingTexts, frames, gameState, jkKep, keys, projectiles, pvpDich, shakeTimer, venKhoa, visualEffects, vkDangKy
-// index.html:69403 · Phạm vi: Player.prototype
+// index.html:69407 · Phạm vi: Player.prototype
 const __Part0 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cwTick.1 EDITABLE
 cwTick(banKey, chargeKey, crouchKey){
@@ -160,7 +160,7 @@ cwTick(banKey, chargeKey, crouchKey){
 // PLAYER_PART_END s4.Player.prototype.cwTick.1
 };
 
-// index.html:69553 · Phạm vi: Player.prototype
+// index.html:69557 · Phạm vi: Player.prototype
 const __Part1 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusBanPhao.1 EDITABLE
 cusBanPhao(){
@@ -183,7 +183,7 @@ cusBanPhao(){
 // PLAYER_PART_END s4.Player.prototype.cusBanPhao.1
 };
 
-// index.html:69571 · Phạm vi: Player.prototype
+// index.html:69575 · Phạm vi: Player.prototype
 const __Part2 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusKvTickNg.1 EDITABLE
 cusKvTickNg(banKey, giuK){
@@ -227,7 +227,7 @@ cusKvTickNg(banKey, giuK){
 // PLAYER_PART_END s4.Player.prototype.cusKvTickNg.1
 };
 
-// index.html:69610 · Phạm vi: Player.prototype
+// index.html:69614 · Phạm vi: Player.prototype
 const __Part3 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusAcTickNg.1 EDITABLE
 cusAcTickNg(banKey){
@@ -245,7 +245,7 @@ cusAcTickNg(banKey){
 // PLAYER_PART_END s4.Player.prototype.cusAcTickNg.1
 };
 
-// index.html:69624 · Phạm vi: Player.prototype
+// index.html:69628 · Phạm vi: Player.prototype
 const __Part4 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusCgTickNg.1 EDITABLE
 cusCgTickNg(banKey, giuK){
@@ -277,7 +277,7 @@ cusCgTickNg(banKey, giuK){
 // PLAYER_PART_END s4.Player.prototype.cusCgTickNg.1
 };
 
-// index.html:69650 · Phạm vi: Player.prototype
+// index.html:69654 · Phạm vi: Player.prototype
 const __Part5 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusPtTickNg.1 EDITABLE
 cusPtTickNg(banKey){
@@ -306,7 +306,7 @@ cusPtTickNg(banKey){
 // PLAYER_PART_END s4.Player.prototype.cusPtTickNg.1
 };
 
-// index.html:69674 · Phạm vi: Player.prototype
+// index.html:69678 · Phạm vi: Player.prototype
 const __Part6 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusRgKTick.1 EDITABLE
 cusRgKTick(giuK){
@@ -361,7 +361,7 @@ cusRgKTick(giuK){
 // PLAYER_PART_END s4.Player.prototype.cusRgKTick.1
 };
 
-// index.html:69724 · Phạm vi: Player.prototype
+// index.html:69728 · Phạm vi: Player.prototype
 const __Part7 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusRgTick.1 EDITABLE
 cusRgTick(banKey){
@@ -407,7 +407,7 @@ cusRgTick(banKey){
 // PLAYER_PART_END s4.Player.prototype.cusRgTick.1
 };
 
-// index.html:69767 · Phạm vi: Player.prototype
+// index.html:69771 · Phạm vi: Player.prototype
 const __Part8 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.cusLaserTick.1 EDITABLE
 cusLaserTick(banKey){
@@ -434,7 +434,7 @@ cusLaserTick(banKey){
 // PLAYER_PART_END s4.Player.prototype.cusLaserTick.1
 };
 
-// index.html:69790 · Phạm vi: global
+// index.html:69794 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.VK_CUSTOM.1 EDITABLE
 const VK_CUSTOM = {
             sacBoQuaNhiet: true,        // Kho tru cua Charge ban duoc CA TRONG luc qua nhiet
@@ -704,7 +704,7 @@ const VK_CUSTOM = {
         };
 // PLAYER_PART_END s4.VK_CUSTOM.1
 
-// index.html:70056 · Phạm vi: global
+// index.html:70060 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.16 EDITABLE
 vkDangKy(14, Object.assign({}, VK_CUSTOM, {
             ten: 'CUSTOM',
@@ -730,12 +730,12 @@ vkDangKy(14, Object.assign({}, VK_CUSTOM, {
         }));
 // PLAYER_PART_END s4.vkDangKy.16
 
-// index.html:70078 · Phạm vi: global
+// index.html:70082 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.17 EDITABLE
 vkDangKy(PT_DAN, Object.assign({}, VK_CUSTOM, { ten: 'PHI TIEU', sacToiDa: 180 }));
 // PLAYER_PART_END s4.vkDangKy.17
 
-// index.html:70079 · Phạm vi: global
+// index.html:70083 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.18 EDITABLE
 vkDangKy(KV_DAN, Object.assign({}, VK_CUSTOM, { ten: 'KIEM VU',  sacToiDa: 180 }));
 // PLAYER_PART_END s4.vkDangKy.18

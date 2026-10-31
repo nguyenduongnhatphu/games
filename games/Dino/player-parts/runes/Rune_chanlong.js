@@ -1,12 +1,12 @@
 // PLAYER_FILE: Rune_chanlong
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: RUNES
-// index.html:83769 · Phạm vi: global
+// index.html:83773 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RUNES.push.11 EDITABLE
 RUNES.push({ id:'chanlong', name:'CHÂN LONG', nameEn:'TRUE DRAGON', icon:'🐉', cost:1, onlyPower:2,
               desc:'Tốn 1 ô. CẦN POWER DRAGON TRIGGER. Rune không thêm đòn mới nào cho bạn — nó sửa đúng một chỗ ở cả hai nhánh của Dragon Trigger: chỗ mà hiện thân phải CHỜ người chơi.\n\nCẬN CHIẾN (Kiếm / Katana / Giáo / Búa / Midas / Venom) — PHÂN THÂN HIỆN CHÂN THÂN. Bình thường phân thân chỉ là một bảng ghi phát lại chậm hơn bạn 14 khung: bạn đứng yên thì nó cũng đứng yên, bạn không bấm thì nó không đánh. Với rune, nó bỏ hẳn bảng ghi và trở thành MỘT NGƯỜI CHƠI THẬT — đúng bộ đòn, đúng combo, đúng mọi kĩ năng của loại đạn đang cầm, được điều khiển bằng chính bộ AI của chế độ đối kháng. Nó tự chọn mục tiêu, tự áp sát và tự chọn đòn theo khoảng cách: GIÁO giữ Channel gạt đạn rồi tiến vào, BÚA ném rồi lùi ra chờ búa về tay, MIDAS lùi ra tích số rồi xông vào đấm — đúng cách mỗi vũ khí phải chơi. Khác bạn ĐÚNG MỘT CHỖ: nó KHÔNG TỰ NÉ. Không giơ khiên, không lướt tránh, không đọc đòn của boss. Nó chỉ đánh, và cũng không được dùng chiêu cuối. Vì không còn là cái bóng chép lại ai nữa, nó hiện CHÂN THÂN: đậm màu, rõ nét, có quầng lửa quanh người.\n\nTẦM XA (8 loại đạn còn lại) — DẠNG RỒNG ĐƯỢC HAI THỨ. Một: đòn kết LONG VIÊM PHÁ ĐỊA nạp SỚM 2 GIÂY — còn 7 giây là rồng đã bắt đầu gầm thay vì 5 giây, nên bạn có thêm cả một nhịp cầu lửa sau khi đại lửa quét xong. Hai: HAI GIÂY CUỐI của lần biến hình, rồng bỏ vị trí, dựng thẳng người bay vọt lên trời rồi lao thẳng xuống giữa bản đồ — PHI LONG TẠI THIÊN. Vụ nổ phủ TRỌN bản đồ, không ai né được, nhưng sát thương tính theo CHỖ ĐỨNG: 10 ở chính giữa, giảm dần còn 6 ở hai mép. Boss quen kè sát mép màn ăn nhẹ nhất — chúng vốn không khó nên cho chúng một đường lui; boss dám đứng giữa sân thì ăn trọn.',

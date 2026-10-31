@@ -1,12 +1,12 @@
 // PLAYER_FILE: ApexRender02
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: apexColor, apexDrawObelith, bienDayHT, ctx, dino, frames, mapTheme, oceanCamY, worldL, worldR
-// index.html:104560 · Phạm vi: apexCreate
+// index.html:104564 · Phạm vi: apexCreate
 function __Part0(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawCombatEffects.1 EDITABLE
 function drawCombatEffects() {
@@ -340,7 +340,7 @@ function drawCombatEffects() {
 // PLAYER_PART_END s8.apexCreate.drawCombatEffects.1
 }}
 
-// index.html:104904 · Phạm vi: apexCreate
+// index.html:104908 · Phạm vi: apexCreate
 function __Part1(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawSpecialties.1 EDITABLE
 function drawSpecialties(){
@@ -360,7 +360,7 @@ function drawSpecialties(){
 // PLAYER_PART_END s8.apexCreate.drawSpecialties.1
 }}
 
-// index.html:104918 · Phạm vi: apexCreate
+// index.html:104922 · Phạm vi: apexCreate
 function __Part2(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawNebulaDashShield.1 EDITABLE
 function drawNebulaDashShield(){
@@ -382,14 +382,14 @@ function drawNebulaDashShield(){
 // PLAYER_PART_END s8.apexCreate.drawNebulaDashShield.1
 }}
 
-// index.html:105474 · Phạm vi: apexCreate
+// index.html:105478 · Phạm vi: apexCreate
 function __Part3(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawTailTrail.1 EDITABLE
 function drawTailTrail(){if(!rise||rise.trail.length<2)return;ctx.save();ctx.lineCap='round';for(let i=1;i<rise.trail.length;i++){ctx.globalAlpha=i/rise.trail.length*.75;ctx.strokeStyle=currentSkin.energyGlow;ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(rise.trail[i-1].x,rise.trail[i-1].y);ctx.lineTo(rise.trail[i].x,rise.trail[i].y);ctx.stroke();ctx.strokeStyle=currentSkin.energyCore;ctx.lineWidth=3;ctx.stroke();}ctx.restore();}
 // PLAYER_PART_END s8.apexCreate.drawTailTrail.1
 }}
 
-// index.html:105547 · Phạm vi: apexCreate
+// index.html:105551 · Phạm vi: apexCreate
 function __Part4(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawWallTrees.1 EDITABLE
 function drawWallTrees(){
@@ -405,14 +405,14 @@ function drawWallTrees(){
 // PLAYER_PART_END s8.apexCreate.drawWallTrees.1
 }}
 
-// index.html:105557 · Phạm vi: apexCreate
+// index.html:105561 · Phạm vi: apexCreate
 function __Part5(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawLeaves.1 EDITABLE
 function drawLeaves(){for(const p of leafs){ctx.save();let yy=p.y,alpha=1;if(p.fallen){const t=240-p.fallen;if(t>35){ctx.restore();continue;}yy+=t*t*.35;alpha=1-t/35;}ctx.globalAlpha=alpha;apexDrawObelith(p.x,yy,p.w,p.h,p.ttl);ctx.restore();}}
 // PLAYER_PART_END s8.apexCreate.drawLeaves.1
 }}
 
-// index.html:105591 · Phạm vi: apexCreate
+// index.html:105595 · Phạm vi: apexCreate
 function __Part6(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawHexShieldLayer.1 EDITABLE
 function drawHexShieldLayer(isFrontHemisphere) {
@@ -592,14 +592,14 @@ function drawHexShieldLayer(isFrontHemisphere) {
 // PLAYER_PART_END s8.apexCreate.drawHexShieldLayer.1
 }}
 
-// index.html:105765 · Phạm vi: apexCreate
+// index.html:105769 · Phạm vi: apexCreate
 function __Part7(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawGuard.1 EDITABLE
 function drawGuard(){drawHexShieldLayer(true);}
 // PLAYER_PART_END s8.apexCreate.drawGuard.1
 }}
 
-// index.html:105767 · Phạm vi: apexCreate
+// index.html:105771 · Phạm vi: apexCreate
 function __Part8(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.draw.1 EDITABLE
 function draw(){currentSkin=obelithSkin();if(liveUltimate()){const u=ultimate;ctx.save();ctx.scale(SCALE,SCALE);drawWallTrees();drawLeaves();drawObelithSites();drawCombatEffects();drawProjectiles();drawParticlesAndEffects();ctx.restore();drawObelithUltimate(u);for(const v of u.victims)drawUltVictim(v,u);drawObelithImpact(u);return;}ctx.save();ctx.scale(SCALE,SCALE);drawWallTrees();drawLeaves();drawSpecialties();drawMagmaAura();drawDashAfterimages();drawTailTrail();drawHexShieldLayer(false);if(!owner.invincible||Math.floor(frames/4)%2===0)drawDinosaur();drawCombatEffects();drawNebulaDashShield();drawProjectiles();drawParticlesAndEffects();drawGuard();drawObelithSites();ctx.restore();}

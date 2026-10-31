@@ -1,12 +1,12 @@
 // PLAYER_FILE: LUOIHAI03
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: FloatingText, LH_BIEN_T, LH_NO_MAX, LT, STYLE_RANKS, camX, camY, canvas, combatStance, ctx, dino, floatingTexts, frames, gameState, hudChu, hudHangDragon, lh, lhBat, lhChBat, lhChu, lhDir, lhDs, lhHeSoChan, lhHienBat, lhImpactDat, lhK, lhLaChu, lhMoi, lhUltBat, lhVeCay, lhVeCheo, lhVeDap, lhVeHien, lhVeHon, lhVeLuoiNguoi, lhVeQua, lhVeSong, lhVeTay2, lhVeThanChet, lhVeTrang, lhVeVet, shakeTimer, styleRankNow, ultCharge, vkDangKy
-// index.html:72676 · Phạm vi: global
+// index.html:72680 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.lhVeNem.1 EDITABLE
 function lhVeNem(N){
             ctx.save(); ctx.globalCompositeOperation = 'lighter';
@@ -17,7 +17,7 @@ function lhVeNem(N){
         }
 // PLAYER_PART_END s4.lhVeNem.1
 
-// index.html:72683 · Phạm vi: global
+// index.html:72687 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.lhVe.1 EDITABLE
 function lhVe(){
             if (!lh || !lhBat() || typeof dino === 'undefined' || !dino) return;
@@ -86,7 +86,7 @@ function lhVe(){
         }
 // PLAYER_PART_END s4.lhVe.1
 
-// index.html:72749 · Phạm vi: global
+// index.html:72753 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.lhVeTren.1 EDITABLE
 function lhVeTren(){
             if (!lh || typeof dino === 'undefined' || !dino) return;
@@ -123,7 +123,7 @@ function lhVeTren(){
         }
 // PLAYER_PART_END s4.lhVeTren.1
 
-// index.html:72782 · Phạm vi: global
+// index.html:72786 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.lhVeUlt.1 EDITABLE
 function lhVeUlt(U){
             let cX = (typeof camX !== 'undefined' ? camX : 0), cY = (typeof camY !== 'undefined' ? camY : 0);
@@ -163,7 +163,7 @@ function lhVeUlt(U){
         }
 // PLAYER_PART_END s4.lhVeUlt.1
 
-// index.html:72819 · Phạm vi: global
+// index.html:72823 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.20 EDITABLE
 vkDangKy(18, {
             ten: 'LUOI HAI',

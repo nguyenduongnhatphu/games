@@ -1,27 +1,27 @@
 // PLAYER_FILE: PlayerState
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: AMMO_NAMES, DK_TIERS, DSAW_NAC, LH_TIERS, beamClashTargets, bosses, defMode, defUnits, enemies, gameState, obstacles, pvpDoiThu, pvpVoBoc
-// index.html:83046 · Phạm vi: global
+// index.html:83050 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.ultCharge.1 EDITABLE
 let ultCharge = 0;
 // PLAYER_PART_END s6.ultCharge.1
 
-// index.html:83135 · Phạm vi: global
+// index.html:83139 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.currentForm.1 EDITABLE
 let currentForm = parseInt(localStorage.getItem("dino_current_form")) || 0;
 // PLAYER_PART_END s6.currentForm.1
 
-// index.html:86080 · Phạm vi: global
+// index.html:86084 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.currentPower.1 EDITABLE
 let currentPower = 0;
 // PLAYER_PART_END s6.currentPower.1
 
-// index.html:89277 · Phạm vi: global
+// index.html:89281 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.currentAmmoType.1 EDITABLE
 let currentAmmoType = (function(){
             let v = parseInt(localStorage.getItem("dino_ammo_type"));
@@ -30,27 +30,27 @@ let currentAmmoType = (function(){
         })();
 // PLAYER_PART_END s6.currentAmmoType.1
 
-// index.html:89284 · Phạm vi: global
+// index.html:89288 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.combatStance.1 EDITABLE
 let combatStance = parseInt(localStorage.getItem("dino_stance")) || 0;
 // PLAYER_PART_END s6.combatStance.1
 
-// index.html:89285 · Phạm vi: global
+// index.html:89289 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.currentShieldType.1 EDITABLE
 let currentShieldType = parseInt(localStorage.getItem("dino_shield")) || 0;
 // PLAYER_PART_END s6.currentShieldType.1
 
-// index.html:94018 · Phạm vi: global
+// index.html:94022 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.checkAABB.1 EDITABLE
 function checkAABB(r1, r2) { return r1.x < r2.x + r2.w && r1.x + r1.w > r2.x && r1.y < r2.y + r2.h && r1.y + r1.h > r2.y; }
 // PLAYER_PART_END s6.checkAABB.1
 
-// index.html:94455 · Phạm vi: global
+// index.html:94459 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.OC_FULL.1 EDITABLE
 const OC_FULL = 160;
 // PLAYER_PART_END s6.OC_FULL.1
 
-// index.html:94470 · Phạm vi: global
+// index.html:94474 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.CHARGE_TIERS.1 EDITABLE
 const CHARGE_TIERS = [
             // 0 PULSE    : 25% vien to | 62.5% vien xuyen | 100% phan hach   (maxChargeFrames 90)
@@ -98,7 +98,7 @@ const CHARGE_TIERS = [
         ];
 // PLAYER_PART_END s6.CHARGE_TIERS.1
 
-// index.html:96853 · Phạm vi: global
+// index.html:96857 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.allTargets.1 EDITABLE
 function allTargets(){
             let out = beamClashTargets();
@@ -119,27 +119,27 @@ function allTargets(){
         }
 // PLAYER_PART_END s6.allTargets.1
 
-// index.html:97444 · Phạm vi: global
+// index.html:97448 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.PARRY_PCT_BLOCK.1 EDITABLE
 const PARRY_PCT_BLOCK = 0.035;
 // PLAYER_PART_END s6.PARRY_PCT_BLOCK.1
 
-// index.html:97445 · Phạm vi: global
+// index.html:97449 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.PARRY_PCT_PERFECT.1 EDITABLE
 const PARRY_PCT_PERFECT = 0.080;
 // PLAYER_PART_END s6.PARRY_PCT_PERFECT.1
 
-// index.html:97446 · Phạm vi: global
+// index.html:97450 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.PARRY_RG_BONUS.1 EDITABLE
 const PARRY_RG_BONUS = 1.40;
 // PLAYER_PART_END s6.PARRY_RG_BONUS.1
 
-// index.html:97447 · Phạm vi: global
+// index.html:97451 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.PARRY_MIN_BLOCK.1 EDITABLE
 const PARRY_MIN_BLOCK = 4, PARRY_MIN_PERFECT = 6;
 // PLAYER_PART_END s6.PARRY_MIN_BLOCK.1
 
-// index.html:97448 · Phạm vi: global
+// index.html:97452 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.PARRY_ULT_BLOCK.1 EDITABLE
 const PARRY_ULT_BLOCK = 5, PARRY_ULT_PERFECT = 15;
 // PLAYER_PART_END s6.PARRY_ULT_BLOCK.1

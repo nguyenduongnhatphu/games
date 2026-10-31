@@ -1,42 +1,42 @@
 // PLAYER_FILE: INFERNO
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: Effect, FloatingText, LT, MUA_HOA_DMG, PULSE_THAN, PVP_HS, Projectile, SFX, allTargets, bosses, canvas, checkAABB, combatStance, ctx, currentAmmoType, damageBossWithFirstStrike, damageFromAmmoAny, dealDamage, dino, dino2, enemies, floatingTexts, frames, gameState, hasRune, lanP1, obstacles, overchargeT, projectiles, pvpDich, pvpNguoi1, pvpVoBoc, score, shakeTimer, ultCharge, visualEffects, vkDangKy
-// index.html:49493 · Phạm vi: global
+// index.html:49497 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.INF_XANH_CHO.1 EDITABLE
 const INF_XANH_CHO = 180;
 // PLAYER_PART_END s4.INF_XANH_CHO.1
 
-// index.html:49494 · Phạm vi: global
+// index.html:49498 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.INF_XANH_DMG.1 EDITABLE
 const INF_XANH_DMG = 6;
 // PLAYER_PART_END s4.INF_XANH_DMG.1
 
-// index.html:49495 · Phạm vi: global
+// index.html:49499 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.INF_NOVA_NOI.1 EDITABLE
 const INF_NOVA_NOI = 60;
 // PLAYER_PART_END s4.INF_NOVA_NOI.1
 
-// index.html:49500 · Phạm vi: global
+// index.html:49504 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.INF_NHIET_BAT.1 EDITABLE
 var INF_NHIET_BAT = true;
 // PLAYER_PART_END s4.INF_NHIET_BAT.1
 
-// index.html:49501 · Phạm vi: global
+// index.html:49505 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.INF_NHIET_CAN.1 EDITABLE
 const INF_NHIET_CAN = 3, INF_NHIET_QUET = 30, INF_XUNG_DMG = 5, INF_XUNG_TO_DMG = 8, INF_ULT_XUNG = 180;
 // PLAYER_PART_END s4.INF_NHIET_CAN.1
 
-// index.html:49502 · Phạm vi: global
+// index.html:49506 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.INF_TAM.1 EDITABLE
 const INF_TAM = [29, 21];
 // PLAYER_PART_END s4.INF_TAM.1
 
-// index.html:49503 · Phạm vi: global
+// index.html:49507 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.INF_VAN.1 EDITABLE
 const INF_VAN = [
             [[29,21],[33,15],[40,11],[48,8]],                 // len dau
@@ -49,7 +49,7 @@ const INF_VAN = [
         ];
 // PLAYER_PART_END s4.INF_VAN.1
 
-// index.html:49512 · Phạm vi: global
+// index.html:49516 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.infVeVan.1 EDITABLE
 function infVeVan(ng){
             if (!ng || (ng.hp !== undefined && ng.hp <= 0)) return;
@@ -101,12 +101,12 @@ function infVeVan(ng){
         }
 // PLAYER_PART_END s4.infVeVan.1
 
-// index.html:49563 · Phạm vi: global
+// index.html:49567 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.fireBrands.1 EDITABLE
 let fireBrands = [];
 // PLAYER_PART_END s4.fireBrands.1
 
-// index.html:49570 · Phạm vi: global
+// index.html:49574 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.mortarBuoc.1 EDITABLE
 function mortarBuoc(proj, p){
                     proj.vy = (proj.vy || 0) + 0.34;
@@ -149,7 +149,7 @@ function mortarBuoc(proj, p){
         }
 // PLAYER_PART_END s4.mortarBuoc.1
 
-// index.html:49609 · Phạm vi: global
+// index.html:49613 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.tickFireBrands.1 EDITABLE
 function tickFireBrands() {
             for (let i = fireBrands.length - 1; i >= 0; i--) {
@@ -189,7 +189,7 @@ function tickFireBrands() {
         }
 // PLAYER_PART_END s4.tickFireBrands.1
 
-// index.html:49645 · Phạm vi: global
+// index.html:49649 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.drawFireBrands.1 EDITABLE
 function drawFireBrands() {
             for (let b of fireBrands) {
@@ -210,7 +210,7 @@ function drawFireBrands() {
         }
 // PLAYER_PART_END s4.drawFireBrands.1
 
-// index.html:49664 · Phạm vi: Player.prototype
+// index.html:49668 · Phạm vi: Player.prototype
 const __Part12 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.startFireBreath.1 EDITABLE
 startFireBreath() {
@@ -222,7 +222,7 @@ startFireBreath() {
 // PLAYER_PART_END s4.Player.prototype.startFireBreath.1
 };
 
-// index.html:49672 · Phạm vi: Player.prototype
+// index.html:49676 · Phạm vi: Player.prototype
 const __Part13 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.infXanh.1 EDITABLE
 infXanh(){
@@ -232,7 +232,7 @@ infXanh(){
 // PLAYER_PART_END s4.Player.prototype.infXanh.1
 };
 
-// index.html:49677 · Phạm vi: Player.prototype
+// index.html:49681 · Phạm vi: Player.prototype
 const __Part14 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.fireExplosiveFireball.1 EDITABLE
 fireExplosiveFireball() {
@@ -260,7 +260,7 @@ fireExplosiveFireball() {
 // PLAYER_PART_END s4.Player.prototype.fireExplosiveFireball.1
 };
 
-// index.html:49700 · Phạm vi: Player.prototype
+// index.html:49704 · Phạm vi: Player.prototype
 const __Part15 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.fireDoubleFireball.1 EDITABLE
 fireDoubleFireball() {
@@ -280,7 +280,7 @@ fireDoubleFireball() {
 // PLAYER_PART_END s4.Player.prototype.fireDoubleFireball.1
 };
 
-// index.html:49715 · Phạm vi: Player.prototype
+// index.html:49719 · Phạm vi: Player.prototype
 const __Part16 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.fireBrand.1 EDITABLE
 fireBrand() {
@@ -300,7 +300,7 @@ fireBrand() {
 // PLAYER_PART_END s4.Player.prototype.fireBrand.1
 };
 
-// index.html:49736 · Phạm vi: Player.prototype
+// index.html:49740 · Phạm vi: Player.prototype
 const __Part17 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.infNhiet.1 EDITABLE
 infNhiet(){
@@ -313,7 +313,7 @@ infNhiet(){
 // PLAYER_PART_END s4.Player.prototype.infNhiet.1
 };
 
-// index.html:49743 · Phạm vi: Player.prototype
+// index.html:49747 · Phạm vi: Player.prototype
 const __Part18 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.infChXung.1 EDITABLE
 infChXung(){                       // moi nhip xung cua Channel
@@ -324,7 +324,7 @@ infChXung(){                       // moi nhip xung cua Channel
 // PLAYER_PART_END s4.Player.prototype.infChXung.1
 };
 
-// index.html:49748 · Phạm vi: Player.prototype
+// index.html:49752 · Phạm vi: Player.prototype
 const __Part19 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.infNhietTick.1 EDITABLE
 infNhietTick(){
@@ -345,7 +345,7 @@ infNhietTick(){
 // PLAYER_PART_END s4.Player.prototype.infNhietTick.1
 };
 
-// index.html:49763 · Phạm vi: Player.prototype
+// index.html:49767 · Phạm vi: Player.prototype
 const __Part20 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.fireNukePulse.1 EDITABLE
 fireNukePulse(dmg, to) {
@@ -359,7 +359,7 @@ fireNukePulse(dmg, to) {
 // PLAYER_PART_END s4.Player.prototype.fireNukePulse.1
 };
 
-// index.html:49771 · Phạm vi: Player.prototype
+// index.html:49775 · Phạm vi: Player.prototype
 const __Part21 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.tickFireEffects.1 EDITABLE
 tickFireEffects() {
@@ -382,7 +382,7 @@ tickFireEffects() {
 // PLAYER_PART_END s4.Player.prototype.tickFireEffects.1
 };
 
-// index.html:49788 · Phạm vi: Player.prototype
+// index.html:49792 · Phạm vi: Player.prototype
 const __Part22 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.drawFireFx.1 EDITABLE
 drawFireFx() {
@@ -432,7 +432,7 @@ drawFireFx() {
 // PLAYER_PART_END s4.Player.prototype.drawFireFx.1
 };
 
-// index.html:49833 · Phạm vi: Player.prototype
+// index.html:49837 · Phạm vi: Player.prototype
 const __Part23 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.infTickLua.1 EDITABLE
 infTickLua() {
@@ -492,7 +492,7 @@ infTickLua() {
 // PLAYER_PART_END s4.Player.prototype.infTickLua.1
 };
 
-// index.html:49888 · Phạm vi: Player.prototype
+// index.html:49892 · Phạm vi: Player.prototype
 const __Part24 = {
 // PLAYER_PART_BEGIN s4.Player.prototype.infVeLua.1 EDITABLE
 infVeLua(pos) {
@@ -573,12 +573,12 @@ infVeLua(pos) {
 // PLAYER_PART_END s4.Player.prototype.infVeLua.1
 };
 
-// index.html:49965 · Phạm vi: global
+// index.html:49969 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.INF_DAI_BUOC.1 EDITABLE
 const INF_DAI_BUOC = 100, INF_DAI_TRAN = 240 + 5 * INF_DAI_BUOC;
 // PLAYER_PART_END s4.INF_DAI_BUOC.1
 
-// index.html:49966 · Phạm vi: global
+// index.html:49970 · Phạm vi: global
 // PLAYER_PART_BEGIN s4.vkDangKy.3 EDITABLE
 vkDangKy(1, {
             ten: 'INFERNO', mauUlt: '#FF1744',

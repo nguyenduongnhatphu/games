@@ -1,12 +1,12 @@
 // PLAYER_FILE: RuneEffects01
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: AI_BODY_PAL, AI_NEON_PAL, BUA_TIERS_TAY, CHARGE_TIERS, Effect, FloatingText, GD_DAN, HVBP_NGUOI, HVBP_NGUOI2, HVBP_R0, HVBP_R_MAX, HVBP_R_MM, HVBP_TRAN, HVBP_TRAN_TRUOT, KAT_TIERS, LIFESTEAL_BURST_CAP, LIFESTEAL_NEED, LT, OC_FULL, PET6_GROW, PET6_R0, PET6_RMAX, Projectile, RGC_TAM, RGC_TI, RGC_TRE, SFX, TRD_TIERS, VOLT_TRASH_CAP, WKG_TIERS, addStyle, allTargets, apexOn, bossProjectiles, bosses, canvas, checkAABB, clashHpOf, combatStance, ctx, currentAmmoType, currentForm, damageFromAmmoAny, danteOn, dealDamage, dino, dino2, dragonBat, drawNeonClone, drawPet1, drawPet2, drawPet3, drawPet4, drawPet5, drawPet6, drawPet6Orbs, drawPetShieldBubble, drawPetShot, dtMau, enemies, floatingTexts, frames, gameState, giaoLaCanChien, handleEnemyDeath, hasRune, hitDam, infernoMaxChain, katBat, keys, mapTheme, midasVeDam, novaBlast, parry, parryDamage, perfectParryCd, pet1Cd, pet1GuardAngle, pet1GuardShots, pet1Shots, pet1Tele, pet1X, pet1Y, pet2Cd, pet2Dash, pet2OrbitMines, pet2PendingShots, pet2Shots, pet2Tele, pet2VeDash, pet2VeLua, pet2X, pet2Y, pet3Cd, pet3CooldownReduction, pet3IdleFrames, pet3Tele, pet3X, pet3Y, pet4Cd, pet4Charges, pet4Flash, pet4SpendCd, pet4Tele, pet4X, pet4Y, pet5A, pet5B, pet6Active, pet6Angle, pet6Boost, pet6Rings, pet6TickBoost, pet6TocDo, pet6X, pet6Y, petChargeRing, petFindThreateningProjectile, petFireGuard, petGhiVanToc, petNewSpawn, petNewestEnemy, petPhatHienLao, petPriorityTarget, petSeen, petTeleFlash, petTickGuardShots, petTickShots, previewEnemies, projectiles, pvpDich, pvpNguoi1, pvpVoBoc, shakeTimer, trdBat, visualEffects, voidBat, voltBossTicks, voltTrashTicks, wkgBat, worldL, worldR
-// index.html:83830 · Phạm vi: global
+// index.html:83834 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.shinGuardReset.1 EDITABLE
 function shinGuardReset(perfect) {
             if (combatStance !== 2 || !dino) return;    // gio la nang luc GOC cua the, khong can rune
@@ -25,7 +25,7 @@ function shinGuardReset(perfect) {
         }
 // PLAYER_PART_END s6.shinGuardReset.1
 
-// index.html:86642 · Phạm vi: global
+// index.html:86646 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.chanLongBat.1 EDITABLE
 function chanLongBat(){
             try { return dragonBat() && typeof hasRune === 'function' && hasRune('chanlong'); }
@@ -33,7 +33,7 @@ function chanLongBat(){
         }
 // PLAYER_PART_END s6.chanLongBat.1
 
-// index.html:87915 · Phạm vi: global
+// index.html:87919 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.hvBoPhapNo.1 EDITABLE
 function hvBoPhapNo(){
             if (typeof hasRune !== 'function' || !hasRune('huvo')) return;
@@ -80,7 +80,7 @@ function hvBoPhapNo(){
         }
 // PLAYER_PART_END s6.hvBoPhapNo.1
 
-// index.html:87961 · Phạm vi: global
+// index.html:87965 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.hvBoPhapTick.1 EDITABLE
 function hvBoPhapTick(){
             if (typeof dino === 'undefined' || !dino) return;
@@ -99,12 +99,12 @@ function hvBoPhapTick(){
         }
 // PLAYER_PART_END s6.hvBoPhapTick.1
 
-// index.html:88018 · Phạm vi: global
+// index.html:88022 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.hoverAiming.1 EDITABLE
 function hoverAiming(){ return typeof dino !== 'undefined' && dino && dino.hoverTimer > 0 && hasRune('hover'); }
 // PLAYER_PART_END s6.hoverAiming.1
 
-// index.html:88255 · Phạm vi: global
+// index.html:88259 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.battuBat.1 EDITABLE
 function battuBat(){
             if (typeof gameState !== 'undefined' && gameState === 'pvp') return false;
@@ -112,12 +112,12 @@ function battuBat(){
         }
 // PLAYER_PART_END s6.battuBat.1
 
-// index.html:88447 · Phạm vi: global
+// index.html:88451 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.pet6Gap.1 EDITABLE
 function pet6Gap(){ return hasRune('pet6x') ? 40 : 72; }
 // PLAYER_PART_END s6.pet6Gap.1
 
-// index.html:88508 · Phạm vi: global
+// index.html:88512 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.shieldCdNguoiChoi.1 EDITABLE
 function shieldCdNguoiChoi(){
             let goc = (combatStance === 2) ? 75 : 90;
@@ -125,7 +125,7 @@ function shieldCdNguoiChoi(){
         }
 // PLAYER_PART_END s6.shieldCdNguoiChoi.1
 
-// index.html:88738 · Phạm vi: global
+// index.html:88742 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.updatePets.1 EDITABLE
 function updatePets(){
             if(apexOn())return;
@@ -393,7 +393,7 @@ function updatePets(){
         }
 // PLAYER_PART_END s6.updatePets.1
 
-// index.html:89119 · Phạm vi: global
+// index.html:89123 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.drawPets.1 EDITABLE
 function drawPets(){
             if(apexOn())return;
@@ -434,32 +434,32 @@ function drawPets(){
         }
 // PLAYER_PART_END s6.drawPets.1
 
-// index.html:89844 · Phạm vi: global
+// index.html:89848 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.afterimages.1 EDITABLE
 let afterimages = [];
 // PLAYER_PART_END s6.afterimages.1
 
-// index.html:89845 · Phạm vi: global
+// index.html:89849 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.birdBank.1 EDITABLE
 let birdBank = 0, birdSpendCd = 0, birdDmgAcc = 0;
 // PLAYER_PART_END s6.birdBank.1
 
-// index.html:89848 · Phạm vi: global
+// index.html:89852 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.birdCap.1 EDITABLE
 function birdCap(){ return hasRune('fullheal') ? 10 : 3; }
 // PLAYER_PART_END s6.birdCap.1
 
-// index.html:89849 · Phạm vi: global
+// index.html:89853 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.coKhoChim.1 EDITABLE
 function coKhoChim(){ return hasRune('redbird') || hasRune('fullheal'); }
 // PLAYER_PART_END s6.coKhoChim.1
 
-// index.html:89865 · Phạm vi: global
+// index.html:89869 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.lifestealNeed.1 EDITABLE
 function lifestealNeed(){ return LIFESTEAL_NEED[currentAmmoType] || 20; }
 // PLAYER_PART_END s6.lifestealNeed.1
 
-// index.html:89870 · Phạm vi: global
+// index.html:89874 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.tickLifesteal.1 EDITABLE
 function tickLifesteal(){
             if (!hasRune('redbird')) return;
@@ -490,12 +490,12 @@ function tickLifesteal(){
         }
 // PLAYER_PART_END s6.tickLifesteal.1
 
-// index.html:89898 · Phạm vi: global
+// index.html:89902 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.afterimgCd.1 EDITABLE
 let afterimgCd = 0;
 // PLAYER_PART_END s6.afterimgCd.1
 
-// index.html:89904 · Phạm vi: global
+// index.html:89908 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.spawnAfterimage.1 EDITABLE
 function spawnAfterimage(){
             if(typeof danteOn==='function'&&danteOn())return;
@@ -513,7 +513,7 @@ function spawnAfterimage(){
         }
 // PLAYER_PART_END s6.spawnAfterimage.1
 
-// index.html:89918 · Phạm vi: global
+// index.html:89922 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.updateAfterimages.1 EDITABLE
 function updateAfterimages(){
             if (typeof dino==='undefined'||!dino) return;
@@ -547,7 +547,7 @@ function updateAfterimages(){
         }
 // PLAYER_PART_END s6.updateAfterimages.1
 
-// index.html:90261 · Phạm vi: global
+// index.html:90265 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.drawAfterimages.1 EDITABLE
 function drawAfterimages(){
             if (typeof dino==='undefined'||!dino) return;
@@ -569,7 +569,7 @@ function drawAfterimages(){
         }
 // PLAYER_PART_END s6.drawAfterimages.1
 
-// index.html:90348 · Phạm vi: global
+// index.html:90352 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.updateBulletClash.1 EDITABLE
 function updateBulletClash(){
             if (gameState === 'pvp') return;
@@ -618,7 +618,7 @@ function updateBulletClash(){
         }
 // PLAYER_PART_END s6.updateBulletClash.1
 
-// index.html:90400 · Phạm vi: global
+// index.html:90404 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.voltDashDmg.1 EDITABLE
 function voltDashDmg(){
             if (dino && dino.lightningFormTimer > 0) return 6;   // dang trong Ult Volt
@@ -627,12 +627,12 @@ function voltDashDmg(){
         }
 // PLAYER_PART_END s6.voltDashDmg.1
 
-// index.html:91509 · Phạm vi: global
+// index.html:91513 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.novaCo.1 EDITABLE
 function novaCo(ng){ return gameState !== 'pvp' && typeof hasRune === 'function' && hasRune('explshot') && (!ng || ng.id === 1); }
 // PLAYER_PART_END s6.novaCo.1
 
-// index.html:91623 · Phạm vi: global
+// index.html:91627 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.calculateLightningChains.1 EDITABLE
 function calculateLightningChains(startX, startY, count, totalTargets, ownerId = 1) {
             let chains = [];
@@ -747,7 +747,7 @@ function calculateLightningChains(startX, startY, count, totalTargets, ownerId =
         }
 // PLAYER_PART_END s6.calculateLightningChains.1
 
-// index.html:93828 · Phạm vi: global
+// index.html:93832 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.slamCanBat.1 EDITABLE
 function slamCanBat(){
             return typeof hasRune === 'function' && hasRune('bodyslam')
@@ -755,7 +755,7 @@ function slamCanBat(){
         }
 // PLAYER_PART_END s6.slamCanBat.1
 
-// index.html:93842 · Phạm vi: global
+// index.html:93846 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.slamLaoBat.1 EDITABLE
 function slamLaoBat(ng){
             if (!ng || typeof dino === 'undefined' || ng !== dino || ng.grounded) return false;
@@ -770,7 +770,7 @@ function slamLaoBat(ng){
         }
 // PLAYER_PART_END s6.slamLaoBat.1
 
-// index.html:93864 · Phạm vi: global
+// index.html:93868 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.setCanBat.1 EDITABLE
 function setCanBat(){
             return typeof hasRune === 'function' && hasRune('voltdash')
@@ -778,7 +778,7 @@ function setCanBat(){
         }
 // PLAYER_PART_END s6.setCanBat.1
 
-// index.html:94529 · Phạm vi: global
+// index.html:94533 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.chargeMoc.1 EDITABLE
 function chargeMoc(ammo){
             const R = chargeVongMax(ammo);
@@ -789,7 +789,7 @@ function chargeMoc(ammo){
         }
 // PLAYER_PART_END s6.chargeMoc.1
 
-// index.html:94538 · Phạm vi: global
+// index.html:94542 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.chargeTick.1 EDITABLE
 function chargeTick(o, ammo){
             let t = Math.max(0, Math.min(1, (o.aKeyHeldTime || 0) / chargeVongMax(ammo)));
@@ -805,7 +805,7 @@ function chargeTick(o, ammo){
         }
 // PLAYER_PART_END s6.chargeTick.1
 
-// index.html:94556 · Phạm vi: global
+// index.html:94560 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.chargeTiersCua.1 EDITABLE
 function chargeTiersCua(ammo){
             if (ammo === 10 && typeof trdBat === 'function' && trdBat()) return TRD_TIERS;   // @@HE-TRIDENT
@@ -816,12 +816,12 @@ function chargeTiersCua(ammo){
         }
 // PLAYER_PART_END s6.chargeTiersCua.1
 
-// index.html:94563 · Phạm vi: global
+// index.html:94567 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.chargeVongMax.1 EDITABLE
 function chargeVongMax(ammo){ return ammo === 13 ? 185 : 180; }
 // PLAYER_PART_END s6.chargeVongMax.1
 
-// index.html:94564 · Phạm vi: global
+// index.html:94568 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.chargeRingColor.1 EDITABLE
 function chargeRingColor(ammo, held) {
             let T = chargeTiersCua(ammo) || CHARGE_TIERS[0], col = "#00E5FF";
@@ -830,12 +830,12 @@ function chargeRingColor(ammo, held) {
         }
 // PLAYER_PART_END s6.chargeRingColor.1
 
-// index.html:94573 · Phạm vi: global
+// index.html:94577 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.overchargeT.1 EDITABLE
 function overchargeT(held, maxF) { return Math.max(0, Math.min(1, (held - maxF) / Math.max(1, OC_FULL - maxF))); }
 // PLAYER_PART_END s6.overchargeT.1
 
-// index.html:95183 · Phạm vi: global
+// index.html:95187 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.gdBat.1 EDITABLE
 function gdBat(){
             return gameState !== 'pvp' && typeof hasRune === 'function' && hasRune('bulletclash')
@@ -843,7 +843,7 @@ function gdBat(){
         }
 // PLAYER_PART_END s6.gdBat.1
 
-// index.html:95217 · Phạm vi: global
+// index.html:95221 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.gdVaCham.1 EDITABLE
 function gdVaCham(hop, luc, xuyen){
             if (gameState === 'pvp' || typeof hasRune !== 'function' || !hasRune('bulletclash') || !(luc > 0)) return luc;
@@ -871,27 +871,27 @@ function gdVaCham(hop, luc, xuyen){
         }
 // PLAYER_PART_END s6.gdVaCham.1
 
-// index.html:95384 · Phạm vi: global
+// index.html:95388 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.asBat.1 EDITABLE
 function asBat(){ return typeof hasRune === 'function' && hasRune('apsuat') && gameState !== 'pvp'; }
 // PLAYER_PART_END s6.asBat.1
 
-// index.html:95426 · Phạm vi: global
+// index.html:95430 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.vxBat.1 EDITABLE
 function vxBat(){ return typeof hasRune === 'function' && hasRune('vanxa') && gameState !== 'pvp'; }
 // PLAYER_PART_END s6.vxBat.1
 
-// index.html:95477 · Phạm vi: global
+// index.html:95481 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.rgcKho.1 EDITABLE
 let rgcKho = 0, rgcDam = null, rgcJCu = false;
 // PLAYER_PART_END s6.rgcKho.1
 
-// index.html:95478 · Phạm vi: global
+// index.html:95482 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.rgcBat.1 EDITABLE
 function rgcBat(){ return typeof hasRune === 'function' && hasRune('rgcounter') && gameState !== 'pvp'; }
 // PLAYER_PART_END s6.rgcBat.1
 
-// index.html:95480 · Phạm vi: global
+// index.html:95484 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.rgcTichTru.1 EDITABLE
 function rgcTichTru(hh){
             if (!hh || !rgcBat() || typeof dino === 'undefined' || !dino) return;
@@ -908,7 +908,7 @@ function rgcTichTru(hh){
         }
 // PLAYER_PART_END s6.rgcTichTru.1
 
-// index.html:95493 · Phạm vi: global
+// index.html:95497 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.rgcTick.1 EDITABLE
 function rgcTick(){
             let j = !!keys['KeyJ'], canh = j && !rgcJCu; rgcJCu = j;
@@ -942,7 +942,7 @@ function rgcTick(){
         }
 // PLAYER_PART_END s6.rgcTick.1
 
-// index.html:95524 · Phạm vi: global
+// index.html:95528 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.rgcVe.1 EDITABLE
 function rgcVe(){
             if (rgcDam && typeof midasVeDam === 'function'){ try { midasVeDam(dino, { dam: rgcDam }); } catch(e){} }
@@ -955,12 +955,12 @@ function rgcVe(){
         }
 // PLAYER_PART_END s6.rgcVe.1
 
-// index.html:95548 · Phạm vi: global
+// index.html:95552 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.tdBat.1 EDITABLE
 function tdBat(){ return typeof hasRune === 'function' && hasRune('tudia') && gameState !== 'pvp' && typeof dino !== 'undefined' && !!dino; }
 // PLAYER_PART_END s6.tdBat.1
 
-// index.html:95657 · Phạm vi: global
+// index.html:95661 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.vhhBat.1 EDITABLE
 function vhhBat(){ return typeof hasRune === 'function' && hasRune('vohahan') && gameState !== 'pvp'
                                    && typeof dino !== 'undefined' && !!dino; }

@@ -1,27 +1,27 @@
 // PLAYER_FILE: RuneMenu
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: AMMO_NAMES, CX, LT, RDESC, RNAME, RUNES, RUNE_CATS, RUNE_LUP, canvas, ctx, dino, frames, mouseX, mouseY, pickerItems, runeGridGeom, runeScroll, runeTachDoan, runeXem, runeXemMax, runeXemScroll, wrapText
-// index.html:83694 · Phạm vi: global
+// index.html:83698 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runePicker.1 EDITABLE
 let runePicker = null;
 // PLAYER_PART_END s6.runePicker.1
 
-// index.html:83904 · Phạm vi: global
+// index.html:83908 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.RUNE_VIEW_TOP.1 EDITABLE
 const RUNE_VIEW_TOP = 52, RUNE_HEAD_H = 26;
 // PLAYER_PART_END s6.RUNE_VIEW_TOP.1
 
-// index.html:83911 · Phạm vi: global
+// index.html:83915 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeViewBot.1 EDITABLE
 function runeViewBot(){ return 26; }
 // PLAYER_PART_END s6.runeViewBot.1
 
-// index.html:83913 · Phạm vi: global
+// index.html:83917 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeThanhCuon.1 EDITABLE
 function runeThanhCuon(L){
             let bx = L.gx + L.cols * L.cw + 6, bh = L.viewH;
@@ -31,12 +31,12 @@ function runeThanhCuon(L){
         }
 // PLAYER_PART_END s6.runeThanhCuon.1
 
-// index.html:83919 · Phạm vi: global
+// index.html:83923 · Phạm vi: global
 // PLAYER_PART_BEGIN s6._runeKeo.1 EDITABLE
 let _runeKeo = null, _nuotClick = false;
 // PLAYER_PART_END s6._runeKeo.1
 
-// index.html:83920 · Phạm vi: global
+// index.html:83924 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runePickerLayout.1 EDITABLE
 function runePickerLayout(){
             let g = runeGridGeom(), cols = g.cols, cw = g.cw, ch = g.ch, gx = g.gx;
@@ -68,7 +68,7 @@ function runePickerLayout(){
         }
 // PLAYER_PART_END s6.runePickerLayout.1
 
-// index.html:83957 · Phạm vi: global
+// index.html:83961 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeLupAt.1 EDITABLE
 function runeLupAt(mx, my){
             let hit = runeCellAt(mx, my); if (!hit) return null;
@@ -79,7 +79,7 @@ function runeLupAt(mx, my){
         }
 // PLAYER_PART_END s6.runeLupAt.1
 
-// index.html:84020 · Phạm vi: global
+// index.html:84024 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.runeCellAt.1 EDITABLE
 function runeCellAt(mx, my){
             let L = runePickerLayout();
@@ -92,7 +92,7 @@ function runeCellAt(mx, my){
         }
 // PLAYER_PART_END s6.runeCellAt.1
 
-// index.html:85421 · Phạm vi: global
+// index.html:85425 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.drawRuneChiTiet.1 EDITABLE
 function drawRuneChiTiet(){
             if (!runeXem) return;
@@ -173,7 +173,7 @@ function drawRuneChiTiet(){
         }
 // PLAYER_PART_END s6.drawRuneChiTiet.1
 
-// index.html:89218 · Phạm vi: global
+// index.html:89222 · Phạm vi: global
 // PLAYER_PART_BEGIN s6.drawRuneShieldBubble.1 EDITABLE
 function drawRuneShieldBubble(){
             if (typeof dino === 'undefined' || !dino) return;

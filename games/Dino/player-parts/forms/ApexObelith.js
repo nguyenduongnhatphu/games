@@ -1,40 +1,40 @@
 // PLAYER_FILE: ApexObelith
-// PLAYER_SNAPSHOT: d5722ee1c848e806df184fefa1d479adadba816b9a6260bbabbdbacfd68be66b
+// PLAYER_SNAPSHOT: 7fab8124c03d46d16307f4ec9963299dbed3e34621bc6add01980145fef9893c
 // Nguồn: games/Dino/index.html
 // File để sửa/gửi AI; không chạy riêng và không thêm script import vào game.
 // Giữ marker, mã ngoài marker và tên API. Chỉ sửa trong EDITABLE.
 // Các lớp/hàm __Part là khung cú pháp để mô tả đoạn nằm trong class/hàm/object gốc.
 // Mỗi đoạn được ghép VỀ ĐÚNG PHẠM VI GỐC; không ghép các khung __Part vào game.
 // Tham chiếu ngoài: APEX_SKINS, SFX, apexColor, apexDrawObelith, apexNativePlatforms, bienDayHT, bosses, camX, camY, canvas, coBuc, ctx, dino, dkNenY, frames, keys, mapTheme, obstacles, oceanCamY, platforms, sgDamage, sgSegmentBox, sgTargets, tetrisCamY, worldL, worldR
-// index.html:105104 · Phạm vi: apexCreate
+// index.html:105108 · Phạm vi: apexCreate
 function __Part0(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.obelith.1 EDITABLE
 const obelith={clock:0,blocks:[],charge:0,ready:false,beam:null,generation:0,form:0,activated:false};
 // PLAYER_PART_END s8.apexCreate.obelith.1
 }}
 
-// index.html:105105 · Phạm vi: apexCreate
+// index.html:105109 · Phạm vi: apexCreate
 function __Part1(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.obelithPreview.1 EDITABLE
 let obelithPreview=false;
 // PLAYER_PART_END s8.apexCreate.obelithPreview.1
 }}
 
-// index.html:105106 · Phạm vi: apexCreate
+// index.html:105110 · Phạm vi: apexCreate
 function __Part2(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.resetObelith.1 EDITABLE
 function resetObelith(){obelith.clock=0;obelith.blocks=[];obelith.charge=0;obelith.ready=false;obelith.beam=null;obelith.form=0;obelith.activated=false;}
 // PLAYER_PART_END s8.apexCreate.resetObelith.1
 }}
 
-// index.html:105107 · Phạm vi: apexCreate
+// index.html:105111 · Phạm vi: apexCreate
 function __Part3(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.obelithPad.1 EDITABLE
 function obelithPad(){return dino.isGrounded&&obelith.blocks.includes(dino.activePlatform)&&!dino.isLedgeClimbing?dino.activePlatform:null;}
 // PLAYER_PART_END s8.apexCreate.obelithPad.1
 }}
 
-// index.html:105108 · Phạm vi: apexCreate
+// index.html:105112 · Phạm vi: apexCreate
 function __Part4(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.obelithTarget.1 EDITABLE
 function obelithTarget(clash=false,bossOnly=false){
@@ -48,7 +48,7 @@ function obelithTarget(clash=false,bossOnly=false){
 // PLAYER_PART_END s8.apexCreate.obelithTarget.1
 }}
 
-// index.html:105116 · Phạm vi: apexCreate
+// index.html:105120 · Phạm vi: apexCreate
 function __Part5(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.spawnObelithBlocks.1 EDITABLE
 function spawnObelithBlocks(){
@@ -70,7 +70,7 @@ function spawnObelithBlocks(){
 // PLAYER_PART_END s8.apexCreate.spawnObelithBlocks.1
 }}
 
-// index.html:105132 · Phạm vi: apexCreate
+// index.html:105136 · Phạm vi: apexCreate
 function __Part6(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.fireObelithBeam.1 EDITABLE
 function fireObelithBeam(){
@@ -90,7 +90,7 @@ function fireObelithBeam(){
 // PLAYER_PART_END s8.apexCreate.fireObelithBeam.1
 }}
 
-// index.html:105146 · Phạm vi: apexCreate
+// index.html:105150 · Phạm vi: apexCreate
 function __Part7(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.tickObelithBeam.1 EDITABLE
 function tickObelithBeam(beam){
@@ -126,7 +126,7 @@ function tickObelithBeam(beam){
 // PLAYER_PART_END s8.apexCreate.tickObelithBeam.1
 }}
 
-// index.html:105176 · Phạm vi: apexCreate
+// index.html:105180 · Phạm vi: apexCreate
 function __Part8(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.hideObelithBlocks.1 EDITABLE
 function hideObelithBlocks(){
@@ -140,7 +140,7 @@ function hideObelithBlocks(){
 // PLAYER_PART_END s8.apexCreate.hideObelithBlocks.1
 }}
 
-// index.html:105195 · Phạm vi: apexCreate
+// index.html:105199 · Phạm vi: apexCreate
 function __Part9(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.tickObelith.1 EDITABLE
 function tickObelith(){
@@ -164,7 +164,7 @@ function tickObelith(){
 // PLAYER_PART_END s8.apexCreate.tickObelith.1
 }}
 
-// index.html:105213 · Phạm vi: apexCreate
+// index.html:105217 · Phạm vi: apexCreate
 function __Part10(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawObelithSites.1 EDITABLE
 function drawObelithSites(){
@@ -195,7 +195,7 @@ function drawObelithSites(){
 // PLAYER_PART_END s8.apexCreate.drawObelithSites.1
 }}
 
-// index.html:105238 · Phạm vi: apexCreate
+// index.html:105242 · Phạm vi: apexCreate
 function __Part11(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.obelithSkin.1 EDITABLE
 function obelithSkin(){
@@ -210,14 +210,14 @@ function obelithSkin(){
 // PLAYER_PART_END s8.apexCreate.obelithSkin.1
 }}
 
-// index.html:105247 · Phạm vi: apexCreate
+// index.html:105251 · Phạm vi: apexCreate
 function __Part12(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.obelithPower.1 EDITABLE
 function obelithPower(){return apexColor===4?(obelithPreview||ultimate?.kind===4?1:obelith.form):0;}
 // PLAYER_PART_END s8.apexCreate.obelithPower.1
 }}
 
-// index.html:105248 · Phạm vi: apexCreate
+// index.html:105252 · Phạm vi: apexCreate
 function __Part13(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawObelithTrace.1 EDITABLE
 function drawObelithTrace(points,phase=0,glyphs=true){
@@ -238,7 +238,7 @@ function drawObelithTrace(points,phase=0,glyphs=true){
 // PLAYER_PART_END s8.apexCreate.drawObelithTrace.1
 }}
 
-// index.html:105263 · Phạm vi: apexCreate
+// index.html:105267 · Phạm vi: apexCreate
 function __Part14(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawObelithGloss.1 EDITABLE
 function drawObelithGloss(r){
@@ -255,7 +255,7 @@ function drawObelithGloss(r){
 // PLAYER_PART_END s8.apexCreate.drawObelithGloss.1
 }}
 
-// index.html:105274 · Phạm vi: apexCreate
+// index.html:105278 · Phạm vi: apexCreate
 function __Part15(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawObelithRunes.1 EDITABLE
 function drawObelithRunes(r){
@@ -269,7 +269,7 @@ function drawObelithRunes(r){
 // PLAYER_PART_END s8.apexCreate.drawObelithRunes.1
 }}
 
-// index.html:105282 · Phạm vi: apexCreate
+// index.html:105286 · Phạm vi: apexCreate
 function __Part16(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.startObelithUltimate.1 EDITABLE
 function startObelithUltimate(u){
@@ -288,14 +288,14 @@ function startObelithUltimate(u){
 // PLAYER_PART_END s8.apexCreate.startObelithUltimate.1
 }}
 
-// index.html:105295 · Phạm vi: apexCreate
+// index.html:105299 · Phạm vi: apexCreate
 function __Part17(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.obelithCurve.1 EDITABLE
 function obelithCurve(a,c,b,q){const k=1-q;return {x:k*k*a.x+2*k*q*c.x+q*q*b.x,y:k*k*a.y+2*k*q*c.y+q*q*b.y};}
 // PLAYER_PART_END s8.apexCreate.obelithCurve.1
 }}
 
-// index.html:105296 · Phạm vi: apexCreate
+// index.html:105300 · Phạm vi: apexCreate
 function __Part18(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.obelithSawPose.1 EDITABLE
 function obelithSawPose(u,p){
@@ -305,7 +305,7 @@ function obelithSawPose(u,p){
 // PLAYER_PART_END s8.apexCreate.obelithSawPose.1
 }}
 
-// index.html:105300 · Phạm vi: apexCreate
+// index.html:105304 · Phạm vi: apexCreate
 function __Part19(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.obelithSweep.1 EDITABLE
 function obelithSweep(u,a,b){
@@ -324,7 +324,7 @@ function obelithSweep(u,a,b){
 // PLAYER_PART_END s8.apexCreate.obelithSweep.1
 }}
 
-// index.html:105313 · Phạm vi: apexCreate
+// index.html:105317 · Phạm vi: apexCreate
 function __Part20(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.obelithRicochet.1 EDITABLE
 function obelithRicochet(u){
@@ -350,7 +350,7 @@ function obelithRicochet(u){
 // PLAYER_PART_END s8.apexCreate.obelithRicochet.1
 }}
 
-// index.html:105333 · Phạm vi: apexCreate
+// index.html:105337 · Phạm vi: apexCreate
 function __Part21(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.obelithDetonate.1 EDITABLE
 function obelithDetonate(u,x,y,scale=1){
@@ -360,7 +360,7 @@ function obelithDetonate(u,x,y,scale=1){
 // PLAYER_PART_END s8.apexCreate.obelithDetonate.1
 }}
 
-// index.html:105337 · Phạm vi: apexCreate
+// index.html:105341 · Phạm vi: apexCreate
 function __Part22(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.tickObelithUltimate.1 EDITABLE
 function tickObelithUltimate(u){
@@ -410,7 +410,7 @@ function tickObelithUltimate(u){
 // PLAYER_PART_END s8.apexCreate.tickObelithUltimate.1
 }}
 
-// index.html:105381 · Phạm vi: apexCreate
+// index.html:105385 · Phạm vi: apexCreate
 function __Part23(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawObelithUltimate.1 EDITABLE
 function drawObelithUltimate(u){
@@ -441,7 +441,7 @@ function drawObelithUltimate(u){
 // PLAYER_PART_END s8.apexCreate.drawObelithUltimate.1
 }}
 
-// index.html:105407 · Phạm vi: apexCreate
+// index.html:105411 · Phạm vi: apexCreate
 function __Part24(){ while(false){
 // PLAYER_PART_BEGIN s8.apexCreate.drawObelithImpact.1 EDITABLE
 function drawObelithImpact(u){
