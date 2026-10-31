@@ -1,5 +1,5 @@
 // BOSS_FILE: IronhaulBoss
-// BOSS_SNAPSHOT: 39483d797c15c5e35e37a5b630ae4f295f939302db706fe13262c4e699541a28
+// BOSS_SNAPSHOT: ac95756f3acfed6d6f9d02fb09138fb3733cdf9c95fea17096fea023062a7b86
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -251,7 +251,7 @@ function ironhaulIK(root,target,upper,lower,bend=1){
 // BOSS_PART_END s1.ironhaulIK.1
 
 // Nguồn: index.html:34358 · Dùng bởi: IronhaulBoss
-// BOSS_PART_BEGIN s1.ironhaulRig.1 EDITABLE
+// BOSS_PART_BEGIN s1.ironhaulRig.1 READ_ONLY
 function ironhaulRig(b){
     const t=b.subTimer||0,st=b.state||'idle',s=b.slash,q=b.shieldStrike;
     const recent=Math.exp(-Math.max(0,frames-(b.animAt??-1000))*.24),speed=Math.min(1,Math.abs(b.animSpeed||0)/6)*recent;
@@ -305,9 +305,9 @@ function ironhaulRig(b){
     if(air){crouch=Math.max(crouch,.35);if(!s&&!q){swordTarget={x:27,y:-149};blade=-1.8;}}
     const fold=st==='ih_morph'?ironhaulEase(t/28):st==='ih_unfold'?1-ironhaulEase((t-22)/36):st==='ih_shift'?1-ironhaulEase((t-44)/45):0;
     if(fold&&!silver){swordTarget={x:ironhaulMix(swordTarget.x,9,fold),y:ironhaulMix(swordTarget.y,-105,fold)};offTarget={x:ironhaulMix(offTarget.x,-9,fold),y:ironhaulMix(offTarget.y,-113,fold)};crouch=Math.max(crouch,fold);lean=ironhaulMix(lean,.3,fold);blade=ironhaulAngleMix(blade,-2.8,fold);}
-    const follow=b.followPose;
-    if(follow&&!s&&!q){
-        const u=ironhaulEase((frames-follow.at)/(follow.duration||12)),old=follow.targets;
+    const follow=b.followPose,blendActive=b.playerBlend&&(s||q)&&(s||q).age<4;
+    if(follow&&(!s&&!q||blendActive)){
+        const u=ironhaulEase(blendActive?(s||q).age/4:(frames-follow.at)/(follow.duration||12)),old=follow.targets;
         swordTarget={x:ironhaulMix(old.swordTarget.x,swordTarget.x,u),y:ironhaulMix(old.swordTarget.y,swordTarget.y,u)};
         offTarget={x:ironhaulMix(old.offTarget.x,offTarget.x,u),y:ironhaulMix(old.offTarget.y,offTarget.y,u)};
         blade=ironhaulAngleMix(old.blade,blade,u);shieldAngle=ironhaulAngleMix(old.shieldAngle,shieldAngle,u);
@@ -348,7 +348,7 @@ function ironhaulWorldPoint(b,p){return {x:b.cx()+b.dir()*p.x,y:b.y+b.h+p.y};}
 // Nguồn: index.html:34445 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulWeapons.1 READ_ONLY
 function ironhaulWeapons(b){
-    const r=b.rigPose||ironhaulRig(b),grip=ironhaulWorldPoint(b,r.sword.hand),reach=(b.slash?.reach||112)*(1-r.fold*.65);
+    const r=b.rigPose||ironhaulRig(b),grip=ironhaulWorldPoint(b,r.sword.hand),reach=(b.playerReach??b.slash?.reach??112)*(1-r.fold*.65);
     const tip=ironhaulWorldPoint(b,{x:r.sword.hand.x+Math.cos(r.sword.angle)*reach,y:r.sword.hand.y+Math.sin(r.sword.angle)*reach});
     const shield=ironhaulWorldPoint(b,r.off.hand),points=[[-27,-35],[19,-37],[32,-16],[25,29],[0,43],[-28,22],[-33,-13]].map(([x,y])=>ironhaulWorldPoint(b,ironhaulRot({x:x*r.shieldFace*IRONHAUL_SHIELD_SCALE,y:y*IRONHAUL_SHIELD_SCALE},r.off.angle,r.off.hand)));
     const gun=ironhaulWorldPoint(b,{x:r.off.hand.x+Math.cos(r.off.angle)*48,y:r.off.hand.y+Math.sin(r.off.angle)*48});
@@ -401,7 +401,7 @@ function ironhaulRobot(b,alpha=1){
             for(const [x,y] of [[-18,-23],[15,-22],[-18,16],[15,19]]){ctx.fillStyle='#607f92';ctx.fillRect(x-2,y-2,4,4);}ctx.restore();
         }else if(armed==='gun'&&!silver&&!((b.state==='ih_cleaver'&&b.subTimer<103)||b.state==='ih_overcharge')){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);ironhaulPolygon([[-5,-8],[30,-9],[36,-5],[49,-5],[49,5],[8,9],[-5,3]],dark,hi);ctx.fillStyle=hi;ctx.fillRect(32,-4,17,8);ctx.fillStyle=energy;ctx.fillRect(8,-7,16,2);
             if(b.muzzle>0){ctx.fillStyle='#ffedb7';ironhaulPolygon([[49,-7],[70,0],[49,7],[55,0]],ctx.fillStyle,null);}ctx.restore();}
-        else if(armed==='sword'){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);const L=(b.slash?.reach||112)*(1-r.fold*.65);
+        else if(armed==='sword'){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);const L=(b.playerReach??b.slash?.reach??112)*(1-r.fold*.65);
             ironhaulPolygon([[0,-5],[L-20,-5],[L,0],[L-20,5],[0,5]],silver?'#f0fcff':'#bbcdd7',energy);ctx.fillStyle=energy;ctx.fillRect(11,-4,L-34,2);ctx.fillStyle=dark;ctx.fillRect(-10,-5,15,10);ctx.fillStyle=hi;ctx.fillRect(-2,-12,5,24);ctx.restore();}
     };
     const leg=l=>{

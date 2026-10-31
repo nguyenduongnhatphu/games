@@ -1,5 +1,5 @@
 // BOSS_FILE: BossShared
-// BOSS_SNAPSHOT: 39483d797c15c5e35e37a5b630ae4f295f939302db706fe13262c4e699541a28
+// BOSS_SNAPSHOT: ac95756f3acfed6d6f9d02fb09138fb3733cdf9c95fea17096fea023062a7b86
 // Nguồn game: games/Dino/index.html
 // Bản tách để sửa/gửi AI; game vẫn chạy từ ../index.html, không nạp file này trực tiếp.
 // Giữ các dòng BOSS_PART_BEGIN / BOSS_PART_END và tên class/hàm công khai.
@@ -1405,10 +1405,100 @@ function ironhaulMix(a,b,t){return a+(b-a)*Math.max(0,Math.min(1,t));}
 function ironhaulEase(t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);}
 // BOSS_PART_END s1.ironhaulEase.1
 
+// Nguồn: index.html:34358 · Dùng bởi: IronhaulBoss
+// BOSS_PART_BEGIN s1.ironhaulRig.1 EDITABLE
+function ironhaulRig(b){
+    const t=b.subTimer||0,st=b.state||'idle',s=b.slash,q=b.shieldStrike;
+    const recent=Math.exp(-Math.max(0,frames-(b.animAt??-1000))*.24),speed=Math.min(1,Math.abs(b.animSpeed||0)/6)*recent;
+    const gait=b.gait||0,air=!b.grounded,silver=!!b.silver;
+    const gunWindow=(a,b,c,d)=>ironhaulEase((t-a)/(b-a))*(1-ironhaulEase((t-c)/(d-c)));
+    const gunBlend=st==='ih_barrage'?gunWindow(8,25,86,109):st==='ih_gunblade'?gunWindow(18,29,55,73):st==='ih_cleaver'?gunWindow(103,114,131,159):b.pose==='gun'?1:0;
+    let turn=0,lean=speed*.13,crouch=0,swordTarget={x:50,y:-88},offTarget={x:8,y:-94},blade=.72,shieldAngle=-.1;
+    const nextSword=ironhaulSwordBeats(b).find(k=>t<=k[0]&&t>=k[0]-18);
+    const wind=nextSword?ironhaulEase((t-nextSword[0]+18)/18):0;
+    if(st==='ih_advance'&&t>=20&&t<50){swordTarget={x:5,y:-125};blade=-2.7;offTarget={x:30,y:-115};lean=.22;crouch=.25;}
+    if(st==='ih_flank'&&t>=20&&t<68){turn=Math.sin(Math.max(0,Math.min(1,(t-43)/20))*Math.PI)*.25;lean=-.2;swordTarget={x:18,y:-151};blade=-1.8;}
+    if(st==='ih_skyfall'&&t<=24){const u=ironhaulEase(t/24);swordTarget={x:ironhaulMix(54,27,u),y:ironhaulMix(-96,-149,u)};blade=ironhaulAngleMix(.95,-1.8,u);crouch=u*.65;}
+    if(st==='ih_skyfall'&&b.landT&&t>=b.landT)crouch=Math.max(crouch,Math.sin(Math.min(1,(t-b.landT)/14)*Math.PI)*.75);
+    if(st==='ih_overcharge'&&t<=80){const u=ironhaulEase(t/25);swordTarget={x:ironhaulMix(50,43,u),y:ironhaulMix(-88,-109,u)};offTarget={x:8,y:ironhaulMix(-94,-114,u)};blade=ironhaulAngleMix(.72,-1.55,u);lean=-.04;crouch=.04;}
+    if(st==='ih_parry'||(st==='ih_riposte'&&t<=28)){offTarget={x:52,y:-113};shieldAngle=.12;swordTarget={x:22,y:-97};blade=.65;crouch=.2;}
+    if((st==='ih_aegis'&&t<31)){const a=ironhaulEase(t/30);offTarget={x:ironhaulMix(-31,68,a),y:ironhaulMix(-136,-108,a)};shieldAngle=ironhaulMix(-.75,.3,a);lean=-.13+.3*a;}
+    if(gunBlend&&!silver){offTarget={x:ironhaulMix(8,57-(b.muzzle||0)*1.2,gunBlend),y:ironhaulMix(-94,-111,gunBlend)};lean=(-.07-(b.muzzle||0)*.012)*gunBlend;}
+    if(wind&&!q){
+        const kind=nextSword[1],goal=kind==='rise'?{x:40,y:-73}:kind==='thrust'?(st==='ih_cleaver'?{x:14,y:-111}:{x:22,y:-103}):st==='ih_cleaver'?{x:14,y:-160}:{x:29,y:-153};
+        swordTarget={x:ironhaulMix(swordTarget.x,goal.x,wind),y:ironhaulMix(swordTarget.y,goal.y,wind)};
+        blade=ironhaulAngleMix(blade,kind==='rise'?.52:kind==='thrust'?-.12:-2.2,wind);
+        lean=ironhaulMix(lean,kind==='rise'?.19:kind==='thrust'?0:-.16,wind);
+    }
+    const nextShield=silver?(IRONHAUL_SHIELD_BEATS[st]||[]).find(k=>t<=k[0]&&t>=k[0]-18):undefined;
+    if(nextShield&&!s&&!q){
+        const u=ironhaulEase((t-nextShield[0]+18)/18),kind=nextShield[1],goal=kind==='spin'?{x:73,y:-101}:kind==='slam'?{x:28,y:-157}:kind==='upper'?{x:46,y:-64}:{x:22,y:-102};
+        offTarget={x:ironhaulMix(offTarget.x,goal.x,u),y:ironhaulMix(offTarget.y,goal.y,u)};
+        shieldAngle=ironhaulAngleMix(shieldAngle,kind==='slam'?-1.4:kind==='upper'?.8:kind==='spin'?.15:-.25,u);
+    }
+    if(s){
+        const u=ironhaulEase(s.age/s.life);blade=s.angle;
+        if(s.kind==='thrust'){swordTarget={x:ironhaulMix(22,91,Math.sin(u*Math.PI*.75)),y:-103};lean=.18*Math.sin(u*Math.PI);}
+        else if(s.kind==='rise'){swordTarget={x:40+Math.sin(u*Math.PI)*36,y:ironhaulMix(-73,-157,u)};lean=ironhaulMix(.19,-.15,u);}
+        else{swordTarget={x:29+Math.sin(u*Math.PI)*47,y:ironhaulMix(-153,-80,u)};lean=ironhaulMix(-.16,.2,u);}
+        if(st==='ih_cleaver'){swordTarget=s.kind==='thrust'?{x:14+Math.sin(u*Math.PI*.75)*21,y:-111}:{x:14+Math.sin(u*Math.PI)*16,y:ironhaulMix(-160,-89,u)};offTarget={x:swordTarget.x-13,y:swordTarget.y+5};crouch=Math.sin(u*Math.PI)*.38;}
+    }
+    if(st==='ih_cleaver'&&wind&&!s){offTarget={x:swordTarget.x-13,y:swordTarget.y+5};}
+    if(q){
+        const u=ironhaulEase(q.age/q.life),power=Math.sin(u*Math.PI);
+        if(q.kind==='spin'){
+            turn=u;offTarget={x:Math.cos(u*Math.PI*2)*73,y:-101+Math.sin(u*Math.PI*2)*14};shieldAngle=u*Math.PI*2+.15;
+            swordTarget={x:-18+Math.cos(u*Math.PI*2+.8)*37,y:-143};blade=-1.7+u*Math.PI*2;lean=Math.sin(u*Math.PI*2)*.12;crouch=.18;
+        }else if(q.kind==='slam'){
+            offTarget={x:ironhaulMix(28,60,u),y:ironhaulMix(-157,-55,u)};shieldAngle=ironhaulMix(-1.4,.9,u);crouch=u*.9;lean=u*.26;swordTarget={x:3,y:-136};blade=-2.4;
+        }else if(q.kind==='upper'){
+            offTarget={x:46+power*25,y:ironhaulMix(-64,-142,u)};shieldAngle=ironhaulMix(.8,-.8,u);lean=ironhaulMix(.25,-.15,u);
+        }else{
+            offTarget={x:ironhaulMix(22,87,power),y:-102};shieldAngle=ironhaulMix(-.25,.25,power);lean=.25*power;crouch=.3*power;swordTarget={x:9,y:-144};blade=-2.2;
+        }
+    }
+    if(air){crouch=Math.max(crouch,.35);if(!s&&!q){swordTarget={x:27,y:-149};blade=-1.8;}}
+    const fold=st==='ih_morph'?ironhaulEase(t/28):st==='ih_unfold'?1-ironhaulEase((t-22)/36):st==='ih_shift'?1-ironhaulEase((t-44)/45):0;
+    if(fold&&!silver){swordTarget={x:ironhaulMix(swordTarget.x,9,fold),y:ironhaulMix(swordTarget.y,-105,fold)};offTarget={x:ironhaulMix(offTarget.x,-9,fold),y:ironhaulMix(offTarget.y,-113,fold)};crouch=Math.max(crouch,fold);lean=ironhaulMix(lean,.3,fold);blade=ironhaulAngleMix(blade,-2.8,fold);}
+    const follow=b.followPose,blendActive=b.playerBlend&&(s||q)&&(s||q).age<4;
+    if(follow&&(!s&&!q||blendActive)){
+        const u=ironhaulEase(blendActive?(s||q).age/4:(frames-follow.at)/(follow.duration||12)),old=follow.targets;
+        swordTarget={x:ironhaulMix(old.swordTarget.x,swordTarget.x,u),y:ironhaulMix(old.swordTarget.y,swordTarget.y,u)};
+        offTarget={x:ironhaulMix(old.offTarget.x,offTarget.x,u),y:ironhaulMix(old.offTarget.y,offTarget.y,u)};
+        blade=ironhaulAngleMix(old.blade,blade,u);shieldAngle=ironhaulAngleMix(old.shieldAngle,shieldAngle,u);
+        lean=ironhaulMix(old.lean,lean,u);crouch=ironhaulMix(old.crouch,crouch,u);turn=ironhaulAngleMix(old.turn*Math.PI*2,turn*Math.PI*2,u)/(Math.PI*2);
+    }
+    if(b.playerCrouch){crouch=Math.max(crouch,2.8);swordTarget.y+=36;offTarget.y+=36;}
+    const targets={swordTarget:{...swordTarget},offTarget:{...offTarget},blade,shieldAngle,lean,crouch,turn};
+    const yaw=Math.cos(turn*Math.PI*2),width=Math.max(.2,Math.abs(yaw)),bob=air?0:Math.sin(gait*2)*speed*2+Math.sin(frames*.055)*.7;
+    const pelvis={x:Math.sin(turn*Math.PI*2)*5,y:-94+crouch*15+bob};
+    const chest=ironhaulRot({x:0,y:-38},lean,pelvis),neck=ironhaulRot({x:0,y:-23},lean,chest);
+    const shoulderFront=ironhaulRot({x:31*yaw,y:-5},lean,chest),shoulderBack=ironhaulRot({x:-31*yaw,y:-5},lean,chest);
+    const sword=ironhaulIK(shoulderFront,swordTarget,34,35,1),off=ironhaulIK(shoulderBack,offTarget,34,35,1);
+    sword.angle=blade;sword.hand={x:sword.end.x+Math.cos(blade)*11,y:sword.end.y+Math.sin(blade)*11};
+    off.angle=(q||nextShield||(st==='ih_aegis'&&t<=30)||(follow&&silver))?shieldAngle:st==='ih_cleaver'&&(s||wind||(follow&&t<103))?blade:silver?-.1:0;
+    if(gunBlend&&!silver&&!s){
+        const localDX=((b.lockX??b.cx()+b.dir()*200)-b.cx())*b.dir()-off.end.x;
+        const localDY=(b.lockY??b.cy())-(b.y+b.h)-off.end.y;
+        off.angle=Math.max(-.85,Math.min(.85,Math.atan2(localDY,Math.max(30,localDX))))*gunBlend;
+    }
+    off.hand={x:off.end.x+Math.cos(off.angle)*11,y:off.end.y+Math.sin(off.angle)*11};
+    const legs=[];
+    for(const side of [-1,1]){
+        const phase=gait+(side<0?Math.PI:0),stride=Math.sin(phase)*19*speed;
+        const ankle={x:side*20+stride+(air?side*8:0),y:-9-Math.max(0,Math.cos(phase))*14*speed-(air?side<0?18:5:0)};
+        const hip={x:pelvis.x+side*14*width,y:pelvis.y+3};
+        const leg=ironhaulIK(hip,ankle,40,44,-1);
+        legs.push({hip:leg.root,knee:leg.joint,ankle:leg.end,angle:air?.3:-.09*Math.sin(phase)*speed+Math.sin(turn*Math.PI*2)*side*.16});
+    }
+    return {targets,fold,pelvis,chest,neck,head:{x:neck.x,y:neck.y-9},lean,width,yaw,turn,crouch,legs,sword,off,shieldFace:q?.kind==='spin'?Math.max(.18,Math.abs(Math.cos(turn*Math.PI*2))):1,offBehind:q?.kind==='spin'&&Math.sin(turn*Math.PI*2)<-.1};
+}
+// BOSS_PART_END s1.ironhaulRig.1
+
 // Nguồn: index.html:34445 · Dùng bởi: IronhaulBoss
 // BOSS_PART_BEGIN s1.ironhaulWeapons.1 EDITABLE
 function ironhaulWeapons(b){
-    const r=b.rigPose||ironhaulRig(b),grip=ironhaulWorldPoint(b,r.sword.hand),reach=(b.slash?.reach||112)*(1-r.fold*.65);
+    const r=b.rigPose||ironhaulRig(b),grip=ironhaulWorldPoint(b,r.sword.hand),reach=(b.playerReach??b.slash?.reach??112)*(1-r.fold*.65);
     const tip=ironhaulWorldPoint(b,{x:r.sword.hand.x+Math.cos(r.sword.angle)*reach,y:r.sword.hand.y+Math.sin(r.sword.angle)*reach});
     const shield=ironhaulWorldPoint(b,r.off.hand),points=[[-27,-35],[19,-37],[32,-16],[25,29],[0,43],[-28,22],[-33,-13]].map(([x,y])=>ironhaulWorldPoint(b,ironhaulRot({x:x*r.shieldFace*IRONHAUL_SHIELD_SCALE,y:y*IRONHAUL_SHIELD_SCALE},r.off.angle,r.off.hand)));
     const gun=ironhaulWorldPoint(b,{x:r.off.hand.x+Math.cos(r.off.angle)*48,y:r.off.hand.y+Math.sin(r.off.angle)*48});
@@ -1431,7 +1521,7 @@ function ironhaulRobot(b,alpha=1){
             for(const [x,y] of [[-18,-23],[15,-22],[-18,16],[15,19]]){ctx.fillStyle='#607f92';ctx.fillRect(x-2,y-2,4,4);}ctx.restore();
         }else if(armed==='gun'&&!silver&&!((b.state==='ih_cleaver'&&b.subTimer<103)||b.state==='ih_overcharge')){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);ironhaulPolygon([[-5,-8],[30,-9],[36,-5],[49,-5],[49,5],[8,9],[-5,3]],dark,hi);ctx.fillStyle=hi;ctx.fillRect(32,-4,17,8);ctx.fillStyle=energy;ctx.fillRect(8,-7,16,2);
             if(b.muzzle>0){ctx.fillStyle='#ffedb7';ironhaulPolygon([[49,-7],[70,0],[49,7],[55,0]],ctx.fillStyle,null);}ctx.restore();}
-        else if(armed==='sword'){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);const L=(b.slash?.reach||112)*(1-r.fold*.65);
+        else if(armed==='sword'){ctx.save();ctx.translate(a.hand.x,a.hand.y);ctx.rotate(a.angle);const L=(b.playerReach??b.slash?.reach??112)*(1-r.fold*.65);
             ironhaulPolygon([[0,-5],[L-20,-5],[L,0],[L-20,5],[0,5]],silver?'#f0fcff':'#bbcdd7',energy);ctx.fillStyle=energy;ctx.fillRect(11,-4,L-34,2);ctx.fillStyle=dark;ctx.fillRect(-10,-5,15,10);ctx.fillStyle=hi;ctx.fillRect(-2,-12,5,24);ctx.restore();}
     };
     const leg=l=>{
