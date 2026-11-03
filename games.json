@@ -11,7 +11,11 @@
       "title": "Pit Boss",
       "description": "Balatro-like but Black Jack core.",
       "category": "Rogue-Lite",
-      "tags": ["Black Jack", "casual", "Deck Builder"],
+      "tags": [
+        "Black Jack",
+        "casual",
+        "Deck Builder"
+      ],
       "path": "games/Jack-Pot/index.html",
       "thumbnail": "",
       "emoji": "🎰",
@@ -24,13 +28,53 @@
       "title": "Dino",
       "description": "Weird Endless Run with many stuff.",
       "category": "Arcade",
-      "tags": ["endless-runner", "casual"],
+      "tags": [
+        "endless-runner",
+        "casual"
+      ],
       "path": "games/Dino/index.html",
       "thumbnail": "",
       "emoji": "🦖",
       "color": "#5cff9d",
       "controls": "Space để nhảy",
       "date": "2026-07-27"
+    },
+    {
+      "id": "dead-line",
+      "title": "Dead Line",
+      "description": "Game chiến thuật đẩy đường và phá căn cứ với 6 phe: Human, Zombie, Tu Tiên, Xâm Lược, Fantasy và Cultist. Tuyển quân, nâng cấp theo nhánh, sử dụng chiêu cuối và xem các trận AI vs AI.",
+      "category": "Strategy",
+      "tags": [
+        "Strategy",
+        "Base Defense",
+        "6 Factions",
+        "Auto Battle",
+        "AI vs AI"
+      ],
+      "path": "games/Dead-Line/index.html",
+      "thumbnail": "",
+      "emoji": "⚔️",
+      "color": "#a78bfa",
+      "controls": "Chuột để chọn phe, tuyển quân, nâng cấp và kích hoạt kỹ năng.",
+      "date": "2026-11-03"
+    },
+    {
+      "id": "age-of-war",
+      "title": "Age of War",
+      "description": "Game chiến thuật thủ thành và đẩy đường lấy cảm hứng từ Age of War: xây dựng đội quân, chống lại các đợt tấn công và tiến công phá hủy căn cứ đối thủ.",
+      "category": "Strategy",
+      "tags": [
+        "Strategy",
+        "Age of War-like",
+        "Base Defense",
+        "Side-Scrolling"
+      ],
+      "path": "games/Age-of-War/index.html",
+      "thumbnail": "",
+      "emoji": "🏰",
+      "color": "#f59e0b",
+      "controls": "Chuột để chọn đơn vị và điều khiển giao diện.",
+      "date": "2026-11-03"
     }
   ]
 }
