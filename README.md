@@ -33,11 +33,16 @@ Hiện có **2 game**.
 - Hệ Rune (gồm cả rune độc quyền thay đổi hoàn toàn lối chơi)
 - Nhiều Boss với AI, phase và combo hợp kích
 - Chế độ Boss Rush, Test Boss, PvP, Defense, Dojo luyện tập…
+- [Đại Cổ Thụ: bản thử Platform rộng, camera hai chiều, cây/đầm lầy/núi](games/Dino/WILDERNESS.md)
 - Stylish rank, parry, graze, dash, khiên, pet…
 
 Game thiên về **khám phá cơ chế** và thử nghiệm build hơn là chỉ chạy tránh chướng ngại vật.
 
 ➡️ [Chơi Dino](https://nguyenduongnhatphu.github.io/games/play.html?id=dino)
+
+➡️ [Tải từng file JS của Boss để gửi AI chỉnh sửa](games/Dino/bosses/README.md)
+
+➡️ [Tải từng file Form người chơi, Rune, đạn và Power để gửi AI chỉnh sửa](games/Dino/PLAYER_FILES.md)
 
 ### Hướng dẫn nhanh (Dino)
 
