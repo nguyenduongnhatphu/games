@@ -79587,9 +79587,11 @@ class PulsarCloneBoss {
             dojoPick = null; return true;
         }
         function drawMenuPanel(){
-            ctx.fillStyle = "rgba(0,0,0,0.78)"; ctx.fillRect(0, 0, canvas.width, 56);
-            ctx.strokeStyle = "rgba(255,215,0,0.5)"; ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.moveTo(0, 56); ctx.lineTo(canvas.width, 56); ctx.stroke();
+            if (!touchMode || !dojoMode) {
+                ctx.fillStyle = "rgba(0,0,0,0.78)"; ctx.fillRect(0, 0, canvas.width, 56);
+                ctx.strokeStyle = "rgba(255,215,0,0.5)"; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(0, 56); ctx.lineTo(canvas.width, 56); ctx.stroke();
+            }
             ctx.textAlign = "center";
             for (let b of menuButtons()){
                 let hov = mouseX >= b.x && mouseX <= b.x + b.w && mouseY >= b.y && mouseY <= b.y + b.h;
@@ -91161,7 +91163,7 @@ function infernoMaxChain(x, y, source){
         const STK_DEAD  = 0.26;   // trong vung nay = khong lam gi
         const STK_MOVE  = 0.30;   // qua nguong nay theo chieu ngang = di
         const STK_DOWN  = 0.36;   // keo xuong qua nguong nay = ngoi
-        const STK_DASH  = 0.80;   // keo gan het co sang ngang = LUOT
+        const STK_DASH  = 1.08;   // keo gan het co sang ngang = LUOT
         const STK_REARM = 0.55;   // keo ve duoi muc nay thi moi luot duoc lan nua
         const STK_UP    = 0.36;   // keo len qua nguong nay = NHAY
         const STK_UPOFF  = 0.22;  // keo ve duoi muc nay = coi nhu da tha, nhay lai duoc
@@ -91246,14 +91248,14 @@ function infernoMaxChain(x, y, source){
             const centre = () => {
                 let q = stageMap(0, 0), c = el._cfg;
                 return { cx: (c.x + c.w / 2) / 100 * q.W,
-                         cy: q.H * (1 - (c.y + c.w * 1.25) / 100),
+                         cy: q.H * (1 - c.y / 100) - c.w / 200 * q.W,
                          R:  c.w / 200 * q.W };
             };
             const setKeys = (want) => {
                 for (let k of [...cur]) if (!want.includes(k)) { tKeyUp(k); cur.delete(k); }
                 for (let k of want) if (!cur.has(k)) { tKeyDown(k, true); cur.add(k); }
             };
-            const clear = () => { for (let k of [...cur]) tKeyUp(k); cur.clear();
+            const clear = () => { pid = null; for (let k of [...cur]) tKeyUp(k); cur.clear();
                                   el._on = false; el._nx = el._ny = 0;
                                   dashArmed = true; ultArmed = true; jumpPhase = 0;
                                   el.classList.remove('act', 'rim');
@@ -91316,6 +91318,7 @@ function infernoMaxChain(x, y, source){
             };
             el.addEventListener('pointerup', up);
             el.addEventListener('pointercancel', up);
+            el.addEventListener('lostpointercapture', () => clear());
             el._release = clear;
             el._tick = apply;
         }
@@ -116800,6 +116803,57 @@ const dpOldPlayerHits=defPlayerHits;defPlayerHits=function(){return dpDefense.ac
 @media(pointer:coarse){#dpdef-theater{height:100dvh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}.dpdef-theater-head{height:34px!important;min-height:34px;padding:0 10px!important;font-size:12px}.dpdef-theater-head button{min-height:32px}}
 @media(pointer:coarse) and (orientation:portrait){#dpdef-theater{inset:auto!important;left:50%!important;top:50%!important;width:100dvh!important;height:100dvw!important;transform:translate(-50%,-50%) rotate(90deg);padding:0 env(safe-area-inset-top) 0 env(safe-area-inset-bottom);box-sizing:border-box}}
 `;document.head.appendChild(style);})();
+// Separate action buttons: every press/release goes through native combat input.
+(function(){
+ const style=document.createElement('style');style.textContent=`
+ #tpad .mobile-action{position:absolute;pointer-events:auto;touch-action:none;border:1px solid #e4f2ff88;border-radius:50%;background:rgba(20,35,48,.12);color:#fff;font:bold clamp(10px,1.7vw,18px) system-ui;display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none}
+ #tpad .mobile-action.hit{background:rgba(150,205,240,.28);border-color:white}#tpad .mobile-action.primary{background:rgba(45,100,145,.14);border-color:#b9e3ff99}#tpad .mobile-action small{font-size:9px}
+ body.dpdef-wide.mob.rot90 #stage{position:fixed!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%) rotate(90deg)!important;width:min(100dvh,calc((100dvw - 65px)*1.8))!important}
+ body.dpdef-wide.mob.rot90 #dpdef-bar{position:fixed;left:0;top:50%;transform:translate(-50%,-50%) rotate(90deg) translateY(-50%);width:100dvh;max-height:65px;overflow:auto;font-size:10px}body.dpdef-wide.mob.rot90 .dpdef-small{display:none}
+ `;document.head.appendChild(style);
+ const refs=new Map();
+ function down(code){const n=refs.get(code)||0;refs.set(code,n+1);if(!n)tKeyDown(code,true);}
+ function up(code){const n=(refs.get(code)||1)-1;if(n<=0){refs.delete(code);tKeyUp(code);}else refs.set(code,n);}
+ function button(label,codes,x,y,w,h,primary=false){const b=document.createElement('button');b.type='button';b.className='mobile-action'+(primary?' primary':'');b.textContent=label;b.style.cssText=`left:${x}%;top:${y}%;width:${w}%;height:${h}%;`;b.setAttribute('aria-label',label);let held=null;
+ b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(held!==null)return;held=e.pointerId;b.setPointerCapture(e.pointerId);b.classList.add('hit');codes.forEach(down);});
+ const release=e=>{if(held===null||e&&e.pointerId!==held)return;held=null;b.classList.remove('hit');[...codes].reverse().forEach(up);};
+ b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',release);b.addEventListener('contextmenu',e=>e.preventDefault());b._release=()=>release();TPAD.appendChild(b);return b;}
+ let buttons=[];const oldRelease=tReleaseAll;tReleaseAll=function(){for(const b of buttons)b._release();refs.clear();oldRelease();};
+ tBuild=function(){tReleaseAll();TPAD.innerHTML='';tSticks=[];buttons=[];const add=(...a)=>buttons.push(button(...a));
+
+ const swipe=document.createElement('div');swipe.style.cssText='position:absolute;left:0;top:0;width:100%;height:52%;pointer-events:auto;touch-action:none;';tBindSwipe(swipe);TPAD.appendChild(swipe);
+ const stick=tMakeStick({x:3,y:5,w:17},'stkL',[]);
+ stick.style.background='rgba(20,35,48,.10)';
+ stick.style.border='1px solid rgba(228,242,255,.45)';
+ tBindStick(stick,'L');TPAD.appendChild(stick);tSticks.push(stick);
+ add('J',['KeyJ'],82,79,8,14.3,true);add('K',['KeyK'],91,67,8,14.3,true);
+ add('L',['KeyL'],82,63,7,12.5);add('U',['KeyU'],91,51,7,12.5);
+ const y=button('Y',['KeyY'],83,47,6,10.7);buttons.push(y);y.style.display=unityOn()?'flex':'none';
+ y.dataset.contextual='unity';
+ };
+ const syncPad=tSyncPad;tSyncPad=function(){syncPad();for(const b of buttons)if(b.dataset.contextual==='unity'){const show=unityOn();if(!show)b._release();b.style.display=show?'flex':'none';}};
+ tBuild();tSyncPad();
+ window.addEventListener('blur',()=>tReleaseAll());document.addEventListener('visibilitychange',()=>{if(document.hidden)tReleaseAll();});
+ // Use the same mobile decision as Dino, including touch-mode selected manually.
+ function landscape(){const el=document.getElementById('dpdef-theater');if(!el)return;const mobile=touchMode||matchMedia('(pointer:coarse)').matches;const v=window.visualViewport,w=v?.width||innerWidth,h=v?.height||innerHeight;el.classList.toggle('dp-landscape',mobile&&h>w);if(mobile&&h>w)el.style.cssText+=';position:fixed;inset:auto!important;left:50%!important;top:50%!important;width:'+h+'px!important;height:'+w+'px!important;transform:translate(-50%,-50%) rotate(90deg)!important;';else{for(const p of ['inset','left','top','width','height','transform'])el.style.removeProperty(p);}}
+ const ensure=dpEnsureUI;dpEnsureUI=function(){ensure();landscape();};window.addEventListener('resize',landscape);window.addEventListener('orientationchange',landscape);window.visualViewport?.addEventListener('resize',landscape);
+})();
+
+// Compact mobile status: no desktop move-list panels over the battlefield.
+const minimalMobileUI=drawUI;
+drawUI=function(){
+ if(!touchMode||!['normal','boss_rush','test_boss'].includes(gameState))return minimalMobileUI();
+ ctx.save();ctx.beginPath();ctx.rect(0,0,0,0);ctx.clip();minimalMobileUI();ctx.restore();
+ const n=dino,p=danteOn()?n.dante:null,hp=dpDefense.active()?Math.ceil(dpDefense.hero().hp):Math.ceil(n.hp),max=dpDefense.active()?dpDefense.cap():n.maxHp;
+ let name=p&&danteOn()?DT_ARMS[p.arm].n:vergilOn()?'VERGIL':ironOn()?'IRONHAUL':xBat()?'X':apexOn()?'APEX':'';
+ ctx.save();ctx.textAlign='left';ctx.font='bold 14px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=3;ctx.fillStyle='#fff';ctx.fillText('♥ '+hp+'/'+max+'  '+name,12,21);
+ ctx.font='12px system-ui';let text='U '+Math.floor(ultCharge)+'% · L '+(n.shieldCd>0?(n.shieldCd/60).toFixed(1)+'s':'✓');
+ if(xBat())text+=' · NL '+Math.floor(xNL);else if(!p)text+=' · Đạn '+Math.ceil(n.ammo);
+ if(p&&danteOn())text+=' · '+DANTE_STYLES[danteStyle(p)]+' · SDT '+Math.floor(danteSinCharge(p))+'%';
+ ctx.fillText(text,12,40);ctx.restore();
+};
+let mobileDojoMenu=false;const minimalMenuButtons=menuButtons;
+menuButtons=function(){if(!touchMode||!dojoMode)return minimalMenuButtons();const close={x:canvas.width-76,y:8,w:68,h:36,c:'#263746',hc:'#4b657a',t:mobileDojoMenu?'ĐÓNG':'MENU',act:()=>mobileDojoMenu=!mobileDojoMenu};if(!mobileDojoMenu)return[close];return minimalMenuButtons().map((b,i)=>({...b,x:canvas.width-330+(i%3)*108,y:52+Math.floor(i/3)*44,w:102,h:40,act:()=>{mobileDojoMenu=false;b.act();}})).concat(close);};
 </script>
 </body>
 </html>
