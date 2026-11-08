@@ -75769,7 +75769,7 @@ class PulsarCloneBoss {
                 LT("Bộ xương — 4 máu. Core đỏ luôn nằm trong ngực. Chết lần đầu: xương bung ra rơi vãi, Core lơ lửng kéo các mảnh lên ghép lại rồi hồi sinh với máu tối đa còn 2 (hồi sinh sau cùng, sau mọi rune hồi sinh). +5% tốc độ chạy, nhảy cao hơn, hồi Dash nhanh hơn.",
                    "Skeleton — 4 HP. A red Core always sits in its chest. First death: the bones burst apart, the Core floats up and pulls them back together, reviving you with max HP reduced to 2 (the very last revive, after every revive rune). +5% run speed, higher jump, faster Dash recharge."));
             formDesc.push(LT("Apex — 8 HP. Claws, nhảy đôi, bật tường và bám mép. Năm biến thể có chiêu cuối riêng. Khóa Power, Rune và phụ kiện.","Apex — 8 HP. Claws, double jump, wall kick and ledge grab. Five variants with their own ultimates. Power, Runes and accessories locked."));
-            formDesc.push(LT("Dante — 10 HP. J combo, K đặc biệt (giữ 1s cường hóa), Q/E đổi 6 vũ khí; I/O đổi thế. U: Devil Trigger 10s, +2 sát thương/hit, hồi 1 HP/2s. Khóa Power, Rune và phụ kiện.","Dante — 10 HP. J combo; K special (charge 1s); Q/E six weapons; I/O styles. U: 10-second Devil Trigger, +2 damage/hit, heal 1 HP/2s. Power, Runes and accessories locked."));
+            formDesc.push(LT("Dante — 6 HP. Chọn biến thể kiếm/găng tại Trang bị Dante. Q/E đổi 6 nhóm vũ khí; I/O đổi thế. U: Devil Trigger 10s, +2 sát thương/hit, hồi 1 HP/2s. Khóa Power, Rune và phụ kiện.","Dante — 6 HP. Pick sword/gauntlet variants in Dante Equipment. Q/E: six weapon groups; I/O: styles. U: 10-second Devil Trigger, +2 damage/hit, heal 1 HP/2s. Power, Runes and accessories locked."));
             formDesc.push(LT("Vergil — 10 HP. J/K: Yamato; I: kiếm tầm xa; O: song kiếm. Q/E đổi đội hình. Shift dịch chuyển. U: SDT → JCE. Khóa Power, Rune, phụ kiện.", "Vergil — 10 HP. J/K: Yamato; I: ranged blades; O: dual blades. Q/E: formation. Shift: Trick. U: SDT → JCE. Equipment locked."));
             formDesc.push(LT("Ironhaul — 10 HP. Q/E đổi robot/xe. J ×5; J/K nối Dash, Jump, cúi. U: giáp trắng 12s → U: Aegis Breaker.","Ironhaul — 10 HP. Q/E: robot/truck. J ×5; J/K → dash/jump/down branches. U: 12s Silver Aegis; U again: finisher."));
             { let _fi = (typeof xFormIdx === 'function') ? xFormIdx() : currentForm;
@@ -104889,7 +104889,7 @@ class DantePlayerRig {
             // 3. CHAN + GIAY BOOTS + GIAP CHAN BALROG
             let lOff = (!b.grounded) ? -3 : walkCycle, rOff = (!b.grounded) ? 2 : -walkCycle;
             let lunge = (b._swordLunge || 0);
-            if(b._faustLegs){
+            if(b._gil){}else if(b._faustLegs){
                 const pose=b._faustLegs,spread=pose.mode==='dash'?15:pose.mode==='cast'?10:8+pose.t*8;
                 ctx.strokeStyle='#242530';ctx.lineWidth=8;ctx.lineCap='round';
                 for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(cxb+side*5,y+39);ctx.lineTo(cxb+side*spread,y+47);ctx.lineTo(cxb+side*(spread+3),y+56);ctx.stroke();ctx.fillStyle='#101116';ctx.fillRect(cxb+side*(spread+3)-4,y+55,side>0?14:10,5);}
@@ -105295,7 +105295,7 @@ function danteTick(){
  if(p.k!==null){if(keys.KeyK)p.k=Math.min(120,p.k+1);else danteRelease();}
  if(p.arm!==0&&p.arm!==1&&p.arm!==2&&p.arm!==3&&p.arm!==5&&keys.KeyJ&&!keys.KeyK&&!p.attack&&p.cd<=0)danteAttack(false,0);
  if(p.dt>0){p.dt--;ultCharge=0;if(++p.regen>=120){p.regen=0;n.hp=Math.min(n.maxHp,n.hp+1);}}
- if(p.attack&&!p.attack.sword&&!p.attack.balrog&&!p.attack.cavaliere&&!p.attack.cerberus&&!p.attack.ebony&&!p.attack.faust&&!p.attack.royal&&playerAttackStep(p.attack,DANTE_ATTACK_RATE)){const a=p.attack;a.age++;
+ if(p.attack&&!p.attack.gil&&!p.attack.sword&&!p.attack.balrog&&!p.attack.cavaliere&&!p.attack.cerberus&&!p.attack.ebony&&!p.attack.faust&&!p.attack.royal&&playerAttackStep(p.attack,DANTE_ATTACK_RATE)){const a=p.attack;a.age++;
   if(a.kind==='slam'&&!n.grounded){a.age=Math.min(a.age,a.wind);n.dy=Math.max(n.dy,9);}
   if(a.age>=a.wind+1&&(a.age-a.wind-1)%a.interval===0&&a.pulses>0){dantePulse(n,p,a);a.pulses--;}
   if(a.kind==='slam'&&!n.grounded)n.dy=Math.max(n.dy,9);
@@ -109713,7 +109713,7 @@ const styleUIBase=drawUI;
 drawUI=function(){
  styleUIBase();if(!danteOn()||!dino?.dante)return;
  const p=dino.dante,s=danteStyleState(p);ctx.save();if(dojoMode)ctx.translate(0,15);ctx.fillStyle='#1c1119';ctx.fillRect(15,72,275,18);ctx.fillRect(15,151,275,22);ctx.textAlign='left';ctx.font='11px Consolas,monospace';ctx.fillStyle='#e6e5ff';ctx.fillText('I/O: '+DANTE_STYLES[danteStyle()],20,85);
- const info=danteStyle()===2?'RG '+s.bank+(s.bank>=DANTE_ROYAL_WAVE?' · WAVE READY':' · WAVE AT 30')+' · Dash L':danteStyle()===3?'TRICKSTER · Crouch → Jump: RISE':danteStyle()===0?'PHANTOM SWORDS: '+danteSwordCount():'RED BULLETS · STRONG SHOTS +';
+ const info=danteStyle()===2?'RG '+s.bank+(s.bank>=DANTE_ROYAL_WAVE?' · WAVE READY':' · WAVE AT 30')+' · Dash L':danteStyle()===3?'TRICKSTER · Crouch → Jump: RISE':danteStyle()===0?(p.arm===0&&typeof danteSwordVariant!=='undefined'&&danteSwordVariant!=='dsd'&&!danteSin(p)?(danteSwordVariant==='rebellion'?'REBELLION · SWORDMASTER COMBOS':'SPARDA · SWORD / SCYTHE / SPEAR'):'PHANTOM SWORDS: '+danteSwordCount()):'RED BULLETS · STRONG SHOTS +';
  ctx.fillText(info,20,165);ctx.restore();
 };
 const styleMenuBase=drawCustomMenu;
@@ -115397,7 +115397,7 @@ function danteOrderPanel(){
  danteOrderClose=closePanel;
  for(const type of ['pointerdown','pointerup','click'])panel.addEventListener(type,e=>e.stopPropagation());
  const watch=()=>{if(panel.dataset.open!=='yes')return;if(gameState!==openedState||dojoMode!==openedDojo||!danteOn()){closePanel();return;}requestAnimationFrame(watch);};requestAnimationFrame(watch);
- const title=document.createElement('div');title.textContent='DANTE · THỨ TỰ VŨ KHÍ / STANCE';panel.appendChild(title);
+ const title=document.createElement('div');title.textContent='DANTE · TRANG BỊ / THỨ TỰ';panel.appendChild(title);
  const hint=document.createElement('p');hint.textContent='Kéo thả để sắp xếp. Ô đầu tiên dùng khi bắt đầu trận. Thứ tự vòng tròn: Q / I lùi, E / O tiến.';panel.appendChild(hint);
  for(const kind of ['arms','styles']){
   const label=document.createElement('p');label.textContent=kind==='arms'?'Vũ khí · Q / E':'Stance · I / O';panel.appendChild(label);
@@ -118294,6 +118294,348 @@ SiegeGoliathBoss.prototype.drawBody=function(){SummitArt.machine(this);};
 const tick=MountainGodBoss.prototype.update;
  MountainGodBoss.prototype.update=function(){this._mgWriting=true;try{return tick.apply(this,arguments);}finally{this._mgWriting=false;}};
 })();
+
+</script>
+<script>
+// Dante weapon variants are equipment, independent of Q/E weapon order.
+let danteSwordVariant='dsd';
+try{const v=localStorage.getItem('dante_sword_variant');if(['dsd','rebellion','sparda'].includes(v))danteSwordVariant=v;}catch(_){}
+const DANTE_SWORD_VARIANTS={dsd:{name:'DEVIL SWORD DANTE',desc:'Swordmaster: Sword Formation — kiếm ảo nối theo đòn đánh.'},rebellion:{name:'REBELLION',desc:'Swordmaster: chém xuống → ngang → bổ mạnh. J–K–K: quét kép → đâm liên hoàn; J–J, ngắt nhịp, J: đâm kết liễu.'},sparda:{name:'SPARDA',desc:'Swordmaster: chém bằng kiếm (+1 sát thương), xoay thành lưỡi hái (+25% tầm), đâm thành giáo (+35% tầm). Không có Sword Formation.'}};
+function danteVariantSelect(v){
+ if(!DANTE_SWORD_VARIANTS[v])return;danteSwordVariant=v;try{localStorage.setItem('dante_sword_variant',v);}catch(_){}
+ if(dino?.dante){const p=dino.dante;if(p.arm===0){if(typeof dswCancel==='function')dswCancel(p);p.attack=null;p.cd=0;p.k=null;const s=dswState(p);s.round=null;s.waves=[];s.queue=[];s.trail=[];s.pose=null;}danteStyleState(p).swords=[];}
+}
+function danteVariantOptions(panel){
+ const title=document.createElement('p');title.textContent='BIẾN THỂ KIẾM · Trang bị riêng của Dante';panel.appendChild(title);
+ const row=document.createElement('div');row.style.cssText='display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px';panel.appendChild(row);
+ const desc=document.createElement('p');desc.style.cssText='line-height:1.5;color:#d8cbd1;max-width:640px';panel.appendChild(desc);
+ const buttons=[];
+ function refresh(){for(const [v,b] of buttons){b.style.borderColor=v===danteSwordVariant?'#ffd294':'#62515f';b.style.background=v===danteSwordVariant?'#6c3547':'#29232e';b.setAttribute('aria-pressed',String(v===danteSwordVariant));}desc.textContent=DANTE_SWORD_VARIANTS[danteSwordVariant].desc;}
+ for(const [v,info] of Object.entries(DANTE_SWORD_VARIANTS)){
+  const button=document.createElement('button');button.style.cssText='padding:10px;border:2px solid;border-radius:8px;color:white;min-width:160px;touch-action:manipulation';
+  const preview=document.createElement('canvas');preview.width=150;preview.height=70;const g=preview.getContext('2d');g.save();g.translate(25,35);g.scale(.9,.9);danteVariantBlade(g,v,'sword',100);g.restore();button.appendChild(preview);
+  const label=document.createElement('div');label.textContent=info.name;button.appendChild(label);button.onclick=()=>{danteVariantSelect(v);refresh();};row.appendChild(button);buttons.push([v,button]);
+ }refresh();
+}
+function danteVariantBlade(g,type,shape,len){
+ const poly=(pts,c)=>{g.beginPath();pts.forEach((p,i)=>i?g.lineTo(...p):g.moveTo(...p));g.closePath();g.fillStyle=c;g.fill();g.strokeStyle='#211c29';g.lineWidth=1.2;g.stroke();};
+ const line=(pts,c,w)=>{g.beginPath();pts.forEach((p,i)=>i?g.lineTo(...p):g.moveTo(...p));g.strokeStyle=c;g.lineWidth=w;g.stroke();};
+ g.lineJoin='round';g.fillStyle='#30232b';g.fillRect(-19,-3,20,6);for(let i=0;i<5;i++)line([[-17+i*3,-3],[-15+i*3,3]],'#b4a199',1);
+ if(type==='dsd'){poly([[0,-10],[14,-6],[len*.5,-10],[len,-1],[len*.5,9],[12,6],[0,11],[5,0]],'#6a4148');line([[7,0],[len-5,0]],'#ff7273',3);return;}
+ if(type==='rebellion'){
+  poly([[5,-5],[len*.8,-4],[len,0],[len*.8,5],[5,5]],'#bac1c9');poly([[9,0],[len,0],[len*.8,5],[9,5]],'#66717f');line([[14,-2],[len*.81,-2]],'#f2eee6',1);
+  poly([[-2,-5],[-7,-19],[1,-12],[7,-8],[7,8],[1,12],[-7,19],[-2,5]],'#c9c3ae');
+  poly([[-5,-7],[1,-10],[6,-5],[5,5],[0,9],[-5,6]],'#e6e0cc');g.fillStyle='#272332';g.fillRect(-3,-4,3,3);g.fillRect(2,-4,3,3);line([[0,3],[0,7]],'#51454a',1);poly([[-22,-4],[-27,0],[-22,4],[-18,0]],'#d7d0bf');return;
+ }
+ // Sparda: organic ribbed core and asymmetrical hooked cutting edges.
+ poly([[-5,-8],[0,-17],[8,-12],[17,-4],[15,9],[4,18],[-3,10],[5,1]],'#c2a584');
+ if(shape==='spear'){
+  poly([[9,-3],[len*.68,-3],[len*.8,-13],[len,0],[len*.8,13],[len*.68,3],[9,3]],'#743f63');poly([[len*.72,0],[len,0],[len*.8,13]],'#cfb2ca');line([[13,0],[len*.85,0]],'#e2b1d3',2);
+ }else if(shape==='scythe'){
+  poly([[9,-4],[len*.74,-4],[len*.88,-31],[len,-35],[len*.96,-12],[len*.78,17],[len*.52,31],[len*.27,34],[len*.52,22],[len*.67,6],[9,4]],'#8c567a');
+  poly([[len,-35],[len*.96,-12],[len*.78,17],[len*.52,31],[len*.27,34],[len*.55,25],[len*.8,9]],'#e7c9d7');
+ }else{
+  // Single-edged dao: thick organic spine, broad belly and upswept tip.
+  poly([[7,-6],[len*.22,-9],[len*.38,-7],[len*.57,-8],[len*.76,-12],[len*.9,-21],[len,-32],[len*.96,-9],[len*.85,10],[len*.68,20],[len*.47,23],[len*.25,19],[len*.12,10],[7,6]],'#79435f');
+  poly([[7,6],[len*.25,12],[len*.47,16],[len*.68,13],[len*.85,4],[len*.96,-13],[len,-32],[len*.96,-9],[len*.85,10],[len*.68,20],[len*.47,23],[len*.25,19],[len*.12,10]],'#e8cbd8');
+  line([[12,-4],[len*.38,-3],[len*.58,-4],[len*.77,-9],[len*.9,-18]],'#3e263f',3);
+  line([[len*.26,17],[len*.47,21],[len*.67,18],[len*.83,9]],'#fff0e8',1);
+
+ }
+ for(let i=0;i<5;i++){const x=13+i*len*.09;line([[x,-4],[x+5,1],[x+1,6]],'#d5b8a7',2);}g.fillStyle='#ed9bce';g.beginPath();g.ellipse(7,0,5,3,0,0,7);g.fill();
+}
+(()=>{
+ const sm=p=>danteSwordVariant!=='dsd'&&danteStyle(p)===0&&!danteSin(p);
+ const start=dswStart;dswStart=function(id,extra={}){start(id,extra);const p=dino?.dante,a=p?.attack;if(!a?.sword||!sm(p))return;
+  if(danteSwordVariant==='rebellion'){
+   const changes={a1:{name:'REBELLION · DOWN',T:22,wind:5,end:14,pose:'down'},a2:{name:'REBELLION · CROSS',T:23,wind:5,end:15,pose:'cross'},a3:{name:'REBELLION · FINISH',T:31,wind:9,end:21,pose:'down',damage:5,push:9},bspin:{name:'REBELLION · DOUBLE CUT',T:32,wind:4,end:26,pose:'spin',hits:[8,22],damage:3},bstab:{name:'REBELLION · RAPID THRUST',T:30,wind:2,end:27,pose:'stab',count:5,damage:1}};
+   if(changes[id]){Object.assign(a,changes[id]);a.duration=a.T;}
+  }else{a.spardaShape=['stab','thrust'].includes(a.pose)?'spear':['spin','prop','shred'].includes(a.pose)?'scythe':'sword';a.rangeScale=a.spardaShape==='spear'?1.35:a.spardaShape==='scythe'?1.25:1;if(a.spardaShape==='sword'&&a.damage>0&&!a.waves)a.damage+=1;}
+ };
+ const dispatch=dswDispatch;dswDispatch=function(cmd){const p=dino?.dante;if(p&&sm(p)&&danteSwordVariant==='rebellion'&&p.cd<=0&&!dino.isShielding()&&cmd.key==='J'&&!cmd.down&&!cmd.dash&&dino.grounded){const s=dswState(p),dt=frames-s.ended;if(s.last==='a2'&&dt>=12&&dt<=35){dswStart('thrust');p.attack.name='REBELLION · DELAYED THRUST';return;}}return dispatch(cmd);};
+ const pose=dswPose;dswPose=function(n,a,age){const v=pose(n,a,age);if(a?.rangeScale){v.len*=a.rangeScale;v.tx=v.x+v.dir*Math.cos(v.angle)*v.len;v.ty=v.y+Math.sin(v.angle)*v.len*v.flat;}return v;};
+ const blade=dswPaintBlade;dswPaintBlade=function(x,y,angle,len,red,flat=1){const p=dino?.dante;if(!danteOn()||p?.arm!==0||danteSwordVariant==='dsd'||danteSin(p))return blade.apply(this,arguments);ctx.save();ctx.translate(x,y);ctx.scale(1,flat);ctx.rotate(angle);danteVariantBlade(ctx,danteSwordVariant,p.attack?.spardaShape||'sword',len);ctx.restore();};
+ const formation=danteSwordStart;danteSwordStart=function(){const p=dino?.dante;if(p?.arm===0&&danteSwordVariant!=='dsd'&&!danteSin(p)){danteStyleState(p).swords=[];return;}return formation.apply(this,arguments);};
+ const tick=danteSwordsTick;danteSwordsTick=function(n,p,s){if(p.arm===0&&danteSwordVariant!=='dsd'&&!danteSin(p)){s.swords=[];return;}return tick.apply(this,arguments);};
+ const ui=drawUI;drawUI=function(){ui.apply(this,arguments);if(!danteOn()||!dino?.dante||dino.dante.arm!==0||danteSin(dino.dante))return;ctx.save();if(dojoMode)ctx.translate(0,15);ctx.fillStyle='#1c1119';ctx.fillRect(16,46,280,24);ctx.fillStyle='#ffb4bd';ctx.font='bold 12px sans-serif';ctx.textAlign='left';ctx.fillText('DANTE · '+DANTE_SWORD_VARIANTS[danteSwordVariant].name,20,64);ctx.restore();};
+})();
+
+</script>
+<script>
+// Rebellion Swordmaster: explicit input branches and the DMC3 Crazy Dance finish.
+(()=>{
+ const live=()=>danteOn()&&dino?.dante?.arm===0&&danteSwordVariant==='rebellion'&&danteStyle(dino.dante)===0&&!danteSin(dino.dante);
+ Object.assign(DSW_MOVES,{
+  rcross:{name:'REBELLION · CROSS CUTS',T:34,wind:4,end:27,damage:2,pose:'cross',hits:[10,24],advance:5},
+  rrise:{name:'REBELLION · RISING CUT',T:26,wind:5,end:18,damage:3,pose:'up',launch:true},
+  rpierce:{name:'SWORD PIERCE',T:26,wind:7,end:19,damage:0,pose:'thrust'},
+  dpole:{name:'CRAZY DANCE · THREE REVOLUTIONS',T:84,wind:12,end:72,damage:2,pose:'pole',hits:[17,27,37,47,57,67]},
+  dlift:{name:'CRAZY DANCE · DRAW SWORD',T:16,wind:5,end:13,damage:0,pose:'up'}
+ });
+ DANTE_SWORD_VARIANTS.rebellion.desc='Swordmaster: JJJ chém xuống–ngang–bổ; JKKK quét kép–đâm nhanh–đâm mạnh. JJK → K → K: chém kép–hất lên–đâm nhanh. Cúi K: Sword Pierce. Dash K, giữ/nhấn K nối Dance Macabre → 2 Drive → Crazy Dance 3 vòng → rút kiếm chém rộng. Không cần ngắt nhịp.';
+ const dispatch=dswDispatch;
+ dswDispatch=function(cmd){
+  if(live()){
+   const n=dino,p=n.dante,s=dswState(p),last=frames-s.ended<=35?s.last:'';
+   if(n.isShielding()||p.cd>0)return;
+   if(cmd.key==='K'&&cmd.down&&!cmd.air){if(s.rPierce)s.rPierce.returning=true;else dswStart('rpierce');return;}
+   if(!cmd.down&&!cmd.dash&&!cmd.air&&cmd.key==='K'){
+    if(last==='a2'){dswStart('rcross');return;}
+    if(last==='rcross'){dswStart('rrise');return;}
+    if(last==='rrise'){dswStart('bstab');return;}
+   }
+   if(cmd.key==='J'&&!cmd.down&&!cmd.dash&&!cmd.air&&n.grounded&&last==='a2'){dswStart('a3');return;}
+  }
+  return dispatch(cmd);
+ };
+ // These branches use immediate K taps, not the neutral K charge gate.
+ const key=danteKey;
+ danteKey=function(code,repeat){
+  if(live()&&code==='KeyK'&&!repeat&&!paused&&!gameOver&&!gameVictory){const p=dino.dante,s=dswState(p),a=p.attack,last=a?.id||(frames-s.ended<=35?s.last:'');
+   if(['rcross','rrise','dpole','dlift'].includes(last)){keys.KeyK=true;dswCommand({key:'K',down:!!(keys.KeyS||keys.ArrowDown),air:!dino.grounded,dash:false});return true;}}
+  return key.apply(this,arguments);
+ };
+ const command=dswCommand;dswCommand=function(cmd){if(live()&&['dpole','dlift'].includes(dino.dante.attack?.id)&&cmd.key==='K')return;return command(cmd);};
+ const start=dswStart;dswStart=function(id,extra={}){
+  const active=live();if(active&&id!=='rpierce'&&dswState(dino.dante).rPierce)dswState(dino.dante).rPierce=null;
+  start(id,extra);const a=dino?.dante?.attack;if(!active||!a)return;
+  if(id==='dpole'){dashVx=0;a.poleX=dino.x+dino.w/2;a.poleY=dino.y+dino.h;}
+  if(id==='dfinish'){a.damage=5;a.rangeScale=1.3;a.wind=10;a.end=24;a.T=a.duration=34;a.advance=0;a.push=26;}
+ };
+ const finish=dswFinish;dswFinish=function(p,a){
+  if(live()){
+   if(a.id==='dwave2'){dswStart('dpole');return;}
+   if(a.id==='dpole'){dswStart('dlift',{poleX:a.poleX,poleY:a.poleY});return;}
+   if(a.id==='dlift'){dswStart('dfinish');return;}
+  }return finish(p,a);
+ };
+ // Double cut uses two opposed arcs, with a recovery between the two contact frames.
+ const pose=dswPose;dswPose=function(n,a,age){
+  if(a?.id==='rcross'){
+   const second=age>=17,v=pose(n,{...a,wind:second?18:4,end:second?27:13},age);
+   if(second){v.angle=-v.angle;v.tx=v.x+v.dir*Math.cos(v.angle)*v.len;v.ty=v.y+Math.sin(v.angle)*v.len*v.flat;}return v;
+  }return pose(n,a,age);
+ };
+ const strike=dswStrike;dswStrike=function(n,p,a,pulse,prev){
+  if(['rpierce','dlift'].includes(a.id))return;
+  if(a.id!=='dpole')return strike(n,p,a,pulse,prev);
+  // Each half-turn sweeps one side, with the foot radius equal to character height.
+  const side=pulse%2===0?1:-1,r=n.h,cx=a.poleX,cy=a.poleY-n.h*.42;
+  const box={x:side>0?cx:cx-r,y:cy-18,w:r,h:36};
+  for(const o of sgTargets(n)){const root=o.__goc||o;if(a.hit.get(root)===pulse||!checkAABB(box,o))continue;
+   if(danteHit(p,o,a.damage+(p.dt?2:0))>0){a.hit.set(root,pulse);if(danteControlAllowed(root)){dswControl(o,{push:0});if(root._dswControl)root._dswControl.stun=Math.max(root._dswControl.stun,14);}}}
+ };
+ const tick=dswTick;dswTick=function(n,p){
+  tick(n,p);const s=dswState(p),a=p.attack;
+  if(live()&&a?.id==='rpierce'&&a.age>=8&&!a.released){a.released=true;s.rPierce={x:n.x+n.w/2,y:n.y+26,dir:a.dir,t:0,hit:new Set(),returning:false};}
+  const r=s.rPierce;if(!r)return;
+  if(!danteActive(n)||n.hp<=0||danteSwordVariant!=='rebellion'||danteSin(p)){s.rPierce=null;return;}
+  r.t++;if(r.t>72)r.returning=true;
+  if(r.returning){const dx=n.x+n.w/2-r.x,dy=n.y+26-r.y,d=Math.hypot(dx,dy);if(d<22){s.rPierce=null;return;}r.x+=dx/d*20;r.y+=dy/d*20;}
+  else if(r.target&&r.target.hp>0){r.x=r.target.x+r.target.w/2;r.y=r.target.y+r.target.h*.45;}
+  else{r.target=null;r.x+=r.dir*13;if(r.t>24)r.returning=true;}
+  if(!r.returning)for(const o of sgTargets(n)){const root=o.__goc||o;if(r.hit.has(root)||!checkAABB({x:r.x-30,y:r.y-12,w:60,h:24},o))continue;
+   if(danteHit(p,o,4+(p.dt?2:0))>0){r.hit.add(root);r.target=o;if(danteControlAllowed(root)){dswControl(o,{push:0});if(root._dswControl)root._dswControl.stun=Math.max(root._dswControl.stun,18);}break;}}
+ };
+ // A planted sword is static; the body orbits it, rather than spinning the blade.
+ function poleDraw(n,a){
+  const cx=a.poleX??n.x+n.w/2,ground=a.poleY??n.y+n.h,H=n.h;
+  const spin=a.id==='dpole',t=a.age,q=spin?Math.max(0,Math.min(1,(t-12)/60)):1;
+  const blend=spin?Math.min(1,t/12,(84-t)/12):0,phase=q*Math.PI*6-Math.PI/2;
+  const projection=Math.cos(phase),sx=Math.abs(projection)<.12?(projection<0?-.12:.12):projection;
+  const gripY=ground-H*.86;
+  const b={...n.dante.body,arms:3,_swordCustom:true,_swordLean:0,_swordLunge:0,_swordTurn:1,_gunRoll:0,_faustLegs:null,_cavRide:0,_gil:false,_sin:false,walk:0,grounded:true,facingLeft:false};
+  const sword=()=>{ctx.save();ctx.translate(cx,gripY-(spin?0:t*.8));ctx.rotate(Math.PI/2);danteVariantBlade(ctx,'rebellion','sword',H*.86);ctx.restore();};
+  ctx.save();if(n.invincible&&frames%6<3)ctx.globalAlpha=.5;
+  if(Math.sin(phase)<0)sword();
+  ctx.save();ctx.translate(cx,gripY);ctx.scale(1-blend+sx*blend,1);ctx.rotate(-Math.PI/2*blend);ctx.scale(n.w/DT_W,H/DT_H);
+  drawDantePlayerBody(b,-DT_W/2,-18);
+  // Both hands remain on the planted grip while the existing torso and boots orbit.
+  dswPaintArmIK(-9,2,0,-4,1);dswPaintArmIK(9,2,0,4,-1);
+  ctx.restore();if(Math.sin(phase)>=0)sword();
+  if(spin&&t>12&&t<73){ctx.strokeStyle='#e5dfd34d';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(cx,ground-H*.42,H,H*.17,0,phase-.65,phase+.4);ctx.stroke();}
+  ctx.restore();
+ }
+ const draw=danteDraw;danteDraw=function(n){const p=n.dante,a=p?.attack;if(live()&&['dpole','dlift'].includes(a?.id)){poleDraw(n,a);return;}draw(n);const r=p?.sword?.rPierce;if(r){ctx.save();ctx.translate(r.x,r.y);ctx.scale(r.dir,1);danteVariantBlade(ctx,'rebellion','sword',78);ctx.restore();}};
+ const blade=dswPaintBlade;dswPaintBlade=function(){if(live()&&dino.dante.sword?.rPierce)return;return blade.apply(this,arguments);};
+ const select=danteVariantSelect;danteVariantSelect=function(v){if(dino?.dante?.sword)dino.dante.sword.rPierce=null;return select(v);};
+})();
+
+</script>
+<script>
+let danteGauntletVariant='balrog';
+try{if(localStorage.getItem('dante_gauntlet_variant')==='gilgamesh')danteGauntletVariant='gilgamesh';}catch(_){}
+function gilLive(){return danteOn()&&dino?.dante?.arm===1&&danteGauntletVariant==='gilgamesh'&&!danteSin(dino.dante);}
+function gilState(p){return p.gil||(p.gil={charge:null,queue:[],last:'',ended:-100,lastDash:-100,kDash:false,fx:[]});}
+function gilSelect(v){if(!['balrog','gilgamesh'].includes(v))return;danteGauntletVariant=v;try{localStorage.setItem('dante_gauntlet_variant',v);}catch(_){}if(dino?.dante){const p=dino.dante;if(p.arm===1){p.attack=null;p.k=null;p.cd=0;if(p.balrog){p.balrog.queue=[];p.balrog.holdJ=0;p.balrog.ignite=0;p.balrog.waves=[];p.balrog.punchArcs=[];p.balrog.sparks=[];}p.gil=null;}}}
+PLAYER_FINISH_ROUTES.gilgamesh=[['g1','g2','g3','g4'],['kick','kick13'],['rising','fullhouse'],['divine','fullhouse']];
+const GIL_MOVES={
+ g1:{name:'GILGAMESH · STRAIGHT PUNCH',T:25,wind:7,end:17,damage:3,pose:'punch',hits:[10]},
+ g2:{name:'GILGAMESH · BACKHAND',T:28,wind:8,end:20,damage:3,pose:'backhand',hits:[12]},
+ g3:{name:'GILGAMESH · BODY BLOW',T:30,wind:9,end:21,damage:4,pose:'body',hits:[13]},
+ g4:{name:'GILGAMESH · HEAVY FINISH',T:38,wind:12,end:27,damage:5,pose:'heavy',hits:[17],push:15},
+ kick:{name:'GILGAMESH · ROUNDHOUSE',T:30,wind:7,end:22,damage:4,pose:'kick',hits:[13]},
+ straight:{name:'STRAIGHT',T:32,wind:9,end:23,damage:5,pose:'heavy',hits:[14],push:14,advance:12},
+ kick13:{name:'KICK 13',T:66,wind:6,end:59,damage:1,pose:'rapidkick',hits:[9,13,17,21,25,29,33,37,41,45,49,53,57],push:0},
+ beast:{name:'BEAST UPPERCUT',T:29,wind:8,end:20,damage:4,pose:'upper',hits:[12],launch:true},
+ rising:{name:'RISING DRAGON',T:39,wind:8,end:29,damage:4,pose:'upper',hits:[12,22],launch:true},
+ divine:{name:'DIVINE DRAGON',T:56,wind:9,end:46,damage:3,pose:'dragon',hits:[13,23,33,43],launch:true},
+ fullhouse:{name:'FULL HOUSE',T:33,wind:6,end:25,damage:5,pose:'dive',hits:[13],push:10},
+ shock:{name:'SHOCK',T:38,wind:11,end:27,damage:5,pose:'slam',hits:[18],slam:true},
+ impact:{name:'REAL IMPACT',T:54,wind:20,end:43,damage:5,pose:'upper',hits:[25,37],launch:true}
+};
+function gilStart(id,level=0){const p=dino.dante,g=gilState(p),m=GIL_MOVES[id];if(!m||dino.hp<=0)return;p.k=null;p.cd=0;p.attack={...m,id,gil:true,age:0,duration:m.T,cancel:m.end+2,dir:dino.isFacingLeft?-1:1,level,damage:m.damage+(id==='kick13'?0:level*2),hit:new Map()};playerComboTrack(p,p.attack,'gilgamesh');danteLabel(m.name+(level?' · CHARGE '+level:''));g.charge=null;}
+function gilDispatch(c){const n=dino,p=n.dante,g=gilState(p),last=frames-g.ended<70?g.last:'';if(n.isShielding()||frames<(p.swapReady||0))return;
+ if(c.dragon){gilStart(c.level>=2?'divine':c.level>=1?'rising':'beast',0);return;}
+ if(c.key==='J'){gilStart(c.down?'impact':c.dash?'straight':!n.grounded?'fullhouse':last==='g1'?'g2':last==='g2'?'g3':last==='g3'?'g4':'g1',c.level||0);return;}
+ gilStart(!n.grounded?'fullhouse':c.down?'shock':c.dash&&g.kDash?'kick13':c.dash?'straight':'kick');g.kDash=false;
+}
+function gilCommand(c){const p=dino.dante,g=gilState(p),a=p.attack;if(a){if(a.gil&&a.age>=a.cancel){g.last=a.id;g.ended=frames;p.attack=null;}else{if(g.queue.length<2)g.queue.push(c);return;}}gilDispatch(c);}
+function gilReleaseCharge(dragon=false){const g=gilState(dino.dante),c=g.charge;if(!c)return;g.charge=null;gilCommand({...c,key:'J',level:c.t>=90?2:c.t>=36?1:0,dragon});}
+function gilHit(n,p,a,index){const dir=a.dir,reach=a.pose==='rapidkick'?76:a.pose==='dive'?75:62;
+ const box=a.id==='shock'?{x:n.x+n.w/2-92,y:n.y+n.h-24,w:184,h:42}:{x:dir>0?n.x+n.w/2-8:n.x+n.w/2-reach,y:n.y+(a.launch?-45:0),w:reach+8,h:n.h+(a.launch?50:0)};
+ for(const o of sgTargets(n)){const root=o.__goc||o;if(a.hit.get(root)===index||!checkAABB(box,o))continue;if(danteHit(p,o,a.damage+(p.dt?2:0),0)>0){a.hit.set(root,index);if(danteControlAllowed(root)){const final=a.id==='kick13'&&index===12;dswControl(o,{launch:a.launch,slam:a.slam,push:(final?15:a.push||0)*dir});if(root._dswControl)root._dswControl.stun=Math.max(root._dswControl.stun, a.id==='kick13'?8:14);}}}
+ gilState(p).fx.push({x:n.x+n.w/2+dir*(a.id==='shock'?0:45),y:n.y+(a.launch?8:30),t:12,r:a.level?30:19,dir,shock:a.id==='shock'});
+}
+function gilTick(n,p){const g=gilState(p);g.fx=g.fx.filter(f=>--f.t>0);
+ if(!gilLive()){g.charge=null;g.queue=[];if(p.attack?.gil)p.attack=null;return;}
+ if(n.hp<=0||n.isShielding()){g.charge=null;g.queue=[];if(p.attack?.gil)p.attack=null;return;}
+ if(g.charge){if(keys.KeyJ)g.charge.t=Math.min(120,g.charge.t+1);else gilReleaseCharge();}
+ const a=p.attack;if(a?.gil&&playerAttackStep(a,DANTE_ATTACK_RATE)){
+  a.age++;if(a.advance&&a.age===a.wind)dashVx=a.dir*a.advance;
+  if(['rising','divine'].includes(a.id)&&a.age===a.wind+1){n.dy=a.id==='divine'?-13:-10;n.grounded=false;n.jumpCount=Math.max(1,n.jumpCount||0);}
+  if(a.id==='fullhouse'&&a.age>a.wind&&a.age<a.end){dashVx=a.dir*9;n.dy=Math.max(n.dy,7);}
+  const index=a.hits.indexOf(a.age);if(index>=0)gilHit(n,p,a,index);
+  if(a.age>=a.T||(g.queue.length&&a.age>=a.cancel)){g.last=a.id;g.ended=frames;p.attack=null;if(g.queue.length)gilDispatch(g.queue.shift());}
+ }
+ if(!p.attack&&g.queue.length)gilDispatch(g.queue.shift());
+ const act=p.attack?.gil?p.attack:null,charge=g.charge;
+ p.body._swordCustom=true;p.body._swordTurn=act?.pose==='dragon'?Math.cos(Math.max(0,act.age-act.wind)*.22):1;p.body._swordLean=charge?.16:act?.pose==='heavy'?.22:act?.launch?-.15:0;p.body._swordLunge=0;p.body._faustLegs=null;
+}
+(()=>{
+ const key=danteKey;danteKey=function(code,repeat){if(!gilLive())return key.apply(this,arguments);const p=dino.dante,g=gilState(p);
+  if(['KeyJ','KeyK'].includes(code)){keys[code]=true;if(repeat||paused||gameOver||gameVictory)return true;
+   const c={down:!!(keys.KeyS||keys.ArrowDown),dash:frames-g.lastDash<=26,t:0};
+   if(code==='KeyJ'){if(!g.charge)g.charge=c;}else gilCommand({...c,key:'K'});return true;}
+  if(['Space','KeyW','ArrowUp'].includes(code)&&g.charge&&!repeat&&!paused){keys[code]=false;gilReleaseCharge(true);return true;}
+  if(code==='KeyL'){g.charge=null;g.queue=[];if(p.attack?.gil)p.attack=null;}
+  return key.apply(this,arguments);
+ };
+ const tick=danteTick;danteTick=function(){tick();if(danteActive(dino)&&dino.dante)gilTick(dino,dino.dante);};
+ const bt=blrTick;blrTick=function(n,p){if(gilLive()){return;}return bt(n,p);};
+ const dash=doDash;doDash=function(){const before=dashCd,live=gilLive(),g=live?gilState(dino.dante):null,prev=live?(dino.dante.attack?.id||g.last):'';const r=dash.apply(this,arguments);if(live&&dashCd>before){g.lastDash=frames;g.kDash=['kick','kick13'].includes(prev);g.charge=null;g.queue=[];if(dino.dante.attack?.gil)dino.dante.attack=null;}return r;};
+ const damage=Player.prototype.takeDamage;Player.prototype.takeDamage=function(){const hp=this.hp,r=damage.apply(this,arguments);if(this===dino&&this.hp<hp&&this.dante?.gil){this.dante.gil.charge=null;this.dante.gil.queue=[];if(this.dante.attack?.gil)this.dante.attack=null;}return r;};
+ window.addEventListener('blur',()=>{if(dino?.dante?.gil){dino.dante.gil.charge=null;dino.dante.gil.queue=[];}});
+})();
+function gilDraw(n){
+ const p=n.dante,g=gilState(p),a=p.attack?.gil?p.attack:null,dir=a?.dir||(n.isFacingLeft?-1:1),cx=n.x+n.w/2;
+ const b={...p.body,arms:1,_gil:true,_sin:false};ctx.save();ctx.translate(n.x,n.y);ctx.scale(n.w/DT_W,n.h/DT_H);drawDantePlayerBody(b,0,0);ctx.restore();
+ const charge=g.charge,level=charge?charge.t>=90?2:charge.t>=36?1:0:a?.level||0;
+ const phase=a?Math.max(0,Math.min(1,(a.age-a.wind)/(a.end-a.wind))):0,extend=Math.sin(Math.PI*phase);
+ let rx=16,ry=25,lx=8,ly=19,kx=8,ky=n.h-3,backx=-8,backy=n.h-3;
+ if(charge){rx=-6;ry=30;lx=15;ly=20;}
+ else if(a){
+  if(['punch','body','heavy'].includes(a.pose)){rx=13+25*extend;ry=a.pose==='body'?34:24;lx=6-10*extend;ly=20;}
+  if(a.pose==='backhand'){lx=10+27*extend;ly=22;rx=8;ry=27;}
+  if(['upper','dragon'].includes(a.pose)){rx=12+14*Math.sin(phase*Math.PI);ry=36-48*phase;lx=4;ly=25;}
+  if(['kick','rapidkick','dive'].includes(a.pose)){const e=a.pose==='rapidkick'?Math.abs(Math.sin((a.age-7)*Math.PI/4)):extend;kx=8+46*e;ky=n.h-3-(a.pose==='dive'?12:32)*e;rx=2;ry=20;lx=-8;ly=25;}
+  if(a.pose==='slam'){rx=16;ry=6+42*phase;lx=10;ly=10+38*phase;}
+ }
+ const armor=(x,y,angle,size)=>{ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.fillStyle='#353a48';ctx.strokeStyle='#181922';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(-size,-6);ctx.lineTo(size-3,-8);ctx.lineTo(size+5,-3);ctx.lineTo(size+5,5);ctx.lineTo(-size,7);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#a4aab4';ctx.fillRect(-size+2,-4,size*1.5,3);ctx.fillStyle=level===2?'#fff3b5':'#d5b77d';ctx.fillRect(0,-3,3,7);for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(-size+2+i*5,-6);ctx.lineTo(-size+4+i*5,-12);ctx.lineTo(-size+6+i*5,-6);ctx.fill();}ctx.restore();};
+ const limb=(pts,color,w)=>{ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.strokeStyle='#1d1b26';ctx.lineWidth=w+2;ctx.stroke();ctx.strokeStyle=color;ctx.lineWidth=w;ctx.stroke();};
+ ctx.save();ctx.translate(cx,n.y);ctx.scale(dir,1);
+ limb([[-5,40],[-8,49],[backx,backy]],'#2b2d38',8);armor(backx,backy-3,0,8);
+ limb([[5,40],[kx*.5+4,(ky+40)/2-3],[kx,ky]],'#343742',8);armor(kx,ky-3,-extend*.3,10);
+ const arm=(sx,sy,tx,ty)=>{const j=danteArmJoints(sx,sy,tx,ty,1);limb([[sx,sy],[j.ex,j.ey],[j.wx,j.wy]],'#a62430',7);armor(j.wx,j.wy,Math.atan2(j.wy-j.ey,j.wx-j.ex),10);};
+ arm(-6,20,lx,ly);arm(8,20,rx,ry);
+ if(charge){const r=9+level*5;ctx.strokeStyle=level===2?'#fff1b2':'#c7a77c';ctx.lineWidth=2;ctx.beginPath();ctx.arc(rx,ry,r,frames*.14,frames*.14+Math.PI*1.6);ctx.stroke();ctx.fillStyle='#e8c784';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(level===2?'MAX':Math.floor(charge.t/90*100)+'%',0,-12);}
+ ctx.restore();
+ for(const f of g.fx){ctx.save();ctx.globalAlpha=f.t/12;ctx.strokeStyle='#eddbb6';ctx.lineWidth=2+f.t/6;ctx.beginPath();if(f.shock)ctx.ellipse(f.x,n.y+n.h,92*(1-f.t/15),14,0,0,Math.PI*2);else ctx.arc(f.x,f.y,f.r*(1.7-f.t/12),0,Math.PI*2);ctx.stroke();ctx.restore();}
+}
+(()=>{const draw=danteDraw;danteDraw=function(n){if(n===dino&&gilLive()){gilDraw(n);return;}return draw(n);};
+ const ui=drawUI;drawUI=function(){ui();if(!gilLive())return;ctx.save();if(dojoMode)ctx.translate(0,15);ctx.fillStyle='#1c1119';ctx.fillRect(16,46,280,67);ctx.fillStyle='#e0c898';ctx.font='bold 12px sans-serif';ctx.textAlign='left';ctx.fillText('DANTE · GILGAMESH',20,64);ctx.font='11px sans-serif';ctx.fillText('Giữ J: charge · Charge J + Nhảy: Dragon',20,84);ctx.fillText(dino.dante.attack?.name||'K Dash K: KICK 13 · Cúi K: SHOCK',20,104);ctx.restore();};})();
+let danteEquipmentClose=null;
+function danteEquipmentPanel(){
+ if(danteEquipmentClose)return;const panel=document.createElement('div');panel.id='dante-equipment-panel';panel.style.cssText='position:absolute;inset:5% 7%;z-index:110;background:#181722f5;color:#eee;border:1px solid #ab6371;border-radius:12px;padding:16px;overflow:auto;font:14px system-ui;touch-action:pan-y;pointer-events:auto';
+ const prev=paused,state=gameState;paused=true;tReleaseAll();const close=()=>{panel.remove();paused=prev;danteEquipmentClose=null;tReleaseAll();};danteEquipmentClose=close;
+ const heading=document.createElement('div');heading.style.cssText='display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#181722;padding:8px;z-index:1';panel.appendChild(heading);
+ const title=document.createElement('b');title.textContent='DANTE · TRANG BỊ RIÊNG';heading.appendChild(title);const exit=document.createElement('button');exit.textContent='Đóng ×';exit.style.cssText='padding:12px;background:#7d3c50;color:white;border:0;border-radius:6px';exit.onclick=close;heading.appendChild(exit);
+ danteVariantOptions(panel);
+ danteGauntletOptions(panel);
+ const foot=document.createElement('p');foot.textContent='Q/E đổi nhóm vũ khí · Thứ tự khởi đầu ở bảng Sắp xếp.';panel.appendChild(foot);
+ for(const type of ['pointerdown','pointerup','click'])panel.addEventListener(type,e=>e.stopPropagation());document.getElementById('stage').appendChild(panel);
+ const watch=()=>{if(!danteEquipmentClose)return;if(!danteOn()||gameState!==state){close();return;}requestAnimationFrame(watch);};requestAnimationFrame(watch);
+}
+(()=>{
+ const menu=drawCustomMenu;drawCustomMenu=function(){menu();if(!danteOn()||runePicker!==null||ammoPicker||ammoXem!==null)return;ctx.save();ctx.fillStyle='#191722';ctx.fillRect(338,235,324,104);ctx.fillStyle='#e0bfc9';ctx.font='bold 13px sans-serif';ctx.textAlign='left';ctx.fillText('TRANG BỊ DANTE',344,252);ctx.fillStyle='#61354b';ctx.fillRect(340,262,320,36);ctx.strokeStyle='#ca8f9f';ctx.strokeRect(340,262,320,36);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText('CHỌN KIẾM / GĂNG TAY ▾',500,285);ctx.font='11px sans-serif';ctx.fillStyle='#d9cbd0';ctx.fillText(DANTE_SWORD_VARIANTS[danteSwordVariant].name+' · '+danteGauntletVariant.toUpperCase(),500,319);
+ ctx.fillStyle='#140f08';ctx.fillRect(320,0,360,39);ctx.fillStyle='#f1b9c8';ctx.font='bold 23px sans-serif';ctx.fillText('CUSTOMIZE DANTE',500,30);
+ if(dino?.dante?.arm===1&&danteGauntletVariant==='gilgamesh'){
+ ctx.fillStyle='#190e14';ctx.fillRect(708,126,262,360);ctx.fillStyle='#e8cba0';ctx.textAlign='left';ctx.font='bold 14px sans-serif';ctx.fillText('GILGAMESH · HEAVY COMBAT',716,146);ctx.font='12px sans-serif';ctx.fillStyle='#eee0df';
+ ctx.save();ctx.translate(743,160);danteGauntletPreview(ctx,'gilgamesh');ctx.restore();
+ apexWrap('GIỮ J · Nạp từng đòn đấm\n0.6s / 1.5s → Nhảy: Thăng long\nK Dash K · Đá liên hoàn\nCúi K · Dập đất',716,296,248,23);
+ }ctx.restore();};
+ canvas.addEventListener('click',e=>{if(gameState!=='custom_menu'||!danteOn()||runePicker!==null||ammoPicker||ammoXem!==null)return;const p=canvasPos(e.clientX,e.clientY);if(p.x>=338&&p.x<=662&&p.y>=235&&p.y<=339){e.preventDefault();e.stopImmediatePropagation();danteEquipmentPanel();}},true);
+ window.addEventListener('keydown',e=>{if(danteEquipmentClose&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();danteEquipmentClose();}},true);
+})();
+
+</script>
+<script>
+const GIL_DRAGON_LAUNCH={beast:{speed:13,height:180},rising:{speed:17,height:300},divine:{speed:22,height:460}};
+(()=>{
+ const hit=gilHit;gilHit=function(n,p,a,index){const launch=GIL_DRAGON_LAUNCH[a.id],before=new Map(a.hit);hit(n,p,a,index);if(!launch)return;
+ for(const [root,pulse] of a.hit){if(pulse!==index||before.get(root)===index||!root._dswControl||!danteControlAllowed(root))continue;const c=root._dswControl;
+ a.launchFloor??=dswFloor(n.x+n.w/2,n.y+n.h);c.air=true;c.hold=false;c.slam=false;c.targetY=a.launchFloor-(root.h||48)-launch.height;c.vy=-launch.speed;c.stun=Math.max(c.stun,a.id==='divine'?42:32);root.dy=c.vy;root.grounded=false;
+ }
+ };
+ const tick=gilTick;gilTick=function(n,p){tick(n,p);const a=p.attack;if(!gilLive()||!a?.gil)return;
+ if(['rising','divine'].includes(a.id)&&a.age===a.wind+1&&!a.dragonLift){a.dragonLift=true;n.dy=a.id==='divine'?-20:-15;n.grounded=false;}
+ if(GIL_DRAGON_LAUNCH[a.id]){p.body._swordTurn=1;p.body._swordLean=-.12-Math.sin(Math.max(0,a.age-a.wind)*.18)*.1;}
+ };
+ function flames(n,a,front){
+ if(!GIL_DRAGON_LAUNCH[a.id]||a.age<a.wind-3||a.age>a.end+5)return;
+ const level=a.id==='divine'?3:a.id==='rising'?2:1,progress=Math.max(0,Math.min(1,(a.age-a.wind+3)/10)),fade=Math.min(1,(a.end+6-a.age)/8),dir=a.dir;
+ const cx=n.x+n.w/2+dir*16,top=n.y-22-level*9,height=75+level*17,phase=a.age*.26;
+ ctx.save();ctx.globalAlpha=Math.max(0,fade)*progress;ctx.lineCap='round';ctx.lineJoin='round';
+ // Two continuous helices, split by depth so the flame winds around the actual body.
+ for(let strand=0;strand<2;strand++)for(let band=0;band<3;band++){
+  ctx.strokeStyle=band===0?'#d6421670':band===1?'#ff9829':'#fff0a7';ctx.lineWidth=(band===0?10+level*2:band===1?5+level:1.8)*(strand===0?1:.5);
+  ctx.beginPath();let active=false;
+  for(let i=0;i<=54;i++){const t=i/54,angle=t*Math.PI*(2+level*.6)-phase+strand*2.2,depth=Math.sin(angle),radius=(12+level*6)*(1-t*.55)*progress,x=cx+Math.cos(angle)*radius,y=top+height*(1-t);
+   if((depth>=0)!==front){active=false;continue;}if(active)ctx.lineTo(x,y);else{ctx.moveTo(x,y);active=true;}}
+  ctx.stroke();
+ }
+ if(front){for(let i=0;i<3;i++){const x=cx+Math.sin(phase+i*2)*10,y=top+12+i*14;ctx.fillStyle=i===0?'#ffe5a1':'#ff8a27';ctx.beginPath();ctx.moveTo(x-5,y+17);ctx.quadraticCurveTo(x+12,y+4,x+Math.sin(phase)*8,y-19);ctx.quadraticCurveTo(x-7,y-2,x-5,y+17);ctx.fill();}}
+ for(let i=0;i<6+level*2;i++){const t=((a.age*.025+i*.113)%1),ang=i*2.4+phase;ctx.fillStyle=i%2?'#ffd97c':'#ff7129';ctx.beginPath();ctx.ellipse(cx+Math.cos(ang)*(15+level*7),top+height*(1-t),1.5,3.5,-.3,0,Math.PI*2);if((Math.sin(ang)>=0)===front)ctx.fill();}
+ ctx.restore();
+ }
+ const draw=gilDraw;gilDraw=function(n){const a=n.dante?.attack;if(a?.gil)flames(n,a,false);draw(n);if(a?.gil)flames(n,a,true);};
+})();
+function danteGauntletPreview(g,v){
+ const bal=v==='balrog';g.save();g.translate(90,48);g.rotate(-.25);
+ const poly=(pts,fill)=>{g.beginPath();pts.forEach((p,i)=>i?g.lineTo(...p):g.moveTo(...p));g.closePath();g.fillStyle=fill;g.fill();g.strokeStyle='#161822';g.lineWidth=2;g.stroke();};
+ for(const side of [-1,1]){g.save();g.translate(side*40,side*6);g.rotate(side*.35);
+ poly([[-20,-24],[16,-26],[25,-9],[23,14],[15,26],[-18,24],[-26,4]],bal?'#612019':'#393d4b');
+ poly([[-19,-19],[11,-21],[17,-5],[10,11],[-17,10],[-22,0]],bal?'#c84420':'#8a909e');
+ poly([[-20,12],[17,12],[19,23],[-18,24]],bal?'#ef8a2c':'#c3c6cd');
+ for(let i=0;i<3;i++){poly([[-18+i*12,-22],[-16+i*12,-40],[-8+i*12,-23]],bal?'#f7a635':'#baa984');}
+ g.fillStyle=bal?'#ffbc48':'#ead49e';for(let i=0;i<3;i++)g.fillRect(-14+i*10,-11,4,18);
+ g.strokeStyle=bal?'#ff582c':'#eee2b8';g.lineWidth=2;g.beginPath();g.moveTo(-19,15);g.lineTo(15,15);g.stroke();g.restore();}
+ g.restore();
+}
+function danteEquipmentCards(panel,items,selected,choose){
+ const row=document.createElement('div');row.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin:10px 0 16px';panel.appendChild(row);const cards=[];
+ const refresh=()=>{for(const [id,b] of cards){const on=selected()===id;b.style.borderColor=on?'#edcb8e':'#574956';b.style.background=on?'#49303b':'#24212c';b.setAttribute('aria-pressed',String(on));}};
+ for(const item of items){const card=document.createElement('button');card.style.cssText='min-width:0;padding:10px;color:#eee;border:2px solid;border-radius:10px;touch-action:manipulation;text-align:center';
+ const c=document.createElement('canvas');c.width=180;c.height=105;c.style.cssText='display:block;width:100%;max-width:220px;height:auto;margin:auto';item.paint(c.getContext('2d'));card.appendChild(c);
+ const title=document.createElement('div');title.textContent=item.name;title.style.cssText='font-weight:700;font-size:13px;margin:6px 0';card.appendChild(title);
+ const desc=document.createElement('div');desc.textContent=item.desc;desc.style.cssText='font-size:12px;line-height:1.45;color:#d1c6cc';card.appendChild(desc);
+ card.onclick=()=>{choose(item.id);refresh();};cards.push([item.id,card]);row.appendChild(card);}
+ refresh();
+}
+danteVariantOptions=function(panel){const label=document.createElement('p');label.textContent='KIẾM';panel.appendChild(label);const desc={dsd:'Sword Formation · Kiếm ảo hỗ trợ',rebellion:'Combo nối dài · Crazy Dance',sparda:'Biến hình kiếm / hái / giáo'};
+ danteEquipmentCards(panel,Object.entries(DANTE_SWORD_VARIANTS).map(([id,info])=>({id,name:info.name,desc:desc[id],paint:g=>{g.save();g.translate(30,57);g.rotate(-.18);danteVariantBlade(g,id,'sword',135);g.restore();}})),()=>danteSwordVariant,danteVariantSelect);
+};
+function danteGauntletOptions(panel){const label=document.createElement('p');label.textContent='GĂNG TAY';panel.appendChild(label);danteEquipmentCards(panel,[{id:'balrog',name:'BALROG',desc:'Đấm đá tốc độ · Ignition',paint:g=>danteGauntletPreview(g,'balrog')},{id:'gilgamesh',name:'GILGAMESH',desc:'Charge trọng quyền · Thăng long',paint:g=>danteGauntletPreview(g,'gilgamesh')}],()=>danteGauntletVariant,gilSelect);}
 
 </script>
 </body>
